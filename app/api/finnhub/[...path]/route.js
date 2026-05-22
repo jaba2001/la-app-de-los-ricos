@@ -1,3 +1,5 @@
+import { requireUser } from '../../../../lib/auth.js';
+
 export const runtime = 'edge';
 
 const ALLOWED = new Set([
@@ -10,6 +12,7 @@ const ALLOWED = new Set([
 ]);
 
 export async function GET(request, { params }) {
+  const { error: authErr } = await requireUser(request); if (authErr) return authErr;
   const path = params.path.join('/');
   if (![...ALLOWED].some(p => path === p || path.startsWith(p + '/'))) {
     return new Response(JSON.stringify({error:'Endpoint not allowed', path}), {status:403, headers:{'Content-Type':'application/json'}});
