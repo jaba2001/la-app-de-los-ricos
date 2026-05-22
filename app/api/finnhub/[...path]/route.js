@@ -14,7 +14,7 @@ const ALLOWED = new Set([
 
 export async function GET(request, { params }) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('finnhub', user.id, 10, 60); if (rl) return rl;
+  const rl = await checkRateLimit('finnhub', user.id, 30, 60); if (rl) return rl;
   const path = params.path.join('/');
   if (![...ALLOWED].some(p => path === p || path.startsWith(p + '/'))) {
     return new Response(JSON.stringify({error:'Endpoint not allowed', path}), {status:403, headers:{'Content-Type':'application/json'}});
