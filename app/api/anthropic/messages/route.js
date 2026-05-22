@@ -1,4 +1,5 @@
 import { requireUser } from '../../../../lib/auth.js';
+import { checkRateLimit } from '../../../../lib/ratelimit.js';
 
 export const runtime = 'edge';
 
@@ -11,7 +12,8 @@ const ALLOWED_MODELS = new Set([
 const MAX_BODY_BYTES = 50 * 1024; // 50 KB
 
 export async function POST(request) {
-  const { error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const rl = await checkRateLimit('anthropic', user.id, 5, 60); if (rl) return rl;
   if (!process.env.ANTHROPIC_KEY) {
     return new Response(JSON.stringify({error:'Server misconfigured: ANTHROPIC_KEY missing'}), {status:500, headers:{'Content-Type':'application/json'}});
   }

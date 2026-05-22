@@ -1,4 +1,5 @@
 import { requireUser } from '../../../../lib/auth.js';
+import { checkRateLimit } from '../../../../lib/ratelimit.js';
 
 export const runtime = 'edge';
 
@@ -12,7 +13,8 @@ const ALLOWED = new Set([
 ]);
 
 export async function GET(request, { params }) {
-  const { error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const rl = await checkRateLimit('finnhub', user.id, 10, 60); if (rl) return rl;
   const path = params.path.join('/');
   if (![...ALLOWED].some(p => path === p || path.startsWith(p + '/'))) {
     return new Response(JSON.stringify({error:'Endpoint not allowed', path}), {status:403, headers:{'Content-Type':'application/json'}});

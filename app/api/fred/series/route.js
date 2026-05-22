@@ -1,11 +1,13 @@
 import { requireUser } from '../../../../lib/auth.js';
+import { checkRateLimit } from '../../../../lib/ratelimit.js';
 
 export const runtime = 'edge';
 
 const VALID_SERIES = /^[A-Z0-9_]{2,30}$/;
 
 export async function GET(request) {
-  const { error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const rl = await checkRateLimit('fred', user.id, 10, 60); if (rl) return rl;
   const url = new URL(request.url);
   const seriesId = url.searchParams.get('series_id');
 
