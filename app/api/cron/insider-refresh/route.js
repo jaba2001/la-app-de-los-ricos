@@ -1,5 +1,9 @@
-export const runtime = 'edge';
+// Node runtime (not Edge): OpenInsider drops Vercel Edge fetches
+// ("Network connection lost"). Node's fetch with full browser headers
+// negotiates the TLS handshake the way the site expects.
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 export async function GET(request) {
   if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`)
@@ -9,8 +13,18 @@ export async function GET(request) {
   try {
     const res = await fetch(
       'https://openinsider.com/screener?s=&o=&pl=&ph=&ll=&lh=&fd=730&xp=1&sic1=-1&sicl=100&sich=9999&grp=0&sortcol=11&cnt=50&page=1',
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; IC-Suite/2.0)' } }
+      {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          'Accept':
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache',
+        },
+      }
     );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     html = await res.text();
   } catch (e) {
     return new Response(JSON.stringify({ error: 'scrape failed: ' + e.message }), {
@@ -61,8 +75,14 @@ export async function GET(request) {
     }
   );
 
+  const sbBody = sbResp.ok ? undefined : await sbResp.text();
+
   return new Response(
-    JSON.stringify({ scraped: rows.length, supabase_status: sbResp.status }),
+    JSON.stringify({
+      scraped: rows.length,
+      supabase_status: sbResp.status,
+      supabase_error: sbBody,
+    }),
     { headers: { 'Content-Type': 'application/json' } }
   );
 }

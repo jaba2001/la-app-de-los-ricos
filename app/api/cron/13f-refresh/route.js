@@ -67,6 +67,24 @@ export async function GET(request) {
     }
   }
 
+  // Aggregate duplicate (fund_cik, filing_date, ticker) keys BEFORE upsert.
+  // A fund can hold the same issuer across multiple infoTable rows (share
+  // classes / lots / put-call). PostgREST ON CONFLICT rejects a batch that
+  // touches the same key twice ("command cannot affect row a second time"),
+  // so we collapse them by summing shares + market value.
+  const byKey = new Map();
+  for (const r of allRows) {
+    const k = `${r.fund_cik}|${r.filing_date}|${r.ticker}`;
+    const prev = byKey.get(k);
+    if (prev) {
+      prev.shares_held += r.shares_held;
+      prev.market_value_usd += r.market_value_usd;
+    } else {
+      byKey.set(k, { ...r });
+    }
+  }
+  const deduped = [...byKey.values()];
+
   // Upsert to Supabase using service role (bypasses RLS)
   const sbResp = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/smart_money_13f?on_conflict=fund_cik,filing_date,ticker`,
@@ -78,14 +96,18 @@ export async function GET(request) {
         'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         'Prefer': 'resolution=merge-duplicates',
       },
-      body: JSON.stringify(allRows),
+      body: JSON.stringify(deduped),
     }
   );
 
+  const sbBody = sbResp.ok ? undefined : await sbResp.text();
+
   return new Response(
     JSON.stringify({
-      inserted: allRows.length,
+      parsed: allRows.length,
+      inserted: deduped.length,
       supabase_status: sbResp.status,
+      supabase_error: sbBody,
       errors: errors.length ? errors : undefined,
     }),
     { headers: { 'Content-Type': 'application/json' } }
