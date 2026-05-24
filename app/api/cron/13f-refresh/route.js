@@ -49,7 +49,10 @@ export async function GET(request) {
       while ((m = re.exec(infoXml)) !== null) {
         const nameOfIssuer = get(m[1], 'nameOfIssuer').trim();
         const shares = parseInt(get(m[1], 'sshPrnamt') || '0', 10);
-        const value = parseFloat(get(m[1], 'value') || '0') * 1000; // reported in thousands
+        // SEC 13F value field is in WHOLE DOLLARS for filings on/after
+        // 2023-01-03 (pre-2023 was thousands). All current funds file in
+        // whole dollars, so no *1000 scaling.
+        const value = parseFloat(get(m[1], 'value') || '0');
         if (!nameOfIssuer || !shares) continue;
         allRows.push({
           fund_cik: fund.cik,
