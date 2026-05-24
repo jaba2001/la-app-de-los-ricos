@@ -1,6 +1,8 @@
-// Node runtime (not Edge): OpenInsider drops Vercel Edge fetches
-// ("Network connection lost"). Node's fetch with full browser headers
-// negotiates the TLS handshake the way the site expects.
+// Insider top-buyers leaderboard.
+// OpenInsider blocks Vercel datacenter IPs (both Edge and Node fetches fail),
+// so we build the market-wide leaderboard from FMP's stable API instead
+// (insider-trading/latest = recent Form 4s across all issuers). FMP_KEY is
+// already configured in this project's Vercel env for the /api/fmp proxy.
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -9,57 +11,68 @@ export async function GET(request) {
   if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`)
     return new Response('Unauthorized', { status: 401 });
 
-  let html = '';
+  if (!process.env.FMP_KEY)
+    return new Response(JSON.stringify({ error: 'FMP_KEY missing' }), {
+      status: 500, headers: { 'Content-Type': 'application/json' },
+    });
+
+  // symbol -> { usd, insiders:Set }
+  const agg = new Map();
+  let pagesFetched = 0;
+  let fmpError = null;
+
   try {
-    const res = await fetch(
-      'https://openinsider.com/screener?s=&o=&pl=&ph=&ll=&lh=&fd=730&xp=1&sic1=-1&sicl=100&sich=9999&grp=0&sortcol=11&cnt=50&page=1',
-      {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-          'Accept':
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Cache-Control': 'no-cache',
-        },
+    for (let page = 0; page < 8; page++) {
+      const u = `https://financialmodelingprep.com/stable/insider-trading/latest?page=${page}&limit=100&apikey=${process.env.FMP_KEY}`;
+      const r = await fetch(u, { headers: { Accept: 'application/json' } });
+      if (!r.ok) { fmpError = 'FMP HTTP ' + r.status; break; }
+      const data = await r.json();
+      if (!Array.isArray(data) || data.length === 0) break;
+      pagesFetched++;
+      for (const t of data) {
+        // open-market purchases only: acquisition (A) + Purchase code
+        const isBuy =
+          t.acquisitionOrDisposition === 'A' &&
+          /purchase|p-purchase/i.test(t.transactionType || '');
+        if (!isBuy) continue;
+        const sym = (t.symbol || '').toUpperCase();
+        if (!/^[A-Z.\-]{1,6}$/.test(sym)) continue;
+        const shares = Number(t.securitiesTransacted) || 0;
+        const price = Number(t.price) || 0;
+        const usd = shares * price;
+        if (usd <= 0) continue;
+        const e = agg.get(sym) || { usd: 0, insiders: new Set() };
+        e.usd += usd;
+        if (t.reportingName) e.insiders.add(t.reportingName);
+        agg.set(sym, e);
       }
-    );
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    html = await res.text();
+    }
   } catch (e) {
-    return new Response(JSON.stringify({ error: 'scrape failed: ' + e.message }), {
-      status: 502,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    fmpError = e.message;
   }
 
-  const rowRe = /<tr[^>]*>([\s\S]*?)<\/tr>/g;
-  const cellRe = /<td[^>]*>([\s\S]*?)<\/td>/g;
-  const rows = [];
-  let m, rank = 0;
-
-  while ((m = rowRe.exec(html)) !== null) {
-    const cells = [];
-    let mc;
-    while ((mc = cellRe.exec(m[1])) !== null)
-      cells.push(mc[1].replace(/<[^>]+>/g, '').trim());
-    if (cells.length < 8) continue;
-    const ticker = cells[3];
-    if (!/^[A-Z.\-]{1,6}$/.test(ticker)) continue;
-    const value = parseFloat((cells[cells.length - 2] || '').replace(/[\$,]/g, '')) || 0;
-    if (value <= 0) continue;
-    rank++;
-    rows.push({
-      month: new Date().toISOString().slice(0, 7) + '-01',
-      rank,
-      ticker,
-      sector: null,
-      net_insider_buying_usd: value,
-      num_insiders: 1,
-      score: Math.min(100, Math.log10(value) * 20),
-    });
-    if (rank >= 50) break;
+  if (agg.size === 0) {
+    return new Response(
+      JSON.stringify({ error: 'no insider buys parsed', fmp_error: fmpError, pagesFetched }),
+      { status: 502, headers: { 'Content-Type': 'application/json' } }
+    );
   }
+
+  const ranked = [...agg.entries()]
+    .map(([ticker, v]) => ({ ticker, usd: v.usd, num_insiders: v.insiders.size }))
+    .sort((a, b) => b.usd - a.usd)
+    .slice(0, 50);
+
+  const month = new Date().toISOString().slice(0, 7) + '-01';
+  const rows = ranked.map((r, i) => ({
+    month,
+    rank: i + 1,
+    ticker: r.ticker,
+    sector: null,
+    net_insider_buying_usd: r.usd,
+    num_insiders: r.num_insiders,
+    score: Math.min(100, Math.log10(r.usd) * 20),
+  }));
 
   const sbResp = await fetch(
     `${process.env.SUPABASE_URL}/rest/v1/smart_money_top_buyers?on_conflict=month,rank`,
@@ -74,14 +87,16 @@ export async function GET(request) {
       body: JSON.stringify(rows),
     }
   );
-
   const sbBody = sbResp.ok ? undefined : await sbResp.text();
 
   return new Response(
     JSON.stringify({
+      source: 'fmp',
+      pagesFetched,
       scraped: rows.length,
       supabase_status: sbResp.status,
       supabase_error: sbBody,
+      fmp_error: fmpError,
     }),
     { headers: { 'Content-Type': 'application/json' } }
   );
