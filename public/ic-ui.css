@@ -1,0 +1,131 @@
+/*
+ * ic-ui.css — Finance AI Design System
+ * Tokens canónicos compartidos: IC DataLayer + StockLens
+ * Versión: 1.0  |  Fecha: 2026-05-26
+ *
+ * Uso:
+ *   <link rel="stylesheet" href="https://ic-proxy-psi.vercel.app/ic-ui.css">
+ *
+ * Convención: migrar inline-styles a var(--token) de forma gradual.
+ * Los valores literales en los comentarios son los originales pre-kit.
+ *
+ * Decisiones adoptadas en v1.0 (resuelve inconsistencias del audit):
+ *   1. Accent principal de acción  → --accent-action: #3B82F6  (azul, no verde)
+ *   2. text.primary                → --text-primary: #e5e7eb   (no #fff)
+ *   3. Radios de card              → --radius-card: 12px        (normalizado entre 8 y 14)
+ *   4. Iconos                      → decisión pendiente (no afecta CSS)
+ */
+
+:root {
+
+  /* ─────────────────────────────────────────────
+   * FONDOS  (dark theme)
+   * ───────────────────────────────────────────── */
+  --bg-app:        #0a0e1a;   /* fondo de página */
+  --bg-card:       #181c25;   /* cards / paneles principales */
+  --bg-card-inner: #1f2937;   /* elementos anidados: badges, filas internas */
+  --bg-input:      #111827;   /* inputs, selects */
+  --bg-hover:      #242937;   /* fila hovered en tablas */
+
+  /* ─────────────────────────────────────────────
+   * TEXTO
+   * ───────────────────────────────────────────── */
+  --text-primary:   #e5e7eb;  /* texto principal, headers de card  [era #fff en algunos sitios] */
+  --text-secondary: #9ca3af;  /* texto secundario / etiquetas */
+  --text-muted:     #6b7280;  /* texto desactivado / estado vacío */
+  --text-inverse:   #0a0e1a;  /* texto sobre fondos claros / botones de color */
+
+  /* ─────────────────────────────────────────────
+   * BORDES
+   * ───────────────────────────────────────────── */
+  --border-subtle:  #262b36;  /* borde estándar de cards y separadores */
+  --border-focus:   #3B82F6;  /* borde de input enfocado */
+
+  /* ─────────────────────────────────────────────
+   * ACENTOS — ESTADOS SEMÁNTICOS
+   * ───────────────────────────────────────────── */
+  --accent-success:  #10B981;  /* verde: OK, valores positivos, botón secundario */
+  --accent-positive: #22c55e;  /* verde alt: deltas positivos en tablas */
+  --accent-warn:     #f59e0b;  /* ámbar: warning, aceleración */
+  --accent-danger:   #ef4444;  /* rojo: error, deltas negativos, credit_blowout */
+  --accent-info:     #60a5fa;  /* azul claro: informativo neutro */
+
+  /* ─────────────────────────────────────────────
+   * ACENTOS — DOMINIO (IC DataLayer)
+   * ───────────────────────────────────────────── */
+  --accent-action:    #3B82F6;  /* acción primaria (botones, links activos)  [resuelve inconsistencia #1] */
+  --accent-dashboard: #3B82F6;  /* tab Dashboard */
+  --accent-macro:     #10B981;  /* tab Macro */
+  --accent-markets:   #F59E0B;  /* tab Markets */
+  --accent-synthesis: #7C3AED;  /* "LIVE SYNTHESIS" label, IC Brief */
+  --accent-macro-alt: #8B5CF6;  /* variante macro / purple */
+
+  /* ─────────────────────────────────────────────
+   * RADIOS
+   * ───────────────────────────────────────────── */
+  --radius-card:   12px;  /* cards principales  [normalizado: era 8 o 14 según card] */
+  --radius-button:  8px;  /* botones, inputs, badges medianos */
+  --radius-chip:    6px;  /* chips / etiquetas pequeñas */
+  --radius-pill:   20px;  /* pills redondeadas (status indicators) */
+
+  /* ─────────────────────────────────────────────
+   * TIPOGRAFÍA
+   * ───────────────────────────────────────────── */
+  --font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+
+  --font-size-caption: 10px;  /* captions muted */
+  --font-size-micro:   11px;  /* micro labels */
+  --font-size-sm:      12px;  /* body small, badges */
+  --font-size-body:    13px;  /* body estándar */
+  --font-size-h3:      15px;  /* headers de card */
+  --font-size-h2:      18px;  /* headers de sección */
+  --font-size-h1:      22px;  /* headers grandes */
+
+  --font-weight-regular: 400;
+  --font-weight-medium:  500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:    700;
+
+  --line-height-tight:  1.2;
+  --line-height-normal: 1.5;
+
+  /* ─────────────────────────────────────────────
+   * SPACING
+   * ───────────────────────────────────────────── */
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  12px;
+  --space-4:  14px;   /* padding interno de card */
+  --space-5:  16px;   /* padding entre secciones */
+  --space-6:  20px;
+  --space-8:  24px;
+
+  --gap-sm:    8px;   /* gap entre filas/columnas pequeño */
+  --gap-md:   12px;   /* gap estándar */
+  --gap-lg:   16px;   /* gap grande */
+
+  --card-margin-bottom: 10px;  /* margen inferior entre cards */
+
+  /* ─────────────────────────────────────────────
+   * SOMBRAS
+   * ───────────────────────────────────────────── */
+  --shadow-card:  0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.6);
+
+  /* ─────────────────────────────────────────────
+   * TRANSICIONES
+   * ───────────────────────────────────────────── */
+  --transition-fast:   120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow:   300ms ease;
+
+  /* ─────────────────────────────────────────────
+   * Z-INDEX
+   * ───────────────────────────────────────────── */
+  --z-base:    1;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-modal:    300;
+  --z-toast:    400;
+
+}

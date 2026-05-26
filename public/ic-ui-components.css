@@ -1,0 +1,351 @@
+/*
+ * ic-ui-components.css — Finance AI Component Library
+ * Clases de componentes base que usan los tokens de ic-ui.css
+ * Versión: 1.0  |  Fecha: 2026-05-26
+ *
+ * REQUIERE: ic-ui.css cargado antes
+ *
+ * Uso en HTML:
+ *   <link rel="stylesheet" href="https://ic-proxy-psi.vercel.app/ic-ui.css">
+ *   <link rel="stylesheet" href="https://ic-proxy-psi.vercel.app/ic-ui-components.css">
+ *
+ * Uso en inline-style migration (React):
+ *   Reemplazar objetos style={...} por className="ic-card" etc.
+ *   — O seguir usando inline-styles con los valores literales del token. —
+ */
+
+/* ═══════════════════════════════════════════════════
+ * BASE
+ * ═══════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body.ic-app {
+  background: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+ * CARD
+ * ═══════════════════════════════════════════════════ */
+
+.ic-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  margin-bottom: var(--card-margin-bottom);
+  box-shadow: var(--shadow-card);
+}
+
+.ic-card--flat {
+  box-shadow: none;
+}
+
+.ic-card--inner {
+  background: var(--bg-card-inner);
+  border-radius: var(--radius-button);
+  padding: var(--space-3);
+}
+
+.ic-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-md);
+}
+
+.ic-card__title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.ic-card__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+ * BOTONES
+ * ═══════════════════════════════════════════════════ */
+
+.ic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: none;
+  border-radius: var(--radius-button);
+  padding: 6px 12px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: opacity var(--transition-fast), background var(--transition-fast);
+  white-space: nowrap;
+}
+
+.ic-btn:disabled {
+  background: #374151 !important;
+  color: var(--text-muted) !important;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Primario — acción principal */
+.ic-btn--primary {
+  background: var(--accent-action);
+  color: #fff;
+}
+.ic-btn--primary:hover {
+  opacity: 0.88;
+}
+
+/* Success — confirmar / positivo */
+.ic-btn--success {
+  background: var(--accent-success);
+  color: #fff;
+}
+.ic-btn--success:hover {
+  opacity: 0.88;
+}
+
+/* Ghost — acción secundaria */
+.ic-btn--ghost {
+  background: var(--bg-card-inner);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+.ic-btn--ghost:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-action);
+}
+
+/* Danger */
+.ic-btn--danger {
+  background: var(--accent-danger);
+  color: #fff;
+}
+.ic-btn--danger:hover {
+  opacity: 0.88;
+}
+
+/* Tamaños */
+.ic-btn--sm {
+  padding: 4px 8px;
+  font-size: var(--font-size-micro);
+  border-radius: var(--radius-chip);
+}
+
+.ic-btn--lg {
+  padding: 10px 20px;
+  font-size: var(--font-size-body);
+}
+
+/* ═══════════════════════════════════════════════════
+ * BADGES / CHIPS / PILLS
+ * ═══════════════════════════════════════════════════ */
+
+.ic-badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-card-inner);
+  color: var(--text-secondary);
+  border-radius: var(--radius-chip);
+  padding: 2px 8px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.ic-badge--success  { background: rgba(16, 185, 129, 0.15); color: var(--accent-success); }
+.ic-badge--warn     { background: rgba(245, 158, 11, 0.15);  color: var(--accent-warn); }
+.ic-badge--danger   { background: rgba(239, 68,  68, 0.15);  color: var(--accent-danger); }
+.ic-badge--info     { background: rgba(59, 130, 246, 0.15);  color: var(--accent-action); }
+.ic-badge--synthesis{ background: rgba(124, 58, 237, 0.15);  color: var(--accent-synthesis); }
+
+.ic-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.ic-pill--live {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-success);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.ic-pill--live::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-success);
+  display: inline-block;
+  animation: ic-pulse 2s infinite;
+}
+
+@keyframes ic-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ═══════════════════════════════════════════════════
+ * TIPOGRAFÍA
+ * ═══════════════════════════════════════════════════ */
+
+.ic-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ic-value {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ic-value--positive { color: var(--accent-positive); }
+.ic-value--negative { color: var(--accent-danger); }
+.ic-value--warn     { color: var(--accent-warn); }
+.ic-value--muted    { color: var(--text-muted); }
+
+.ic-caption {
+  font-size: var(--font-size-caption);
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════
+ * SEPARADOR
+ * ═══════════════════════════════════════════════════ */
+
+.ic-divider {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: var(--gap-md) 0;
+}
+
+/* ═══════════════════════════════════════════════════
+ * INPUTS
+ * ═══════════════════════════════════════════════════ */
+
+.ic-input {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  padding: 6px 10px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  width: 100%;
+}
+
+.ic-input:focus {
+  border-color: var(--border-focus);
+}
+
+.ic-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ═══════════════════════════════════════════════════
+ * TABLA
+ * ═══════════════════════════════════════════════════ */
+
+.ic-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.ic-table th {
+  color: var(--text-muted);
+  font-weight: var(--font-weight-medium);
+  text-align: left;
+  padding: var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+  text-transform: uppercase;
+  font-size: var(--font-size-micro);
+  letter-spacing: 0.04em;
+}
+
+.ic-table td {
+  color: var(--text-primary);
+  padding: 6px var(--space-2);
+  border-bottom: 1px solid rgba(38, 43, 54, 0.5);
+  font-variant-numeric: tabular-nums;
+}
+
+.ic-table tr:hover td {
+  background: var(--bg-hover);
+}
+
+/* ═══════════════════════════════════════════════════
+ * TABS
+ * ═══════════════════════════════════════════════════ */
+
+.ic-tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--gap-lg);
+}
+
+.ic-tab {
+  padding: 8px 14px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.ic-tab:hover {
+  color: var(--text-primary);
+}
+
+.ic-tab--active {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-action);
+}
+
+/* ═══════════════════════════════════════════════════
+ * UTILIDADES
+ * ═══════════════════════════════════════════════════ */
+
+.ic-flex         { display: flex; align-items: center; }
+.ic-flex-between { display: flex; align-items: center; justify-content: space-between; }
+.ic-flex-center  { display: flex; align-items: center; justify-content: center; }
+.ic-flex-col     { display: flex; flex-direction: column; }
+.ic-gap-sm       { gap: var(--gap-sm); }
+.ic-gap-md       { gap: var(--gap-md); }
+.ic-gap-lg       { gap: var(--gap-lg); }
+
+.ic-text-right   { text-align: right; }
+.ic-text-center  { text-align: center; }
+.ic-truncate     { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ic-mono         { font-variant-numeric: tabular-nums; }
