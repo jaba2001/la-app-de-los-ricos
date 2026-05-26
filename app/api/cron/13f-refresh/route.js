@@ -29,14 +29,14 @@ async function fetchInfoTableXml(cikInt, accNo) {
     });
     for (const name of names) {
       const xml = await fetch(`${base}/${name}`, { headers }).then(r => r.text());
-      if (/<infoTable>/i.test(xml)) return xml;
+      if (/<(?:\w+:)?infoTable>/i.test(xml)) return xml;
     }
   } catch {}
   // Fallback: known fixed names.
   for (const name of ['infotable.xml', 'form13fInfoTable.xml']) {
     try {
       const xml = await fetch(`${base}/${name}`, { headers }).then(r => r.text());
-      if (/<infoTable>/i.test(xml)) return xml;
+      if (/<(?:\w+:)?infoTable>/i.test(xml)) return xml;
     } catch {}
   }
   return '';
@@ -73,30 +73,44 @@ export async function GET(request) {
       const infoXml = await fetchInfoTableXml(cikInt, accNo);
       if (!infoXml) { errors.push(`${fund.name}: infotable not found`); continue; }
 
-      // Parse <infoTable> blocks
-      const re = /<infoTable>([\s\S]*?)<\/infoTable>/g;
-      const get = (block, tag) => (new RegExp(`<${tag}>([^<]+)</${tag}>`).exec(block) || [])[1] || '';
+      // Parse <infoTable> blocks (tolerate namespace prefixes like <ns1:infoTable>
+      // — Bridgewater filings use them and we'd get 0 rows without this).
+      const re = /<(?:\w+:)?infoTable>([\s\S]*?)<\/(?:\w+:)?infoTable>/g;
+      const get = (block, tag) => (new RegExp(`<(?:\\w+:)?${tag}>([^<]+)</(?:\\w+:)?${tag}>`).exec(block) || [])[1] || '';
+      // Aggregate per-issuer WITHIN this fund (collapses multiple share-class /
+      // lot rows for the same name), then keep TOP 25 by market value.
+      // Why: RenTech alone has 3,200+ micro-positions that drown out the
+      // conviction signal; we want each fund's top bets, not their whole book.
+      const byIssuer = new Map();
       let m;
       while ((m = re.exec(infoXml)) !== null) {
         const nameOfIssuer = get(m[1], 'nameOfIssuer').trim();
         const shares = parseInt(get(m[1], 'sshPrnamt') || '0', 10);
-        // SEC 13F value field is in WHOLE DOLLARS for filings on/after
-        // 2023-01-03 (pre-2023 was thousands). All current funds file in
-        // whole dollars, so no *1000 scaling.
+        // SEC 13F value field is WHOLE DOLLARS post-2023 (no *1000).
         const value = parseFloat(get(m[1], 'value') || '0');
         if (!nameOfIssuer || !shares) continue;
-        allRows.push({
-          fund_cik: fund.cik,
-          fund_name: fund.name,
-          filing_date: filingDate,
-          ticker: nameOfIssuer,   // full nameOfIssuer — no CUSIP→ticker map needed for MVP
-          shares_held: shares,
-          market_value_usd: value,
-          delta_vs_prior_q: null,
-          action: 'HOLD',
-        });
+        const ex = byIssuer.get(nameOfIssuer);
+        if (ex) {
+          ex.shares_held += shares;
+          ex.market_value_usd += value;
+        } else {
+          byIssuer.set(nameOfIssuer, {
+            fund_cik: fund.cik,
+            fund_name: fund.name,
+            filing_date: filingDate,
+            ticker: nameOfIssuer,
+            shares_held: shares,
+            market_value_usd: value,
+            delta_vs_prior_q: null,
+            action: 'HOLD',
+          });
+        }
       }
-      fundCounts[fund.name] = allRows.length - startLen;
+      const top = [...byIssuer.values()]
+        .sort((a, b) => b.market_value_usd - a.market_value_usd)
+        .slice(0, 25);
+      for (const row of top) allRows.push(row);
+      fundCounts[fund.name] = top.length;
     } catch (e) {
       errors.push(`${fund.name}: ${e.message}`);
     }
