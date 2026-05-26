@@ -1,5 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/13f-refresh", "schedule": "0 12 15 * *" }
+    { "path": "/api/cron/13f-refresh",   "schedule": "0 12 15 * *" },
+    { "path": "/api/cron/alerts-check",  "schedule": "0 13 * * *" }
   ]
 }
