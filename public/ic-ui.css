@@ -128,4 +128,18 @@
   --z-modal:    300;
   --z-toast:    400;
 
+  /* ─────────────────────────────────────────────
+   * SIGNAL COLORS — IC Brief composites
+   * ───────────────────────────────────────────── */
+  --color-lcc: #06B6D4;   /* Liquidity Cycle Composite — cyan */
+  --color-csc: #FF6B35;   /* Credit Stress Composite — orange-red */
+  --color-rpc: #EF4444;   /* Recession Probability — rojo (= accent-danger) */
+  --color-grc: #F59E0B;   /* Geopolitical Risk — ámbar (= accent-warn) */
+  --color-hsc: #8B5CF6;   /* Housing Stress Composite — púrpura */
+
+  --color-regime-moderado:    #F59E0B;
+  --color-regime-restrictivo: #F97316;
+  --color-regime-crisis:      #EF4444;  /* = accent-danger */
+  --color-regime-expansivo:   #22c55e;  /* = accent-positive */
+
 }
