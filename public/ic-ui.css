@@ -1,184 +1,205 @@
 /*
- * ic-ui.css — Finance AI Design System
+ * ic-ui.css — Finance AI Design System · "INSTRUMENT" (dirección C)
  * Tokens canónicos compartidos: IC DataLayer + StockLens
- * Versión: 1.0  |  Fecha: 2026-05-26
+ * Versión: 2.0 (rediseño Instrument)  |  Fecha base: 2026-05-26 · skin: 2026-06-13
  *
  * Uso:
  *   <link rel="stylesheet" href="https://ic-proxy-psi.vercel.app/ic-ui.css">
  *
- * Convención: migrar inline-styles a var(--token) de forma gradual.
- * Los valores literales en los comentarios son los originales pre-kit.
+ * ARQUITECTURA (v2.0):
+ *   · Los tokens canónicos son los `--ic-*` de Instrument (fuente única).
+ *   · Mis nombres históricos (`--bg-app`, `--text-primary`, `--accent-*`, `--radius-*`,
+ *     `--shadow-*`, `--font-family`) se conservan como ALIAS → `var(--ic-*)`, para no
+ *     renombrar a los ~777 consumidores de IC DataLayer ni la component-lib.
+ *   · `:root` = modo OSCURO (default de la app). `.ic-theme-light` = override claro:
+ *     solo redefine los `--ic-*`; los alias se voltean solos (var() resuelve en uso).
+ *   · Fallback inline (en index.html de cada app) DEBE reflejar este archivo.
  *
- * Decisiones adoptadas en v1.0 (resuelve inconsistencias del audit):
- *   1. Accent principal de acción  → --accent-action: #3B82F6  (azul, no verde)
- *   2. text.primary                → --text-primary: #e5e7eb   (no #fff)
- *   3. Radios de card              → --radius-card: 12px        (normalizado entre 8 y 14)
- *   4. Iconos                      → decisión pendiente (no afecta CSS)
+ * COLORES SEMÁNTICOS DE DATOS — significado fijo:
+ *   pos = sano / bull · warn = aviso / transición · neg = riesgo / bear
+ *   El acento índigo (--ic-accent) es SOLO UI (links, activos, focus, botón primario).
  */
 
 :root {
 
-  /* ─────────────────────────────────────────────
-   * FONDOS  (dark theme)
-   * ───────────────────────────────────────────── */
-  --bg-app:        #0a0e1a;   /* fondo de página */
-  --bg-card:       #181c25;   /* cards / paneles principales */
-  --bg-card-inner: #1f2937;   /* elementos anidados: badges, filas internas */
-  --bg-input:      #111827;   /* inputs, selects */
-  --bg-hover:      #242937;   /* fila hovered en tablas */
+  /* ═════════════════════════════════════════════════════════════════════════
+   * INSTRUMENT — TOKENS CANÓNICOS  (modo oscuro = default)
+   * ═════════════════════════════════════════════════════════════════════════ */
 
-  /* ─────────────────────────────────────────────
-   * TEXTO
-   * ───────────────────────────────────────────── */
-  --text-primary:   #e5e7eb;  /* texto principal, headers de card  [era #fff en algunos sitios] */
-  --text-secondary: #9ca3af;  /* texto secundario / etiquetas */
-  --text-muted:     #6b7280;  /* texto desactivado / estado vacío */
-  --text-inverse:   #0a0e1a;  /* texto sobre fondos claros / botones de color */
+  /* ---- Tipografía --------------------------------------------------------- */
+  --ic-font-display: "Hanken Grotesk", "DM Sans", system-ui, -apple-system, sans-serif;
+  --ic-font-sans:    "Hanken Grotesk", "DM Sans", system-ui, -apple-system, sans-serif;
+  --ic-font-mono:    "Geist Mono", ui-monospace, "JetBrains Mono", "SF Mono", monospace;
+  --ic-display-weight:   700;
+  --ic-display-tracking: -0.025em;   /* titulares / valores grandes */
+  --ic-mono-tracking:    0.14em;     /* micro-labels mono MUY espaciados */
 
-  /* ─────────────────────────────────────────────
-   * BORDES
-   * ───────────────────────────────────────────── */
-  --border-subtle:  #262b36;  /* borde estándar de cards y separadores */
-  --border-focus:   #3B82F6;  /* borde de input enfocado */
+  /* ---- Escala tipográfica (px) -------------------------------------------- */
+  --ic-t-micro: 11px;  --ic-t-label: 12px; --ic-t-sm: 13px;  --ic-t-base: 14px;
+  --ic-t-md: 16px;     --ic-t-lg: 19px;    --ic-t-xl: 24px;  --ic-t-2xl: 32px;
+  --ic-t-3xl: 44px;    --ic-t-4xl: 60px;
 
-  /* ─────────────────────────────────────────────
-   * ACENTOS — ESTADOS SEMÁNTICOS
-   * ───────────────────────────────────────────── */
-  --accent-success:  #10B981;  /* verde: OK, valores positivos, botón secundario */
-  --accent-positive: #22c55e;  /* verde alt: deltas positivos en tablas */
-  --accent-warn:     #f59e0b;  /* ámbar: warning, aceleración */
-  --accent-danger:   #ef4444;  /* rojo: error, deltas negativos, credit_blowout */
-  --accent-info:     #60a5fa;  /* azul claro: informativo neutro */
+  /* ---- Espaciado (escala 4pt) --------------------------------------------- */
+  --ic-sp-1: 4px;  --ic-sp-2: 8px;  --ic-sp-3: 12px; --ic-sp-4: 16px;
+  --ic-sp-5: 20px; --ic-sp-6: 24px; --ic-sp-7: 32px; --ic-sp-8: 40px; --ic-sp-9: 56px;
 
-  /* ─────────────────────────────────────────────
-   * ACENTOS — DOMINIO (IC DataLayer)
-   * ───────────────────────────────────────────── */
-  --accent-action:    #3B82F6;  /* acción primaria (botones, links activos)  [resuelve inconsistencia #1] */
-  --accent-dashboard: #3B82F6;  /* tab Dashboard */
-  --accent-macro:     #10B981;  /* tab Macro */
-  --accent-markets:   #F59E0B;  /* tab Markets */
-  --accent-synthesis: #7C3AED;  /* "LIVE SYNTHESIS" label, IC Brief */
-  --accent-macro-alt: #8B5CF6;  /* variante macro / purple */
+  /* ---- Radios ------------------------------------------------------------- */
+  --ic-radius-sm: 4px;
+  --ic-radius:    6px;     /* default de tarjetas/celdas */
+  --ic-radius-lg: 8px;
+  --ic-radius-pill: 999px;
+  --ic-hair: 1px;          /* grosor de hairline/borde */
 
-  /* ─────────────────────────────────────────────
-   * RADIOS
-   * ───────────────────────────────────────────── */
-  --radius-card:   12px;  /* cards principales  [normalizado: era 8 o 14 según card] */
-  --radius-button:  8px;  /* botones, inputs, badges medianos */
-  --radius-chip:    6px;  /* chips / etiquetas pequeñas */
-  --radius-pill:   20px;  /* pills redondeadas (status indicators) */
+  /* ---- Color · OSCURO (índigo frío, hue ~280) ----------------------------- */
+  --ic-bg:            #15151c;
+  --ic-surface:       #1c1d26;
+  --ic-surface-2:     #24262f;
+  --ic-surface-3:     #2e2f3a;
+  --ic-border:        #33353f;
+  --ic-border-strong: #4b4c58;
 
-  /* ─────────────────────────────────────────────
-   * TIPOGRAFÍA
-   * ───────────────────────────────────────────── */
-  --font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+  --ic-text:          #edeef4;
+  --ic-text-2:        #a6a7b1;
+  --ic-text-3:        #787a83;
 
-  --font-size-caption: 10px;  /* captions muted */
-  --font-size-micro:   11px;  /* micro labels */
-  --font-size-sm:      12px;  /* body small, badges */
-  --font-size-body:    13px;  /* body estándar */
-  --font-size-h3:      15px;  /* headers de card */
-  --font-size-h2:      18px;  /* headers de sección */
-  --font-size-h1:      22px;  /* headers grandes */
+  --ic-accent:        #968ff7;   /* SOLO UI */
+  --ic-accent-weak:   #34315f;
+  --ic-accent-fg:     #15151c;
 
-  --font-weight-regular: 400;
-  --font-weight-medium:  500;
-  --font-weight-semibold: 600;
-  --font-weight-bold:    700;
+  --ic-pos:  #5ac576;  --ic-pos-weak:  #194224;   /* sano / bull        */
+  --ic-warn: #eca851;  --ic-warn-weak: #54360b;   /* aviso / transición */
+  --ic-neg:  #eb6459;  --ic-neg-weak:  #602a25;   /* riesgo / bear      */
 
-  --line-height-tight:  1.2;
-  --line-height-normal: 1.5;
+  /* ---- Sombras · oscuro --------------------------------------------------- */
+  --ic-shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+  --ic-shadow:    0 2px 8px rgba(0,0,0,.4);
+  --ic-shadow-lg: 0 16px 40px rgba(0,0,0,.5);
 
-  /* ─────────────────────────────────────────────
-   * SPACING
-   * ───────────────────────────────────────────── */
-  --space-1:   4px;
-  --space-2:   8px;
-  --space-3:  12px;
-  --space-4:  14px;   /* padding interno de card */
-  --space-5:  16px;   /* padding entre secciones */
-  --space-6:  20px;
-  --space-8:  24px;
+  /* ═════════════════════════════════════════════════════════════════════════
+   * ALIAS LEGACY → INSTRUMENT  (no renombrar consumidores existentes)
+   * ═════════════════════════════════════════════════════════════════════════ */
 
-  --gap-sm:    8px;   /* gap entre filas/columnas pequeño */
-  --gap-md:   12px;   /* gap estándar */
-  --gap-lg:   16px;   /* gap grande */
+  /* Fondos */
+  /* OJO: --bg-app es LITERAL (no var(--ic-bg)). El main de IC DataLayer inyecta en
+     runtime :root{--ic-bg: var(--bg-app)}; aliasarlo crearía un ciclo de custom
+     properties (ambas inválidas → fondo roto). Mantener en sync con --ic-bg. */
+  --bg-app:        #15151c;
+  --bg-card:       var(--ic-surface);
+  --bg-card-inner: var(--ic-surface-2);
+  --bg-input:      var(--ic-surface-2);
+  --bg-hover:      var(--ic-surface-3);
 
-  --card-margin-bottom: 10px;  /* margen inferior entre cards */
+  /* Texto */
+  /* --text-primary LITERAL por la misma razón (el main inyecta --ic-text: var(--text-primary)). */
+  --text-primary:   #edeef4;
+  --text-secondary: var(--ic-text-2);
+  --text-muted:     var(--ic-text-3);
+  --text-inverse:   var(--ic-accent-fg);
 
-  /* ─────────────────────────────────────────────
-   * SOMBRAS
-   * ───────────────────────────────────────────── */
-  --shadow-card:  0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.6);
+  /* Bordes */
+  --border-subtle: var(--ic-border);
+  --border-focus:  var(--ic-accent);
 
-  /* ─────────────────────────────────────────────
-   * TRANSICIONES
-   * ───────────────────────────────────────────── */
+  /* Semánticos (significado preservado) */
+  --accent-success:  var(--ic-pos);
+  --accent-positive: var(--ic-pos);
+  --accent-warn:     var(--ic-warn);
+  --accent-danger:   var(--ic-neg);
+
+  /* Acentos de UI/dominio → índigo uniforme (decisión F0) */
+  --accent-info:      var(--ic-accent);
+  --accent-action:    var(--ic-accent);
+  --accent-dashboard: var(--ic-accent);
+  --accent-macro:     var(--ic-accent);
+  --accent-markets:   var(--ic-accent);
+  --accent-synthesis: var(--ic-accent);
+  --accent-macro-alt: var(--ic-accent);
+
+  /* Radios (legacy → Instrument ajustados: 12→6 / 8→4 / 6→4 / 20→999) */
+  --radius-card:   var(--ic-radius);
+  --radius-button: var(--ic-radius-sm);
+  --radius-chip:   var(--ic-radius-sm);
+  --radius-pill:   var(--ic-radius-pill);
+
+  /* Tipografía (Hanken; DM Sans queda como fallback dentro del stack) */
+  --font-family: var(--ic-font-sans);
+
+  /* Sombras (legacy → Instrument) */
+  --shadow-card:  var(--ic-shadow);
+  --shadow-modal: var(--ic-shadow-lg);
+
+  /* ═════════════════════════════════════════════════════════════════════════
+   * TOKENS PROPIOS SIN EQUIVALENTE INSTRUMENT (se conservan tal cual)
+   * ═════════════════════════════════════════════════════════════════════════ */
+
+  /* Tamaños de fuente históricos (777 consumidores usan estos nombres) */
+  --font-size-caption: 10px;  --font-size-micro: 11px;  --font-size-sm: 12px;
+  --font-size-body:    13px;  --font-size-h3:    15px;  --font-size-h2: 18px;
+  --font-size-h1:      22px;
+
+  --font-weight-regular: 400;  --font-weight-medium: 500;
+  --font-weight-semibold: 600; --font-weight-bold:   700;
+
+  --line-height-tight:  1.2;  --line-height-normal: 1.5;
+
+  /* Espaciado histórico */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 14px; --space-5: 16px;
+  --space-6: 20px; --space-8: 24px;
+  --gap-sm: 8px;   --gap-md: 12px;  --gap-lg: 16px;
+  --card-margin-bottom: 10px;
+
   --transition-fast:   120ms ease;
   --transition-normal: 200ms ease;
   --transition-slow:   300ms ease;
 
-  /* ─────────────────────────────────────────────
-   * Z-INDEX
-   * ───────────────────────────────────────────── */
-  --z-base:    1;
-  --z-dropdown: 100;
-  --z-sticky:   200;
-  --z-modal:    300;
-  --z-toast:    400;
+  --z-base: 1; --z-dropdown: 100; --z-sticky: 200; --z-modal: 300; --z-toast: 400;
 
-  /* ─────────────────────────────────────────────
-   * SIGNAL COLORS — IC Brief composites
-   * ───────────────────────────────────────────── */
-  --color-lcc: #06B6D4;   /* Liquidity Cycle Composite — cyan */
-  --color-csc: #FF6B35;   /* Credit Stress Composite — orange-red */
-  --color-rpc: #EF4444;   /* Recession Probability — rojo (= accent-danger) */
-  --color-grc: #F59E0B;   /* Geopolitical Risk — ámbar (= accent-warn) */
-  --color-hsc: #8B5CF6;   /* Housing Stress Composite — púrpura */
-
+  /* Data-viz / signal — INTACTO (decisión F0; verificar contraste en F4) */
+  --color-lcc: #06B6D4;   /* Liquidity Cycle Composite */
+  --color-csc: #FF6B35;   /* Credit Stress Composite */
+  --color-rpc: #EF4444;   /* Recession Probability */
+  --color-grc: #F59E0B;   /* Geopolitical Risk */
+  --color-hsc: #8B5CF6;   /* Housing Stress Composite */
   --color-regime-moderado:    #F59E0B;
   --color-regime-restrictivo: #F97316;
-  --color-regime-crisis:      #EF4444;  /* = accent-danger */
-  --color-regime-expansivo:   #22c55e;  /* = accent-positive */
+  --color-regime-crisis:      #EF4444;
+  --color-regime-expansivo:   #22c55e;
 
 }
 
-/* ─────────────────────────────────────────────
- * TEMA CLARO — se activa con la clase .ic-theme-light en <html>
- * (toggle 🌙 en IC DataLayer). Sobreescribe los tokens del :root.
- * Los tokens de data-viz/signal se mantienen (legibles sobre blanco).
- * ───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * TEMA CLARO — clase .ic-theme-light en <html> (toggle 🌙/☀️ de IC DataLayer)
+ * Solo redefine los --ic-* (papel cálido, hue ~85). Los alias se voltean solos.
+ * Los tokens de data-viz se mantienen (legibles sobre blanco).
+ * ═══════════════════════════════════════════════════════════════════════════ */
 .ic-theme-light {
-  --bg-app:        #F0F4F8;
-  --bg-card:       #FFFFFF;
-  --bg-card-inner: #F7F9FC;
-  --bg-input:      #F8FAFC;
-  --bg-hover:      #EEF2F7;
+  --ic-bg:            #f8f5f1;
+  --ic-surface:       #fffdfa;
+  --ic-surface-2:     #f3f0e9;
+  --ic-surface-3:     #ebe7df;
+  --ic-border:        #e1ded6;
+  --ic-border-strong: #c2bdb4;
 
-  --text-primary:   #0F172A;
-  --text-secondary: #475569;
-  --text-muted:     #64748B;
-  --text-inverse:   #FFFFFF;
+  --ic-text:          #211c15;
+  --ic-text-2:        #605a52;
+  --ic-text-3:        #8a857e;
 
-  --border-subtle:  #DDE3EE;
-  --border-focus:   #2563EB;
+  --ic-accent:        #5a58c2;
+  --ic-accent-weak:   #e5e9ff;
+  --ic-accent-fg:     #ffffff;
 
-  --accent-success:  #059669;
-  --accent-positive: #16A34A;
-  --accent-warn:     #D97706;
-  --accent-danger:   #DC2626;
-  --accent-info:     #2563EB;
+  --ic-pos:  #2d8949;  --ic-pos-weak:  #d4f5da;
+  --ic-warn: #c17924;  --ic-warn-weak: #ffe5c5;
+  --ic-neg:  #c53732;  --ic-neg-weak:  #ffdfda;
 
-  --accent-action:    #2563EB;
-  --accent-dashboard: #2563EB;
-  --accent-macro:     #059669;
-  --accent-markets:   #D97706;
-  --accent-synthesis: #6D28D9;
-  --accent-macro-alt: #7C3AED;
+  --ic-shadow-sm: 0 1px 2px rgba(60,50,30,.05);
+  --ic-shadow:    0 1px 3px rgba(60,50,30,.06), 0 2px 8px rgba(60,50,30,.04);
+  --ic-shadow-lg: 0 10px 30px rgba(60,50,30,.09);
 
+  /* Literales anti-ciclo (ver nota en :root) — sincronizados con --ic-bg/--ic-text claros */
+  --bg-app:       #f8f5f1;
+  --text-primary: #211c15;
+
+  /* data-viz: único ajuste claro conservado del sistema anterior */
   --color-regime-restrictivo: #EA580C;
-
-  --shadow-card:  0 2px 12px rgba(0, 0, 0, 0.08);
-  --shadow-modal: 0 8px 32px rgba(0, 0, 0, 0.18);
 }
