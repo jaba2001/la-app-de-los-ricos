@@ -32,7 +32,8 @@ export async function GET(request) {
 
   let built;
   try {
-    built = await buildMacroState(process.env.FRED_KEY);
+    // FMP key (optional) powers the A4 private-credit proxy; absent → fields null.
+    built = await buildMacroState(process.env.FRED_KEY, { fmpKey: process.env.FMP_KEY });
   } catch (e) {
     return new Response(JSON.stringify({ error: `compute failed: ${e.message}` }), {
       status: 500,

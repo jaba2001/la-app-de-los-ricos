@@ -97,6 +97,39 @@ export async function GET(request) {
     errors.push(`qt_acceleration: ${e.message}`);
   }
 
+  // 3) credit_divergence (A4) — estrés de crédito oculto: HY público sigue tight
+  // pero el proxy privado (BIZD/BKLN) se debilita. La señal la computa el cron
+  // macro-refresh y la cachea en macro_state (credit_divergence + proxy). Aquí
+  // solo la leemos y emitimos alerta si está activa (0 fetches de mercado extra).
+  try {
+    const url = `${process.env.SUPABASE_URL}/rest/v1/macro_state?id=eq.1&select=credit_divergence,credit_private_proxy,credit_stress&limit=1`;
+    const r = await fetch(url, {
+      headers: {
+        apikey: process.env.SUPABASE_SERVICE_KEY,
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+      },
+    });
+    if (r.ok) {
+      const arr = await r.json();
+      const m = Array.isArray(arr) ? arr[0] : null;
+      if (m) {
+        checks.push({ type: 'credit_divergence', active: !!m.credit_divergence, proxy: m.credit_private_proxy });
+        if (m.credit_divergence === true && !(await alreadyAlertedToday('credit_divergence'))) {
+          toInsert.push({
+            alert_type: 'credit_divergence',
+            threshold: 0,
+            actual_value: m.credit_private_proxy != null ? +Number(m.credit_private_proxy).toFixed(2) : null,
+            message: `🕳️ Divergencia de crédito: HY público tight (CSC ${m.credit_stress != null ? Math.round(m.credit_stress) : '—'}) pero proxy privado BIZD/BKLN débil (${m.credit_private_proxy != null ? Number(m.credit_private_proxy).toFixed(2) + '%' : 'n/d'}). Posible estrés de crédito oculto.`,
+          });
+        }
+      }
+    } else {
+      errors.push(`credit_divergence: macro_state HTTP ${r.status}`);
+    }
+  } catch (e) {
+    errors.push(`credit_divergence: ${e.message}`);
+  }
+
   // Insertar (uno por uno; pocas alertas a la vez)
   const insertResults = [];
   for (const a of toInsert) {
