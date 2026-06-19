@@ -32,8 +32,9 @@ export async function GET(request) {
 
   let built;
   try {
-    // FMP key (optional) powers the A4 private-credit proxy; absent → fields null.
-    built = await buildMacroState(process.env.FRED_KEY, { fmpKey: process.env.FMP_KEY });
+    // Finnhub key (optional) powers the A4 private-credit proxy; absent → null.
+    // (FMP's /stable/quote rejects BIZD/BKLN under our plan, so we use Finnhub.)
+    built = await buildMacroState(process.env.FRED_KEY, { finnhubKey: process.env.FINNHUB_KEY });
   } catch (e) {
     return new Response(JSON.stringify({ error: `compute failed: ${e.message}` }), {
       status: 500,
