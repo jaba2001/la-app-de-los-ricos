@@ -10,6 +10,7 @@ const ALLOWED = new Set([
   'discounted-cash-flow','balance-sheet-statement','price-target',
   'cash-flow-statement','peers','historical-dividends',
   'institutional-holder','historical-shares-float',
+  'search',
 ]);
 
 export async function GET(request, { params }) {
@@ -22,7 +23,7 @@ export async function GET(request, { params }) {
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
-  if (symbol && !/^[A-Z.\-]{1,8}$/.test(symbol)) {
+  if (symbol && !/^[A-Z.\-]{1,15}$/.test(symbol)) {
     return new Response(JSON.stringify({error:'Invalid symbol'}), {status:400, headers:{'Content-Type':'application/json'}});
   }
 
