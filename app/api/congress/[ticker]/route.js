@@ -36,9 +36,16 @@ export async function GET(request, { params }) {
   const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().substring(0, 10);
   const trades = [];
 
+  const fetchWithTimeout = (url, ms = 8000) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal, next: { revalidate: 43200 } })
+      .finally(() => clearTimeout(timer));
+  };
+
   const [senateRes, houseRes] = await Promise.allSettled([
-    fetch(SENATE_URL, { next: { revalidate: 43200 } }),
-    fetch(HOUSE_URL,  { next: { revalidate: 43200 } }),
+    fetchWithTimeout(SENATE_URL),
+    fetchWithTimeout(HOUSE_URL),
   ]);
 
   if (senateRes.status === 'fulfilled' && senateRes.value.ok) {
