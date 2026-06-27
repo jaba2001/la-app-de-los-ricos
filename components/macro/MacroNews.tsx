@@ -126,7 +126,7 @@ export default function MacroNews() {
     setLoading(true);
     setNews([]);
     setFetchError("");
-    authedFetch<NewsItem[]>(`/api/fmp/news?tickers=${cat.tickers}&limit=8`)
+    authedFetch<NewsItem[]>(`/api/fmp/news?symbols=${cat.tickers}&limit=8`)
       .then(r => {
         const items = Array.isArray(r) ? r : [];
         setNews(items);

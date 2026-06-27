@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
@@ -17,6 +18,7 @@ function closes(history: Record<string, unknown>[]): number[] {
 function rc(v: number) { return v > 0 ? "var(--sr-pos)" : v < 0 ? "var(--sr-neg)" : "var(--sr-text-3)"; }
 
 export default function StockSmartMoney({ data, loading, ticker }: Props) {
+  const router = useRouter();
   const [topBuyers, setTopBuyers] = useState<InsiderRow[]>([]);
   const [loadingTop, setLoadingTop] = useState(true);
 
@@ -189,7 +191,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
               {topBuyers.slice(0, 15).map((row) => (
                 <tr key={row.rank} style={{ background: row.ticker === ticker ? "color-mix(in srgb, var(--sr-amber) 8%, transparent)" : undefined }}>
                   <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{row.rank}</td>
-                  <td><a href={`/stock/${row.ticker}`} style={{ fontWeight: 700, color: row.ticker === ticker ? "var(--sr-amber)" : "var(--sr-text)" }}>{row.ticker}</a></td>
+                  <td><span onClick={() => router.push(`/stock/${row.ticker}`)} style={{ fontWeight: 700, color: row.ticker === ticker ? "var(--sr-amber)" : "var(--sr-text)", cursor: "pointer" }}>{row.ticker}</span></td>
                   <td style={{ color: "var(--sr-text-2)" }}>{row.sector}</td>
                   <td style={{ textAlign: "right", color: "var(--sr-pos)", fontWeight: 600 }} className="num">${(row.net_insider_buying_usd / 1e6).toFixed(1)}M</td>
                   <td style={{ textAlign: "right" }} className="num">{row.num_insiders}</td>

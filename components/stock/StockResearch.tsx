@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores } from "@/lib/types";
 import { authedFetch } from "@/lib/proxy";
@@ -39,6 +40,7 @@ function computeMoat(metrics: Record<string, unknown> | null, ratios: Record<str
 }
 
 export default function StockResearch({ data, scores, loading, ticker, macro, macroTilt }: Props) {
+  const router = useRouter();
   const [aiVerdict, setAiVerdict] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
@@ -49,14 +51,12 @@ export default function StockResearch({ data, scores, loading, ticker, macro, ma
   const [peerQuotes, setPeerQuotes] = useState<Record<string, { price: number; changesPercentage: number }>>({});
   const [peerLoading, setPeerLoading] = useState(false);
 
-  // Lazy-load peer quotes when peers list is available
   const peerList = (data?.peers ?? []).slice(0, 6);
   const peersKey = peerList.join(",");
-  const [peersFetched, setPeersFetched] = useState("");
 
-  if (!loading && peerList.length > 0 && peersKey !== peersFetched && !peerLoading) {
+  useEffect(() => {
+    if (!peersKey || loading) return;
     setPeerLoading(true);
-    setPeersFetched(peersKey);
     Promise.allSettled(
       peerList.map(p =>
         authedFetch<{ price: number; changesPercentage: number }[]>(`/api/fmp/quote?symbol=${p}`)
@@ -70,7 +70,8 @@ export default function StockResearch({ data, scores, loading, ticker, macro, ma
       setPeerQuotes(map);
       setPeerLoading(false);
     }).catch(() => setPeerLoading(false));
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [peersKey, loading]);
 
   async function generateEarningsAnalysis() {
     if (!data) return;
@@ -218,13 +219,17 @@ Be specific, analytical, and data-driven. Write in English.`;
               const pct = q?.changesPercentage ?? 0;
               const isThis = p === ticker;
               return (
-                <a key={p} href={`/stock/${p}`} style={{
-                  display: "block", padding: "var(--sr-sp-3)",
-                  borderRadius: "var(--sr-radius)",
-                  background: isThis ? "color-mix(in srgb, var(--sr-amber) 10%, var(--sr-surface-2))" : "var(--sr-surface-2)",
-                  border: `1px solid ${isThis ? "color-mix(in srgb, var(--sr-amber) 40%, var(--sr-border))" : "var(--sr-border)"}`,
-                  textDecoration: "none",
-                }}>
+                <div
+                  key={p}
+                  onClick={() => !isThis && router.push(`/stock/${p}`)}
+                  style={{
+                    display: "block", padding: "var(--sr-sp-3)",
+                    borderRadius: "var(--sr-radius)",
+                    background: isThis ? "color-mix(in srgb, var(--sr-amber) 10%, var(--sr-surface-2))" : "var(--sr-surface-2)",
+                    border: `1px solid ${isThis ? "color-mix(in srgb, var(--sr-amber) 40%, var(--sr-border))" : "var(--sr-border)"}`,
+                    cursor: isThis ? "default" : "pointer",
+                  }}
+                >
                   <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: isThis ? "var(--sr-amber)" : "var(--sr-text)", marginBottom: 4 }}>{p}</div>
                   {peerLoading ? <Sk w={60} h={12} /> : q ? (
                     <>
@@ -234,7 +239,7 @@ Be specific, analytical, and data-driven. Write in English.`;
                       </div>
                     </>
                   ) : <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>—</div>}
-                </a>
+                </div>
               );
             })}
           </div>
