@@ -10,7 +10,8 @@ const ALLOWED = new Set([
   'discounted-cash-flow','balance-sheet-statement','price-target',
   'cash-flow-statement','peers','historical-dividends',
   'institutional-holder','historical-shares-float',
-  'search',
+  'key-metrics','financial-growth','earnings-surprises',
+  'search','senate-trading','house-disclosure',
 ]);
 
 export async function GET(request, { params }) {
