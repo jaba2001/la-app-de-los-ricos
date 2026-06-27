@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, getRating, getMacroTilt, SECTOR_ETF } from "@/lib/scoring";
+import { useMacroContext } from "@/lib/MacroContext";
 import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
@@ -66,10 +67,13 @@ export default function StockTickerPage() {
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
+  const { setMacro: setMacroContext } = useMacroContext();
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
+  const TOTAL_SOURCES = 21;
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -86,7 +90,11 @@ export default function StockTickerPage() {
     if (!session || !ticker) return;
     setHasAnalyzed(true);
     setLoading(true);
+    setFetchProgress(0);
     setError("");
+
+    const track = <T,>(p: PromiseLike<T>): Promise<T> =>
+      Promise.resolve(p).finally(() => setFetchProgress(c => c + 1));
 
     try {
       const [
@@ -98,31 +106,32 @@ export default function StockTickerPage() {
         spyRes, congressRes, houseRes,
         annualIncomeRes, sharesFloatRes,
       ] = await Promise.allSettled([
-        supabase.from("macro_state").select("*").eq("id", 1).single(),
-        authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`),
-        authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`),
-        authedFetch<unknown>(`/api/fmp/ratios-ttm?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&quarter=true&limit=12`),
-        authedFetch<unknown[]>(`/api/fmp/balance-sheet-statement?symbol=${ticker}&quarter=true&limit=12`),
-        authedFetch<unknown[]>(`/api/fmp/cash-flow-statement?symbol=${ticker}&quarter=true&limit=8`),
-        authedFetch<string[]>(`/api/fmp/peers?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/price-target?symbol=${ticker}&limit=10`),
-        authedFetch<unknown[]>(`/api/fmp/analyst-estimates?symbol=${ticker}&limit=2`),
-        authedFetch<unknown[]>(`/api/fmp/institutional-holder/${ticker}`),
-        authedFetch<unknown[]>(`/api/finnhub/stock/earnings?symbol=${ticker}&limit=8`),
-        authedFetch<{ data?: unknown[] }>(`/api/finnhub/stock/insider-transactions?symbol=${ticker}`),
-        authedFetch<unknown>(`/api/fmp/discounted-cash-flow?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=SPY`),
-        authedFetch<unknown[]>(`/api/fmp/senate-trading?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/house-disclosure?symbol=${ticker}`),
-        authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&limit=5`),
-        authedFetch<unknown[]>(`/api/fmp/historical-shares-float?symbol=${ticker}&limit=10`),
+        track(supabase.from("macro_state").select("*").eq("id", 1).single()),
+        track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`)),
+        track(authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`)),
+        track(authedFetch<unknown>(`/api/fmp/ratios-ttm?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&quarter=true&limit=12`)),
+        track(authedFetch<unknown[]>(`/api/fmp/balance-sheet-statement?symbol=${ticker}&quarter=true&limit=12`)),
+        track(authedFetch<unknown[]>(`/api/fmp/cash-flow-statement?symbol=${ticker}&quarter=true&limit=8`)),
+        track(authedFetch<string[]>(`/api/fmp/peers?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/price-target?symbol=${ticker}&limit=10`)),
+        track(authedFetch<unknown[]>(`/api/fmp/analyst-estimates?symbol=${ticker}&limit=2`)),
+        track(authedFetch<unknown[]>(`/api/fmp/institutional-holder/${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/finnhub/stock/earnings?symbol=${ticker}&limit=8`)),
+        track(authedFetch<{ data?: unknown[] }>(`/api/finnhub/stock/insider-transactions?symbol=${ticker}`)),
+        track(authedFetch<unknown>(`/api/fmp/discounted-cash-flow?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=SPY`)),
+        track(authedFetch<unknown[]>(`/api/fmp/senate-trading?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/house-disclosure?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&limit=5`)),
+        track(authedFetch<unknown[]>(`/api/fmp/historical-shares-float?symbol=${ticker}&limit=10`)),
       ]);
 
       const macroData = macroRes.status === "fulfilled" ? (macroRes.value as { data: MacroState }).data : null;
       setMacro(macroData);
+      if (macroData) setMacroContext(macroData);
 
       const apiResults = [quoteRes, profileRes, metricsRes, ratiosRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, targetsRes, estimatesRes, holdersRes, earningsRes, insiderRes, dcfRes];
       setFailedApis(apiResults.filter(r => r.status === "rejected").length);
@@ -169,6 +178,12 @@ export default function StockTickerPage() {
 
       setData(stockData);
 
+      // Compute momentum from daily close prices (history is newest-first from FMP)
+      const cl = stockData.history.map(h => Number(h.close)).filter(v => !isNaN(v));
+      const priceChange1M = cl.length > 22  ? ((cl[0] - cl[22])  / cl[22])  * 100 : null;
+      const priceChange3M = cl.length > 63  ? ((cl[0] - cl[63])  / cl[63])  * 100 : null;
+      const priceChange6M = cl.length > 126 ? ((cl[0] - cl[126]) / cl[126]) * 100 : null;
+
       const macroTiltData = macroData ? getMacroTilt(macroData, sector) : { tilt: 0 };
       const calc = calcScores({
         pe:               metrics?.peRatioTTM as number ?? null,
@@ -186,6 +201,9 @@ export default function StockTickerPage() {
         epsGrowth:        ratios?.netIncomeGrowthTTM != null ? (ratios.netIncomeGrowthTTM as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,
         regime:           macroData?.regime_id ?? null,
+        priceChange1M,
+        priceChange3M,
+        priceChange6M,
       });
       setScores(calc);
 
@@ -358,6 +376,22 @@ export default function StockTickerPage() {
             >
               {loading ? "Analyzing…" : `Analyze ${ticker}`}
             </button>
+            {loading && (
+              <div style={{ width: 320, textAlign: "center" }}>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>
+                  Fetching {fetchProgress} / {TOTAL_SOURCES} data sources…
+                </div>
+                <div style={{ height: 4, background: "var(--sr-surface-3)", borderRadius: 2, overflow: "hidden" }}>
+                  <div style={{
+                    height: "100%",
+                    width: `${Math.min(100, (fetchProgress / TOTAL_SOURCES) * 100)}%`,
+                    background: "var(--sr-amber)",
+                    borderRadius: 2,
+                    transition: "width 200ms ease",
+                  }} />
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* ── Tab content — only mounts after analyze ── */

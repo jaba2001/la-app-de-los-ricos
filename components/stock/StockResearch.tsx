@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
-import type { MacroState, Scores } from "@/lib/types";
+import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
 import { authedFetch } from "@/lib/proxy";
+import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { getRating, calcFactorTilts, SECTOR_PE_BM, SECTOR_EV_BM } from "@/lib/scoring";
@@ -48,28 +49,26 @@ export default function StockResearch({ data, scores, loading, ticker, macro, ma
   const [earningsAI, setEarningsAI] = useState("");
   const [earningsLoading, setEarningsLoading] = useState(false);
 
-  const [peerQuotes, setPeerQuotes] = useState<Record<string, { price: number; changesPercentage: number }>>({});
+  const [peerScores, setPeerScores] = useState<Record<string, StockAnalysis>>({});
   const [peerLoading, setPeerLoading] = useState(false);
 
-  const peerList = (data?.peers ?? []).slice(0, 6);
+  const peerList = (data?.peers ?? []).slice(0, 8);
   const peersKey = peerList.join(",");
 
   useEffect(() => {
     if (!peersKey || loading) return;
     setPeerLoading(true);
-    Promise.allSettled(
-      peerList.map(p =>
-        authedFetch<{ price: number; changesPercentage: number }[]>(`/api/fmp/quote?symbol=${p}`)
-          .then(r => ({ p, q: Array.isArray(r) ? r[0] : null }))
-      )
-    ).then(results => {
-      const map: Record<string, { price: number; changesPercentage: number }> = {};
-      results.forEach(r => {
-        if (r.status === "fulfilled" && r.value.q) map[r.value.p] = r.value.q;
+    supabase
+      .from("sl_analyses")
+      .select("*")
+      .in("ticker", peerList)
+      .order("analysis_date", { ascending: false })
+      .then(({ data: rows }) => {
+        const map: Record<string, StockAnalysis> = {};
+        if (rows) (rows as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
+        setPeerScores(map);
+        setPeerLoading(false);
       });
-      setPeerQuotes(map);
-      setPeerLoading(false);
-    }).catch(() => setPeerLoading(false));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peersKey, loading]);
 
@@ -209,40 +208,61 @@ Be specific, analytical, and data-driven. Write in English.`;
         )}
       </div>
 
-      {/* ── PEERS ────────────────────────────────────────────── */}
+      {/* ── PEER SCORING COMPARISON ──────────────────────────── */}
       {peerList.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-          <div className="section-label">Sector Peers</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
-            {peerList.map(p => {
-              const q = peerQuotes[p];
-              const pct = q?.changesPercentage ?? 0;
-              const isThis = p === ticker;
-              return (
-                <div
-                  key={p}
-                  onClick={() => !isThis && router.push(`/stock/${p}`)}
-                  style={{
-                    display: "block", padding: "var(--sr-sp-3)",
-                    borderRadius: "var(--sr-radius)",
-                    background: isThis ? "color-mix(in srgb, var(--sr-amber) 10%, var(--sr-surface-2))" : "var(--sr-surface-2)",
-                    border: `1px solid ${isThis ? "color-mix(in srgb, var(--sr-amber) 40%, var(--sr-border))" : "var(--sr-border)"}`,
-                    cursor: isThis ? "default" : "pointer",
-                  }}
-                >
-                  <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: isThis ? "var(--sr-amber)" : "var(--sr-text)", marginBottom: 4 }}>{p}</div>
-                  {peerLoading ? <Sk w={60} h={12} /> : q ? (
-                    <>
-                      <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }} className="num">${q.price.toFixed(2)}</div>
-                      <div style={{ fontSize: "var(--sr-t-xs)", color: pct >= 0 ? "var(--sr-pos)" : "var(--sr-neg)", fontWeight: 600 }} className="num">
-                        {pct >= 0 ? "+" : ""}{pct.toFixed(2)}%
-                      </div>
-                    </>
-                  ) : <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>—</div>}
-                </div>
-              );
-            })}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+            <div>
+              <div className="section-label">Peer Score Comparison</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>From sl_analyses — run full analysis on each peer to populate</div>
+            </div>
           </div>
+          {peerLoading ? <Sk w="100%" h={160} /> : (
+            <table className="sr-table">
+              <thead><tr>
+                <th>Ticker</th>
+                <th style={{ textAlign: "right" }}>Base Score</th>
+                <th style={{ textAlign: "right" }}>Value</th>
+                <th style={{ textAlign: "right" }}>Health</th>
+                <th style={{ textAlign: "right" }}>Momentum</th>
+                <th style={{ textAlign: "right" }}>Growth</th>
+                <th>Rating</th>
+                <th style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Date</th>
+              </tr></thead>
+              <tbody>
+                {peerList.map(p => {
+                  const a = peerScores[p];
+                  const isThis = p === ticker;
+                  const pRating = a ? getRating(Number(a.score_total)) : null;
+                  return (
+                    <tr
+                      key={p}
+                      style={{
+                        cursor: isThis ? "default" : "pointer",
+                        background: isThis ? "color-mix(in srgb, var(--sr-amber) 6%, transparent)" : undefined,
+                      }}
+                      onClick={() => !isThis && router.push(`/stock/${p}`)}
+                    >
+                      <td style={{ fontWeight: 700, color: isThis ? "var(--sr-amber)" : "var(--sr-text)" }}>
+                        {p}{isThis && <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 400, color: "var(--sr-text-3)", marginLeft: 4 }}>(this)</span>}
+                      </td>
+                      <td style={{ textAlign: "right", fontWeight: 700 }} className="num">
+                        {a ? Number(a.score_total).toFixed(0) : <span style={{ color: "var(--sr-text-3)" }}>—</span>}
+                      </td>
+                      <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_val).toFixed(0) : "—"}</td>
+                      <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_hlth).toFixed(0) : "—"}</td>
+                      <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_mom).toFixed(0) : "—"}</td>
+                      <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_growth).toFixed(0) : "—"}</td>
+                      <td>{pRating ? <Pill label={pRating.label} color={pRating.color} /> : <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>not analyzed</span>}</td>
+                      <td style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                        {a?.analysis_date ? String(a.analysis_date).slice(0, 10) : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
 

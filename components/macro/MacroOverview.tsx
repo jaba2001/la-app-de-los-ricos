@@ -139,16 +139,17 @@ export default function MacroOverview({ macro, loading }: Props) {
                   <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: icScoreColor(macro?.ic_score), lineHeight: 1 }} className="num">
                     {macro?.ic_score != null ? Number(macro.ic_score).toFixed(1) : "—"}
                   </span>
-                  <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, letterSpacing: "0.08em", marginTop: 2 }}>IC SCORE</span>
+                  <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, letterSpacing: "0.08em", marginTop: 2 }}>STRESS INDEX</span>
+                  <span style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 1, opacity: 0.7 }}>↑ = more risk</span>
                 </div>
               </>
             )}
           </div>
           <div>
-            <div className="section-label">Investment Climate</div>
+            <div className="section-label">Market Stress Score</div>
             {loading ? <Sk w={120} h={20} /> : (
               <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: icScoreColor(macro?.ic_score), marginBottom: 4 }}>
-                {Number(macro?.ic_score ?? 0) >= 70 ? "Risk Zone" : Number(macro?.ic_score ?? 0) >= 45 ? "Caution" : "Favorable"}
+                {Number(macro?.ic_score ?? 0) >= 70 ? "High Stress" : Number(macro?.ic_score ?? 0) >= 45 ? "Elevated" : "Low Stress"}
               </div>
             )}
             {updatedAt && (

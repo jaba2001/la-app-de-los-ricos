@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { useMacroContext } from "@/lib/MacroContext";
 import dynamic from "next/dynamic";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
@@ -27,6 +28,7 @@ const TABS = [
 
 export default function MacroPage() {
   const { session, loading: authLoading } = useAuth();
+  const { setMacro: setMacroContext } = useMacroContext();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [macro, setMacro] = useState<MacroState | null>(null);
@@ -48,7 +50,10 @@ export default function MacroPage() {
       .eq("id", 1)
       .single();
     if (err) setError(err.message);
-    else setMacro(data as MacroState);
+    else {
+      setMacro(data as MacroState);
+      setMacroContext(data as MacroState);
+    }
     setHasLoaded(true);
     setLoading(false);
   }
@@ -81,10 +86,27 @@ export default function MacroPage() {
             {t.label}
           </button>
         ))}
-        {hasLoaded && macro?.snapshot_date && (
-          <span style={{ marginLeft: "auto", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flexShrink: 0 }}>
-            Snapshot: {macro.snapshot_date}
-          </span>
+        {hasLoaded && (
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", flexShrink: 0 }}>
+            {macro?.snapshot_date && (
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                Snapshot: {macro.snapshot_date}
+              </span>
+            )}
+            <button
+              onClick={loadData}
+              disabled={loading}
+              title="Refresh macro data"
+              style={{
+                padding: "4px 10px", fontSize: "var(--sr-t-xs)", fontWeight: 600,
+                borderRadius: "var(--sr-radius-pill)", cursor: loading ? "default" : "pointer",
+                background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)",
+                color: loading ? "var(--sr-text-3)" : "var(--sr-text-2)",
+              }}
+            >
+              {loading ? "…" : "↻ Refresh"}
+            </button>
+          </div>
         )}
       </div>
 

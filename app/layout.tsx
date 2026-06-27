@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
+import { MacroProvider } from "@/lib/MacroContext";
 import Nav from "@/components/Nav";
 
 const hanken = Hanken_Grotesk({
@@ -28,13 +29,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={hanken.variable}>
       <body>
         <AuthProvider>
-          <Nav />
-          <main style={{
-            paddingTop: "var(--sr-nav-h)",
-            minHeight: "100vh",
-          }}>
-            {children}
-          </main>
+          <MacroProvider>
+            <Nav />
+            <main style={{
+              paddingTop: "var(--sr-nav-h)",
+              minHeight: "100vh",
+            }}>
+              {children}
+            </main>
+          </MacroProvider>
         </AuthProvider>
       </body>
     </html>
