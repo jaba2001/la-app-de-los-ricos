@@ -63,6 +63,7 @@ export interface MacroState {
   ted_spread?: number | null;
   c_and_i_loans?: number | null;
   credit_card_delinq?: number | null;
+  nfci?: number | null;
   /* Extended Macro Signals */
   t10y2y?: number | null;
   sahm_rule?: number | null;
