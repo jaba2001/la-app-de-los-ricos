@@ -56,8 +56,24 @@ export interface MacroState {
   fedfunds?: number | null;
   /* Extended Credit */
   hy_oas?: number | null;
+  hy_bb_oas?: number | null;
+  hy_ccc_oas?: number | null;
+  bbb_oas?: number | null;
   hy_oas_momentum?: number | null;
   ted_spread?: number | null;
+  c_and_i_loans?: number | null;
+  credit_card_delinq?: number | null;
+  /* Extended Macro Signals */
+  t10y2y?: number | null;
+  sahm_rule?: number | null;
+  umcsent?: number | null;
+  sofr?: number | null;
+  wresbal?: number | null;
+  mortgage_rate?: number | null;
+  case_shiller_yoy?: number | null;
+  /* Extended FX & Commodities */
+  dxy?: number | null;
+  usdjpy?: number | null;
   /* Extended Labor & Inflation */
   icsa?: number | null;
   payems?: number | null;
