@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { Sk } from "@/components/ui/Skeleton";
 import { authedFetch } from "@/lib/proxy";
@@ -142,6 +143,7 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
   peers: string[];
   ratios: Record<string, unknown> | null;
 }) {
+  const router = useRouter();
   const [peerData, setPeerData] = useState<Record<string, Record<string, unknown>>>({});
   const [loadingPeers, setLoadingPeers] = useState(false);
   const limited = peers.slice(0, 5);
@@ -203,7 +205,7 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
                 <td>
                   {row.isSelf
                     ? <span style={{ fontWeight: 700, color: "var(--sr-amber)" }}>{row.t}</span>
-                    : <a href={`/stock/${row.t}`} style={{ color: "var(--sr-text-2)", fontWeight: 600 }}>{row.t}</a>
+                    : <span onClick={() => router.push(`/stock/${row.t}`)} style={{ color: "var(--sr-text-2)", fontWeight: 600, cursor: "pointer" }}>{row.t}</span>
                   }
                 </td>
                 {row.isLoading ? (

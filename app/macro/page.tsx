@@ -30,21 +30,28 @@ export default function MacroPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [macro, setMacro] = useState<MacroState | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
   }, [session, authLoading, router]);
 
-  useEffect(() => {
+  async function loadData() {
     if (!session) return;
-    supabase.from("macro_state").select("*").eq("id", 1).single().then(({ data, error }) => {
-      if (error) setError(error.message);
-      else setMacro(data as MacroState);
-      setLoading(false);
-    });
-  }, [session]);
+    setLoading(true);
+    setError("");
+    const { data, error: err } = await supabase
+      .from("macro_state")
+      .select("*")
+      .eq("id", 1)
+      .single();
+    if (err) setError(err.message);
+    else setMacro(data as MacroState);
+    setHasLoaded(true);
+    setLoading(false);
+  }
 
   if (authLoading || !session) return null;
 
@@ -74,6 +81,11 @@ export default function MacroPage() {
             {t.label}
           </button>
         ))}
+        {hasLoaded && macro?.snapshot_date && (
+          <span style={{ marginLeft: "auto", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flexShrink: 0 }}>
+            Snapshot: {macro.snapshot_date}
+          </span>
+        )}
       </div>
 
       {/* Content */}
@@ -90,12 +102,52 @@ export default function MacroPage() {
             {error}
           </div>
         )}
-        {activeTab === "overview"   && <MacroOverview   macro={macro} loading={loading} />}
-        {activeTab === "indicators" && <MacroIndicators macro={macro} loading={loading} />}
-        {activeTab === "markets"    && <MacroMarkets    macro={macro} loading={loading} />}
-        {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
-        {activeTab === "news"       && <MacroNews />}
-        {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}
+
+        {!hasLoaded ? (
+          /* ── Load gate ── */
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 480, textAlign: "center", gap: "var(--sr-sp-5)" }}>
+            <div>
+              <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "var(--sr-sp-2)" }}>
+                Macro Dashboard
+              </div>
+              <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", maxWidth: 440, lineHeight: 1.7 }}>
+                Composite scores, FRED indicators, market data and AI synthesis.
+                Click below to fetch the latest snapshot from Supabase.
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-1)", alignItems: "center" }}>
+              {["Liquidity · Credit · Recession · Geopolitical · Housing composites", "43+ FRED series across 8 indicator categories", "Live ETF & crypto market quotes", "News sentiment scoring · AI OPLA synthesis"].map(line => (
+                <div key={line} style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "flex", alignItems: "center", gap: "var(--sr-sp-2)" }}>
+                  <span style={{ color: "var(--sr-pos)", fontSize: 8 }}>▶</span>
+                  {line}
+                </div>
+              ))}
+            </div>
+            <button
+              className="btn-primary"
+              onClick={loadData}
+              disabled={loading}
+              style={{ padding: "12px 36px", fontSize: "var(--sr-t-base)", fontWeight: 700, marginTop: "var(--sr-sp-2)" }}
+            >
+              {loading ? "Loading…" : "Load Macro Data"}
+            </button>
+            {loading && (
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                Fetching macro_state from Supabase…
+              </div>
+            )}
+          </div>
+        ) : (
+          /* ── Tab content — only mounts after manual load ── */
+          <>
+            {activeTab === "overview"   && <MacroOverview   macro={macro} loading={loading} />}
+            {activeTab === "indicators" && <MacroIndicators macro={macro} loading={loading} />}
+            {activeTab === "markets"    && <MacroMarkets    macro={macro} loading={loading} />}
+            {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
+            {activeTab === "news"       && <MacroNews />}
+            {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}
+          </>
+        )}
       </div>
     </div>
   );

@@ -70,19 +70,31 @@ COMPOSITE SCORES (0-100, stress direction):
 • Housing Stress (HSC): ${macro.housing_stress ?? "N/A"} [lagging cycle indicator]
 
 RATES & LIQUIDITY:
-• 2Y: ${macro.dgs2 ?? "N/A"}% | 10Y: ${macro.dgs10 ?? "N/A"}% | 30Y: ${macro.dgs30 ?? "N/A"}%
-• Curve (10Y-2Y): ${macro.curve_steepener ?? "N/A"}bp | Term Premium: ${macro.term_premium_10y ?? "N/A"}%
-• Net Liquidity: ${macro.net_liquidity_t != null ? `$${macro.net_liquidity_t}T` : "N/A"} (${macro.net_liquidity_dir ?? "N/A"})
-• Global Liquidity: ${macro.global_liquidity_dir ?? "N/A"}
+• 2Y: ${macro.dgs2 ?? "N/A"}% | 5Y: ${macro.dgs5 ?? "N/A"}% | 10Y: ${macro.dgs10 ?? "N/A"}% | 30Y: ${macro.dgs30 ?? "N/A"}%
+• Curve 10Y-2Y: ${macro.t10y2y != null ? macro.t10y2y.toFixed(2) + "%" : "N/A"} | Curve 10Y-3M: ${macro.t10y3m != null ? macro.t10y3m.toFixed(2) + "%" : "N/A"} | Term Premium: ${macro.term_premium_10y ?? "N/A"}%
+• SOFR: ${macro.sofr ?? "N/A"}% | Fed Funds: ${macro.fedfunds ?? "N/A"}% | Real Yield 10Y: ${macro.dgs10 != null && macro.core_pce_yoy != null ? (Number(macro.dgs10) - Number(macro.core_pce_yoy)).toFixed(2) + "%" : "N/A"}
+• Net Liquidity: ${macro.net_liquidity_t != null ? `$${macro.net_liquidity_t}T` : "N/A"} (${macro.net_liquidity_dir ?? "N/A"}) | Fed BS: ${macro.walcl != null ? `$${(Number(macro.walcl)/1e6).toFixed(2)}T` : "N/A"}
+• Global Liquidity: ${macro.global_liquidity_dir ?? "N/A"} | M2 Growth: ${macro.m2_growth ?? "N/A"}% | Sahm Rule: ${macro.sahm_rule ?? "N/A"}
+
+CREDIT & STRESS:
+• HY OAS (All): ${macro.hy_oas ?? "N/A"}bp | HY OAS BB: ${macro.hy_bb_oas ?? "N/A"}bp | HY OAS CCC: ${macro.hy_ccc_oas ?? "N/A"}bp | BBB: ${macro.bbb_oas ?? "N/A"}bp
+• C&I Tightening: ${macro.c_and_i_loans ?? "N/A"}% | Credit Card Delinq.: ${macro.credit_card_delinq ?? "N/A"}%
+• NFCI: ${macro.nfci ?? "N/A"} | STLFSI4: ${macro.stlfsi4 ?? "N/A"}
 
 MACRO & FED:
-• Core PCE YoY: ${macro.core_pce_yoy ?? "N/A"}% | Unemployment: ${macro.unrate ?? "N/A"}%
+• Core PCE YoY: ${macro.core_pce_yoy ?? "N/A"}% | Core CPI YoY: ${macro.core_cpi_yoy ?? "N/A"}% | Unemployment: ${macro.unrate ?? "N/A"}%
+• UMich Sentiment: ${macro.umcsent ?? "N/A"} | Jobless Claims: ${macro.icsa ?? "N/A"}K
 • Buffett Indicator: ${macro.buffett_indicator ?? "N/A"}% | Expected 10Y Return: ${macro.expected_return_10y ?? "N/A"}%
 • Fed Room: ${macro.fed_room ?? "N/A"} | WTI: $${macro.wti_level ?? "N/A"} (1M: ${macro.wti_chg_1m ?? "N/A"}%) | Oil Shock: ${macro.oil_shock ?? "none"}
+• DXY: ${macro.dxy ?? "N/A"} | USD/JPY: ${macro.usdjpy ?? "N/A"} | Brent: $${macro.brent ?? "N/A"}
+
+HOUSING:
+• Mortgage Rate 30Y: ${macro.mortgage_rate ?? "N/A"}% | Housing Starts: ${macro.house_starts ?? "N/A"}K | Building Permits: ${macro.building_permits ?? "N/A"}K
+• Existing Home Sales: ${macro.home_sales != null ? (Number(macro.home_sales)/1000).toFixed(0) + "K" : "N/A"} | Case-Shiller YoY: ${macro.case_shiller_yoy ?? "N/A"}%
 
 SENTIMENT & VOLATILITY:
 • Fear & Greed: ${macro.fear_greed ?? "N/A"} (${macro.fear_greed_rating ?? "N/A"}) | Put/Call: ${macro.put_call_ratio ?? "N/A"}
-• VIX: ${macro.vix ?? "N/A"} | MOVE Index: ${macro.move_index ?? "N/A"}
+• VIX: ${macro.vix ?? "N/A"} | MOVE Index: ${macro.move_index ?? "N/A"} | OVX: ${macro.ovx ?? "N/A"}
 • Sentiment Signal: ${macro.sentiment_signal ?? "N/A"} | Global Liquidity: ${macro.global_liquidity_dir ?? "N/A"}
 
 Be specific, quantitative, and actionable. Use exact numbers from the data. Scenario probabilities must sum to 100%.`;

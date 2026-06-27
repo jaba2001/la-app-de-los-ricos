@@ -66,7 +66,8 @@ export default function StockTickerPage() {
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
 
@@ -83,6 +84,7 @@ export default function StockTickerPage() {
 
   const analyze = useCallback(async () => {
     if (!session || !ticker) return;
+    setHasAnalyzed(true);
     setLoading(true);
     setError("");
 
@@ -209,8 +211,6 @@ export default function StockTickerPage() {
     setLoading(false);
   }, [session, ticker]);
 
-  useEffect(() => { if (session) analyze(); }, [session, analyze]);
-
   if (authLoading || !session) return null;
 
   const profile = data?.profile;
@@ -326,25 +326,62 @@ export default function StockTickerPage() {
 
       {/* Content */}
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1200, margin: "0 auto" }}>
-        {error && (
-          <div style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-sm)", marginBottom: "var(--sr-sp-5)" }}>
-            {error}
+        {!hasAnalyzed ? (
+          /* ── Analyze gate ── */
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 480, textAlign: "center", gap: "var(--sr-sp-5)" }}>
+            <div>
+              <div style={{ fontSize: "var(--sr-t-3xl)", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "var(--sr-sp-2)" }}>
+                {ticker}
+              </div>
+              <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", maxWidth: 440, lineHeight: 1.7 }}>
+                Fetch fundamentals, valuation, momentum, insider activity, macro overlay and more for this ticker.
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-1)", alignItems: "center" }}>
+              {[
+                "Overview · Fundamentals · Valuation · Chart",
+                "Research · Smart Money · Screener · Compare",
+                "Macro tilt overlay from current regime",
+                "Score saved to watchlist automatically",
+              ].map(line => (
+                <div key={line} style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "flex", alignItems: "center", gap: "var(--sr-sp-2)" }}>
+                  <span style={{ color: "var(--sr-amber)", fontSize: 8 }}>▶</span>
+                  {line}
+                </div>
+              ))}
+            </div>
+            <button
+              className="btn-primary"
+              onClick={() => analyze()}
+              disabled={loading}
+              style={{ padding: "12px 36px", fontSize: "var(--sr-t-base)", fontWeight: 700, marginTop: "var(--sr-sp-2)" }}
+            >
+              {loading ? "Analyzing…" : `Analyze ${ticker}`}
+            </button>
           </div>
+        ) : (
+          /* ── Tab content — only mounts after analyze ── */
+          <>
+            {error && (
+              <div style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-sm)", marginBottom: "var(--sr-sp-5)" }}>
+                {error}
+              </div>
+            )}
+            {!error && failedApis > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", marginBottom: "var(--sr-sp-4)", border: "1px solid color-mix(in srgb, var(--sr-warn) 20%, transparent)" }}>
+                ⚠ {failedApis} data source{failedApis > 1 ? "s" : ""} unavailable — some fields may show "—"
+              </div>
+            )}
+            {activeTab === "overview"     && <StockOverview    data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />}
+            {activeTab === "fundamentals" && <StockFundamentals data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
+            {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
+            {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "screener"     && <StockScreener />}
+            {activeTab === "compare"      && <StockCompare     ticker={ticker} />}
+          </>
         )}
-        {!error && failedApis > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", marginBottom: "var(--sr-sp-4)", border: "1px solid color-mix(in srgb, var(--sr-warn) 20%, transparent)" }}>
-            ⚠ {failedApis} data source{failedApis > 1 ? "s" : ""} unavailable — some fields may show "—"
-          </div>
-        )}
-
-        {activeTab === "overview"     && <StockOverview    data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />}
-        {activeTab === "fundamentals" && <StockFundamentals data={data} loading={loading} ticker={ticker} />}
-        {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
-        {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} />}
-        {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
-        {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
-        {activeTab === "screener"     && <StockScreener />}
-        {activeTab === "compare"      && <StockCompare     ticker={ticker} />}
       </div>
     </div>
   );
