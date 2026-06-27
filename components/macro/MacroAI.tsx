@@ -179,6 +179,7 @@ export default function MacroAI({ macro, loading }: Props) {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [alertsSaved, setAlertsSaved] = useState(false);
 
   async function generate() {
     if (!macro) return;
@@ -213,6 +214,24 @@ export default function MacroAI({ macro, loading }: Props) {
       setSaved(true);
     } catch { /* ic_briefs may not exist — fail silently */ }
     setSaving(false);
+  }
+
+  async function saveAlerts() {
+    if (!macro || activeTripwires.length === 0) return;
+    setAlertsSaved(false);
+    try {
+      const rows = activeTripwires.map(t => ({
+        alert_key:           t.key,
+        alert_label:         t.label,
+        threshold_value:     t.threshold ?? null,
+        current_value:       (() => { const v = (macro as unknown as Record<string,unknown>)[t.key]; return v != null ? Number(v) : null; })(),
+        macro_snapshot_date: macro.snapshot_date,
+        ic_score:            macro.ic_score,
+        triggered_at:        new Date().toISOString(),
+      }));
+      await supabase.from("alerts_log").insert(rows);
+      setAlertsSaved(true);
+    } catch { /* alerts_log may not exist yet — fail silently */ }
   }
 
   function exportReport() {
@@ -360,7 +379,25 @@ export default function MacroAI({ macro, loading }: Props) {
         <div>
           <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
-              <div className="section-label">Tripwires</div>
+              <div>
+                <div className="section-label">Tripwires</div>
+              </div>
+              <div style={{ display: "flex", gap: "var(--sr-sp-2)", alignItems: "center" }}>
+                {activeTripwires.length > 0 && (
+                  <button
+                    onClick={saveAlerts}
+                    disabled={alertsSaved}
+                    style={{
+                      padding: "4px 10px", borderRadius: "var(--sr-radius-pill)", fontSize: "var(--sr-t-xs)",
+                      fontWeight: 600, cursor: alertsSaved ? "default" : "pointer",
+                      background: alertsSaved ? "color-mix(in srgb, var(--sr-pos) 12%, transparent)" : "var(--sr-surface-2)",
+                      border: `1px solid ${alertsSaved ? "color-mix(in srgb, var(--sr-pos) 35%, transparent)" : "var(--sr-border)"}`,
+                      color: alertsSaved ? "var(--sr-pos)" : "var(--sr-text-3)",
+                    }}
+                  >
+                    {alertsSaved ? "✓ Saved" : "↓ Save to Log"}
+                  </button>
+                )}
               <span style={{
                 fontSize: "var(--sr-t-xs)", fontWeight: 700, padding: "2px 8px",
                 borderRadius: "var(--sr-radius-pill)",
@@ -371,6 +408,7 @@ export default function MacroAI({ macro, loading }: Props) {
               }}>
                 {activeTripwires.length} ACTIVE
               </span>
+              </div>
             </div>
             {TRIPWIRES.map(t => {
               const active = activeTripwires.includes(t);

@@ -210,6 +210,60 @@ export function computeVolumeProfile(data: OHLCV[], buckets = 24): VolumeProfile
   return { buckets: bkts, pocMid: bkts[pocIdx].mid, vaHigh: bkts[hi].hi, vaLow: bkts[lo].lo };
 }
 
+// ── Divergence Detection ──────────────────────────────────────────────────────
+
+export interface Divergence {
+  type: "bullish" | "bearish";
+  dateIdx: number;
+  label: string;
+}
+
+export function detectDivergences(
+  prices: number[],
+  sqzMom: (number | null)[],
+  pivotLen = 5,
+): Divergence[] {
+  const n = prices.length;
+  if (n < pivotLen * 4) return [];
+  const divs: Divergence[] = [];
+
+  const lows: number[] = [];
+  for (let i = pivotLen; i < n - pivotLen; i++) {
+    let ok = true;
+    for (let j = i - pivotLen; j <= i + pivotLen; j++) {
+      if (j !== i && prices[j] <= prices[i]) { ok = false; break; }
+    }
+    if (ok) lows.push(i);
+  }
+  for (let k = 1; k < lows.length; k++) {
+    const [i1, i2] = [lows[k - 1], lows[k]];
+    if (i2 - i1 < pivotLen * 2) continue;
+    const m1 = sqzMom[i1], m2 = sqzMom[i2];
+    if (m1 == null || m2 == null) continue;
+    if (prices[i2] < prices[i1] && m2 > m1)
+      divs.push({ type: "bullish", dateIdx: i2, label: "Bullish Div" });
+  }
+
+  const highs: number[] = [];
+  for (let i = pivotLen; i < n - pivotLen; i++) {
+    let ok = true;
+    for (let j = i - pivotLen; j <= i + pivotLen; j++) {
+      if (j !== i && prices[j] >= prices[i]) { ok = false; break; }
+    }
+    if (ok) highs.push(i);
+  }
+  for (let k = 1; k < highs.length; k++) {
+    const [i1, i2] = [highs[k - 1], highs[k]];
+    if (i2 - i1 < pivotLen * 2) continue;
+    const m1 = sqzMom[i1], m2 = sqzMom[i2];
+    if (m1 == null || m2 == null) continue;
+    if (prices[i2] > prices[i1] && m2 < m1)
+      divs.push({ type: "bearish", dateIdx: i2, label: "Bearish Div" });
+  }
+
+  return divs;
+}
+
 // ── TL Confluence signals ─────────────────────────────────────────────────────
 
 export interface TLSignals {

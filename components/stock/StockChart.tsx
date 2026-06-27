@@ -5,13 +5,18 @@ import { Sk } from "@/components/ui/Skeleton";
 import {
   ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine, ReferenceArea, Cell, BarChart, LineChart,
+  Brush,
 } from "recharts";
 import {
-  computeSqueeze, computeADX, computeVolumeProfile, computeTLResult,
+  computeSqueeze, computeADX, computeVolumeProfile, computeTLResult, detectDivergences,
   type OHLCV,
 } from "@/lib/technicalIndicators";
 
-interface Props { data: StockData | null; loading: boolean; ticker: string; icScore?: number | null; }
+interface Props {
+  data: StockData | null; loading: boolean; ticker: string;
+  icScore?: number | null;
+  dgs2?: number | null;
+}
 
 type Period = "1M" | "3M" | "6M" | "1Y" | "5Y";
 
@@ -42,19 +47,21 @@ function ToggleBtn({ label, active, onClick }: { label: string; active: boolean;
   );
 }
 
-export default function StockChart({ data, loading, ticker, icScore = null }: Props) {
-  const [period, setPeriod]         = useState<Period>("1Y");
-  const [showEMA, setShowEMA]       = useState(true);
-  const [showVolume, setShowVolume] = useState(false);
+export default function StockChart({ data, loading, ticker, icScore = null, dgs2 = null }: Props) {
+  const [period, setPeriod]           = useState<Period>("1Y");
+  const [showEMA, setShowEMA]         = useState(true);
+  const [showVolume, setShowVolume]   = useState(false);
   const [showSqueeze, setShowSqueeze] = useState(false);
-  const [showADX, setShowADX]       = useState(false);
-  const [showVP, setShowVP]         = useState(false);
+  const [showADX, setShowADX]         = useState(false);
+  const [showVP, setShowVP]           = useState(false);
+  const [showBrush, setShowBrush]     = useState(false);
+  const [showDivergence, setShowDivergence] = useState(false);
 
   const rawHistory = data?.history ?? [];
 
   // ─── Compute all indicators on full history, slice to display period ──────
-  const { chartData, vp, tlResult } = useMemo(() => {
-    if (!rawHistory.length) return { chartData: [], vp: null, tlResult: null };
+  const { chartData, vp, tlResult, divergences } = useMemo(() => {
+    if (!rawHistory.length) return { chartData: [], vp: null, tlResult: null, divergences: [] };
 
     const fullSorted = [...rawHistory]
       .sort((a, b) => new Date(a.date as string).getTime() - new Date(b.date as string).getTime());
@@ -107,7 +114,12 @@ export default function StockChart({ data, loading, ticker, icScore = null }: Pr
       rawDisp, sqSlice, adxSlice, vpResult, icScore,
     );
 
-    return { chartData: cd, vp: vpResult, tlResult: tl };
+    // Divergences from squeeze momentum
+    const prices = cd.map(d => d.price);
+    const sqzMom = sqSlice.map(s => s?.val ?? null);
+    const divs = detectDivergences(prices, sqzMom);
+
+    return { chartData: cd, vp: vpResult, tlResult: tl, divergences: divs };
   }, [rawHistory, period, icScore]);
 
   const quote   = data?.quote;
@@ -161,12 +173,15 @@ export default function StockChart({ data, loading, ticker, icScore = null }: Pr
             ))}
           </div>
           <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-            <ToggleBtn label="EMA 20/50" active={showEMA}     onClick={() => setShowEMA(!showEMA)} />
-            <ToggleBtn label="Volume"    active={showVolume}   onClick={() => setShowVolume(!showVolume)} />
-            <ToggleBtn label="VP Levels" active={showVP}       onClick={() => setShowVP(!showVP)} />
+            <ToggleBtn label="EMA 20/50"  active={showEMA}        onClick={() => setShowEMA(!showEMA)} />
+            <ToggleBtn label="Volume"      active={showVolume}     onClick={() => setShowVolume(!showVolume)} />
+            <ToggleBtn label="VP Levels"   active={showVP}         onClick={() => setShowVP(!showVP)} />
+            {dgs2 != null && <ToggleBtn label={`Fed ~${dgs2.toFixed(1)}%`} active={false} onClick={() => {}} />}
             <div style={{ width: 1, background: "var(--sr-border)", margin: "0 2px" }} />
-            <ToggleBtn label="Squeeze"   active={showSqueeze}  onClick={() => setShowSqueeze(!showSqueeze)} />
-            <ToggleBtn label="ADX"       active={showADX}      onClick={() => setShowADX(!showADX)} />
+            <ToggleBtn label="Squeeze"     active={showSqueeze}   onClick={() => setShowSqueeze(!showSqueeze)} />
+            <ToggleBtn label="ADX"         active={showADX}       onClick={() => setShowADX(!showADX)} />
+            <ToggleBtn label="Divergence"  active={showDivergence} onClick={() => setShowDivergence(!showDivergence)} />
+            <ToggleBtn label="Zoom Range"  active={showBrush}      onClick={() => setShowBrush(!showBrush)} />
           </div>
         </div>
 
@@ -219,6 +234,21 @@ export default function StockChart({ data, loading, ticker, icScore = null }: Pr
                   <ReferenceLine yAxisId="price" y={Number(quote.price)}
                     stroke="var(--sr-text-3)" strokeDasharray="4 4" />
                 )}
+                {/* Divergence markers on main chart */}
+                {showDivergence && divergences.map((div, i) => {
+                  const date = chartData[div.dateIdx]?.date;
+                  if (!date) return null;
+                  return (
+                    <ReferenceLine key={i} yAxisId="price" x={date}
+                      stroke={div.type === "bullish" ? "var(--sr-pos)" : "var(--sr-neg)"}
+                      strokeWidth={1} strokeDasharray="3 3" strokeOpacity={0.6}
+                    />
+                  );
+                })}
+                {showBrush && (
+                  <Brush dataKey="date" height={28} stroke="var(--sr-border)"
+                    fill="var(--sr-surface-2)" travellerWidth={8} />
+                )}
               </ComposedChart>
             </ResponsiveContainer>
 
@@ -245,6 +275,18 @@ export default function StockChart({ data, loading, ticker, icScore = null }: Pr
                         />
                       ))}
                     </Bar>
+                    {/* Divergence markers */}
+                    {showDivergence && divergences.map((div, i) => {
+                      const date = chartData[div.dateIdx]?.date;
+                      if (!date) return null;
+                      return (
+                        <ReferenceLine key={i} x={date}
+                          stroke={div.type === "bullish" ? "var(--sr-pos)" : "var(--sr-neg)"}
+                          strokeWidth={2} strokeDasharray="2 2"
+                          label={{ value: div.type === "bullish" ? "↑" : "↓", position: "top", fill: div.type === "bullish" ? "var(--sr-pos)" : "var(--sr-neg)", fontSize: 12 }}
+                        />
+                      );
+                    })}
                   </BarChart>
                 </ResponsiveContainer>
               </>

@@ -44,6 +44,36 @@ export interface MacroState {
   /* MOVE / VIX */
   move_index?: number | null;
   vix?: number | null;
+  /* Extended Rates */
+  dgs1?: number | null;
+  dgs5?: number | null;
+  t10y3m?: number | null;
+  real_yield_10y?: number | null;
+  breakeven_10y?: number | null;
+  skew_index?: number | null;
+  stlfsi4?: number | null;
+  ovx?: number | null;
+  fedfunds?: number | null;
+  /* Extended Credit */
+  hy_oas?: number | null;
+  hy_oas_momentum?: number | null;
+  ted_spread?: number | null;
+  /* Extended Labor & Inflation */
+  icsa?: number | null;
+  payems?: number | null;
+  core_cpi_yoy?: number | null;
+  /* Extended Liquidity */
+  walcl?: number | null;
+  rrpontsyd?: number | null;
+  m2_growth?: number | null;
+  /* Extended Housing */
+  house_starts?: number | null;
+  home_sales?: number | null;
+  building_permits?: number | null;
+  median_home_price_chg?: number | null;
+  /* Extended Commodities */
+  gold_price?: number | null;
+  brent?: number | null;
 }
 
 /* ── Stock Analysis (from Supabase sl_analyses) ── */
