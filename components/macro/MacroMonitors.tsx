@@ -1,0 +1,186 @@
+"use client";
+import type { MacroState } from "@/lib/types";
+import { Sk } from "@/components/ui/Skeleton";
+import { Pill } from "@/components/ui/Pill";
+
+interface Props { macro: MacroState | null; loading: boolean; }
+
+function MonitorCard({ title, score, color, status, signals, children }: {
+  title: string;
+  score?: number | null;
+  color: string;
+  status: string;
+  signals?: string[];
+  children?: React.ReactNode;
+}) {
+  const pct = score ?? 0;
+  return (
+    <div className="card">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
+        <div>
+          <div className="section-label">{title}</div>
+          {score != null && (
+            <span style={{ fontSize: "var(--sr-t-hero)", fontWeight: 700, color, lineHeight: 1 }} className="num">
+              {score.toFixed(0)}
+            </span>
+          )}
+        </div>
+        <Pill label={status} color={color} />
+      </div>
+      {score != null && (
+        <div className="score-bar-track" style={{ height: 6, marginBottom: "var(--sr-sp-4)" }}>
+          <div className="score-bar-fill" style={{ width: `${pct}%`, background: color }} />
+        </div>
+      )}
+      {signals && signals.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
+          {signals.map((s, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
+              <span style={{ color, flexShrink: 0 }}>▸</span>
+              {s}
+            </div>
+          ))}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+const DALIO_STAGES = [
+  { n: 1, label: "Accumulation",          desc: "Normal debt cycle, productive borrowing" },
+  { n: 2, label: "Currency as Tool",       desc: "Monetary policy drives growth" },
+  { n: 3, label: "Creditors Diversify",    desc: "Foreign holders reduce exposure" },
+  { n: 4, label: "Political Fracture",     desc: "Debt servicing crowding out defense/social" },
+  { n: 5, label: "Extraordinary Measures", desc: "Debt monetization, currency debasement" },
+];
+
+export default function MacroMonitors({ macro, loading }: Props) {
+  if (loading) {
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)" }}>
+        {[0,1,2,3].map(i => <div key={i} className="card" style={{ height: 200 }}><Sk w="100%" h={180} /></div>)}
+      </div>
+    );
+  }
+
+  const meltup = macro?.meltup_score != null ? Number(macro.meltup_score) : null;
+  const meltupColor = (meltup ?? 0) >= 70 ? "var(--sr-pos)" : (meltup ?? 0) >= 45 ? "var(--sr-warn)" : "var(--sr-text-2)";
+  const meltupStatus = (meltup ?? 0) >= 70 ? "BULLISH" : (meltup ?? 0) >= 45 ? "CAUTION" : "NEUTRAL";
+
+  const bubble = macro?.bubble_debt != null ? Number(macro.bubble_debt) : null;
+  const bubbleAI = macro?.bubble_ai != null ? Number(macro.bubble_ai) : null;
+  const bubbleAvg = bubble != null && bubbleAI != null ? (bubble + bubbleAI) / 2 : bubble ?? bubbleAI ?? 0;
+  const bubbleColor = bubbleAvg >= 70 ? "var(--sr-neg)" : bubbleAvg >= 45 ? "var(--sr-warn)" : "var(--sr-pos)";
+  const bubbleStatus = bubbleAvg >= 70 ? "HIGH RISK" : bubbleAvg >= 45 ? "ELEVATED" : "CONTAINED";
+
+  const rpc = macro?.recession_prob != null ? Number(macro.recession_prob) : 0;
+  const rpcColor = rpc >= 60 ? "var(--sr-neg)" : rpc >= 40 ? "var(--sr-warn)" : "var(--sr-pos)";
+  const rpcStatus = rpc >= 60 ? "HIGH" : rpc >= 40 ? "ELEVATED" : "LOW";
+
+  return (
+    <div className="animate-fade-in">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
+        {/* Meltup Monitor */}
+        <MonitorCard
+          title="Meltup Monitor"
+          score={meltup}
+          color={meltupColor}
+          status={meltupStatus}
+          signals={[
+            "Equity valuations elevated (Buffett Indicator)",
+            "Put/Call ratio declining",
+            "Momentum trend: positive",
+          ]}
+        />
+
+        {/* Bubble Risk Monitor */}
+        <MonitorCard
+          title="Bubble Risk Monitor"
+          score={bubbleAvg > 0 ? bubbleAvg : null}
+          color={bubbleColor}
+          status={bubbleStatus}
+          signals={[
+            "Debt Bubble score: " + (bubble?.toFixed(0) ?? "—"),
+            "AI Valuation bubble: " + (bubbleAI?.toFixed(0) ?? "—"),
+            macro?.vix != null ? `VIX: ${Number(macro.vix).toFixed(1)} ${Number(macro.vix) > 35 ? "⚠ TRIGGER" : ""}` : "VIX: —",
+          ]}
+        />
+
+        {/* Recession Monitor */}
+        <MonitorCard
+          title="Recession Monitor"
+          score={rpc}
+          color={rpcColor}
+          status={rpcStatus}
+          signals={[
+            `Core PCE YoY: ${macro?.core_pce_yoy != null ? Number(macro.core_pce_yoy).toFixed(1) : "—"}% (target: 2%)`,
+            `Unemployment: ${macro?.unrate != null ? Number(macro.unrate).toFixed(1) : "—"}%`,
+            `Fed Room: ${macro?.fed_room ?? "—"}`,
+            `Curve Steepener: ${macro?.curve_steepener != null ? Number(macro.curve_steepener).toFixed(0) : "—"}bp`,
+          ]}
+        />
+
+        {/* Commodity Supercycle */}
+        <div className="card">
+          <div className="section-label">Commodity Supercycle</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
+            {[
+              { label: "WTI Oil",   val: macro?.wti_level != null ? `$${Number(macro.wti_level).toFixed(1)}` : "—" },
+              { label: "1M Change", val: macro?.wti_chg_1m != null ? `${Number(macro.wti_chg_1m) >= 0 ? "+" : ""}${Number(macro.wti_chg_1m).toFixed(1)}%` : "—",
+                color: Number(macro?.wti_chg_1m ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
+              { label: "Oil Shock", val: macro?.oil_shock ?? "—" },
+              { label: "Real Rate", val: macro?.dgs10 != null && macro?.core_pce_yoy != null
+                ? `${(Number(macro.dgs10) - Number(macro.core_pce_yoy)).toFixed(2)}%` : "—" },
+            ].map(({ label, val, color }) => (
+              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: color ?? "var(--sr-text)" }} className="num">{val}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Dalio Debt Cycle */}
+      <div className="card">
+        <div className="section-label">Dalio Long-Term Debt Cycle</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-3)" }}>
+          {DALIO_STAGES.map(stage => (
+            <div key={stage.n} style={{
+              padding: "var(--sr-sp-3)",
+              borderRadius: "var(--sr-radius)",
+              background: stage.n === 4 ? "color-mix(in srgb, var(--sr-warn) 12%, var(--sr-surface-2))" : "var(--sr-surface-2)",
+              border: stage.n === 4 ? "1px solid color-mix(in srgb, var(--sr-warn) 40%, transparent)" : "1px solid transparent",
+            }}>
+              <div style={{
+                fontSize: "var(--sr-t-xs)", fontWeight: 700, color: stage.n === 4 ? "var(--sr-warn)" : "var(--sr-text-3)",
+                marginBottom: 4,
+              }}>
+                Stage {stage.n}{stage.n === 4 ? " ← CURRENT" : ""}
+              </div>
+              <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: stage.n === 4 ? "var(--sr-text)" : "var(--sr-text-2)", marginBottom: 4 }}>
+                {stage.label}
+              </div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{stage.desc}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: "var(--sr-sp-4)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+          {[
+            { label: "Interest % of Income", val: "18%", warn: "Critical: 22%" },
+            { label: "Interest vs Defense",  val: "1.2×", warn: "Crossed 2024" },
+            { label: "USD Reserve Share",    val: "58%", warn: "Was 72% in 2001" },
+            { label: "China Treasuries",     val: "−$380B", warn: "Since 2021" },
+          ].map(({ label, val, warn }) => (
+            <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)", marginTop: 2 }}>⚠ {warn}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
