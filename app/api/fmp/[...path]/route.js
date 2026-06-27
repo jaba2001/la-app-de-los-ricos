@@ -11,7 +11,7 @@ const ALLOWED = new Set([
   'cash-flow-statement','peers','historical-dividends',
   'institutional-holder','historical-shares-float',
   'key-metrics','financial-growth','earnings-surprises',
-  'search','senate-trading','house-disclosure',
+  'search','senate-trading','house-disclosure','insider-trading',
 ]);
 
 export async function GET(request, { params }) {
@@ -32,7 +32,10 @@ export async function GET(request, { params }) {
     return new Response(JSON.stringify({error:'Server misconfigured: FMP_KEY missing'}), {status:500, headers:{'Content-Type':'application/json'}});
   }
 
-  const upstream = new URL(`https://financialmodelingprep.com/stable/${path}`);
+  const fmpBase = path === 'news'
+    ? `https://financialmodelingprep.com/api/v3/stock_news`
+    : `https://financialmodelingprep.com/stable/${path}`;
+  const upstream = new URL(fmpBase);
   for (const [k,v] of url.searchParams) upstream.searchParams.set(k, v);
   upstream.searchParams.set('apikey', process.env.FMP_KEY);
 
