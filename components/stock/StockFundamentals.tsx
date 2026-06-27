@@ -1,7 +1,8 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { Sk } from "@/components/ui/Skeleton";
+import { authedFetch } from "@/lib/proxy";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, LineChart, Line, ComposedChart, Area,
@@ -132,6 +133,97 @@ function SharesDilutionChart({ sharesFloat, loading }: { sharesFloat: Record<str
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+function PeerMetricsTable({ ticker, peers, ratios }: {
+  ticker: string;
+  peers: string[];
+  ratios: Record<string, unknown> | null;
+}) {
+  const [peerData, setPeerData] = useState<Record<string, Record<string, unknown>>>({});
+  const [loadingPeers, setLoadingPeers] = useState(false);
+  const limited = peers.slice(0, 5);
+
+  useEffect(() => {
+    if (!limited.length) return;
+    setLoadingPeers(true);
+    Promise.allSettled(
+      limited.map(t =>
+        authedFetch<Record<string, unknown>[]>(`/api/fmp/ratios-ttm?symbol=${t}`)
+          .then(r => ({ t, d: (Array.isArray(r) ? r[0] : r) as Record<string, unknown> ?? {} }))
+      )
+    ).then(results => {
+      const map: Record<string, Record<string, unknown>> = {};
+      results.forEach(r => { if (r.status === "fulfilled") map[r.value.t] = r.value.d; });
+      setPeerData(map);
+      setLoadingPeers(false);
+    }).catch(() => setLoadingPeers(false));
+  }, [limited.join(",")]);
+
+  const fmtPe = (v: unknown) => {
+    const x = Number(v); return isNaN(x) || x <= 0 || x > 999 ? "—" : x.toFixed(1) + "x";
+  };
+  const fmtPct = (v: unknown, mul = true) => {
+    const x = Number(v); return isNaN(x) ? "—" : ((mul ? x * 100 : x).toFixed(1)) + "%";
+  };
+
+  const rows = [ticker, ...limited].map(t => {
+    const m = t === ticker ? ratios : (peerData[t] ?? null);
+    const revGrowth = m ? fmtPct(m.revenueGrowthTTM) : "—";
+    return {
+      t, isSelf: t === ticker,
+      pe:          m ? fmtPe(m.peRatioTTM) : "—",
+      grossMargin: m ? fmtPct(m.grossProfitMarginTTM) : "—",
+      revGrowth,
+      roe:         m ? fmtPct(m.returnOnEquityTTM) : "—",
+      revGrowthNum: m?.revenueGrowthTTM != null ? Number(m.revenueGrowthTTM) : null,
+      isLoading: t !== ticker && loadingPeers && !peerData[t],
+    };
+  });
+
+  return (
+    <div className="card">
+      <div className="section-label">Peer Comparison</div>
+      <div style={{ overflowX: "auto" }}>
+        <table className="sr-table" style={{ minWidth: 520 }}>
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th style={{ textAlign: "right" }}>P/E (TTM)</th>
+              <th style={{ textAlign: "right" }}>Gross Margin</th>
+              <th style={{ textAlign: "right" }}>Rev Growth</th>
+              <th style={{ textAlign: "right" }}>ROE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(row => (
+              <tr key={row.t} style={{ background: row.isSelf ? "color-mix(in srgb, var(--sr-amber) 6%, transparent)" : undefined }}>
+                <td>
+                  {row.isSelf
+                    ? <span style={{ fontWeight: 700, color: "var(--sr-amber)" }}>{row.t}</span>
+                    : <a href={`/stock/${row.t}`} style={{ color: "var(--sr-text-2)", fontWeight: 600 }}>{row.t}</a>
+                  }
+                </td>
+                {row.isLoading ? (
+                  <><td><Sk w={40} h={14} /></td><td><Sk w={50} h={14} /></td><td><Sk w={50} h={14} /></td><td><Sk w={50} h={14} /></td></>
+                ) : (
+                  <>
+                    <td style={{ textAlign: "right" }} className="num">{row.pe}</td>
+                    <td style={{ textAlign: "right" }} className="num">{row.grossMargin}</td>
+                    <td style={{ textAlign: "right", color: row.revGrowthNum != null ? (row.revGrowthNum >= 0 ? "var(--sr-pos)" : "var(--sr-neg)") : undefined }} className="num">{row.revGrowth}</td>
+                    <td style={{ textAlign: "right" }} className="num">{row.roe}</td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)" }}>
+        TTM = trailing twelve months · Max 5 peers shown
+      </div>
     </div>
   );
 }
@@ -274,29 +366,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
       {/* Peers */}
       {peers.length > 0 && (
-        <div className="card">
-          <div className="section-label">Peer Comparison</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
-            {[ticker, ...peers.slice(0, 8)].map(p => (
-              <a
-                key={p}
-                href={`/stock/${p}`}
-                style={{
-                  padding: "4px 12px",
-                  borderRadius: "var(--sr-radius-pill)",
-                  fontSize: "var(--sr-t-sm)",
-                  fontWeight: 600,
-                  background: p === ticker ? "var(--sr-amber-dim)" : "var(--sr-surface-2)",
-                  color: p === ticker ? "var(--sr-amber)" : "var(--sr-text-2)",
-                  border: p === ticker ? "1px solid color-mix(in srgb, var(--sr-amber) 40%, transparent)" : "1px solid var(--sr-border)",
-                  transition: "all 160ms",
-                }}
-              >
-                {p}
-              </a>
-            ))}
-          </div>
-        </div>
+        <PeerMetricsTable ticker={ticker} peers={peers} ratios={ratios ?? null} />
       )}
     </div>
   );

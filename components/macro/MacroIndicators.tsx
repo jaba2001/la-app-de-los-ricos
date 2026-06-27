@@ -11,80 +11,96 @@ type SeriesEntry = {
   threshold?: { warn: number; bad: number }; derived?: (m: MacroState) => number | null;
 };
 
-// ─── 43-series definitions across 8 categories ──────────────────────────────
+// ─── Series definitions across 8 categories ─────────────────────────────────
 
 const RATES: SeriesEntry[] = [
-  { label: "Fed Funds Rate",       key: "fedfunds",       suffix: "%", threshold: { warn: 3, bad: 5 }, higherIsBad: false },
-  { label: "1Y Treasury",          key: "dgs1",           suffix: "%" },
-  { label: "2Y Treasury",          key: "dgs2",           suffix: "%" },
-  { label: "5Y Treasury",          key: "dgs5",           suffix: "%" },
-  { label: "10Y Treasury",         key: "dgs10",          suffix: "%" },
-  { label: "30Y Treasury",         key: "dgs30",          suffix: "%" },
-  { label: "Curve 10Y−2Y",        key: "curve_steepener", suffix: "bp", signed: true, threshold: { warn: 0, bad: -25 } },
-  { label: "Curve 10Y−3M",        key: "t10y3m",         suffix: "bp", signed: true, threshold: { warn: 0, bad: -25 } },
-  { label: "Real Yield 10Y",       key: "real_yield_10y", suffix: "%",
+  { label: "Fed Funds Rate",        key: "fedfunds",         suffix: "%", threshold: { warn: 3, bad: 5 }, higherIsBad: false },
+  { label: "SOFR",                  key: "sofr",             suffix: "%" },
+  { label: "1Y Treasury",           key: "dgs1",             suffix: "%" },
+  { label: "2Y Treasury",           key: "dgs2",             suffix: "%" },
+  { label: "5Y Treasury",           key: "dgs5",             suffix: "%" },
+  { label: "10Y Treasury",          key: "dgs10",            suffix: "%" },
+  { label: "30Y Treasury",          key: "dgs30",            suffix: "%" },
+  { label: "Curve 10Y−2Y",         key: "t10y2y",           suffix: "%", signed: true, threshold: { warn: 0, bad: -0.25 } },
+  { label: "Curve 10Y−3M",         key: "t10y3m",           suffix: "%", signed: true, threshold: { warn: 0, bad: -0.25 } },
+  { label: "Steepener Direction",   key: "curve_steepener",  text: true },
+  { label: "Real Yield 10Y",        key: "real_yield_10y",   suffix: "%",
     derived: m => m.dgs10 != null && m.core_pce_yoy != null ? Number(m.dgs10) - Number(m.core_pce_yoy) : null },
-  { label: "Breakeven Inflation",  key: "breakeven_10y",  suffix: "%" },
-  { label: "Term Premium 10Y",     key: "term_premium_10y", suffix: "%" },
+  { label: "Breakeven Inflation",   key: "breakeven_10y",    suffix: "%" },
+  { label: "Term Premium 10Y",      key: "term_premium_10y", suffix: "%" },
 ];
 
 const CREDIT: SeriesEntry[] = [
-  { label: "HY OAS (All)",         key: "hy_oas",          suffix: "bp", threshold: { warn: 400, bad: 600 }, higherIsBad: true },
-  { label: "HY OAS Momentum",      key: "hy_oas_momentum", suffix: "bp/m", signed: true, higherIsBad: true },
-  { label: "TED Spread",           key: "ted_spread",      suffix: "bp", threshold: { warn: 30, bad: 60 }, higherIsBad: true },
-  { label: "Credit Stress (CSC)",  key: "credit_stress",   suffix: "",   threshold: { warn: 50, bad: 70 }, higherIsBad: true },
+  { label: "HY OAS (All)",          key: "hy_oas",           suffix: "bp", threshold: { warn: 400, bad: 600 }, higherIsBad: true },
+  { label: "HY OAS BB-rated",       key: "hy_bb_oas",        suffix: "bp", threshold: { warn: 300, bad: 450 }, higherIsBad: true },
+  { label: "HY OAS CCC-rated",      key: "hy_ccc_oas",       suffix: "bp", threshold: { warn: 800, bad: 1200 }, higherIsBad: true },
+  { label: "BBB OAS",               key: "bbb_oas",          suffix: "bp", threshold: { warn: 150, bad: 200 }, higherIsBad: true },
+  { label: "HY OAS Momentum",       key: "hy_oas_momentum",  suffix: "bp/m", signed: true, higherIsBad: true },
+  { label: "TED Spread",            key: "ted_spread",       suffix: "bp", threshold: { warn: 30, bad: 60 }, higherIsBad: true },
+  { label: "C&I Loan Tightening",   key: "c_and_i_loans",    suffix: "%", threshold: { warn: 20, bad: 40 }, higherIsBad: true },
+  { label: "Credit Card Delinq.",   key: "credit_card_delinq", suffix: "%", threshold: { warn: 3.5, bad: 5 }, higherIsBad: true },
+  { label: "Credit Stress (CSC)",   key: "credit_stress",    suffix: "", threshold: { warn: 50, bad: 70 }, higherIsBad: true },
 ];
 
 const LIQUIDITY: SeriesEntry[] = [
-  { label: "Fed Balance Sheet ($T)", key: "walcl",          suffix: "T", prefix: "$" },
-  { label: "Reverse Repo ($B)",      key: "rrpontsyd",      suffix: "B", prefix: "$" },
-  { label: "M2 YoY Growth",          key: "m2_growth",      suffix: "%" },
-  { label: "Net Liquidity ($T)",      key: "net_liquidity_t",suffix: "T", prefix: "$" },
+  { label: "Fed Balance Sheet ($T)", key: "walcl", suffix: "T", prefix: "$",
+    derived: m => m.walcl != null ? Number(m.walcl) / 1e6 : null },
+  { label: "Reverse Repo ($B)",      key: "rrpontsyd",        suffix: "B", prefix: "$" },
+  { label: "M2 YoY Growth",          key: "m2_growth",        suffix: "%" },
+  { label: "Net Liquidity ($T)",      key: "net_liquidity_t",  suffix: "T", prefix: "$" },
   { label: "Net Liquidity Direction", key: "net_liquidity_dir", text: true },
   { label: "Global Liquidity",        key: "global_liquidity_dir", text: true },
-  { label: "Liquidity Cycle (LCC)",   key: "liquidity_cycle", suffix: "", threshold: { warn: 40, bad: 25 }, higherIsBad: false },
+  { label: "Liquidity Cycle (LCC)",   key: "liquidity_cycle",  suffix: "", threshold: { warn: 40, bad: 25 }, higherIsBad: false },
 ];
 
 const LABOR: SeriesEntry[] = [
-  { label: "Unemployment Rate",    key: "unrate",  suffix: "%",  threshold: { warn: 5, bad: 7   }, higherIsBad: true },
-  { label: "Nonfarm Payrolls Δ",  key: "payems",  suffix: "K",  signed: true },
-  { label: "Initial Jobless Claims",key:"icsa",    suffix: "K",  threshold: { warn: 250, bad: 300 }, higherIsBad: true },
-  { label: "Recession Prob (RPC)", key: "recession_prob", suffix: "", threshold: { warn: 40, bad: 60 }, higherIsBad: true },
+  { label: "Unemployment Rate",     key: "unrate",         suffix: "%", threshold: { warn: 5, bad: 7 }, higherIsBad: true },
+  { label: "Nonfarm Payrolls (M)",  key: "payems",         suffix: "M", decimals: 1,
+    derived: m => m.payems != null ? Number(m.payems) / 1000 : null },
+  { label: "Initial Jobless Claims",key: "icsa",           suffix: "K", threshold: { warn: 250, bad: 300 }, higherIsBad: true },
+  { label: "Recession Prob (RPC)",  key: "recession_prob", suffix: "", threshold: { warn: 40, bad: 60 }, higherIsBad: true },
 ];
 
 const INFLATION: SeriesEntry[] = [
-  { label: "Core PCE YoY",        key: "core_pce_yoy",   suffix: "%", threshold: { warn: 2.5, bad: 3.5 }, higherIsBad: true },
-  { label: "Core CPI YoY",        key: "core_cpi_yoy",   suffix: "%", threshold: { warn: 2.5, bad: 3.5 }, higherIsBad: true },
-  { label: "Buffett Indicator",    key: "buffett_indicator", suffix: "%", threshold: { warn: 150, bad: 180 }, higherIsBad: true },
-  { label: "Expected Return 10Y",  key: "expected_return_10y", suffix: "%" },
+  { label: "Core PCE YoY",         key: "core_pce_yoy",        suffix: "%", threshold: { warn: 2.5, bad: 3.5 }, higherIsBad: true },
+  { label: "Core CPI YoY",         key: "core_cpi_yoy",        suffix: "%", threshold: { warn: 2.5, bad: 3.5 }, higherIsBad: true },
+  { label: "Buffett Indicator",     key: "buffett_indicator",    suffix: "%", threshold: { warn: 150, bad: 180 }, higherIsBad: true },
+  { label: "Expected Return 10Y",   key: "expected_return_10y",  suffix: "%" },
+  { label: "UMich Sentiment",       key: "umcsent",              suffix: "", threshold: { warn: 65, bad: 55 }, higherIsBad: false },
 ];
 
 const HOUSING: SeriesEntry[] = [
-  { label: "Housing Stress (HSC)", key: "housing_stress",   suffix: "", threshold: { warn: 45, bad: 65 }, higherIsBad: true },
-  { label: "Housing Starts (K)",   key: "house_starts",     suffix: "K" },
-  { label: "Existing Home Sales",  key: "home_sales",       suffix: "K" },
-  { label: "Building Permits (K)", key: "building_permits", suffix: "K" },
-  { label: "Median Price Δ YoY",   key: "median_home_price_chg", suffix: "%", signed: true },
+  { label: "Housing Stress (HSC)", key: "housing_stress",       suffix: "", threshold: { warn: 45, bad: 65 }, higherIsBad: true },
+  { label: "Mortgage Rate 30Y",    key: "mortgage_rate",        suffix: "%", threshold: { warn: 6.5, bad: 8 }, higherIsBad: true },
+  { label: "Housing Starts (K)",   key: "house_starts",         suffix: "K", decimals: 0 },
+  { label: "Existing Home Sales",  key: "home_sales",           suffix: "K", decimals: 0,
+    derived: m => m.home_sales != null ? Number(m.home_sales) / 1000 : null },
+  { label: "Building Permits (K)", key: "building_permits",     suffix: "K", decimals: 0 },
+  { label: "Case-Shiller YoY",    key: "case_shiller_yoy",     suffix: "%", signed: true },
+  { label: "Median Price Δ YoY",  key: "median_home_price_chg", suffix: "%", signed: true },
 ];
 
 const COMMODITIES: SeriesEntry[] = [
-  { label: "WTI Crude Oil",       key: "wti_level",  suffix: "", prefix: "$", threshold: { warn: 85, bad: 100 }, higherIsBad: true },
-  { label: "WTI Change 1M",       key: "wti_chg_1m", suffix: "%", signed: true },
-  { label: "Brent Crude",         key: "brent",      suffix: "", prefix: "$" },
-  { label: "Gold (FRED $oz)",     key: "gold_price", suffix: "", prefix: "$" },
-  { label: "Oil Volatility (OVX)",key: "ovx",        suffix: "", threshold: { warn: 35, bad: 55 }, higherIsBad: true },
-  { label: "Oil Shock",           key: "oil_shock",  text: true },
+  { label: "WTI Crude Oil",        key: "wti_level",  suffix: "", prefix: "$", threshold: { warn: 85, bad: 100 }, higherIsBad: true },
+  { label: "WTI Change 1M",        key: "wti_chg_1m", suffix: "%", signed: true },
+  { label: "Brent Crude",          key: "brent",      suffix: "", prefix: "$" },
+  { label: "Gold (GLD ETF)",       key: "gold_price", suffix: "", prefix: "$" },
+  { label: "Oil Volatility (OVX)", key: "ovx",        suffix: "", threshold: { warn: 35, bad: 55 }, higherIsBad: true },
+  { label: "Oil Shock",            key: "oil_shock",  text: true },
+  { label: "DXY (Broad Trade-Wtd)", key: "dxy",       suffix: "", threshold: { warn: 115, bad: 125 }, higherIsBad: true },
+  { label: "USD/JPY",              key: "usdjpy",     suffix: "" },
 ];
 
 const CONDITIONS: SeriesEntry[] = [
-  { label: "VIX",              key: "vix",         suffix: "", threshold: { warn: 20, bad: 35 }, higherIsBad: true },
-  { label: "MOVE Index",       key: "move_index",  suffix: "", threshold: { warn: 100, bad: 140 }, higherIsBad: true },
-  { label: "SKEW Index",       key: "skew_index",  suffix: "", threshold: { warn: 130, bad: 145 }, higherIsBad: true },
-  { label: "Fin. Stress (STLFSI4)", key: "stlfsi4", suffix: "", threshold: { warn: 0.5, bad: 1.5 }, higherIsBad: true },
-  { label: "Geopolitical (GRC)",key: "geopolitical_risk", suffix: "", threshold: { warn: 45, bad: 65 }, higherIsBad: true },
-  { label: "Melt-up Score",    key: "meltup_score", suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
-  { label: "Bubble — Debt",    key: "bubble_debt",  suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
-  { label: "Bubble — AI/Tech", key: "bubble_ai",    suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
+  { label: "VIX",                  key: "vix",              suffix: "", threshold: { warn: 20, bad: 35 }, higherIsBad: true },
+  { label: "MOVE Index",           key: "move_index",       suffix: "", threshold: { warn: 100, bad: 140 }, higherIsBad: true },
+  { label: "SKEW Index",           key: "skew_index",       suffix: "", threshold: { warn: 130, bad: 145 }, higherIsBad: true },
+  { label: "Fin. Stress (STLFSI4)", key: "stlfsi4",         suffix: "", threshold: { warn: 0.5, bad: 1.5 }, higherIsBad: true },
+  { label: "Chicago NFCI",         key: "nfci",             suffix: "", threshold: { warn: 0, bad: 0.5 }, higherIsBad: true },
+  { label: "Geopolitical (GRC)",   key: "geopolitical_risk", suffix: "", threshold: { warn: 45, bad: 65 }, higherIsBad: true },
+  { label: "Melt-up Score",        key: "meltup_score",     suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
+  { label: "Bubble — Debt",        key: "bubble_debt",      suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
+  { label: "Bubble — AI/Tech",     key: "bubble_ai",        suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
 ];
 
 const ALL_CATS = [
@@ -105,6 +121,15 @@ const SAHM_BANDS = [
   { range: "0.10–0.24", label: "Monitor",              color: "var(--sr-text-3)" },
   { range: "< 0.10",    label: "Benign",               color: "var(--sr-pos)" },
 ];
+
+function sahmBand(v: number | null | undefined) {
+  if (v == null) return null;
+  if (v >= 0.80) return SAHM_BANDS[0];
+  if (v >= 0.50) return SAHM_BANDS[1];
+  if (v >= 0.25) return SAHM_BANDS[2];
+  if (v >= 0.10) return SAHM_BANDS[3];
+  return SAHM_BANDS[4];
+}
 
 function getValue(item: SeriesEntry, macro: MacroState | null): number | string | null {
   if (!macro) return null;
@@ -244,20 +269,36 @@ export default function MacroIndicators({ macro, loading }: Props) {
             <div className="section-label">Sahm Rule — Recession Trigger</div>
             <div style={{ marginBottom: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>SAHMREALTIME</div>
-              <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }}>
-                {loading ? <Sk w={60} h={20} /> : "—"}
-              </div>
-              <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
-                Pending: add FRED SAHMREALTIME to macro pipeline
-              </div>
+              {loading ? <Sk w={60} h={20} /> : (() => {
+                const sv = macro?.sahm_rule != null ? Number(macro.sahm_rule) : null;
+                const band = sahmBand(sv);
+                return (
+                  <>
+                    <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: band?.color ?? "var(--sr-text)" }}>
+                      {sv != null ? sv.toFixed(2) : "—"}
+                    </div>
+                    {band && (
+                      <div style={{ fontSize: "10px", fontWeight: 600, color: band.color, marginTop: 4 }}>{band.label}</div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              {SAHM_BANDS.map(b => (
-                <div key={b.range} style={{ display: "flex", justifyContent: "space-between", padding: "4px 8px", borderRadius: 4, background: "var(--sr-surface-2)" }}>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: b.color }} className="num">{b.range}</span>
-                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{b.label}</span>
-                </div>
-              ))}
+              {SAHM_BANDS.map(b => {
+                const sv = macro?.sahm_rule != null ? Number(macro.sahm_rule) : null;
+                const active = sahmBand(sv) === b;
+                return (
+                  <div key={b.range} style={{
+                    display: "flex", justifyContent: "space-between", padding: "4px 8px", borderRadius: 4,
+                    background: active ? `color-mix(in srgb, ${b.color} 12%, var(--sr-surface-2))` : "var(--sr-surface-2)",
+                    border: active ? `1px solid color-mix(in srgb, ${b.color} 30%, transparent)` : "1px solid transparent",
+                  }}>
+                    <span style={{ fontSize: "10px", fontWeight: 700, color: b.color }} className="num">{b.range}</span>
+                    <span style={{ fontSize: "10px", color: active ? b.color : "var(--sr-text-3)", fontWeight: active ? 600 : 400 }}>{b.label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -269,7 +310,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
               {[
                 ["USD Reserve Share", "58% (↓ from 72%)"],
                 ["Debt / GDP",        "~130%"],
-                ["Fed Balance Sheet", macro?.walcl != null ? `$${Number(macro.walcl).toFixed(1)}T` : "Pending"],
+                ["Fed Balance Sheet", macro?.walcl != null ? `$${(Number(macro.walcl)/1e6).toFixed(2)}T` : "Pending"],
                 ["Policy Stance",     macro?.fed_room ?? "Pending"],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
