@@ -117,7 +117,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
             `Core PCE YoY: ${macro?.core_pce_yoy != null ? Number(macro.core_pce_yoy).toFixed(1) : "—"}% (target: 2%)`,
             `Unemployment: ${macro?.unrate != null ? Number(macro.unrate).toFixed(1) : "—"}%`,
             `Fed Room: ${macro?.fed_room ?? "—"}`,
-            `Curve Steepener: ${macro?.curve_steepener != null ? Number(macro.curve_steepener).toFixed(0) : "—"}bp`,
+            `Curve Steepener: ${macro?.curve_steepener ?? "—"}`,
           ]}
         />
 
@@ -129,7 +129,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
               { label: "WTI Oil",   val: macro?.wti_level != null ? `$${Number(macro.wti_level).toFixed(1)}` : "—" },
               { label: "1M Change", val: macro?.wti_chg_1m != null ? `${Number(macro.wti_chg_1m) >= 0 ? "+" : ""}${Number(macro.wti_chg_1m).toFixed(1)}%` : "—",
                 color: Number(macro?.wti_chg_1m ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
-              { label: "Oil Shock", val: macro?.oil_shock ?? "—" },
+              { label: "Oil Shock", val: macro?.oil_shock ? String(macro.oil_shock) : "—" },
               { label: "Real Rate", val: macro?.dgs10 != null && macro?.core_pce_yoy != null
                 ? `${(Number(macro.dgs10) - Number(macro.core_pce_yoy)).toFixed(2)}%` : "—" },
             ].map(({ label, val, color }) => (

@@ -19,23 +19,27 @@ interface Props {
 }
 
 function computeMoat(metrics: Record<string, unknown> | null, ratios: Record<string, unknown> | null): { score: number; pillars: { name: string; score: number; detail: string }[] } {
-  const grossMargin = (ratios?.grossProfitMarginTTM as number ?? 0) * 100;
-  const roic = (metrics?.roicTTM as number ?? 0) * 100;
-  const netMargin = (ratios?.netProfitMarginTTM as number ?? 0) * 100;
-  const interestCov = ratios?.interestCoverageTTM as number ?? 0;
+  const grossMarginRaw = ratios?.grossProfitMarginTTM != null ? ratios.grossProfitMarginTTM as number : null;
+  const roicRaw        = metrics?.roicTTM             != null ? metrics.roicTTM             as number : null;
+  const netMarginRaw   = ratios?.netProfitMarginTTM   != null ? ratios.netProfitMarginTTM   as number : null;
+  const interestCov    = ratios?.interestCoverageTTM  != null ? ratios.interestCoverageTTM  as number : null;
 
-  const demand = Math.min(25, grossMargin > 60 ? 22 : grossMargin > 40 ? 16 : grossMargin > 25 ? 10 : 5);
-  const supply = Math.min(25, roic > 20 ? 22 : roic > 12 ? 15 : roic > 7 ? 9 : 4);
-  const pricing = Math.min(25, netMargin > 20 ? 22 : netMargin > 12 ? 15 : netMargin > 5 ? 9 : 4);
-  const capital = Math.min(25, interestCov > 15 ? 22 : interestCov > 8 ? 15 : interestCov > 3 ? 9 : 4);
+  const grossMargin = grossMarginRaw != null ? grossMarginRaw * 100 : null;
+  const roic        = roicRaw        != null ? roicRaw        * 100 : null;
+  const netMargin   = netMarginRaw   != null ? netMarginRaw   * 100 : null;
+
+  const demand  = grossMargin == null ? 4 : Math.min(25, grossMargin > 60 ? 22 : grossMargin > 40 ? 16 : grossMargin > 25 ? 10 : 5);
+  const supply  = roic        == null ? 4 : Math.min(25, roic        > 20 ? 22 : roic        > 12 ? 15 : roic        > 7  ? 9  : 4);
+  const pricing = netMargin   == null ? 4 : Math.min(25, netMargin   > 20 ? 22 : netMargin   > 12 ? 15 : netMargin   > 5  ? 9  : 4);
+  const capital = interestCov == null ? 4 : Math.min(25, interestCov > 15 ? 22 : interestCov > 8  ? 15 : interestCov > 3  ? 9  : 4);
 
   return {
     score: demand + supply + pricing + capital,
     pillars: [
-      { name: "Demand Inelasticity", score: demand, detail: `Gross margin: ${grossMargin.toFixed(1)}%` },
-      { name: "Supply Barriers",     score: supply, detail: `ROIC: ${roic.toFixed(1)}%` },
-      { name: "Pricing Power",       score: pricing, detail: `Net margin: ${netMargin.toFixed(1)}%` },
-      { name: "Capital Efficiency",  score: capital, detail: `Interest coverage: ${interestCov.toFixed(1)}x` },
+      { name: "Demand Inelasticity", score: demand,  detail: grossMargin != null ? `Gross margin: ${grossMargin.toFixed(1)}%`        : "Gross margin: N/A" },
+      { name: "Supply Barriers",     score: supply,  detail: roic        != null ? `ROIC: ${roic.toFixed(1)}%`                      : "ROIC: N/A" },
+      { name: "Pricing Power",       score: pricing, detail: netMargin   != null ? `Net margin: ${netMargin.toFixed(1)}%`            : "Net margin: N/A" },
+      { name: "Capital Efficiency",  score: capital, detail: interestCov != null ? `Interest coverage: ${interestCov.toFixed(1)}x`  : "Interest coverage: N/A" },
     ],
   };
 }
@@ -83,7 +87,7 @@ Last 4 quarters of income statement:
 ${income.map(q => `${String(q.date ?? "").slice(0,7)}: Revenue ${Number(q.revenue ?? 0) >= 1e9 ? `$${(Number(q.revenue)/1e9).toFixed(2)}B` : `$${(Number(q.revenue)/1e6).toFixed(0)}M`}, Net Income ${Number(q.netIncome ?? 0) >= 1e9 ? `$${(Number(q.netIncome)/1e9).toFixed(2)}B` : `$${(Number(q.netIncome)/1e6).toFixed(0)}M`}, EPS $${Number(q.eps ?? 0).toFixed(2)}, Gross Margin ${q.grossProfitRatio != null ? ((q.grossProfitRatio as number)*100).toFixed(1) : "N/A"}%`).join("\n")}
 
 EPS surprises (actual vs estimate):
-${eps.map((e: Record<string, unknown>) => `${String(e.date ?? "").slice(0,7)}: Actual $${Number(e.actual ?? 0).toFixed(2)} vs Est $${Number(e.estimated ?? e.estimate ?? 0).toFixed(2)} (${e.actualEarningResultDifference != null ? (Number(e.actualEarningResultDifference) > 0 ? "BEAT" : "MISS") : ""})`).join("\n")}
+${eps.map((e: Record<string, unknown>) => { const act = e.actual ?? e.actualEarningResult ?? 0; const est = e.estimated ?? e.estimate ?? e.estimatedEarning ?? 0; const diff = e.actualEarningResultDifference ?? (Number(act) - Number(est)); return `${String(e.date ?? e.period ?? "").slice(0,7)}: Actual $${Number(act).toFixed(2)} vs Est $${Number(est).toFixed(2)} (${Number(diff) > 0 ? "BEAT" : Number(diff) < 0 ? "MISS" : ""})`; }).join("\n")}
 
 Provide a concise earnings quality analysis (2-3 paragraphs): revenue trend, margin trajectory, EPS beat/miss pattern, and key risk or catalyst for next quarter.`;
 
@@ -394,8 +398,8 @@ Be specific, analytical, and data-driven. Write in English.`;
               <thead><tr><th>Period</th><th style={{ textAlign: "right" }}>Actual EPS</th><th style={{ textAlign: "right" }}>Expected</th><th style={{ textAlign: "right" }}>Surprise</th></tr></thead>
               <tbody>
                 {earningsSurprises.slice(0, 8).map((e, i) => {
-                  const actRaw = e.actual ?? e.epsActual;
-                  const estRaw = e.estimate ?? e.epsEstimated;
+                  const actRaw = e.actual ?? e.epsActual ?? e.actualEarningResult;
+                  const estRaw = e.estimate ?? e.epsEstimated ?? e.estimatedEarning;
                   const act = actRaw != null ? Number(actRaw) : null;
                   const est = estRaw != null ? Number(estRaw) : null;
                   const surp = act != null && est != null && !isNaN(act) && !isNaN(est) ? act - est : null;
@@ -417,7 +421,11 @@ Be specific, analytical, and data-driven. Write in English.`;
       </div>
 
       {/* ── FACTOR TILT ENGINE ─────────────────────────────────── */}
-      {!loading && metrics && ratios && (() => {
+      {!loading && data && (() => {
+        const histCl = (data?.history ?? []).map(h => Number(h.close)).filter(v => !isNaN(v));
+        const priceChange1M = histCl.length > 22  ? ((histCl[0] - histCl[22])  / histCl[22])  * 100 : null;
+        const priceChange3M = histCl.length > 63  ? ((histCl[0] - histCl[63])  / histCl[63])  * 100 : null;
+        const priceChange6M = histCl.length > 126 ? ((histCl[0] - histCl[126]) / histCl[126]) * 100 : null;
         const ft = calcFactorTilts({
           pe: metrics?.peRatioTTM as number ?? null,
           pfcf: metrics?.priceToFreeCashFlowsRatioTTM as number ?? null,
@@ -429,6 +437,9 @@ Be specific, analytical, and data-driven. Write in English.`;
           grossMargin: ratios?.grossProfitMarginTTM != null ? (ratios.grossProfitMarginTTM as number) * 100 : null,
           interestCoverage: ratios?.interestCoverageTTM as number ?? null,
           marketCap: (data?.quote?.marketCap as number) ?? null,
+          priceChange1M,
+          priceChange3M,
+          priceChange6M,
         });
         const factors = [
           { label: "Value",    score: ft.value,    color: "#3B82F6",         note: "Cheap vs peers — P/E, FCF, EV" },
