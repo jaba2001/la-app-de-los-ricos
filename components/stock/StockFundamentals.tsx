@@ -265,6 +265,42 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         </div>
       </div>
 
+      {/* Operating Efficiency (P9) */}
+      {(() => {
+        const revTTM  = income.slice(0, 4).reduce((s, q) => s + Number(q.revenue        ?? 0), 0);
+        const ebitTTM = income.slice(0, 4).reduce((s, q) => s + Number(q.operatingIncome ?? 0), 0);
+        const revPrev  = income.slice(4, 8).reduce((s, q) => s + Number(q.revenue        ?? 0), 0);
+        const ebitPrev = income.slice(4, 8).reduce((s, q) => s + Number(q.operatingIncome ?? 0), 0);
+        const capexTTM = Math.abs(cashFlow.slice(0, 4).reduce((s, q) => s + Number(q.capitalExpenditure ?? 0), 0));
+        const ar       = Number(balance[0]?.netReceivables ?? balance[0]?.accountsReceivable ?? 0);
+        const dso      = revTTM > 0 && ar > 0 ? (ar / revTTM) * 365 : null;
+        const capexRev = revTTM > 0 && capexTTM > 0 ? (capexTTM / revTTM) * 100 : null;
+        const revChg   = revPrev > 0 ? (revTTM - revPrev) / revPrev : null;
+        const ebitChg  = ebitPrev !== 0 ? (ebitTTM - ebitPrev) / Math.abs(ebitPrev) : null;
+        const opLev    = revChg != null && ebitChg != null && Math.abs(revChg) > 0.001 ? ebitChg / revChg : null;
+        if (dso == null && capexRev == null && opLev == null) return null;
+        return (
+          <div className="card">
+            <div className="section-label">Operating Efficiency (TTM YoY)</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+              {[
+                { label: "DSO", val: dso != null ? `${dso.toFixed(0)} days` : "—", note: "Accounts Receivable / Revenue × 365", good: dso != null && dso < 45, warn: dso != null && dso > 90 },
+                { label: "Capex / Revenue", val: capexRev != null ? `${capexRev.toFixed(1)}%` : "—", note: "Capital intensity indicator", good: capexRev != null && capexRev < 5, warn: capexRev != null && capexRev > 20 },
+                { label: "Operating Leverage", val: opLev != null ? `${opLev.toFixed(2)}x` : "—", note: "% EBIT Δ ÷ % Revenue Δ (YoY)", good: opLev != null && opLev > 1 && opLev < 5, warn: opLev != null && (opLev > 10 || opLev < 0) },
+              ].map(({ label, val, note, good, warn: w }) => (
+                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                  {loading ? <Sk w={50} h={20} /> : (
+                    <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: good ? "var(--sr-pos)" : w ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">{val}</div>
+                  )}
+                  <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 4, lineHeight: 1.4 }}>{note}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Historical Financials chart */}
       <HistoricalFinancials annual={annual} loading={loading} />
 
