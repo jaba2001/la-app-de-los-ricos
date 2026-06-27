@@ -37,6 +37,29 @@ function icScoreColor(v: unknown) {
   return "var(--sr-pos)";
 }
 
+function computeICHealthScore(macro: MacroState | null): number | null {
+  const lcc = macro?.liquidity_cycle, csc = macro?.credit_stress;
+  const rpc = macro?.recession_prob,  grc = macro?.geopolitical_risk;
+  const hsc = macro?.housing_stress;
+  if (lcc == null || csc == null || rpc == null || grc == null || hsc == null) return null;
+  return Math.max(0, Math.min(100, 100 - (Number(csc)*0.25 + (100-Number(lcc))*0.35 + Number(rpc)*0.20 + Number(grc)*0.10 + Number(hsc)*0.10)));
+}
+
+function healthLabel(v: number) {
+  if (v >= 65) return { label: "FAVORABLE",  color: "var(--sr-pos)" };
+  if (v >= 45) return { label: "CAUTION",     color: "var(--sr-warn)" };
+  if (v >= 30) return { label: "STRESS",      color: "#FB923C" };
+  return               { label: "RISK-OFF",   color: "var(--sr-neg)" };
+}
+
+const SIGNAL_HIERARCHY = [
+  { tier: 1, name: "Liquidity",   key: "liquidity_cycle",   desc: "Druckenmiller primary — market fuel",     good: (v:number) => v > 55, bad: (v:number) => v < 35 },
+  { tier: 2, name: "Credit",      key: "credit_stress",     desc: "Transmission mechanism — stress spreads", good: (v:number) => v < 30, bad: (v:number) => v > 65 },
+  { tier: 3, name: "Recession",   key: "recession_prob",    desc: "Growth signal — labor + curve + Sahm",    good: (v:number) => v < 25, bad: (v:number) => v > 55 },
+  { tier: 4, name: "Geopolitical",key: "geopolitical_risk", desc: "Commodity + volatility premium",          good: (v:number) => v < 30, bad: (v:number) => v > 65 },
+  { tier: 5, name: "Positioning", key: "housing_stress",    desc: "Confirmatory — housing cycle late signal", good: (v:number) => v < 30, bad: (v:number) => v > 60 },
+] as const;
+
 function ScoreRing({ value, color }: { value: number; color: string }) {
   const r = 52, circ = 2 * Math.PI * r, dash = circ * (value / 100);
   return (
@@ -168,6 +191,59 @@ export default function MacroOverview({ macro, loading }: Props) {
           </div>
         </div>
       </div>
+
+      {/* IC Health Score + Signal Hierarchy */}
+      {!loading && (() => {
+        const icHealth = computeICHealthScore(macro);
+        const hl = icHealth != null ? healthLabel(icHealth) : null;
+        return (
+          <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
+            {/* IC Health Score */}
+            <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-4)" }}>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "var(--sr-sp-2)" }}>IC Health Score</div>
+              {icHealth != null && hl ? (
+                <>
+                  <div style={{ fontSize: "var(--sr-t-3xl)", fontWeight: 700, color: hl.color, lineHeight: 1 }} className="num">{icHealth.toFixed(0)}</div>
+                  <div style={{ marginTop: 6, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hl.color, letterSpacing: "0.08em" }}>{hl.label}</div>
+                  <div style={{ marginTop: 8, height: 4, borderRadius: 2, background: "var(--sr-surface-3)" }}>
+                    <div style={{ height: "100%", width: `${icHealth}%`, background: hl.color, borderRadius: 2, transition: "width 800ms ease" }} />
+                  </div>
+                  <div style={{ marginTop: 6, fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.4 }}>
+                    100 − (CSC×0.25 + (100−LCC)×0.35 + RPC×0.2 + GRC×0.1 + HSC×0.1)
+                  </div>
+                </>
+              ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>—</div>}
+            </div>
+
+            {/* Druckenmiller Signal Hierarchy */}
+            <div className="card" style={{ padding: "var(--sr-sp-4)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+                <div className="section-label" style={{ margin: 0 }}>Signal Hierarchy — Druckenmiller Framework</div>
+                <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>Priority 1→5</span>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
+                {SIGNAL_HIERARCHY.map(s => {
+                  const raw = macro ? (macro as unknown as Record<string, unknown>)[s.key] : null;
+                  const val = raw != null ? Number(raw) : null;
+                  const isGood = val != null && s.good(val);
+                  const isBad  = val != null && s.bad(val);
+                  const sigColor = isBad ? "var(--sr-neg)" : isGood ? "var(--sr-pos)" : "var(--sr-warn)";
+                  const dot      = isBad ? "var(--sr-neg)" : isGood ? "var(--sr-pos)" : "var(--sr-surface-3)";
+                  return (
+                    <div key={s.tier} style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "6px var(--sr-sp-3)", borderRadius: "var(--sr-radius-sm)", background: isBad ? "color-mix(in srgb, var(--sr-neg) 6%, transparent)" : "transparent" }}>
+                      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", width: 16, textAlign: "center", fontWeight: 700 }}>{s.tier}</span>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, boxShadow: isBad ? `0 0 5px ${dot}` : "none", flexShrink: 0 }} />
+                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: sigColor, width: 90, flexShrink: 0 }}>{s.name}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flex: 1 }}>{s.desc}</span>
+                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sigColor, width: 36, textAlign: "right" }} className="num">{val != null ? val.toFixed(0) : "—"}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Composite scores */}
       <div className="section-label">Composite Scores</div>
