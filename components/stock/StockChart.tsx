@@ -75,8 +75,8 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
     }));
     const fullPrices = fullOHLCV.map(d => d.close);
 
-    const allEma20 = emaOf(fullPrices, 20);
-    const allEma50 = emaOf(fullPrices, 50);
+    const allEmaFast = emaOf(fullPrices, 10);  // IC-calibrated: 10/55 matches StockLens
+    const allEmaSlow = emaOf(fullPrices, 55);
     const allSqz   = computeSqueeze(fullOHLCV);
     const allADX   = computeADX(fullOHLCV);
 
@@ -92,8 +92,8 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
       return {
         date:     (d.date as string).slice(0, 10),
         price:    fullPrices[ai],
-        ema20:    allEma20[ai],
-        ema50:    allEma50[ai],
+        emaFast:  allEmaFast[ai],
+        emaSlow:  allEmaSlow[ai],
         volume:   fullOHLCV[ai].volume,
         high:     fullOHLCV[ai].high,
         low:      fullOHLCV[ai].low,
@@ -108,9 +108,9 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
 
     const sqSlice  = allSqz.slice(sliceStart);
     const adxSlice = allADX.slice(sliceStart);
-    const rawDisp  = cd.map(d => ({ high: d.high, low: d.low, price: d.price, ema20: d.ema20, ema50: d.ema50 }));
+    const rawDisp  = cd.map(d => ({ high: d.high, low: d.low, price: d.price, emaFast: d.emaFast, emaSlow: d.emaSlow }));
     const tl = computeTLResult(
-      cd.map(d => d.price), cd.map(d => d.ema20), cd.map(d => d.ema50),
+      cd.map(d => d.price), cd.map(d => d.emaFast), cd.map(d => d.emaSlow),
       rawDisp, sqSlice, adxSlice, vpResult, icScore,
     );
 
@@ -173,7 +173,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
             ))}
           </div>
           <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-            <ToggleBtn label="EMA 20/50"  active={showEMA}        onClick={() => setShowEMA(!showEMA)} />
+            <ToggleBtn label="EMA 10/55"  active={showEMA}        onClick={() => setShowEMA(!showEMA)} />
             <ToggleBtn label="Volume"      active={showVolume}     onClick={() => setShowVolume(!showVolume)} />
             <ToggleBtn label="VP Levels"   active={showVP}         onClick={() => setShowVP(!showVP)} />
             {dgs2 != null && <ToggleBtn label={`Fed ~${dgs2.toFixed(1)}%`} active={false} onClick={() => {}} />}
@@ -224,9 +224,9 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   stroke="var(--sr-amber)" strokeWidth={2} dot={false} isAnimationActive={false} />
                 {showEMA && (
                   <>
-                    <Line yAxisId="price" type="monotone" dataKey="ema20" name="EMA 20"
+                    <Line yAxisId="price" type="monotone" dataKey="emaFast" name="EMA 10"
                       stroke="var(--sr-pos)"  strokeWidth={1} dot={false} strokeOpacity={0.75} isAnimationActive={false} />
-                    <Line yAxisId="price" type="monotone" dataKey="ema50" name="EMA 50"
+                    <Line yAxisId="price" type="monotone" dataKey="emaSlow" name="EMA 55"
                       stroke="var(--sr-info)" strokeWidth={1} dot={false} strokeOpacity={0.75} isAnimationActive={false} />
                   </>
                 )}
@@ -323,8 +323,8 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
           <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)" }}>— Price</span>
           {showEMA && (
             <>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-pos)" }}>— EMA 20</span>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-info)" }}>— EMA 50</span>
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-pos)" }}>— EMA 10</span>
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-info)" }}>— EMA 55</span>
             </>
           )}
           {showVP && vp && (
@@ -422,8 +422,8 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   {
                     label:  "EMA Alignment",
                     active: tlResult.signals.emaLong,
-                    detail: tlResult.signals.emaLong  ? "EMA 20 > EMA 50 (bullish)"
-                          : tlResult.signals.emaShort ? "EMA 20 < EMA 50 (bearish)"
+                    detail: tlResult.signals.emaLong  ? "EMA 10 > EMA 55 (bullish)"
+                          : tlResult.signals.emaShort ? "EMA 10 < EMA 55 (bearish)"
                           : "Flat / crossing",
                   },
                   {

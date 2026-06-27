@@ -297,9 +297,9 @@ export interface TLResult {
 
 export function computeTLResult(
   prices:   number[],
-  ema20:    number[],
-  ema50:    number[],
-  rawHist:  Array<{ high: number; low: number; price: number; ema20: number | null; ema50: number | null; }>,
+  emaFast:  number[],
+  emaSlow:  number[],
+  rawHist:  Array<{ high: number; low: number; price: number; emaFast: number | null; emaSlow: number | null; }>,
   sqzData:  SqueezePt[],
   adxData:  ADXPt[],
   vp:       VolumeProfile,
@@ -310,12 +310,12 @@ export function computeTLResult(
   const last    = rawHist[rawHist.length - 1];
   const lastSqz = sqzData[sqzData.length - 1];
   const lastADX = adxData[adxData.length - 1];
-  const lastE20 = ema20[ema20.length - 1];
-  const lastE50 = ema50[ema50.length - 1];
+  const lastEFast = emaFast[emaFast.length - 1];
+  const lastESlow = emaSlow[emaSlow.length - 1];
   const price   = last.price;
 
-  const emaLong  = !isNaN(lastE20) && !isNaN(lastE50) && lastE20 > lastE50;
-  const emaShort = !isNaN(lastE20) && !isNaN(lastE50) && lastE20 < lastE50;
+  const emaLong  = !isNaN(lastEFast) && !isNaN(lastESlow) && lastEFast > lastESlow;
+  const emaShort = !isNaN(lastEFast) && !isNaN(lastESlow) && lastEFast < lastESlow;
   const adxActive = lastADX.adx != null && lastADX.adx > 23;
   const adxRising = adxData.length >= 2 && lastADX.adx != null && (adxData[adxData.length - 2].adx ?? 0) < lastADX.adx;
   const sqzLong  = lastSqz.sqzOff && lastSqz.val != null && lastSqz.val > 0;
@@ -336,8 +336,8 @@ export function computeTLResult(
   const recent20  = rawHist.slice(-20);
   const swingLow  = Math.min(...recent20.map(d => d.low));
   const swingHigh = Math.max(...recent20.map(d => d.high));
-  const stopLong  = Math.min(!isNaN(lastE50) ? lastE50 * 0.993 : Infinity, swingLow * 0.995);
-  const stopShort = Math.max(!isNaN(lastE50) ? lastE50 * 1.007 : -Infinity, swingHigh * 1.005);
+  const stopLong  = Math.min(!isNaN(lastESlow) ? lastESlow * 0.993 : Infinity, swingLow * 0.995);
+  const stopShort = Math.max(!isNaN(lastESlow) ? lastESlow * 1.007 : -Infinity, swingHigh * 1.005);
   const riskLong  = price > 0 && stopLong < price  ? ((price - stopLong)  / price) * 100 : 0;
   const riskShort = price > 0 && stopShort > price ? ((stopShort - price) / price) * 100 : 0;
   const tp1Long   = price + 2 * (price - stopLong);

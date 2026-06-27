@@ -8,10 +8,10 @@ interface Props { macro: MacroState | null; loading: boolean; }
 
 const ETF_GROUPS = [
   { label: "Equity Index",   tickers: ["SPY", "QQQ", "IWM"] },
-  { label: "Sectors",        tickers: ["XLF", "XLE", "XLK", "XLV"] },
+  { label: "Sectors",        tickers: ["XLF", "KRE", "XLE", "XLK", "XLV"] },
   { label: "Fixed Income",   tickers: ["TLT", "IEF", "HYG", "LQD"] },
   { label: "Commodities",    tickers: ["GLD", "USO"] },
-  { label: "Alternatives",   tickers: ["ARCC", "BX", "EEM"] },
+  { label: "Alternatives",   tickers: ["ARCC", "BX", "KKR", "EEM"] },
 ];
 
 const CRYPTO_TICKERS = ["BTCUSD", "ETHUSD"];
