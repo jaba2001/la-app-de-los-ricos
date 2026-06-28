@@ -402,6 +402,119 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         </div>
       </div>
 
+      {/* Technical Signals — Phase 2 */}
+      <div className="card">
+        <div className="section-label">Technical Signals</div>
+        {loading ? <Sk w="100%" h={300} /> : !data?.technicals ? null : (() => {
+          const t = data.technicals!;
+          const price = Number(data.quote?.price ?? 0);
+
+          const smaSignal = (sma: number | null) => {
+            if (!sma || !price) return { color: "var(--sr-text-3)", label: "—" };
+            const diff = ((price - sma) / sma) * 100;
+            return { color: diff >= 0 ? "var(--sr-pos)" : "var(--sr-neg)", label: `${diff >= 0 ? "+" : ""}${diff.toFixed(1)}%` };
+          };
+          const s20 = smaSignal(t.sma20); const s50 = smaSignal(t.sma50); const s200 = smaSignal(t.sma200);
+
+          const rangeW = t.week52High && t.week52Low && t.week52High > t.week52Low && price
+            ? Math.min(100, Math.max(0, ((price - t.week52Low) / (t.week52High - t.week52Low)) * 100)) : null;
+
+          return (
+            <>
+              {/* RSI / Beta / Short Float / Next Earnings */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
+                {([
+                  {
+                    label: "RSI (14)",
+                    val: t.rsi14 != null ? t.rsi14.toFixed(1) : "—",
+                    color: t.rsi14 != null ? (t.rsi14 >= 70 ? "var(--sr-neg)" : t.rsi14 <= 30 ? "var(--sr-pos)" : "var(--sr-warn)") : "var(--sr-text-3)",
+                    sub: t.rsi14 != null ? (t.rsi14 >= 70 ? "Overbought" : t.rsi14 <= 30 ? "Oversold" : "Neutral") : "",
+                  },
+                  {
+                    label: "Beta",
+                    val: t.beta != null ? t.beta.toFixed(2) : "—",
+                    color: t.beta != null && Math.abs(t.beta) > 1.5 ? "var(--sr-warn)" : "var(--sr-text)",
+                    sub: t.beta != null ? (Math.abs(t.beta) > 1.5 ? "High volatility" : t.beta < 0.8 ? "Defensive" : "Moderate") : "",
+                  },
+                  {
+                    label: "Short Float",
+                    val: t.shortPercent != null ? `${t.shortPercent.toFixed(1)}%` : "—",
+                    color: t.shortPercent != null && t.shortPercent > 15 ? "var(--sr-neg)" : "var(--sr-text)",
+                    sub: t.shortPercent != null ? (t.shortPercent > 15 ? "High short interest" : t.shortPercent > 5 ? "Moderate" : "Low") : "",
+                  },
+                  {
+                    label: "Next Earnings",
+                    val: t.nextEarningsDate ? t.nextEarningsDate.slice(5) : "—",
+                    color: "var(--sr-amber)",
+                    sub: t.nextEarningsHour === "amc" ? "After Close" : t.nextEarningsHour === "bmo" ? "Before Open" : (t.nextEarningsHour ?? ""),
+                  },
+                ] as {label:string;val:string;color:string;sub:string}[]).map(({ label, val, color, sub }) => (
+                  <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
+                    {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>}
+                  </div>
+                ))}
+              </div>
+
+              {/* SMA vs price */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
+                {([
+                  { label: "vs SMA 20",  sig: s20,  sma: t.sma20  },
+                  { label: "vs SMA 50",  sig: s50,  sma: t.sma50  },
+                  { label: "vs SMA 200", sig: s200, sma: t.sma200 },
+                ] as {label:string;sig:{color:string;label:string};sma:number|null}[]).map(({ label, sig, sma }) => (
+                  <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{label}</div>
+                      {sma != null && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 2 }} className="num">${sma.toFixed(2)}</div>}
+                    </div>
+                    <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sig.color }} className="num">{sig.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* 52W range bar */}
+              {rangeW != null && (
+                <div style={{ marginBottom: "var(--sr-sp-4)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 6 }}>
+                    <span>52W Low <strong className="num">${t.week52Low?.toFixed(2)}</strong></span>
+                    <span style={{ color: "var(--sr-amber)" }}>{rangeW.toFixed(0)}% of 52W range</span>
+                    <span>52W High <strong className="num">${t.week52High?.toFixed(2)}</strong></span>
+                  </div>
+                  <div style={{ height: 6, background: "var(--sr-surface-3)", borderRadius: 3, position: "relative" }}>
+                    <div style={{ height: "100%", width: `${rangeW}%`, background: "linear-gradient(to right, var(--sr-pos), var(--sr-warn))", borderRadius: "3px 0 0 3px" }} />
+                    <div style={{ position: "absolute", left: `${rangeW}%`, top: -3, transform: "translateX(-50%)", width: 12, height: 12, borderRadius: "50%", background: "var(--sr-amber)", border: "2px solid var(--sr-bg)" }} />
+                  </div>
+                </div>
+              )}
+
+              {/* Performance */}
+              <div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>PRICE PERFORMANCE</div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "var(--sr-sp-2)" }}>
+                  {([
+                    { label: "1W",  val: t.perfWeek     },
+                    { label: "1M",  val: t.perfMonth    },
+                    { label: "3M",  val: t.perfQuarter  },
+                    { label: "6M",  val: t.perfHalfYear },
+                    { label: "1Y",  val: t.perfYear     },
+                    { label: "YTD", val: t.perfYTD      },
+                  ] as {label:string;val:number|null}[]).map(({ label, val }) => (
+                    <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius-sm)", padding: "var(--sr-sp-2) var(--sr-sp-2)", textAlign: "center" }}>
+                      <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginBottom: 3 }}>{label}</div>
+                      <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: val != null ? (val >= 0 ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text-3)" }} className="num">
+                        {val != null ? `${val >= 0 ? "+" : ""}${val.toFixed(1)}%` : "—"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          );
+        })()}
+      </div>
+
       {/* Peers */}
       {peers.length > 0 && (
         <PeerMetricsTable ticker={ticker} peers={peers} ratios={ratios ?? null} />

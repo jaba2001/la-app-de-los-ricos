@@ -56,6 +56,16 @@ export interface StockData {
   annualIncome: Record<string, unknown>[];
   sharesFloat: Record<string, unknown>[];
   analystConsensus: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number; period: string } | null;
+  technicals: {
+    rsi14: number | null;
+    sma20: number | null; sma50: number | null; sma200: number | null;
+    perfWeek: number | null; perfMonth: number | null; perfQuarter: number | null;
+    perfHalfYear: number | null; perfYear: number | null; perfYTD: number | null;
+    beta: number | null; week52High: number | null; week52Low: number | null;
+    avgVol10d: number | null; avgVol3m: number | null;
+    shortPercent: number | null;
+    nextEarningsDate: string | null; nextEarningsHour: string | null;
+  } | null;
 }
 
 export default function StockTickerPage() {
@@ -74,7 +84,7 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 25;
+  const TOTAL_SOURCES = 27;
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -107,6 +117,7 @@ export default function StockTickerPage() {
         spyRes, congressRes, houseRes,
         annualIncomeRes, sharesFloatRes,
         fhMetricRes, fhTargetRes, fhEarningsRes, fhRecommRes,
+        fhShortRes, fhEarningsCalRes,
       ] = await Promise.allSettled([
         track(supabase.from("macro_state").select("*").eq("id", 1).single()),
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
@@ -134,6 +145,9 @@ export default function StockTickerPage() {
         track(authedFetch<{targetHigh: number; targetLow: number; targetMean: number; lastUpdated: string}>(`/api/finnhub/stock/price-target?symbol=${ticker}`)),
         track(authedFetch<Record<string, unknown>[]>(`/api/finnhub/stock/earnings?symbol=${ticker}`)),
         track(authedFetch<{buy: number; hold: number; period: string; sell: number; strongBuy: number; strongSell: number}[]>(`/api/finnhub/stock/recommendation?symbol=${ticker}`)),
+        // Phase 2 — short float + next earnings date (already in proxy ALLOWED)
+        track(authedFetch<{data:{shortPercent:number}[]}>(`/api/finnhub/stock/short-interest?symbol=${ticker}&from=${new Date(Date.now()-90*86400000).toISOString().slice(0,10)}&to=${new Date().toISOString().slice(0,10)}`)),
+        track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
       ]);
 
       const macroData = macroRes.status === "fulfilled"
@@ -217,6 +231,54 @@ export default function StockTickerPage() {
         + (mergedEarnings.length === 0 ? 1 : 0)
       );
 
+      // ── Phase 2: Technical indicators from price history + Finnhub ─
+      const histData: Record<string,unknown>[] = historyRes.status === "fulfilled"
+        ? (historyRes.value as Record<string,unknown>[]) ?? [] : [];
+      const closes = histData.map(h => Number(h.close)).filter(v => !isNaN(v));
+
+      const smaN = (n: number): number | null =>
+        closes.length >= n ? closes.slice(0, n).reduce((a, b) => a + b, 0) / n : null;
+      const perfN = (n: number): number | null =>
+        closes.length > n ? ((closes[0] - closes[n]) / closes[n]) * 100 : null;
+      const rsi14 = (() => {
+        if (closes.length < 15) return null;
+        const p = closes.slice(0, 15).reverse();
+        let g = 0, l = 0;
+        for (let i = 1; i < p.length; i++) { const d = p[i]-p[i-1]; if (d>0) g+=d; else l-=d; }
+        return 100 - 100 / (1 + g / (l || 1e-10));
+      })();
+      const ytdClose = (() => {
+        const yr = new Date().getFullYear().toString();
+        const e = histData.find(h => !(h.date as string)?.startsWith(yr));
+        return e ? Number(e.close) : null;
+      })();
+      const fhNum = (key: string): number | null => fhM?.[key] ?? null;
+
+      const fhSI = fhShortRes.status === "fulfilled"
+        ? (fhShortRes.value as {data?:{shortPercent?:number}[]})?.data ?? [] : [];
+      const shortPercent = fhSI.length > 0 ? (fhSI[fhSI.length-1]?.shortPercent ?? null) : null;
+
+      const fhCal = fhEarningsCalRes.status === "fulfilled"
+        ? (fhEarningsCalRes.value as {earningsCalendar?:{date?:string;hour?:string}[]})?.earningsCalendar ?? [] : [];
+      const nextEarning = fhCal.length > 0 ? fhCal[0] : null;
+
+      const technicals = {
+        rsi14,
+        sma20: smaN(20), sma50: smaN(50), sma200: smaN(200),
+        perfWeek: perfN(5), perfMonth: perfN(21), perfQuarter: perfN(63),
+        perfHalfYear: perfN(126), perfYear: perfN(252),
+        perfYTD: closes.length > 0 && ytdClose ? ((closes[0]-ytdClose)/ytdClose)*100 : null,
+        beta:       fhNum("beta"),
+        week52High: fhNum("52WeekHigh"),
+        week52Low:  fhNum("52WeekLow"),
+        avgVol10d:  fhNum("10DayAverageTradingVolume"),
+        avgVol3m:   fhNum("3MonthAverageTradingVolume"),
+        shortPercent,
+        nextEarningsDate: nextEarning?.date ?? null,
+        nextEarningsHour: nextEarning?.hour ?? null,
+      };
+      // ─────────────────────────────────────────────────────────────
+
       const sector = (profile?.sector as string) ?? "";
       const sectorEtfSymbol = SECTOR_ETF[sector] ?? "SPY";
 
@@ -253,6 +315,7 @@ export default function StockTickerPage() {
         annualIncome:         annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [],
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
         analystConsensus,
+        technicals,
       };
 
       setData(stockData);
@@ -380,6 +443,16 @@ export default function StockTickerPage() {
             )}
             {profile?.companyName != null && (
               <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{String(profile.companyName)}</span>
+            )}
+            {data?.technicals?.nextEarningsDate && (
+              <span style={{
+                fontSize: "10px", fontWeight: 700, letterSpacing: "0.06em", flexShrink: 0,
+                padding: "2px 7px", borderRadius: "var(--sr-radius-pill)",
+                background: "color-mix(in srgb, var(--sr-amber) 12%, transparent)",
+                color: "var(--sr-amber)", border: "1px solid color-mix(in srgb, var(--sr-amber) 30%, transparent)",
+              }}>
+                ER {data.technicals.nextEarningsDate.slice(5)}{data.technicals.nextEarningsHour === "amc" ? " AMC" : data.technicals.nextEarningsHour === "bmo" ? " BMO" : ""}
+              </span>
             )}
           </div>
           {quote?.price != null && (
