@@ -10,6 +10,7 @@ const ALLOWED = new Set([
   'stock/financials-reported', 'stock/transcripts',
   'stock/short-interest', 'stock/social-sentiment',
   'forex/rates', 'crypto/candle',
+  'stock/metric', 'stock/price-target',
 ]);
 
 export async function GET(request, { params }) {
