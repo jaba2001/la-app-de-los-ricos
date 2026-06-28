@@ -328,7 +328,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         </div>
         {loading ? <Sk w="100%" h={200} /> : income.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>
-            {isEuropean ? "Income statement sourced from SEC EDGAR (US-listed companies only). Ratios above come from Finnhub." : "No data"}
+            {isEuropean ? "Financial statements for European stocks via SimFin (requires SIMFIN_KEY). Ratios above come from Finnhub." : "No data"}
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
@@ -387,7 +387,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 </span>
               </div>
             ))
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Balance sheet via SEC EDGAR (US only)" : "No data"}</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Balance sheet via SimFin (requires SIMFIN_KEY)" : "No data"}</div>}
         </div>
 
         <div className="card">
@@ -406,7 +406,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 </div>
               );
             })
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Cash flow via SEC EDGAR (US only)" : "No data"}</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Cash flow via SimFin (requires SIMFIN_KEY)" : "No data"}</div>}
         </div>
       </div>
 

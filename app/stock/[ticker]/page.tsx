@@ -84,7 +84,7 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 28;
+  const TOTAL_SOURCES = 29;
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -119,6 +119,7 @@ export default function StockTickerPage() {
         fhMetricRes, fhTargetRes, fhEarningsRes, fhRecommRes,
         fhShortRes, fhEarningsCalRes,
         edgarRes,
+        simfinRes,
       ] = await Promise.allSettled([
         track(supabase.from("macro_state").select("*").eq("id", 1).single()),
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
@@ -151,6 +152,8 @@ export default function StockTickerPage() {
         track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
         // Phase 3 — SEC EDGAR income / balance sheet / cash flow (US stocks only; European returns empty)
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar/financials?symbol=${ticker}`)),
+        // Phase 7 — SimFin financials for European stocks (requires SIMFIN_KEY in ic-proxy env)
+        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin/financials?symbol=${ticker}`)),
       ]);
 
       const macroData = macroRes.status === "fulfilled"
@@ -295,17 +298,19 @@ export default function StockTickerPage() {
         } catch { /* silent */ }
       }
 
-      // ── Phase 3: SEC EDGAR merge (fills income/balance/CF for US stocks) ─
-      type EdgarData = { income: Record<string,unknown>[]; balanceSheet: Record<string,unknown>[]; cashFlow: Record<string,unknown>[]; annualIncome: Record<string,unknown>[] };
-      const edgar: EdgarData | null = edgarRes.status === "fulfilled" ? edgarRes.value as EdgarData : null;
-      const fmpIncome   = incomeRes.status      === "fulfilled" ? (incomeRes.value      as Record<string,unknown>[]) ?? [] : [];
-      const fmpBalance  = balanceRes.status     === "fulfilled" ? (balanceRes.value     as Record<string,unknown>[]) ?? [] : [];
-      const fmpCashFlow = cashRes.status        === "fulfilled" ? (cashRes.value        as Record<string,unknown>[]) ?? [] : [];
+      // ── Phase 3+7: SEC EDGAR (US) + SimFin (European) merge ──────────────────
+      type FinData = { income: Record<string,unknown>[]; balanceSheet: Record<string,unknown>[]; cashFlow: Record<string,unknown>[]; annualIncome: Record<string,unknown>[] };
+      const edgar:  FinData | null = edgarRes.status  === "fulfilled" ? edgarRes.value  as FinData : null;
+      const simfin: FinData | null = simfinRes.status === "fulfilled" ? simfinRes.value as FinData : null;
+      const fmpIncome   = incomeRes.status       === "fulfilled" ? (incomeRes.value       as Record<string,unknown>[]) ?? [] : [];
+      const fmpBalance  = balanceRes.status      === "fulfilled" ? (balanceRes.value      as Record<string,unknown>[]) ?? [] : [];
+      const fmpCashFlow = cashRes.status         === "fulfilled" ? (cashRes.value         as Record<string,unknown>[]) ?? [] : [];
       const fmpAnnual   = annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [];
-      const mergedIncome      = fmpIncome.length   > 0 ? fmpIncome   : (edgar?.income       ?? []);
-      const mergedBalance     = fmpBalance.length  > 0 ? fmpBalance  : (edgar?.balanceSheet ?? []);
-      const mergedCashFlow    = fmpCashFlow.length > 0 ? fmpCashFlow : (edgar?.cashFlow     ?? []);
-      const mergedAnnualIncome = fmpAnnual.length  > 0 ? fmpAnnual   : (edgar?.annualIncome ?? []);
+      // Priority: FMP (if any data) → EDGAR (US stocks) → SimFin (European stocks)
+      const mergedIncome       = fmpIncome.length   > 0 ? fmpIncome   : (edgar?.income        ?? simfin?.income        ?? []);
+      const mergedBalance      = fmpBalance.length  > 0 ? fmpBalance  : (edgar?.balanceSheet  ?? simfin?.balanceSheet  ?? []);
+      const mergedCashFlow     = fmpCashFlow.length > 0 ? fmpCashFlow : (edgar?.cashFlow      ?? simfin?.cashFlow      ?? []);
+      const mergedAnnualIncome = fmpAnnual.length   > 0 ? fmpAnnual   : (edgar?.annualIncome  ?? simfin?.annualIncome  ?? []);
       // ─────────────────────────────────────────────────────────────
 
       const stockData: StockData = {
