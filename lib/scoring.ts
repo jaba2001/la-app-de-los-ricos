@@ -73,8 +73,7 @@ export function calcScores(inp: ScoreInputs): Scores {
 
 export function getRating(total: number): { label: string; color: string } {
   if (total >= 80) return { label: "STRONG BUY", color: "var(--sr-pos)" };
-  if (total >= 65) return { label: "BUY",         color: "var(--sr-pos)" };
-  if (total >= 50) return { label: "HOLD",        color: "var(--sr-warn)" };
+  if (total >= 50) return { label: "BUY",         color: "var(--sr-pos)" };
   if (total >= 35) return { label: "CAUTION",     color: "var(--sr-neg)" };
   return               { label: "AVOID",          color: "var(--sr-neg)" };
 }
