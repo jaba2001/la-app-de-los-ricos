@@ -279,7 +279,7 @@ export default function MacroOverview({ macro, loading }: Props) {
             { label: "10Y Treasury",     val: macro?.dgs10,           fmt: (v: number) => `${v.toFixed(2)}%` },
             { label: "30Y Treasury",     val: macro?.dgs30,           fmt: (v: number) => `${v.toFixed(2)}%` },
             { label: "Term Premium 10Y", val: macro?.term_premium_10y, fmt: (v: number) => `${v.toFixed(2)}%` },
-            { label: "Curve Steepener",  val: macro?.curve_steepener, fmt: (v: number) => `${v.toFixed(0)}bp` },
+            { label: "Curve Steepener",  val: macro?.curve_steepener, fmt: (v: number) => isNaN(v) ? String(macro?.curve_steepener ?? "—") : `${v.toFixed(0)}bp` },
           ].map(({ label, val, fmt }) => (
             <div key={label} className="stat-row">
               <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>

@@ -126,21 +126,21 @@ export default function MacroNews() {
     setLoading(true);
     setNews([]);
     setFetchError("");
-    authedFetch<NewsItem[]>(`/api/fmp/news?symbols=${cat.tickers}&limit=8`)
-      .then(r => {
-        const items = Array.isArray(r) ? r : [];
-        setNews(items);
-        setCategoryCounts(prev => ({ ...prev, [active]: items.length }));
-
-        // Compute sentiment counts for the sidebar
-        const alignments = items.map(it => computeAlignment(it.title, it.text, cat.composite));
-        const bull = alignments.filter(a => a.sentiment === "bullish").length;
-        const bear = alignments.filter(a => a.sentiment === "bearish").length;
-        setSentimentMap(prev => ({ ...prev, [active]: { bull, bear } }));
-
-        setLoading(false);
-      })
-      .catch(e => { setFetchError(e instanceof Error ? e.message : "Failed to load news"); setLoading(false); });
+    const tickerList = cat.tickers.split(',').map(t => t.trim());
+    Promise.allSettled(
+      tickerList.map(t => authedFetch<NewsItem[]>(`/api/fmp/news?tickers=${t}&limit=6`))
+    ).then(results => {
+      const items: NewsItem[] = [];
+      results.forEach(r => { if (r.status === "fulfilled" && Array.isArray(r.value)) items.push(...r.value); });
+      const unique = Array.from(new Map(items.map(i => [i.title, i])).values()).slice(0, 8);
+      setNews(unique);
+      setCategoryCounts(prev => ({ ...prev, [active]: unique.length }));
+      const alignments = unique.map(it => computeAlignment(it.title, it.text, cat.composite));
+      const bull = alignments.filter(a => a.sentiment === "bullish").length;
+      const bear = alignments.filter(a => a.sentiment === "bearish").length;
+      setSentimentMap(prev => ({ ...prev, [active]: { bull, bear } }));
+      setLoading(false);
+    }).catch(() => { setFetchError("News temporarily unavailable"); setLoading(false); });
   }, [active, cat.tickers, cat.composite]);
 
   const currentSentiment = sentimentMap[active];

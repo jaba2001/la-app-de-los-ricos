@@ -51,22 +51,26 @@ export default function MacroMarkets({ macro, loading }: Props) {
   const [loadingC, setLoadingC] = useState(true);
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoadingC(false), 12000);
     Promise.allSettled(
       CRYPTO_TICKERS.map(t =>
         authedFetch<Quote[]>(`/api/fmp/quote?symbol=${t}`)
           .then(r => ({ ticker: t, data: Array.isArray(r) ? r[0] : (r as Quote) }))
       )
     ).then(results => {
+      clearTimeout(timeout);
       const map: Record<string, Quote> = {};
       results.forEach(r => {
         if (r.status === "fulfilled" && r.value.data) map[r.value.ticker] = r.value.data;
       });
       setCryptoQuotes(map);
       setLoadingC(false);
-    }).catch(() => setLoadingC(false));
+    }).catch(() => { clearTimeout(timeout); setLoadingC(false); });
+    return () => clearTimeout(timeout);
   }, []);
 
   useEffect(() => {
+    const timeout = setTimeout(() => setLoadingQ(false), 12000);
     const allTickers = ETF_GROUPS.flatMap(g => g.tickers);
     Promise.allSettled(
       allTickers.map(t =>
@@ -74,13 +78,15 @@ export default function MacroMarkets({ macro, loading }: Props) {
           .then(r => ({ ticker: t, data: Array.isArray(r) ? r[0] : (r as Quote) }))
       )
     ).then(results => {
+      clearTimeout(timeout);
       const map: Record<string, Quote> = {};
       results.forEach(r => {
         if (r.status === "fulfilled" && r.value.data) map[r.value.ticker] = r.value.data;
       });
       setQuotes(map);
       setLoadingQ(false);
-    }).catch(() => setLoadingQ(false));
+    }).catch(() => { clearTimeout(timeout); setLoadingQ(false); });
+    return () => clearTimeout(timeout);
   }, []);
 
   return (

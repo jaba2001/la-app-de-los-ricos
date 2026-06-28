@@ -42,11 +42,6 @@ export function calcScores(inp: ScoreInputs): Scores {
   if (inp.revenueGrowth != null) growth += inp.revenueGrowth > 20 ? 11 : inp.revenueGrowth > 10 ? 8 : inp.revenueGrowth > 0 ? 5 : 0;
   if (inp.epsGrowth != null) growth += inp.epsGrowth > 20 ? 9 : inp.epsGrowth > 10 ? 6 : inp.epsGrowth > 0 ? 3 : 0;
 
-  value    = Math.min(25, value);
-  health   = Math.min(30, health);
-  momentum = Math.min(25, momentum);
-  growth   = Math.min(20, growth);
-
   // B1 — Regime-weighted scoring
   const regime = inp.regime ?? "neutral";
   let vW = 1, hW = 1, mW = 1, gW = 1;
@@ -79,30 +74,33 @@ export function getRating(total: number): { label: string; color: string } {
 }
 
 export function getMacroTilt(
-  macroState: { regime_id?: string | null; recession_prob?: number | null; credit_stress?: number | null; ic_score?: number | null; cartera_quadrant?: string | null },
+  macroState: { regime_id?: string | null; recession_prob?: number | null; credit_stress?: number | null; ic_score?: number | null; cartera_quadrant?: string | null; fear_greed?: number | null; ted_spread?: number | null; hy_oas?: number | null },
   sector: string
 ): { tilt: number; label: string; color: string; reasons: string[] } {
   let tilt = 0;
   const reasons: string[] = [];
   const regime = macroState.regime_id ?? "neutral";
   const rpc = macroState.recession_prob != null ? Number(macroState.recession_prob) : 0;
-  const csc = macroState.credit_stress != null ? Number(macroState.credit_stress) : 0;
+  const csc = macroState.credit_stress  != null ? Number(macroState.credit_stress)  : 0;
+  const ic  = macroState.ic_score       != null ? Number(macroState.ic_score)        : null;
+  const fg  = macroState.fear_greed     != null ? Number(macroState.fear_greed)      : null;
+  const ted = macroState.ted_spread     != null ? Number(macroState.ted_spread)      : null;
 
-  const growthSectors   = ["Technology", "Consumer Cyclical", "Communication Services", "Real Estate"];
+  const growthSectors    = ["Technology", "Consumer Cyclical", "Communication Services", "Real Estate"];
   const defensiveSectors = ["Utilities", "Consumer Defensive", "Healthcare"];
   const cyclicalSectors  = ["Energy", "Materials", "Industrials", "Financials"];
 
   if (regime === "expansion") {
     tilt += 8;
     reasons.push("Expansion regime favors equities");
-    if (growthSectors.includes(sector)) { tilt += 4; reasons.push(`Growth tilt benefits ${sector}`); }
+    if (growthSectors.includes(sector))   { tilt += 4; reasons.push(`Growth tilt benefits ${sector}`); }
   } else if (regime === "reflation") {
     tilt += 3;
     if (cyclicalSectors.includes(sector)) { tilt += 5; reasons.push(`Reflation favors ${sector}`); }
   } else if (regime === "stagflation") {
     tilt -= 8;
     reasons.push("Stagflation — unfavorable macro backdrop");
-    if (growthSectors.includes(sector)) { tilt -= 5; reasons.push(`Growth tech underperforms in stagflation`); }
+    if (growthSectors.includes(sector))    { tilt -= 5; reasons.push(`Growth tech underperforms in stagflation`); }
     if (defensiveSectors.includes(sector)) { tilt += 3; reasons.push(`${sector} defensive tilt partially offsets`); }
   } else if (regime === "contraction") {
     tilt -= 12;
@@ -113,6 +111,21 @@ export function getMacroTilt(
   if (rpc > 60) { tilt -= 5; reasons.push(`High recession probability (${rpc.toFixed(0)})`); }
   else if (rpc > 40) { tilt -= 2; reasons.push(`Elevated recession probability`); }
   if (csc > 60) { tilt -= 4; reasons.push(`Credit stress elevated`); }
+
+  // IC score adds direct macro health signal (independent of regime category)
+  if (ic != null) {
+    if (ic < 25)       { tilt -= 4; reasons.push(`Macro health very weak (IC ${ic.toFixed(0)})`); }
+    else if (ic < 40)  { tilt -= 2; reasons.push(`Macro health below average (IC ${ic.toFixed(0)})`); }
+    else if (ic > 72)  { tilt += 3; reasons.push(`Strong macro health (IC ${ic.toFixed(0)})`); }
+  }
+
+  // TED spread — interbank stress (above 50 bps is elevated; above 100 bps is crisis territory)
+  if (ted != null && ted > 100) { tilt -= 3; reasons.push(`TED spread elevated (${ted.toFixed(0)} bps)`); }
+  else if (ted != null && ted > 50) { tilt -= 1; reasons.push(`TED spread slightly elevated`); }
+
+  // Extreme fear creates buying opportunity; extreme greed signals risk
+  if (fg != null && fg < 20)  { tilt += 2; reasons.push(`Extreme fear — contrarian positive`); }
+  if (fg != null && fg > 80)  { tilt -= 2; reasons.push(`Extreme greed — elevated risk`); }
 
   tilt = Math.max(-20, Math.min(20, tilt));
   const label = tilt >= 6 ? "Favorable" : tilt >= -2 ? "Neutral" : tilt >= -8 ? "Caution" : "Unfavorable";

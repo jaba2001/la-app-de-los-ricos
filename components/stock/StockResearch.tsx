@@ -84,7 +84,7 @@ export default function StockResearch({ data, scores, loading, ticker, macro, ma
     const prompt = `You are a sell-side analyst. Analyze the recent earnings trend for ${data.profile?.companyName ?? ticker} (${ticker}).
 
 Last 4 quarters of income statement:
-${income.map(q => `${String(q.date ?? "").slice(0,7)}: Revenue ${Number(q.revenue ?? 0) >= 1e9 ? `$${(Number(q.revenue)/1e9).toFixed(2)}B` : `$${(Number(q.revenue)/1e6).toFixed(0)}M`}, Net Income ${Number(q.netIncome ?? 0) >= 1e9 ? `$${(Number(q.netIncome)/1e9).toFixed(2)}B` : `$${(Number(q.netIncome)/1e6).toFixed(0)}M`}, EPS $${Number(q.eps ?? 0).toFixed(2)}, Gross Margin ${q.grossProfitRatio != null ? ((q.grossProfitRatio as number)*100).toFixed(1) : "N/A"}%`).join("\n")}
+${income.map(q => { const gmPct = q.grossProfitRatio != null ? ((q.grossProfitRatio as number)*100).toFixed(1) : (q.grossProfit != null && Number(q.revenue) > 0 ? (Number(q.grossProfit)/Number(q.revenue)*100).toFixed(1) : "N/A"); return `${String(q.date ?? "").slice(0,7)}: Revenue ${Number(q.revenue ?? 0) >= 1e9 ? `$${(Number(q.revenue)/1e9).toFixed(2)}B` : `$${(Number(q.revenue)/1e6).toFixed(0)}M`}, Net Income ${Number(q.netIncome ?? 0) >= 1e9 ? `$${(Number(q.netIncome)/1e9).toFixed(2)}B` : `$${(Number(q.netIncome)/1e6).toFixed(0)}M`}, EPS $${Number(q.eps ?? 0).toFixed(2)}, Gross Margin ${gmPct}%`; }).join("\n")}
 
 EPS surprises (actual vs estimate):
 ${eps.map((e: Record<string, unknown>) => { const act = e.actual ?? e.actualEarningResult ?? 0; const est = e.estimated ?? e.estimate ?? e.estimatedEarning ?? 0; const diff = e.actualEarningResultDifference ?? (Number(act) - Number(est)); return `${String(e.date ?? e.period ?? "").slice(0,7)}: Actual $${Number(act).toFixed(2)} vs Est $${Number(est).toFixed(2)} (${Number(diff) > 0 ? "BEAT" : Number(diff) < 0 ? "MISS" : ""})`; }).join("\n")}
@@ -159,22 +159,22 @@ Be specific, analytical, and data-driven. Write in English.`;
   const bearSignals: string[] = [];
 
   if (!loading && metrics && ratios) {
-    const gm = (ratios?.grossProfitMarginTTM as number ?? 0) * 100;
-    const roic = (metrics?.roicTTM as number ?? 0) * 100;
+    const gm   = ratios?.grossProfitMarginTTM != null ? (ratios.grossProfitMarginTTM  as number) * 100 : null;
+    const roic = metrics?.roicTTM             != null ? (metrics.roicTTM              as number) * 100 : null;
     const netDebtEbitda = metrics?.netDebtToEBITDATTM as number ?? 0;
-    const pe = metrics?.peRatioTTM as number ?? 0;
+    const pe    = metrics?.peRatioTTM          as number ?? 0;
     const intCov = ratios?.interestCoverageTTM as number ?? 0;
 
-    if (gm > 50) bullSignals.push(`Gross margin ${gm.toFixed(1)}% — strong pricing power`);
-    if (roic > 20) bullSignals.push(`ROIC ${roic.toFixed(1)}% — deep moat (Escudero framework)`);
+    if (gm != null && gm > 50) bullSignals.push(`Gross margin ${gm.toFixed(1)}% — strong pricing power`);
+    if (roic != null && roic > 20) bullSignals.push(`ROIC ${roic.toFixed(1)}% — deep moat (Escudero framework)`);
     if (netDebtEbitda < 0) bullSignals.push("Net cash balance sheet — fortress");
     if (intCov > 15) bullSignals.push(`Interest coverage ${intCov.toFixed(0)}x — zero financing risk`);
     if ((scores?.momentum ?? 0) > 18) bullSignals.push("Strong price momentum — trend confirmation");
 
     if (pe > 50) bearSignals.push(`Premium P/E ${pe.toFixed(0)}x — requires flawless execution`);
     if (netDebtEbitda > 3) bearSignals.push(`High leverage Net Debt/EBITDA ${netDebtEbitda.toFixed(1)}x`);
-    if (gm < 25) bearSignals.push("Thin gross margins — pricing vulnerability");
-    if (roic < 8) bearSignals.push("Low ROIC — weak capital allocation");
+    if (gm != null && gm < 25) bearSignals.push("Thin gross margins — pricing vulnerability");
+    if (roic != null && roic < 8) bearSignals.push("Low ROIC — weak capital allocation");
     if ((scores?.momentum ?? 0) < 8) bearSignals.push("Weak price momentum — not confirming bull case");
     if (macroTilt && macroTilt.tilt < -5) bearSignals.push(`Macro headwind: ${macroTilt.label}`);
   }

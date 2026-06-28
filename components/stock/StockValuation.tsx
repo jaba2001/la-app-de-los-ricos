@@ -18,7 +18,9 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   const baseRevenue = income.length > 0
     ? (income.slice(0, 4).reduce((s, q) => s + ((q.revenue as number) ?? 0), 0))
     : 0;
-  const shares = (metrics?.weightedAverageSharesOutstandingDilutedTTM as number) ?? 1000000000;
+  // Derive shares from market cap / price as fallback — avoids wild DCF errors from hardcoded default
+  const shares = (metrics?.weightedAverageSharesOutstandingDilutedTTM as number)
+    ?? (quote?.marketCap != null && currentPrice > 0 ? Number(quote.marketCap) / currentPrice : null);
   const netDebt = (balance[0]?.totalDebt as number ?? 0) - (balance[0]?.cashAndCashEquivalents as number ?? 0);
   const rfRate = macro?.dgs10 != null ? Number(macro.dgs10) : 4.2;
 
@@ -31,7 +33,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   const [capexPct, setCapexPct] = useState(5);
 
   function calcDCF(g1: number, g2: number, margin: number, tax: number, discount: number, terminal: number, capex: number) {
-    if (!baseRevenue || discount <= terminal) return null;
+    if (!shares || !baseRevenue || discount <= terminal) return null;
     let totalPV = 0;
     let rev = baseRevenue;
     for (let yr = 1; yr <= 10; yr++) {

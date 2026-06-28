@@ -231,8 +231,8 @@ export default function StockPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "var(--sr-sp-3)" }}>
             {watchlist.map(w => {
               const a = analyses[w.ticker];
-              const rating = a ? getRating(Number(a.score_total)) : null;
-              const icScore = a ? (Number(a.score_total) + Number(a.macro_tilt ?? 0)) : null;
+              const icScore = a ? Math.max(0, Math.min(100, Number(a.score_total) + Number(a.macro_tilt ?? 0))) : null;
+              const rating = icScore != null ? getRating(icScore) : null;
               return (
                 <div
                   key={w.ticker}

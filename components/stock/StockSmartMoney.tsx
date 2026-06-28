@@ -101,7 +101,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                   return (
                     <tr key={i}>
                       <td>{(t.transactionDate as string)?.slice(0, 10) ?? "—"}</td>
-                      <td style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>{t.reportingName as string ?? "—"}</td>
+                      <td style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>{(t.reportingName ?? t.name) as string ?? "—"}</td>
                       <td style={{ color: isBuy ? "var(--sr-pos)" : "var(--sr-neg)", fontWeight: 600 }}>{isBuy ? "BUY" : "SELL"}</td>
                       <td style={{ textAlign: "right" }} className="num">{t.change != null ? Math.abs(t.change as number).toLocaleString() : "—"}</td>
                     </tr>

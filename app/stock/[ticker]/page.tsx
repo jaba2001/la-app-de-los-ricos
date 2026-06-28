@@ -399,7 +399,7 @@ export default function StockTickerPage() {
   const sector  = (profile?.sector as string) ?? "";
   const macroTilt = macro ? getMacroTilt(macro, sector) : null;
   const icScore   = scores && macroTilt ? Math.max(0, Math.min(100, scores.total + macroTilt.tilt)) : null;
-  const rating    = scores ? getRating(scores.total) : null;
+  const rating    = icScore != null ? getRating(icScore) : (scores ? getRating(scores.total) : null);
 
   const ipoDate     = profile?.ipoDate as string | undefined;
   const isRecentIPO = ipoDate

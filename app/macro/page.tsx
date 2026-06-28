@@ -28,12 +28,12 @@ const TABS = [
 
 export default function MacroPage() {
   const { session, loading: authLoading } = useAuth();
-  const { setMacro: setMacroContext } = useMacroContext();
+  const { macro: contextMacro, setMacro: setMacroContext } = useMacroContext();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
-  const [macro, setMacro] = useState<MacroState | null>(null);
+  const [macro, setMacro] = useState<MacroState | null>(contextMacro);
   const [loading, setLoading] = useState(false);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(!!contextMacro);
   const [error, setError] = useState("");
 
   useEffect(() => {
