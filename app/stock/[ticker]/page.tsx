@@ -55,6 +55,7 @@ export interface StockData {
   houseDisclosures: Record<string, unknown>[];
   annualIncome: Record<string, unknown>[];
   sharesFloat: Record<string, unknown>[];
+  analystConsensus: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number; period: string } | null;
 }
 
 export default function StockTickerPage() {
@@ -67,13 +68,13 @@ export default function StockTickerPage() {
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
-  const { setMacro: setMacroContext } = useMacroContext();
+  const { macro: contextMacro, setMacro: setMacroContext } = useMacroContext();
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 21;
+  const TOTAL_SOURCES = 25;
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -105,6 +106,7 @@ export default function StockTickerPage() {
         earningsRes, insiderRes, dcfRes,
         spyRes, congressRes, houseRes,
         annualIncomeRes, sharesFloatRes,
+        fhMetricRes, fhTargetRes, fhEarningsRes, fhRecommRes,
       ] = await Promise.allSettled([
         track(supabase.from("macro_state").select("*").eq("id", 1).single()),
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
@@ -118,28 +120,102 @@ export default function StockTickerPage() {
         track(authedFetch<string[]>(`/api/fmp/peers?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/price-target?symbol=${ticker}&limit=10`)),
         track(authedFetch<unknown[]>(`/api/fmp/analyst-estimates?symbol=${ticker}&limit=2`)),
-        track(authedFetch<unknown[]>(`/api/fmp/institutional-holder/${ticker}`)),
-        track(authedFetch<unknown[]>(`/api/finnhub/stock/earnings?symbol=${ticker}&limit=8`)),
-        track(authedFetch<{ data?: unknown[] }>(`/api/finnhub/stock/insider-transactions?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/institutional-holder?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/earnings-surprises?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/insider-trading?symbol=${ticker}&limit=10`)),
         track(authedFetch<unknown>(`/api/fmp/discounted-cash-flow?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=SPY`)),
         track(authedFetch<unknown[]>(`/api/fmp/senate-trading?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/house-disclosure?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&limit=5`)),
         track(authedFetch<unknown[]>(`/api/fmp/historical-shares-float?symbol=${ticker}&limit=10`)),
+        // Phase 1 — Finnhub fundamentals (fills gaps when FMP plan blocks endpoints)
+        track(authedFetch<{metric: Record<string, number>}>(`/api/finnhub/stock/metric?symbol=${ticker}&metric=all`)),
+        track(authedFetch<{targetHigh: number; targetLow: number; targetMean: number; lastUpdated: string}>(`/api/finnhub/stock/price-target?symbol=${ticker}`)),
+        track(authedFetch<Record<string, unknown>[]>(`/api/finnhub/stock/earnings?symbol=${ticker}`)),
+        track(authedFetch<{buy: number; hold: number; period: string; sell: number; strongBuy: number; strongSell: number}[]>(`/api/finnhub/stock/recommendation?symbol=${ticker}`)),
       ]);
 
-      const macroData = macroRes.status === "fulfilled" ? (macroRes.value as { data: MacroState }).data : null;
+      const macroData = macroRes.status === "fulfilled"
+        ? (macroRes.value as { data: MacroState }).data
+        : contextMacro;
       setMacro(macroData);
       if (macroData) setMacroContext(macroData);
-
-      const apiResults = [quoteRes, profileRes, metricsRes, ratiosRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, targetsRes, estimatesRes, holdersRes, earningsRes, insiderRes, dcfRes];
-      setFailedApis(apiResults.filter(r => r.status === "rejected").length);
 
       const quote   = quoteRes.status   === "fulfilled" ? (quoteRes.value as unknown[])?.[0]   as Record<string,unknown> ?? null : null;
       const profile = profileRes.status === "fulfilled" ? (profileRes.value as unknown[])?.[0] as Record<string,unknown> ?? null : null;
       const metrics = metricsRes.status === "fulfilled" ? (Array.isArray(metricsRes.value) ? metricsRes.value[0] : metricsRes.value) as Record<string,unknown> ?? null : null;
       const ratios  = ratiosRes.status  === "fulfilled" ? (Array.isArray(ratiosRes.value)  ? ratiosRes.value[0]  : ratiosRes.value)  as Record<string,unknown> ?? null : null;
+
+      // ── Phase 1: Finnhub fundamentals merge ──────────────────────
+      const fhM = fhMetricRes.status === "fulfilled"
+        ? (fhMetricRes.value as { metric?: Record<string, number> })?.metric ?? null
+        : null;
+
+      const fhToMetrics = (m: Record<string, number>): Record<string, unknown> => ({
+        peRatioTTM:                       m.peTTM ?? null,
+        priceToBookRatioTTM:              m.pbQuarterly ?? m.pbAnnual ?? null,
+        enterpriseValueOverEBITDATTM:     (m as Record<string, unknown>)["evToEbitdaTTM"] ?? (m as Record<string, unknown>)["evToEbitdaAnnual"] ?? null,
+        priceToFreeCashFlowsRatioTTM:     m.pfcfShareTTM ?? m.pfcfShareAnnual ?? null,
+        netDebtToEBITDATTM:               (m as Record<string, unknown>)["netDebt/EBITDA_Annual"] ?? null,
+        roicTTM:                          m.roiTTM != null ? m.roiTTM / 100 : null,
+        roeTTM:                           m.roeTTM != null ? m.roeTTM / 100 : null,
+      });
+
+      const fhToRatios = (m: Record<string, number>): Record<string, unknown> => ({
+        grossProfitMarginTTM:        m.grossMarginTTM != null      ? m.grossMarginTTM / 100 : null,
+        operatingProfitMarginTTM:    m.operatingMarginTTM != null  ? m.operatingMarginTTM / 100 : null,
+        netProfitMarginTTM:          m.netMarginTTM != null        ? m.netMarginTTM / 100 : null,
+        returnOnEquityTTM:           m.roeTTM != null              ? m.roeTTM / 100 : null,
+        returnOnAssetsTTM:           m.roaTTM != null              ? m.roaTTM / 100 : null,
+        returnOnInvestedCapitalTTM:  m.roiTTM != null              ? m.roiTTM / 100 : null,
+        debtEquityRatioTTM:          (m as Record<string, unknown>)["totalDebt/totalEquityAnnual"] ?? null,
+        currentRatioTTM:             m.currentRatioAnnual ?? m.currentRatioQuarterly ?? null,
+        interestCoverageTTM:         m.netInterestCoverageAnnual ?? null,
+        revenueGrowthTTM:            m.revenueGrowthTTMYoy != null ? m.revenueGrowthTTMYoy / 100 : null,
+        netIncomeGrowthTTM:          m.epsGrowthTTMYoy != null     ? m.epsGrowthTTMYoy / 100 : null,
+        peRatioTTM:                  m.peTTM ?? null,
+      });
+
+      const mergedMetrics = metrics ?? (fhM ? fhToMetrics(fhM) : null);
+      const mergedRatios  = ratios  ?? (fhM ? fhToRatios(fhM)  : null);
+
+      // Finnhub price targets (fallback if FMP returned empty)
+      const fmpTargets = targetsRes.status === "fulfilled" ? (targetsRes.value as Record<string,unknown>[]) ?? [] : [];
+      const fhTarget   = fhTargetRes.status === "fulfilled"
+        ? fhTargetRes.value as { targetHigh?: number; targetLow?: number; targetMean?: number; lastUpdated?: string } | null
+        : null;
+      const mergedTargets: Record<string, unknown>[] = fmpTargets.length > 0 ? fmpTargets
+        : (fhTarget?.targetMean != null ? [{
+            priceTarget:    fhTarget.targetMean,
+            adjPriceTarget: fhTarget.targetMean,
+            publishedDate:  fhTarget.lastUpdated ?? new Date().toISOString().slice(0, 10),
+            analystName:    `High $${Number(fhTarget.targetHigh).toFixed(0)} · Low $${Number(fhTarget.targetLow).toFixed(0)}`,
+            analystCompany: "Finnhub Consensus",
+            action:         "Consensus",
+          }] : []);
+
+      // Finnhub earnings (fallback — component accepts both FMP and Finnhub formats)
+      const fmpEarnings = earningsRes.status === "fulfilled" ? (earningsRes.value as Record<string,unknown>[]) ?? [] : [];
+      const fhEarnings  = fhEarningsRes.status === "fulfilled" ? (fhEarningsRes.value as Record<string,unknown>[]) ?? [] : [];
+      const mergedEarnings = fmpEarnings.length > 0 ? fmpEarnings : fhEarnings;
+
+      // Finnhub analyst consensus (buy/hold/sell)
+      const fhRecomm = fhRecommRes.status === "fulfilled"
+        ? (fhRecommRes.value as { buy: number; hold: number; period: string; sell: number; strongBuy: number; strongSell: number }[]) ?? []
+        : [];
+      const analystConsensus = fhRecomm.length > 0 ? fhRecomm[0] : null;
+      // ─────────────────────────────────────────────────────────────
+
+      // Count truly missing sources (after FMP + Finnhub fallback)
+      const coreFmpFailed = [quoteRes, profileRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, estimatesRes, holdersRes, insiderRes, dcfRes].filter(r => r.status === "rejected").length;
+      setFailedApis(
+        coreFmpFailed
+        + (mergedMetrics ? 0 : 1)
+        + (mergedRatios  ? 0 : 1)
+        + (mergedTargets.length  === 0 ? 1 : 0)
+        + (mergedEarnings.length === 0 ? 1 : 0)
+      );
 
       const sector = (profile?.sector as string) ?? "";
       const sectorEtfSymbol = SECTOR_ETF[sector] ?? "SPY";
@@ -155,17 +231,19 @@ export default function StockTickerPage() {
       }
 
       const stockData: StockData = {
-        quote, profile, metrics, ratios,
+        quote, profile,
+        metrics: mergedMetrics,
+        ratios:  mergedRatios,
         history:              historyRes.status  === "fulfilled" ? (historyRes.value  as Record<string,unknown>[]) ?? [] : [],
         income:               incomeRes.status   === "fulfilled" ? (incomeRes.value   as Record<string,unknown>[]) ?? [] : [],
         balanceSheet:         balanceRes.status  === "fulfilled" ? (balanceRes.value  as Record<string,unknown>[]) ?? [] : [],
         cashFlow:             cashRes.status     === "fulfilled" ? (cashRes.value     as Record<string,unknown>[]) ?? [] : [],
         peers:                peersRes.status    === "fulfilled" ? (peersRes.value    as string[]) ?? [] : [],
-        priceTargets:         targetsRes.status  === "fulfilled" ? (targetsRes.value  as Record<string,unknown>[]) ?? [] : [],
+        priceTargets:         mergedTargets,
         analystEstimates:     estimatesRes.status === "fulfilled" ? (estimatesRes.value as Record<string,unknown>[]) ?? [] : [],
         institutionalHolders: holdersRes.status  === "fulfilled" ? (holdersRes.value  as Record<string,unknown>[]) ?? [] : [],
-        earningsSurprises:    earningsRes.status === "fulfilled" ? (earningsRes.value as Record<string,unknown>[]) ?? [] : [],
-        insiderTrades:        insiderRes.status  === "fulfilled" ? ((insiderRes.value as { data?: unknown[] })?.data ?? []) as Record<string,unknown>[] : [],
+        earningsSurprises:    mergedEarnings,
+        insiderTrades:        insiderRes.status  === "fulfilled" ? (insiderRes.value as Record<string,unknown>[]) ?? [] : [],
         dcf:                  dcfRes.status === "fulfilled" ? (Array.isArray(dcfRes.value) ? dcfRes.value[0] : dcfRes.value) as Record<string,unknown> ?? null : null,
         spyHistory:           spyRes.status === "fulfilled" ? (spyRes.value as Record<string,unknown>[]) ?? [] : [],
         sectorEtfHistory,
@@ -174,6 +252,7 @@ export default function StockTickerPage() {
         houseDisclosures:     houseRes.status    === "fulfilled" ? (houseRes.value    as Record<string,unknown>[]) ?? [] : [],
         annualIncome:         annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [],
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
+        analystConsensus,
       };
 
       setData(stockData);
@@ -186,19 +265,19 @@ export default function StockTickerPage() {
 
       const macroTiltData = macroData ? getMacroTilt(macroData, sector) : { tilt: 0 };
       const calc = calcScores({
-        pe:               metrics?.peRatioTTM as number ?? null,
-        pb:               metrics?.priceToBookRatioTTM as number ?? null,
-        evEbitda:         metrics?.enterpriseValueOverEBITDATTM as number ?? null,
-        pfcf:             metrics?.priceToFreeCashFlowsRatioTTM as number ?? null,
-        debtEquity:       ratios?.debtEquityRatioTTM as number ?? null,
-        currentRatio:     ratios?.currentRatioTTM as number ?? null,
-        interestCoverage: ratios?.interestCoverageTTM as number ?? null,
-        netDebtEbitda:    metrics?.netDebtToEBITDATTM as number ?? null,
-        roic:             metrics?.roicTTM != null ? (metrics.roicTTM as number) * 100 : null,
-        roe:              metrics?.roeTTM  != null ? (metrics.roeTTM  as number) * 100 : null,
-        grossMargin:      ratios?.grossProfitMarginTTM != null ? (ratios.grossProfitMarginTTM as number) * 100 : null,
-        revenueGrowth:    ratios?.revenueGrowthTTM != null ? (ratios.revenueGrowthTTM as number) * 100 : null,
-        epsGrowth:        ratios?.netIncomeGrowthTTM != null ? (ratios.netIncomeGrowthTTM as number) * 100 : null,
+        pe:               mergedMetrics?.peRatioTTM as number ?? null,
+        pb:               mergedMetrics?.priceToBookRatioTTM as number ?? null,
+        evEbitda:         mergedMetrics?.enterpriseValueOverEBITDATTM as number ?? null,
+        pfcf:             mergedMetrics?.priceToFreeCashFlowsRatioTTM as number ?? null,
+        debtEquity:       mergedRatios?.debtEquityRatioTTM as number ?? null,
+        currentRatio:     mergedRatios?.currentRatioTTM as number ?? null,
+        interestCoverage: mergedRatios?.interestCoverageTTM as number ?? null,
+        netDebtEbitda:    mergedMetrics?.netDebtToEBITDATTM as number ?? null,
+        roic:             mergedMetrics?.roicTTM != null ? (mergedMetrics.roicTTM as number) * 100 : null,
+        roe:              mergedMetrics?.roeTTM  != null ? (mergedMetrics.roeTTM  as number) * 100 : null,
+        grossMargin:      mergedRatios?.grossProfitMarginTTM != null ? (mergedRatios.grossProfitMarginTTM as number) * 100 : null,
+        revenueGrowth:    mergedRatios?.revenueGrowthTTM != null ? (mergedRatios.revenueGrowthTTM as number) * 100 : null,
+        epsGrowth:        mergedRatios?.netIncomeGrowthTTM != null ? (mergedRatios.netIncomeGrowthTTM as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,
         regime:           macroData?.regime_id ?? null,
         priceChange1M,
@@ -409,7 +488,7 @@ export default function StockTickerPage() {
             {activeTab === "overview"     && <StockOverview    data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />}
             {activeTab === "fundamentals" && <StockFundamentals data={data} loading={loading} ticker={ticker} />}
             {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
-            {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} icScore={icScore} dgs2={macro?.dgs2 as number ?? null} />}
             {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
             {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
             {activeTab === "screener"     && <StockScreener />}

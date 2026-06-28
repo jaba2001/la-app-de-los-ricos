@@ -502,6 +502,29 @@ Be specific, analytical, and data-driven. Write in English.`;
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginTop: "var(--sr-sp-5)" }}>
         <div className="card">
           <div className="section-label">Analyst Price Targets</div>
+          {!loading && data?.analystConsensus && (() => {
+            const c = data.analystConsensus!;
+            const total = c.strongBuy + c.buy + c.hold + c.sell + c.strongSell;
+            const bullPct = total > 0 ? Math.round((c.strongBuy + c.buy) / total * 100) : 0;
+            const bearPct = total > 0 ? Math.round((c.sell + c.strongSell) / total * 100) : 0;
+            const holdPct = 100 - bullPct - bearPct;
+            return (
+              <div style={{ marginBottom: "var(--sr-sp-3)" }}>
+                <div style={{ display: "flex", gap: "var(--sr-sp-3)", marginBottom: 6, alignItems: "center", fontSize: "var(--sr-t-xs)" }}>
+                  {bullPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-pos)" }}>{bullPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>Buy</span></span>}
+                  {holdPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-warn)" }}>{holdPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>Hold</span></span>}
+                  {bearPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-neg)" }}>{bearPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>Sell</span></span>}
+                </div>
+                <div style={{ height: 4, borderRadius: 2, overflow: "hidden", background: "var(--sr-surface-3)" }}>
+                  <div style={{ height: "100%", display: "flex" }}>
+                    <div style={{ width: `${bullPct}%`, background: "var(--sr-pos)" }} />
+                    <div style={{ width: `${holdPct}%`, background: "var(--sr-warn)" }} />
+                    <div style={{ width: `${bearPct}%`, background: "var(--sr-neg)" }} />
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
           {loading ? <Sk w="100%" h={120} /> : priceTargets.length === 0 ? (
             <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No analyst targets</div>
           ) : (
