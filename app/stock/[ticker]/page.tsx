@@ -84,7 +84,7 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 27;
+  const TOTAL_SOURCES = 28;
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -118,6 +118,7 @@ export default function StockTickerPage() {
         annualIncomeRes, sharesFloatRes,
         fhMetricRes, fhTargetRes, fhEarningsRes, fhRecommRes,
         fhShortRes, fhEarningsCalRes,
+        edgarRes,
       ] = await Promise.allSettled([
         track(supabase.from("macro_state").select("*").eq("id", 1).single()),
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
@@ -148,6 +149,8 @@ export default function StockTickerPage() {
         // Phase 2 — short float + next earnings date (already in proxy ALLOWED)
         track(authedFetch<{data:{shortPercent:number}[]}>(`/api/finnhub/stock/short-interest?symbol=${ticker}&from=${new Date(Date.now()-90*86400000).toISOString().slice(0,10)}&to=${new Date().toISOString().slice(0,10)}`)),
         track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
+        // Phase 3 — SEC EDGAR income / balance sheet / cash flow (US stocks only; European returns empty)
+        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar/financials?symbol=${ticker}`)),
       ]);
 
       const macroData = macroRes.status === "fulfilled"
@@ -292,14 +295,27 @@ export default function StockTickerPage() {
         } catch { /* silent */ }
       }
 
+      // ── Phase 3: SEC EDGAR merge (fills income/balance/CF for US stocks) ─
+      type EdgarData = { income: Record<string,unknown>[]; balanceSheet: Record<string,unknown>[]; cashFlow: Record<string,unknown>[]; annualIncome: Record<string,unknown>[] };
+      const edgar: EdgarData | null = edgarRes.status === "fulfilled" ? edgarRes.value as EdgarData : null;
+      const fmpIncome   = incomeRes.status      === "fulfilled" ? (incomeRes.value      as Record<string,unknown>[]) ?? [] : [];
+      const fmpBalance  = balanceRes.status     === "fulfilled" ? (balanceRes.value     as Record<string,unknown>[]) ?? [] : [];
+      const fmpCashFlow = cashRes.status        === "fulfilled" ? (cashRes.value        as Record<string,unknown>[]) ?? [] : [];
+      const fmpAnnual   = annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [];
+      const mergedIncome      = fmpIncome.length   > 0 ? fmpIncome   : (edgar?.income       ?? []);
+      const mergedBalance     = fmpBalance.length  > 0 ? fmpBalance  : (edgar?.balanceSheet ?? []);
+      const mergedCashFlow    = fmpCashFlow.length > 0 ? fmpCashFlow : (edgar?.cashFlow     ?? []);
+      const mergedAnnualIncome = fmpAnnual.length  > 0 ? fmpAnnual   : (edgar?.annualIncome ?? []);
+      // ─────────────────────────────────────────────────────────────
+
       const stockData: StockData = {
         quote, profile,
         metrics: mergedMetrics,
         ratios:  mergedRatios,
         history:              historyRes.status  === "fulfilled" ? (historyRes.value  as Record<string,unknown>[]) ?? [] : [],
-        income:               incomeRes.status   === "fulfilled" ? (incomeRes.value   as Record<string,unknown>[]) ?? [] : [],
-        balanceSheet:         balanceRes.status  === "fulfilled" ? (balanceRes.value  as Record<string,unknown>[]) ?? [] : [],
-        cashFlow:             cashRes.status     === "fulfilled" ? (cashRes.value     as Record<string,unknown>[]) ?? [] : [],
+        income:               mergedIncome,
+        balanceSheet:         mergedBalance,
+        cashFlow:             mergedCashFlow,
         peers:                peersRes.status    === "fulfilled" ? (peersRes.value    as string[]) ?? [] : [],
         priceTargets:         mergedTargets,
         analystEstimates:     estimatesRes.status === "fulfilled" ? (estimatesRes.value as Record<string,unknown>[]) ?? [] : [],
@@ -312,7 +328,7 @@ export default function StockTickerPage() {
         sectorEtfSymbol,
         congressTrades:       congressRes.status === "fulfilled" ? (congressRes.value as Record<string,unknown>[]) ?? [] : [],
         houseDisclosures:     houseRes.status    === "fulfilled" ? (houseRes.value    as Record<string,unknown>[]) ?? [] : [],
-        annualIncome:         annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [],
+        annualIncome:         mergedAnnualIncome,
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
         analystConsensus,
         technicals,

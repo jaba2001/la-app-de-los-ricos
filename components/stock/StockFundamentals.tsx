@@ -232,6 +232,7 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
 
 export default function StockFundamentals({ data, loading, ticker }: Props) {
   const [quarterLimit, setQuarterLimit] = useState(4);
+  const isEuropean = ticker.includes('.');
   const income = data?.income ?? [];
   const balance = data?.balanceSheet ?? [];
   const annual = data?.annualIncome ?? [];
@@ -325,7 +326,11 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
             </button>
           )}
         </div>
-        {loading ? <Sk w="100%" h={200} /> : (
+        {loading ? <Sk w="100%" h={200} /> : income.length === 0 ? (
+          <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>
+            {isEuropean ? "Income statement sourced from SEC EDGAR (US-listed companies only). Ratios above come from Finnhub." : "No data"}
+          </div>
+        ) : (
           <div style={{ overflowX: "auto" }}>
             <table className="sr-table" style={{ minWidth: 600 }}>
               <thead><tr>
@@ -363,6 +368,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
       </div>
 
       {/* Balance Sheet Summary */}
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)" }}>
         <div className="card">
           <div className="section-label">Balance Sheet (Latest Quarter)</div>
@@ -381,14 +387,16 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 </span>
               </div>
             ))
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Balance sheet via SEC EDGAR (US only)" : "No data"}</div>}
         </div>
 
         <div className="card">
           <div className="section-label">Free Cash Flow (Latest Quarters)</div>
           {loading ? <Sk w="100%" h={160} /> : cashFlow.length > 0 ? (
             cashFlow.slice(0, 5).map(q => {
-              const fcf = Number(q.operatingCashFlow ?? 0) - Number(q.capitalExpenditure ?? 0);
+              const fcf = q.freeCashFlow != null
+                ? Number(q.freeCashFlow)
+                : Number(q.operatingCashFlow ?? 0) - Number(q.capitalExpenditure ?? 0);
               return (
                 <div key={q.date as string} className="stat-row">
                   <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{(q.date as string)?.slice(0, 7)}</span>
@@ -398,7 +406,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 </div>
               );
             })
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Cash flow via SEC EDGAR (US only)" : "No data"}</div>}
         </div>
       </div>
 
