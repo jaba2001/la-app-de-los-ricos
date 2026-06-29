@@ -87,10 +87,29 @@ export default function StockTickerPage() {
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
   const TOTAL_SOURCES = 29;
+  const [watchlisted, setWatchlisted] = useState(false);
+  const [watchlistId, setWatchlistId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
   }, [session, authLoading, router]);
+
+  useEffect(() => {
+    if (!session || !ticker) return;
+    supabase.from("watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
+      .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
+  }, [session, ticker]);
+
+  async function toggleWatchlist() {
+    if (!session || !ticker) return;
+    if (watchlisted && watchlistId != null) {
+      await supabase.from("watchlist").delete().eq("id", watchlistId);
+      setWatchlisted(false); setWatchlistId(null);
+    } else {
+      const { data } = await supabase.from("watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
+      if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); }
+    }
+  }
 
   useEffect(() => {
     if (!ticker) return;
@@ -578,6 +597,19 @@ export default function StockTickerPage() {
               )}
             </div>
           )}
+          <button
+            onClick={toggleWatchlist}
+            title={watchlisted ? "Quitar de watchlist" : "Agregar a watchlist"}
+            style={{
+              background: watchlisted ? "color-mix(in srgb, var(--sr-amber) 15%, transparent)" : "var(--sr-surface-2)",
+              border: `1px solid ${watchlisted ? "color-mix(in srgb, var(--sr-amber) 40%, transparent)" : "var(--sr-border)"}`,
+              borderRadius: "var(--sr-radius)", cursor: "pointer", flexShrink: 0,
+              fontSize: "16px", padding: "4px 10px", lineHeight: 1,
+              color: watchlisted ? "var(--sr-amber)" : "var(--sr-text-3)",
+            }}
+          >
+            {watchlisted ? "★" : "☆"}
+          </button>
           {!loading && data && (
             <button
               onClick={exportCSV}

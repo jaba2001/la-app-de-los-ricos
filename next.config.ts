@@ -1,9 +1,12 @@
+import withPWA from "@ducanh2912/next-pwa";
 import type { NextConfig } from "next";
-import path from "path";
 
-const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  turbopack: { root: path.resolve(__dirname) },
-};
+const nextConfig: NextConfig = {};
 
-export default nextConfig;
+export default withPWA({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  disable: process.env.NODE_ENV === "development",
+})(nextConfig);

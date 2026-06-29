@@ -24,6 +24,7 @@ const TABS = [
   { id: "monitors",    label: "Monitors" },
   { id: "news",        label: "News" },
   { id: "ai",          label: "AI Synthesis" },
+  { id: "raw",         label: "Raw Data" },
 ];
 
 export default function MacroPage() {
@@ -168,9 +169,118 @@ export default function MacroPage() {
             {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
             {activeTab === "news"       && <MacroNews />}
             {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}
+            {activeTab === "raw"        && <MacroRawData    macro={macro} loading={loading} />}
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: boolean }) {
+  const [q, setQ] = useState("");
+
+  if (loading) return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div key={i} style={{ height: 28, borderRadius: 4, background: "var(--sr-surface-3)", animation: "pulse 1.5s ease-in-out infinite" }} />
+      ))}
+    </div>
+  );
+
+  if (!macro) return (
+    <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-5)" }}>
+      No data — load macro first.
+    </div>
+  );
+
+  const entries = (Object.entries(macro) as [string, unknown][])
+    .filter(([k, v]) => v != null && k !== "id")
+    .filter(([k]) => q === "" || k.toLowerCase().includes(q.toLowerCase()))
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  const nullEntries = (Object.entries(macro) as [string, unknown][])
+    .filter(([k, v]) => v == null && k !== "id")
+    .filter(([k]) => q === "" || k.toLowerCase().includes(q.toLowerCase()))
+    .sort(([a], [b]) => a.localeCompare(b));
+
+  const fmtVal = (v: unknown): string => {
+    if (v == null) return "—";
+    if (typeof v === "boolean") return v ? "true" : "false";
+    if (typeof v === "string") return v;
+    if (typeof v === "number") return v % 1 === 0 ? v.toString() : v.toFixed(4);
+    return String(v);
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-4)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap" }}>
+        <input
+          type="text"
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          placeholder="Filter field…"
+          style={{
+            flex: 1, maxWidth: 280,
+            padding: "var(--sr-sp-2) var(--sr-sp-3)",
+            background: "var(--sr-surface)", border: "1px solid var(--sr-border)",
+            borderRadius: "var(--sr-radius)", color: "var(--sr-text)",
+            fontSize: "var(--sr-t-sm)", outline: "none",
+          }}
+          onFocus={e => (e.target.style.borderColor = "var(--sr-amber)")}
+          onBlur={e => (e.target.style.borderColor = "var(--sr-border)")}
+        />
+        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+          {entries.length} populated · {nullEntries.length} null
+        </span>
+        {macro.updated_at && (
+          <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+            Cron: {new Date(macro.updated_at as string).toLocaleString("es-MX")}
+          </span>
+        )}
+      </div>
+
+      <div style={{ background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg)", overflow: "hidden", marginBottom: "var(--sr-sp-4)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
+          <thead>
+            <tr style={{ background: "var(--sr-surface-2)" }}>
+              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "left", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase", width: "50%" }}>Field</th>
+              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {entries.map(([k, v]) => (
+              <tr key={k} style={{ borderTop: "1px solid var(--sr-border)" }}>
+                <td style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", color: "var(--sr-text-2)", fontSize: "11px" }} className="num">{k}</td>
+                <td style={{
+                  padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", fontWeight: 600, fontSize: "11px",
+                  color: typeof v === "boolean" ? (v ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text)",
+                }} className="num">
+                  {fmtVal(v)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {nullEntries.length > 0 && (
+        <details style={{ background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg)", overflow: "hidden" }}>
+          <summary style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", cursor: "pointer" }}>
+            {nullEntries.length} fields pending (null in macro_state)
+          </summary>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
+            <tbody>
+              {nullEntries.map(([k]) => (
+                <tr key={k} style={{ borderTop: "1px solid var(--sr-border)" }}>
+                  <td style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", color: "var(--sr-text-3)", fontSize: "11px", opacity: 0.5 }}>{k}</td>
+                  <td style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", color: "var(--sr-text-3)", fontSize: "11px", opacity: 0.5 }}>—</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
+      )}
     </div>
   );
 }
