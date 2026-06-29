@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
-import type { MacroState } from "@/lib/types";
+import type { MacroState, ReverseDCFSnapshot } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 
@@ -11,6 +11,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   const metrics = data?.metrics;
   const income = data?.income ?? [];
   const balance = data?.balanceSheet ?? [];
+  const rdcf: ReverseDCFSnapshot | null = data?.rdcf ?? null;
   const quote = data?.quote;
   const dcf = data?.dcf;
 
@@ -184,42 +185,70 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
         </div>
       </div>
 
-      {/* Reverse DCF */}
+      {/* Reverse DCF — auto-computed */}
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
           <div>
             <div className="section-label">Reverse DCF — Market Expectations</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-              What growth rate does the current price imply?
+              What revenue CAGR does the current price imply? Auto-computed from FCF margin + WACC.
             </div>
           </div>
+          {rdcf && (
+            <Pill
+              label={rdcf.realityBand === "achievable" ? "Achievable" : rdcf.realityBand === "ambitious" ? "Ambitious" : "Very Aggressive"}
+              color={rdcf.realityBand === "achievable" ? "var(--sr-pos)" : rdcf.realityBand === "ambitious" ? "var(--sr-warn)" : "var(--sr-neg)"}
+            />
+          )}
         </div>
         {loading ? <Sk w="100%" h={100} /> : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
-            {[
-              { label: "Current Price",       val: `$${currentPrice.toFixed(2)}` },
-              { label: "Implied Growth (Y1-5)", val: (() => {
-                if (!currentPrice) return "N/A";
-                let best: { g: number; diff: number } | null = null;
-                for (let g = -5; g <= 60; g += 0.5) {
-                  const v = calcDCF(g, Math.max(0, g - 4), ebitMargin, taxRate, wacc, termGr, capexPct);
-                  if (v != null) {
-                    const diff = Math.abs(v - currentPrice) / currentPrice;
-                    if (best === null || diff < best.diff) best = { g, diff };
-                    if (diff < 0.01) break;
-                  }
-                }
-                if (!best || best.diff > 0.20) return ">60%";
-                return `~${best.g.toFixed(1)}%`;
-              })() },
-              { label: "Risk-Free Rate", val: `${rfRate.toFixed(2)}%` },
-            ].map(({ label, val }) => (
-              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
-                <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
+          rdcf ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+              {[
+                {
+                  label: "Implied CAGR (Y1-5)",
+                  val: `${rdcf.impliedGrowthCagr.toFixed(1)}%`,
+                  color: rdcf.impliedGrowthCagr > 25 ? "var(--sr-neg)" : rdcf.impliedGrowthCagr > 12 ? "var(--sr-warn)" : "var(--sr-pos)",
+                },
+                {
+                  label: "Conservative Value",
+                  val: `$${rdcf.conventionalValue.toFixed(2)}`,
+                  color: rdcf.upside > 15 ? "var(--sr-pos)" : rdcf.upside > -10 ? "var(--sr-warn)" : "var(--sr-neg)",
+                },
+                {
+                  label: "Upside vs Conservative",
+                  val: `${rdcf.upside >= 0 ? "+" : ""}${rdcf.upside.toFixed(1)}%`,
+                  color: rdcf.upside > 15 ? "var(--sr-pos)" : rdcf.upside > -10 ? "var(--sr-warn)" : "var(--sr-neg)",
+                },
+                {
+                  label: "Terminal Value Share",
+                  val: `${(rdcf.tvShare * 100).toFixed(0)}%`,
+                  color: rdcf.tvShare > 0.7 ? "var(--sr-neg)" : "var(--sr-text-1)",
+                },
+              ].map(({ label, val, color }) => (
+                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
+                </div>
+              ))}
+              <div style={{ gridColumn: "1 / -1", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)" }}>
+                WACC {rdcf.wacc.toFixed(1)}% · rf {rdcf.rfRate.toFixed(2)}% · Conservative model: 8% Y1-5, 4% Y6-10
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+              {[
+                { label: "Current Price", val: `$${currentPrice.toFixed(2)}` },
+                { label: "Risk-Free Rate", val: `${rfRate.toFixed(2)}%` },
+                { label: "Status", val: "Insufficient data" },
+              ].map(({ label, val }) => (
+                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
+                </div>
+              ))}
+            </div>
+          )
         )}
       </div>
 

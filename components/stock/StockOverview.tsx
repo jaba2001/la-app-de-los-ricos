@@ -90,6 +90,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
   const quote   = data?.quote;
 
   const [scoreHistory, setScoreHistory] = useState<{ date: string; score: number }[]>([]);
+  const [sectorPeers, setSectorPeers] = useState<{ ticker: string; score: number; date: string }[]>([]);
 
   useEffect(() => {
     supabase.from("sl_analyses")
@@ -104,6 +105,34 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
         })));
       });
   }, [ticker]);
+
+  useEffect(() => {
+    const sector = data?.profile?.sector as string | undefined;
+    if (!sector) return;
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    supabase.from("sl_analyses")
+      .select("ticker, analysis_date, score_total, macro_tilt")
+      .eq("sector", sector)
+      .gte("analysis_date", thirtyDaysAgo)
+      .order("analysis_date", { ascending: false })
+      .limit(200)
+      .then(({ data: rows }) => {
+        if (!rows) return;
+        const seen = new Set<string>();
+        const deduped: { ticker: string; score: number; date: string }[] = [];
+        for (const row of rows) {
+          if (!seen.has(row.ticker as string)) {
+            seen.add(row.ticker as string);
+            deduped.push({
+              ticker: row.ticker as string,
+              score: Number(row.score_total) + Number(row.macro_tilt ?? 0),
+              date: row.analysis_date as string,
+            });
+          }
+        }
+        setSectorPeers(deduped);
+      });
+  }, [data?.profile?.sector]);
 
   const cl    = !loading && data ? closePrices(data.history)    : [];
   const spyCl = !loading && data ? closePrices(data.spyHistory) : [];
@@ -406,6 +435,92 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               </>
             )}
           </div>
+
+          {/* Sector Context — requires ≥3 peers */}
+          {sectorPeers.length >= 3 && icScore != null && (() => {
+            const currentScore = icScore;
+            const sorted = [...sectorPeers].sort((a, b) => a.score - b.score);
+            const n = sorted.length;
+            const medIdx = Math.floor(n / 2);
+            const median = sorted[medIdx].score;
+            const rank = sorted.filter(p => p.score <= currentScore).length;
+            const pct = Math.round((rank / n) * 100);
+            const pctColor = pct >= 75 ? "var(--sr-pos)" : pct >= 50 ? "var(--sr-warn)" : pct >= 25 ? "#FB923C" : "var(--sr-neg)";
+            const sector = data?.profile?.sector as string;
+
+            // Histogram: 5 buckets 0-20, 20-40, 40-60, 60-80, 80-100
+            const buckets = [0, 20, 40, 60, 80, 100];
+            const hist = buckets.slice(0, -1).map((lo, i) => ({
+              lo, hi: buckets[i + 1],
+              count: sorted.filter(p => p.score >= lo && p.score < buckets[i + 1]).length,
+            }));
+            const maxCount = Math.max(...hist.map(b => b.count), 1);
+            const currentBucket = hist.findIndex(b => currentScore >= b.lo && currentScore < b.hi);
+
+            return (
+              <div className="card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
+                  <div>
+                    <div className="section-label" style={{ margin: 0 }}>Sector Context</div>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
+                      {sector} · {n} analyzed in last 30d
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: pctColor }} className="num">
+                      {pct}th pct.
+                    </div>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>vs sector</div>
+                  </div>
+                </div>
+
+                {/* Distribution histogram */}
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 40, marginBottom: "var(--sr-sp-2)" }}>
+                  {hist.map((b, i) => (
+                    <div key={b.lo} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                      <div style={{
+                        width: "100%",
+                        height: `${Math.max(4, (b.count / maxCount) * 36)}px`,
+                        borderRadius: "2px 2px 0 0",
+                        background: i === currentBucket
+                          ? pctColor
+                          : "var(--sr-surface-3)",
+                        transition: "height 400ms ease",
+                        position: "relative",
+                      }}>
+                        {i === currentBucket && (
+                          <div style={{ position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)", fontSize: 8, color: pctColor, fontWeight: 700, marginBottom: 2, whiteSpace: "nowrap" }}>
+                            ▼ you
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
+                  <span className="num">0</span>
+                  <span className="num">20</span>
+                  <span className="num">40</span>
+                  <span className="num">60</span>
+                  <span className="num">80</span>
+                  <span className="num">100</span>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-2)", fontSize: "var(--sr-t-xs)" }}>
+                  {[
+                    { label: "Your Score",    val: currentScore.toFixed(0), color: pctColor },
+                    { label: "Sector Median", val: median.toFixed(0), color: "var(--sr-text-1)" },
+                    { label: "vs Median",     val: `${currentScore - median >= 0 ? "+" : ""}${(currentScore - median).toFixed(0)}`, color: (currentScore - median) > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
+                  ].map(({ label, val, color }) => (
+                    <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-2) var(--sr-sp-3)" }}>
+                      <div style={{ color: "var(--sr-text-3)", marginBottom: 2 }}>{label}</div>
+                      <div style={{ fontWeight: 700, color, fontSize: "var(--sr-t-sm)" }} className="num">{val}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {profile?.description != null && !loading && (
             <div className="card">

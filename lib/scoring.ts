@@ -25,6 +25,15 @@ export function calcScores(inp: ScoreInputs): Scores {
   if (inp.pb != null) value += inp.pb < 1.5 ? 6 : inp.pb < 3 ? 4 : inp.pb < 5 ? 2 : 0;
   if (inp.evEbitda != null) value += inp.evEbitda < 8 ? 6 : inp.evEbitda < 15 ? 4 : inp.evEbitda < 25 ? 2 : 0;
   if (inp.pfcf != null) value += inp.pfcf < 15 ? 6 : inp.pfcf < 25 ? 4 : inp.pfcf < 40 ? 2 : 0;
+  // Reverse DCF signal — market expectations premium/discount vs conservative growth
+  if (inp.impliedGrowthCagr != null) {
+    value += inp.impliedGrowthCagr > 30 ? -4
+           : inp.impliedGrowthCagr > 20 ? -2
+           : inp.impliedGrowthCagr <  5 ?  3   // price implies below-consensus growth → potential
+           : 0;
+  }
+  // Speculative value: >70% of value from terminal → unreliable
+  if (inp.tvShare != null && inp.tvShare > 0.7) value -= 2;
 
   let health = 0;
   if (inp.debtEquity != null) health += inp.debtEquity < 0.3 ? 10 : inp.debtEquity < 0.7 ? 7 : inp.debtEquity < 1.5 ? 4 : 0;

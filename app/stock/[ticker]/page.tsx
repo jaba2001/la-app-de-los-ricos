@@ -5,8 +5,9 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, getRating, getMacroTilt, SECTOR_ETF } from "@/lib/scoring";
+import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
-import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
+import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
 
@@ -56,6 +57,7 @@ export interface StockData {
   annualIncome: Record<string, unknown>[];
   sharesFloat: Record<string, unknown>[];
   analystConsensus: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number; period: string } | null;
+  rdcf: ReverseDCFSnapshot | null;
   technicals: {
     rsi14: number | null;
     sma20: number | null; sma50: number | null; sma200: number | null;
@@ -108,9 +110,43 @@ export default function StockTickerPage() {
       Promise.resolve(p).finally(() => setFetchProgress(c => c + 1));
 
     try {
+      const today = new Date().toISOString().split("T")[0];
+
+      // ── Always-fresh: macro + live quote ─────────────────────────
+      const [macroRes, quoteRes] = await Promise.allSettled([
+        track(supabase.from("macro_state").select("*").eq("id", 1).single()),
+        track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
+      ]);
+
+      const macroData = macroRes.status === "fulfilled"
+        ? (macroRes.value as { data: MacroState }).data
+        : contextMacro;
+      setMacro(macroData);
+      if (macroData) setMacroContext(macroData);
+
+      const freshQuote = quoteRes.status === "fulfilled"
+        ? ((quoteRes.value as unknown[])?.[0] as Record<string, unknown>) ?? null
+        : null;
+
+      // ── 24h snapshot check ────────────────────────────────────────
+      const { data: snap } = await supabase
+        .from("stock_snapshot")
+        .select("data")
+        .eq("ticker", ticker.toUpperCase())
+        .eq("snapshot_date", today)
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      let stockData: StockData;
+
+      if (snap?.data) {
+        stockData = { ...(snap.data as StockData), quote: freshQuote, rdcf: null };
+        setFetchProgress(TOTAL_SOURCES);
+        setFailedApis(0);
+      } else {
+      // ── CACHE MISS: remaining 27 fetches ─────────────────────────
       const [
-        macroRes,
-        quoteRes, profileRes, metricsRes, ratiosRes,
+        profileRes, metricsRes, ratiosRes,
         historyRes, incomeRes, balanceRes, cashRes,
         peersRes, targetsRes, estimatesRes, holdersRes,
         earningsRes, insiderRes, dcfRes,
@@ -121,8 +157,6 @@ export default function StockTickerPage() {
         edgarRes,
         simfinRes,
       ] = await Promise.allSettled([
-        track(supabase.from("macro_state").select("*").eq("id", 1).single()),
-        track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/ratios-ttm?symbol=${ticker}`)),
@@ -156,13 +190,7 @@ export default function StockTickerPage() {
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin/financials?symbol=${ticker}`)),
       ]);
 
-      const macroData = macroRes.status === "fulfilled"
-        ? (macroRes.value as { data: MacroState }).data
-        : contextMacro;
-      setMacro(macroData);
-      if (macroData) setMacroContext(macroData);
-
-      const quote   = quoteRes.status   === "fulfilled" ? (quoteRes.value as unknown[])?.[0]   as Record<string,unknown> ?? null : null;
+      const quote   = freshQuote;
       const profile = profileRes.status === "fulfilled" ? (profileRes.value as unknown[])?.[0] as Record<string,unknown> ?? null : null;
       const metrics = metricsRes.status === "fulfilled" ? (Array.isArray(metricsRes.value) ? metricsRes.value[0] : metricsRes.value) as Record<string,unknown> ?? null : null;
       const ratios  = ratiosRes.status  === "fulfilled" ? (Array.isArray(ratiosRes.value)  ? ratiosRes.value[0]  : ratiosRes.value)  as Record<string,unknown> ?? null : null;
@@ -313,7 +341,7 @@ export default function StockTickerPage() {
       const mergedAnnualIncome = fmpAnnual.length   > 0 ? fmpAnnual   : (edgar?.annualIncome  ?? simfin?.annualIncome  ?? []);
       // ─────────────────────────────────────────────────────────────
 
-      const stockData: StockData = {
+      stockData = {
         quote, profile,
         metrics: mergedMetrics,
         ratios:  mergedRatios,
@@ -336,10 +364,68 @@ export default function StockTickerPage() {
         annualIncome:         mergedAnnualIncome,
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
         analystConsensus,
+        rdcf: null,
         technicals,
       };
 
+      // ── Write 24h snapshot (exclude quote/rdcf, cap history arrays) ──
+      const { quote: _snapQ, rdcf: _snapR, history: _sh, spyHistory: _ss, sectorEtfHistory: _se, ...snapRest } = stockData;
+      await supabase.from("stock_snapshot").upsert({
+        ticker: ticker.toUpperCase(),
+        snapshot_date: today,
+        user_id: session.user.id,
+        data: {
+          ...snapRest,
+          history:          _sh.slice(0, 252),
+          spyHistory:       _ss.slice(0, 252),
+          sectorEtfHistory: _se.slice(0, 252),
+        },
+      }, { onConflict: "ticker,snapshot_date,user_id" });
+
+      } // end cache miss
+
+      // ── Common: RDCF + scoring + upsert ──────────────────────────
       setData(stockData);
+
+      const mergedMetrics = stockData.metrics;
+      const mergedRatios  = stockData.ratios;
+      const quote         = stockData.quote;
+      const sector        = (stockData.profile?.sector as string) ?? "";
+
+      // ── Reverse DCF (auto) ────────────────────────────────────────
+      const rdcfRevTTM  = stockData.income.slice(0, 4).reduce((s, q) => s + (Number(q.revenue) || 0), 0);
+      const rdcfFcfTTM  = stockData.cashFlow.slice(0, 4).reduce((s, q) =>
+        s + ((Number(q.operatingCashFlow) || 0) - (Number(q.capitalExpenditure) || 0)), 0);
+      const rdcfNetDebt = stockData.balanceSheet[0]
+        ? (Number(stockData.balanceSheet[0].totalDebt) || 0) - (Number(stockData.balanceSheet[0].cashAndCashEquivalents) || 0)
+        : 0;
+      const rdcfShares = (mergedMetrics?.weightedAverageSharesOutstandingDilutedTTM as number)
+        ?? (quote?.marketCap != null && Number(quote.price ?? 0) > 0
+            ? Number(quote.marketCap) / Number(quote.price)
+            : null);
+      const rdcfPrice = Number(quote?.price ?? 0);
+      const rdcfBeta  = (stockData.technicals?.beta ?? (mergedMetrics as Record<string,unknown>)?.beta as number) ?? 1.0;
+      const rdcfRf    = macroData?.dgs10 != null ? Number(macroData.dgs10) : 4.2;
+
+      const rdcfResult = rdcfRevTTM > 0 && rdcfShares != null && rdcfShares > 0 && rdcfPrice > 0
+        ? computeReverseDCF({
+            currentPrice:  rdcfPrice,
+            revenueTTM:    rdcfRevTTM,
+            fcfMarginTTM:  rdcfRevTTM > 0 ? rdcfFcfTTM / rdcfRevTTM : 0,
+            netDebt:       rdcfNetDebt,
+            sharesOut:     rdcfShares,
+            beta:          rdcfBeta,
+            rfRate:        rdcfRf,
+            creditStress:  macroData?.credit_stress ?? null,
+          })
+        : null;
+
+      const rdcfSnapshot: ReverseDCFSnapshot | null = rdcfResult
+        ? { ...rdcfResult, computedAt: new Date().toISOString() }
+        : null;
+
+      stockData.rdcf = rdcfSnapshot;
+      setData({ ...stockData });
 
       // Compute momentum from daily close prices (history is newest-first from FMP)
       const cl = stockData.history.map(h => Number(h.close)).filter(v => !isNaN(v));
@@ -364,16 +450,16 @@ export default function StockTickerPage() {
         epsGrowth:        mergedRatios?.netIncomeGrowthTTM != null ? (mergedRatios.netIncomeGrowthTTM as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,
         regime:           macroData?.regime_id ?? null,
-        priceChange1M,
-        priceChange3M,
-        priceChange6M,
+        priceChange1M, priceChange3M, priceChange6M,
+        impliedGrowthCagr: rdcfResult?.impliedGrowthCagr ?? null,
+        tvShare:           rdcfResult?.tvShare ?? null,
       });
       setScores(calc);
 
       const rating = getRating(calc.total);
       const { data: saved } = await supabase.from("sl_analyses").upsert({
         ticker: ticker.toUpperCase(),
-        analysis_date: new Date().toISOString().split("T")[0],
+        analysis_date: today,
         score_total: calc.total,
         score_val: calc.value,
         score_hlth: calc.health,
@@ -382,6 +468,7 @@ export default function StockTickerPage() {
         rating: rating.label,
         macro_tilt: macroTiltData.tilt,
         sector,
+        reverse_dcf: rdcfSnapshot,
       }, { onConflict: "ticker,analysis_date" }).select().single();
 
       if (saved) setSavedAnalysis(saved as StockAnalysis);

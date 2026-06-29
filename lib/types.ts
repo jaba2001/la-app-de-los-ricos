@@ -130,6 +130,21 @@ export interface ScoreInputs {
   netDebtEbitda?: number | null;
   regime?: string | null;
   marketCap?: number | null;
+  /** Reverse DCF signals — optional, integrated into value score when available */
+  impliedGrowthCagr?: number | null;
+  tvShare?: number | null;
+}
+
+/* ── Reverse DCF result (stored in sl_analyses.reverse_dcf JSONB) ── */
+export interface ReverseDCFSnapshot {
+  impliedGrowthCagr: number;
+  conventionalValue: number;
+  upside: number;
+  tvShare: number;
+  realityBand: 'achievable' | 'ambitious' | 'very_aggressive';
+  wacc: number;
+  rfRate: number;
+  computedAt: string;
 }
 
 export interface Scores {
