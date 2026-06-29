@@ -91,6 +91,13 @@ export interface MacroState {
   /* Extended Commodities */
   gold_price?: number | null;
   brent?: number | null;
+  /* Sentiment & Research Gate */
+  boj_assets?: number | null;
+  claims_trend?: string | null;
+  profits_trend?: string | null;
+  recession_gate_active?: boolean | null;
+  credit_private_proxy?: number | null;
+  credit_divergence?: boolean | null;
 }
 
 /* ── Stock Analysis (from Supabase sl_analyses) ── */

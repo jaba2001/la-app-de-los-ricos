@@ -57,6 +57,9 @@ const LIQUIDITY: SeriesEntry[] = [
   { label: "Fed Balance Sheet ($T)", key: "walcl", suffix: "T", prefix: "$",
     derived: m => m.walcl != null ? Number(m.walcl) / 1e6 : null },
   { label: "Reverse Repo ($B)",      key: "rrpontsyd",        suffix: "B", prefix: "$" },
+  { label: "Bank Reserves ($T)",     key: "wresbal",          suffix: "T", prefix: "$",
+    derived: m => m.wresbal != null ? Number(m.wresbal) / 1000 : null,
+    badge: v => v < 2 ? { text: "LOW", color: "var(--sr-neg)" } : v < 3 ? { text: "WATCH", color: "var(--sr-warn)" } : v < 4 ? { text: "NORMAL", color: "var(--sr-text-3)" } : { text: "AMPLE", color: "var(--sr-pos)" } },
   { label: "M2 YoY Growth",          key: "m2_growth",        suffix: "%",
     badge: v => v < -2 ? { text: "CONTRACTING", color: "var(--sr-neg)" } : v < 2 ? { text: "LOW", color: "var(--sr-warn)" } : v < 6 ? { text: "NORMAL", color: "var(--sr-pos)" } : { text: "EXPANDING", color: "var(--sr-warn)" } },
   { label: "Net Liquidity ($T)",      key: "net_liquidity_t",  suffix: "T", prefix: "$",
@@ -73,6 +76,7 @@ const LABOR: SeriesEntry[] = [
     derived: m => m.payems != null ? Number(m.payems) / 1000 : null },
   { label: "Initial Jobless Claims",key: "icsa",           suffix: "K", threshold: { warn: 250, bad: 300 }, higherIsBad: true,
     badge: v => v < 200 ? { text: "LOW", color: "var(--sr-pos)" } : v < 250 ? { text: "NORMAL", color: "var(--sr-pos)" } : v < 300 ? { text: "RISING", color: "var(--sr-warn)" } : { text: "HIGH", color: "var(--sr-neg)" } },
+  { label: "Claims Trend",          key: "claims_trend",   text: true },
   { label: "Recession Prob (RPC)",  key: "recession_prob", suffix: "", threshold: { warn: 40, bad: 60 }, higherIsBad: true },
 ];
 
@@ -86,6 +90,7 @@ const INFLATION: SeriesEntry[] = [
   { label: "Expected Return 10Y",   key: "expected_return_10y",  suffix: "%" },
   { label: "UMich Sentiment",       key: "umcsent",              suffix: "", threshold: { warn: 65, bad: 55 }, higherIsBad: false,
     badge: v => v > 80 ? { text: "OPTIMISTIC", color: "var(--sr-pos)" } : v > 65 ? { text: "MODERATE", color: "var(--sr-pos)" } : v > 55 ? { text: "CAUTIOUS", color: "var(--sr-warn)" } : { text: "PESSIMISTIC", color: "var(--sr-neg)" } },
+  { label: "Profits Trend",         key: "profits_trend",        text: true },
 ];
 
 const HOUSING: SeriesEntry[] = [
@@ -133,6 +138,26 @@ const CONDITIONS: SeriesEntry[] = [
   { label: "Bubble — AI/Tech",     key: "bubble_ai",        suffix: "", threshold: { warn: 60, bad: 80 }, higherIsBad: true },
 ];
 
+const SENTIMENT: SeriesEntry[] = [
+  { label: "Fear & Greed",          key: "fear_greed",           suffix: "", threshold: { warn: 70, bad: 80 }, higherIsBad: true,
+    badge: v => v < 25 ? { text: "EXTREME FEAR", color: "var(--sr-neg)" } : v < 45 ? { text: "FEAR", color: "var(--sr-warn)" } : v < 55 ? { text: "NEUTRAL", color: "var(--sr-text-3)" } : v < 75 ? { text: "GREED", color: "var(--sr-warn)" } : { text: "EXTREME GREED", color: "var(--sr-neg)" } },
+  { label: "F&G Rating",            key: "fear_greed_rating",    text: true },
+  { label: "Sentiment Signal",      key: "sentiment_signal",     text: true },
+  { label: "Put/Call Ratio",        key: "put_call_ratio",       suffix: "", decimals: 2, threshold: { warn: 1.0, bad: 1.3 }, higherIsBad: true,
+    badge: v => v < 0.7 ? { text: "COMPLACENT", color: "var(--sr-neg)" } : v < 0.9 ? { text: "BULLISH", color: "var(--sr-warn)" } : v < 1.1 ? { text: "NEUTRAL", color: "var(--sr-text-3)" } : v < 1.3 ? { text: "BEARISH", color: "var(--sr-warn)" } : { text: "EXTREME FEAR", color: "var(--sr-neg)" } },
+  { label: "Credit Private Proxy",  key: "credit_private_proxy", suffix: "%", decimals: 2, signed: true },
+  { label: "Credit Divergence",     key: "credit_divergence",    suffix: "",  decimals: 0,
+    derived: m => m.credit_divergence != null ? (m.credit_divergence ? 1 : 0) : null,
+    badge: v => v === 1 ? { text: "DIVERGING", color: "var(--sr-warn)" } : { text: "NO DIV.", color: "var(--sr-pos)" } },
+  { label: "BOJ Assets ($T)",       key: "boj_assets",           suffix: "T", prefix: "$", decimals: 1,
+    derived: m => m.boj_assets != null ? Number(m.boj_assets) / 1e12 : null },
+  { label: "Claims Trend",          key: "claims_trend",         text: true },
+  { label: "Profits Trend",         key: "profits_trend",        text: true },
+  { label: "Recession Gate",        key: "recession_gate_active", suffix: "", decimals: 0,
+    derived: m => m.recession_gate_active != null ? (m.recession_gate_active ? 1 : 0) : null,
+    badge: v => v === 1 ? { text: "ACTIVE", color: "var(--sr-pos)" } : { text: "INACTIVE", color: "var(--sr-warn)" } },
+];
+
 const ALL_CATS = [
   { id: "rates",      label: "Rates",       series: RATES      },
   { id: "credit",     label: "Credit",      series: CREDIT     },
@@ -142,6 +167,7 @@ const ALL_CATS = [
   { id: "housing",    label: "Housing",     series: HOUSING    },
   { id: "commodities",label: "Commodities", series: COMMODITIES},
   { id: "conditions", label: "Conditions",  series: CONDITIONS },
+  { id: "sentiment",  label: "Sentiment",   series: SENTIMENT  },
 ];
 
 const SAHM_BANDS = [
