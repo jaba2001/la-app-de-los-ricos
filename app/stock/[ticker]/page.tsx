@@ -7,7 +7,7 @@ import { authedFetch } from "@/lib/proxy";
 import { calcScores, getRating, getMacroTilt, SECTOR_ETF } from "@/lib/scoring";
 import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
-import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot } from "@/lib/types";
+import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
 
@@ -21,6 +21,7 @@ const StockResearch     = dynamic(() => import("@/components/stock/StockResearch
 const StockSmartMoney   = dynamic(() => import("@/components/stock/StockSmartMoney"),   { loading: TabSk, ssr: false });
 const StockScreener     = dynamic(() => import("@/components/stock/StockScreener"),     { loading: TabSk, ssr: false });
 const StockCompare      = dynamic(() => import("@/components/stock/StockCompare"),      { loading: TabSk, ssr: false });
+const StockSentiment    = dynamic(() => import("@/components/stock/StockSentiment"),    { loading: TabSk, ssr: false });
 
 const TABS = [
   { id: "overview",      label: "Overview" },
@@ -29,6 +30,7 @@ const TABS = [
   { id: "chart",         label: "Chart" },
   { id: "research",      label: "Research" },
   { id: "smartmoney",    label: "Smart Money" },
+  { id: "sentiment",     label: "Sentiment" },
   { id: "screener",      label: "Screener" },
   { id: "compare",       label: "Compare" },
 ];
@@ -58,6 +60,7 @@ export interface StockData {
   sharesFloat: Record<string, unknown>[];
   analystConsensus: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number; period: string } | null;
   rdcf: ReverseDCFSnapshot | null;
+  finviz: FinvizData | null;
   technicals: {
     rsi14: number | null;
     sma20: number | null; sma50: number | null; sma200: number | null;
@@ -86,7 +89,7 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 29;
+  const TOTAL_SOURCES = 30;
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
 
@@ -161,7 +164,7 @@ export default function StockTickerPage() {
       let stockData: StockData;
 
       if (snap?.data) {
-        stockData = { ...(snap.data as StockData), quote: freshQuote, rdcf: null };
+        stockData = { ...(snap.data as StockData), quote: freshQuote, rdcf: null, finviz: (snap.data as StockData).finviz ?? null };
         setFetchProgress(TOTAL_SOURCES);
         setFailedApis(0);
       } else {
@@ -177,6 +180,7 @@ export default function StockTickerPage() {
         fhShortRes, fhEarningsCalRes,
         edgarRes,
         simfinRes,
+        finvizRes,
       ] = await Promise.allSettled([
         track(authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`)),
@@ -209,6 +213,8 @@ export default function StockTickerPage() {
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar/financials?symbol=${ticker}`)),
         // Phase 7 — SimFin financials for European stocks (requires SIMFIN_KEY in ic-proxy env)
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin/financials?symbol=${ticker}`)),
+        // Phase 8 — Finviz short/sentiment/ownership data (free, edge-scraped, 6h cache)
+        track(authedFetch<FinvizData>(`/api/finviz/quote?symbol=${ticker}`)),
       ]);
 
       const quote   = freshQuote;
@@ -362,6 +368,12 @@ export default function StockTickerPage() {
       const mergedAnnualIncome = fmpAnnual.length   > 0 ? fmpAnnual   : (edgar?.annualIncome  ?? simfin?.annualIncome  ?? []);
       // ─────────────────────────────────────────────────────────────
 
+      // ── Phase 8: Finviz ──────────────────────────────────────────
+      const finvizData: FinvizData | null = finvizRes.status === "fulfilled"
+        ? (finvizRes.value as FinvizData) ?? null
+        : null;
+      // ─────────────────────────────────────────────────────────────
+
       stockData = {
         quote, profile,
         metrics: mergedMetrics,
@@ -386,6 +398,7 @@ export default function StockTickerPage() {
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
         analystConsensus,
         rdcf: null,
+        finviz: finvizData,
         technicals,
       };
 
@@ -474,6 +487,15 @@ export default function StockTickerPage() {
         priceChange1M, priceChange3M, priceChange6M,
         impliedGrowthCagr: rdcfResult?.impliedGrowthCagr ?? null,
         tvShare:           rdcfResult?.tvShare ?? null,
+        // Finviz signals
+        shortFloat:       stockData.finviz?.shortFloat ?? null,
+        instTrans:        stockData.finviz?.instTrans ?? null,
+        insiderTrans:     stockData.finviz?.insiderTrans ?? null,
+        relVolume:        stockData.finviz?.relVolume ?? null,
+        forwardPe:        stockData.finviz?.forwardPe ?? null,
+        epsQoQ:           stockData.finviz?.epsQoQ ?? null,
+        salesQoQ:         stockData.finviz?.salesQoQ ?? null,
+        operatingMargin:  stockData.finviz?.operatingMargin ?? null,
       });
       setScores(calc);
 
@@ -706,6 +728,7 @@ export default function StockTickerPage() {
             {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} icScore={icScore} dgs2={macro?.dgs2 as number ?? null} />}
             {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
             {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "sentiment"    && <StockSentiment   data={data} loading={loading} />}
             {activeTab === "screener"     && <StockScreener />}
             {activeTab === "compare"      && <StockCompare     ticker={ticker} />}
           </>

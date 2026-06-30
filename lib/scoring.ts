@@ -51,6 +51,48 @@ export function calcScores(inp: ScoreInputs): Scores {
   if (inp.revenueGrowth != null) growth += inp.revenueGrowth > 20 ? 11 : inp.revenueGrowth > 10 ? 8 : inp.revenueGrowth > 0 ? 5 : 0;
   if (inp.epsGrowth != null) growth += inp.epsGrowth > 20 ? 9 : inp.epsGrowth > 10 ? 6 : inp.epsGrowth > 0 ? 3 : 0;
 
+  // ── Finviz signals (all optional — gracefully degrade to no-op when null) ──
+
+  // Forward P/E adds value signal (cap remains 25)
+  if (inp.forwardPe != null && inp.forwardPe > 0) {
+    value += inp.forwardPe < 12 ? 4 : inp.forwardPe < 20 ? 3 : inp.forwardPe < 30 ? 1 : 0;
+  }
+
+  // Operating margin adds profitability to health (cap remains 30)
+  if (inp.operatingMargin != null) {
+    const om = inp.operatingMargin * 100;
+    health += om > 25 ? 3 : om > 12 ? 2 : om > 0 ? 1 : 0;
+  }
+
+  // Institutional flow adds confidence to health
+  if (inp.instTrans != null) {
+    const it = inp.instTrans * 100;
+    health += it > 3 ? 3 : it > 1 ? 2 : it < -3 ? -3 : it < -1 ? -2 : 0;
+  }
+
+  // Short float as momentum/sentiment signal
+  if (inp.shortFloat != null) {
+    const sf = inp.shortFloat * 100;
+    momentum += sf < 2 ? 2 : sf > 25 ? -5 : sf > 15 ? -3 : sf > 8 ? -1 : 0;
+  }
+
+  // Relative volume — unusual activity
+  if (inp.relVolume != null) {
+    momentum += inp.relVolume > 3 ? 2 : inp.relVolume > 1.5 ? 1 : inp.relVolume < 0.2 ? -1 : 0;
+  }
+
+  // EPS Q/Q acceleration adds to growth
+  if (inp.epsQoQ != null) {
+    const eq = inp.epsQoQ * 100;
+    growth += eq > 30 ? 3 : eq > 10 ? 2 : eq > 0 ? 1 : 0;
+  }
+
+  // Sales Q/Q adds to growth
+  if (inp.salesQoQ != null) {
+    const sq = inp.salesQoQ * 100;
+    growth += sq > 20 ? 2 : sq > 5 ? 1 : 0;
+  }
+
   // B1 — Regime-weighted scoring
   const regime = inp.regime ?? "neutral";
   let vW = 1, hW = 1, mW = 1, gW = 1;

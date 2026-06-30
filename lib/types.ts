@@ -140,6 +140,15 @@ export interface ScoreInputs {
   /** Reverse DCF signals — optional, integrated into value score when available */
   impliedGrowthCagr?: number | null;
   tvShare?: number | null;
+  /** Finviz signals — optional, all fields gracefully degrade when null */
+  shortFloat?: number | null;
+  instTrans?: number | null;
+  insiderTrans?: number | null;
+  relVolume?: number | null;
+  forwardPe?: number | null;
+  epsQoQ?: number | null;
+  salesQoQ?: number | null;
+  operatingMargin?: number | null;
 }
 
 /* ── Reverse DCF result (stored in sl_analyses.reverse_dcf JSONB) ── */
@@ -177,4 +186,38 @@ export interface MacroTilt {
   quadrant: string;
   reasons: string[];
   updatedAt: string;
+}
+
+/* ── Finviz snapshot data ── */
+export interface FinvizData {
+  shortFloat: number | null;
+  shortRatio: number | null;
+  insiderOwn: number | null;
+  insiderTrans: number | null;
+  instOwn: number | null;
+  instTrans: number | null;
+  relVolume: number | null;
+  atr: number | null;
+  volatility14d: number | null;
+  forwardPe: number | null;
+  peg: number | null;
+  ps: number | null;
+  pc: number | null;
+  evSales: number | null;
+  operatingMargin: number | null;
+  profitMargin: number | null;
+  roa: number | null;
+  roe: number | null;
+  epsQoQ: number | null;
+  salesQoQ: number | null;
+  epsNextY: number | null;
+  epsNext5Y: number | null;
+  salesGrowth3Y: number | null;
+  perf3Y: number | null;
+  perf5Y: number | null;
+  perfYear: number | null;
+  recom: number | null;
+  targetPrice: number | null;
+  betaFv: number | null;
+  grossMarginFv: number | null;
 }
