@@ -4,6 +4,7 @@ import type { MacroState } from "@/lib/types";
 import { authedFetch } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
+import { computeICHealthScore } from "@/lib/scoring";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -17,11 +18,7 @@ const TRIPWIRES = [
 ];
 
 function buildOPLAPrompt(macro: MacroState): string {
-  const icHealth = (() => {
-    const { liquidity_cycle: lcc, credit_stress: csc, recession_prob: rpc, geopolitical_risk: grc, housing_stress: hsc } = macro;
-    if (lcc == null || csc == null || rpc == null || grc == null || hsc == null) return "N/A";
-    return (100 - (Number(csc)*0.25 + (100-Number(lcc))*0.35 + Number(rpc)*0.20 + Number(grc)*0.10 + Number(hsc)*0.10)).toFixed(1);
-  })();
+  const icHealth = computeICHealthScore(macro)?.toFixed(1) ?? "N/A";
 
   return `You are an Investment Committee AI (CFA/CAIA level). Apply the Druckenmiller Signal Hierarchy (Tier 1: Liquidity → Tier 2: Credit → Tier 3: Recession → Tier 4: Geopolitical → Tier 5: Positioning) and the Howell Global Liquidity Model to analyze the following macro data. Structure your response with EXACTLY these section headers:
 

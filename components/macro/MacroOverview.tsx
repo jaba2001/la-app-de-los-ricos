@@ -5,7 +5,7 @@ import type { MacroState, StockAnalysis } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
-import { getRating } from "@/lib/scoring";
+import { getRating, computeICHealthScore } from "@/lib/scoring";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -35,14 +35,6 @@ function icScoreColor(v: unknown) {
   if (n >= 70) return "var(--sr-neg)";
   if (n >= 45) return "var(--sr-warn)";
   return "var(--sr-pos)";
-}
-
-function computeICHealthScore(macro: MacroState | null): number | null {
-  const lcc = macro?.liquidity_cycle, csc = macro?.credit_stress;
-  const rpc = macro?.recession_prob,  grc = macro?.geopolitical_risk;
-  const hsc = macro?.housing_stress;
-  if (lcc == null || csc == null || rpc == null || grc == null || hsc == null) return null;
-  return Math.max(0, Math.min(100, 100 - (Number(csc)*0.25 + (100-Number(lcc))*0.35 + Number(rpc)*0.20 + Number(grc)*0.10 + Number(hsc)*0.10)));
 }
 
 function healthLabel(v: number) {

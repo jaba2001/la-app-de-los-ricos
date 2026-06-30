@@ -1,4 +1,4 @@
-import type { ScoreInputs, Scores } from "./types";
+import type { ScoreInputs, Scores, MacroState } from "./types";
 
 export const SECTOR_PE_BM: Record<string, number> = {
   Technology: 28, Healthcare: 22, Financials: 14, "Consumer Cyclical": 20,
@@ -122,6 +122,17 @@ export function getRating(total: number): { label: string; color: string } {
   if (total >= 50) return { label: "BUY",         color: "var(--sr-pos)" };
   if (total >= 35) return { label: "CAUTION",     color: "var(--sr-neg)" };
   return               { label: "AVOID",          color: "var(--sr-neg)" };
+}
+
+// Weighted composite health score, 0-100 (higher = healthier backdrop). Druckenmiller-style
+// hierarchy: Liquidity > Credit > Recession > Geopolitical = Housing. Same weights used by
+// the matching engine in lib/historicalMatch.ts for consistency across the app.
+export function computeICHealthScore(macro: Pick<MacroState, "liquidity_cycle" | "credit_stress" | "recession_prob" | "geopolitical_risk" | "housing_stress"> | null | undefined): number | null {
+  const lcc = macro?.liquidity_cycle, csc = macro?.credit_stress;
+  const rpc = macro?.recession_prob,  grc = macro?.geopolitical_risk;
+  const hsc = macro?.housing_stress;
+  if (lcc == null || csc == null || rpc == null || grc == null || hsc == null) return null;
+  return Math.max(0, Math.min(100, 100 - (Number(csc) * 0.25 + (100 - Number(lcc)) * 0.35 + Number(rpc) * 0.20 + Number(grc) * 0.10 + Number(hsc) * 0.10)));
 }
 
 export function getMacroTilt(
