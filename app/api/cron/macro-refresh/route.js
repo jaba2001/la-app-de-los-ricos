@@ -62,6 +62,38 @@ export async function GET(request) {
 
   const sbBody = sbResp.ok ? undefined : await sbResp.text();
 
+  // Append today's snapshot to history (best-effort — never blocks/breaks the macro_state
+  // upsert above, which remains the source of truth StockLens reads). Powers the
+  // Historical Analog feature's future "your own history" comparison once enough rows
+  // accumulate; today it's a thin daily log of just the 5 composites + regime + ic_score + vix.
+  if (sbResp.ok) {
+    try {
+      await fetch(
+        `${process.env.SUPABASE_URL}/rest/v1/macro_state_history?on_conflict=snapshot_date`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: process.env.SUPABASE_SERVICE_KEY,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+            Prefer: 'resolution=merge-duplicates',
+          },
+          body: JSON.stringify({
+            snapshot_date: row.snapshot_date,
+            liquidity_cycle: row.liquidity_cycle,
+            credit_stress: row.credit_stress,
+            recession_prob: row.recession_prob,
+            geopolitical_risk: row.geopolitical_risk,
+            housing_stress: row.housing_stress,
+            regime_id: row.regime_id,
+            ic_score: row.ic_score,
+            vix: row.vix,
+          }),
+        }
+      );
+    } catch (e) { /* best-effort; macro_state write already succeeded, never fail the request for this */ }
+  }
+
   return new Response(
     JSON.stringify({
       ok: sbResp.ok,
