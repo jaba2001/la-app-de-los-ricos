@@ -28,7 +28,11 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       .order("month", { ascending: false })
       .order("rank", { ascending: true })
       .limit(20)
-      .then(({ data }) => { if (data) setTopBuyers(data as InsiderRow[]); setLoadingTop(false); });
+      .then(({ data, error }) => {
+        if (data) setTopBuyers(data as InsiderRow[]);
+        if (error) console.warn("smart_money_top_buyers:", error.message);
+        setLoadingTop(false);
+      });
   }, []);
 
   const insiders  = data?.insiderTrades        ?? [];

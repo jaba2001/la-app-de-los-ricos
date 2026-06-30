@@ -22,7 +22,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   // Derive shares from market cap / price as fallback — avoids wild DCF errors from hardcoded default
   const shares = (metrics?.weightedAverageSharesOutstandingDilutedTTM as number)
     ?? (quote?.marketCap != null && currentPrice > 0 ? Number(quote.marketCap) / currentPrice : null);
-  const netDebt = (balance[0]?.totalDebt as number ?? 0) - (balance[0]?.cashAndCashEquivalents as number ?? 0);
+  const netDebt = Number(balance[0]?.totalDebt ?? 0) - Number(balance[0]?.cashAndCashEquivalents ?? 0);
   const rfRate = macro?.dgs10 != null ? Number(macro.dgs10) : 4.2;
 
   const [gr1, setGr1] = useState(12);
@@ -223,7 +223,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 {
                   label: "Terminal Value Share",
                   val: `${(rdcf.tvShare * 100).toFixed(0)}%`,
-                  color: rdcf.tvShare > 0.7 ? "var(--sr-neg)" : "var(--sr-text-1)",
+                  color: rdcf.tvShare > 0.7 ? "var(--sr-neg)" : "var(--sr-text-2)",
                 },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>

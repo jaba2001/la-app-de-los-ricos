@@ -283,11 +283,13 @@ function computeSubScores(m: MacroState) {
   const bbb_s = bbb == null ? 30 : clamp(bbb < 100 ? 0 : bbb < 150 ? ((bbb - 100) / 50) * 30 : bbb < 250 ? 30 + ((bbb - 150) / 100) * 50 : 80 + Math.min(20, ((bbb - 250) / 50) * 20));
   const stlfsi = g("stlfsi4");
   const stlfsi_s = stlfsi == null ? 30 : clamp(stlfsi < -1 ? 0 : stlfsi < 0 ? (stlfsi + 1) * 25 : stlfsi < 0.5 ? 25 + (stlfsi / 0.5) * 40 : stlfsi < 1 ? 65 + ((stlfsi - 0.5) / 0.5) * 25 : 90 + Math.min(10, (stlfsi - 1) * 10));
+  const nfci = g("nfci");
+  const nfci_s = nfci == null ? 30 : clamp(nfci < -1 ? 0 : nfci < 0 ? ((nfci + 1) / 1) * 30 : nfci < 0.5 ? 30 + (nfci / 0.5) * 40 : nfci < 1 ? 70 + ((nfci - 0.5) / 0.5) * 20 : 90 + Math.min(10, (nfci - 1) * 10));
   const candi = g("c_and_i_loans");
   const candi_s = candi == null ? 30 : clamp(candi < -20 ? 0 : candi < 0 ? ((candi + 20) / 20) * 20 : candi < 25 ? 20 + (candi / 25) * 30 : candi < 50 ? 50 + ((candi - 25) / 25) * 30 : 80 + Math.min(20, ((candi - 50) / 20) * 20));
   const card = g("credit_card_delinq");
   const card_s = card == null ? 25 : clamp(card < 2.5 ? 5 : card < 4 ? 5 + ((card - 2.5) / 1.5) * 30 : card < 6 ? 35 + ((card - 4) / 2) * 40 : 75 + Math.min(25, ((card - 6) / 1.5) * 25));
-  const csc = hyOas_s * 0.25 + 20 * 0.20 + bbCcc_s * 0.15 + bbb_s * 0.15 + stlfsi_s * 0.10 + candi_s * 0.10 + card_s * 0.05;
+  const csc = hyOas_s * 0.25 + nfci_s * 0.20 + bbCcc_s * 0.15 + bbb_s * 0.15 + stlfsi_s * 0.10 + candi_s * 0.10 + card_s * 0.05;
 
   // RPC
   const sahm = g("sahm_rule");
@@ -501,15 +503,15 @@ export default function MacroIndicators({ macro, loading }: Props) {
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
               {SAHM_BANDS.map(b => {
                 const sv = macro?.sahm_rule != null ? Number(macro.sahm_rule) : null;
-                const active = sahmBand(sv) === b;
+                const isBandActive = sahmBand(sv) === b;
                 return (
                   <div key={b.range} style={{
                     display: "flex", justifyContent: "space-between", padding: "4px 8px", borderRadius: 4,
-                    background: active ? `color-mix(in srgb, ${b.color} 12%, var(--sr-surface-2))` : "var(--sr-surface-2)",
-                    border: active ? `1px solid color-mix(in srgb, ${b.color} 30%, transparent)` : "1px solid transparent",
+                    background: isBandActive ? `color-mix(in srgb, ${b.color} 12%, var(--sr-surface-2))` : "var(--sr-surface-2)",
+                    border: isBandActive ? `1px solid color-mix(in srgb, ${b.color} 30%, transparent)` : "1px solid transparent",
                   }}>
                     <span style={{ fontSize: "10px", fontWeight: 700, color: b.color }} className="num">{b.range}</span>
-                    <span style={{ fontSize: "10px", color: active ? b.color : "var(--sr-text-3)", fontWeight: active ? 600 : 400 }}>{b.label}</span>
+                    <span style={{ fontSize: "10px", color: isBandActive ? b.color : "var(--sr-text-3)", fontWeight: isBandActive ? 600 : 400 }}>{b.label}</span>
                   </div>
                 );
               })}

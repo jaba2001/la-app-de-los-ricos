@@ -23,7 +23,7 @@ export default function StockScreener() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_watchlist").select("*").then(({ data }) => {
+    supabase.from("watchlist").select("*").then(({ data }) => {
       if (data) setWatchlist(data as WatchlistItem[]);
       setLoading(false);
     });
@@ -105,7 +105,7 @@ export default function StockScreener() {
     e.preventDefault();
     const t = newTicker.trim().toUpperCase();
     if (!t || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await supabase.from("sl_watchlist").insert({ ticker: t }).select().single();
+    const { data } = await supabase.from("watchlist").insert({ ticker: t }).select().single();
     if (data) {
       setWatchlist(prev => [...prev, data as WatchlistItem]);
       setNewTicker("");
@@ -114,7 +114,7 @@ export default function StockScreener() {
   }
 
   async function removeTicker(t: string) {
-    await supabase.from("sl_watchlist").delete().eq("ticker", t);
+    await supabase.from("watchlist").delete().eq("ticker", t);
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 

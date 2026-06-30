@@ -46,7 +46,7 @@ export default function StockPage() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_watchlist").select("*").then(({ data }) => {
+    supabase.from("watchlist").select("*").then(({ data }) => {
       if (data) setWatchlist(data as WatchlistItem[]);
       setLoadingWl(false);
     });
@@ -110,12 +110,12 @@ export default function StockPage() {
 
   async function addToWatchlist(t: string) {
     if (!session || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await supabase.from("sl_watchlist").insert({ ticker: t }).select().single();
+    const { data } = await supabase.from("watchlist").insert({ ticker: t }).select().single();
     if (data) setWatchlist(prev => [...prev, data as WatchlistItem]);
   }
 
   async function removeFromWatchlist(t: string) {
-    await supabase.from("sl_watchlist").delete().eq("ticker", t);
+    await supabase.from("watchlist").delete().eq("ticker", t);
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 
@@ -149,7 +149,7 @@ export default function StockPage() {
             {suggestions.length > 0 && (
               <div style={{
                 position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
-                background: "var(--sr-surface-1)", border: "1px solid var(--sr-border-2)",
+                background: "var(--sr-surface-2)", border: "1px solid var(--sr-border-2)",
                 borderRadius: "var(--sr-radius)", boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
                 zIndex: 500, overflow: "hidden",
               }}>

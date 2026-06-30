@@ -154,7 +154,7 @@ export default function Nav() {
         {suggestions.length > 0 && (
           <div style={{
             position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
-            background: "var(--sr-surface-1)", border: "1px solid var(--sr-border-2)",
+            background: "var(--sr-surface-2)", border: "1px solid var(--sr-border-2)",
             borderRadius: "var(--sr-radius)", boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
             zIndex: 500, overflow: "hidden",
           }}>

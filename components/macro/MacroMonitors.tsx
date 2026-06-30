@@ -70,9 +70,9 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
   const bubble = macro?.bubble_debt != null ? Number(macro.bubble_debt) : null;
   const bubbleAI = macro?.bubble_ai != null ? Number(macro.bubble_ai) : null;
-  const bubbleAvg = bubble != null && bubbleAI != null ? (bubble + bubbleAI) / 2 : bubble ?? bubbleAI ?? 0;
-  const bubbleColor = bubbleAvg >= 70 ? "var(--sr-neg)" : bubbleAvg >= 45 ? "var(--sr-warn)" : "var(--sr-pos)";
-  const bubbleStatus = bubbleAvg >= 70 ? "HIGH RISK" : bubbleAvg >= 45 ? "ELEVATED" : "CONTAINED";
+  const bubbleAvg = bubble != null && bubbleAI != null ? (bubble + bubbleAI) / 2 : bubble ?? bubbleAI ?? null;
+  const bubbleColor = bubbleAvg == null ? "var(--sr-text-3)" : bubbleAvg >= 70 ? "var(--sr-neg)" : bubbleAvg >= 45 ? "var(--sr-warn)" : "var(--sr-pos)";
+  const bubbleStatus = bubbleAvg == null ? "—" : bubbleAvg >= 70 ? "HIGH RISK" : bubbleAvg >= 45 ? "ELEVATED" : "CONTAINED";
 
   const rpc = macro?.recession_prob != null ? Number(macro.recession_prob) : 0;
   const rpcColor = rpc >= 60 ? "var(--sr-neg)" : rpc >= 40 ? "var(--sr-warn)" : "var(--sr-pos)";
@@ -97,7 +97,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
         {/* Bubble Risk Monitor */}
         <MonitorCard
           title="Bubble Risk Monitor"
-          score={bubbleAvg > 0 ? bubbleAvg : null}
+          score={bubbleAvg}
           color={bubbleColor}
           status={bubbleStatus}
           signals={[

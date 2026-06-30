@@ -509,7 +509,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-2)", fontSize: "var(--sr-t-xs)" }}>
                   {[
                     { label: "Your Score",    val: currentScore.toFixed(0), color: pctColor },
-                    { label: "Sector Median", val: median.toFixed(0), color: "var(--sr-text-1)" },
+                    { label: "Sector Median", val: median.toFixed(0), color: "var(--sr-text-2)" },
                     { label: "vs Median",     val: `${currentScore - median >= 0 ? "+" : ""}${(currentScore - median).toFixed(0)}`, color: (currentScore - median) > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
                   ].map(({ label, val, color }) => (
                     <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-2) var(--sr-sp-3)" }}>

@@ -396,7 +396,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
             cashFlow.slice(0, 5).map(q => {
               const fcf = q.freeCashFlow != null
                 ? Number(q.freeCashFlow)
-                : Number(q.operatingCashFlow ?? 0) - Number(q.capitalExpenditure ?? 0);
+                : Number(q.operatingCashFlow ?? 0) + Number(q.capitalExpenditure ?? 0);
               return (
                 <div key={q.date as string} className="stat-row">
                   <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{(q.date as string)?.slice(0, 7)}</span>

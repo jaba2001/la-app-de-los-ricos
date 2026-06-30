@@ -96,6 +96,8 @@ export default function StockTickerPage() {
 
   useEffect(() => {
     if (!session || !ticker) return;
+    setWatchlisted(false);
+    setWatchlistId(null);
     supabase.from("watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
   }, [session, ticker]);

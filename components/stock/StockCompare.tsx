@@ -26,9 +26,12 @@ export default function StockCompare({ ticker }: Props) {
   const [analyses, setAnalyses] = useState<Record<string, StockAnalysis>>({});
   const [selected, setSelected] = useState<string[]>([ticker]);
 
+  // Reset selection when navigating to a different ticker
+  useEffect(() => { setSelected([ticker]); }, [ticker]);
+
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_watchlist").select("*").then(({ data }) => {
+    supabase.from("watchlist").select("*").then(({ data }) => {
       setWatchlist((data ?? []) as WatchlistItem[]);
     });
   }, [session]);
