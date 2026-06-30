@@ -98,17 +98,17 @@ export default function StockTickerPage() {
     if (!session || !ticker) return;
     setWatchlisted(false);
     setWatchlistId(null);
-    supabase.from("watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
+    supabase.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
   }, [session, ticker]);
 
   async function toggleWatchlist() {
     if (!session || !ticker) return;
     if (watchlisted && watchlistId != null) {
-      await supabase.from("watchlist").delete().eq("id", watchlistId);
+      await supabase.from("sl_watchlist").delete().eq("id", watchlistId);
       setWatchlisted(false); setWatchlistId(null);
     } else {
-      const { data } = await supabase.from("watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
+      const { data } = await supabase.from("sl_watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
       if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); }
     }
   }

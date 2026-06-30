@@ -40,7 +40,7 @@ export default function WatchlistPage() {
     if (!session) return;
     setLoadingList(true);
     const { data, error } = await supabase
-      .from("watchlist")
+      .from("sl_watchlist")
       .select("id,ticker,added_at")
       .eq("user_id", session.user.id)
       .order("added_at", { ascending: false });
@@ -74,14 +74,14 @@ export default function WatchlistPage() {
     if (!t || !session) return;
     setAdding(true);
     setError("");
-    const { error } = await supabase.from("watchlist").insert({ user_id: session.user.id, ticker: t });
+    const { error } = await supabase.from("sl_watchlist").insert({ user_id: session.user.id, ticker: t });
     if (error) setError(error.message);
     else { setNewTicker(""); await loadItems(); }
     setAdding(false);
   }
 
   async function removeTicker(id: number) {
-    const { error } = await supabase.from("watchlist").delete().eq("id", id);
+    const { error } = await supabase.from("sl_watchlist").delete().eq("id", id);
     if (error) setError(error.message);
     else setItems(prev => prev.filter(i => i.id !== id));
   }

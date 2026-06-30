@@ -46,7 +46,7 @@ export default function StockPage() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("watchlist").select("*").then(({ data }) => {
+    supabase.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
       if (data) setWatchlist(data as WatchlistItem[]);
       setLoadingWl(false);
     });
@@ -110,12 +110,12 @@ export default function StockPage() {
 
   async function addToWatchlist(t: string) {
     if (!session || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await supabase.from("watchlist").insert({ ticker: t }).select().single();
+    const { data } = await supabase.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
     if (data) setWatchlist(prev => [...prev, data as WatchlistItem]);
   }
 
   async function removeFromWatchlist(t: string) {
-    await supabase.from("watchlist").delete().eq("ticker", t);
+    await supabase.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 

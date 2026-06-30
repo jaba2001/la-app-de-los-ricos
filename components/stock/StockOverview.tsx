@@ -83,7 +83,7 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
   );
 }
 
-export default function StockOverview({ data, macro, scores, icScore, rating, macroTilt, loading, ticker }: Props) {
+export default function StockOverview({ data, macro, scores, icScore, rating, macroTilt, loading, ticker, savedAnalysis }: Props) {
   const profile = data?.profile;
   const metrics = data?.metrics;
   const ratios  = data?.ratios;
@@ -160,6 +160,42 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
   return (
     <div className="animate-fade-in">
+      {/* Previous analysis banner */}
+      {savedAnalysis && !loading && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: "var(--sr-sp-4)",
+          padding: "var(--sr-sp-2) var(--sr-sp-4)", marginBottom: "var(--sr-sp-4)",
+          borderRadius: "var(--sr-radius)",
+          background: "var(--sr-surface-2)",
+          border: "1px solid var(--sr-border)",
+          fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)",
+          flexWrap: "wrap",
+        }}>
+          <span>Último análisis guardado:</span>
+          <span style={{ color: "var(--sr-text-2)", fontWeight: 600 }}>
+            {new Date(savedAnalysis.analysis_date).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+          </span>
+          <span style={{ color: savedAnalysis.rating === "STRONG BUY" ? "var(--sr-pos)" : savedAnalysis.rating?.includes("BUY") ? "#34D399" : savedAnalysis.rating?.includes("SELL") ? "var(--sr-neg)" : "var(--sr-warn)", fontWeight: 700 }}>
+            {savedAnalysis.rating ?? "—"}
+          </span>
+          <span className="num" style={{ color: "var(--sr-text-2)" }}>
+            Score: <strong>{savedAnalysis.score_total}</strong>
+            {savedAnalysis.macro_tilt != null && savedAnalysis.macro_tilt !== 0 && (
+              <span style={{ color: Number(savedAnalysis.macro_tilt) > 0 ? "var(--sr-pos)" : "var(--sr-neg)", marginLeft: 4 }}>
+                {Number(savedAnalysis.macro_tilt) > 0 ? "+" : ""}{savedAnalysis.macro_tilt} macro
+              </span>
+            )}
+          </span>
+          {icScore != null && (
+            <span className="num" style={{ color: "var(--sr-text-3)", marginLeft: "auto" }}>
+              vs current: <strong style={{ color: icScore >= savedAnalysis.score_total + (savedAnalysis.macro_tilt ?? 0) ? "var(--sr-pos)" : "var(--sr-neg)" }}>
+                {icScore.toFixed(0)}
+              </strong>
+            </span>
+          )}
+        </div>
+      )}
+
       {/* Macro context */}
       {(macro || loading) && (
         <div style={{

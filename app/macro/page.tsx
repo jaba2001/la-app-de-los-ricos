@@ -16,12 +16,14 @@ const MacroMarkets    = dynamic(() => import("@/components/macro/MacroMarkets"),
 const MacroMonitors   = dynamic(() => import("@/components/macro/MacroMonitors"),   { loading: TabSk, ssr: false });
 const MacroNews       = dynamic(() => import("@/components/macro/MacroNews"),       { loading: TabSk, ssr: false });
 const MacroAI         = dynamic(() => import("@/components/macro/MacroAI"),         { loading: TabSk, ssr: false });
+const MacroPortfolio  = dynamic(() => import("@/components/macro/MacroPortfolio"),  { loading: TabSk, ssr: false });
 
 const TABS = [
   { id: "overview",    label: "Overview" },
   { id: "indicators",  label: "Indicators" },
   { id: "markets",     label: "Markets" },
   { id: "monitors",    label: "Monitors" },
+  { id: "portfolio",   label: "Portfolio" },
   { id: "news",        label: "News" },
   { id: "ai",          label: "AI Synthesis" },
   { id: "raw",         label: "Raw Data" },
@@ -167,6 +169,7 @@ export default function MacroPage() {
             {activeTab === "indicators" && <MacroIndicators macro={macro} loading={loading} />}
             {activeTab === "markets"    && <MacroMarkets    macro={macro} loading={loading} />}
             {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
+            {activeTab === "portfolio"  && <MacroPortfolio  macro={macro} loading={loading} />}
             {activeTab === "news"       && <MacroNews />}
             {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}
             {activeTab === "raw"        && <MacroRawData    macro={macro} loading={loading} />}

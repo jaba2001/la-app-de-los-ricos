@@ -31,7 +31,7 @@ export default function StockCompare({ ticker }: Props) {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("watchlist").select("*").then(({ data }) => {
+    supabase.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
       setWatchlist((data ?? []) as WatchlistItem[]);
     });
   }, [session]);
