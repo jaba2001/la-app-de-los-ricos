@@ -62,7 +62,6 @@ function computeAlignment(title: string, text: string | undefined, composite: st
 
   const bullCount   = kw.bullish.filter(k => corpus.includes(k)).length;
   const bearCount   = kw.bearish.filter(k => corpus.includes(k)).length;
-  const totalMatches = bullCount + bearCount + kw.neutral.filter(k => corpus.includes(k)).length;
 
   const sentiment: "bullish" | "bearish" | "neutral" =
     bullCount > bearCount ? "bullish" : bearCount > bullCount ? "bearish" : "neutral";
@@ -71,7 +70,6 @@ function computeAlignment(title: string, text: string | undefined, composite: st
     Math.max(bullCount, bearCount) >= 3 ? "HIGH" :
     Math.max(bullCount, bearCount) >= 1 ? "MODERATE" : "LOW";
 
-  void totalMatches;
   return { composite, sentiment, confidence };
 }
 

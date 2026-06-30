@@ -1,15 +1,55 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, ReverseDCFSnapshot } from "@/lib/types";
+import { computeWACC, ERP_BASE } from "@/lib/reverseDcf";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 
 interface Props { data: StockData | null; macro: MacroState | null; loading: boolean; ticker: string; }
 
+interface DCFScenario { gr1: number; gr2: number; fcfMargin: number; wacc: number; termGr: number; }
+type ScenarioKey = "bear" | "base" | "bull";
+
+interface YearRow { yr: number; revenue: number; fcf: number; pv: number; }
+interface DCFOutput {
+  perShare: number;
+  ev: number;
+  equity: number;
+  pvOperating: number;
+  pvTerminal: number;
+  tvShare: number;
+  years: YearRow[];
+}
+
+function runDCFModel(rev0: number, shares: number | null, netDebt: number, p: DCFScenario): DCFOutput | null {
+  if (!shares || shares <= 0 || rev0 <= 0 || p.wacc <= p.termGr) return null;
+  let rev = rev0;
+  let pvOperating = 0;
+  let lastFCF = 0;
+  const years: YearRow[] = [];
+  for (let yr = 1; yr <= 10; yr++) {
+    const g = yr <= 5 ? p.gr1 / 100 : p.gr2 / 100;
+    rev *= (1 + g);
+    const fcf = rev * (p.fcfMargin / 100);
+    const pv = fcf / Math.pow(1 + p.wacc / 100, yr);
+    pvOperating += pv;
+    years.push({ yr, revenue: rev, fcf, pv });
+    if (yr === 10) lastFCF = fcf;
+  }
+  const tv = (lastFCF * (1 + p.termGr / 100)) / ((p.wacc - p.termGr) / 100);
+  const pvTerminal = tv / Math.pow(1 + p.wacc / 100, 10);
+  const ev = pvOperating + pvTerminal;
+  const equity = ev - netDebt;
+  const perShare = Math.max(0, equity / shares);
+  const tvShare = ev > 0 ? pvTerminal / ev : 0;
+  return { perShare, ev, equity, pvOperating, pvTerminal, tvShare, years };
+}
+
 export default function StockValuation({ data, macro, loading, ticker }: Props) {
   const metrics = data?.metrics;
   const income = data?.income ?? [];
+  const cashFlow = data?.cashFlow ?? [];
   const balance = data?.balanceSheet ?? [];
   const rdcf: ReverseDCFSnapshot | null = data?.rdcf ?? null;
   const quote = data?.quote;
@@ -19,42 +59,92 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   const baseRevenue = income.length > 0
     ? (income.slice(0, 4).reduce((s, q) => s + ((q.revenue as number) ?? 0), 0))
     : 0;
+  const priorRevenue = income.length >= 8
+    ? (income.slice(4, 8).reduce((s, q) => s + ((q.revenue as number) ?? 0), 0))
+    : 0;
   // Derive shares from market cap / price as fallback — avoids wild DCF errors from hardcoded default
   const shares = (metrics?.weightedAverageSharesOutstandingDilutedTTM as number)
     ?? (quote?.marketCap != null && currentPrice > 0 ? Number(quote.marketCap) / currentPrice : null);
   const netDebt = Number(balance[0]?.totalDebt ?? 0) - Number(balance[0]?.cashAndCashEquivalents ?? 0);
   const rfRate = macro?.dgs10 != null ? Number(macro.dgs10) : 4.2;
+  const beta = data?.technicals?.beta ?? (metrics?.beta as number | undefined) ?? 1.0;
+  const autoWacc = computeWACC(rfRate, beta, macro?.credit_stress ?? null);
 
-  const [gr1, setGr1] = useState(12);
-  const [gr2, setGr2] = useState(8);
-  const [ebitMargin, setEbitMargin] = useState(20);
-  const [taxRate, setTaxRate] = useState(21);
-  const [wacc, setWacc] = useState(Math.max(7, rfRate + 4));
-  const [termGr, setTermGr] = useState(3);
-  const [capexPct, setCapexPct] = useState(5);
+  // TTM FCF margin = (OCF - CapEx) / Revenue, same convention as Reverse DCF for internal consistency
+  const ttmFcf = cashFlow.length > 0
+    ? cashFlow.slice(0, 4).reduce((s, q) => s + ((Number(q.operatingCashFlow) || 0) - (Number(q.capitalExpenditure) || 0)), 0)
+    : 0;
+  const ttmFcfMargin = baseRevenue > 0 ? (ttmFcf / baseRevenue) * 100 : 15;
+  const ttmGrowth = priorRevenue > 0 ? ((baseRevenue / priorRevenue) - 1) * 100 : 10;
 
-  function calcDCF(g1: number, g2: number, margin: number, tax: number, discount: number, terminal: number, capex: number) {
-    if (!shares || !baseRevenue || discount <= terminal) return null;
-    let totalPV = 0;
-    let rev = baseRevenue;
-    for (let yr = 1; yr <= 10; yr++) {
-      const growthRate = yr <= 5 ? g1 / 100 : g2 / 100;
-      rev *= (1 + growthRate);
-      const ebit = rev * (margin / 100);
-      const nopat = ebit * (1 - tax / 100);
-      const capexAmt = rev * (capex / 100);
-      const fcf = nopat - capexAmt;
-      totalPV += fcf / Math.pow(1 + discount / 100, yr);
-    }
-    const termVal = (rev * (margin / 100) * (1 - tax / 100) * (1 + terminal / 100)) / ((discount - terminal) / 100);
-    totalPV += termVal / Math.pow(1 + discount / 100, 10);
-    const equity = totalPV - netDebt;
-    return Math.max(0, equity / shares);
+  const defaultScenarios = useMemo<Record<ScenarioKey, DCFScenario>>(() => ({
+    bear: {
+      gr1: Math.max(-10, Math.min(40, ttmGrowth * 0.4)),
+      gr2: Math.max(0, Math.min(20, ttmGrowth * 0.2)),
+      fcfMargin: Math.max(1, ttmFcfMargin * 0.75),
+      wacc: Math.min(20, autoWacc + 2),
+      termGr: 2,
+    },
+    base: {
+      gr1: Math.max(-5, Math.min(50, ttmGrowth)),
+      gr2: Math.max(0, Math.min(25, ttmGrowth * 0.5)),
+      fcfMargin: Math.max(1, ttmFcfMargin),
+      wacc: autoWacc,
+      termGr: 2.5,
+    },
+    bull: {
+      gr1: Math.max(0, Math.min(60, ttmGrowth * 1.4)),
+      gr2: Math.max(2, Math.min(30, ttmGrowth * 0.7)),
+      fcfMargin: Math.max(2, ttmFcfMargin * 1.15),
+      wacc: Math.max(7, autoWacc - 1.5),
+      termGr: 3,
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [ticker, Math.round(ttmGrowth), Math.round(ttmFcfMargin), Math.round(autoWacc * 10)]);
+
+  const [scenarios, setScenarios] = useState<Record<ScenarioKey, DCFScenario> | null>(null);
+  const [activeScenario, setActiveScenario] = useState<ScenarioKey>("base");
+  const [showYearly, setShowYearly] = useState(false);
+
+  // Seed scenarios from real company data whenever the ticker (or its underlying data) changes
+  useEffect(() => {
+    setScenarios(defaultScenarios);
+    setActiveScenario("base");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticker]);
+
+  const active: DCFScenario = scenarios?.[activeScenario] ?? defaultScenarios.base;
+
+  function updateActive(patch: Partial<DCFScenario>) {
+    setScenarios(prev => {
+      const base = prev ?? defaultScenarios;
+      return { ...base, [activeScenario]: { ...base[activeScenario], ...patch } };
+    });
   }
 
-  const intrinsic = calcDCF(gr1, gr2, ebitMargin, taxRate, wacc, termGr, capexPct);
+  function resetActiveToAuto() {
+    setScenarios(prev => ({ ...(prev ?? defaultScenarios), [activeScenario]: defaultScenarios[activeScenario] }));
+  }
+
+  const result = runDCFModel(baseRevenue, shares, netDebt, active);
+  const intrinsic = result?.perShare ?? null;
   const upside = intrinsic != null && currentPrice > 0 ? ((intrinsic - currentPrice) / currentPrice) * 100 : null;
   const intrinsicColor = upside == null ? "var(--sr-text-3)" : upside > 15 ? "var(--sr-pos)" : upside > -10 ? "var(--sr-warn)" : "var(--sr-neg)";
+
+  // All-scenario comparison (for the synthesis bar)
+  const allScenarios: { key: ScenarioKey; label: string; color: string }[] = [
+    { key: "bear", label: "Bear", color: "var(--sr-neg)" },
+    { key: "base", label: "Base", color: "var(--sr-amber)" },
+    { key: "bull", label: "Bull", color: "var(--sr-pos)" },
+  ];
+  const scenarioValues = scenarios
+    ? allScenarios.map(s => ({ ...s, value: runDCFModel(baseRevenue, shares, netDebt, scenarios[s.key])?.perShare ?? null }))
+    : [];
+
+  // Sensitivity table now keys off the active scenario's growth/margin, varying WACC × terminal growth
+  function calcDCF(g1: number, g2: number, fcfMargin: number, discount: number, terminal: number): number | null {
+    return runDCFModel(baseRevenue, shares, netDebt, { gr1: g1, gr2: g2, fcfMargin, wacc: discount, termGr: terminal })?.perShare ?? null;
+  }
 
   function SliderRow({ label, value, min, max, step = 1, onChange, suffix = "" }: {
     label: string; value: number; min: number; max: number; step?: number;
@@ -77,21 +167,42 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
 
   return (
     <div className="animate-fade-in">
+      {/* Scenario tabs */}
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)" }}>
+        {allScenarios.map(s => (
+          <button
+            key={s.key}
+            className={`subtab ${activeScenario === s.key ? "active" : ""}`}
+            onClick={() => setActiveScenario(s.key)}
+            style={activeScenario === s.key ? { borderColor: s.color, color: s.color } : undefined}
+          >
+            {s.label}
+          </button>
+        ))}
+        <button
+          onClick={resetActiveToAuto}
+          style={{ marginLeft: "auto", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
+        >
+          Reset to auto
+        </button>
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
         {/* DCF Model */}
         <div className="card">
-          <div className="section-label">Interactive DCF Model</div>
+          <div className="section-label">
+            Interactive DCF Model — {allScenarios.find(s => s.key === activeScenario)?.label}
+          </div>
           {loading ? <Sk w="100%" h={300} /> : (
             <>
-              <SliderRow label="Year 1-5 Growth" value={gr1} min={-10} max={50} onChange={setGr1} suffix="%" />
-              <SliderRow label="Year 6-10 Growth" value={gr2} min={-5} max={30} onChange={setGr2} suffix="%" />
-              <SliderRow label="EBIT Margin" value={ebitMargin} min={0} max={60} onChange={setEbitMargin} suffix="%" />
-              <SliderRow label="Tax Rate" value={taxRate} min={10} max={40} onChange={setTaxRate} suffix="%" />
-              <SliderRow label="WACC / Discount" value={wacc} min={4} max={20} step={0.5} onChange={setWacc} suffix="%" />
-              <SliderRow label="Terminal Growth" value={termGr} min={0} max={6} step={0.5} onChange={setTermGr} suffix="%" />
-              <SliderRow label="CapEx % Revenue" value={capexPct} min={0} max={30} onChange={setCapexPct} suffix="%" />
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)" }}>
-                Risk-free rate from macro_state.dgs10: {rfRate.toFixed(2)}%
+              <SliderRow label="Year 1-5 Growth" value={active.gr1} min={-10} max={60} onChange={v => updateActive({ gr1: v })} suffix="%" />
+              <SliderRow label="Year 6-10 Growth" value={active.gr2} min={-5} max={30} onChange={v => updateActive({ gr2: v })} suffix="%" />
+              <SliderRow label="FCF Margin" value={active.fcfMargin} min={0} max={50} onChange={v => updateActive({ fcfMargin: v })} suffix="%" />
+              <SliderRow label="WACC / Discount" value={active.wacc} min={4} max={20} step={0.5} onChange={v => updateActive({ wacc: v })} suffix="%" />
+              <SliderRow label="Terminal Growth" value={active.termGr} min={0} max={6} step={0.5} onChange={v => updateActive({ termGr: v })} suffix="%" />
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)", lineHeight: 1.5 }}>
+                FCF margin model — same methodology as Reverse DCF. WACC auto-seeded from rf {rfRate.toFixed(2)}% + β {beta.toFixed(2)} × ERP {ERP_BASE.toFixed(1)}%{macro?.credit_stress != null ? ` (+ credit stress)` : ""}.
+                TTM revenue growth {ttmGrowth.toFixed(1)}%, TTM FCF margin {ttmFcfMargin.toFixed(1)}%.
               </div>
             </>
           )}
@@ -129,6 +240,60 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
             )}
           </div>
 
+          {/* Scenario synthesis */}
+          {scenarioValues.length > 0 && (
+            <div className="card">
+              <div className="section-label">Scenario Synthesis</div>
+              <div style={{ display: "grid", gridTemplateColumns: dcf ? "repeat(4, 1fr)" : "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+                {scenarioValues.map(s => (
+                  <div key={s.key} style={{
+                    background: s.key === activeScenario ? `color-mix(in srgb, ${s.color} 10%, var(--sr-surface-2))` : "var(--sr-surface-2)",
+                    borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)",
+                    border: s.key === activeScenario ? `1px solid color-mix(in srgb, ${s.color} 40%, transparent)` : "1px solid transparent",
+                  }}>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: s.color, marginBottom: 4, fontWeight: 600 }}>{s.label}</div>
+                    <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
+                      {s.value != null ? `$${s.value.toFixed(2)}` : "—"}
+                    </div>
+                  </div>
+                ))}
+                {dcf && (
+                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4, fontWeight: 600 }}>FMP</div>
+                    <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
+                      ${Number(dcf.dcf ?? 0).toFixed(2)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* EV Bridge */}
+          {result && (
+            <div className="card">
+              <div className="section-label">EV Bridge</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {[
+                  { label: "PV Operating FCF (Y1-10)", val: result.pvOperating },
+                  { label: "+ PV Terminal Value", val: result.pvTerminal },
+                  { label: "= Enterprise Value", val: result.ev, bold: true },
+                  { label: "− Net Debt", val: -netDebt },
+                  { label: "= Equity Value", val: result.equity, bold: true },
+                ].map(row => (
+                  <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-sm)", fontWeight: row.bold ? 700 : 400, color: row.bold ? "var(--sr-text)" : "var(--sr-text-2)" }}>
+                    <span>{row.label}</span>
+                    <span className="num">${(row.val / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</span>
+                  </div>
+                ))}
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
+                  Terminal value is {(result.tvShare * 100).toFixed(0)}% of enterprise value
+                  {result.tvShare > 0.75 ? " — model is highly dependent on long-term assumptions" : ""}.
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* FMP DCF */}
           {dcf && (
             <div className="card">
@@ -149,16 +314,16 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
               <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
                 <thead><tr>
                   <th>WACC\TG</th>
-                  {[-1, -0.5, 0, 0.5, 1].map(d => <th key={d} style={{ textAlign: "right" }}>{(termGr + d).toFixed(1)}%</th>)}
+                  {[-1, -0.5, 0, 0.5, 1].map(d => <th key={d} style={{ textAlign: "right" }}>{(active.termGr + d).toFixed(1)}%</th>)}
                 </tr></thead>
                 <tbody>
                   {[-2, -1, 0, 1, 2].map(wd => {
-                    const waccRow = wacc + wd;
+                    const waccRow = active.wacc + wd;
                     return (
                       <tr key={wd}>
                         <td style={{ fontWeight: 600 }}>{waccRow.toFixed(1)}%</td>
                         {[-1, -0.5, 0, 0.5, 1].map(td => {
-                          const v = calcDCF(gr1, gr2, ebitMargin, taxRate, waccRow, termGr + td, capexPct);
+                          const v = calcDCF(active.gr1, active.gr2, active.fcfMargin, waccRow, active.termGr + td);
                           const up = v != null && currentPrice > 0 ? ((v - currentPrice) / currentPrice) * 100 : null;
                           const isBase = wd === 0 && td === 0;
                           return (
@@ -184,6 +349,42 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
           </div>
         </div>
       </div>
+
+      {/* Year-by-year projection */}
+      {result && (
+        <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
+          <div
+            className="section-label"
+            style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
+            onClick={() => setShowYearly(v => !v)}
+          >
+            <span>10-Year Projection</span>
+            <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{showYearly ? "Hide ▲" : "Show ▼"}</span>
+          </div>
+          {showYearly && (
+            <div style={{ overflowX: "auto", marginTop: "var(--sr-sp-3)" }}>
+              <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
+                <thead><tr>
+                  <th>Year</th>
+                  <th style={{ textAlign: "right" }}>Revenue</th>
+                  <th style={{ textAlign: "right" }}>FCF</th>
+                  <th style={{ textAlign: "right" }}>PV of FCF</th>
+                </tr></thead>
+                <tbody>
+                  {result.years.map(y => (
+                    <tr key={y.yr}>
+                      <td>Y{y.yr}</td>
+                      <td style={{ textAlign: "right" }} className="num">${(y.revenue / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</td>
+                      <td style={{ textAlign: "right" }} className="num">${(y.fcf / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</td>
+                      <td style={{ textAlign: "right", color: "var(--sr-text-2)" }} className="num">${(y.pv / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Reverse DCF — auto-computed */}
       <div className="card">

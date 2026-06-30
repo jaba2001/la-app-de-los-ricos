@@ -97,7 +97,7 @@ export default function StockSentiment({ data, loading }: Props) {
           />
           <Cell
             label="Short Ratio"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fmt(fv?.shortRatio, 1)}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fmt(fv?.shortRatio, 1)}</span>}
             sub="days to cover"
           />
         </div>
@@ -133,7 +133,7 @@ export default function StockSentiment({ data, loading }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
             label="Inst Own"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fv?.instOwn != null ? `${(fv.instOwn * 100).toFixed(1)}%` : "—"}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.instOwn != null ? `${(fv.instOwn * 100).toFixed(1)}%` : "—"}</span>}
             sub="% institutional ownership"
           />
           <Cell
@@ -147,7 +147,7 @@ export default function StockSentiment({ data, loading }: Props) {
           />
           <Cell
             label="Insider Own"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fv?.insiderOwn != null ? `${(fv.insiderOwn * 100).toFixed(1)}%` : "—"}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.insiderOwn != null ? `${(fv.insiderOwn * 100).toFixed(1)}%` : "—"}</span>}
             sub="% insider ownership"
           />
           <Cell
@@ -173,12 +173,12 @@ export default function StockSentiment({ data, loading }: Props) {
           />
           <Cell
             label="ATR"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fv?.atr != null ? `$${fmt(fv.atr, 2)}` : "—"}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.atr != null ? `$${fmt(fv.atr, 2)}` : "—"}</span>}
             sub="avg true range"
           />
           <Cell
             label="Volatility 14D"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fv?.volatility14d != null ? `${(fv.volatility14d * 100).toFixed(2)}%` : "—"}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.volatility14d != null ? `${(fv.volatility14d * 100).toFixed(2)}%` : "—"}</span>}
             sub="daily avg move"
           />
         </div>
@@ -195,17 +195,17 @@ export default function StockSentiment({ data, loading }: Props) {
           />
           <Cell
             label="Target Price"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fv?.targetPrice != null ? `$${fmt(fv.targetPrice, 2)}` : "—"}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.targetPrice != null ? `$${fmt(fv.targetPrice, 2)}` : "—"}</span>}
             sub="analyst consensus target"
           />
           <Cell
             label="Forward P/E"
-            value={<span style={{ color: "var(--sr-text-1)" }}>{fmt(fv?.forwardPe, 1)}</span>}
+            value={<span style={{ color: "var(--sr-text-2)" }}>{fmt(fv?.forwardPe, 1)}</span>}
             sub="next-12M earnings"
           />
           <Cell
             label="PEG"
-            value={<span style={{ color: fv?.peg != null ? (fv.peg < 1 ? "var(--sr-pos)" : fv.peg < 2 ? "var(--sr-text-1)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{fmt(fv?.peg, 2)}</span>}
+            value={<span style={{ color: fv?.peg != null ? (fv.peg < 1 ? "var(--sr-pos)" : fv.peg < 2 ? "var(--sr-text-2)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{fmt(fv?.peg, 2)}</span>}
             sub="price/earnings/growth"
           />
         </div>
@@ -249,7 +249,7 @@ export default function StockSentiment({ data, loading }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
             label="Operating Margin"
-            value={<span style={{ color: fv?.operatingMargin != null ? (fv.operatingMargin > 0.15 ? "var(--sr-pos)" : fv.operatingMargin > 0 ? "var(--sr-text-1)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>
+            value={<span style={{ color: fv?.operatingMargin != null ? (fv.operatingMargin > 0.15 ? "var(--sr-pos)" : fv.operatingMargin > 0 ? "var(--sr-text-2)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>
               {fv?.operatingMargin != null ? `${(fv.operatingMargin * 100).toFixed(1)}%` : "—"}
             </span>}
           />
@@ -261,7 +261,7 @@ export default function StockSentiment({ data, loading }: Props) {
           />
           <Cell
             label="Gross Margin"
-            value={<span style={{ color: "var(--sr-text-1)" }}>
+            value={<span style={{ color: "var(--sr-text-2)" }}>
               {fv?.grossMarginFv != null ? `${(fv.grossMarginFv * 100).toFixed(1)}%` : "—"}
             </span>}
           />

@@ -34,14 +34,14 @@ export interface ReverseDCFResult {
   rfRate: number;                     // % risk-free rate used
 }
 
-const ERP_BASE = 5.5;       // Equity risk premium base (Damodaran 2026 US estimate)
+export const ERP_BASE = 5.5;       // Equity risk premium base (Damodaran 2026 US estimate)
 const MIN_WACC = 7;
 const MAX_WACC = 20;
 const TERM_GR  = 3;         // Default terminal growth %
 const TAX_RATE = 0.21;      // US effective corporate tax approximation
 
-/** WACC = rf + beta × (ERP_base + credit_stress_spread) */
-function computeWACC(rf: number, beta: number, creditStress: number | null | undefined): number {
+/** WACC = rf + beta × (ERP_base + credit_stress_spread) — shared methodology across Reverse DCF and Interactive DCF */
+export function computeWACC(rf: number, beta: number, creditStress: number | null | undefined): number {
   const csc = creditStress != null ? Number(creditStress) : 0;
   // Each point of credit stress adds up to 1.5% extra ERP spread (linear, capped at stress=100)
   const stressSpread = Math.min(1.5, (csc / 100) * 1.5);
