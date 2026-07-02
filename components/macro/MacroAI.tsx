@@ -162,7 +162,7 @@ function buildHTMLReport(macro: MacroState, synthesis: string, date: string): st
       <tr><th>Indicator</th><th>Value</th><th>Indicator</th><th>Value</th></tr>
       <tr><td>2Y Treasury</td><td><strong>${macro.dgs2?.toFixed(2)??"—"}%</strong></td><td>Core PCE YoY</td><td><strong>${macro.core_pce_yoy?.toFixed(1)??"—"}%</strong></td></tr>
       <tr><td>10Y Treasury</td><td><strong>${macro.dgs10?.toFixed(2)??"—"}%</strong></td><td>Unemployment</td><td><strong>${macro.unrate?.toFixed(1)??"—"}%</strong></td></tr>
-      <tr><td>Curve (10Y-2Y)</td><td><strong>${macro.curve_steepener?.toFixed(0)??"—"}bp</strong></td><td>Buffett Indicator</td><td><strong>${macro.buffett_indicator?.toFixed(0)??"—"}%</strong></td></tr>
+      <tr><td>Curve (10Y-2Y)</td><td><strong>${macro.t10y2y!=null?`${macro.t10y2y>0?"+":""}${macro.t10y2y.toFixed(2)}%`:"—"}${macro.curve_steepener?` (${macro.curve_steepener})`:""}</strong></td><td>Buffett Indicator</td><td><strong>${macro.buffett_indicator?.toFixed(0)??"—"}%</strong></td></tr>
       <tr><td>Net Liquidity</td><td><strong>${macro.net_liquidity_t!=null?`$${macro.net_liquidity_t}T`:"—"} (${macro.net_liquidity_dir??"—"})</strong></td><td>WTI Oil</td><td><strong>$${macro.wti_level?.toFixed(1)??"—"}</strong></td></tr>
       <tr><td>Fear & Greed</td><td><strong>${macro.fear_greed?.toFixed(0)??"—"} (${macro.fear_greed_rating??"—"})</strong></td><td>VIX</td><td><strong>${macro.vix?.toFixed(1)??"—"}</strong></td></tr>
     </table>

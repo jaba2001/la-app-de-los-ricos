@@ -19,7 +19,7 @@ export interface MacroState {
   dgs10: number | null;
   dgs30: number | null;
   term_premium_10y: number | null;
-  curve_steepener: number | null;
+  curve_steepener: string | null;
   net_liquidity_t: number | null;
   net_liquidity_dir: string | null;
   /* Fed & macro */
