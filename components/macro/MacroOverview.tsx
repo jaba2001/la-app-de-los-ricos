@@ -95,10 +95,10 @@ export default function MacroOverview({ macro, loading }: Props) {
   const [topAtRisk,  setTopAtRisk]  = useState<StockAnalysis[]>([]);
 
   useEffect(() => {
-    supabase.from("ic_snapshots")
+    supabase.from("macro_state_history")
       .select("snapshot_date, ic_score")
       .order("snapshot_date", { ascending: true })
-      .limit(60)
+      .limit(90)
       .then(({ data }) => {
         if (data) setIcHistory(data.map(r => ({ date: r.snapshot_date as string, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)));
       });

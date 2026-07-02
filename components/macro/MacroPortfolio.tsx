@@ -19,9 +19,10 @@ interface PortfolioEntry {
   icScore: number;
 }
 
-function tiltBucket(t: number): "favorable" | "neutral" | "headwind" {
-  if (t > 3) return "favorable";
-  if (t < -3) return "headwind";
+// Aligns with getMacroTilt label thresholds: Favorable≥6, Neutral≥-2, Caution≥-8, Unfavorable<-8
+function tiltBucket(tiltLabel: string): "favorable" | "neutral" | "headwind" {
+  if (tiltLabel === "Favorable") return "favorable";
+  if (tiltLabel === "Caution" || tiltLabel === "Unfavorable") return "headwind";
   return "neutral";
 }
 
@@ -102,9 +103,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
   );
 
   const buckets = {
-    favorable: entries.filter(e => tiltBucket(e.liveTilt) === "favorable"),
-    neutral:   entries.filter(e => tiltBucket(e.liveTilt) === "neutral"),
-    headwind:  entries.filter(e => tiltBucket(e.liveTilt) === "headwind"),
+    favorable: entries.filter(e => tiltBucket(e.tiltLabel) === "favorable"),
+    neutral:   entries.filter(e => tiltBucket(e.tiltLabel) === "neutral"),
+    headwind:  entries.filter(e => tiltBucket(e.tiltLabel) === "headwind"),
   };
 
   const avgIc = entries.reduce((s, e) => s + e.icScore, 0) / entries.length;

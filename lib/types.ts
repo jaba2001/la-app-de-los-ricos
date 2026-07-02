@@ -98,6 +98,8 @@ export interface MacroState {
   recession_gate_active?: boolean | null;
   credit_private_proxy?: number | null;
   credit_divergence?: boolean | null;
+  /* Dalio Debt Cycle */
+  dalio_stage?: number | null;
 }
 
 /* ── Stock Analysis (from Supabase sl_analyses) ── */

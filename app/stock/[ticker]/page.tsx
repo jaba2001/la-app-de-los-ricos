@@ -501,6 +501,7 @@ export default function StockTickerPage() {
 
       const rating = getRating(calc.total);
       const { data: saved } = await supabase.from("sl_analyses").upsert({
+        user_id: session.user.id,
         ticker: ticker.toUpperCase(),
         analysis_date: today,
         score_total: calc.total,
@@ -512,7 +513,7 @@ export default function StockTickerPage() {
         macro_tilt: macroTiltData?.tilt ?? null,
         sector,
         reverse_dcf: rdcfSnapshot,
-      }, { onConflict: "ticker,analysis_date" }).select().single();
+      }, { onConflict: "ticker,analysis_date,user_id" }).select().single();
 
       if (saved) setSavedAnalysis(saved as StockAnalysis);
 

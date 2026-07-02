@@ -55,6 +55,15 @@ const DALIO_STAGES = [
   { n: 5, label: "Extraordinary Measures", desc: "Debt monetization, currency debasement" },
 ];
 
+// ⚠ Update quarterly — source: BIS/Treasury/Fed.gov/CBO
+// dalio_stage (which stage is highlighted) comes from macro_state.dalio_stage (updatable via dashboard)
+const DALIO_KPIS = [
+  { label: "Interest % of Income", val: "18%",    warn: "Critical threshold: 22%" },
+  { label: "Interest vs Defense",  val: "1.2×",   warn: "Crossed parity in 2024" },
+  { label: "USD Reserve Share",    val: "58%",     warn: "Was 72% in 2001" },
+  { label: "China Treasuries Δ",   val: "−$380B",  warn: "Cumulative since 2021" },
+];
+
 export default function MacroMonitors({ macro, loading }: Props) {
   if (loading) {
     return (
@@ -144,35 +153,40 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
       {/* Dalio Debt Cycle */}
       <div className="card">
-        <div className="section-label">Dalio Long-Term Debt Cycle</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)" }}>
+          <div className="section-label" style={{ marginBottom: 0 }}>Dalio Long-Term Debt Cycle</div>
+          {macro?.dalio_stage != null && (
+            <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+              Stage {macro.dalio_stage} — updated from macro_state
+            </span>
+          )}
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-3)" }}>
-          {DALIO_STAGES.map(stage => (
-            <div key={stage.n} style={{
-              padding: "var(--sr-sp-3)",
-              borderRadius: "var(--sr-radius)",
-              background: stage.n === 4 ? "color-mix(in srgb, var(--sr-warn) 12%, var(--sr-surface-2))" : "var(--sr-surface-2)",
-              border: stage.n === 4 ? "1px solid color-mix(in srgb, var(--sr-warn) 40%, transparent)" : "1px solid transparent",
-            }}>
-              <div style={{
-                fontSize: "var(--sr-t-xs)", fontWeight: 700, color: stage.n === 4 ? "var(--sr-warn)" : "var(--sr-text-3)",
-                marginBottom: 4,
+          {DALIO_STAGES.map(stage => {
+            const isCurrent = stage.n === (macro?.dalio_stage ?? 4);
+            return (
+              <div key={stage.n} style={{
+                padding: "var(--sr-sp-3)",
+                borderRadius: "var(--sr-radius)",
+                background: isCurrent ? "color-mix(in srgb, var(--sr-warn) 12%, var(--sr-surface-2))" : "var(--sr-surface-2)",
+                border: isCurrent ? "1px solid color-mix(in srgb, var(--sr-warn) 40%, transparent)" : "1px solid transparent",
               }}>
-                Stage {stage.n}{stage.n === 4 ? " ← CURRENT" : ""}
+                <div style={{
+                  fontSize: "var(--sr-t-xs)", fontWeight: 700, color: isCurrent ? "var(--sr-warn)" : "var(--sr-text-3)",
+                  marginBottom: 4,
+                }}>
+                  Stage {stage.n}{isCurrent ? " ← CURRENT" : ""}
+                </div>
+                <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: isCurrent ? "var(--sr-text)" : "var(--sr-text-2)", marginBottom: 4 }}>
+                  {stage.label}
+                </div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{stage.desc}</div>
               </div>
-              <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: stage.n === 4 ? "var(--sr-text)" : "var(--sr-text-2)", marginBottom: 4 }}>
-                {stage.label}
-              </div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{stage.desc}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div style={{ marginTop: "var(--sr-sp-4)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
-          {[
-            { label: "Interest % of Income", val: "18%", warn: "Critical: 22%" },
-            { label: "Interest vs Defense",  val: "1.2×", warn: "Crossed 2024" },
-            { label: "USD Reserve Share",    val: "58%", warn: "Was 72% in 2001" },
-            { label: "China Treasuries",     val: "−$380B", warn: "Since 2021" },
-          ].map(({ label, val, warn }) => (
+          {DALIO_KPIS.map(({ label, val, warn }) => (
             <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
               <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
