@@ -61,6 +61,7 @@ export interface StockData {
   analystConsensus: { strongBuy: number; buy: number; hold: number; sell: number; strongSell: number; period: string } | null;
   rdcf: ReverseDCFSnapshot | null;
   finviz: FinvizData | null;
+  fcfQuality: { capexToRevenue: number | null; fcfYield: number | null; fcfGrowthYoy: number | null } | null;
   technicals: {
     rsi14: number | null;
     sma20: number | null; sma50: number | null; sma200: number | null;
@@ -399,6 +400,7 @@ export default function StockTickerPage() {
         analystConsensus,
         rdcf: null,
         finviz: finvizData,
+        fcfQuality: null,
         technicals,
       };
 
@@ -458,7 +460,22 @@ export default function StockTickerPage() {
         ? { ...rdcfResult, computedAt: new Date().toISOString() }
         : null;
 
+      // ── FCF quality metrics (Features 1, 2, 6) ───────────────────
+      const ttmCapex     = stockData.cashFlow.slice(0, 4).reduce((s, q) => s + Math.abs(Number(q.capitalExpenditure) || 0), 0);
+      const ttmRevenue   = stockData.income.slice(0, 4).reduce((s, q) => s + (Number(q.revenue) || 0), 0);
+      const prevFcf      = stockData.cashFlow.slice(4, 8).reduce((s, q) =>
+        s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0);
+      const ttmFcfForYoy = stockData.cashFlow.slice(0, 4).reduce((s, q) =>
+        s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0);
+      const capexToRevenue = ttmRevenue > 0 && ttmCapex >= 0 ? ttmCapex / ttmRevenue : null;
+      const fcfYield       = quote?.marketCap != null && Number(quote.marketCap) > 0 && ttmFcfForYoy !== 0
+        ? ttmFcfForYoy / Number(quote.marketCap) : null;
+      const fcfGrowthYoy   = prevFcf !== 0 && Math.abs(prevFcf) > 1e4
+        ? ((ttmFcfForYoy - prevFcf) / Math.abs(prevFcf)) * 100 : null;
+      // ─────────────────────────────────────────────────────────────
+
       stockData.rdcf = rdcfSnapshot;
+      stockData.fcfQuality = { capexToRevenue, fcfYield, fcfGrowthYoy };
       setData({ ...stockData });
 
       // Compute momentum from daily close prices (history is newest-first from FMP)
@@ -487,6 +504,10 @@ export default function StockTickerPage() {
         priceChange1M, priceChange3M, priceChange6M,
         impliedGrowthCagr: rdcfResult?.impliedGrowthCagr ?? null,
         tvShare:           rdcfResult?.tvShare ?? null,
+        // FCF quality signals
+        capexToRevenue,
+        fcfYield,
+        fcfGrowthYoy,
         // Finviz signals
         shortFloat:       stockData.finviz?.shortFloat ?? null,
         instTrans:        stockData.finviz?.instTrans ?? null,

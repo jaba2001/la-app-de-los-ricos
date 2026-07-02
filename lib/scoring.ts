@@ -51,6 +51,24 @@ export function calcScores(inp: ScoreInputs): Scores {
   if (inp.revenueGrowth != null) growth += inp.revenueGrowth > 20 ? 11 : inp.revenueGrowth > 10 ? 8 : inp.revenueGrowth > 0 ? 5 : 0;
   if (inp.epsGrowth != null) growth += inp.epsGrowth > 20 ? 9 : inp.epsGrowth > 10 ? 6 : inp.epsGrowth > 0 ? 3 : 0;
 
+  // ── FCF quality signals (Features 1 & 6 from videos) ──────────────────────
+
+  // Feature 1: CapEx/Revenue — asset-light model quality (lower = better: Uber/Airbnb style)
+  if (inp.capexToRevenue != null && inp.capexToRevenue >= 0) {
+    const cr = inp.capexToRevenue;
+    health += cr < 0.05 ? 4 : cr < 0.10 ? 3 : cr < 0.20 ? 1 : cr > 0.40 ? -2 : 0;
+  }
+
+  // Feature 6: FCF vs Earnings divergence — accounting quality signal
+  // FCF growing faster than earnings → real cash generation; slower → earnings may be inflated
+  if (inp.fcfGrowthYoy != null && inp.epsGrowth != null) {
+    const div = inp.fcfGrowthYoy - inp.epsGrowth;
+    if (div > 15)        { health += 3; growth += 1; }  // FCF well ahead of earnings → quality
+    else if (div > 5)    { health += 1; }
+    else if (div < -20)  { health -= 3; }                // Earnings far ahead of FCF → concern
+    else if (div < -10)  { health -= 1; }
+  }
+
   // ── Finviz signals (all optional — gracefully degrade to no-op when null) ──
 
   // Forward P/E adds value signal (cap remains 25)

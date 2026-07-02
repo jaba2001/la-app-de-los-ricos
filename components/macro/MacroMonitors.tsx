@@ -130,7 +130,55 @@ export default function MacroMonitors({ macro, loading }: Props) {
           ]}
         />
 
-        {/* Commodity Supercycle */}
+        {/* Feature 9: Stock/Bond Correlation Badge */}
+        <div className="card">
+          <div className="section-label">Stock / Bond Correlation Regime</div>
+          {(() => {
+            const pce = macro?.core_pce_yoy != null ? Number(macro.core_pce_yoy) : null;
+            const cpi = macro?.core_cpi_yoy != null ? Number(macro.core_cpi_yoy) : null;
+            const infl = pce ?? cpi;
+            const dgs10 = macro?.dgs10 != null ? Number(macro.dgs10) : null;
+            if (infl == null) return <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>Inflation data unavailable</div>;
+
+            const inflColor = infl >= 3.5 ? "var(--sr-neg)" : infl >= 2.5 ? "var(--sr-warn)" : "var(--sr-pos)";
+            const corrLabel = infl >= 3.5 ? "Positive (High Inflation)" : infl >= 2.5 ? "Borderline" : "Negative (Low Inflation)";
+            const corrIcon  = infl >= 3.5 ? "⚠" : infl >= 2.5 ? "◆" : "✓";
+            const corrDesc  = infl >= 3.5
+              ? "With PCE above 3.5%, stocks and bonds historically fall together — 60/40 diversification benefit collapses"
+              : infl >= 2.5
+              ? "Borderline — correlation can swing positive; monitor inflation trajectory"
+              : "Sub-2.5% inflation historically supports negative stock/bond correlation — 60/40 logic holds";
+            const implication = infl >= 3.5
+              ? "Consider satellite hedges: gold (GLD), short-term bills (SHV), commodities"
+              : infl >= 2.5
+              ? "Diversification benefit uncertain — reduce duration in bond allocation"
+              : "Bond allocation provides meaningful portfolio diversification at current inflation levels";
+
+            return (
+              <div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
+                  {[
+                    { label: "Core PCE / CPI", val: `${infl.toFixed(1)}%`, color: inflColor, sub: "Inflation driver" },
+                    { label: "Correlation Mode", val: `${corrIcon} ${corrLabel}`, color: inflColor, sub: "Stocks vs Bonds" },
+                    { label: "10Y Rate", val: dgs10 != null ? `${dgs10.toFixed(2)}%` : "—", color: dgs10 != null && dgs10 > 4.5 ? "var(--sr-warn)" : "var(--sr-text-2)", sub: "Higher = more pressure" },
+                  ].map(({ label, val, color, sub }) => (
+                    <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                      <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color }} className="num">{val}</div>
+                      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${inflColor} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${inflColor} 25%, transparent)` }}>
+                  <div style={{ fontSize: "var(--sr-t-sm)", color: inflColor, fontWeight: 600, marginBottom: 4 }}>{corrDesc}</div>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{implication}</div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+      {/* Commodity Supercycle */}
         <div className="card">
           <div className="section-label">Commodity Supercycle</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>

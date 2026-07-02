@@ -8,6 +8,23 @@ import { Pill } from "@/components/ui/Pill";
 
 interface Props { data: StockData | null; macro: MacroState | null; loading: boolean; ticker: string; }
 
+// Margin of Safety — Graham threshold: 30%+ vs intrinsic
+function getMoS(intrinsic: number | null, price: number): { pct: number; label: string; color: string } | null {
+  if (intrinsic == null || intrinsic <= 0 || price <= 0) return null;
+  const mos = ((intrinsic - price) / intrinsic) * 100;
+  const label = mos >= 30 ? "Graham MoS ✓" : mos >= 15 ? "Moderate MoS" : mos >= 0 ? "Thin MoS" : "No MoS";
+  const color = mos >= 30 ? "var(--sr-pos)" : mos >= 15 ? "var(--sr-warn)" : mos >= 0 ? "var(--sr-text-2)" : "var(--sr-neg)";
+  return { pct: mos, label, color };
+}
+
+// TV Risk bucket
+function tvRiskLabel(tvShare: number): { label: string; color: string; warning: string } {
+  if (tvShare >= 0.85) return { label: "Speculative", color: "var(--sr-neg)", warning: "85%+ of value from terminal — small g/WACC change has outsized impact" };
+  if (tvShare >= 0.70) return { label: "Elevated", color: "var(--sr-warn)", warning: "70%+ terminal dependency — model is sensitive to long-run assumptions" };
+  if (tvShare >= 0.50) return { label: "Moderate", color: "var(--sr-text-2)", warning: "Typical for growth companies — monitor terminal assumptions" };
+  return { label: "Conservative", color: "var(--sr-pos)", warning: "Well-anchored — majority of value in explicit forecast period" };
+}
+
 interface DCFScenario { gr1: number; gr2: number; fcfMargin: number; wacc: number; termGr: number; }
 type ScenarioKey = "bear" | "base" | "bull";
 
@@ -130,6 +147,16 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   const intrinsic = result?.perShare ?? null;
   const upside = intrinsic != null && currentPrice > 0 ? ((intrinsic - currentPrice) / currentPrice) * 100 : null;
   const intrinsicColor = upside == null ? "var(--sr-text-3)" : upside > 15 ? "var(--sr-pos)" : upside > -10 ? "var(--sr-warn)" : "var(--sr-neg)";
+  const mos = getMoS(intrinsic, currentPrice);
+
+  // Feature 2: FCF Yield + Feature 1: CapEx/Revenue — derived from raw data already in props
+  const fcqual = data?.fcfQuality ?? null;
+  const fcfYieldPct = fcqual?.fcfYield != null ? fcqual.fcfYield * 100 : null;
+  const capexRev   = fcqual?.capexToRevenue != null ? fcqual.capexToRevenue * 100 : null;
+  const fcfGrowPct = fcqual?.fcfGrowthYoy ?? null;
+  const fcfYieldColor = fcfYieldPct == null ? "var(--sr-text-3)" : fcfYieldPct > 8 ? "var(--sr-pos)" : fcfYieldPct > 4 ? "var(--sr-text-2)" : fcfYieldPct > 0 ? "var(--sr-text-3)" : "var(--sr-neg)";
+  const capexColor   = capexRev == null ? "var(--sr-text-3)" : capexRev < 5 ? "var(--sr-pos)" : capexRev < 15 ? "var(--sr-text-2)" : capexRev > 35 ? "var(--sr-neg)" : "var(--sr-text-3)";
+  const fcfGrowColor = fcfGrowPct == null ? "var(--sr-text-3)" : fcfGrowPct > 20 ? "var(--sr-pos)" : fcfGrowPct > 0 ? "var(--sr-text-2)" : "var(--sr-neg)";
 
   // All-scenario comparison (for the synthesis bar)
   const allScenarios: { key: ScenarioKey; label: string; color: string }[] = [
@@ -145,6 +172,34 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   function calcDCF(g1: number, g2: number, fcfMargin: number, discount: number, terminal: number): number | null {
     return runDCFModel(baseRevenue, shares, netDebt, { gr1: g1, gr2: g2, fcfMargin, wacc: discount, termGr: terminal })?.perShare ?? null;
   }
+
+  // Feature 5: Growth × Exit Multiple (P/FCF) sensitivity — simpler Trainor/multiple-based cross-check
+  // Compute FCF at Y10 for a given growth path, then apply a P/FCF exit multiple discounted back
+  function calcMultipleSensitivity(growthPct: number, exitMultiple: number): number | null {
+    if (!shares || shares <= 0 || baseRevenue <= 0 || active.wacc <= 0) return null;
+    let rev = baseRevenue;
+    let lastFCF = 0;
+    for (let yr = 1; yr <= 10; yr++) {
+      const g = yr <= 5 ? growthPct / 100 : (growthPct / 2) / 100;
+      rev *= (1 + g);
+      lastFCF = rev * (active.fcfMargin / 100);
+    }
+    // Exit value = FCF₁₀ × multiple, discounted back 10 years + PV of FCF Y1-9
+    let pvFCFs = 0;
+    let rev2 = baseRevenue;
+    for (let yr = 1; yr <= 9; yr++) {
+      const g = yr <= 5 ? growthPct / 100 : (growthPct / 2) / 100;
+      rev2 *= (1 + g);
+      pvFCFs += (rev2 * (active.fcfMargin / 100)) / Math.pow(1 + active.wacc / 100, yr);
+    }
+    const exitPV = (lastFCF * exitMultiple) / Math.pow(1 + active.wacc / 100, 10);
+    const equity = pvFCFs + exitPV - netDebt;
+    return Math.max(0, equity / shares);
+  }
+  const growthRows = scenarios
+    ? [scenarios.bear.gr1, scenarios.base.gr1, scenarios.bull.gr1]
+    : [defaultScenarios.bear.gr1, defaultScenarios.base.gr1, defaultScenarios.bull.gr1];
+  const exitMultiples = [12, 18, 25, 35];
 
   function SliderRow({ label, value, min, max, step = 1, onChange, suffix = "" }: {
     label: string; value: number; min: number; max: number; step?: number;
@@ -227,8 +282,17 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                       color={intrinsicColor}
                     />
                   )}
+                  {mos != null && (
+                    <Pill label={mos.label} color={mos.color} />
+                  )}
                 </div>
-                <div style={{ marginTop: "var(--sr-sp-4)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
+                {mos != null && (
+                  <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                    Graham Margin of Safety: <span style={{ color: mos.color, fontWeight: 700 }} className="num">{mos.pct.toFixed(1)}%</span>
+                    {mos.pct >= 30 ? " — meets Graham's 30% threshold" : mos.pct >= 0 ? " — below Graham's 30% threshold" : " — price exceeds intrinsic estimate"}
+                  </div>
+                )}
+                <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
                   {upside == null ? "Insufficient data for DCF" :
                    upside > 30 ? "Deep Value — significant margin of safety" :
                    upside > 10 ? "Value Zone — modest upside" :
@@ -286,10 +350,18 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                     <span className="num">${(row.val / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</span>
                   </div>
                 ))}
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
-                  Terminal value is {(result.tvShare * 100).toFixed(0)}% of enterprise value
-                  {result.tvShare > 0.75 ? " — model is highly dependent on long-term assumptions" : ""}.
-                </div>
+                {(() => {
+                  const tvr = tvRiskLabel(result.tvShare);
+                  return (
+                    <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 8%, var(--sr-surface-2))` : "var(--sr-surface-2)", border: `1px solid ${result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 30%, transparent)` : "transparent"}` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
+                        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: tvr.color }}>TV Risk: {tvr.label}</span>
+                        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>({(result.tvShare * 100).toFixed(0)}% of EV)</span>
+                      </div>
+                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{tvr.warning}</div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           )}
@@ -386,6 +458,105 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
         </div>
       )}
 
+      {/* Feature 1+2: FCF Quality Panel */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
+        <div className="section-label">FCF Quality</div>
+        {loading ? <Sk w="100%" h={80} /> : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+            {[
+              {
+                label: "FCF Yield",
+                val: fcfYieldPct != null ? `${fcfYieldPct.toFixed(1)}%` : "—",
+                color: fcfYieldColor,
+                sub: fcfYieldPct != null ? (fcfYieldPct > 8 ? "High quality" : fcfYieldPct > 4 ? "Moderate" : fcfYieldPct > 0 ? "Low yield" : "Negative FCF") : "No data",
+                hint: "FCF TTM / Market Cap — higher = more attractive than P/E suggests",
+              },
+              {
+                label: "CapEx/Revenue",
+                val: capexRev != null ? `${capexRev.toFixed(1)}%` : "—",
+                color: capexColor,
+                sub: capexRev != null ? (capexRev < 5 ? "Asset-light ★" : capexRev < 15 ? "Moderate" : capexRev < 30 ? "Capital-heavy" : "Very CapEx-intensive") : "No data",
+                hint: "Lower = more FCF per $ of revenue (Uber/Airbnb model)",
+              },
+              {
+                label: "FCF Growth YoY",
+                val: fcfGrowPct != null ? `${fcfGrowPct >= 0 ? "+" : ""}${fcfGrowPct.toFixed(0)}%` : "—",
+                color: fcfGrowColor,
+                sub: fcfGrowPct != null ? (fcfGrowPct > 20 ? "Strong" : fcfGrowPct > 0 ? "Positive" : "Declining") : "No data",
+                hint: "TTM FCF vs prior 4Q — confirms or refutes earnings quality",
+              },
+              {
+                label: "FCF vs Earnings",
+                val: (fcfGrowPct != null && fcqual?.fcfGrowthYoy != null)
+                  ? `${((fcqual.fcfGrowthYoy) - (data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : 0)).toFixed(0)}pp`
+                  : "—",
+                color: (() => {
+                  const epsGr = data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : null;
+                  if (fcfGrowPct == null || epsGr == null) return "var(--sr-text-3)";
+                  const div = fcfGrowPct - epsGr;
+                  return div > 10 ? "var(--sr-pos)" : div < -15 ? "var(--sr-neg)" : "var(--sr-text-2)";
+                })(),
+                sub: (() => {
+                  const epsGr = data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : null;
+                  if (fcfGrowPct == null || epsGr == null) return "No data";
+                  const div = fcfGrowPct - epsGr;
+                  return div > 10 ? "FCF outpacing ✓" : div < -15 ? "Earnings ahead ⚠" : "Aligned";
+                })(),
+                hint: "FCF growth minus EPS growth — positive = cash generation outpaces accounting earnings",
+              },
+            ].map(({ label, val, color, sub, hint }) => (
+              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }} title={hint}>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color }} className="num">{val}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Feature 5: Growth × Exit Multiple sensitivity */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
+        <div className="section-label">Sensitivity — Revenue Growth × Exit P/FCF Multiple</div>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
+          Implied price using bear/base/bull growth paths × 4 P/FCF exit multiples at year 10. Uses active FCF margin ({active.fcfMargin.toFixed(0)}%) and WACC ({active.wacc.toFixed(1)}%).
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
+            <thead><tr>
+              <th>Growth→</th>
+              {growthRows.map((g, i) => <th key={i} style={{ textAlign: "right" }}>{["Bear", "Base", "Bull"][i]} ({g.toFixed(0)}%)</th>)}
+            </tr></thead>
+            <tbody>
+              {exitMultiples.map(em => (
+                <tr key={em}>
+                  <td style={{ fontWeight: 600 }}>{em}× P/FCF</td>
+                  {growthRows.map((g, gi) => {
+                    const v = calcMultipleSensitivity(g, em);
+                    const up = v != null && currentPrice > 0 ? ((v - currentPrice) / currentPrice) * 100 : null;
+                    const isBase = gi === 1 && em === exitMultiples[1];
+                    return (
+                      <td key={gi} style={{
+                        textAlign: "right",
+                        background: isBase ? "color-mix(in srgb, var(--sr-amber) 15%, transparent)" :
+                                    up == null ? "transparent" :
+                                    up > 10 ? "color-mix(in srgb, var(--sr-pos) 10%, transparent)" :
+                                    up < -10 ? "color-mix(in srgb, var(--sr-neg) 10%, transparent)" : "transparent",
+                        color: up == null ? "var(--sr-text-3)" : up > 0 ? "var(--sr-pos)" : "var(--sr-neg)",
+                        fontWeight: isBase ? 700 : 400,
+                      }} className="num">
+                        {v != null ? `$${v.toFixed(0)}` : "—"}
+                        {up != null ? <span style={{ fontSize: "9px", marginLeft: 3 }}>({up >= 0 ? "+" : ""}{up.toFixed(0)}%)</span> : null}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Reverse DCF — auto-computed */}
       <div className="card">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
@@ -424,7 +595,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 {
                   label: "Terminal Value Share",
                   val: `${(rdcf.tvShare * 100).toFixed(0)}%`,
-                  color: rdcf.tvShare > 0.7 ? "var(--sr-neg)" : "var(--sr-text-2)",
+                  color: tvRiskLabel(rdcf.tvShare).color,
                 },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
@@ -432,8 +603,18 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
-              <div style={{ gridColumn: "1 / -1", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)" }}>
-                WACC {rdcf.wacc.toFixed(1)}% · rf {rdcf.rfRate.toFixed(2)}% · Conservative model: 8% Y1-5, 4% Y6-10
+              <div style={{ gridColumn: "1 / -1", marginTop: "var(--sr-sp-2)" }}>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>
+                  WACC {rdcf.wacc.toFixed(1)}% · rf {rdcf.rfRate.toFixed(2)}% · Conservative model: 8% Y1-5, 4% Y6-10
+                </div>
+                {(() => {
+                  const tvr = tvRiskLabel(rdcf.tvShare);
+                  return rdcf.tvShare >= 0.50 ? (
+                    <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${tvr.color} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${tvr.color} 25%, transparent)`, fontSize: "var(--sr-t-xs)", color: tvr.color }}>
+                      ▸ Terminal Value Risk ({tvr.label}): {tvr.warning}
+                    </div>
+                  ) : null;
+                })()}
               </div>
             </div>
           ) : (

@@ -142,6 +142,10 @@ export interface ScoreInputs {
   /** Reverse DCF signals — optional, integrated into value score when available */
   impliedGrowthCagr?: number | null;
   tvShare?: number | null;
+  /** FCF quality signals — optional, from cashFlow + income statement */
+  capexToRevenue?: number | null;  // |CapEx| / Revenue TTM — lower = higher quality (Uber/Airbnb model)
+  fcfYield?: number | null;        // FCF TTM / marketCap — cleaner than P/E
+  fcfGrowthYoy?: number | null;    // FCF TTM YoY growth % — for divergence signal
   /** Finviz signals — optional, all fields gracefully degrade when null */
   shortFloat?: number | null;
   instTrans?: number | null;

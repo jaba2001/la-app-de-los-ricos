@@ -307,6 +307,78 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
       {/* Historical Financials chart */}
       <HistoricalFinancials annual={annual} loading={loading} />
 
+      {/* Feature 6: FCF vs Earnings Divergence — accounting quality signal */}
+      {(() => {
+        if (cashFlow.length < 8 || income.length < 8) return null;
+        const fcfTTM   = cashFlow.slice(0, 4).reduce((s, q) => s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0);
+        const fcfPrev  = cashFlow.slice(4, 8).reduce((s, q) => s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0);
+        const niTTM    = income.slice(0, 4).reduce((s, q) => s + (Number(q.netIncome) || 0), 0);
+        const niPrev   = income.slice(4, 8).reduce((s, q) => s + (Number(q.netIncome) || 0), 0);
+        const fcfGr    = Math.abs(fcfPrev) > 1e4 ? ((fcfTTM - fcfPrev) / Math.abs(fcfPrev)) * 100 : null;
+        const niGr     = Math.abs(niPrev)  > 1e4 ? ((niTTM  - niPrev)  / Math.abs(niPrev))  * 100 : null;
+        if (fcfGr == null && niGr == null) return null;
+        const divergence = fcfGr != null && niGr != null ? fcfGr - niGr : null;
+        const divColor   = divergence == null ? "var(--sr-text-3)" : divergence > 10 ? "var(--sr-pos)" : divergence < -15 ? "var(--sr-neg)" : "var(--sr-text-2)";
+        const divLabel   = divergence == null ? "—" : divergence > 10 ? "FCF outpacing earnings — high quality" : divergence < -15 ? "Earnings ahead of FCF — review accruals" : "Aligned — earnings and FCF tracking";
+        const divIcon    = divergence == null ? "" : divergence > 10 ? "✓" : divergence < -15 ? "⚠" : "◆";
+
+        // Build quarterly FCF vs NI trend (up to 8Q)
+        const qData = cashFlow.slice(0, Math.min(8, cashFlow.length, income.length)).map((cq, i) => {
+          const inq = income[i];
+          return {
+            q: String(cq.date ?? "").slice(0, 7),
+            fcf: (Number(cq.operatingCashFlow) || 0) + (Number(cq.capitalExpenditure) || 0),
+            ni:  Number(inq?.netIncome ?? 0),
+          };
+        }).reverse();
+
+        return (
+          <div className="card">
+            <div className="section-label">FCF vs Earnings Divergence</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
+              {[
+                { label: "FCF Growth (YoY)", val: fcfGr != null ? `${fcfGr >= 0 ? "+" : ""}${fcfGr.toFixed(0)}%` : "—", color: fcfGr == null ? "var(--sr-text-3)" : fcfGr > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
+                { label: "Net Income Growth (YoY)", val: niGr != null ? `${niGr >= 0 ? "+" : ""}${niGr.toFixed(0)}%` : "—", color: niGr == null ? "var(--sr-text-3)" : niGr > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
+                { label: "Divergence (FCF − EPS)", val: divergence != null ? `${divergence >= 0 ? "+" : ""}${divergence.toFixed(0)}pp` : "—", color: divColor },
+                { label: "FCF TTM", val: fmtB(fcfTTM), color: fcfTTM > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
+              ].map(({ label, val, color }) => (
+                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                  <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${divColor} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${divColor} 25%, transparent)`, marginBottom: "var(--sr-sp-4)" }}>
+              <span style={{ color: divColor, fontWeight: 700, fontSize: "var(--sr-t-sm)" }}>{divIcon} {divLabel}</span>
+              {divergence != null && divergence < -15 && (
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
+                  High accruals often indicate aggressive revenue recognition, large D&A add-backs, or working capital consumption. Cross-check accounts receivable trend.
+                </div>
+              )}
+              {divergence != null && divergence > 10 && (
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
+                  FCF growing faster than net income suggests high earnings quality — real cash is being generated, not just accounting profits.
+                </div>
+              )}
+            </div>
+            {qData.length > 1 && (
+              <ResponsiveContainer width="100%" height={160}>
+                <ComposedChart data={qData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--sr-border)" strokeOpacity={0.4} />
+                  <XAxis dataKey="q" tick={{ fill: "var(--sr-text-3)", fontSize: 10 }} interval="preserveStartEnd" />
+                  <YAxis tick={{ fill: "var(--sr-text-3)", fontSize: 10 }} tickFormatter={fmtB} width={60} />
+                  <Tooltip contentStyle={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: 8, fontSize: 12 }}
+                    formatter={(v: number, n: string) => [fmtB(v), n === "fcf" ? "FCF" : "Net Income"]} />
+                  <Legend iconSize={10} wrapperStyle={{ fontSize: 11, color: "var(--sr-text-3)" }} />
+                  <Bar dataKey="fcf" name="FCF" fill="var(--sr-info)" radius={[3, 3, 0, 0]} opacity={0.85} />
+                  <Bar dataKey="ni"  name="Net Income" fill="var(--sr-pos)" radius={[3, 3, 0, 0]} opacity={0.65} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+        );
+      })()}
+
       {/* Shares / Dilution chart */}
       {(sharesFloat.length > 0 || !loading) && (
         <SharesDilutionChart sharesFloat={sharesFloat} loading={loading} />
