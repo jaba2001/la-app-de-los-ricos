@@ -214,9 +214,9 @@ export default function StockPage() {
 
       {/* Watchlist */}
       <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+        <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div className="section-label">Watchlist</div>
-          <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{watchlist.length} tickers</span>
+          <span className="sr-hint">{watchlist.length} tickers</span>
         </div>
 
         {loadingWl ? (
@@ -259,7 +259,7 @@ export default function StockPage() {
                       </div>
                     </>
                   ) : (
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Not analyzed yet</div>
+                    <div className="sr-hint">Not analyzed yet</div>
                   )}
                 </div>
               );

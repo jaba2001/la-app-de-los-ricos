@@ -328,7 +328,7 @@ export default function MacroAI({ macro, loading }: Props) {
         {/* AI Synthesis */}
         <div>
           <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+            <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
               <div>
                 <div className="section-label">AI Macro Synthesis — OPLA Framework</div>
                 <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Claude Haiku · Druckenmiller Hierarchy · 8-section structured analysis</div>
@@ -405,7 +405,7 @@ export default function MacroAI({ macro, loading }: Props) {
                 <div style={{ fontSize: "var(--sr-t-sm)", marginBottom: "var(--sr-sp-2)" }}>
                   8-section OPLA analysis: Régimen · Señal Maestra · Escenarios (Base/Bull/Bear) · Tripwires · Positioning · Dalio Debt Cycle · Analog Histórico · Outlook 12M
                 </div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Powered by Druckenmiller Signal Hierarchy + Howell Liquidity Model</div>
+                <div className="sr-hint">Powered by Druckenmiller Signal Hierarchy + Howell Liquidity Model</div>
               </div>
             )}
           </div>
@@ -441,7 +441,7 @@ export default function MacroAI({ macro, loading }: Props) {
         {/* Tripwires */}
         <div>
           <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+            <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
               <div>
                 <div className="section-label">Tripwires</div>
               </div>
@@ -518,7 +518,7 @@ export default function MacroAI({ macro, loading }: Props) {
                   { label: "GLOBAL LIQ.",    val: macro?.global_liquidity_dir },
                 ].map(({ label, val }) => (
                   <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                    <div className="sr-tile-label">{label}</div>
                     <div style={{ fontWeight: 700, textTransform: "capitalize" }}>{val ?? "—"}</div>
                   </div>
                 ))}

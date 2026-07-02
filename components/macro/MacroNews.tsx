@@ -223,9 +223,9 @@ export default function MacroNews() {
                     onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--sr-border-2)")}
                     onMouseLeave={e => (e.currentTarget.style.borderColor = borderColor)}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{item.site ?? "Source"}</span>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                    <div className="sr-flex-between" style={{ marginBottom: 6 }}>
+                      <span className="sr-hint">{item.site ?? "Source"}</span>
+                      <span className="sr-hint">
                         {item.publishedDate ? new Date(item.publishedDate).toLocaleDateString("en-US", { month: "short", day: "2-digit" }) : ""}
                       </span>
                     </div>
@@ -252,11 +252,11 @@ export default function MacroNews() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
               <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", textAlign: "center" }}>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{news.length}</div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Articles</div>
+                <div className="sr-hint">Articles</div>
               </div>
               <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", textAlign: "center" }}>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-pos)" }}>LIVE</div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Status</div>
+                <div className="sr-hint">Status</div>
               </div>
             </div>
 

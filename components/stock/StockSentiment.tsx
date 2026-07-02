@@ -34,8 +34,8 @@ function Arrow({ v }: { v: number | null | undefined }) {
 
 function Cell({ label, value, sub }: { label: string; value: React.ReactNode; sub?: React.ReactNode }) {
   return (
-    <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+    <div className="sr-tile">
+      <div className="sr-tile-label">{label}</div>
       <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{value}</div>
       {sub && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{sub}</div>}
     </div>

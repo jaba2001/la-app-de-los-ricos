@@ -167,8 +167,8 @@ export default function MacroMonitors({ macro, loading }: Props) {
                     { label: "Correlation Mode", val: `${corrIcon} ${corrLabel}`, color: inflColor, sub: "Stocks vs Bonds" },
                     { label: "10Y Rate", val: dgs10 != null ? `${dgs10.toFixed(2)}%` : "—", color: dgs10 != null && dgs10 > 4.5 ? "var(--sr-warn)" : "var(--sr-text-2)", sub: "Higher = more pressure" },
                   ].map(({ label, val, color, sub }) => (
-                    <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                    <div key={label} className="sr-tile">
+                      <div className="sr-tile-label">{label}</div>
                       <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color }} className="num">{val}</div>
                       <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
                     </div>
@@ -176,7 +176,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
                 </div>
                 <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${inflColor} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${inflColor} 25%, transparent)` }}>
                   <div style={{ fontSize: "var(--sr-t-sm)", color: inflColor, fontWeight: 600, marginBottom: 4 }}>{corrDesc}</div>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{implication}</div>
+                  <div className="sr-hint">{implication}</div>
                 </div>
               </div>
             );
@@ -195,8 +195,8 @@ export default function MacroMonitors({ macro, loading }: Props) {
               { label: "Real Rate", val: macro?.dgs10 != null && macro?.core_pce_yoy != null
                 ? `${(Number(macro.dgs10) - Number(macro.core_pce_yoy)).toFixed(2)}%` : "—" },
             ].map(({ label, val, color }) => (
-              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+              <div key={label} className="sr-tile">
+                <div className="sr-tile-label">{label}</div>
                 <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: color ?? "var(--sr-text)" }} className="num">{val}</div>
               </div>
             ))}
@@ -210,7 +210,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
           <div className="section-label" style={{ marginBottom: 0 }}>Dalio Long-Term Debt Cycle</div>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
             {macro?.dalio_stage != null && (
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+              <span className="sr-hint">
                 Stage {macro.dalio_stage} — from macro_state
               </span>
             )}
@@ -219,7 +219,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
             </span>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-3)" }}>
+        <div className="sr-grid-5">
           {DALIO_STAGES.map(stage => {
             const isCurrent = stage.n === (macro?.dalio_stage ?? 4);
             return (
@@ -238,7 +238,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
                 <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: isCurrent ? "var(--sr-text)" : "var(--sr-text-2)", marginBottom: 4 }}>
                   {stage.label}
                 </div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{stage.desc}</div>
+                <div className="sr-hint">{stage.desc}</div>
               </div>
             );
           })}
@@ -246,7 +246,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
         <div style={{ marginTop: "var(--sr-sp-4)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
           {DALIO_KPIS.map(({ label, val, warn }) => (
             <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+              <div className="sr-tile-label">{label}</div>
               <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)", marginTop: 2 }}>⚠ {warn}</div>
             </div>

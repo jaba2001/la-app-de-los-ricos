@@ -274,7 +274,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                     background: isCurrentRegime ? `color-mix(in srgb, ${col} 10%, var(--sr-surface-2))` : "var(--sr-surface-2)",
                     border: isCurrentRegime ? `1px solid color-mix(in srgb, ${col} 35%, transparent)` : "1px solid transparent",
                   }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                    <div className="sr-flex-between" style={{ marginBottom: 6 }}>
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: col }}>{REGIME_LABELS[r]}</span>
                       {isCurrentRegime && <span style={{ fontSize: "9px", color: col, fontWeight: 700 }}>← CURRENT</span>}
                     </div>

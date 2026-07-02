@@ -322,7 +322,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   </div>
                 ))}
                 {dcf && (
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+                  <div className="sr-tile">
                     <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4, fontWeight: 600 }}>FMP</div>
                     <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
                       ${Number(dcf.dcf ?? 0).toFixed(2)}
@@ -356,7 +356,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                     <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 8%, var(--sr-surface-2))` : "var(--sr-surface-2)", border: `1px solid ${result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 30%, transparent)` : "transparent"}` }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
                         <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: tvr.color }}>TV Risk: {tvr.label}</span>
-                        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>({(result.tvShare * 100).toFixed(0)}% of EV)</span>
+                        <span className="sr-hint">({(result.tvShare * 100).toFixed(0)}% of EV)</span>
                       </div>
                       <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{tvr.warning}</div>
                     </div>
@@ -431,7 +431,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
             onClick={() => setShowYearly(v => !v)}
           >
             <span>10-Year Projection</span>
-            <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{showYearly ? "Hide ▲" : "Show ▼"}</span>
+            <span className="sr-hint">{showYearly ? "Hide ▲" : "Show ▼"}</span>
           </div>
           {showYearly && (
             <div style={{ overflowX: "auto", marginTop: "var(--sr-sp-3)" }}>
@@ -462,7 +462,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div className="section-label">FCF Quality</div>
         {loading ? <Sk w="100%" h={80} /> : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+          <div className="sr-grid-4">
             {[
               {
                 label: "FCF Yield",
@@ -505,8 +505,8 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 hint: "FCF growth minus EPS growth — positive = cash generation outpaces accounting earnings",
               },
             ].map(({ label, val, color, sub, hint }) => (
-              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }} title={hint}>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+              <div key={label} className="sr-tile" title={hint}>
+                <div className="sr-tile-label">{label}</div>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color }} className="num">{val}</div>
                 <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
               </div>
@@ -559,7 +559,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
 
       {/* Reverse DCF — auto-computed */}
       <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+        <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div>
             <div className="section-label">Reverse DCF — Market Expectations</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
@@ -575,7 +575,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
         </div>
         {loading ? <Sk w="100%" h={100} /> : (
           rdcf ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+            <div className="sr-grid-4">
               {[
                 {
                   label: "Implied CAGR (Y1-5)",
@@ -598,8 +598,8 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   color: tvRiskLabel(rdcf.tvShare).color,
                 },
               ].map(({ label, val, color }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
@@ -618,14 +618,14 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
               </div>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+            <div className="sr-grid-3">
               {[
                 { label: "Current Price", val: `$${currentPrice.toFixed(2)}` },
                 { label: "Risk-Free Rate", val: `${rfRate.toFixed(2)}%` },
                 { label: "Status", val: "Insufficient data" },
               ].map(({ label, val }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
                 </div>
               ))}
@@ -692,9 +692,9 @@ function TaxAwarePnL({ price }: { price: number }) {
       </div>
 
       {costBasis > 0 && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
-          <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>Unrealized P&amp;L</div>
+        <div className="sr-grid-4">
+          <div className="sr-tile">
+            <div className="sr-tile-label">Unrealized P&amp;L</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: gain != null && gain >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {gain != null ? `${gain >= 0 ? "+" : ""}$${Math.abs(gain).toLocaleString("en-US", { maximumFractionDigits: 0 })}` : "—"}
             </div>
@@ -703,8 +703,8 @@ function TaxAwarePnL({ price }: { price: number }) {
             </div>
           </div>
 
-          <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>Tax Treatment</div>
+          <div className="sr-tile">
+            <div className="sr-tile-label">Tax Treatment</div>
             <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: isLTCG ? "var(--sr-pos)" : "var(--sr-warn)" }}>
               {holdingDays == null ? "Enter date" : isLTCG ? "LTCG" : "Short-Term"}
             </div>
@@ -713,16 +713,16 @@ function TaxAwarePnL({ price }: { price: number }) {
             </div>
           </div>
 
-          <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>Est. Tax Owed</div>
+          <div className="sr-tile">
+            <div className="sr-tile-label">Est. Tax Owed</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-neg)" }} className="num">
               {taxEstimate != null ? `$${taxEstimate.toLocaleString("en-US", { maximumFractionDigits: 0 })}` : gain != null && gain <= 0 ? "$0" : "—"}
             </div>
             <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>US top marginal rate</div>
           </div>
 
-          <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>Net After Tax</div>
+          <div className="sr-tile">
+            <div className="sr-tile-label">Net After Tax</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: netGain != null && netGain >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {netGain != null ? `${netGain >= 0 ? "+" : ""}$${Math.abs(netGain).toLocaleString("en-US", { maximumFractionDigits: 0 })}` : "—"}
             </div>

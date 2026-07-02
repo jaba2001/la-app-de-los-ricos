@@ -87,20 +87,20 @@ export default function SignalBacktest() {
                 { label: `BUY-side (score ≥ ${result.buyThreshold})`, s: result.buy, hi: true },
                 { label: `Rest (score < ${result.buyThreshold})`, s: result.rest, hi: false },
               ].map(({ label, s, hi }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   <div style={{ display: "flex", gap: "var(--sr-sp-4)", alignItems: "baseline" }}>
                     <div>
                       <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: hi ? (s.hitRate >= 0.6 ? "var(--sr-pos)" : s.hitRate >= 0.45 ? "var(--sr-warn)" : "var(--sr-neg)") : "var(--sr-text-2)" }} className="num">
                         {s.n > 0 ? `${(s.hitRate * 100).toFixed(0)}%` : "—"}
                       </div>
-                      <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>beat SPY ({s.n})</div>
+                      <div className="sr-hint">beat SPY ({s.n})</div>
                     </div>
                     <div>
                       <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: s.avgAlpha >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
                         {s.avgAlpha >= 0 ? "+" : ""}{s.avgAlpha.toFixed(1)}%
                       </div>
-                      <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>avg alpha</div>
+                      <div className="sr-hint">avg alpha</div>
                     </div>
                   </div>
                 </div>

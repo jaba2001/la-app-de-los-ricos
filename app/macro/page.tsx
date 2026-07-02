@@ -94,7 +94,7 @@ export default function MacroPage() {
         {hasLoaded && (
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", flexShrink: 0 }}>
             {macro?.snapshot_date && (
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+              <span className="sr-hint">
                 Snapshot: {macro.snapshot_date}
               </span>
             )}
@@ -159,7 +159,7 @@ export default function MacroPage() {
               {loading ? "Loading…" : "Load Macro Data"}
             </button>
             {loading && (
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+              <div className="sr-hint">
                 Fetching macro_state from Supabase…
               </div>
             )}
@@ -236,11 +236,11 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
           onFocus={e => (e.target.style.borderColor = "var(--sr-amber)")}
           onBlur={e => (e.target.style.borderColor = "var(--sr-border)")}
         />
-        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+        <span className="sr-hint">
           {entries.length} populated · {nullEntries.length} null
         </span>
         {macro.updated_at && (
-          <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+          <span className="sr-hint">
             Cron: {new Date(macro.updated_at as string).toLocaleString("es-MX")}
           </span>
         )}

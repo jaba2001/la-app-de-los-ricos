@@ -434,7 +434,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
         <div className="card">
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)" }}>
             <div className="section-label">{cat.label}</div>
-            <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{liveCount(cat.series)}/{cat.series.length} live</span>
+            <span className="sr-hint">{liveCount(cat.series)}/{cat.series.length} live</span>
           </div>
           {cat.series.map(s => (
             <SeriesRow key={s.key} item={s} macro={macro} loading={loading} />
@@ -469,10 +469,10 @@ export default function MacroIndicators({ macro, loading }: Props) {
               })}
             </div>
             <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Total FRED series</span>
+              <span className="sr-hint">Total FRED series</span>
               <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
                 {ALL_CATS.reduce((s, c) => s + liveCount(c.series), 0)}
-                <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}> / {ALL_CATS.reduce((s, c) => s + c.series.length, 0)}</span>
+                <span className="sr-hint"> / {ALL_CATS.reduce((s, c) => s + c.series.length, 0)}</span>
               </span>
             </div>
           </div>
@@ -484,7 +484,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
           <div className="card">
             <div className="section-label">Sahm Rule — Recession Trigger</div>
             <div style={{ marginBottom: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>SAHMREALTIME</div>
+              <div className="sr-tile-label">SAHMREALTIME</div>
               {loading ? <Sk w={60} h={20} /> : (() => {
                 const sv = macro?.sahm_rule != null ? Number(macro.sahm_rule) : null;
                 const band = sahmBand(sv);

@@ -46,7 +46,7 @@ function HistoricalFinancials({ annual, loading }: { annual: Record<string, unkn
 
   return (
     <div className="card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+      <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
         <div className="section-label">Historical Financials — Annual</div>
         <div style={{ display: "flex", gap: 4 }}>
           {(["revenue", "income", "fcf"] as const).map(m => (
@@ -95,7 +95,7 @@ function SharesDilutionChart({ sharesFloat, loading }: { sharesFloat: Record<str
 
   return (
     <div className="card">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+      <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
         <div className="section-label">Shares Outstanding — Dilution Trend</div>
         {dilution != null && (
           <span style={{
@@ -124,7 +124,7 @@ function SharesDilutionChart({ sharesFloat, loading }: { sharesFloat: Record<str
       )}
       {chartData.length > 0 && (
         <div style={{ display: "flex", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)" }}>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+          <div className="sr-hint">
             Current: <strong>{last.toFixed(0)}M</strong> shares
           </div>
           {dilution != null && (
@@ -247,7 +247,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
       {/* Margins & Profitability */}
       <div className="card">
         <div className="section-label">Profitability (TTM)</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+        <div className="sr-grid-4">
           {[
             { label: "Gross Margin",    val: pct(ratios?.grossProfitMarginTTM) },
             { label: "Operating Margin",val: pct(ratios?.operatingProfitMarginTTM) },
@@ -258,8 +258,8 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
             { label: "ROA",             val: pct(ratios?.returnOnAssetsTTM) },
             { label: "EBITDA/Share",    val: n(ratios?.ebitdaPerShareTTM, 2, "", "$") },
           ].map(({ label, val }) => (
-            <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+            <div key={label} className="sr-tile">
+              <div className="sr-tile-label">{label}</div>
               {loading ? <Sk w={50} h={20} /> : (
                 <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>
               )}
@@ -285,14 +285,14 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         return (
           <div className="card">
             <div className="section-label">Operating Efficiency (TTM YoY)</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+            <div className="sr-grid-3">
               {[
                 { label: "DSO", val: dso != null ? `${dso.toFixed(0)} days` : "—", note: "Accounts Receivable / Revenue × 365", good: dso != null && dso < 45, warn: dso != null && dso > 90 },
                 { label: "Capex / Revenue", val: capexRev != null ? `${capexRev.toFixed(1)}%` : "—", note: "Capital intensity indicator", good: capexRev != null && capexRev < 5, warn: capexRev != null && capexRev > 20 },
                 { label: "Operating Leverage", val: opLev != null ? `${opLev.toFixed(2)}x` : "—", note: "% EBIT Δ ÷ % Revenue Δ (YoY)", good: opLev != null && opLev > 1 && opLev < 5, warn: opLev != null && (opLev > 10 || opLev < 0) },
               ].map(({ label, val, note, good, warn: w }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   {loading ? <Sk w={50} h={20} /> : (
                     <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: good ? "var(--sr-pos)" : w ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">{val}</div>
                   )}
@@ -342,8 +342,8 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 { label: "Divergence (FCF − EPS)", val: divergence != null ? `${divergence >= 0 ? "+" : ""}${divergence.toFixed(0)}pp` : "—", color: divColor },
                 { label: "FCF TTM", val: fmtB(fcfTTM), color: fcfTTM > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
               ].map(({ label, val, color }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
@@ -386,7 +386,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
       {/* Quarterly Income Statement */}
       <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+        <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
           <div className="section-label" style={{ margin: 0 }}>Income Statement — Quarterly</div>
           {!loading && income.length > 4 && (
             <button
@@ -529,8 +529,8 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                     sub: t.nextEarningsHour === "amc" ? "After Close" : t.nextEarningsHour === "bmo" ? "Before Open" : (t.nextEarningsHour ?? ""),
                   },
                 ] as {label:string;val:string;color:string;sub:string}[]).map(({ label, val, color, sub }) => (
-                  <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                  <div key={label} className="sr-tile">
+                    <div className="sr-tile-label">{label}</div>
                     <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
                     {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>}
                   </div>
@@ -546,7 +546,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 ] as {label:string;sig:{color:string;label:string};sma:number|null}[]).map(({ label, sig, sma }) => (
                   <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{label}</div>
+                      <div className="sr-hint">{label}</div>
                       {sma != null && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 2 }} className="num">${sma.toFixed(2)}</div>}
                     </div>
                     <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sig.color }} className="num">{sig.label}</div>

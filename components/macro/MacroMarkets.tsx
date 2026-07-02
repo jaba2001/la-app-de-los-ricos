@@ -30,7 +30,7 @@ function QuoteCard({ ticker, quote, loadingQ }: { ticker: string; quote: Quote |
       <div>
         <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }}>{ticker}</div>
         {loadingQ ? <Sk w={60} h={12} /> : (
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+          <div className="sr-hint">
             {quote?.price != null ? `$${quote.price.toFixed(2)}` : "—"}
           </div>
         )}

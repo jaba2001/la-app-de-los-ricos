@@ -173,13 +173,13 @@ export default function MacroOverview({ macro, loading }: Props) {
             </div>
             {!loading && macro?.regime_id && <Pill label={macro.regime_id.toUpperCase()} color={regimeColor} />}
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+          <div className="sr-grid-3">
             {[
               { label: "Quadrant",      val: macro?.cartera_quadrant },
               { label: "Net Liquidity", val: macro?.net_liquidity_dir },
               { label: "Fed Room",      val: macro?.fed_room },
             ].map(({ label, val }) => (
-              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
+              <div key={label} className="sr-tile">
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
                 {loading ? <Sk w="80%" h={14} /> : <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }}>{val ?? "—"}</div>}
               </div>
@@ -213,9 +213,9 @@ export default function MacroOverview({ macro, loading }: Props) {
 
             {/* Druckenmiller Signal Hierarchy */}
             <div className="card" style={{ padding: "var(--sr-sp-4)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+              <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
                 <div className="section-label" style={{ margin: 0 }}>Signal Hierarchy — Druckenmiller Framework</div>
-                <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>Priority 1→5</span>
+                <span className="sr-hint">Priority 1→5</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
                 {SIGNAL_HIERARCHY.map(s => {

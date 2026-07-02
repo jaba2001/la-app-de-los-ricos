@@ -89,7 +89,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
           </div>
           {icHealth != null && (
             <div style={{ marginLeft: "auto", textAlign: "center" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>IC Health</div>
+              <div className="sr-hint">IC Health</div>
               <div className="num" style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: icHealth >= 65 ? "var(--sr-pos)" : icHealth >= 45 ? "var(--sr-warn)" : "var(--sr-neg)" }}>
                 {icHealth.toFixed(0)}
               </div>
@@ -175,7 +175,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
       )}
 
       {/* Future enhancement note */}
-      <div className="card" style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+      <div className="card sr-hint">
         Today's matches compare against a curated library of well-known historical episodes. Scora now records a daily macro snapshot — once enough history accumulates, this tab can also compare today against Scora's own recorded past instead of curated estimates only.
       </div>
 

@@ -67,10 +67,10 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
           <div className="section-label" style={{ margin: 0 }}>Sector Relative Strength vs {etfSym}</div>
         </div>
         {loading ? <Sk w="100%" h={80} /> : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+          <div className="sr-grid-4">
             {rs.map(({ label, tickRet, sectorRet, alpha }) => (
-              <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label} Alpha</div>
+              <div key={label} className="sr-tile">
+                <div className="sr-tile-label">{label} Alpha</div>
                 {alpha != null ? (
                   <>
                     <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(alpha) }} className="num">
@@ -79,7 +79,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                     <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
                       {ticker}: {tickRet != null ? `${tickRet >= 0 ? "+" : ""}${tickRet.toFixed(1)}%` : "—"}
                     </div>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                    <div className="sr-hint">
                       {etfSym}: {sectorRet != null ? `${sectorRet >= 0 ? "+" : ""}${sectorRet.toFixed(1)}%` : "—"}
                     </div>
                   </>

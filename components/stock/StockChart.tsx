@@ -151,7 +151,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
           { label: "52W Low",          val: quote?.yearLow  != null ? `$${Number(quote.yearLow).toFixed(2)}`  : "—", color: "var(--sr-text)" },
         ].map(({ label, val, color }) => (
           <div key={label} className="card-sm">
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+            <div className="sr-tile-label">{label}</div>
             <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
           </div>
         ))}
@@ -338,7 +338,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
       {/* ── Volume Profile card ─────────────────────────────────────────────── */}
       {showVP && vp && vpChartData.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+          <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
             <div className="section-label">Volume Profile — {period}</div>
             <div style={{ display: "flex", gap: "var(--sr-sp-4)" }}>
               {[
@@ -349,7 +349,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   color: lastPrice > vp.pocMid ? "var(--sr-pos)" : "var(--sr-neg)" },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{label}</div>
+                  <div className="sr-hint">{label}</div>
                   <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
@@ -392,10 +392,10 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
       {/* ── TL Confluence™ Panel ─────────────────────────────────────────────── */}
       {showSubpanels && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
+          <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
             <div>
               <div className="section-label">TL Confluence™ Strategy</div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+              <div className="sr-hint">
                 EMA Alignment · ADX Strength · Squeeze Momentum · Volume Profile
               </div>
             </div>
@@ -463,7 +463,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                         {label}
                       </span>
                     </div>
-                    <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{detail}</div>
+                    <div className="sr-hint">{detail}</div>
                   </div>
                 ))}
               </div>
@@ -478,7 +478,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   { label: "SHORT", val: `${tlResult.shortSignals}/4`,          color: "var(--sr-neg)" },
                 ].map(({ label, val, color }) => (
                   <div key={label}>
-                    <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{label}</div>
+                    <div className="sr-hint">{label}</div>
                     <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }} className="num">{val}</div>
                   </div>
                 ))}
@@ -493,7 +493,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   { label: "Short TP1",  val: `$${tlResult.tp1Short.toFixed(2)}`,  sub: `−${(tlResult.riskShort*2).toFixed(1)}%`,    c: "var(--sr-pos)" },
                 ].map(({ label, val, sub, c }) => (
                   <div key={label} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius-sm)" }}>
-                    <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{label}</div>
+                    <div className="sr-hint">{label}</div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">{val}</span>
                       <span style={{ fontSize: "10px", color: c }} className="num">{sub}</span>
@@ -524,14 +524,14 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
       {/* ── Sector Context ───────────────────────────────────────────────────── */}
       <div className="card">
         <div className="section-label">Sector Context</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+        <div className="sr-grid-3">
           {[
             { label: "Sector",   val: profile?.sector   as string ?? "—" },
             { label: "Industry", val: profile?.industry  as string ?? "—" },
             { label: "Beta",     val: quote?.beta != null ? Number(quote.beta).toFixed(2) : "—" },
           ].map(({ label, val }) => (
-            <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+            <div key={label} className="sr-tile">
+              <div className="sr-tile-label">{label}</div>
               <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 600 }}>{val}</div>
             </div>
           ))}

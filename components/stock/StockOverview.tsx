@@ -297,13 +297,13 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
           {scoreHistory.length >= 2 && (
             <div className="card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+              <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
                 <div className="section-label" style={{ margin: 0 }}>Score History</div>
-                <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{scoreHistory.length} sessions</span>
+                <span className="sr-hint">{scoreHistory.length} sessions</span>
               </div>
               <Sparkline points={scoreHistory.map(h => h.score)} color="var(--sr-amber)" />
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
-                <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{scoreHistory[0]?.date?.slice(0, 10)}</span>
+                <span className="sr-hint">{scoreHistory[0]?.date?.slice(0, 10)}</span>
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-amber)" }} className="num">
                   {scoreHistory[scoreHistory.length - 1]?.score?.toFixed(0)}
                 </span>
@@ -340,7 +340,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             const hits = highs.filter(r => (r.fwd ?? 0) > 0).length;
             return (
               <div className="card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-2)" }}>
+                <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
                   <div className="section-label" style={{ margin: 0 }}>Score Track Record</div>
                   {highs.length > 0 && (
                     <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hits >= highs.length / 2 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
@@ -353,7 +353,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 </div>
                 {rows.map(r => (
                   <div key={r.date} className="stat-row" style={{ padding: "3px 0" }}>
-                    <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }} className="num">{r.date}</span>
+                    <span className="sr-hint num">{r.date}</span>
                     <span style={{ display: "flex", gap: "var(--sr-sp-3)", alignItems: "center" }}>
                       <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: totalColor(r.score) }} className="num">{r.score.toFixed(0)}</span>
                       <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, width: 52, textAlign: "right", color: (r.fwd ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
@@ -388,7 +388,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
           <div className="card">
             <div className="section-label">Key Metrics (TTM)</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
+            <div className="sr-grid-4">
               {[
                 { label: "P/E",             val: n(metrics?.peRatioTTM, 1) },
                 { label: "EV/EBITDA",       val: n(metrics?.enterpriseValueOverEBITDATTM, 1) },
@@ -403,8 +403,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 { label: "Div. Yield",      val: n(metrics?.dividendYieldTTM != null ? Number(metrics.dividendYieldTTM)*100 : null, 2, "%") },
                 { label: "EV/Revenue",      val: n(metrics?.evToSalesTTM, 1) },
               ].map(({ label, val }) => (
-                <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>{label}</div>
+                <div key={label} className="sr-tile">
+                  <div className="sr-tile-label">{label}</div>
                   {loading ? <Sk w={40} h={18} /> : <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>}
                 </div>
               ))}
@@ -415,7 +415,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             const p52 = Number(quote.price), low52 = quote.yearLow != null ? Number(quote.yearLow) : null, high52 = quote.yearHigh != null ? Number(quote.yearHigh) : null;
             return (
               <div className="card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-3)" }}>
+                <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
                   <div className="section-label" style={{ margin: 0 }}>52-Week Range</div>
                   <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">${p52.toFixed(2)}</span>
                 </div>
@@ -428,8 +428,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                       })()}
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }} className="num">${low52.toFixed(2)}</span>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }} className="num">${high52.toFixed(2)}</span>
+                      <span className="sr-hint num">${low52.toFixed(2)}</span>
+                      <span className="sr-hint num">${high52.toFixed(2)}</span>
                     </div>
                   </>
                 )}
@@ -446,10 +446,10 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               </div>
             ) : (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
+                <div className="sr-grid-3">
                   {/* RSI 14 */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>RSI (14)</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">RSI (14)</div>
                     {rsi14 != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rsi14 > 70 ? "var(--sr-neg)" : rsi14 < 30 ? "var(--sr-pos)" : "var(--sr-warn)" }} className="num">{rsi14.toFixed(1)}</div>
@@ -461,8 +461,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   </div>
 
                   {/* vs SMA50 */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>vs SMA 50</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">vs SMA 50</div>
                     {vs50 != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(vs50) }} className="num">{vs50 >= 0 ? "+" : ""}{vs50.toFixed(1)}%</div>
@@ -472,8 +472,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   </div>
 
                   {/* vs SMA200 */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>vs SMA 200</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">vs SMA 200</div>
                     {vs200 != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(vs200) }} className="num">{vs200 >= 0 ? "+" : ""}{vs200.toFixed(1)}%</div>
@@ -483,8 +483,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   </div>
 
                   {/* MACD */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>MACD (12/26)</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">MACD (12/26)</div>
                     {macd != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(macd) }} className="num">{macd >= 0 ? "+" : ""}{macd.toFixed(2)}</div>
@@ -494,16 +494,16 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   </div>
 
                   {/* 3M Return */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>3M Return</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">3M Return</div>
                     {ret3m != null ? (
                       <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(ret3m) }} className="num">{ret3m >= 0 ? "+" : ""}{ret3m.toFixed(1)}%</div>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
                   </div>
 
                   {/* 6M Alpha vs SPY */}
-                  <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>6M Alpha vs SPY</div>
+                  <div className="sr-tile">
+                    <div className="sr-tile-label">6M Alpha vs SPY</div>
                     {alpha6m != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(alpha6m) }} className="num">{alpha6m >= 0 ? "+" : ""}{alpha6m.toFixed(1)}%</div>
@@ -561,7 +561,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: pctColor }} className="num">
                       {pct}th pct.
                     </div>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>vs sector</div>
+                    <div className="sr-hint">vs sector</div>
                   </div>
                 </div>
 
