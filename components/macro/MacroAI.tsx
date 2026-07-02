@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { MacroState } from "@/lib/types";
-import { authedFetch } from "@/lib/proxy";
+import { aiAnalyze } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { computeICHealthScore } from "@/lib/scoring";
@@ -196,11 +196,7 @@ export default function MacroAI({ macro, loading }: Props) {
     setError("");
     try {
       const prompt = buildOPLAPrompt(macro);
-      const res = await authedFetch<{ content: string }>("/api/ai/analyze", {
-        method: "POST",
-        body: JSON.stringify({ prompt, maxTokens: 1800 }),
-      });
-      const content = res.content ?? "No response generated.";
+      const content = await aiAnalyze(prompt, 1800);
       setSynthesis(content);
       setSaved(false);
     } catch (e) {
@@ -212,35 +208,34 @@ export default function MacroAI({ macro, loading }: Props) {
   async function saveSynthesis() {
     if (!synthesis || !macro) return;
     setSaving(true);
-    try {
-      await supabase.from("ic_briefs").insert({
-        snapshot_date: new Date().toISOString().split("T")[0],
-        ic_score: macro.ic_score,
-        regime_id: macro.regime_id,
-        brief_text: synthesis,
-        meta: { recession_prob: macro.recession_prob, credit_stress: macro.credit_stress },
-      });
-      setSaved(true);
-    } catch { /* ic_briefs may not exist — fail silently */ }
+    // supabase-js returns { error } instead of throwing — a try/catch never fires
+    const { error } = await supabase.from("ic_briefs").insert({
+      snapshot_date: new Date().toISOString().split("T")[0],
+      ic_score: macro.ic_score,
+      regime_id: macro.regime_id,
+      brief_text: synthesis,
+      meta: { recession_prob: macro.recession_prob, credit_stress: macro.credit_stress },
+    });
+    if (!error) setSaved(true);
+    else setError(`Save failed: ${error.message}`);
     setSaving(false);
   }
 
   async function saveAlerts() {
     if (!macro || activeTripwires.length === 0) return;
     setAlertsSaved(false);
-    try {
-      const rows = activeTripwires.map(t => ({
-        alert_key:           t.key,
-        alert_label:         t.label,
-        threshold_value:     t.threshold ?? null,
-        current_value:       (() => { const v = (macro as unknown as Record<string,unknown>)[t.key]; return v != null ? Number(v) : null; })(),
-        macro_snapshot_date: macro.snapshot_date,
-        ic_score:            macro.ic_score,
-        triggered_at:        new Date().toISOString(),
-      }));
-      await supabase.from("alerts_log").insert(rows);
-      setAlertsSaved(true);
-    } catch { /* alerts_log may not exist yet — fail silently */ }
+    const rows = activeTripwires.map(t => ({
+      alert_key:           t.key,
+      alert_label:         t.label,
+      threshold_value:     t.threshold ?? null,
+      current_value:       (() => { const v = (macro as unknown as Record<string,unknown>)[t.key]; return v != null ? Number(v) : null; })(),
+      macro_snapshot_date: macro.snapshot_date,
+      ic_score:            macro.ic_score,
+      triggered_at:        new Date().toISOString(),
+    }));
+    // supabase-js returns { error } instead of throwing — check it explicitly
+    const { error } = await supabase.from("alerts_log").insert(rows);
+    if (!error) setAlertsSaved(true);
   }
 
   function exportReport() {
@@ -277,7 +272,7 @@ export default function MacroAI({ macro, loading }: Props) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
               <div>
                 <div className="section-label">AI Macro Synthesis — OPLA Framework</div>
-                <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Claude Sonnet · Druckenmiller Hierarchy · 8-section structured analysis</div>
+                <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Claude Haiku · Druckenmiller Hierarchy · 8-section structured analysis</div>
               </div>
               <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap", justifyContent: "flex-end" }}>
                 {synthesis && (

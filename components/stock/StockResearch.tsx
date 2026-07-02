@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
-import { authedFetch } from "@/lib/proxy";
+import { aiAnalyze } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
@@ -92,11 +92,7 @@ ${eps.map((e: Record<string, unknown>) => { const act = e.actual ?? e.actualEarn
 Provide a concise earnings quality analysis (2-3 paragraphs): revenue trend, margin trajectory, EPS beat/miss pattern, and key risk or catalyst for next quarter.`;
 
     try {
-      const res = await authedFetch<{ content: string }>("/api/ai/analyze", {
-        method: "POST",
-        body: JSON.stringify({ prompt, maxTokens: 600 }),
-      });
-      setEarningsAI(res.content ?? "");
+      setEarningsAI(await aiAnalyze(prompt, 600));
     } catch { setEarningsAI("Failed to generate earnings analysis."); }
     setEarningsLoading(false);
   }
@@ -144,11 +140,7 @@ Moat score: ${moat?.score ?? "—"}/100 (${moatLabel})
 
 Be specific, analytical, and data-driven. Write in English.`;
 
-      const res = await authedFetch<{ content: string }>("/api/ai/analyze", {
-        method: "POST",
-        body: JSON.stringify({ prompt, maxTokens: 1000 }),
-      });
-      setAiVerdict(res.content ?? "No response generated.");
+      setAiVerdict(await aiAnalyze(prompt, 1000));
     } catch (e) {
       setAiError(e instanceof Error ? e.message : "AI analysis failed");
     }
@@ -186,7 +178,7 @@ Be specific, analytical, and data-driven. Write in English.`;
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-4)" }}>
           <div>
             <div className="section-label">AI Earnings Analysis</div>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Claude Sonnet — last 4 quarters revenue, EPS & beat/miss pattern</div>
+            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Claude Haiku — last 4 quarters revenue, EPS & beat/miss pattern</div>
           </div>
           <button
             className="btn-primary"
@@ -280,7 +272,7 @@ Be specific, analytical, and data-driven. Write in English.`;
           <div>
             <div className="section-label">AI Investment Verdict</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-              Claude Sonnet — full context: fundamentals + macro + scoring
+              Claude Haiku — full context: fundamentals + macro + scoring
             </div>
           </div>
           <button

@@ -211,9 +211,9 @@ export default function StockTickerPage() {
         track(authedFetch<{data:{shortPercent:number}[]}>(`/api/finnhub/stock/short-interest?symbol=${ticker}&from=${new Date(Date.now()-90*86400000).toISOString().slice(0,10)}&to=${new Date().toISOString().slice(0,10)}`)),
         track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
         // Phase 3 — SEC EDGAR income / balance sheet / cash flow (US stocks only; European returns empty)
-        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar/financials?symbol=${ticker}`)),
+        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar?symbol=${ticker}`)),
         // Phase 7 — SimFin financials for European stocks (requires SIMFIN_KEY in ic-proxy env)
-        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin/financials?symbol=${ticker}`)),
+        track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin?symbol=${ticker}`)),
         // Phase 8 — Finviz short/sentiment/ownership data (free, edge-scraped, 6h cache)
         track(authedFetch<FinvizData>(`/api/finviz/quote?symbol=${ticker}`)),
       ]);
@@ -405,8 +405,11 @@ export default function StockTickerPage() {
       };
 
       // ── Write 24h snapshot (exclude quote/rdcf, cap history arrays) ──
+      // Skip when core data is missing (e.g. FMP rate-limited): caching an empty
+      // payload would poison every re-analyze for the rest of the day.
+      const snapshotWorthSaving = stockData.profile != null || stockData.income.length > 0 || stockData.history.length > 0;
       const { quote: _snapQ, rdcf: _snapR, history: _sh, spyHistory: _ss, sectorEtfHistory: _se, ...snapRest } = stockData;
-      await supabase.from("stock_snapshot").upsert({
+      if (snapshotWorthSaving) await supabase.from("stock_snapshot").upsert({
         ticker: ticker.toUpperCase(),
         snapshot_date: today,
         user_id: session.user.id,

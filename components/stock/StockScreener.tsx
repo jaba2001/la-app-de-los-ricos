@@ -43,6 +43,7 @@ export default function StockScreener() {
   }, [watchlist]);
 
   async function quickAnalyze(ticker: string) {
+    if (!session) return;
     setAnalyzingTickers(prev => new Set([...prev, ticker]));
     try {
       const [quoteRes, profileRes, metricsRes, ratiosRes] = await Promise.allSettled([
@@ -83,6 +84,7 @@ export default function StockScreener() {
 
       const rating = getRating(calc.total);
       const row = {
+        user_id: session!.user.id,
         ticker: ticker.toUpperCase(),
         analysis_date: new Date().toISOString().split("T")[0],
         score_total: calc.total,
@@ -95,7 +97,7 @@ export default function StockScreener() {
         sector,
       };
 
-      await supabase.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date" });
+      await supabase.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
       setAnalyses(prev => ({ ...prev, [ticker]: row as StockAnalysis }));
     } catch { /* fail silently — screener still shows the row */ }
     setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
@@ -124,9 +126,9 @@ export default function StockScreener() {
     if (!aa && !ba) return 0;
     if (!aa) return 1;
     if (!ba) return -1;
-    if (sortBy === "ic_score") return (Number(ba.score_total) + Number(ba.macro_tilt)) - (Number(aa.score_total) + Number(aa.macro_tilt));
+    if (sortBy === "ic_score") return (Number(ba.score_total) + Number(ba.macro_tilt ?? 0)) - (Number(aa.score_total) + Number(aa.macro_tilt ?? 0));
     if (sortBy === "score_total") return Number(ba.score_total) - Number(aa.score_total);
-    if (sortBy === "macro_tilt") return Number(ba.macro_tilt) - Number(aa.macro_tilt);
+    if (sortBy === "macro_tilt") return Number(ba.macro_tilt ?? 0) - Number(aa.macro_tilt ?? 0);
     return 0;
   });
 

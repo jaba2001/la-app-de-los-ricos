@@ -122,7 +122,9 @@ function bisect(
     const mid = (a + b) / 2;
     const fMid = (dcfAt(mid) ?? 0) - targetPrice;
     if (Math.abs(fMid) < 0.01 || (b - a) / 2 < 0.01) return mid;
-    if (fMid < 0) b = mid; else a = mid;
+    // DCF value is monotonically increasing in g (fcfMargin > 0 guaranteed
+    // upstream): value below target price → the root lies in the upper half.
+    if (fMid < 0) a = mid; else b = mid;
   }
   return (a + b) / 2;
 }
@@ -140,11 +142,13 @@ export function computeReverseDCF(inputs: ReverseDCFInputs): ReverseDCFResult | 
     terminalGr = TERM_GR,
   } = inputs;
 
-  // Guard: model requires positive revenue, positive FCF margin, valid shares and price
+  // Guard: model requires positive revenue, positive FCF margin, valid shares and price.
+  // With fcfMargin <= 0 every DCF value is <= 0 regardless of growth, so no implied
+  // CAGR exists — same "not applicable" convention as StockAnalyzer's reverseDcf().
   if (
     currentPrice <= 0 ||
     revenueTTM <= 0 ||
-    fcfMarginTTM < -0.5 ||   // too deeply loss-making for model to be meaningful
+    fcfMarginTTM <= 0 ||
     sharesOut <= 0
   ) return null;
 

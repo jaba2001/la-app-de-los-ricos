@@ -56,7 +56,7 @@ export default function WatchlistPage() {
     setLoadingQuotes(true);
     Promise.allSettled(
       items.map(item =>
-        authedFetch<Quote[]>(`/api/fmp/stable/quote/${item.ticker}`)
+        authedFetch<Quote[]>(`/api/fmp/quote?symbol=${item.ticker}`)
           .then(r => ({ ticker: item.ticker, data: Array.isArray(r) ? r[0] : null }))
       )
     ).then(results => {

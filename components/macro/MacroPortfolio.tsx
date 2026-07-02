@@ -458,10 +458,11 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                         <td style={{ textAlign: "right", color: "var(--sr-neg)", fontWeight: 600 }} className="num">
                           {spyDd.toFixed(1)}%
                         </td>
-                        <td style={{ textAlign: "right", fontWeight: 700, color: estimated != null ? (estimated > spyDd ? "var(--sr-neg)" : "var(--sr-pos)") : "var(--sr-text-3)" }} className="num">
+                        {/* Drawdowns are negative: more negative than SPY = worse = red */}
+                        <td style={{ textAlign: "right", fontWeight: 700, color: estimated != null ? (estimated < spyDd ? "var(--sr-neg)" : "var(--sr-pos)") : "var(--sr-text-3)" }} className="num">
                           {estimated != null ? `${estimated.toFixed(1)}%` : "—"}
                         </td>
-                        <td style={{ textAlign: "right", color: diff == null ? "var(--sr-text-3)" : diff > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }} className="num">
+                        <td style={{ textAlign: "right", color: diff == null ? "var(--sr-text-3)" : diff < 0 ? "var(--sr-neg)" : "var(--sr-pos)" }} className="num">
                           {diff != null ? `${diff > 0 ? "+" : ""}${diff.toFixed(1)}pp` : "—"}
                         </td>
                         <td style={{ color: "var(--sr-text-3)", fontSize: "10px", maxWidth: 180 }}>{explanation}</td>

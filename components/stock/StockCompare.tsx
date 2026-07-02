@@ -10,9 +10,9 @@ import { Pill } from "@/components/ui/Pill";
 interface Props { ticker: string; }
 
 const COMPARE_METRICS = [
-  { label: "Scora Score",   key: (a: StockAnalysis) => Number(a.score_total) + Number(a.macro_tilt), best: "max" },
-  { label: "Base Score",    key: (a: StockAnalysis) => Number(a.score_total),                        best: "max" },
-  { label: "Macro Tilt",    key: (a: StockAnalysis) => Number(a.macro_tilt),                         best: "max" },
+  { label: "Scora Score",   key: (a: StockAnalysis) => Number(a.score_total) + Number(a.macro_tilt ?? 0), best: "max" },
+  { label: "Base Score",    key: (a: StockAnalysis) => Number(a.score_total),                             best: "max" },
+  { label: "Macro Tilt",    key: (a: StockAnalysis) => Number(a.macro_tilt ?? 0),                         best: "max" },
   { label: "Value",         key: (a: StockAnalysis) => Number(a.score_val),                          best: "max" },
   { label: "Health",        key: (a: StockAnalysis) => Number(a.score_hlth),                         best: "max" },
   { label: "Momentum",      key: (a: StockAnalysis) => Number(a.score_mom),                          best: "max" },

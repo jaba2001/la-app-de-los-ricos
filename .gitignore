@@ -4,3 +4,13 @@ node_modules/
 .vercel/
 
 .vercel
+
+# next-pwa generated service workers (rebuilt on every `next build`)
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/swe-worker-*.js
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo

@@ -651,7 +651,8 @@ function TaxAwarePnL({ price }: { price: number }) {
   const holdingDays = buyDate
     ? Math.floor((Date.now() - new Date(buyDate).getTime()) / 86400000)
     : null;
-  const isLTCG = holdingDays != null && holdingDays >= 365;
+  // LTCG requires holding MORE than one year (IRC §1222) — exactly 365 days is still short-term
+  const isLTCG = holdingDays != null && holdingDays > 365;
 
   const stRate = 0.37;  // top marginal short-term rate
   const ltRate = 0.238; // 20% + 3.8% NIIT
@@ -727,7 +728,7 @@ function TaxAwarePnL({ price }: { price: number }) {
             </div>
             {!isLTCG && holdingDays != null && gain != null && gain > 0 && (
               <div style={{ fontSize: "10px", color: "var(--sr-warn)", marginTop: 2 }}>
-                Wait {365 - holdingDays}d → save ${((gain * (stRate - ltRate)).toLocaleString("en-US", { maximumFractionDigits: 0 }))}
+                Wait {366 - holdingDays}d → save ${((gain * (stRate - ltRate)).toLocaleString("en-US", { maximumFractionDigits: 0 }))}
               </div>
             )}
           </div>
