@@ -93,6 +93,7 @@ export default function StockTickerPage() {
   const TOTAL_SOURCES = 30;
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
+  const [autoChecked, setAutoChecked] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -102,6 +103,14 @@ export default function StockTickerPage() {
     if (!session || !ticker) return;
     setWatchlisted(false);
     setWatchlistId(null);
+    // Reset analysis state so navigating between tickers re-checks the snapshot
+    // and never shows the previous ticker's data.
+    setHasAnalyzed(false);
+    setAutoChecked(false);
+    setData(null);
+    setScores(null);
+    setSavedAnalysis(null);
+    setError("");
     supabase.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
   }, [session, ticker]);
@@ -123,6 +132,11 @@ export default function StockTickerPage() {
     document.title = name ? `${ticker} · ${name} — Scora Research` : `${ticker} — Scora Research`;
     return () => { document.title = "Scora Research"; };
   }, [ticker, data?.profile?.companyName]);
+
+  // Auto-load when a fresh 24h snapshot already exists — a cache HIT costs ~3 calls
+  // (macro + quote + snapshot read), so this gives instant load for recently-analyzed
+  // tickers without spending the FMP free-tier quota that the manual gate protects.
+  // (autoChecked state declared with the other useState hooks above.)
 
   const analyze = useCallback(async () => {
     if (!session || !ticker) return;
@@ -546,6 +560,18 @@ export default function StockTickerPage() {
     }
     setLoading(false);
   }, [session, ticker]);
+
+  useEffect(() => {
+    if (!session || !ticker || hasAnalyzed || autoChecked) return;
+    const today = new Date().toISOString().split("T")[0];
+    supabase.from("stock_snapshot").select("ticker")
+      .eq("ticker", ticker.toUpperCase()).eq("snapshot_date", today).eq("user_id", session.user.id)
+      .maybeSingle()
+      .then(({ data: snap }) => {
+        setAutoChecked(true);
+        if (snap) analyze();  // fresh snapshot → cheap cache-hit load
+      });
+  }, [session, ticker, hasAnalyzed, autoChecked, analyze]);
 
   if (authLoading || !session) return null;
 

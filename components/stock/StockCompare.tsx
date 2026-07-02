@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/lib/auth";
-import type { StockAnalysis, WatchlistItem } from "@/lib/types";
+import type { StockAnalysis } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
+import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import { Pill } from "@/components/ui/Pill";
 
 interface Props { ticker: string; }
@@ -20,37 +19,12 @@ const COMPARE_METRICS = [
 ];
 
 export default function StockCompare({ ticker }: Props) {
-  const { session } = useAuth();
   const router = useRouter();
-  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
-  const [analyses, setAnalyses] = useState<Record<string, StockAnalysis>>({});
+  const { watchlist, analyses } = useWatchlistAnalyses([ticker]);
   const [selected, setSelected] = useState<string[]>([ticker]);
 
   // Reset selection when navigating to a different ticker
   useEffect(() => { setSelected([ticker]); }, [ticker]);
-
-  useEffect(() => {
-    if (!session) return;
-    supabase.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
-      setWatchlist((data ?? []) as WatchlistItem[]);
-    });
-  }, [session]);
-
-  useEffect(() => {
-    if (!session) return;
-    const tickers = watchlist.map(w => w.ticker);
-    // Always include current ticker (works even when watchlist is empty)
-    if (!tickers.includes(ticker)) tickers.push(ticker);
-    supabase.from("sl_analyses").select("*")
-      .in("ticker", tickers)
-      .order("analysis_date", { ascending: false })
-      .then(({ data }) => {
-        if (!data) return;
-        const map: Record<string, StockAnalysis> = {};
-        (data as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
-        setAnalyses(map);
-      });
-  }, [watchlist, ticker, session]);
 
   function toggle(t: string) {
     setSelected(prev => {

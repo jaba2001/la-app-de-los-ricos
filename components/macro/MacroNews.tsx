@@ -55,20 +55,48 @@ interface Alignment {
   confidence: "HIGH" | "MODERATE" | "LOW";
 }
 
+// A bullish keyword next to a concern/negation word isn't bullish: "rate cut fears"
+// and "no stimulus" are bearish despite containing "cut"/"stimulus". We only flip
+// *bullish* keywords (a bad thing being feared is still bad — "recession fears" stays
+// bearish) and use a tight ~12-char window so adjacent-word negation doesn't bleed
+// across a whole clause into unrelated keywords. This fixes the main keyword failure
+// mode without paying for an LLM classification.
+const NEGATORS = [
+  "fear", "concern", "risk", "threat", "worry", "worries", "deepen", "worsen", "worse",
+  "warn", "doubt", "unlikely", "no ", "not ", "won't", "denies", "denied", "avert",
+  "delay", "stall", "despite", "fail", "miss",
+];
+
+function bullishNegated(corpus: string, keyword: string): boolean {
+  const idx = corpus.indexOf(keyword);
+  if (idx === -1) return false;
+  const window = corpus.slice(Math.max(0, idx - 12), idx + keyword.length + 12);
+  return NEGATORS.some(n => window.includes(n));
+}
+
 function computeAlignment(title: string, text: string | undefined, composite: string): Alignment {
-  const corpus = (title + " " + (text ?? "")).toLowerCase();
+  // Title carries the signal; body is supporting context weighted at half.
+  const titleLc = title.toLowerCase();
+  const bodyLc  = (text ?? "").toLowerCase();
+  const corpus  = titleLc + " " + bodyLc;
   const kw = KEYWORD_MAP[composite];
   if (!kw) return { composite, sentiment: "neutral", confidence: "LOW" };
 
-  const bullCount   = kw.bullish.filter(k => corpus.includes(k)).length;
-  const bearCount   = kw.bearish.filter(k => corpus.includes(k)).length;
+  const hit = (k: string) => (titleLc.includes(k) ? 1 : bodyLc.includes(k) ? 0.5 : 0);
 
+  // Bullish keywords flip to bearish when negated; bearish keywords always count bearish.
+  const bull = kw.bullish.reduce((s, k) => {
+    const w = hit(k);
+    return w === 0 ? s : bullishNegated(corpus, k) ? s - w : s + w;
+  }, 0);
+  const bear = kw.bearish.reduce((s, k) => s + hit(k), 0);
+
+  const net = bull - bear;
+  const magnitude = Math.abs(net);
   const sentiment: "bullish" | "bearish" | "neutral" =
-    bullCount > bearCount ? "bullish" : bearCount > bullCount ? "bearish" : "neutral";
-
+    net > 0.4 ? "bullish" : net < -0.4 ? "bearish" : "neutral";
   const confidence: "HIGH" | "MODERATE" | "LOW" =
-    Math.max(bullCount, bearCount) >= 3 ? "HIGH" :
-    Math.max(bullCount, bearCount) >= 1 ? "MODERATE" : "LOW";
+    magnitude >= 2 ? "HIGH" : magnitude >= 0.9 ? "MODERATE" : "LOW";
 
   return { composite, sentiment, confidence };
 }

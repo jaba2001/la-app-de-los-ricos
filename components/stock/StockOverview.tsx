@@ -311,6 +311,61 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             </div>
           )}
 
+          {/* Score Track Record — did past scores precede gains? Forward return from
+              each analysis date to the latest close, computed from price history ($0). */}
+          {!loading && scoreHistory.length >= 2 && cl.length > 0 && (() => {
+            const dated = (data?.history ?? [])
+              .map(h => ({ date: String(h.date ?? "").slice(0, 10), close: Number(h.close) }))
+              .filter(h => h.date && !isNaN(h.close))
+              .sort((a, b) => a.date.localeCompare(b.date));
+            if (dated.length < 2) return null;
+            const latestClose = dated[dated.length - 1].close;
+            // Closest close on-or-before a given date.
+            const closeAt = (d: string): number | null => {
+              let found: number | null = null;
+              for (const row of dated) { if (row.date <= d) found = row.close; else break; }
+              return found;
+            };
+            const rows = scoreHistory
+              .map(h => {
+                const c = closeAt(h.date);
+                const fwd = c != null && c > 0 ? ((latestClose - c) / c) * 100 : null;
+                return { date: h.date.slice(0, 10), score: h.score, fwd };
+              })
+              .filter(r => r.fwd != null)
+              .slice(-6);
+            if (rows.length < 2) return null;
+            // Simple hit-rate signal: of scores >= 60, how many had positive forward return?
+            const highs = rows.filter(r => r.score >= 60);
+            const hits = highs.filter(r => (r.fwd ?? 0) > 0).length;
+            return (
+              <div className="card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--sr-sp-2)" }}>
+                  <div className="section-label" style={{ margin: 0 }}>Score Track Record</div>
+                  {highs.length > 0 && (
+                    <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hits >= highs.length / 2 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
+                      {hits}/{highs.length} BUY→up
+                    </span>
+                  )}
+                </div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
+                  Forward price return from each analysis to today
+                </div>
+                {rows.map(r => (
+                  <div key={r.date} className="stat-row" style={{ padding: "3px 0" }}>
+                    <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }} className="num">{r.date}</span>
+                    <span style={{ display: "flex", gap: "var(--sr-sp-3)", alignItems: "center" }}>
+                      <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: totalColor(r.score) }} className="num">{r.score.toFixed(0)}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, width: 52, textAlign: "right", color: (r.fwd ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
+                        {(r.fwd ?? 0) >= 0 ? "+" : ""}{(r.fwd ?? 0).toFixed(1)}%
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
           <div className="card">
             <div className="section-label">Quick Info</div>
             {[

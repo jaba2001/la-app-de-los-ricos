@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useMemo } from "react";
 import { useAuth } from "@/lib/auth";
 import { computeICHealthScore } from "@/lib/scoring";
 import { matchHistoricalAnalogs, crossReferenceSectors, type AnalogMatch, type SectorExposure } from "@/lib/historicalMatch";
-import type { MacroState, StockAnalysis } from "@/lib/types";
+import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
+import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 
@@ -31,28 +31,11 @@ function fmtMonths(v: number | null): string {
 
 export default function MacroHistoricalAnalog({ macro, loading }: Props) {
   const { session } = useAuth();
-  const [holdings, setHoldings] = useState<{ sector: string | null }[]>([]);
-  const [holdingsLoading, setHoldingsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!session) { setHoldingsLoading(false); return; }
-    supabase.from("sl_watchlist").select("ticker").eq("user_id", session.user.id)
-      .then(({ data: wlData, error: wlErr }) => {
-        if (wlErr || !wlData || wlData.length === 0) { setHoldingsLoading(false); return; }
-        const tickers = (wlData as { ticker: string }[]).map(w => w.ticker);
-        supabase.from("sl_analyses")
-          .select("*")
-          .in("ticker", tickers)
-          .order("analysis_date", { ascending: false })
-          .then(({ data: anlData, error: anlErr }) => {
-            if (anlErr || !anlData) { setHoldingsLoading(false); return; }
-            const latest: Record<string, StockAnalysis> = {};
-            (anlData as StockAnalysis[]).forEach(a => { if (!latest[a.ticker]) latest[a.ticker] = a; });
-            setHoldings(tickers.filter(t => latest[t]).map(t => ({ sector: latest[t].sector ?? null })));
-            setHoldingsLoading(false);
-          });
-      });
-  }, [session]);
+  const { analyses, loading: holdingsLoading } = useWatchlistAnalyses();
+  const holdings = useMemo(
+    () => Object.values(analyses).map(a => ({ sector: a.sector ?? null })),
+    [analyses],
+  );
 
   if (loading) {
     return (
