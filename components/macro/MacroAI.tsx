@@ -1,12 +1,66 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { MacroState } from "@/lib/types";
 import { aiAnalyze } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { Sk } from "@/components/ui/Skeleton";
 import { computeICHealthScore } from "@/lib/scoring";
 
 interface Props { macro: MacroState | null; loading: boolean; }
+
+// Opt-in toggle for the daily macro-alert emails sent by the ic-proxy alerts-check
+// cron (credit blowout, QT acceleration, credit divergence). Writes the user's email
+// into sl_alert_prefs; the cron reads that table and emails via Resend.
+function AlertSubscription() {
+  const { session } = useAuth();
+  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!session) return;
+    supabase.from("sl_alert_prefs").select("macro_alerts").eq("user_id", session.user.id).maybeSingle()
+      .then(({ data }) => setEnabled(data ? Boolean((data as { macro_alerts: boolean }).macro_alerts) : false));
+  }, [session]);
+
+  async function toggle() {
+    if (!session || enabled == null) return;
+    const next = !enabled;
+    setSaving(true);
+    setEnabled(next); // optimistic
+    const { error } = await supabase.from("sl_alert_prefs").upsert({
+      user_id: session.user.id,
+      email: session.user.email,
+      macro_alerts: next,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: "user_id" });
+    if (error) setEnabled(!next); // revert on failure
+    setSaving(false);
+  }
+
+  if (!session || enabled == null) return null;
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", marginTop: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: "var(--sr-text-2)" }}>Email me macro alerts</div>
+        <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>
+          Daily check — credit blowout, QT acceleration, credit divergence. To {session.user.email}
+        </div>
+      </div>
+      <button
+        onClick={toggle}
+        disabled={saving}
+        aria-pressed={enabled}
+        style={{
+          position: "relative", width: 40, height: 22, borderRadius: 11, border: "none", cursor: saving ? "default" : "pointer",
+          background: enabled ? "var(--sr-pos)" : "var(--sr-surface-3)", transition: "background 200ms", flexShrink: 0,
+        }}
+      >
+        <span style={{ position: "absolute", top: 2, left: enabled ? 20 : 2, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 200ms" }} />
+      </button>
+    </div>
+  );
+}
 
 const TRIPWIRES = [
   { label: "VIX > 35",             key: "vix",            threshold: 35, dir: "above" },
@@ -224,15 +278,20 @@ export default function MacroAI({ macro, loading }: Props) {
   async function saveAlerts() {
     if (!macro || activeTripwires.length === 0) return;
     setAlertsSaved(false);
-    const rows = activeTripwires.map(t => ({
-      alert_key:           t.key,
-      alert_label:         t.label,
-      threshold_value:     t.threshold ?? null,
-      current_value:       (() => { const v = (macro as unknown as Record<string,unknown>)[t.key]; return v != null ? Number(v) : null; })(),
-      macro_snapshot_date: macro.snapshot_date,
-      ic_score:            macro.ic_score,
-      triggered_at:        new Date().toISOString(),
-    }));
+    // Columns must match the real alerts_log schema (alert_type/threshold/
+    // actual_value/message), not the old alert_key/alert_label names that silently
+    // failed every insert.
+    const rows = activeTripwires.map(t => {
+      const v = (macro as unknown as Record<string, unknown>)[t.key];
+      const cur = v != null && typeof v !== "string" ? Number(v) : null;
+      return {
+        alert_type:   t.key,
+        threshold:    t.threshold ?? null,
+        actual_value: cur,
+        message:      `${t.label}${cur != null ? ` — ${cur.toFixed(2)}` : ""} (snapshot ${macro.snapshot_date ?? "current"})`,
+        triggered_at: new Date().toISOString(),
+      };
+    });
     // supabase-js returns { error } instead of throwing — check it explicitly
     const { error } = await supabase.from("alerts_log").insert(rows);
     if (!error) setAlertsSaved(true);
@@ -444,6 +503,7 @@ export default function MacroAI({ macro, loading }: Props) {
                 </div>
               );
             })}
+            <AlertSubscription />
           </div>
 
           {/* IC Positioning */}

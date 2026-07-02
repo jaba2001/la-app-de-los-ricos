@@ -1126,8 +1126,8 @@ const flows = {
   'ai-flow': [
     '① User clicks <b>"✦ Generate Analysis"</b> in Stock Research tab (or Macro AI tab)',
     '② App assembles a <b>structured prompt</b> with: ticker, all 5 sub-scores, macro_tilt, macro_state fields (regime, recession_prob, DGS10, WTI, PCE…)',
-    '③ POST to <b>ic-proxy /api/ai/analyze</b> with prompt + maxTokens:800',
-    '④ ic-proxy forwards to <b>Anthropic Claude Sonnet 4.6 API</b> with server-side key',
+    '③ POST to <b>ic-proxy /api/anthropic/messages</b> with the raw Anthropic body (model + messages + max_tokens)',
+    '④ ic-proxy forwards to <b>Anthropic Claude Haiku 4.5 API</b> with server-side key (Sonnet 4.6 available as a "deep" tier)',
     '⑤ Claude returns: Verdict + Bull case + Bear case + Moat Scorecard (4 pillars × 25 pts)',
     '⑥ Response streamed back through ic-proxy → displayed in Research tab',
     '✓ <b>Complete.</b> AI analysis aware of both fundamental scores AND macro regime.'
