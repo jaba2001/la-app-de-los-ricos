@@ -4,6 +4,8 @@
 // Las alertas se insertan con user_id NULL (system-wide; la RLS deja que
 // cualquier usuario autenticado las vea). Dedupe: no re-emite el mismo
 // alert_type si ya hay uno en las últimas 24h.
+import { sendEmail, alertEmailHtml } from '../../../../lib/email.js';
+
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
@@ -133,7 +135,45 @@ export async function GET(request) {
   // Insertar (uno por uno; pocas alertas a la vez)
   const insertResults = [];
   for (const a of toInsert) {
-    insertResults.push({ alert_type: a.alert_type, ...(await insertAlert(a)) });
+    const res = await insertAlert(a);
+    insertResults.push({ alert_type: a.alert_type, ...res });
+  }
+
+  // ── Email the newly-inserted alerts to opted-in subscribers ────────────────
+  // Only messages that were actually inserted this run (dedup already prevents
+  // re-emailing the same alert within 24h). No-ops when RESEND_KEY is unset.
+  let email = undefined;
+  const freshMessages = toInsert
+    .filter((_, i) => insertResults[i]?.ok)
+    .map((a) => a.message);
+  if (freshMessages.length > 0) {
+    try {
+      const subUrl = `${process.env.SUPABASE_URL}/rest/v1/sl_alert_prefs?macro_alerts=eq.true&select=email&limit=1000`;
+      const sr = await fetch(subUrl, {
+        headers: {
+          apikey: process.env.SUPABASE_SERVICE_KEY,
+          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+        },
+      });
+      const subs = sr.ok ? await sr.json() : [];
+      const recipients = Array.isArray(subs)
+        ? [...new Set(subs.map((s) => s.email).filter((e) => e && e.includes('@')))]
+        : [];
+      const html = alertEmailHtml(freshMessages, new Date().toISOString().slice(0, 10));
+      const subject = `Scora macro alert: ${toInsert.map((a) => a.alert_type).join(', ')}`;
+      let sent = 0, skipped = 0;
+      const emailErrors = [];
+      // Send individually so recipients aren't exposed to each other.
+      for (const to of recipients) {
+        const r = await sendEmail({ to, subject, html });
+        if (r.ok) sent++;
+        else if (r.skipped) skipped++;
+        else emailErrors.push(`${to}: ${r.status ?? r.error ?? 'fail'}`);
+      }
+      email = { recipients: recipients.length, sent, skipped, errors: emailErrors.length ? emailErrors : undefined };
+    } catch (e) {
+      email = { error: e.message };
+    }
   }
 
   return new Response(
@@ -142,6 +182,7 @@ export async function GET(request) {
       candidates: toInsert.length,
       inserted: insertResults.filter((r) => r.ok).length,
       insertResults: insertResults.length ? insertResults : undefined,
+      email,
       errors: errors.length ? errors : undefined,
     }),
     { headers: { 'Content-Type': 'application/json' } }
