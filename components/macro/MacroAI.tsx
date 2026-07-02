@@ -260,7 +260,7 @@ export default function MacroAI({ macro, loading }: Props) {
 
   const activeTripwires = TRIPWIRES.filter(t => {
     if (!macro) return false;
-    if (t.special === "notnull") return (macro as unknown as Record<string, unknown>)[t.key] != null;
+    if (t.special === "notnull") { const v = (macro as unknown as Record<string, unknown>)[t.key]; return !!v && v !== "none"; }
     const raw = (macro as unknown as Record<string, unknown>)[t.key];
     if (raw == null) return false;
     const val = Number(raw);

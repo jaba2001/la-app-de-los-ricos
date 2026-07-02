@@ -72,7 +72,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
 
   // TTM FCF margin = (OCF - CapEx) / Revenue, same convention as Reverse DCF for internal consistency
   const ttmFcf = cashFlow.length > 0
-    ? cashFlow.slice(0, 4).reduce((s, q) => s + ((Number(q.operatingCashFlow) || 0) - (Number(q.capitalExpenditure) || 0)), 0)
+    ? cashFlow.slice(0, 4).reduce((s, q) => s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0)
     : 0;
   const ttmFcfMargin = baseRevenue > 0 ? (ttmFcf / baseRevenue) * 100 : 15;
   const ttmGrowth = priorRevenue > 0 ? ((baseRevenue / priorRevenue) - 1) * 100 : 10;
@@ -111,7 +111,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
     setScenarios(defaultScenarios);
     setActiveScenario("base");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticker]);
+  }, [defaultScenarios]);
 
   const active: DCFScenario = scenarios?.[activeScenario] ?? defaultScenarios.base;
 

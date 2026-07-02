@@ -66,7 +66,7 @@ export const HISTORICAL_ANALOGS: HistoricalAnalog[] = [
     id: "eurozone-2011",
     label: "2011 Eurozone Debt Crisis",
     dateRange: "Jul 2011 – Oct 2011",
-    regimeId: "stagflation",
+    regimeId: "contraction",
     composites: { liquidity_cycle: 45, credit_stress: 70, recession_prob: 55, geopolitical_risk: 45, housing_stress: 40 },
     narrative: {
       trigger: "Sovereign-debt fears around Greece, Portugal, Ireland, Italy and Spain raised the risk of a Eurozone banking/currency crisis.",

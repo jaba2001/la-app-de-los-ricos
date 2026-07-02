@@ -88,9 +88,9 @@ export default function MacroMonitors({ macro, loading }: Props) {
           color={meltupColor}
           status={meltupStatus}
           signals={[
-            "Equity valuations elevated (Buffett Indicator)",
-            "Put/Call ratio declining",
-            "Momentum trend: positive",
+            macro?.buffett_indicator != null ? `Buffett Indicator: ${Number(macro.buffett_indicator).toFixed(0)}%${Number(macro.buffett_indicator) > 170 ? " ⚠" : ""}` : "Buffett Indicator: —",
+            macro?.put_call_ratio != null ? `Put/Call: ${Number(macro.put_call_ratio).toFixed(2)}${Number(macro.put_call_ratio) < 0.7 ? " (bullish skew)" : Number(macro.put_call_ratio) > 1.2 ? " (bearish skew)" : ""}` : "Put/Call: —",
+            macro?.fear_greed != null ? `Fear & Greed: ${Number(macro.fear_greed).toFixed(0)}${macro.fear_greed_rating ? ` (${macro.fear_greed_rating})` : ""}` : "Fear & Greed: —",
           ]}
         />
 

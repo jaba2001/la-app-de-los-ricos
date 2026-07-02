@@ -504,9 +504,9 @@ Be specific, analytical, and data-driven. Write in English.`;
           <div className="section-label">Analyst Price Targets</div>
           {!loading && data?.analystConsensus && (() => {
             const c = data.analystConsensus!;
-            const active = (c.strongBuy + c.buy) + (c.sell + c.strongSell);
-            const bullPct = active > 0 ? Math.round((c.strongBuy + c.buy) / active * 100) : 0;
-            const bearPct = 100 - bullPct;
+            const total = c.strongBuy + c.buy + (c.hold ?? 0) + c.sell + c.strongSell;
+            const bullPct = total > 0 ? Math.round((c.strongBuy + c.buy) / total * 100) : 0;
+            const bearPct = total > 0 ? Math.round((c.sell + c.strongSell) / total * 100) : 0;
             return (
               <div style={{ marginBottom: "var(--sr-sp-3)" }}>
                 <div style={{ display: "flex", gap: "var(--sr-sp-3)", marginBottom: 6, alignItems: "center", fontSize: "var(--sr-t-xs)" }}>

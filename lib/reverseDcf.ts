@@ -163,16 +163,20 @@ export function computeReverseDCF(inputs: ReverseDCFInputs): ReverseDCFResult | 
 
   // Terminal value share at the implied growth scenario
   const totalPVAtImplied = runDCF(revenueTTM, fcfMarginTTM, netDebt, sharesOut, impliedG, impliedG / 2, wacc, terminalGr);
-  // Compute just the operating PV (no TV) to get TV share
+  // Compute operating PV and terminal PV in total $ — avoids per-share vs total-$ unit mismatch
   let opPV = 0;
   let rev = revenueTTM;
+  let lastFCF = 0;
   for (let yr = 1; yr <= 10; yr++) {
     const gr = yr <= 5 ? impliedG / 100 : (impliedG / 2) / 100;
     rev *= (1 + gr);
-    opPV += (rev * fcfMarginTTM) / Math.pow(1 + wacc / 100, yr);
+    const fcf = rev * fcfMarginTTM;
+    opPV += fcf / Math.pow(1 + wacc / 100, yr);
+    if (yr === 10) lastFCF = fcf;
   }
-  const tvShare = totalPVAtImplied != null && totalPVAtImplied > 0
-    ? Math.max(0, Math.min(1, 1 - opPV / (totalPVAtImplied + netDebt / sharesOut)))
+  const pvTV = ((lastFCF * (1 + terminalGr / 100)) / ((wacc - terminalGr) / 100)) / Math.pow(1 + wacc / 100, 10);
+  const tvShare = totalPVAtImplied != null && (opPV + pvTV) > 0
+    ? Math.min(1, Math.max(0, pvTV / (opPV + pvTV)))
     : 0;
 
   const realityBand: ReverseDCFResult['realityBand'] =

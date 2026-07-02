@@ -52,7 +52,7 @@ export function matchHistoricalAnalogs(
     const regimeBonus = macro.regime_id && analog.regimeId === macro.regime_id ? 0.08 : 0;
     const adjustedDistance = Math.max(0, distance - regimeBonus);
 
-    const similarity = Math.round(Math.max(0, 1 - adjustedDistance) * 100);
+    const similarity = Math.round(Math.max(0, Math.min(1, 1 - adjustedDistance)) * 100);
     return { analog, similarity, distance: adjustedDistance };
   });
 

@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { getRating, computeICHealthScore } from "@/lib/scoring";
+import { useAuth } from "@/lib/auth";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -49,7 +50,7 @@ const SIGNAL_HIERARCHY = [
   { tier: 2, name: "Credit",      key: "credit_stress",     desc: "Transmission mechanism — stress spreads", good: (v:number) => v < 30, bad: (v:number) => v > 65 },
   { tier: 3, name: "Recession",   key: "recession_prob",    desc: "Growth signal — labor + curve + Sahm",    good: (v:number) => v < 25, bad: (v:number) => v > 55 },
   { tier: 4, name: "Geopolitical",key: "geopolitical_risk", desc: "Commodity + volatility premium",          good: (v:number) => v < 30, bad: (v:number) => v > 65 },
-  { tier: 5, name: "Positioning", key: "housing_stress",    desc: "Confirmatory — housing cycle late signal", good: (v:number) => v < 30, bad: (v:number) => v > 60 },
+  { tier: 5, name: "Housing",     key: "housing_stress",    desc: "Confirmatory — housing cycle late signal", good: (v:number) => v < 30, bad: (v:number) => v > 60 },
 ] as const;
 
 function ScoreRing({ value, color }: { value: number; color: string }) {
@@ -81,6 +82,7 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
 
 export default function MacroOverview({ macro, loading }: Props) {
   const router = useRouter();
+  const { session } = useAuth();
   const regimeColor = macro?.regime_id ? (REGIME_COLORS[macro.regime_id] ?? "var(--sr-text-2)") : "var(--sr-text-2)";
   const updatedAt   = macro?.updated_at
     ? new Date(macro.updated_at).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
@@ -100,20 +102,21 @@ export default function MacroOverview({ macro, loading }: Props) {
       .then(({ data }) => {
         if (data) setIcHistory(data.map(r => ({ date: r.snapshot_date as string, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)));
       });
-    supabase.from("sl_analyses")
-      .select("ticker, sector, score_total, macro_tilt, rating, analysis_date")
-      .order("analysis_date", { ascending: false })
-      .limit(200)
-      .then(({ data }) => {
-        if (!data) return;
-        // Dedupe — take latest per ticker
-        const seen = new Set<string>();
-        const unique = (data as StockAnalysis[]).filter(r => { if (seen.has(r.ticker)) return false; seen.add(r.ticker); return true; });
-        // Sort by macro_tilt ascending (worst first)
-        unique.sort((a, b) => Number(a.macro_tilt ?? 0) - Number(b.macro_tilt ?? 0));
-        setTopAtRisk(unique.slice(0, 8));
-      });
-  }, []);
+    if (session) {
+      supabase.from("sl_analyses")
+        .select("ticker, sector, score_total, macro_tilt, rating, analysis_date")
+        .eq("user_id", session.user.id)
+        .order("analysis_date", { ascending: false })
+        .limit(200)
+        .then(({ data }) => {
+          if (!data) return;
+          const seen = new Set<string>();
+          const unique = (data as StockAnalysis[]).filter(r => { if (seen.has(r.ticker)) return false; seen.add(r.ticker); return true; });
+          unique.sort((a, b) => Number(a.macro_tilt ?? 0) - Number(b.macro_tilt ?? 0));
+          setTopAtRisk(unique.slice(0, 8));
+        });
+    }
+  }, [session]);
 
   const quadrant = macro?.cartera_quadrant as string | null | undefined;
   const quadrantInfo = quadrant ? PORTFOLIO_QUADRANTS[quadrant] : null;

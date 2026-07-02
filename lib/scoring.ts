@@ -142,8 +142,8 @@ export function getMacroTilt(
   let tilt = 0;
   const reasons: string[] = [];
   const regime = macroState.regime_id ?? "neutral";
-  const rpc = macroState.recession_prob != null ? Number(macroState.recession_prob) : 0;
-  const csc = macroState.credit_stress  != null ? Number(macroState.credit_stress)  : 0;
+  const rpc = macroState.recession_prob != null ? Number(macroState.recession_prob) : 50;
+  const csc = macroState.credit_stress  != null ? Number(macroState.credit_stress)  : 50;
   const ic  = macroState.ic_score       != null ? Number(macroState.ic_score)        : null;
   const fg  = macroState.fear_greed     != null ? Number(macroState.fear_greed)      : null;
   const ted = macroState.ted_spread     != null ? Number(macroState.ted_spread)      : null;

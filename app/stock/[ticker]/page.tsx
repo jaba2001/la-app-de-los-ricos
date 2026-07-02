@@ -429,7 +429,7 @@ export default function StockTickerPage() {
       // ── Reverse DCF (auto) ────────────────────────────────────────
       const rdcfRevTTM  = stockData.income.slice(0, 4).reduce((s, q) => s + (Number(q.revenue) || 0), 0);
       const rdcfFcfTTM  = stockData.cashFlow.slice(0, 4).reduce((s, q) =>
-        s + ((Number(q.operatingCashFlow) || 0) - (Number(q.capitalExpenditure) || 0)), 0);
+        s + ((Number(q.operatingCashFlow) || 0) + (Number(q.capitalExpenditure) || 0)), 0);
       const rdcfNetDebt = stockData.balanceSheet[0]
         ? (Number(stockData.balanceSheet[0].totalDebt) || 0) - (Number(stockData.balanceSheet[0].cashAndCashEquivalents) || 0)
         : 0;
@@ -467,7 +467,7 @@ export default function StockTickerPage() {
       const priceChange3M = cl.length > 63  ? ((cl[0] - cl[63])  / cl[63])  * 100 : null;
       const priceChange6M = cl.length > 126 ? ((cl[0] - cl[126]) / cl[126]) * 100 : null;
 
-      const macroTiltData = macroData ? getMacroTilt(macroData, sector) : { tilt: 0 };
+      const macroTiltData = macroData ? getMacroTilt(macroData, sector) : null;
       const calc = calcScores({
         pe:               mergedMetrics?.peRatioTTM as number ?? null,
         pb:               mergedMetrics?.priceToBookRatioTTM as number ?? null,
@@ -509,7 +509,7 @@ export default function StockTickerPage() {
         score_mom: calc.momentum,
         score_growth: calc.growth,
         rating: rating.label,
-        macro_tilt: macroTiltData.tilt,
+        macro_tilt: macroTiltData?.tilt ?? null,
         sector,
         reverse_dcf: rdcfSnapshot,
       }, { onConflict: "ticker,analysis_date" }).select().single();

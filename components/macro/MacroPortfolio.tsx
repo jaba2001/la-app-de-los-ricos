@@ -39,6 +39,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
 
   useEffect(() => {
     if (!session || !macro || loading) return;
+    setLoadingData(true);
     const m = macro; // capture non-null macro for async closure
 
     supabase.from("sl_watchlist").select("ticker").eq("user_id", session.user.id)
@@ -61,7 +62,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                 const sector = a.sector ?? null;
                 const tiltResult = sector ? getMacroTilt(m, sector) : { tilt: 0, label: "Neutral", color: "var(--sr-text-3)" };
                 const tilt = tiltResult.tilt;
-                const icScore = Number(a.score_total) + tilt;
+                const icScore = Math.max(0, Math.min(100, Number(a.score_total) + tilt));
                 return {
                   ticker: t,
                   analysis: a,

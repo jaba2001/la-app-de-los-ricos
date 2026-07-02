@@ -54,12 +54,12 @@ export default function MacroPage() {
       .select("*")
       .eq("id", 1)
       .single();
-    if (err) setError(err.message);
+    if (err) { setError(err.message); }
     else {
       setMacro(data as MacroState);
       setMacroContext(data as MacroState);
+      setHasLoaded(true);
     }
-    setHasLoaded(true);
     setLoading(false);
   }
 

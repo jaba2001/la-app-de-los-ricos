@@ -70,6 +70,10 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
     );
   }
 
+  const hasNullComposites =
+    macro.liquidity_cycle == null || macro.credit_stress == null ||
+    macro.recession_prob == null || macro.geopolitical_risk == null ||
+    macro.housing_stress == null;
   const icHealth = computeICHealthScore(macro);
   const regimeColor = REGIME_COLORS[macro.regime_id ?? "neutral"] ?? "var(--sr-text-2)";
   const matches: AnalogMatch[] = matchHistoricalAnalogs(macro, 3);
@@ -78,6 +82,18 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
+
+      {hasNullComposites && (
+        <div style={{
+          padding: "var(--sr-sp-3) var(--sr-sp-4)",
+          borderRadius: "var(--sr-radius)",
+          background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--sr-warn) 30%, transparent)",
+          fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)",
+        }}>
+          One or more macro composites are null — matching uses 50 as neutral placeholder. Results are directional only.
+        </div>
+      )}
 
       {/* Header: today's regime */}
       <div className="card">
