@@ -8,6 +8,7 @@ import { calcScores, getRating, computeICHealthScore, getMacroTilt, calcFactorTi
 import {
   computeSqueeze, computeADX, computeVolumeProfile, detectDivergences, computeTLResult,
 } from "../lib/technicalIndicators.ts";
+import { runBacktest } from "../lib/backtest.ts";
 
 let passed = 0, failed = 0;
 const fails = [];
@@ -67,6 +68,15 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   // Weak company scores low.
   const weak = calcScores({ pe: 60, pb: 8, evEbitda: 30, debtEquity: 3, currentRatio: 0.5, interestCoverage: 1, roic: 2, revenueGrowth: -10, epsGrowth: -20, priceChange1M: -20, priceChange3M: -30, priceChange6M: -40, marketCap: 5e9, regime: "contraction" });
   ok(weak.total < strong.total, `weak < strong (${weak.total} < ${strong.total})`);
+
+  // Sector-relative valuation: the same P/E scores differently by sector.
+  // P/E 20 is below Tech's benchmark (28) but above Financials' (14).
+  const techPe20 = calcScores({ pe: 20, sector: "Technology" });
+  const finPe20 = calcScores({ pe: 20, sector: "Financials" });
+  ok(techPe20.value > finPe20.value, `sector-relative: PE20 cheaper for Tech than Financials (${techPe20.value} > ${finPe20.value})`);
+  // Unknown sector falls back to absolute bands (same as passing no sector).
+  ok(calcScores({ pe: 20 }).value === calcScores({ pe: 20, sector: "Nonexistent" }).value, "sector-relative: unknown sector = absolute fallback");
+  ok(calcScores({ pe: 12 }).value === 7, "absolute fallback: PE12 → 7 (no sector)");
 
   // Rating thresholds.
   ok(getRating(85).label === "STRONG BUY", "rating 85 = STRONG BUY");
@@ -141,6 +151,35 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
     ok(typeof tl.bias === "string" && tl.bias.length > 0, "TL bias is a label");
     ok(tl.stopLong < tl.tp1Long || tl.riskLong === 0, "TL: long stop below TP1");
   }
+}
+
+// ── Backtest ─────────────────────────────────────────────────────────────────
+{
+  // Construct a world where high-score picks genuinely beat SPY.
+  const spy = [];
+  for (let i = 0; i < 200; i++) spy.push({ date: `2026-${String(1 + Math.floor(i / 30)).padStart(2, "0")}-${String(1 + (i % 30)).padStart(2, "0")}`, close: 400 + i * 0.2 });
+  // Winner ticker: rises fast. Loser: falls. Both have full history.
+  const winner = spy.map((d, i) => ({ date: d.date, close: 100 + i * 0.8 }));
+  const loser = spy.map((d, i) => ({ date: d.date, close: 100 - i * 0.3 }));
+  const analyses = [
+    { ticker: "WIN", date: "2026-01-05", score: 75 },
+    { ticker: "WIN", date: "2026-02-05", score: 70 },
+    { ticker: "WIN", date: "2026-03-05", score: 68 },
+    { ticker: "LOSE", date: "2026-01-05", score: 30 },
+    { ticker: "LOSE", date: "2026-02-05", score: 25 },
+  ];
+  const res = runBacktest(analyses, { WIN: winner, LOSE: loser }, spy, 60);
+  ok(res.points.length === 5, `backtest: 5 points computed (${res.points.length})`);
+  ok(res.buy.n === 3, `backtest: 3 buy-side (${res.buy.n})`);
+  ok(res.buy.hitRate === 1, `backtest: winners all beat SPY (${res.buy.hitRate})`);
+  ok(res.buy.avgAlpha > res.rest.avgAlpha, `backtest: buy alpha > rest (${res.buy.avgAlpha.toFixed(1)} > ${res.rest.avgAlpha.toFixed(1)})`);
+  ok(res.verdict === "supportive", `backtest: verdict supportive (${res.verdict})`);
+  // Too few high-score picks → insufficient, never a false "supportive".
+  const thin = runBacktest([{ ticker: "WIN", date: "2026-01-05", score: 75 }], { WIN: winner }, spy, 60);
+  ok(thin.verdict === "insufficient", `backtest: <3 picks → insufficient (${thin.verdict})`);
+  // Missing history → point skipped, no crash.
+  const noHist = runBacktest(analyses, {}, spy, 60);
+  ok(noHist.points.length === 0, "backtest: missing history → 0 points, no crash");
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────

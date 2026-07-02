@@ -518,6 +518,7 @@ export default function StockTickerPage() {
         epsGrowth:        mergedRatios?.netIncomeGrowthTTM != null ? (mergedRatios.netIncomeGrowthTTM as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,
         regime:           macroData?.regime_id ?? null,
+        sector,
         priceChange1M, priceChange3M, priceChange6M,
         impliedGrowthCagr: rdcfResult?.impliedGrowthCagr ?? null,
         tvShare:           rdcfResult?.tvShare ?? null,

@@ -55,14 +55,19 @@ const DALIO_STAGES = [
   { n: 5, label: "Extraordinary Measures", desc: "Debt monetization, currency debasement" },
 ];
 
-// ⚠ Update quarterly — source: BIS/Treasury/Fed.gov/CBO
-// dalio_stage (which stage is highlighted) comes from macro_state.dalio_stage (updatable via dashboard)
+// ⚠ Manually maintained — source: BIS/Treasury/Fed.gov/CBO. Bump DALIO_REVIEWED
+// whenever you refresh these figures; the UI flags them as stale after ~6 months so
+// nobody trusts a number that quietly went out of date.
+const DALIO_REVIEWED = "2026-06-01";
 const DALIO_KPIS = [
   { label: "Interest % of Income", val: "18%",    warn: "Critical threshold: 22%" },
   { label: "Interest vs Defense",  val: "1.2×",   warn: "Crossed parity in 2024" },
   { label: "USD Reserve Share",    val: "58%",     warn: "Was 72% in 2001" },
   { label: "China Treasuries Δ",   val: "−$380B",  warn: "Cumulative since 2021" },
 ];
+function dalioStale(): boolean {
+  return (Date.now() - new Date(DALIO_REVIEWED).getTime()) > 183 * 86400000;
+}
 
 export default function MacroMonitors({ macro, loading }: Props) {
   if (loading) {
@@ -201,13 +206,18 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
       {/* Dalio Debt Cycle */}
       <div className="card">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)", flexWrap: "wrap", gap: 6 }}>
           <div className="section-label" style={{ marginBottom: 0 }}>Dalio Long-Term Debt Cycle</div>
-          {macro?.dalio_stage != null && (
-            <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-              Stage {macro.dalio_stage} — updated from macro_state
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
+            {macro?.dalio_stage != null && (
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
+                Stage {macro.dalio_stage} — from macro_state
+              </span>
+            )}
+            <span style={{ fontSize: "10px", color: dalioStale() ? "var(--sr-warn)" : "var(--sr-text-3)", fontWeight: dalioStale() ? 700 : 400 }}>
+              {dalioStale() ? "⚠ KPIs may be stale · " : "KPIs "}reviewed {DALIO_REVIEWED}
             </span>
-          )}
+          </div>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-3)" }}>
           {DALIO_STAGES.map(stage => {

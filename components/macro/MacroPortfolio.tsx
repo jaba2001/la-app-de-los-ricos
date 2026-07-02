@@ -8,6 +8,7 @@ import { HISTORICAL_ANALOGS } from "@/lib/historicalAnalogs";
 import type { MacroState, StockAnalysis } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import SignalBacktest from "@/components/macro/SignalBacktest";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -479,6 +480,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
           </div>
         );
       })()}
+
+      {/* Signal backtest — does the score have a track record vs SPY? */}
+      <SignalBacktest />
     </div>
   );
 }

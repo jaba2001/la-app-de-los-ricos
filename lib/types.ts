@@ -138,6 +138,7 @@ export interface ScoreInputs {
   roe?: number | null;
   netDebtEbitda?: number | null;
   regime?: string | null;
+  sector?: string | null;
   marketCap?: number | null;
   /** Reverse DCF signals — optional, integrated into value score when available */
   impliedGrowthCagr?: number | null;

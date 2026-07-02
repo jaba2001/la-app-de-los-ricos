@@ -533,6 +533,9 @@ export default function MacroIndicators({ macro, loading }: Props) {
                   <span>{k}</span><span style={{ fontWeight: 600 }}>{v}</span>
                 </div>
               ))}
+              <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 8, opacity: 0.7 }}>
+                USD share &amp; Debt/GDP are manually maintained figures, not live series.
+              </div>
             </div>
           </div>
         </div>

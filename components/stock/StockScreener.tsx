@@ -77,6 +77,7 @@ export default function StockScreener() {
         epsGrowth:        ratios?.netIncomeGrowthTTM   != null ? (ratios.netIncomeGrowthTTM   as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,
         regime:           macroState?.regime_id ?? null,
+        sector,
         priceChange1M:    null,
         priceChange3M:    null,
         priceChange6M:    null,

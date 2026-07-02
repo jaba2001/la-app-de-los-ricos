@@ -21,9 +21,29 @@ export const SECTOR_ETF: Record<string, string> = {
 
 export function calcScores(inp: ScoreInputs): Scores {
   let value = 0;
-  if (inp.pe != null) value += inp.pe < 15 ? 7 : inp.pe < 25 ? 5 : inp.pe < 35 ? 3 : 0;
+  // Sector-relative valuation: a P/E of 12 is cheap for a bank but expensive for a
+  // utility. When we know the sector, score P/E and EV/EBITDA against that sector's
+  // benchmark (bands of 0.7×/1.0×/1.3×). Falls back to absolute bands when the sector
+  // is unknown, so callers that don't pass one behave exactly as before.
+  const sectorPeBm = inp.sector ? SECTOR_PE_BM[inp.sector] : undefined;
+  const sectorEvBm = inp.sector ? SECTOR_EV_BM[inp.sector] : undefined;
+  if (inp.pe != null) {
+    if (sectorPeBm && inp.pe > 0) {
+      const r = inp.pe / sectorPeBm;
+      value += r < 0.7 ? 7 : r < 1.0 ? 5 : r < 1.3 ? 3 : 0;
+    } else {
+      value += inp.pe < 15 ? 7 : inp.pe < 25 ? 5 : inp.pe < 35 ? 3 : 0;
+    }
+  }
   if (inp.pb != null) value += inp.pb < 1.5 ? 6 : inp.pb < 3 ? 4 : inp.pb < 5 ? 2 : 0;
-  if (inp.evEbitda != null) value += inp.evEbitda < 8 ? 6 : inp.evEbitda < 15 ? 4 : inp.evEbitda < 25 ? 2 : 0;
+  if (inp.evEbitda != null) {
+    if (sectorEvBm && inp.evEbitda > 0) {
+      const r = inp.evEbitda / sectorEvBm;
+      value += r < 0.7 ? 6 : r < 1.0 ? 4 : r < 1.3 ? 2 : 0;
+    } else {
+      value += inp.evEbitda < 8 ? 6 : inp.evEbitda < 15 ? 4 : inp.evEbitda < 25 ? 2 : 0;
+    }
+  }
   if (inp.pfcf != null) value += inp.pfcf < 15 ? 6 : inp.pfcf < 25 ? 4 : inp.pfcf < 40 ? 2 : 0;
   // Reverse DCF signal — market expectations premium/discount vs conservative growth
   if (inp.impliedGrowthCagr != null) {
