@@ -584,6 +584,24 @@ export default function StockTickerPage() {
 
       if (saved) setSavedAnalysis(saved as StockAnalysis);
 
+      // ── Live track record: immutable score snapshot (append-only, 1/ticker/day) ──
+      // Seals the score with a timestamp and the point-in-time price, so realized
+      // forward return vs SPY can be measured later. The table has no UPDATE/DELETE
+      // policy and we insert do-nothing-on-conflict, so the record can't be curated.
+      const icForLog = Math.round(Math.max(0, Math.min(100, calc.total + (macroTiltData?.tilt ?? 0))));
+      await supabase.from("sl_score_log").upsert({
+        user_id: session.user.id,
+        ticker: ticker.toUpperCase(),
+        score_date: today,
+        score_total: calc.total,
+        ic_score: icForLog,
+        macro_tilt: macroTiltData?.tilt ?? null,
+        rating: getRating(icForLog).label,
+        sector,
+        regime_id: macroData?.regime_id ?? null,
+        price_at_score: quote?.price != null ? Number(quote.price) : null,
+      }, { onConflict: "user_id,ticker,score_date", ignoreDuplicates: true });
+
     } catch (e) {
       setError(e instanceof Error ? e.message : "Analysis failed");
     }
