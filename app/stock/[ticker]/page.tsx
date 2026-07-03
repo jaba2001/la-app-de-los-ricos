@@ -91,7 +91,7 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 30;
+  const TOTAL_SOURCES = 32;
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
   const [autoChecked, setAutoChecked] = useState(false);
@@ -202,6 +202,7 @@ export default function StockTickerPage() {
         edgarRes,
         simfinRes,
         finvizRes,
+        shortIntRes,
       ] = await Promise.allSettled([
         track(authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`)),
@@ -223,7 +224,7 @@ export default function StockTickerPage() {
         track(authedFetch<unknown[]>(`/api/congress/${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/house-disclosure?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&limit=5`)),
-        track(authedFetch<unknown[]>(`/api/fmp/historical-shares-float?symbol=${ticker}&limit=10`)),
+        track(authedFetch<unknown[]>(`/api/fmp/shares-float?symbol=${ticker}`)),
         // Growth ratios (revenue/EPS YoY) — not present in stable ratios-ttm
         track(authedFetch<unknown[]>(`/api/fmp/financial-growth?symbol=${ticker}&limit=1`)),
         // Phase 1 — Finnhub fundamentals (fills gaps when FMP plan blocks endpoints)
@@ -240,6 +241,8 @@ export default function StockTickerPage() {
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin?symbol=${ticker}`)),
         // Phase 8 — Finviz short/sentiment/ownership data (free, edge-scraped, 6h cache)
         track(authedFetch<FinvizData>(`/api/finviz/quote?symbol=${ticker}`)),
+        // Short interest / short float — free (NASDAQ official + FINRA fallback)
+        track(authedFetch<{sharesShort?:number; daysToCover?:number; settlementDate?:string; shortVolumeRatio?:number}>(`/api/short-interest?symbol=${ticker}`)),
       ]);
 
       const quote   = freshQuote;
@@ -386,10 +389,30 @@ export default function StockTickerPage() {
       const finvizData: FinvizData | null = finvizRes.status === "fulfilled"
         ? (finvizRes.value as FinvizData) ?? null
         : null;
-      const finvizMerged = mergeFinviz(
+      let finvizMerged = mergeFinviz(
         finvizData,
         finnhubToFinvizFallback(fhM, analystConsensus, fhTarget),
       );
+      // Short float: NASDAQ short interest ÷ float (both free); FINRA short-volume
+      // ratio as the fallback. Overlays onto the Sentiment tab's Short Interest cells.
+      const shortInt = shortIntRes.status === "fulfilled"
+        ? (shortIntRes.value as { sharesShort?: number; daysToCover?: number; settlementDate?: string; shortVolumeRatio?: number }) ?? null
+        : null;
+      const floatShares = (() => {
+        const sf = sharesFloatRes.status === "fulfilled" ? (sharesFloatRes.value as Record<string, unknown>[]) ?? [] : [];
+        const v = sf?.[0]?.floatShares ?? sf?.[0]?.outstandingShares;
+        return v != null ? Number(v) : null;
+      })();
+      const shortFloatPct = shortInt?.sharesShort != null && floatShares && floatShares > 0
+        ? shortInt.sharesShort / floatShares : null;
+      if (shortInt && (shortFloatPct != null || shortInt.daysToCover != null || shortInt.shortVolumeRatio != null)) {
+        finvizMerged = {
+          ...(finvizMerged ?? ({} as FinvizData)),
+          shortFloat:       finvizMerged?.shortFloat ?? shortFloatPct,
+          shortRatio:       finvizMerged?.shortRatio ?? shortInt.daysToCover ?? null,
+          shortVolumeRatio: shortInt.shortVolumeRatio ?? null,
+        } as FinvizData;
+      }
       // ─────────────────────────────────────────────────────────────
 
       stockData = {

@@ -229,4 +229,6 @@ export interface FinvizData {
   targetPrice: number | null;
   betaFv: number | null;
   grossMarginFv: number | null;
+  /** Short-side pressure gauge from FINRA Reg SHO daily (shortVol/totalVol), when NASDAQ short interest is unavailable. */
+  shortVolumeRatio?: number | null;
 }

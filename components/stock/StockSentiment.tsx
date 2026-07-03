@@ -100,6 +100,13 @@ export default function StockSentiment({ data, loading }: Props) {
             value={<span style={{ color: "var(--sr-text-2)" }}>{fmt(fv?.shortRatio, 1)}</span>}
             sub="days to cover"
           />
+          {fv?.shortVolumeRatio != null && (
+            <Cell
+              label="Short Volume"
+              value={<span style={{ color: fv.shortVolumeRatio > 0.55 ? "var(--sr-neg)" : fv.shortVolumeRatio > 0.45 ? "var(--sr-warn)" : "var(--sr-text-2)" }}>{`${(fv.shortVolumeRatio * 100).toFixed(0)}%`}</span>}
+              sub="of daily volume (FINRA)"
+            />
+          )}
         </div>
         {/* Short float visual bar */}
         {sfPct != null && (
@@ -301,7 +308,7 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Powered by watermark */}
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", paddingRight: "var(--sr-sp-2)" }}>
-        Fundamentals via Finnhub · short interest &amp; ownership require a paid feed
+        Fundamentals via Finnhub · short interest via NASDAQ/FINRA · ownership needs a paid feed
       </div>
 
     </div>

@@ -34,6 +34,7 @@ const ROUTES = [
   ["GET", `/api/fmp/senate-trading?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/house-disclosure?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/historical-shares-float?symbol=${SYM}`, 401],
+  ["GET", `/api/fmp/shares-float?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/search?query=apple`, 401],
   ["GET", `/api/fmp/news?tickers=SPY&limit=1`, 401],
   // Finnhub
@@ -47,8 +48,9 @@ const ROUTES = [
   ["GET", `/api/finnhub/stock/recommendation?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/short-interest?symbol=${SYM}&from=${ago90}&to=${today}`, 401],
   ["GET", `/api/finnhub/calendar/earnings?symbol=${SYM}&from=${today}&to=${in30}`, 401],
-  // Congress (free STOCK-Act S3 route) + data fallbacks + AI
+  // Congress (free STOCK-Act S3 route) + short interest + data fallbacks + AI
   ["GET", `/api/congress/${SYM}`, 401],
+  ["GET", `/api/short-interest?symbol=${SYM}`, 401],
   ["GET", `/api/edgar?symbol=${SYM}`, 401],
   ["GET", `/api/simfin?symbol=${SYM}`, 401],
   ["GET", `/api/finviz/quote?symbol=${SYM}`, 401],
