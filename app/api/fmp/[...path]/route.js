@@ -9,7 +9,7 @@ const ALLOWED = new Set([
   'price-target-consensus','analyst-estimates','upgrades-downgrades-consensus',
   'discounted-cash-flow','balance-sheet-statement','price-target',
   'cash-flow-statement','peers','historical-dividends',
-  'institutional-holder','historical-shares-float',
+  'institutional-holder','historical-shares-float','shares-float',
   'key-metrics','financial-growth','earnings-surprises',
   'search','senate-trading','house-disclosure','insider-trading',
 ]);
