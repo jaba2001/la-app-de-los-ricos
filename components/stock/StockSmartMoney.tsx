@@ -40,7 +40,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
   const congress  = data?.congressTrades        ?? [];
   const house     = data?.houseDisclosures      ?? [];
   const allCongress = [...congress, ...house].sort((a, b) =>
-    ((b.transactionDate as string) ?? "").localeCompare((a.transactionDate as string) ?? "")
+    ((b.date ?? b.transactionDate) as string ?? "").localeCompare((a.date ?? a.transactionDate) as string ?? "")
   );
 
   // Sector Relative Strength
@@ -155,11 +155,11 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
               {allCongress.slice(0, 15).map((t, i) => {
                 const isBuy = (t.type as string)?.toLowerCase().includes("purchase") || (t.transactionType as string)?.toLowerCase().includes("buy");
                 const isSell = (t.type as string)?.toLowerCase().includes("sale") || (t.transactionType as string)?.toLowerCase().includes("sell");
-                const chamber = house.includes(t) ? "House" : "Senate";
-                const name = (t.representativeName ?? t.senator ?? t.member) as string;
+                const chamber = (t.chamber as string) ?? (house.includes(t) ? "House" : "Senate");
+                const name = (t.name ?? t.representativeName ?? t.senator ?? t.member) as string;
                 return (
                   <tr key={i}>
-                    <td>{((t.transactionDate ?? t.disclosureDate) as string)?.slice(0, 10) ?? "—"}</td>
+                    <td>{((t.date ?? t.transactionDate ?? t.disclosureDate) as string)?.slice(0, 10) ?? "—"}</td>
                     <td style={{ maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis" }}>{name ?? "—"}</td>
                     <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>{chamber}</td>
                     <td style={{ color: isBuy ? "var(--sr-pos)" : isSell ? "var(--sr-neg)" : "var(--sr-text-2)", fontWeight: 600, fontSize: "var(--sr-t-xs)" }}>

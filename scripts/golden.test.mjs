@@ -9,6 +9,7 @@ import {
   computeSqueeze, computeADX, computeVolumeProfile, detectDivergences, computeTLResult,
 } from "../lib/technicalIndicators.ts";
 import { runBacktest } from "../lib/backtest.ts";
+import { normalizeFundamentals } from "../lib/normalize.ts";
 
 let passed = 0, failed = 0;
 const fails = [];
@@ -180,6 +181,76 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   // Missing history → point skipped, no crash.
   const noHist = runBacktest(analyses, {}, spy, 60);
   ok(noHist.points.length === 0, "backtest: missing history → 0 points, no crash");
+}
+
+// ── Fundamentals normalizer (FMP-stable + Finnhub → legacy canonical keys) ─────
+{
+  // Real UBER field names from FMP stable (the renamed ones) must map to the
+  // legacy keys the scoring engine and components read. This guards the exact
+  // legacy→stable mismatch that was silently zeroing VALUE/GROWTH.
+  const fmpKeyMetrics = {
+    evToEBITDATTM: 25.9, netDebtToEBITDATTM: 1.12, returnOnInvestedCapitalTTM: 0.2339,
+    returnOnEquityTTM: 0.3332, returnOnAssetsTTM: 0.1417, currentRatioTTM: 1.069,
+    evToSalesTTM: 2.95, freeCashFlowYieldTTM: 0.061,
+  };
+  const fmpRatios = {
+    priceToEarningsRatioTTM: 17.66, priceToBookRatioTTM: 6.28, priceToFreeCashFlowRatioTTM: 15.4,
+    debtToEquityRatioTTM: 0.39, currentRatioTTM: 1.069, interestCoverageRatioTTM: 5.2,
+    grossProfitMarginTTM: 0.4103, operatingProfitMarginTTM: 0.1166, netProfitMarginTTM: 0.159,
+    dividendYieldTTM: 0, freeCashFlowPerShareTTM: 4.8,
+  };
+  const fmpGrowth = { revenueGrowth: 0.1828, netIncomeGrowth: 0.02, epsgrowth: 0.023 };
+  const profile = { beta: 1.12 };
+
+  const a = normalizeFundamentals({ fmpKeyMetrics, fmpRatios, fmpGrowth, profile });
+  ok(a.metrics.peRatioTTM === 17.66, `norm: pe from ratios.priceToEarningsRatioTTM (${a.metrics.peRatioTTM})`);
+  ok(a.metrics.enterpriseValueOverEBITDATTM === 25.9, `norm: evEbitda from key-metrics.evToEBITDATTM (${a.metrics.enterpriseValueOverEBITDATTM})`);
+  ok(a.metrics.roicTTM === 0.2339, `norm: roic from returnOnInvestedCapitalTTM (${a.metrics.roicTTM})`);
+  ok(a.metrics.roeTTM === 0.3332, `norm: roe from returnOnEquityTTM (${a.metrics.roeTTM})`);
+  ok(a.metrics.priceToFreeCashFlowsRatioTTM === 15.4, `norm: pfcf from priceToFreeCashFlowRatioTTM (${a.metrics.priceToFreeCashFlowsRatioTTM})`);
+  ok(a.metrics.priceToBookRatioTTM === 6.28, `norm: pb mapped (${a.metrics.priceToBookRatioTTM})`);
+  ok(a.metrics.beta === 1.12, `norm: beta from profile (${a.metrics.beta})`);
+  ok(a.ratios.debtEquityRatioTTM === 0.39, `norm: d/e from debtToEquityRatioTTM (${a.ratios.debtEquityRatioTTM})`);
+  ok(a.ratios.interestCoverageTTM === 5.2, `norm: interestCoverage from interestCoverageRatioTTM (${a.ratios.interestCoverageTTM})`);
+  ok(a.ratios.revenueGrowthTTM === 0.1828, `norm: revenueGrowth from financial-growth (${a.ratios.revenueGrowthTTM})`);
+  ok(a.ratios.netIncomeGrowthTTM === 0.02, `norm: netIncomeGrowth from financial-growth (${a.ratios.netIncomeGrowthTTM})`);
+  ok(a.ratios.returnOnEquityTTM === 0.3332, `norm: ratios.returnOnEquityTTM preserved for Fundamentals tab (${a.ratios.returnOnEquityTTM})`);
+
+  // Finnhub-only fallback (FMP quota exhausted): percents ÷100 into fractions.
+  const fh = {
+    peTTM: 17.66, evEbitdaTTM: 22.28, roiTTM: 23.39, roeTTM: 33.32, roaTTM: 14.17,
+    grossMarginTTM: 35.54, operatingMarginTTM: 11.66, netMarginTTM: 15.9, pbAnnual: 6.28,
+    pfcfShareTTM: 15.39, "totalDebt/totalEquityAnnual": 0.389, currentRatioAnnual: 1.13,
+    netInterestCoverageAnnual: 1.34, revenueGrowthTTMYoy: 18.31, epsGrowthTTMYoy: -29.82, beta: 1.15,
+  };
+  const b = normalizeFundamentals({ finnhubMetric: fh });
+  ok(b.metrics.peRatioTTM === 17.66, `norm-fh: pe fallback (${b.metrics.peRatioTTM})`);
+  ok(b.metrics.enterpriseValueOverEBITDATTM === 22.28, `norm-fh: evEbitda fallback via evEbitdaTTM (${b.metrics.enterpriseValueOverEBITDATTM})`);
+  approx(b.metrics.roeTTM, 0.3332, 1e-9, "norm-fh: roe ÷100 to fraction");
+  approx(b.ratios.grossProfitMarginTTM, 0.3554, 1e-9, "norm-fh: grossMargin ÷100");
+  ok(b.ratios.debtEquityRatioTTM === 0.389, `norm-fh: d/e via totalDebt/totalEquityAnnual (${b.ratios.debtEquityRatioTTM})`);
+  approx(b.ratios.revenueGrowthTTM, 0.1831, 1e-9, "norm-fh: revenueGrowth ÷100");
+  approx(b.ratios.netIncomeGrowthTTM, -0.2982, 1e-9, "norm-fh: epsGrowth ÷100 (negative preserved)");
+
+  // Field-level merge: FMP has evEbitda but not roe; Finnhub fills only the gap.
+  const c = normalizeFundamentals({ fmpKeyMetrics: { evToEBITDATTM: 25.9 }, finnhubMetric: { roeTTM: 33.32 } });
+  ok(c.metrics.enterpriseValueOverEBITDATTM === 25.9, "norm-merge: FMP evEbitda kept");
+  approx(c.metrics.roeTTM, 0.3332, 1e-9, "norm-merge: Finnhub fills missing roe");
+
+  // The payoff: a normalized UBER feeds calcScores to a NON-zero value+growth,
+  // exactly what the legacy-name bug was suppressing.
+  const m = a.metrics, r = a.ratios;
+  const s = calcScores({
+    pe: m.peRatioTTM, pb: m.priceToBookRatioTTM, evEbitda: m.enterpriseValueOverEBITDATTM,
+    pfcf: m.priceToFreeCashFlowsRatioTTM, debtEquity: r.debtEquityRatioTTM, currentRatio: r.currentRatioTTM,
+    interestCoverage: r.interestCoverageTTM, netDebtEbitda: m.netDebtToEBITDATTM,
+    roic: m.roicTTM * 100, roe: m.roeTTM * 100, grossMargin: r.grossProfitMarginTTM * 100,
+    revenueGrowth: r.revenueGrowthTTM * 100, epsGrowth: r.netIncomeGrowthTTM * 100,
+    marketCap: 150e9, sector: "Technology",
+  });
+  ok(s.value > 0, `norm→score: VALUE no longer zero (${s.value})`);
+  ok(s.growth > 0, `norm→score: GROWTH no longer zero (${s.growth})`);
+  ok(s.health > 0, `norm→score: HEALTH populated (${s.health})`);
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────

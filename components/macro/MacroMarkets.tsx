@@ -18,6 +18,23 @@ const CRYPTO_TICKERS = ["BTCUSD", "ETHUSD"];
 
 interface Quote { symbol: string; price: number; change: number; changesPercentage: number; }
 
+/** Finnhub /quote → Quote. Returns null on the {c:0} "unknown symbol" response. */
+interface FhQuote { c?: number; d?: number; dp?: number }
+function fromFinnhub(symbol: string, r: FhQuote | null): Quote | null {
+  if (r == null || r.c == null || r.c === 0) return null;
+  return { symbol, price: r.c, change: r.d ?? 0, changesPercentage: r.dp ?? 0 };
+}
+/** FMP stable/quote → Quote. Stable renamed `changesPercentage` → `changePercentage`. */
+function fromFmp(symbol: string, r: Record<string, unknown> | null): Quote | null {
+  if (r == null || r.price == null) return null;
+  return {
+    symbol,
+    price: Number(r.price),
+    change: Number(r.change ?? 0),
+    changesPercentage: Number((r.changePercentage ?? r.changesPercentage ?? 0) as number),
+  };
+}
+
 function QuoteCard({ ticker, quote, loadingQ }: { ticker: string; quote: Quote | null; loadingQ: boolean }) {
   const pct = quote?.changesPercentage ?? 0;
   const color = pct > 0 ? "var(--sr-pos)" : pct < 0 ? "var(--sr-neg)" : "var(--sr-text-3)";
@@ -50,12 +67,13 @@ export default function MacroMarkets({ macro, loading }: Props) {
   const [loadingQ, setLoadingQ] = useState(true);
   const [loadingC, setLoadingC] = useState(true);
 
+  // Crypto stays on FMP (stable/quote covers BTCUSD/ETHUSD); map the renamed field.
   useEffect(() => {
     const timeout = setTimeout(() => setLoadingC(false), 12000);
     Promise.allSettled(
       CRYPTO_TICKERS.map(t =>
-        authedFetch<Quote[]>(`/api/fmp/quote?symbol=${t}`)
-          .then(r => ({ ticker: t, data: Array.isArray(r) ? r[0] : (r as Quote) }))
+        authedFetch<Record<string, unknown>[]>(`/api/fmp/quote?symbol=${t}`)
+          .then(r => ({ ticker: t, data: fromFmp(t, Array.isArray(r) ? r[0] : (r as Record<string, unknown>)) }))
       )
     ).then(results => {
       clearTimeout(timeout);
@@ -69,13 +87,15 @@ export default function MacroMarkets({ macro, loading }: Props) {
     return () => clearTimeout(timeout);
   }, []);
 
+  // ETFs move to Finnhub /quote — free, a separate rate budget from FMP (whose
+  // 250/day cap is spent on stock analysis), so the grid loads reliably.
   useEffect(() => {
     const timeout = setTimeout(() => setLoadingQ(false), 12000);
     const allTickers = ETF_GROUPS.flatMap(g => g.tickers);
     Promise.allSettled(
       allTickers.map(t =>
-        authedFetch<Quote[]>(`/api/fmp/quote?symbol=${t}`)
-          .then(r => ({ ticker: t, data: Array.isArray(r) ? r[0] : (r as Quote) }))
+        authedFetch<FhQuote>(`/api/finnhub/quote?symbol=${t}`)
+          .then(r => ({ ticker: t, data: fromFinnhub(t, r) }))
       )
     ).then(results => {
       clearTimeout(timeout);

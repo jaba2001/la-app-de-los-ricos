@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, getRating, getMacroTilt } from "@/lib/scoring";
+import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
@@ -46,17 +47,24 @@ export default function StockScreener() {
     if (!session) return;
     setAnalyzingTickers(prev => new Set([...prev, ticker]));
     try {
-      const [quoteRes, profileRes, metricsRes, ratiosRes] = await Promise.allSettled([
+      const [quoteRes, profileRes, metricsRes, ratiosRes, growthRes, fhMetricRes] = await Promise.allSettled([
         authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`),
         authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`),
         authedFetch<unknown[]>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`),
         authedFetch<unknown[]>(`/api/fmp/ratios-ttm?symbol=${ticker}`),
+        authedFetch<unknown[]>(`/api/fmp/financial-growth?symbol=${ticker}&limit=1`),
+        authedFetch<{ metric: Record<string, number> }>(`/api/finnhub/stock/metric?symbol=${ticker}&metric=all`),
       ]);
 
       const quote   = quoteRes.status   === "fulfilled" ? (quoteRes.value   as Record<string,unknown>[])?.[0] ?? null : null;
       const profile = profileRes.status === "fulfilled" ? (profileRes.value as Record<string,unknown>[])?.[0] ?? null : null;
-      const metrics = metricsRes.status === "fulfilled" ? (metricsRes.value as Record<string,unknown>[])?.[0] ?? null : null;
-      const ratios  = ratiosRes.status  === "fulfilled" ? (ratiosRes.value  as Record<string,unknown>[])?.[0] ?? null : null;
+      const fmpKeyMetrics = metricsRes.status === "fulfilled" ? (metricsRes.value as Record<string,unknown>[])?.[0] ?? null : null;
+      const fmpRatios     = ratiosRes.status  === "fulfilled" ? (ratiosRes.value  as Record<string,unknown>[])?.[0] ?? null : null;
+      const fmpGrowth     = growthRes.status  === "fulfilled" ? (growthRes.value  as Record<string,unknown>[])?.[0] ?? null : null;
+      const fhM = fhMetricRes.status === "fulfilled" ? (fhMetricRes.value as { metric?: Record<string, number> })?.metric ?? null : null;
+
+      // Canonical field mapping (FMP-stable + Finnhub) — same layer as the full page.
+      const { metrics, ratios } = normalizeFundamentals({ fmpKeyMetrics, fmpRatios, fmpGrowth, finnhubMetric: fhM, profile });
 
       const sector = profile?.sector as string ?? null;
       const tiltResult = macroState && sector ? getMacroTilt(macroState, sector) : { tilt: 0 };

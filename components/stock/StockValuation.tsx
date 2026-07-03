@@ -209,7 +209,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
       <div style={{ marginBottom: "var(--sr-sp-3)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
           <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
-          <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-amber)" }} className="num">{value}{suffix}</span>
+          <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-amber)" }} className="num">{value.toFixed(step < 1 ? 1 : 0)}{suffix}</span>
         </div>
         <input
           type="range" min={min} max={max} step={step} value={value}
@@ -342,7 +342,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   { label: "PV Operating FCF (Y1-10)", val: result.pvOperating },
                   { label: "+ PV Terminal Value", val: result.pvTerminal },
                   { label: "= Enterprise Value", val: result.ev, bold: true },
-                  { label: "− Net Debt", val: -netDebt },
+                  { label: netDebt >= 0 ? "− Net Debt" : "+ Net Cash", val: -netDebt },
                   { label: "= Equity Value", val: result.equity, bold: true },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-sm)", fontWeight: row.bold ? 700 : 400, color: row.bold ? "var(--sr-text)" : "var(--sr-text-2)" }}>
@@ -374,7 +374,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 ${Number(dcf.dcf ?? 0).toFixed(2)}
               </div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 4 }}>
-                Discount: {dcf.dcf != null ? (((Number(dcf.dcf) - currentPrice) / currentPrice) * 100).toFixed(1) : "—"}%
+                Upside to fair value: {dcf.dcf != null ? `${Number(dcf.dcf) >= currentPrice ? "+" : ""}${(((Number(dcf.dcf) - currentPrice) / currentPrice) * 100).toFixed(1)}%` : "—"}
               </div>
             </div>
           )}
@@ -480,16 +480,19 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
               },
               {
                 label: "FCF Growth YoY",
-                val: fcfGrowPct != null ? `${fcfGrowPct >= 0 ? "+" : ""}${fcfGrowPct.toFixed(0)}%` : "—",
+                val: fcfGrowPct != null ? (Math.abs(fcfGrowPct) > 300 ? "n/m" : `${fcfGrowPct >= 0 ? "+" : ""}${fcfGrowPct.toFixed(0)}%`) : "—",
                 color: fcfGrowColor,
-                sub: fcfGrowPct != null ? (fcfGrowPct > 20 ? "Strong" : fcfGrowPct > 0 ? "Positive" : "Declining") : "No data",
+                sub: fcfGrowPct != null ? (Math.abs(fcfGrowPct) > 300 ? "Base near zero" : fcfGrowPct > 20 ? "Strong" : fcfGrowPct > 0 ? "Positive" : "Declining") : "No data",
                 hint: "TTM FCF vs prior 4Q — confirms or refutes earnings quality",
               },
               {
                 label: "FCF vs Earnings",
-                val: (fcfGrowPct != null && fcqual?.fcfGrowthYoy != null)
-                  ? `${((fcqual.fcfGrowthYoy) - (data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : 0)).toFixed(0)}pp`
-                  : "—",
+                val: (() => {
+                  const epsGr = data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : null;
+                  if (fcfGrowPct == null || fcqual?.fcfGrowthYoy == null || epsGr == null) return "—";
+                  const div = fcqual.fcfGrowthYoy - epsGr;
+                  return Math.abs(div) > 300 ? "n/m" : `${div >= 0 ? "+" : ""}${div.toFixed(0)}pp`;
+                })(),
                 color: (() => {
                   const epsGr = data?.ratios?.netIncomeGrowthTTM != null ? Number(data.ratios.netIncomeGrowthTTM) * 100 : null;
                   if (fcfGrowPct == null || epsGr == null) return "var(--sr-text-3)";

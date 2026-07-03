@@ -58,7 +58,7 @@ const LIQUIDITY: SeriesEntry[] = [
     derived: m => m.walcl != null ? Number(m.walcl) / 1e6 : null },
   { label: "Reverse Repo ($B)",      key: "rrpontsyd",        suffix: "B", prefix: "$" },
   { label: "Bank Reserves ($T)",     key: "wresbal",          suffix: "T", prefix: "$",
-    derived: m => m.wresbal != null ? Number(m.wresbal) / 1000 : null,
+    derived: m => m.wresbal != null ? Number(m.wresbal) / 1e6 : null,
     badge: v => v < 2 ? { text: "LOW", color: "var(--sr-neg)" } : v < 3 ? { text: "WATCH", color: "var(--sr-warn)" } : v < 4 ? { text: "NORMAL", color: "var(--sr-text-3)" } : { text: "AMPLE", color: "var(--sr-pos)" } },
   { label: "M2 YoY Growth",          key: "m2_growth",        suffix: "%",
     badge: v => v < -2 ? { text: "CONTRACTING", color: "var(--sr-neg)" } : v < 2 ? { text: "LOW", color: "var(--sr-warn)" } : v < 6 ? { text: "NORMAL", color: "var(--sr-pos)" } : { text: "EXPANDING", color: "var(--sr-warn)" } },
@@ -149,8 +149,8 @@ const SENTIMENT: SeriesEntry[] = [
   { label: "Credit Divergence",     key: "credit_divergence",    suffix: "",  decimals: 0,
     derived: m => m.credit_divergence != null ? (m.credit_divergence ? 1 : 0) : null,
     badge: v => v === 1 ? { text: "DIVERGING", color: "var(--sr-warn)" } : { text: "NO DIV.", color: "var(--sr-pos)" } },
-  { label: "BOJ Assets ($T)",       key: "boj_assets",           suffix: "T", prefix: "$", decimals: 1,
-    derived: m => m.boj_assets != null ? Number(m.boj_assets) / 1e12 : null },
+  { label: "BOJ Assets (¥T)",       key: "boj_assets",           suffix: "T", prefix: "¥", decimals: 1,
+    derived: m => m.boj_assets != null ? Number(m.boj_assets) / 1e4 : null },
   { label: "Claims Trend",          key: "claims_trend",         text: true },
   { label: "Profits Trend",         key: "profits_trend",        text: true },
   { label: "Recession Gate",        key: "recession_gate_active", suffix: "", decimals: 0,
@@ -264,7 +264,7 @@ function computeSubScores(m: MacroState) {
   const netLiq = g("net_liquidity_t");
   const netLiq_s = netLiq == null ? 50 : clamp(netLiq < 3 ? 0 : netLiq < 4 ? (netLiq - 3) * 30 : netLiq < 5 ? 30 + (netLiq - 4) * 30 : 60 + ((netLiq - 5) / 1.5) * 40);
   const wresbalB = g("wresbal");
-  const wresbalT = wresbalB != null ? wresbalB / 1000 : null;
+  const wresbalT = wresbalB != null ? wresbalB / 1e6 : null;  // WRESBAL is FRED $M → $T
   const wresbal_s = wresbalT == null ? 50 : clamp(wresbalT >= 4 ? 100 : wresbalT >= 3 ? 50 + (wresbalT - 3) * 50 : wresbalT >= 2 ? (wresbalT - 2) * 50 : 0);
   const sofr = g("sofr"); const ff = g("fedfunds");
   let sofr_s = 50;

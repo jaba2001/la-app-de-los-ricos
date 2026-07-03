@@ -168,7 +168,7 @@ export default function StockSentiment({ data, loading }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
             label="Rel Volume"
-            value={<span style={{ color: relVolColor }}>{fmt(fv?.relVolume, 2)}x</span>}
+            value={<span style={{ color: relVolColor }}>{fv?.relVolume != null ? `${fv.relVolume.toFixed(2)}x` : "—"}</span>}
             sub="vs avg volume"
           />
           <Cell
@@ -301,7 +301,7 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Powered by watermark */}
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", paddingRight: "var(--sr-sp-2)" }}>
-        Data sourced from Finviz · 6h cache
+        Fundamentals via Finnhub · short interest &amp; ownership require a paid feed
       </div>
 
     </div>

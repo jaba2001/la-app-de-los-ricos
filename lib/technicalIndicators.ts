@@ -343,13 +343,13 @@ export function computeTLResult(
   const tp1Long   = price + 2 * (price - stopLong);
   const tp1Short  = price - 2 * (stopShort - price);
 
-  let gate = "Sin confluencia suficiente — esperar setup definido", gateColor = "var(--sr-text-3)";
-  if      (longSignals  >= 3 && icScore != null && icScore >= 65) { gate = "✓ Entrada confirmada — IC positivo + 3/4 TL LONG";         gateColor = "var(--sr-pos)"; }
-  else if (shortSignals >= 3 && icScore != null && icScore <= 35) { gate = "✓ Entrada SHORT — IC AVOID + 3/4 TL SHORT";                gateColor = "var(--sr-neg)"; }
-  else if (longSignals  >= 3 && icScore != null && icScore <= 35) { gate = "⚡ CONFLICTO — TL LONG pero fundamentales AVOID";           gateColor = "var(--sr-warn)"; }
-  else if (shortSignals >= 3 && icScore != null && icScore >= 65) { gate = "⚡ CONFLICTO — TL SHORT pero fundamentales BUY";            gateColor = "var(--sr-warn)"; }
-  else if (longSignals  >= 2 && icScore != null && icScore >= 65) { gate = "⏳ En espera — fundamentales fuertes, aguardando TL LONG";  gateColor = "#34D399"; }
-  else if (shortSignals >= 2 && icScore != null && icScore <= 35) { gate = "⏳ En espera — fundamentales débiles, TL SHORT acumulándose"; gateColor = "#FB923C"; }
+  let gate = "No confluence yet — wait for a defined setup", gateColor = "var(--sr-text-3)";
+  if      (longSignals  >= 3 && icScore != null && icScore >= 65) { gate = "✓ Entry confirmed — IC positive + 3/4 TL LONG";            gateColor = "var(--sr-pos)"; }
+  else if (shortSignals >= 3 && icScore != null && icScore <= 35) { gate = "✓ SHORT entry — IC AVOID + 3/4 TL SHORT";                 gateColor = "var(--sr-neg)"; }
+  else if (longSignals  >= 3 && icScore != null && icScore <= 35) { gate = "⚡ CONFLICT — TL LONG but fundamentals AVOID";            gateColor = "var(--sr-warn)"; }
+  else if (shortSignals >= 3 && icScore != null && icScore >= 65) { gate = "⚡ CONFLICT — TL SHORT but fundamentals BUY";             gateColor = "var(--sr-warn)"; }
+  else if (longSignals  >= 2 && icScore != null && icScore >= 65) { gate = "⏳ Waiting — strong fundamentals, awaiting TL LONG";       gateColor = "#34D399"; }
+  else if (shortSignals >= 2 && icScore != null && icScore <= 35) { gate = "⏳ Waiting — weak fundamentals, TL SHORT building";        gateColor = "#FB923C"; }
 
   return {
     signals: { emaLong, emaShort, adxActive, adxRising, sqzLong, sqzShort, sqzLoaded, vpAbove, vpBelow },

@@ -11,6 +11,9 @@ interface NewsItem {
   site?: string;
 }
 
+/** Finnhub company-news item shape. */
+interface FhNews { headline?: string; summary?: string; url?: string; source?: string; datetime?: number }
+
 const CATEGORIES = [
   { id: "rates",        label: "Rates & Fed",        tickers: "TLT,IEF",     composite: "LCC" },
   { id: "credit",       label: "Credit & HY",         tickers: "HYG,LQD",     composite: "CSC" },
@@ -153,11 +156,29 @@ export default function MacroNews() {
     setNews([]);
     setFetchError("");
     const tickerList = cat.tickers.split(',').map(t => t.trim());
+    // FMP dropped its news endpoints from the free tier; Finnhub company-news is
+    // free and covers every ETF proxy in these categories. Map to NewsItem.
+    const from = new Date(Date.now() - 14 * 86400000).toISOString().slice(0, 10);
+    const to   = new Date().toISOString().slice(0, 10);
     Promise.allSettled(
-      tickerList.map(t => authedFetch<NewsItem[]>(`/api/fmp/news?tickers=${t}&limit=6`))
+      tickerList.map(t => authedFetch<FhNews[]>(`/api/finnhub/company-news?symbol=${t}&from=${from}&to=${to}`))
     ).then(results => {
       const items: NewsItem[] = [];
-      results.forEach(r => { if (r.status === "fulfilled" && Array.isArray(r.value)) items.push(...r.value); });
+      results.forEach(r => {
+        if (r.status === "fulfilled" && Array.isArray(r.value)) {
+          for (const n of r.value) {
+            if (!n.headline) continue;
+            items.push({
+              title: n.headline,
+              text: n.summary || undefined,
+              url: n.url,
+              site: n.source,
+              publishedDate: n.datetime ? new Date(n.datetime * 1000).toISOString() : undefined,
+            });
+          }
+        }
+      });
+      items.sort((a, b) => (b.publishedDate ?? "").localeCompare(a.publishedDate ?? ""));
       const unique = Array.from(new Map(items.map(i => [i.title, i])).values()).slice(0, 8);
       setNews(unique);
       setCategoryCounts(prev => ({ ...prev, [active]: unique.length }));
