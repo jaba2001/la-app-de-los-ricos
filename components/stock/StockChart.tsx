@@ -528,7 +528,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
           {[
             { label: "Sector",   val: profile?.sector   as string ?? "—" },
             { label: "Industry", val: profile?.industry  as string ?? "—" },
-            { label: "Beta",     val: quote?.beta != null ? Number(quote.beta).toFixed(2) : "—" },
+            { label: "Beta",     val: (() => { const b = data?.technicals?.beta ?? (data?.metrics?.beta as number ?? null); return b != null ? Number(b).toFixed(2) : "—"; })() },
           ].map(({ label, val }) => (
             <div key={label} className="sr-tile">
               <div className="sr-tile-label">{label}</div>

@@ -101,7 +101,11 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
               <thead><tr><th>Date</th><th>Name</th><th>Type</th><th style={{ textAlign: "right" }}>Shares</th></tr></thead>
               <tbody>
                 {insiders.slice(0, 10).map((t, i) => {
-                  const isBuy = (t.transactionType as string)?.toLowerCase().includes("buy") || (t.transactionCode as string) === "P";
+                  // Finnhub gives a signed `change` (shares acquired vs disposed) — the
+                  // clearest buy/sell signal; fall back to the transaction code/type.
+                  const isBuy = t.change != null
+                    ? (t.change as number) > 0
+                    : ((t.transactionCode as string) === "P" || (t.transactionType as string)?.toLowerCase().includes("buy"));
                   return (
                     <tr key={i}>
                       <td>{(t.transactionDate as string)?.slice(0, 10) ?? "—"}</td>

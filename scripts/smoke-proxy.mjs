@@ -19,6 +19,7 @@ const ROUTES = [
   ["GET", `/api/fmp/profile?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/key-metrics-ttm?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/ratios-ttm?symbol=${SYM}`, 401],
+  ["GET", `/api/fmp/financial-growth?symbol=${SYM}&limit=1`, 401],
   ["GET", `/api/fmp/historical-price-eod/full?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/income-statement?symbol=${SYM}&limit=5`, 401],
   ["GET", `/api/fmp/balance-sheet-statement?symbol=${SYM}`, 401],
@@ -36,13 +37,18 @@ const ROUTES = [
   ["GET", `/api/fmp/search?query=apple`, 401],
   ["GET", `/api/fmp/news?tickers=SPY&limit=1`, 401],
   // Finnhub
+  ["GET", `/api/finnhub/quote?symbol=${SYM}`, 401],
+  ["GET", `/api/finnhub/company-news?symbol=${SYM}&from=${ago90}&to=${today}`, 401],
+  ["GET", `/api/finnhub/news?category=general`, 401],
+  ["GET", `/api/finnhub/stock/insider-transactions?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/metric?symbol=${SYM}&metric=all`, 401],
   ["GET", `/api/finnhub/stock/price-target?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/earnings?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/recommendation?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/short-interest?symbol=${SYM}&from=${ago90}&to=${today}`, 401],
   ["GET", `/api/finnhub/calendar/earnings?symbol=${SYM}&from=${today}&to=${in30}`, 401],
-  // Data fallbacks + AI
+  // Congress (free STOCK-Act S3 route) + data fallbacks + AI
+  ["GET", `/api/congress/${SYM}`, 401],
   ["GET", `/api/edgar?symbol=${SYM}`, 401],
   ["GET", `/api/simfin?symbol=${SYM}`, 401],
   ["GET", `/api/finviz/quote?symbol=${SYM}`, 401],

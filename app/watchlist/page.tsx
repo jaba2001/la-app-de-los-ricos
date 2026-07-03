@@ -54,11 +54,26 @@ export default function WatchlistPage() {
   useEffect(() => {
     if (items.length === 0) { setQuotes({}); return; }
     setLoadingQuotes(true);
+    // FMP stable/quote renamed `changesPercentage`→`changePercentage` and dropped `pe`;
+    // map the field and pull P/E from Finnhub stock/metric (free, separate budget).
     Promise.allSettled(
-      items.map(item =>
-        authedFetch<Quote[]>(`/api/fmp/quote?symbol=${item.ticker}`)
-          .then(r => ({ ticker: item.ticker, data: Array.isArray(r) ? r[0] : null }))
-      )
+      items.map(async item => {
+        const [qRes, mRes] = await Promise.allSettled([
+          authedFetch<Record<string, unknown>[]>(`/api/fmp/quote?symbol=${item.ticker}`),
+          authedFetch<{ metric?: Record<string, number> }>(`/api/finnhub/stock/metric?symbol=${item.ticker}&metric=all`),
+        ]);
+        const raw = qRes.status === "fulfilled" && Array.isArray(qRes.value) ? qRes.value[0] as Record<string, unknown> : null;
+        if (!raw || raw.price == null) return { ticker: item.ticker, data: null as Quote | null };
+        const pe = mRes.status === "fulfilled" ? (mRes.value?.metric?.peTTM ?? null) : null;
+        const data: Quote = {
+          symbol: item.ticker,
+          price: Number(raw.price),
+          changesPercentage: Number((raw.changePercentage ?? raw.changesPercentage ?? 0) as number),
+          pe: pe != null && isFinite(Number(pe)) ? Number(pe) : null,
+          marketCap: raw.marketCap != null ? Number(raw.marketCap) : null,
+        };
+        return { ticker: item.ticker, data };
+      })
     ).then(results => {
       const map: Record<string, Quote> = {};
       results.forEach(r => {

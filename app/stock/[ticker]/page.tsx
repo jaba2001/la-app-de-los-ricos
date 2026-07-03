@@ -167,6 +167,11 @@ export default function StockTickerPage() {
       const freshQuote = quoteRes.status === "fulfilled"
         ? ((quoteRes.value as unknown[])?.[0] as Record<string, unknown>) ?? null
         : null;
+      // FMP stable/quote renamed `changesPercentage`→`changePercentage`; alias it back
+      // so the header %-change badge and any consumer of quote.changesPercentage work.
+      if (freshQuote && freshQuote.changesPercentage == null && freshQuote.changePercentage != null) {
+        freshQuote.changesPercentage = freshQuote.changePercentage;
+      }
 
       // ── 24h snapshot check ────────────────────────────────────────
       const { data: snap } = await supabase
