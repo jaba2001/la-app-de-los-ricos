@@ -79,6 +79,17 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(calcScores({ pe: 20 }).value === calcScores({ pe: 20, sector: "Nonexistent" }).value, "sector-relative: unknown sector = absolute fallback");
   ok(calcScores({ pe: 12 }).value === 7, "absolute fallback: PE12 → 7 (no sector)");
 
+  // Financial-sector health: a healthy bank must NOT score 0 on industrial leverage
+  // ratios. It's scored on ROE/ROA/net margin/efficiency instead (JPM-like).
+  const bank = calcScores({ sector: "Financial Services", roe: 16, roa: 1.3, netMargin: 30, operatingMargin: 0.40, debtEquity: 1.2, pe: 12, pb: 1.5, marketCap: 400e9 });
+  ok(bank.health > 18, `bank health scored on ROE/ROA/margins, not zeroed (${bank.health})`);
+  // Industrial path ignores roa/netMargin — same "bank" numbers on a tech name score lower health.
+  const techSameNums = calcScores({ sector: "Technology", roe: 16, roa: 1.3, netMargin: 30, debtEquity: 1.2 });
+  ok(techSameNums.health < bank.health, `industrial path doesn't use roa/netMargin (${techSameNums.health} < ${bank.health})`);
+  // A weak financial (poor ROE/ROA) still scores low — the change doesn't just inflate all banks.
+  const weakBank = calcScores({ sector: "Financial Services", roe: 3, roa: 0.3, netMargin: 8, operatingMargin: 0.05 });
+  ok(weakBank.health < 10, `weak bank scores low health (${weakBank.health})`);
+
   // Rating thresholds.
   ok(getRating(85).label === "STRONG BUY", "rating 85 = STRONG BUY");
   ok(getRating(60).label === "BUY", "rating 60 = BUY");

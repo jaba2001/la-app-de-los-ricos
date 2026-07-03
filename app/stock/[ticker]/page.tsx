@@ -516,6 +516,8 @@ export default function StockTickerPage() {
         netDebtEbitda:    mergedMetrics?.netDebtToEBITDATTM as number ?? null,
         roic:             mergedMetrics?.roicTTM != null ? (mergedMetrics.roicTTM as number) * 100 : null,
         roe:              mergedMetrics?.roeTTM  != null ? (mergedMetrics.roeTTM  as number) * 100 : null,
+        roa:              mergedRatios?.returnOnAssetsTTM != null ? (mergedRatios.returnOnAssetsTTM as number) * 100 : null,
+        netMargin:        mergedRatios?.netProfitMarginTTM != null ? (mergedRatios.netProfitMarginTTM as number) * 100 : null,
         grossMargin:      mergedRatios?.grossProfitMarginTTM != null ? (mergedRatios.grossProfitMarginTTM as number) * 100 : null,
         revenueGrowth:    mergedRatios?.revenueGrowthTTM != null ? (mergedRatios.revenueGrowthTTM as number) * 100 : null,
         epsGrowth:        mergedRatios?.netIncomeGrowthTTM != null ? (mergedRatios.netIncomeGrowthTTM as number) * 100 : null,

@@ -136,6 +136,8 @@ export interface ScoreInputs {
   grossMargin?: number | null;
   roic?: number | null;
   roe?: number | null;
+  roa?: number | null;          // return on assets % — used for financial-sector health
+  netMargin?: number | null;    // net profit margin % — used for financial-sector health
   netDebtEbitda?: number | null;
   regime?: string | null;
   sector?: string | null;

@@ -55,12 +55,24 @@ export function calcScores(inp: ScoreInputs): Scores {
   // Speculative value: >70% of value from terminal → unreliable
   if (inp.tvShare != null && inp.tvShare > 0.7) value -= 2;
 
+  // Banks/insurers carry deposits & leverage by design, so industrial balance-sheet
+  // ratios (D/E, current ratio, interest coverage, net debt/EBITDA) score them ~0
+  // even when they're perfectly healthy. For financials, gauge health on the metrics
+  // that actually apply — ROE, ROA, net margin, operating efficiency — all free-tier.
+  const isFinancial = inp.sector === "Financial Services" || inp.sector === "Financials";
   let health = 0;
-  if (inp.debtEquity != null) health += inp.debtEquity < 0.3 ? 10 : inp.debtEquity < 0.7 ? 7 : inp.debtEquity < 1.5 ? 4 : 0;
-  if (inp.currentRatio != null) health += inp.currentRatio > 2 ? 10 : inp.currentRatio > 1.5 ? 7 : inp.currentRatio > 1 ? 4 : 0;
-  if (inp.interestCoverage != null) health += inp.interestCoverage > 10 ? 10 : inp.interestCoverage > 5 ? 6 : inp.interestCoverage > 2 ? 3 : 0;
-  if (inp.netDebtEbitda != null) health += inp.netDebtEbitda < 1 ? 5 : inp.netDebtEbitda < 3 ? 3 : 0;
-  if (inp.roic != null) health += inp.roic > 20 ? 5 : inp.roic > 12 ? 3 : 0;
+  if (isFinancial) {
+    if (inp.roe != null)             health += inp.roe > 18 ? 12 : inp.roe > 13 ? 9 : inp.roe > 9 ? 6 : inp.roe > 5 ? 3 : 0;
+    if (inp.roa != null)             health += inp.roa > 1.4 ? 8 : inp.roa > 1.1 ? 6 : inp.roa > 0.8 ? 4 : inp.roa > 0.4 ? 2 : 0;
+    if (inp.netMargin != null)       health += inp.netMargin > 28 ? 6 : inp.netMargin > 20 ? 4 : inp.netMargin > 12 ? 2 : 0;
+    if (inp.operatingMargin != null) { const om = inp.operatingMargin * 100; health += om > 35 ? 4 : om > 20 ? 3 : om > 0 ? 1 : 0; }
+  } else {
+    if (inp.debtEquity != null) health += inp.debtEquity < 0.3 ? 10 : inp.debtEquity < 0.7 ? 7 : inp.debtEquity < 1.5 ? 4 : 0;
+    if (inp.currentRatio != null) health += inp.currentRatio > 2 ? 10 : inp.currentRatio > 1.5 ? 7 : inp.currentRatio > 1 ? 4 : 0;
+    if (inp.interestCoverage != null) health += inp.interestCoverage > 10 ? 10 : inp.interestCoverage > 5 ? 6 : inp.interestCoverage > 2 ? 3 : 0;
+    if (inp.netDebtEbitda != null) health += inp.netDebtEbitda < 1 ? 5 : inp.netDebtEbitda < 3 ? 3 : 0;
+    if (inp.roic != null) health += inp.roic > 20 ? 5 : inp.roic > 12 ? 3 : 0;
+  }
 
   let momentum = 0;
   if (inp.priceChange1M != null) momentum += inp.priceChange1M > 5 ? 9 : inp.priceChange1M > 0 ? 6 : inp.priceChange1M > -5 ? 3 : 0;
@@ -74,14 +86,14 @@ export function calcScores(inp: ScoreInputs): Scores {
   // ── FCF quality signals (Features 1 & 6 from videos) ──────────────────────
 
   // Feature 1: CapEx/Revenue — asset-light model quality (lower = better: Uber/Airbnb style)
-  if (inp.capexToRevenue != null && inp.capexToRevenue >= 0) {
+  if (!isFinancial && inp.capexToRevenue != null && inp.capexToRevenue >= 0) {
     const cr = inp.capexToRevenue;
     health += cr < 0.05 ? 4 : cr < 0.10 ? 3 : cr < 0.20 ? 1 : cr > 0.40 ? -2 : 0;
   }
 
   // Feature 6: FCF vs Earnings divergence — accounting quality signal
   // FCF growing faster than earnings → real cash generation; slower → earnings may be inflated
-  if (inp.fcfGrowthYoy != null && inp.epsGrowth != null) {
+  if (!isFinancial && inp.fcfGrowthYoy != null && inp.epsGrowth != null) {
     const div = inp.fcfGrowthYoy - inp.epsGrowth;
     if (div > 15)        { health += 3; growth += 1; }  // FCF well ahead of earnings → quality
     else if (div > 5)    { health += 1; }
@@ -96,8 +108,9 @@ export function calcScores(inp: ScoreInputs): Scores {
     value += inp.forwardPe < 12 ? 4 : inp.forwardPe < 20 ? 3 : inp.forwardPe < 30 ? 1 : 0;
   }
 
-  // Operating margin adds profitability to health (cap remains 30)
-  if (inp.operatingMargin != null) {
+  // Operating margin adds profitability to health (cap remains 30). Financials already
+  // fold operating efficiency into their own health formula above — don't double-count.
+  if (!isFinancial && inp.operatingMargin != null) {
     const om = inp.operatingMargin * 100;
     health += om > 25 ? 3 : om > 12 ? 2 : om > 0 ? 1 : 0;
   }

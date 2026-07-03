@@ -80,6 +80,8 @@ export default function StockScreener() {
         netDebtEbitda:    metrics?.netDebtToEBITDATTM      as number ?? null,
         roic:             metrics?.roicTTM != null ? (metrics.roicTTM as number) * 100 : null,
         roe:              metrics?.roeTTM  != null ? (metrics.roeTTM  as number) * 100 : null,
+        roa:              ratios?.returnOnAssetsTTM != null ? (ratios.returnOnAssetsTTM as number) * 100 : null,
+        netMargin:        ratios?.netProfitMarginTTM != null ? (ratios.netProfitMarginTTM as number) * 100 : null,
         grossMargin:      ratios?.grossProfitMarginTTM != null ? (ratios.grossProfitMarginTTM as number) * 100 : null,
         revenueGrowth:    ratios?.revenueGrowthTTM     != null ? (ratios.revenueGrowthTTM     as number) * 100 : null,
         epsGrowth:        ratios?.netIncomeGrowthTTM   != null ? (ratios.netIncomeGrowthTTM   as number) * 100 : null,
