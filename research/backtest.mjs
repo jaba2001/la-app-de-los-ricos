@@ -13,7 +13,7 @@ import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, fwdReturn, momentum, hasPriceAt } from "./prices.mjs";
 import { regimeAsOf } from "./macro.mjs";
 import { scoreStock } from "./score.mjs";
-import { CURATED } from "./universe.mjs";
+import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 
 const HORIZONS = [1, 3, 6, 12];
 const COST_BPS = 10;           // per side
@@ -34,18 +34,40 @@ function spearman(x, y) { if (x.length < 5) return null; const rx = rank(x), ry 
 // ── collect the panel ─────────────────────────────────────────────────────────
 const today = new Date().toISOString().slice(0, 10);
 const dates = monthStarts(START, addMonths(today, -1)); // need ≥1M forward for the equity curve
-console.log(`\n  SCORA backtest · ${CURATED.length} names · ${dates.length} monthly rebalances ${dates[0]}→${dates.at(-1)}\n  loading data…`);
+
+// Universe: CURATED by default; `--full [N]` = S&P 500 with point-in-time membership
+// (union of members over the window, capped at N by presence). `--macro` feeds the
+// as-of regime into the score to measure the overlay's lift vs pure-micro.
+const FULL = process.argv.includes("--full");
+const USE_MACRO = process.argv.includes("--macro");
+const CAP = Number(process.argv.find((a) => /^\d+$/.test(a)) ?? 120);
+let UNIVERSE = CURATED;
+const memberSet = new Map();
+if (FULL) {
+  const table = await loadSP500Historical();
+  if (table) {
+    for (const d of dates) memberSet.set(d, new Set(membersAsOf(table, d)));
+    const freq = new Map();
+    for (const d of dates) for (const t of memberSet.get(d)) freq.set(t, (freq.get(t) || 0) + 1);
+    UNIVERSE = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, CAP).map((e) => e[0]);
+    console.log(`  full S&P 500 mode · ${UNIVERSE.length} names (cap ${CAP}) · point-in-time membership`);
+  } else console.log("  --full: constituents load failed → CURATED");
+}
+const isMember = (t, d) => !FULL || (memberSet.get(d)?.has(t) ?? false);
+
+console.log(`\n  SCORA backtest · ${UNIVERSE.length} names · ${dates.length} monthly rebalances ${dates[0]}→${dates.at(-1)}${USE_MACRO ? " · MACRO overlay" : ""}\n  loading data…`);
 
 const rows = [];
 const spyCache = new Map();
 async function spyFwd(date, m) { const k = `${date}/${m}`; if (!spyCache.has(k)) spyCache.set(k, await fwdReturn("SPY", date, addMonths(date, m))); return spyCache.get(k); }
 
 const meta = {};
-for (const t of CURATED) { const cik = await tickerToCik(t); meta[t] = { cik, sector: cik ? await sicSector(cik) : "" }; }
+for (const t of UNIVERSE) { const cik = await tickerToCik(t); meta[t] = { cik, sector: cik ? await sicSector(cik) : "" }; }
 
 for (const date of dates) {
   const macro = await regimeAsOf(date);
-  for (const t of CURATED) {
+  for (const t of UNIVERSE) {
+    if (!isMember(t, date)) continue;
     const { cik, sector } = meta[t];
     if (!cik || !(await hasPriceAt(t, date))) continue;
     const f = await fundamentalsAsOf(cik, date);
@@ -56,7 +78,7 @@ for (const date of dates) {
     // used only to *label* the by-regime breakdown, never fed into the score, so the
     // headline isn't confounded by a coarse macro classifier. The production macro
     // overlay is validated separately once macro.js runs historically.
-    const { ic } = scoreStock(f, raw, mom, sector, null);
+    const { ic } = scoreStock(f, raw, mom, sector, USE_MACRO ? macro : null);
     const fwd = {}, alpha = {};
     for (const m of HORIZONS) { const r = await fwdReturn(t, date, addMonths(date, m)); const s = await spyFwd(date, m); fwd[m] = r; alpha[m] = r != null && s != null ? r - s : null; }
     rows.push({ date, t, ic, sector, regime: macro.regime_id, fwd, alpha });
@@ -66,7 +88,7 @@ console.log(`  scored ${rows.length} name-months\n`);
 
 // ── metrics ─────────────────────────────────────────────────────────────────
 const pct = (v, d = 1) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${v.toFixed(d)}`);
-const report = { generatedAt: new Date().toISOString(), universe: CURATED.length, rebalances: dates.length, nameMonths: rows.length, buyThreshold: BUY_THRESH, horizons: {}, regimes: {}, caveats: ["survivorship (current members only)", "no delisted names (FMP free)", "simplified as-of regime", "sector benchmarks held constant"] };
+const report = { generatedAt: new Date().toISOString(), universe: UNIVERSE.length, mode: FULL ? "full-sp500-pit" : "curated", macroOverlay: USE_MACRO, rebalances: dates.length, nameMonths: rows.length, buyThreshold: BUY_THRESH, horizons: {}, regimes: {}, caveats: [FULL ? "point-in-time S&P 500 membership (incl. removed names)" : "survivorship (curated current members)", "fully-delisted names omitted (Yahoo) — add Tiingo for a bias-free universe", USE_MACRO ? "macro overlay fed into score" : "pure-micro score (regime is descriptive only)", "sector benchmarks held constant"] };
 
 console.log("  ── Hit-rate & alpha vs SPY, by horizon (score ≥60 vs rest) ──");
 console.log("  Horizon   BUY n   BUY hit   BUY α    | rest n   rest hit  rest α");

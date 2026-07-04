@@ -20,15 +20,15 @@ export const CURATED = [
   "XOM", "CVX", "COP", "BA", "CAT", "GE", "HON", "UPS",
 ];
 
-/** Full survivorship-controlled S&P 500 membership over time (GitHub, free). Best-effort. */
+/** Full survivorship-controlled S&P 500 membership over time (GitHub, free).
+ * date,"TICKER1,TICKER2,…" from 1996→present, including names later removed. */
 export async function loadSP500Historical() {
-  const url = "https://raw.githubusercontent.com/fja05680/sp500/master/S%26P%20500%20Historical%20Components%20%26%20Changes(current).csv";
+  const url = "https://raw.githubusercontent.com/hanshof/sp500_constituents/main/sp_500_historical_components.csv";
   try {
     const r = await fetch(url);
     if (!r.ok) return null;
     const text = await r.text();
-    const lines = text.trim().split("\n").slice(1);
-    const byDate = lines.map((ln) => {
+    const byDate = text.trim().split("\n").slice(1).map((ln) => {
       const c = ln.indexOf(",");
       const date = ln.slice(0, c).replace(/"/g, "").trim();
       const tickers = ln.slice(c + 1).replace(/"/g, "").split(",").map((t) => t.trim()).filter(Boolean);

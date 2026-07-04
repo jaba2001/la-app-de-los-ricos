@@ -94,8 +94,8 @@ export default function TrackRecordPage() {
           <Stat label="Info. Coefficient" value={H.informationCoefficient.toFixed(3)} sub="Spearman, 3M" />
         </div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.6 }}>
-          Equal-weight portfolio of names scoring ≥{H.buyThreshold}, monthly rebalance, net of 10bps/side, across {H.universe} names ·
-          {H.rebalances} rebalances · {H.nameMonths.toLocaleString()} name-months. Point-in-time (SEC EDGAR filing dates), free data.
+          Equal-weight portfolio of names scoring ≥{H.buyThreshold}, monthly rebalance, net of 10bps/side, across {H.universe} names ({H.mode}) ·
+          {H.rebalances} rebalances · {H.nameMonths.toLocaleString()} name-months. Point-in-time fundamentals (SEC EDGAR filing dates), free data.
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export default function TrackRecordPage() {
             <span>D1 (low score)</span><span>D10 (high)</span>
           </div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginTop: 8 }}>
-            Top-minus-bottom decile spread: <strong style={{ color: "var(--sr-pos)" }}>{pct(H.topMinusBottom)}</strong> — higher score, higher forward return.
+            Top-minus-bottom decile spread: <strong style={{ color: clr(H.topMinusBottom) }}>{pct(H.topMinusBottom)}</strong> — on this broad universe fine-grained ranking is roughly flat; the signal is in the BUY-vs-rest cut, not the deciles.
           </div>
         </div>
       </div>

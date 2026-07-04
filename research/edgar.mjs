@@ -126,6 +126,32 @@ function instTag(fj, tags, asOf, taxonomy = "us-gaap", unit = "USD") {
   return null;
 }
 
+// Sum instant share CLASSES at the latest filing (Google/Meta report A+C separately),
+// deduping identical duplicate contexts by value. Returns null if none.
+function sumInstantShares(units, asOf) {
+  const arr = units?.shares;
+  if (!Array.isArray(arr)) return null;
+  const elig = arr.filter((x) => !x.start && x.filed <= asOf && x.end <= asOf);
+  if (!elig.length) return null;
+  const maxEnd = elig.reduce((m, x) => (x.end > m ? x.end : m), "");
+  const atEnd = elig.filter((x) => x.end === maxEnd);
+  const lf = atEnd.reduce((m, x) => (x.filed > m ? x.filed : m), "");
+  const seen = new Set(); let sum = 0;
+  for (const x of atEnd.filter((x) => x.filed === lf)) { const k = String(x.val); if (seen.has(k)) continue; seen.add(k); sum += x.val; }
+  return sum || null;
+}
+
+/** Shares outstanding as-of: cover-page classes → weighted-avg diluted/basic → us-gaap classes. */
+function sharesAsOf(fj, asOf) {
+  const dei = sumInstantShares(facts(fj, "EntityCommonStockSharesOutstanding", "dei"), asOf);
+  if (dei) return dei;
+  for (const tag of ["WeightedAverageNumberOfDilutedSharesOutstanding", "WeightedAverageNumberOfSharesOutstandingBasic"]) {
+    const q = quarters(facts(fj, tag), asOf, "shares");
+    if (q.length) return q[0].val;
+  }
+  return sumInstantShares(facts(fj, "CommonStockSharesOutstanding"), asOf);
+}
+
 const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet", "RevenuesNetOfInterestExpense", "InterestAndDividendIncomeOperating"];
 const NI = ["NetIncomeLoss"];
 const GP = ["GrossProfit"];
@@ -163,7 +189,7 @@ export async function fundamentalsAsOf(cik, asOf) {
     curA: I(["AssetsCurrent"]), curL: I(["LiabilitiesCurrent"]),
     cash: I(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"]),
     debt: (ltd ?? 0) + (ltdC ?? 0),
-    shares: I(["EntityCommonStockSharesOutstanding"], "dei", "shares"),
+    shares: sharesAsOf(fj, asOf),
     asOfLatestFiling: rev?.latestFiled ?? ni?.latestFiled ?? null,
   };
 }
