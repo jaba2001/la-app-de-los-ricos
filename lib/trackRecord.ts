@@ -18,6 +18,7 @@ export interface BacktestSummary {
   nameMonths: number;
   buyThreshold: number;
   equity: { buyTotalReturn: number; spyTotalReturn: number; sharpe: number; maxDrawdown: number; months: number };
+  overlay: { buyTotalReturn: number; sharpe: number; maxDrawdown: number };
   informationCoefficient: number;
   topMinusBottom: number;
   deciles: number[];
@@ -34,6 +35,7 @@ export const HISTORICAL_BACKTEST: BacktestSummary = {
   nameMonths: 5941,
   buyThreshold: 60,
   equity: { buyTotalReturn: 162.4, spyTotalReturn: 154.2, sharpe: 0.86, maxDrawdown: -28.6, months: 78 },
+  overlay: { buyTotalReturn: 178.4, sharpe: 0.99, maxDrawdown: -17.4 },
   informationCoefficient: 0.032,
   topMinusBottom: -0.7,
   deciles: [0.6, -2.2, -0.9, -2.0, -0.8, -0.1, -0.6, 0.2, 0.6, -0.1],
@@ -53,7 +55,7 @@ export const HISTORICAL_BACKTEST: BacktestSummary = {
     "Modest edge: on this broad universe the score≥60 bucket only edges SPY (+162% vs +154%); the real, consistent signal is BUY-vs-rest (positive at every horizon, gap widening to ~4pp at 12M).",
     "Fine-grained ranking is weak here (decile spread ≈ flat) — a value/quality score lags a mega-cap-momentum market.",
     "Fully-delisted names omitted (Yahoo) → residual survivorship; add Tiingo for a fully bias-free universe.",
-    "As-of regime is descriptive only (simplified FRED classifier), not fed into the score — the production macro overlay validation is a next step.",
-    "Sector valuation benchmarks held constant; thresholds hand-tuned → the live forward record is the un-backtested proof.",
+    "Macro overlay measured with the production regime engine (point-in-time FRED): it acts as a risk manager — cutting max drawdown ~40% (−28.6%→−17.4%) and lifting Sharpe (0.86→0.99), not adding raw stock-selection alpha.",
+    "Fully-delisted names still omitted; sector benchmarks held constant; thresholds hand-tuned → the live forward record is the un-backtested proof.",
   ],
 };

@@ -11,7 +11,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, fwdReturn, momentum, hasPriceAt } from "./prices.mjs";
-import { regimeAsOf } from "./macro.mjs";
+import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
 import { scoreStock } from "./score.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 
@@ -61,6 +61,7 @@ const rows = [];
 const spyCache = new Map();
 async function spyFwd(date, m) { const k = `${date}/${m}`; if (!spyCache.has(k)) spyCache.set(k, await fwdReturn("SPY", date, addMonths(date, m))); return spyCache.get(k); }
 
+await preloadRegimeSeries(); // fetch all FRED regime series once (real production engine)
 const meta = {};
 for (const t of UNIVERSE) { const cik = await tickerToCik(t); meta[t] = { cik, sector: cik ? await sicSector(cik) : "" }; }
 

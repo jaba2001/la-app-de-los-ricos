@@ -99,6 +99,30 @@ export default function TrackRecordPage() {
         </div>
       </div>
 
+      {/* Macro regime overlay — the differentiator, measured */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)", borderColor: "color-mix(in srgb, var(--sr-amber) 22%, var(--sr-border))" }}>
+        <div className="section-label">Macro regime overlay · the macro↔micro edge, measured</div>
+        <div className="sr-grid-3">
+          <div className="sr-tile">
+            <div className="sr-tile-label">Total return</div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{pct(H.equity.buyTotalReturn, 0)} → <span style={{ color: "var(--sr-amber)" }}>{pct(H.overlay.buyTotalReturn, 0)}</span></div>
+            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>micro-only → + macro overlay</div>
+          </div>
+          <div className="sr-tile">
+            <div className="sr-tile-label">Sharpe (ann.)</div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{H.equity.sharpe.toFixed(2)} → <span style={{ color: "var(--sr-pos)" }}>{H.overlay.sharpe.toFixed(2)}</span></div>
+          </div>
+          <div className="sr-tile">
+            <div className="sr-tile-label">Max drawdown</div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{pct(H.equity.maxDrawdown, 0)} → <span style={{ color: "var(--sr-pos)" }}>{pct(H.overlay.maxDrawdown, 0)}</span></div>
+            <div style={{ fontSize: "10px", color: "var(--sr-pos)", marginTop: 2 }}>~40% smaller</div>
+          </div>
+        </div>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
+          Feeding the current macro regime (the production engine, point-in-time) into the score barely changes raw stock-selection alpha, but it works as a <strong>risk manager</strong> — cutting drawdown ~40% and lifting the Sharpe. That is the macro↔micro thesis, measured: the regime lens tells you <em>when</em> to lean in.
+        </div>
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
         {/* By horizon */}
         <div className="card">
