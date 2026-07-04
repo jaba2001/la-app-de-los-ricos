@@ -14,3 +14,7 @@ public/swe-worker-*.js
 
 # TypeScript incremental build cache
 tsconfig.tsbuildinfo
+
+# research pipeline caches/outputs (regenerable)
+research/.cache/
+research/out/

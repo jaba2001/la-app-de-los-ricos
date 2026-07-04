@@ -1,48 +1,93 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SEC EDGAR — point-in-time fundamentals (free, no API key, no limits).
 //
-// The whole credibility of the backtest hinges on this: to score a stock as of a
-// past date `asOf`, we use ONLY the XBRL facts that had already been FILED by then
-// (`filed <= asOf`). EDGAR tags every fact with its filing date, so this is native
-// point-in-time — no look-ahead. Flow items (revenue, net income) are summed over
-// the 4 most-recent discrete quarters known by `asOf` (TTM); stock items (assets,
-// equity) take the latest value as-of. Fair-access: send a User-Agent, throttle.
+// One companyfacts call per company (all XBRL tags at once) → disk-cached, so a
+// 500-name universe is ~500 downloads done once. To score as of a past date we use
+// ONLY facts with filed<=asOf (native point-in-time, zero look-ahead). Flow items
+// (revenue, income, D&A…) are summed over the 4 most-recent discrete quarters known
+// by asOf (TTM); balance-sheet instants take the latest value as-of.
 // ─────────────────────────────────────────────────────────────────────────────
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 const UA = "Scora Research contact@scora.app";
-const SEC = "https://data.sec.gov";
+const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache");
+if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
+const mem = new Map();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const cache = new Map();
 
-/** ticker → zero-padded 10-digit CIK (from the free SEC map). */
-export async function tickerToCik(ticker) {
-  if (!cache.has("__map")) {
-    const r = await fetch("https://www.sec.gov/files/company_tickers.json", { headers: { "User-Agent": UA } });
-    const j = await r.json();
-    const m = {};
-    for (const k in j) m[j[k].ticker.toUpperCase()] = String(j[k].cik_str).padStart(10, "0");
-    cache.set("__map", m);
+async function getJSON(url, cacheFile, ttlDays = 30) {
+  const path = join(DIR, cacheFile);
+  if (existsSync(path)) {
+    const age = (Date.now() - Number(readFileSync(path + ".t", "utf8").trim())) / 86400000;
+    if (age < ttlDays) { try { return JSON.parse(readFileSync(path, "utf8")); } catch { /* refetch */ } }
   }
-  return cache.get("__map")[ticker.toUpperCase()] ?? null;
-}
-
-/** Fetch one XBRL concept (cached). taxonomy = "us-gaap" | "dei". */
-async function concept(cik, taxonomy, tag) {
-  const key = `${cik}/${taxonomy}/${tag}`;
-  if (cache.has(key)) return cache.get(key);
-  await sleep(90); // stay well under SEC's 10 req/s fair-access limit
+  await sleep(90); // SEC fair-access (<10 req/s)
   let j = null;
-  try {
-    const r = await fetch(`${SEC}/api/xbrl/companyconcept/CIK${cik}/${taxonomy}/${tag}.json`, { headers: { "User-Agent": UA } });
-    j = r.ok ? await r.json() : null;
-  } catch { j = null; }
-  cache.set(key, j);
+  try { const r = await fetch(url, { headers: { "User-Agent": UA } }); j = r.ok ? await r.json() : null; } catch { j = null; }
+  if (j) { writeFileSync(path, JSON.stringify(j)); writeFileSync(path + ".t", String(Date.now())); }
   return j;
 }
 
-/** Discrete ~quarter facts (80–100 day span) known by asOf, newest end first, deduped by period. */
-function quarters(j, asOf, unit = "USD") {
-  const arr = j?.units?.[unit];
+/** ticker → zero-padded 10-digit CIK (free SEC map, cached in-process + disk). */
+export async function tickerToCik(ticker) {
+  if (!mem.has("__map")) {
+    const j = await getJSON("https://www.sec.gov/files/company_tickers.json", "company_tickers.json", 7);
+    const m = {};
+    if (j) for (const k in j) m[j[k].ticker.toUpperCase()] = String(j[k].cik_str).padStart(10, "0");
+    mem.set("__map", m);
+  }
+  return mem.get("__map")[ticker.toUpperCase()] ?? null;
+}
+
+async function companyFacts(cik) {
+  const key = `facts_${cik}`;
+  if (mem.has(key)) return mem.get(key);
+  const j = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`, `CIK${cik}.json`);
+  mem.set(key, j);
+  return j;
+}
+
+/** SIC code → Scora sector (from submissions endpoint, cached). */
+export async function sicSector(cik) {
+  const j = await getJSON(`https://data.sec.gov/submissions/CIK${cik}.json`, `sub${cik}.json`);
+  const sic = j?.sic ? Number(j.sic) : null;
+  if (sic == null) return "";
+  // Coarse SIC-range → Scora sector map (matches SECTOR_PE_BM keys in scoring.ts).
+  if (sic >= 6000 && sic <= 6199) return "Financial Services";
+  if (sic >= 6200 && sic <= 6399) return "Financial Services";
+  if (sic >= 6400 && sic <= 6499) return "Financial Services";
+  if (sic >= 6500 && sic <= 6599) return "Real Estate";
+  if (sic >= 2833 && sic <= 2836) return "Healthcare";
+  if (sic >= 8000 && sic <= 8099) return "Healthcare";
+  if (sic >= 3570 && sic <= 3579) return "Technology";
+  if (sic >= 3670 && sic <= 3679) return "Technology";
+  if (sic >= 7370 && sic <= 7379) return "Technology";
+  if (sic === 3571 || sic === 3572 || sic === 3576 || sic === 3577 || sic === 3674) return "Technology";
+  if (sic >= 1300 && sic <= 1399) return "Energy";
+  if (sic >= 2900 && sic <= 2999) return "Energy";
+  if (sic >= 2800 && sic <= 2899) return "Materials";
+  if (sic >= 1000 && sic <= 1099) return "Materials";
+  if (sic >= 4800 && sic <= 4899) return "Communication Services";
+  if (sic >= 2000 && sic <= 2199) return "Consumer Defensive";
+  if (sic >= 2080 && sic <= 2099) return "Consumer Defensive";
+  if (sic >= 5400 && sic <= 5499) return "Consumer Defensive";
+  if (sic >= 5200 && sic <= 5999) return "Consumer Cyclical";
+  if (sic >= 3700 && sic <= 3799) return "Consumer Cyclical";
+  if (sic >= 4000 && sic <= 4799) return "Industrials";
+  if (sic >= 3400 && sic <= 3569) return "Industrials";
+  if (sic >= 4900 && sic <= 4999) return "Utilities";
+  return "";
+}
+
+function facts(fj, tag, taxonomy = "us-gaap") {
+  return fj?.facts?.[taxonomy]?.[tag]?.units ?? null;
+}
+
+/** Discrete ~quarter facts known by asOf, newest end first, deduped by period end. */
+function quarters(units, asOf, unit = "USD") {
+  const arr = units?.[unit];
   if (!Array.isArray(arr)) return [];
   const q = arr.filter((x) => {
     if (!x.start || x.filed > asOf) return false;
@@ -53,10 +98,8 @@ function quarters(j, asOf, unit = "USD") {
   for (const x of q) { const e = byEnd.get(x.end); if (!e || x.filed > e.filed) byEnd.set(x.end, x); }
   return [...byEnd.values()].sort((a, b) => b.end.localeCompare(a.end));
 }
-
-/** Latest instant (balance-sheet) value with end<=asOf and filed<=asOf. */
-function instant(j, asOf, unit = "USD") {
-  const arr = j?.units?.[unit];
+function instant(units, asOf, unit = "USD") {
+  const arr = units?.[unit];
   if (!Array.isArray(arr)) return null;
   const rows = arr.filter((x) => !x.start && x.filed <= asOf && x.end <= asOf);
   if (!rows.length) return null;
@@ -64,61 +107,63 @@ function instant(j, asOf, unit = "USD") {
   return rows[0].val;
 }
 
-async function flowTTM(cik, tags, asOf, skip = 0) {
-  // Try every tag and keep the one whose window is the MOST RECENT — companies switch
-  // XBRL tags over time (banks especially), and an old tag with stale quarters must
-  // not win over a newer tag with current data.
+// Try every tag, keep the window whose latest quarter is the MOST RECENT (tags change
+// over time — banks especially — and stale tags must never beat current data).
+function flowTTM(fj, tags, asOf, skip = 0) {
   let best = null;
   for (const t of tags) {
-    const q = quarters(await concept(cik, "us-gaap", t), asOf);
+    const q = quarters(facts(fj, t), asOf);
     if (q.length >= skip + 4) {
-      const slice = q.slice(skip, skip + 4);
-      const cand = { val: slice.reduce((s, x) => s + x.val, 0), latestFiled: slice[0].filed, latestEnd: slice[0].end };
+      const s = q.slice(skip, skip + 4);
+      const cand = { val: s.reduce((a, x) => a + x.val, 0), latestFiled: s[0].filed, latestEnd: s[0].end };
       if (!best || cand.latestEnd > best.latestEnd) best = cand;
     }
   }
   return best;
 }
-async function instTag(cik, tags, asOf, taxonomy = "us-gaap", unit = "USD") {
-  for (const t of tags) { const v = instant(await concept(cik, taxonomy, t), asOf, unit); if (v != null) return v; }
+function instTag(fj, tags, asOf, taxonomy = "us-gaap", unit = "USD") {
+  for (const t of tags) { const v = instant(facts(fj, t, taxonomy), asOf, unit); if (v != null) return v; }
   return null;
 }
 
-const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet",
-  "RevenuesNetOfInterestExpense", "InterestAndDividendIncomeOperating"]; // last two: banks
-const NI  = ["NetIncomeLoss"];
-const GP  = ["GrossProfit"];
-const OI  = ["OperatingIncomeLoss"];
+const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet", "RevenuesNetOfInterestExpense", "InterestAndDividendIncomeOperating"];
+const NI = ["NetIncomeLoss"];
+const GP = ["GrossProfit"];
+const COST = ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold"];
+const OI = ["OperatingIncomeLoss"];
+const DA = ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"];
+const INT = ["InterestExpense", "InterestExpenseDebt", "InterestAndDebtExpense"];
+const OCF = ["NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"];
+const CAPEX = ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"];
 
-/** Full point-in-time fundamentals bundle for `cik` as known on `asOf` (YYYY-MM-DD). */
+/** Full point-in-time fundamentals for `cik` as known on `asOf` (YYYY-MM-DD). */
 export async function fundamentalsAsOf(cik, asOf) {
-  const revNow  = await flowTTM(cik, REV, asOf, 0);
-  const revPrev = await flowTTM(cik, REV, asOf, 4);
-  const niNow   = await flowTTM(cik, NI, asOf, 0);
-  const niPrev  = await flowTTM(cik, NI, asOf, 4);
-  const gpNow   = await flowTTM(cik, GP, asOf, 0);
-  const oiNow   = await flowTTM(cik, OI, asOf, 0);
+  const fj = await companyFacts(cik);
+  if (!fj) return null;
+  const F = (tags, skip = 0) => flowTTM(fj, tags, asOf, skip);
+  const I = (tags, tax, unit) => instTag(fj, tags, asOf, tax, unit);
 
-  const assets = await instTag(cik, ["Assets"], asOf);
-  const equity = await instTag(cik, ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"], asOf);
-  const curA   = await instTag(cik, ["AssetsCurrent"], asOf);
-  const curL   = await instTag(cik, ["LiabilitiesCurrent"], asOf);
-  const cash   = await instTag(cik, ["CashAndCashEquivalentsAtCarryingValue"], asOf);
-  const ltd    = await instTag(cik, ["LongTermDebtNoncurrent", "LongTermDebt"], asOf);
-  const ltdC   = await instTag(cik, ["LongTermDebtCurrent", "DebtCurrent"], asOf);
-  const shares = await instTag(cik, ["EntityCommonStockSharesOutstanding"], asOf, "dei", "shares");
+  const rev = F(REV), revP = F(REV, 4), ni = F(NI), niP = F(NI, 4);
+  let gp = F(GP);
+  const cost = F(COST);
+  if (gp == null && rev != null && cost != null) gp = { val: rev.val - cost.val };
+  const oi = F(OI), da = F(DA), intp = F(INT), ocf = F(OCF), capex = F(CAPEX);
+
+  const equity = I(["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"]);
+  const ltd = I(["LongTermDebtNoncurrent", "LongTermDebt"]);
+  const ltdC = I(["LongTermDebtCurrent", "DebtCurrent"]);
 
   return {
-    revTTM: revNow?.val ?? null,
-    revPrevTTM: revPrev?.val ?? null,
-    niTTM: niNow?.val ?? null,
-    niPrevTTM: niPrev?.val ?? null,
-    gpTTM: gpNow?.val ?? null,
-    oiTTM: oiNow?.val ?? null,
-    assets, equity, curA, curL, cash,
+    revTTM: rev?.val ?? null, revPrevTTM: revP?.val ?? null,
+    niTTM: ni?.val ?? null, niPrevTTM: niP?.val ?? null,
+    gpTTM: gp?.val ?? null, oiTTM: oi?.val ?? null,
+    daTTM: da?.val ?? null, interestTTM: intp?.val != null ? Math.abs(intp.val) : null,
+    ocfTTM: ocf?.val ?? null, capexTTM: capex?.val != null ? Math.abs(capex.val) : null,
+    assets: I(["Assets"]), equity,
+    curA: I(["AssetsCurrent"]), curL: I(["LiabilitiesCurrent"]),
+    cash: I(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"]),
     debt: (ltd ?? 0) + (ltdC ?? 0),
-    shares,
-    asOfLatestFiling: revNow?.latestFiled ?? niNow?.latestFiled ?? null,
-    asOfLatestPeriod: revNow?.latestEnd ?? niNow?.latestEnd ?? null,
+    shares: I(["EntityCommonStockSharesOutstanding"], "dei", "shares"),
+    asOfLatestFiling: rev?.latestFiled ?? ni?.latestFiled ?? null,
   };
 }
