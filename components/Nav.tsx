@@ -8,6 +8,7 @@ const MAIN_TABS = [
   { label: "Macro", href: "/macro" },
   { label: "Stocks", href: "/stock" },
   { label: "Watchlist", href: "/watchlist" },
+  { label: "Track Record", href: "/track-record" },
 ];
 
 interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
