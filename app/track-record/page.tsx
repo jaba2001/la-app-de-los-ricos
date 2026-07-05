@@ -99,27 +99,27 @@ export default function TrackRecordPage() {
         </div>
       </div>
 
-      {/* Macro regime overlay — the differentiator, measured */}
-      <div className="card" style={{ marginBottom: "var(--sr-sp-5)", borderColor: "color-mix(in srgb, var(--sr-amber) 22%, var(--sr-border))" }}>
-        <div className="section-label">Macro regime overlay · the macro↔micro edge, measured</div>
+      {/* The differentiator — the macro overlay is what beats the market, survivorship-free */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)", borderColor: "color-mix(in srgb, var(--sr-amber) 38%, var(--sr-border))" }}>
+        <div className="section-label" style={{ color: "var(--sr-amber)" }}>The edge is the macro↔micro overlay — micro alone doesn&apos;t beat the market</div>
         <div className="sr-grid-3">
           <div className="sr-tile">
             <div className="sr-tile-label">Total return</div>
-            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{pct(H.equity.buyTotalReturn, 0)} → <span style={{ color: "var(--sr-amber)" }}>{pct(H.overlay.buyTotalReturn, 0)}</span></div>
-            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>micro-only → + macro overlay</div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num"><span style={{ color: "var(--sr-neg)" }}>{pct(H.microOnly.buyTotalReturn, 0)}</span> → <span style={{ color: "var(--sr-amber)" }}>{pct(H.equity.buyTotalReturn, 0)}</span></div>
+            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>micro-only (&lt;SPY) → full score (&gt;SPY {pct(H.equity.spyTotalReturn, 0)})</div>
           </div>
           <div className="sr-tile">
             <div className="sr-tile-label">Sharpe (ann.)</div>
-            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{H.equity.sharpe.toFixed(2)} → <span style={{ color: "var(--sr-pos)" }}>{H.overlay.sharpe.toFixed(2)}</span></div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{H.microOnly.sharpe.toFixed(2)} → <span style={{ color: "var(--sr-pos)" }}>{H.equity.sharpe.toFixed(2)}</span></div>
           </div>
           <div className="sr-tile">
             <div className="sr-tile-label">Max drawdown</div>
-            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{pct(H.equity.maxDrawdown, 0)} → <span style={{ color: "var(--sr-pos)" }}>{pct(H.overlay.maxDrawdown, 0)}</span></div>
+            <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{pct(H.microOnly.maxDrawdown, 0)} → <span style={{ color: "var(--sr-pos)" }}>{pct(H.equity.maxDrawdown, 0)}</span></div>
             <div style={{ fontSize: "10px", color: "var(--sr-pos)", marginTop: 2 }}>~40% smaller</div>
           </div>
         </div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-          Feeding the current macro regime (the production engine, point-in-time) into the score barely changes raw stock-selection alpha, but it works as a <strong>risk manager</strong> — cutting drawdown ~40% and lifting the Sharpe. That is the macro↔micro thesis, measured: the regime lens tells you <em>when</em> to lean in.
+          On a survivorship-free test the raw value/quality score <strong>lags the mega-cap tape</strong> (+112% vs SPY +154%). Feeding the current macro regime (the production engine, point-in-time) into the score is what flips it to a win — <strong>+157.5% vs +154.2%, Sharpe 0.98, half the drawdown</strong>. Scora&apos;s differentiator isn&apos;t the stock score; it&apos;s the macro↔micro integration — the regime lens telling you <em>when</em> to lean in.
         </div>
       </div>
 
