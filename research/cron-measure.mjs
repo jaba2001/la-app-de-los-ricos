@@ -7,7 +7,7 @@
 import { priceAsOf } from "./prices.mjs";
 
 const DRY = process.argv.includes("--dry");
-const SB = process.env.SUPABASE_URL;
+const SB = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
 const KEY = process.env.SUPABASE_SERVICE_KEY;
 const today = new Date().toISOString().slice(0, 10);
 const BUY = 60;

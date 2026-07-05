@@ -10,6 +10,9 @@ import { CURATED } from "./universe.mjs";
 
 const DRY = process.argv.includes("--dry");
 const today = new Date().toISOString().slice(0, 10);
+// SUPABASE_URL is public (already in the app client) — default it so only the
+// service_role key needs to be a secret.
+const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
 
 const rows = [];
 for (const t of CURATED) {
@@ -34,7 +37,7 @@ if (DRY || !process.env.SUPABASE_SERVICE_KEY) {
   process.exit(0);
 }
 
-const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/sl_cohort?on_conflict=score_date,ticker`, {
+const res = await fetch(`${SB_URL}/rest/v1/sl_cohort?on_conflict=score_date,ticker`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
