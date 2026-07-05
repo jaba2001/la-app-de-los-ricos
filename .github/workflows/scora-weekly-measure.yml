@@ -18,7 +18,6 @@ jobs:
           node-version: "22"
       - name: Measure cohorts → sl_track_summary
         env:
-          FMP_KEY: ${{ secrets.FMP_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # optional — enables delisted coverage
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node --experimental-strip-types --no-warnings research/cron-measure.mjs

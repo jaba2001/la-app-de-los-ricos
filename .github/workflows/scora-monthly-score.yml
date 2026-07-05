@@ -18,8 +18,7 @@ jobs:
           node-version: "22"
       - name: Score universe → sl_cohort
         env:
-          FMP_KEY: ${{ secrets.FMP_KEY }}
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # optional — enables delisted coverage
           FRED_KEY: ${{ secrets.FRED_KEY }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: node --experimental-strip-types --no-warnings research/cron-score.mjs
