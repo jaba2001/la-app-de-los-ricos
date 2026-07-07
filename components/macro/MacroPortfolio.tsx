@@ -12,6 +12,7 @@ import SignalBacktest from "@/components/macro/SignalBacktest";
 import AllWeatherAllocator from "@/components/macro/AllWeatherAllocator";
 import RegimeRadar from "@/components/macro/RegimeRadar";
 import SecularClock from "@/components/macro/SecularClock";
+import SectorRotation from "@/components/macro/SectorRotation";
 import ScoraBrief from "@/components/macro/ScoraBrief";
 
 interface Props { macro: MacroState | null; loading: boolean; }
@@ -207,6 +208,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       {/* Layer 1 secular → Layer 2 multi-asset → Regime Radar (macro-driven, shown regardless of watchlist) */}
       <SecularClock macro={macro} />
       <AllWeatherAllocator macro={macro} />
+      <SectorRotation />
       <RegimeRadar macro={macro} />
       <ScoraBrief macro={macro} />
 
