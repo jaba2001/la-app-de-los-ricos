@@ -14,6 +14,7 @@ import { rawPriceAsOf, fwdReturn, momentum, hasPriceAt } from "./prices.mjs";
 import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
 import { scoreStock } from "./score.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
+import { buildCorrEngine, corrAsOf } from "./correlation.mjs";
 
 const HORIZONS = [1, 3, 6, 12];
 const COST_BPS = 10;           // per side
@@ -79,10 +80,16 @@ for (const date of dates) {
     // used only to *label* the by-regime breakdown, never fed into the score, so the
     // headline isn't confounded by a coarse macro classifier. The production macro
     // overlay is validated separately once macro.js runs historically.
-    const { ic } = scoreStock(f, raw, mom, sector, USE_MACRO ? macro : null);
+    const { ic, scores } = scoreStock(f, raw, mom, sector, USE_MACRO ? macro : null);
+    // Phase 4 — momentum/trajectory score to test 0A's hypothesis that the value/quality
+    // score reads dispersion backwards. `mom121` = 12-1m price momentum (Jegadeesh-Titman,
+    // PIT: window ends 1M before `date`). `traj` = momentum-dominant blend + earnings/rev
+    // growth (from the production sub-scores). Both are pure rankers for the IC test.
+    const mom121 = await fwdReturn(t, addMonths(date, -12), addMonths(date, -1));
+    const traj = (mom121 ?? 0) + 0.4 * (mom.m6 ?? 0) + 1.2 * (scores.growth ?? 0);
     const fwd = {}, alpha = {};
     for (const m of HORIZONS) { const r = await fwdReturn(t, date, addMonths(date, m)); const s = await spyFwd(date, m); fwd[m] = r; alpha[m] = r != null && s != null ? r - s : null; }
-    rows.push({ date, t, ic, sector, regime: macro.regime_id, fwd, alpha });
+    rows.push({ date, t, ic, mom: mom121, traj, sector, regime: macro.regime_id, fwd, alpha });
   }
 }
 console.log(`  scored ${rows.length} name-months\n`);
@@ -144,6 +151,62 @@ for (const rg of ["expansion", "reflation", "stagflation", "contraction"]) {
   const g = rows.filter((r) => r.regime === rg && r.ic >= BUY_THRESH && r.alpha[3] != null);
   report.regimes[rg] = { months: regMonths[rg] ?? 0, n: g.length, alpha: mean(g.map((r) => r.alpha[3])) };
   console.log(`  ${rg.padEnd(12)} ${String(regMonths[rg] ?? 0).padStart(2)} mo · BUY n=${String(g.length).padStart(4)}  avg 3M alpha ${g.length ? pct(report.regimes[rg].alpha) + "%" : "—"}`);
+}
+
+// ── 0A · correlation-conditioned scores · value/quality vs momentum (Phase 4) ─
+// 0A showed the value/quality score reads dispersion backwards (2020-24 was mega-cap
+// MOMENTUM, so a value tilt ranks the winners LOW). Phase 4 tests the fix: does a
+// momentum/trajectory score earn POSITIVE IC in low correlation where value/quality
+// fails? Bucket months into terciles by realized correlation and compare IC + decile
+// spread for three rankers: value/quality (baseline), 12-1m momentum, momentum+growth.
+console.log("\n  ── 0A · scores conditioned on market correlation regime (Phase 4) ──");
+const corrEngine = await buildCorrEngine(UNIVERSE);
+const corrByDate = new Map();
+for (const d of dates) { const c = corrAsOf(corrEngine, UNIVERSE, d, 63); if (c != null) corrByDate.set(d, c); }
+const corrDates = [...corrByDate.keys()].sort((a, b) => corrByDate.get(a) - corrByDate.get(b));
+report.correlation = { months: corrDates.length, scores: {} };
+
+function corrBuckets() {
+  const t = Math.floor(corrDates.length / 3);
+  return [
+    { label: "LOW  corr (stock-pickers)", ds: new Set(corrDates.slice(0, t)) },
+    { label: "MID  corr",                 ds: new Set(corrDates.slice(t, corrDates.length - t)) },
+    { label: "HIGH corr (macro tape)",    ds: new Set(corrDates.slice(corrDates.length - t)) },
+  ];
+}
+// IC (avg monthly Spearman of score↔3M fwd) + decile spread by score, per corr bucket.
+function bucketReport(scoreOf, label) {
+  console.log(`\n  ${label}`);
+  console.log("  bucket                       months  avgCorr     IC      D10-D1(3M α)");
+  const out = [];
+  for (const g of corrBuckets()) {
+    const gd = [...g.ds];
+    const avgCorr = mean(gd.map((d) => corrByDate.get(d)));
+    const ics = [];
+    for (const d of gd) { const gg = rows.filter((r) => r.date === d && r.fwd[3] != null && scoreOf(r) != null); if (gg.length >= 8) { const s = spearman(gg.map(scoreOf), gg.map((r) => r.fwd[3])); if (s != null) ics.push(s); } }
+    const ic = mean(ics);
+    const pool = rows.filter((r) => g.ds.has(r.date) && r.alpha[3] != null && scoreOf(r) != null).sort((a, b) => scoreOf(a) - scoreOf(b));
+    let spread = null;
+    if (pool.length >= 30) { const sz = Math.floor(pool.length / 10); spread = mean(pool.slice(9 * sz).map((r) => r.alpha[3])) - mean(pool.slice(0, sz).map((r) => r.alpha[3])); }
+    out.push({ label: g.label, months: gd.length, avgCorr, ic, decileSpread: spread });
+    console.log(`  ${g.label.padEnd(27)}${String(gd.length).padStart(5)}   ${avgCorr != null ? avgCorr.toFixed(3) : "  —  "}    ${ic != null ? (ic >= 0 ? "+" : "") + ic.toFixed(3) : "  —  "}     ${spread != null ? pct(spread) + "%" : "—"}`);
+  }
+  return out;
+}
+if (corrDates.length >= 9) {
+  report.correlation.scores.valueQuality = bucketReport((r) => r.ic,   "value/quality  (baseline — the score today)");
+  report.correlation.scores.momentum     = bucketReport((r) => r.mom,  "12-1m momentum (Phase 4 candidate)");
+  report.correlation.scores.trajectory   = bucketReport((r) => r.traj, "trajectory     (momentum + earnings/rev growth)");
+  const loIC = (s) => s?.[0]?.ic ?? null;
+  const vqLo = loIC(report.correlation.scores.valueQuality);
+  const momLo = loIC(report.correlation.scores.momentum);
+  const trLo = loIC(report.correlation.scores.trajectory);
+  const best = Math.max(momLo ?? -9, trLo ?? -9);
+  const verdict = best >= 0.03
+    ? `PASS — a momentum/trajectory score earns positive low-corr IC (mom ${momLo?.toFixed(3)}, traj ${trLo?.toFixed(3)}) where value/quality fails (${vqLo?.toFixed(3)}). Build the micro 2.0 around momentum/trajectory, gated by correlation.`
+    : `WEAK — neither momentum (${momLo?.toFixed(3)}) nor trajectory (${trLo?.toFixed(3)}) is decisively positive in low correlation. Even the right factor mix struggles on this universe → the durable edge stays in allocation.`;
+  report.correlation.gate0A_phase4 = verdict;
+  console.log(`\n  Gate 0A (Phase 4): ${verdict}`);
 }
 
 writeFileSync(join(OUT, "backtest_summary.json"), JSON.stringify(report, null, 2));

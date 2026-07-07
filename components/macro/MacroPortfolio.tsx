@@ -9,6 +9,9 @@ import type { MacroState, StockAnalysis } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import SignalBacktest from "@/components/macro/SignalBacktest";
+import AllWeatherAllocator from "@/components/macro/AllWeatherAllocator";
+import RegimeRadar from "@/components/macro/RegimeRadar";
+import SecularClock from "@/components/macro/SecularClock";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -182,26 +185,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       });
   }, [session, macro, loading]);
 
-  if (loading || loadingData) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
-        {[0, 1, 2].map(i => <div key={i} className="card" style={{ height: 120 }}><Sk w="100%" h={100} /></div>)}
-      </div>
-    );
-  }
-
   if (!session) return (
     <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
       Inicia sesión para ver tu cartera.
-    </div>
-  );
-
-  if (entries.length === 0) return (
-    <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-      <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>Tu watchlist está vacía</p>
-      <p style={{ fontSize: "var(--sr-t-sm)" }}>
-        Agrega tickers desde la página de Stock (★) o desde el Screener.
-      </p>
     </div>
   );
 
@@ -211,12 +197,30 @@ export default function MacroPortfolio({ macro, loading }: Props) {
     headwind:  entries.filter(e => tiltBucket(e.tiltLabel) === "headwind"),
   };
 
-  const avgIc = entries.reduce((s, e) => s + e.icScore, 0) / entries.length;
+  const avgIc = entries.length ? entries.reduce((s, e) => s + e.icScore, 0) / entries.length : 0;
   const regimeLabel = macro?.regime_label ?? "—";
   const regimeColor = macro?.regime_id === "expansion" ? "var(--sr-pos)" : macro?.regime_id === "contraction" || macro?.regime_id === "stagflation" ? "var(--sr-neg)" : "var(--sr-warn)";
 
   return (
     <div className="animate-fade-in">
+      {/* Layer 1 secular → Layer 2 multi-asset → Regime Radar (macro-driven, shown regardless of watchlist) */}
+      <SecularClock macro={macro} />
+      <AllWeatherAllocator macro={macro} />
+      <RegimeRadar macro={macro} />
+
+      {(loading || loadingData) ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
+          {[0, 1, 2].map(i => <div key={i} className="card" style={{ height: 120 }}><Sk w="100%" h={100} /></div>)}
+        </div>
+      ) : entries.length === 0 ? (
+        <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
+          <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>Tu watchlist está vacía</p>
+          <p style={{ fontSize: "var(--sr-t-sm)" }}>
+            Agrega tickers desde la página de Stock (★) o desde el Screener.
+          </p>
+        </div>
+      ) : (
+        <>
       {/* Summary header */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--sr-sp-4)" }}>
@@ -483,6 +487,8 @@ export default function MacroPortfolio({ macro, loading }: Props) {
 
       {/* Signal backtest — does the score have a track record vs SPY? */}
       <SignalBacktest />
+        </>
+      )}
     </div>
   );
 }

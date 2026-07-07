@@ -13,7 +13,9 @@ import { fileURLToPath } from "url";
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache", "px");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36";
-const FROM = "2018-06-01";
+// Fetch window start. Default 2018-06 for the equity backtest; override with PX_FROM to
+// pull a longer history (e.g. the multi-asset 0B robustness run back to the GFC).
+const FROM = process.env.PX_FROM || "2018-06-01";
 const P1 = Math.floor(new Date(FROM).getTime() / 1000);
 const P2 = Math.floor(Date.now() / 1000);
 const TODAY = new Date().toISOString().slice(0, 10);
@@ -89,3 +91,16 @@ export async function momentum(ticker, date) {
   return { m1: pct(21), m3: pct(63), m6: pct(126) };
 }
 export async function hasPriceAt(ticker, date) { return idxOnOrBefore(await series(ticker), date) >= 0; }
+
+// Full history of daily log total-returns (adj-based), memoized via the same cache.
+// Used by correlation.mjs to build the realized-correlation engine. PIT-safe: callers
+// slice a trailing window ending on-or-before their as-of date.
+export async function returnsSeries(ticker) {
+  const r = await series(ticker);
+  const out = [];
+  for (let k = 1; k < r.length; k++) {
+    const p0 = r[k - 1].adj, p1 = r[k].adj;
+    if (p0 > 0 && p1 > 0) out.push({ date: r[k].date, ret: Math.log(p1 / p0) });
+  }
+  return out;
+}

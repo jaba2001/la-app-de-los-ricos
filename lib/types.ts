@@ -9,6 +9,16 @@ export interface MacroState {
   credit_stress: number | null;
   geopolitical_risk: number | null;
   housing_stress: number | null;
+  /* Liquidity-led risk-on gauge (0-100) for the multi-asset allocator. Optional: when
+     the cron doesn't populate it, the app derives it from the composites above. */
+  risk_on?: number | null;
+  /* Stationary drivers of risk_on (0-100 percentiles) — for the Regime Radar. */
+  risk_on_lcc?: number | null; // liquidity impulse (higher = expanding)
+  risk_on_rpc?: number | null; // recession risk (higher = worse)
+  risk_on_csc?: number | null; // financial stress (higher = worse)
+  /* CBOE 3-month implied correlation (^COR3M) — stock-picking regime for the momentum
+     micro score (Phase 4). Low = dispersion (selection pays); high = macro tape. */
+  implied_corr?: number | null;
   /* Regime */
   regime_id: string | null;
   regime_label: string | null;
@@ -31,6 +41,7 @@ export interface MacroState {
   wti_chg_1m: number | null;
   buffett_indicator: number | null;
   expected_return_10y: number | null;
+  cape?: number | null; // Shiller CAPE — secular valuation (Phase 5, Secular Clock)
   /* Sentiment */
   fear_greed: number | null;
   fear_greed_rating: string | null;

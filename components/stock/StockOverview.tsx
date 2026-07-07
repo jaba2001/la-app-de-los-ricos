@@ -5,6 +5,7 @@ import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 
 interface Props {
   data: StockData | null;
@@ -294,6 +295,34 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               </div>
             ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
           </div>
+
+          {/* Trajectory · momentum (Phase 4) — validated: momentum selection pays when correlation is low */}
+          {!loading && scores && (() => {
+            const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
+            const pc6 = periodRet(cl, 126);
+            const tr = trajectoryRating(mom12_1, pc6, scores.growth);
+            const pick = stockPickingRegime(macro?.implied_corr ?? null);
+            return (
+              <div className="card">
+                <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
+                  <div className="section-label" style={{ margin: 0 }}>Trajectory · momentum</div>
+                  <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: tr.color }} className="num">
+                    {tr.score}<span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 400 }}>/100 · {tr.label}</span>
+                  </span>
+                </div>
+                <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${tr.score}%`, background: tr.color }} /></div>
+                <div style={{ display: "flex", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flexWrap: "wrap" }}>
+                  <span>12-1m mom: <strong className="num" style={{ color: mom12_1 != null ? (mom12_1 > 0 ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{mom12_1 != null ? (mom12_1 > 0 ? "+" : "") + mom12_1.toFixed(0) + "%" : "—"}</strong></span>
+                  <span>6m: <strong className="num" style={{ color: "var(--sr-text-2)" }}>{pc6 != null ? (pc6 > 0 ? "+" : "") + pc6.toFixed(0) + "%" : "—"}</strong></span>
+                  <span>growth: <strong className="num" style={{ color: "var(--sr-text-2)" }}>{scores.growth}/20</strong></span>
+                </div>
+                <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${pick.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${pick.color} 28%, transparent)`, fontSize: "var(--sr-t-xs)", lineHeight: 1.5 }}>
+                  <strong style={{ color: pick.color }}>Stock-picking: {pick.label}</strong>
+                  <span style={{ color: "var(--sr-text-3)" }}> — {pick.detail}</span>
+                </div>
+              </div>
+            );
+          })()}
 
           {scoreHistory.length >= 2 && (
             <div className="card">
