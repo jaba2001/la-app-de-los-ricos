@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
+import StockThesis from "@/components/stock/StockThesis";
 
 interface Props {
   data: StockData | null;
@@ -321,6 +322,31 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   <span style={{ color: "var(--sr-text-3)" }}> — {pick.detail}</span>
                 </div>
               </div>
+            );
+          })()}
+
+          {/* AI thesis (Phase 6) — grounded per-name, cites only real metrics */}
+          {!loading && scores && (() => {
+            const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
+            const traj = trajectoryRating(mom12_1, periodRet(cl, 126), scores.growth).score;
+            const num = (v: unknown) => (typeof v === "number" && !isNaN(v) ? v : null);
+            return (
+              <StockThesis
+                macro={macro}
+                input={{
+                  ticker,
+                  sector: (data?.profile?.sector as string) ?? null,
+                  icScore,
+                  scores: { value: scores.value, health: scores.health, momentum: scores.momentum, growth: scores.growth },
+                  trajectory: traj,
+                  mom12_1,
+                  pe: num(metrics?.peRatioTTM),
+                  pb: num(metrics?.priceToBookRatioTTM),
+                  pfcf: num(metrics?.priceToFreeCashFlowsRatioTTM),
+                  macroTilt: macroTilt?.tilt ?? null,
+                  rating: rating?.label ?? null,
+                }}
+              />
             );
           })()}
 

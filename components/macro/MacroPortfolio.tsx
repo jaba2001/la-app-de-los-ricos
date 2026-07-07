@@ -12,6 +12,7 @@ import SignalBacktest from "@/components/macro/SignalBacktest";
 import AllWeatherAllocator from "@/components/macro/AllWeatherAllocator";
 import RegimeRadar from "@/components/macro/RegimeRadar";
 import SecularClock from "@/components/macro/SecularClock";
+import ScoraBrief from "@/components/macro/ScoraBrief";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -207,6 +208,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       <SecularClock macro={macro} />
       <AllWeatherAllocator macro={macro} />
       <RegimeRadar macro={macro} />
+      <ScoraBrief macro={macro} />
 
       {(loading || loadingData) ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
