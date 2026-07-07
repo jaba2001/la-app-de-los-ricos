@@ -28,6 +28,42 @@ export interface BacktestSummary {
   caveats: string[];
 }
 
+// ── The validated edge (Phases 0-4) ─────────────────────────────────────────
+// The session's central finding: stock-picking doesn't beat the market, but the
+// regime-driven MULTI-ASSET ALLOCATOR does — risk-adjusted, with a fifth of the
+// drawdown. And stock selection only pays CONDITIONALLY: momentum ranking earns
+// positive IC when market correlation is low, and crashes when it's high.
+// Sources: research/backtest_assets.mjs (REGIME=stationary, 2007-2026),
+// research/walkforward.mjs (OOS), research/backtest.mjs --full 500 (0A momentum).
+
+export const ALLOCATOR_BACKTEST = {
+  period: "Jul 2007 – Jun 2026",
+  months: 228,
+  strategy: { label: "Risk-on tilt + dual-momentum", totalReturn: 210.1, sharpe: 1.01, maxDrawdown: -10.1 },
+  control:  { label: "Dual-momentum only (no regime)", totalReturn: 185.3, sharpe: 0.88, maxDrawdown: -14.0 },
+  spy:      { label: "SPY buy & hold", totalReturn: 602.3, sharpe: 0.71, maxDrawdown: -50.7 },
+  walkForward: { period: "2011–2026", oosMonths: 178, oosSharpe: 0.99, overfitGap: 0.01 },
+  subPeriods: [
+    { label: "pre-2020 (out-of-sample)", strat: 0.93, control: 0.75, spy: 0.60 },
+    { label: "2020–2026",                strat: 1.15, control: 1.14, spy: 0.89 },
+  ],
+  notes: [
+    "Regime-independent control (dual-momentum only) beaten in BOTH sub-periods → the liquidity-led risk-on tilt adds value, not just the trend gate.",
+    "Gives up raw return vs a two-decade equity bull (SPY +602%) — this is a risk-managed sleeve: match equity-like results with a fifth of the drawdown and a much higher Sharpe, not beat the index outright.",
+    "Composites are stationarized to percentiles (not absolute levels) so the regime is valid across cycles including the GFC.",
+  ],
+};
+
+export const STOCK_PICKING = {
+  universe: 500,
+  nameMonths: 34405,
+  period: "Jan 2020 – Jun 2026",
+  valueQuality: { totalReturn: 127.6, spyReturn: 154.2, ic: 0.007 }, // definitive survivorship-free
+  // momentum IC by market-correlation bucket — the meta-switch (Phase 4)
+  momentumIC: { low: 0.064, mid: -0.030, high: -0.054 },
+  momentumDecileLow: 3.9, // top-minus-bottom 3M alpha % in low correlation
+};
+
 export const HISTORICAL_BACKTEST: BacktestSummary = {
   period: "Jan 2020 – Jun 2026",
   universe: 120,
