@@ -57,6 +57,6 @@ export const HISTORICAL_BACKTEST: BacktestSummary = {
     "The micro score alone does NOT beat SPY here (+112% vs +154%); the win comes from the macro↔micro overlay (+157.5%, Sharpe 0.98, half the drawdown). Scora's edge IS the macro regime lens.",
     "Raw fine-grained ranking is weak (IC ~0.015, decile spread negative) — the value is in regime-timing and risk, not stock-by-stock ranking.",
     "Sector benchmarks held constant; thresholds hand-tuned → the live forward record is the un-backtested proof.",
-    "Capped at 120 names (by presence) for runtime — a full ~500-name run would refine the number further.",
+    "Definitive 500-name run (34,405 name-months): value/quality micro +127.6% vs SPY +154.2% (IC 0.007) — confirms stock-picking on value/quality does NOT beat the market on the full survivorship-free universe. The validated edge is the multi-asset allocator (Sharpe 1.01 OOS 2007-2026) and momentum gated by correlation (IC +0.064 in low correlation, −0.05 in high).",
   ],
 };
