@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, getRating, getMacroTilt } from "@/lib/scoring";
+import { stockPickingRegime } from "@/lib/microScore";
 import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
@@ -143,8 +144,18 @@ export default function StockScreener() {
     return 0;
   });
 
+  const picking = stockPickingRegime(macroState?.implied_corr ?? null);
+
   return (
     <div className="animate-fade-in">
+      {/* Stock-picking regime — validated Phase 4 context: does selecting names pay right now? */}
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${picking.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${picking.color} 28%, transparent)` }}>
+        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: picking.color, whiteSpace: "nowrap" }}>Selection regime: {picking.label}</span>
+        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>
+          {macroState?.implied_corr != null ? `Implied correlation ${macroState.implied_corr.toFixed(1)}. ` : ""}{picking.detail}
+        </span>
+      </div>
+
       {/* Add ticker */}
       <form onSubmit={addTicker} style={{ display: "flex", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-5)", maxWidth: 400 }}>
         <input
