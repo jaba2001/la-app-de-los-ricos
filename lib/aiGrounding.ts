@@ -97,3 +97,34 @@ DATA for ${s.ticker} (${s.sector ?? "sector n/a"}):
 
 STOCK-PICKING REGIME (market-wide): implied correlation ${n(macro?.implied_corr, "", 1)} → ${pick.label}. ${pick.detail}`;
 }
+
+/**
+ * Grounded earnings-call TONE analysis (idea #14) — scores management confidence, Q&A
+ * evasiveness and guidance tone from a transcript. The grounding is strict: the model
+ * analyzes ONLY the supplied text and must back every judgment with a direct quote from
+ * it — no outside knowledge of the company, no invented figures. Research (MarketSenseAI
+ * and NLP-of-earnings-calls literature) links call tone and Q&A evasiveness to forward
+ * returns; the value here is a disciplined, quoted read, not a vibe.
+ */
+export function buildEarningsToneAnalysis(ticker: string, transcript: string): string {
+  const text = (transcript || "").trim().slice(0, 16000); // cap input for cost; analyze the excerpt
+  return `${GROUNDING_RULES}
+- Additional rule: analyze ONLY the transcript below. Every judgment MUST be backed by a short DIRECT QUOTE from it (in "quotes"). Use no outside knowledge about ${ticker}. If the transcript doesn't address something, write "not addressed".
+
+You are Scora's earnings-call analyst. Read the ${ticker} transcript excerpt and output exactly:
+## Management confidence: N/100
+[one line + a supporting quote]
+## Q&A evasiveness: Low | Medium | High
+[are questions answered directly or deflected? cite a quote]
+## Guidance tone: Raised | Maintained | Lowered | Unclear
+[cite the guidance language]
+## Notable signals
+- [each bullet: a claim + its "direct quote"]
+## Net read
+[2 sentences: does the tone lean constructive or cautious, strictly per the text]
+
+TRANSCRIPT EXCERPT (${ticker}${transcript.length > 16000 ? ", truncated" : ""}):
+"""
+${text || "(no transcript provided)"}
+"""`;
+}

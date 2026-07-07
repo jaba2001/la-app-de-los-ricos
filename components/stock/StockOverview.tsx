@@ -7,6 +7,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 import StockThesis from "@/components/stock/StockThesis";
+import EarningsTone from "@/components/stock/EarningsTone";
 
 interface Props {
   data: StockData | null;
@@ -349,6 +350,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               />
             );
           })()}
+
+          <EarningsTone ticker={ticker} />
 
           {scoreHistory.length >= 2 && (
             <div className="card">
