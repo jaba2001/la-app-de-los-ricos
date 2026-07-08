@@ -1,0 +1,23 @@
+name: Scora — weekly discovery ranking
+
+# Ranks the current S&P 500 by 12-1m momentum (the validated Phase-4 factor) and upserts
+# the top names to sl_discovery, so the /discovery screener stays fresh without anyone
+# opening the app. Free data (Yahoo/Tiingo prices + EDGAR sector).
+on:
+  schedule:
+    - cron: "0 13 * * 1" # every Monday, 13:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  discovery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Rank universe → sl_discovery
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}            # optional — delisted coverage
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/discovery.mjs

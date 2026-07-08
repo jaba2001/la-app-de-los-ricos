@@ -6,6 +6,7 @@ import { authedFetch } from "@/lib/proxy";
 
 const MAIN_TABS = [
   { label: "Macro", href: "/macro" },
+  { label: "Discovery", href: "/discovery" },
   { label: "Stocks", href: "/stock" },
   { label: "Watchlist", href: "/watchlist" },
   { label: "Track Record", href: "/track-record" },
