@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { aiAnalyze } from "@/lib/proxy";
 import { buildAllocationBrief } from "@/lib/aiGrounding";
+import { fetchKbCards, selectCards, renderKb, type KbCard } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface Props { macro: MacroState | null; }
@@ -26,12 +27,16 @@ export default function ScoraBrief({ macro }: Props) {
   const [brief, setBrief] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cards, setCards] = useState<KbCard[]>([]);
+
+  useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
 
   async function generate() {
     if (!macro) return;
     setLoading(true); setError("");
     try {
-      setBrief(await aiAnalyze(buildAllocationBrief(macro), 700));
+      const kb = renderKb(selectCards(cards, ["allocation", "regime", "secular", "risk-on", "edge", "methodology"]));
+      setBrief(await aiAnalyze(buildAllocationBrief(macro, kb), 700));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate brief");
     }

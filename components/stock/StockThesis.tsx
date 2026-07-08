@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { aiAnalyze } from "@/lib/proxy";
 import { buildStockThesis, type StockThesisInput } from "@/lib/aiGrounding";
+import { fetchKbCards, selectCards, renderKb, type KbCard } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface Props { input: StockThesisInput; macro: MacroState | null; }
@@ -25,11 +26,15 @@ export default function StockThesis({ input, macro }: Props) {
   const [thesis, setThesis] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cards, setCards] = useState<KbCard[]>([]);
+
+  useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
 
   async function generate() {
     setLoading(true); setError("");
     try {
-      setThesis(await aiAnalyze(buildStockThesis(input, macro), 600));
+      const kb = renderKb(selectCards(cards, ["momentum", "stock-picking", "correlation", "edge"]));
+      setThesis(await aiAnalyze(buildStockThesis(input, macro, kb), 600));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate thesis");
     }

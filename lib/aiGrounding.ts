@@ -28,14 +28,14 @@ export const GROUNDING_RULES = `GROUNDING RULES — follow strictly:
  * (Layer 1) → risk-on allocation (Layer 2) → cross-asset context → stock-picking regime.
  * Every number comes from macro_state; the model interprets, it does not source data.
  */
-export function buildAllocationBrief(macro: MacroState): string {
+export function buildAllocationBrief(macro: MacroState, kb = ""): string {
   const sec = secularRegime(macro.buffett_indicator ?? null, macro.cape ?? null, macro.expected_return_10y ?? null);
   const pick = stockPickingRegime(macro.implied_corr ?? null);
   const riskOn = macro.risk_on ?? null;
   const w = riskOn != null ? blendWeights(riskOn) : null;
   const weights = w ? ALLOC_ASSETS.map((a) => `${a} ${(w[a] * 100).toFixed(0)}% (${ASSET_META[a].role})`).join(", ") : "not available";
 
-  return `${GROUNDING_RULES}
+  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}
 
 You are Scora's macro strategist. Write a crisp brief (≈180 words) with exactly these sections:
 ## Where we are
@@ -79,9 +79,9 @@ export interface StockThesisInput {
 }
 
 /** Grounded per-name thesis — cites only the computed metrics + the live stock-picking regime. */
-export function buildStockThesis(s: StockThesisInput, macro: MacroState | null): string {
+export function buildStockThesis(s: StockThesisInput, macro: MacroState | null, kb = ""): string {
   const pick = stockPickingRegime(macro?.implied_corr ?? null);
-  return `${GROUNDING_RULES}
+  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}
 
 You are Scora's equity analyst. Write a tight thesis (≈140 words) for ${s.ticker} with exactly:
 ## Bull points
