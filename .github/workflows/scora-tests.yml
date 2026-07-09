@@ -1,0 +1,24 @@
+name: Scora — tests (golden + red-team)
+
+# Continuous verification of the two guarantees that must never silently regress:
+#  1. the pure calculation core (golden.test.mjs) — the math behind every score,
+#  2. the AI grounding gate (redteam_grounding.mjs) — "the AI can't hallucinate figures".
+# Both are headless, deterministic, need no secrets. Either failing fails the build.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Golden tests (calculation core)
+        run: node --experimental-strip-types --no-warnings scripts/golden.test.mjs
+      - name: Red-team the grounding gate
+        run: node --experimental-strip-types --no-warnings research/redteam_grounding.mjs

@@ -19,8 +19,14 @@ if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Default seed universe — liquid US filers with 10-Ks that the app's users hit most
-// (AI-capex / memory complex + mega-cap tech). Foreign issuers (ASML=20-F) are skipped.
-const DEFAULT = ["NVDA","AAPL","MSFT","AMD","MU","GOOGL","META","AMZN","AVGO","WDC","STX","INTC"];
+// (AI-capex / memory complex + mega-cap tech + high-traffic names). Foreign issuers
+// (ASML=20-F) are skipped. INTC is a known structural miss: its primary 10-K doc is a
+// paginated wrapper whose section headings only appear as TOC page-refs, so the item-
+// heading parser can't anchor the bodies — it skips gracefully rather than store garbage.
+const DEFAULT = [
+  "NVDA","AAPL","MSFT","AMD","MU","GOOGL","META","AMZN","AVGO","WDC","STX","INTC",
+  "TSLA","NFLX","ORCL","CRM","QCOM","TXN","DELL","PLTR","ADBE","NOW","PANW","AMAT","LRCX","ANET","CSCO","IBM",
+];
 // Chars stored per section. Sized to what the grounded thesis injects (~2k/section) to
 // keep the KB lean and cheap; the Phase-4 research report can re-ingest deeper when built.
 const MAX_SECTION = 2200;
@@ -71,6 +77,8 @@ function bestSection(text, startRe, endRes) {
   const cands = [];
   for (const m of ms) {
     const s = m.index, headingEnd = s + m[0].length;
+    const before = text.slice(Math.max(0, s - 18), s);
+    if (/\b(in|see|to|under|within|refer\s+to)\s+$/i.test(before)) continue; // "…discussion in Item 7…" = a cross-reference mid-sentence, not a heading
     const tail = text.slice(headingEnd, headingEnd + 140);
     if (XREF.test(tail)) continue;                 // heading followed by citation language
     if (NAV.test(tail.slice(0, 140))) continue;    // opening references another item / the TOC

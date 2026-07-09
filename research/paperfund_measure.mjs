@@ -73,6 +73,7 @@ const row = {
   nav: +nav.toFixed(2), spy_nav: +spyNav.toFixed(2),
   total_ret: +(totalRet * 100).toFixed(2), spy_ret: +(spyTotalRet * 100).toFixed(2),
   max_dd: +(maxDD * 100).toFixed(2), sharpe: +sharpe.toFixed(2), grade,
+  updated_at: new Date().toISOString(), // refresh on re-measure (PostgREST won't touch it otherwise)
 };
 console.log(`  NAV ${row.nav} (${row.total_ret >= 0 ? "+" : ""}${row.total_ret}%) vs SPY ${row.spy_nav} (${row.spy_ret}%) · maxDD ${row.max_dd}% · Sharpe ${row.sharpe} · grade ${grade}`);
 
