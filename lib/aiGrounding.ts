@@ -99,6 +99,42 @@ DATA for ${s.ticker} (${s.sector ?? "sector n/a"}):
 STOCK-PICKING REGIME (market-wide): implied correlation ${n(macro?.implied_corr, "", 1)} → ${pick.label}. ${pick.detail}`;
 }
 
+// ── Due-diligence modules (Phase 6) — the guided workflow ────────────────────────────
+// Each module is a focused grounded prompt sharing one DATA block (the component builds it
+// once and also hands it to the code gate). The "golden rule" — cite / verify / challenge —
+// is exactly GROUNDING_RULES. Qualitative modules (moat, red-flags) lean on the filing
+// excerpts; numeric ones cite the DATA. All must obey the anti-hallucination contract.
+export type ModuleKind = "redflags" | "moat" | "bullbear" | "macrosens" | "thesisupdate";
+
+export const MODULE_META: Record<ModuleKind, { label: string; blurb: string }> = {
+  redflags:     { label: "Red-flag scanner",     blurb: "Accounting, leverage, dilution, concentration, litigation — from the 10-K." },
+  moat:         { label: "Moat audit",           blurb: "The 7 sources of durable competitive advantage, each rated." },
+  bullbear:     { label: "Bull vs bear",         blurb: "Steelman both sides, then a referee verdict." },
+  macrosens:    { label: "Macro sensitivity",    blurb: "Exposure to rates, USD, oil, growth, liquidity in this regime." },
+  thesisupdate: { label: "What defines the thesis", blurb: "The metrics that matter now + their upgrade/downgrade triggers." },
+};
+
+const MODULE_TASK: Record<ModuleKind, string> = {
+  redflags: `Scan ${"{T}"} for RED FLAGS across: accounting quality, liquidity/leverage, share dilution, customer/supplier concentration, litigation/regulatory, governance. List up to 5, most serious first. Each: **Flag** — severity Low/Med/High — a supporting DIRECT QUOTE from the filing (cite "(10-K, section)") or a specific provided metric. If the data/filing does not support a flag, write "none evident in the provided data" — do not invent one.`,
+  moat: `Audit ${"{T}"}'s economic moat across the 7 sources: network effects, switching costs, cost advantage, intangibles/brand, efficient scale, data advantage, regulatory/licensing. For EACH: rating None/Narrow/Wide + one line grounded in the Business filing or a provided metric (e.g. ROE, margins). End with ## Overall moat: None/Narrow/Wide and the single strongest pillar.`,
+  bullbear: `Pressure-test ${"{T}"}. Output ## Strongest bull (3 points, each tied to a provided number or filing quote) then ## Strongest bear (3 points, each tied to a number or a Risk Factor quote) then ## Referee — which case the DATA currently supports better, and the ONE fact that would flip it.`,
+  macrosens: `Decode ${"{T}"}'s MACRO SENSITIVITY for the current regime. Rate exposure −−/−/0/+/++ to each: rates & duration, US dollar, oil/inflation, growth/recession, liquidity. Ground each in the sector and the provided macro figures. End with ## Net regime read: headwind/neutral/tailwind for ${"{T}"} right now, and why.`,
+  thesisupdate: `Define what drives ${"{T}"}'s thesis NOW. List the 3 metrics that most determine the outcome from here; for each give its current level (from DATA) and the specific threshold that would be an UPGRADE trigger and a DOWNGRADE trigger. End with the single most important thing to watch next.`,
+};
+
+/** Assemble a grounded due-diligence module prompt. `dataBlock` is the shared real-number
+ *  context (also passed to the code gate); kb/filings are the retrieved grounding blocks. */
+export function buildDiligenceModule(kind: ModuleKind, ticker: string, dataBlock: string, kb = "", filings = ""): string {
+  const task = MODULE_TASK[kind].replace(/\{T\}/g, ticker);
+  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}${filings ? "\n\n" + filings : ""}
+
+You are Scora's analyst running one step of a due-diligence workflow on ${ticker}. Be concrete, grounded, and concise (≤170 words). Cite a provided number or a filing section for every substantive claim.
+
+TASK: ${task}
+
+${dataBlock}`;
+}
+
 export interface ResearchReportInput {
   ticker: string;
   company: string | null;
