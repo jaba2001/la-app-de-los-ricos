@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { aiAnalyze } from "@/lib/proxy";
 import { buildStockThesis, type StockThesisInput } from "@/lib/aiGrounding";
-import { fetchKbCards, selectCards, renderKb, type KbCard } from "@/lib/knowledge";
+import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface Props { input: StockThesisInput; macro: MacroState | null; }
@@ -27,14 +27,17 @@ export default function StockThesis({ input, macro }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cards, setCards] = useState<KbCard[]>([]);
+  const [docs, setDocs] = useState<KbDoc[]>([]);
 
   useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
+  useEffect(() => { fetchDocChunks(input.ticker).then(setDocs).catch(() => setDocs([])); }, [input.ticker]);
 
   async function generate() {
     setLoading(true); setError("");
     try {
       const kb = renderKb(selectCards(cards, ["momentum", "stock-picking", "correlation", "edge"]));
-      setThesis(await aiAnalyze(buildStockThesis(input, macro, kb), 600));
+      const filings = renderDocChunks(docs);
+      setThesis(await aiAnalyze(buildStockThesis(input, macro, kb, filings), 700));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate thesis");
     }
@@ -46,7 +49,10 @@ export default function StockThesis({ input, macro }: Props) {
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
           <div className="section-label" style={{ margin: 0 }}>AI thesis · grounded</div>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>Cites only {input.ticker}&apos;s computed metrics — no invented numbers.</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>
+            Cites only {input.ticker}&apos;s computed metrics — no invented numbers.
+            {docs.length > 0 && <span style={{ color: "var(--sr-pos)", marginLeft: 4 }}>· Grounded in 10-K{docs[0].fiscal_year ? ` FY${docs[0].fiscal_year}` : ""} ({docs.map((d) => d.section).join(", ")})</span>}
+          </div>
         </div>
         <button className="btn-primary" onClick={generate} disabled={loading} style={{ flexShrink: 0 }}>
           {loading ? "Writing…" : thesis ? "Regenerate" : "✦ Generate"}

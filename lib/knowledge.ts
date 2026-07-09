@@ -32,3 +32,34 @@ export function renderKb(cards: KbCard[]): string {
   return `KNOWLEDGE BASE — Scora's own VALIDATED findings. Ground your reasoning in these and cite the relevant source in parentheses when you use one. Do not contradict them or substitute outside consensus:
 ${lines}`;
 }
+
+// ── Company filings (Phase 3) — verbatim 10-K excerpts, retrieved per ticker ──────
+// kb_docs holds Business / Risk Factors / MD&A sections pulled from SEC EDGAR (free) by
+// research/ingest_filings.mjs. The stock thesis retrieves the ticker's chunks and cites
+// them, so bull/bear points can be grounded in the actual filing, not model memory.
+export interface KbDoc { ticker: string; form: string; section: string; text: string; filed_date: string | null; fiscal_year: number | null; }
+
+/** Fetch this ticker's filing section chunks (optionally limited to certain sections). */
+export async function fetchDocChunks(ticker: string, sections?: string[]): Promise<KbDoc[]> {
+  const { data } = await supabase
+    .from("kb_docs")
+    .select("ticker,form,section,text,filed_date,fiscal_year")
+    .eq("ticker", ticker.toUpperCase());
+  let docs = (data as KbDoc[]) ?? [];
+  if (sections?.length) { const want = new Set(sections); docs = docs.filter((d) => want.has(d.section)); }
+  // Deterministic order: Risk Factors first (most useful for bear points), then MD&A, then Business.
+  const rank: Record<string, number> = { "Risk Factors": 0, "MD&A": 1, "Business": 2 };
+  return docs.sort((a, b) => (rank[a.section] ?? 9) - (rank[b.section] ?? 9));
+}
+
+/** Render filing chunks as a grounded block the model must cite (e.g. "(10-K FY2025, Risk Factors)"). */
+export function renderDocChunks(docs: KbDoc[], perSectionChars = 1500): string {
+  if (!docs.length) return "";
+  const t = docs[0].ticker;
+  const blocks = docs.map((d) => {
+    const fy = d.fiscal_year ? ` FY${d.fiscal_year}` : "";
+    return `--- ${d.form}${fy} · ${d.section} ---\n${(d.text || "").slice(0, perSectionChars).trim()}`;
+  }).join("\n\n");
+  return `COMPANY FILINGS — verbatim excerpts from ${t}'s latest SEC 10-K. Use these for company-specific facts and cite the section in parentheses, e.g. "(10-K, Risk Factors)". Do NOT use any knowledge about ${t} beyond these excerpts and the metrics provided; if a detail isn't here, say it's not in the filing.
+${blocks}`;
+}

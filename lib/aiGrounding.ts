@@ -78,16 +78,17 @@ export interface StockThesisInput {
   rating: string | null;
 }
 
-/** Grounded per-name thesis — cites only the computed metrics + the live stock-picking regime. */
-export function buildStockThesis(s: StockThesisInput, macro: MacroState | null, kb = ""): string {
+/** Grounded per-name thesis — cites only the computed metrics, the ticker's real filing
+ *  excerpts (kb_docs), and the live stock-picking regime. */
+export function buildStockThesis(s: StockThesisInput, macro: MacroState | null, kb = "", filings = ""): string {
   const pick = stockPickingRegime(macro?.implied_corr ?? null);
-  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}
+  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}${filings ? "\n\n" + filings : ""}
 
-You are Scora's equity analyst. Write a tight thesis (≈140 words) for ${s.ticker} with exactly:
+You are Scora's equity analyst. Write a tight thesis (≈150 words) for ${s.ticker} with exactly:
 ## Bull points
 ## Bear points
 ## Verdict
-Cite the exact metrics below. Weight momentum/trajectory more heavily when the stock-picking regime favors selection (low correlation), less when it doesn't. End with: Conviction HIGH/MEDIUM/LOW.
+Cite the exact metrics below. ${filings ? `When the filing excerpts are provided, ground at least one bear point in a specific Risk Factor or MD&A statement and cite it, e.g. "(10-K, Risk Factors)". ` : ""}Weight momentum/trajectory more heavily when the stock-picking regime favors selection (low correlation), less when it doesn't. End with: Conviction HIGH/MEDIUM/LOW.
 
 DATA for ${s.ticker} (${s.sector ?? "sector n/a"}):
 - Scora score (macro-tilted): ${n(s.icScore, "/100", 0)} · rating: ${s.rating ?? "not available"} · macro tilt: ${s.macroTilt == null ? "not available" : (s.macroTilt >= 0 ? "+" : "") + s.macroTilt + " pts"}
