@@ -6,8 +6,10 @@ import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
+import { classifyInstrument } from "@/lib/instrument";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
+import InstrumentPanel from "@/components/stock/InstrumentPanel";
 
 interface Props {
   data: StockData | null;
@@ -91,6 +93,13 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
   const metrics = data?.metrics;
   const ratios  = data?.ratios;
   const quote   = data?.quote;
+
+  // Instrument routing — metals/bonds/broad ETFs are read by momentum + regime, not P/E.
+  const instr = classifyInstrument(ticker, profile ? {
+    isEtf: Boolean(profile.isEtf ?? profile.isFund),
+    sector: profile.sector as string | undefined,
+    industry: profile.industry as string | undefined,
+  } : null);
 
   const [scoreHistory, setScoreHistory] = useState<{ date: string; score: number }[]>([]);
   const [sectorPeers, setSectorPeers] = useState<{ ticker: string; score: number; date: string }[]>([]);
@@ -266,6 +275,12 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
       <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: "var(--sr-sp-5)" }}>
         {/* Left */}
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
+          {/* Non-equity (metal / bond / commodity / broad-ETF) → instrument panel, not fundamentals */}
+          {!loading && !instr.isEquity && (
+            <InstrumentPanel instrument={instr} closes={cl} spyCloses={spyCl} macro={macro} ticker={ticker} />
+          )}
+
+          {instr.isEquity && (
           <div className="card" style={{ textAlign: "center" }}>
             <div className="section-label">Scora Score</div>
             {loading ? <Sk w="80px" h={64} /> : (
@@ -283,7 +298,9 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               </div>
             )}
           </div>
+          )}
 
+          {instr.isEquity && (
           <div className="card">
             <div className="section-label">Score Breakdown</div>
             {loading ? (
@@ -297,9 +314,10 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               </div>
             ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
           </div>
+          )}
 
           {/* Trajectory · momentum (Phase 4) — validated: momentum selection pays when correlation is low */}
-          {!loading && scores && (() => {
+          {instr.isEquity && !loading && scores && (() => {
             const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
             const pc6 = periodRet(cl, 126);
             const tr = trajectoryRating(mom12_1, pc6, scores.growth);
@@ -327,7 +345,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           })()}
 
           {/* AI thesis (Phase 6) — grounded per-name, cites only real metrics */}
-          {!loading && scores && (() => {
+          {instr.isEquity && !loading && scores && (() => {
             const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
             const traj = trajectoryRating(mom12_1, periodRet(cl, 126), scores.growth).score;
             const num = (v: unknown) => (typeof v === "number" && !isNaN(v) ? v : null);
@@ -351,7 +369,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             );
           })()}
 
-          <EarningsTone ticker={ticker} />
+          {instr.isEquity && <EarningsTone ticker={ticker} />}
 
           {scoreHistory.length >= 2 && (
             <div className="card">
