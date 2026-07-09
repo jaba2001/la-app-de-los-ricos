@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
+import PaperFund from "@/components/macro/PaperFund";
 
 interface LiveSummary {
   as_of: string | null; months_live: number | null; cohorts: number | null; names_scored: number | null;
@@ -56,6 +57,9 @@ export default function TrackRecordPage() {
           the validated allocator backtest (out-of-sample), the honest stock-picking result, and a live forward record. Transparency is the point.
         </p>
       </div>
+
+      {/* ── Autonomous paper fund (the living, self-running proof) ── */}
+      <PaperFund />
 
       {/* ── Live forward record ── */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-6)", borderColor: "color-mix(in srgb, var(--sr-amber) 30%, var(--sr-border))" }}>

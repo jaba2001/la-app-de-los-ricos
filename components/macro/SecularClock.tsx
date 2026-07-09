@@ -1,12 +1,14 @@
 "use client";
 import type { MacroState } from "@/lib/types";
-import { secularRegime } from "@/lib/secular";
+import { secularRegime, secularCyclePosition } from "@/lib/secular";
 
 interface Props { macro: MacroState | null; }
 
 export default function SecularClock({ macro }: Props) {
   if (!macro) return null;
   const s = secularRegime(macro.buffett_indicator ?? null, macro.cape ?? null, macro.expected_return_10y ?? null);
+  const cycle = secularCyclePosition(new Date(), macro.cape ?? null);
+  const cyclePct = Math.max(4, Math.min(100, (cycle.yearsElapsed / (cycle.typicalYears + 2)) * 100));
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
@@ -53,6 +55,24 @@ export default function SecularClock({ macro }: Props) {
 
       <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.55 }}>
         {s.detail}
+      </div>
+
+      {/* ── Secular cycle position (v2) — narrative, not prediction ── */}
+      <div style={{ marginTop: "var(--sr-sp-4)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
+        <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
+          <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Long cycle · secular {cycle.phase.toLowerCase()}</span>
+          <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: cycle.stage === "mature" ? "var(--sr-neg)" : cycle.stage === "late" ? "var(--sr-warn)" : "var(--sr-text-2)" }}>{cycle.stage}-stage · ~{cycle.yearsElapsed}y in</span>
+        </div>
+        {/* timeline bar: elapsed vs typical bull length */}
+        <div style={{ position: "relative", height: 8, borderRadius: 4, background: "var(--sr-surface-3)" }}>
+          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${cyclePct}%`, borderRadius: 4, background: cycle.stage === "mature" ? "var(--sr-neg)" : cycle.stage === "late" ? "var(--sr-warn)" : "var(--sr-pos)" }} />
+          {/* typical-length marker */}
+          <div style={{ position: "absolute", left: `${Math.min(100, (cycle.typicalYears / (cycle.typicalYears + 2)) * 100)}%`, top: -2, width: 2, height: 12, background: "var(--sr-text-3)" }} title={`~${cycle.typicalYears}y typical`} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: "9px", color: "var(--sr-text-3)" }}>
+          <span>{cycle.startYear} start</span><span>~{cycle.typicalYears}y avg</span>
+        </div>
+        <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>{cycle.note}</div>
       </div>
     </div>
   );

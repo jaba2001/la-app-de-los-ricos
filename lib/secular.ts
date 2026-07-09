@@ -62,3 +62,40 @@ export function secularRegime(buffett: number | null, cape: number | null, expec
 
   return { phase: band.phase, baselineEquity: band.base, percentile: band.pct, gauge, detail, color: band.color };
 }
+
+// ── Secular cycle position (Phase 8, "secular v2") ───────────────────────────────────
+// Where are we in the long alternation of secular BULLS (boom) and secular BEARS
+// (consolidation)? This is NARRATIVE, not prediction: the modern record is only n≈3 full
+// cycles, so the "typical length" is a weak prior, not a clock you can trade. We anchor on
+// the factual start of the current secular bull (2009) and let valuation set the stage.
+export interface SecularCycle {
+  phase: "Boom" | "Consolidation";
+  startYear: number;
+  yearsElapsed: number;
+  typicalYears: number;      // weak prior from the historical record
+  stage: "early" | "mid" | "late" | "mature";
+  yearsRemainingLow: number; // rough band, floored at 0
+  yearsRemainingHigh: number;
+  note: string;
+}
+
+// Modern secular phases (US large caps): 1949-68 bull, 1968-82 bear, 1982-2000 bull,
+// 2000-09 bear, 2009- bull. Bull avg ≈ 18y, bear avg ≈ 11y. n is tiny — hence the honesty.
+const CURRENT_START = 2009;      // secular bull that began at the GFC low (Mar 2009)
+const TYPICAL_BULL = 18;
+
+export function secularCyclePosition(now: Date = new Date(), cape: number | null = null): SecularCycle {
+  const year = now.getUTCFullYear();
+  const yearsElapsed = Math.max(0, year - CURRENT_START);
+  const ratio = yearsElapsed / TYPICAL_BULL;
+  const stage: SecularCycle["stage"] = ratio < 0.4 ? "early" : ratio < 0.72 ? "mid" : ratio < 1.0 ? "late" : "mature";
+  const lo = Math.max(0, TYPICAL_BULL - 3 - yearsElapsed);
+  const hi = Math.max(0, TYPICAL_BULL + 4 - yearsElapsed);
+  const capeNote = cape != null
+    ? cape >= 34 ? ` Valuations are extreme (CAPE ${cape.toFixed(0)}), consistent with a late/mature boom — which historically means compressed forward returns, not an imminent crash.`
+      : cape < 16 ? ` Valuations are cheap (CAPE ${cape.toFixed(0)}), the reset that typically ends a consolidation and seeds the next boom.`
+      : ` Valuations are middling (CAPE ${cape.toFixed(0)}).`
+    : "";
+  const note = `We anchor the current secular bull at ${CURRENT_START} (the GFC low), so ~${yearsElapsed} years elapsed vs a ~${TYPICAL_BULL}-year historical average — a ${stage}-stage boom.${capeNote} This is narrative from only ~3 modern cycles, not a countdown.`;
+  return { phase: "Boom", startYear: CURRENT_START, yearsElapsed, typicalYears: TYPICAL_BULL, stage, yearsRemainingLow: lo, yearsRemainingHigh: hi, note };
+}
