@@ -10,6 +10,7 @@ import { classifyInstrument } from "@/lib/instrument";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
 import InstrumentPanel from "@/components/stock/InstrumentPanel";
+import BondCockpit from "@/components/stock/BondCockpit";
 
 interface Props {
   data: StockData | null;
@@ -278,6 +279,10 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           {/* Non-equity (metal / bond / commodity / broad-ETF) → instrument panel, not fundamentals */}
           {!loading && !instr.isEquity && (
             <InstrumentPanel instrument={instr} closes={cl} spyCloses={spyCl} macro={macro} ticker={ticker} />
+          )}
+          {/* Bond ETF → rates cockpit (duration/convexity + regime rate view + Treasury calc) */}
+          {!loading && instr.type === "bond-etf" && (
+            <BondCockpit ticker={ticker} macro={macro} price={cl[0] ?? null} />
           )}
 
           {instr.isEquity && (

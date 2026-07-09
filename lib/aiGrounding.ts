@@ -99,6 +99,61 @@ DATA for ${s.ticker} (${s.sector ?? "sector n/a"}):
 STOCK-PICKING REGIME (market-wide): implied correlation ${n(macro?.implied_corr, "", 1)} → ${pick.label}. ${pick.detail}`;
 }
 
+export interface ResearchReportInput {
+  ticker: string;
+  company: string | null;
+  sector: string | null;
+  price: number | null;
+  marketCap: number | null;         // $
+  wacc: number | null;              // %
+  dcfGordon: number | null;         // $/share
+  dcfExit: number | null;           // $/share
+  hingeGapPct: number | null;       // %
+  analystMean: number | null;       // $/share
+  roe: number | null;               // decimal
+  netMargin: number | null;         // decimal
+  revGrowth: number | null;         // % YoY
+  pe: number | null;
+  evEbitda: number | null;
+  netDebtEbitda: number | null;
+  scoreTotal: number | null;
+  trajectory: number | null;        // 0-100 momentum
+}
+
+/**
+ * Grounded institutional-style research note (Phase 4). Writes a SWOT + bull/base/bear
+ * scenarios from the computed valuation (the terminal-multiple hinge, DuPont, momentum)
+ * and the ticker's real 10-K excerpts (kb_docs). Strict grounding: every claim cites a
+ * provided number or a filing section; scenarios must reference the DCF hinge explicitly.
+ */
+export function buildResearchReport(s: ResearchReportInput, kb = "", filings = ""): string {
+  return `${GROUNDING_RULES}${kb ? "\n\n" + kb : ""}${filings ? "\n\n" + filings : ""}
+
+You are Scora's senior analyst writing an initiation note on ${s.ticker}${s.company ? ` (${s.company})` : ""}. Be concrete and grounded. Output EXACTLY these sections:
+## Thesis
+[2 sentences: what this company is and the core investment question, grounded in the data.]
+## SWOT
+- Strength: …
+- Weakness: …
+- Opportunity: …
+- Threat: … ${filings ? `(ground Weakness/Threat in a specific Risk Factor / MD&A statement and cite "(10-K, section)")` : ""}
+## Valuation read
+[Interpret the TERMINAL-MULTIPLE HINGE: the DCF is worth $${n(s.dcfGordon, "", 0)} on a Gordon 2.5% perpetuity vs $${n(s.dcfExit, "", 0)} on an exit-at-today's-multiple terminal, a ${n(s.hingeGapPct, "%", 0)} gap. Explain what each assumption implies and which is more defensible for THIS business — do NOT just average them. Reference the analyst mean $${n(s.analystMean, "", 0)} and WACC ${n(s.wacc, "%", 1)}.]
+## Scenarios
+- Bull: [1 line + rough value]
+- Base: [1 line + rough value]
+- Bear: [1 line + rough value]
+## Verdict
+[1-2 sentences + Conviction HIGH/MEDIUM/LOW]
+
+DATA for ${s.ticker} (${s.sector ?? "sector n/a"}):
+- Price $${n(s.price, "", 2)} · market cap $${s.marketCap != null ? (s.marketCap / 1e9).toFixed(1) + "B" : "not available"}
+- Valuation hinge: DCF-Gordon $${n(s.dcfGordon, "", 0)}, DCF-exit-multiple $${n(s.dcfExit, "", 0)}, gap ${n(s.hingeGapPct, "%", 0)}, WACC ${n(s.wacc, "%", 1)}, analyst mean $${n(s.analystMean, "", 0)}
+- Quality: ROE ${s.roe != null ? (s.roe * 100).toFixed(0) + "%" : "not available"}, net margin ${s.netMargin != null ? (s.netMargin * 100).toFixed(0) + "%" : "not available"}, revenue growth ${n(s.revGrowth, "%", 0)} YoY
+- Valuation multiples: P/E ${n(s.pe, "", 1)}, EV/EBITDA ${n(s.evEbitda, "", 1)}, net debt/EBITDA ${n(s.netDebtEbitda, "", 1)}
+- Scora score ${n(s.scoreTotal, "/100", 0)} · momentum/trajectory ${n(s.trajectory, "/100", 0)}`;
+}
+
 /**
  * Grounded earnings-call TONE analysis (idea #14) — scores management confidence, Q&A
  * evasiveness and guidance tone from a transcript. The grounding is strict: the model

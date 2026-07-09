@@ -19,6 +19,7 @@ const StockFundamentals = dynamic(() => import("@/components/stock/StockFundamen
 const StockValuation    = dynamic(() => import("@/components/stock/StockValuation"),    { loading: TabSk, ssr: false });
 const StockChart        = dynamic(() => import("@/components/stock/StockChart"),        { loading: TabSk, ssr: false });
 const StockResearch     = dynamic(() => import("@/components/stock/StockResearch"),     { loading: TabSk, ssr: false });
+const StockReport       = dynamic(() => import("@/components/stock/StockReport"),       { loading: TabSk, ssr: false });
 const StockSmartMoney   = dynamic(() => import("@/components/stock/StockSmartMoney"),   { loading: TabSk, ssr: false });
 const StockScreener     = dynamic(() => import("@/components/stock/StockScreener"),     { loading: TabSk, ssr: false });
 const StockCompare      = dynamic(() => import("@/components/stock/StockCompare"),      { loading: TabSk, ssr: false });
@@ -28,6 +29,7 @@ const TABS = [
   { id: "overview",      label: "Overview" },
   { id: "fundamentals",  label: "Fundamentals" },
   { id: "valuation",     label: "Valuation" },
+  { id: "report",        label: "Report" },
   { id: "chart",         label: "Chart" },
   { id: "research",      label: "Research" },
   { id: "smartmoney",    label: "Smart Money" },
@@ -823,6 +825,7 @@ export default function StockTickerPage() {
             {activeTab === "overview"     && <StockOverview    data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />}
             {activeTab === "fundamentals" && <StockFundamentals data={data} loading={loading} ticker={ticker} />}
             {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
+            {activeTab === "report"       && <StockReport      data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} ticker={ticker} />}
             {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} icScore={icScore} dgs2={macro?.dgs2 as number ?? null} />}
             {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
             {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}

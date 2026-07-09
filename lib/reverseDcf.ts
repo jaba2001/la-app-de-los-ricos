@@ -53,8 +53,10 @@ export function computeWACC(rf: number, beta: number, creditStress: number | nul
 /**
  * Run the 10-year DCF model and return equity value per share.
  * Returns null if the model is undefined (wacc <= termGr).
+ * Exported so the forward DCF / research report (lib/researchReport.ts) reuses the
+ * exact same projection + Gordon-terminal math — one code path, no divergence.
  */
-function runDCF(
+export function runDCF(
   revenueTTM: number,
   fcfMarginTTM: number,
   netDebt: number,
