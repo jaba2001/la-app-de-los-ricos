@@ -2,6 +2,7 @@
 import type { MacroState } from "@/lib/types";
 import { computeRiskOn } from "@/lib/allocation";
 import { stockPickingRegime } from "@/lib/microScore";
+import { regimeConfirmation } from "@/lib/regimeLoop";
 
 interface Props { macro: MacroState | null; }
 
@@ -66,6 +67,29 @@ export default function RegimeRadar({ macro }: Props) {
           <div style={{ fontSize: "10px", fontWeight: 700, color: tiltColor }}>{tiltLabel}</div>
         </div>
       </div>
+
+      {/* A3 — the loop: top-down (risk-on) vs bottom-up (breadth). Divergence = early warning. */}
+      {(() => {
+        const conf = regimeConfirmation(riskOn, macro.breadth_200dma ?? null);
+        if (conf.state === "unknown") return null;
+        const isDiv = conf.state.startsWith("divergent");
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", marginBottom: "var(--sr-sp-3)", background: `color-mix(in srgb, ${conf.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${conf.color} 30%, transparent)` }}>
+            <div style={{ minWidth: 58, textAlign: "center" }}>
+              <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Breadth</div>
+              <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: conf.color, lineHeight: 1 }} className="num">{macro.breadth_200dma != null ? macro.breadth_200dma.toFixed(0) + "%" : "—"}</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-text)" }}>Top-down ↔ bottom-up:</span>
+                <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: conf.color }}>{conf.label}</span>
+                {isDiv && <span style={{ fontSize: "9px", fontWeight: 700, color: "var(--sr-neg)", padding: "1px 6px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-neg) 12%, transparent)" }}>EARLY WARNING</span>}
+              </div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 3, lineHeight: 1.45 }}>{conf.detail}</div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Stock-picking regime — VALIDATED switch (momentum selection pays when correlation is low) */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", marginBottom: "var(--sr-sp-3)", background: `color-mix(in srgb, ${picking.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${picking.color} 30%, transparent)` }}>

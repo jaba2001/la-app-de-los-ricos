@@ -41,6 +41,14 @@ interface AnthropicResponse {
 // without touching any caller. Default = the Anthropic passthrough on ic-proxy.
 export interface AiProvider { name: string; complete(model: string, maxTokens: number, prompt: string): Promise<string>; }
 
+// Both providers return Anthropic's { content:[{type:'text',text}] } shape — ic-proxy's
+// /api/llm normalizes any free provider (Groq/Gemini) to it — so parsing is shared.
+function parseAnthropic(res: AnthropicResponse): string {
+  const text = res.content?.filter((b) => b.type === "text" && typeof b.text === "string").map((b) => b.text).join("\n");
+  if (!text) throw new Error(res.error?.message ?? "Empty AI response");
+  return text;
+}
+
 const anthropicProvider: AiProvider = {
   name: "anthropic",
   async complete(model, maxTokens, prompt) {
@@ -48,13 +56,28 @@ const anthropicProvider: AiProvider = {
       method: "POST",
       body: JSON.stringify({ model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
     });
-    const text = res.content?.filter((b) => b.type === "text" && typeof b.text === "string").map((b) => b.text).join("\n");
-    if (!text) throw new Error(res.error?.message ?? "Empty AI response");
-    return text;
+    return parseAnthropic(res);
   },
 };
 
-let activeProvider: AiProvider = anthropicProvider;
+// Free-tier backend (Groq / Gemini) via ic-proxy /api/llm. The server picks the model, so
+// the client-side model name is ignored here. Enabled with NEXT_PUBLIC_AI_PROVIDER=free.
+const freeLlmProvider: AiProvider = {
+  name: "free",
+  async complete(_model, maxTokens, prompt) {
+    const res = await authedFetch<AnthropicResponse>("/api/llm", {
+      method: "POST",
+      body: JSON.stringify({ max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
+    });
+    return parseAnthropic(res);
+  },
+};
+
+// Default provider is swappable by env with zero code changes: set NEXT_PUBLIC_AI_PROVIDER=free
+// to run the whole AI layer on a free-tier backend (€0). The code grounding gate keeps a
+// weaker free model safe, so this doesn't sacrifice trust.
+let activeProvider: AiProvider =
+  (process.env.NEXT_PUBLIC_AI_PROVIDER || "").toLowerCase() === "free" ? freeLlmProvider : anthropicProvider;
 export function setAiProvider(p: AiProvider) { activeProvider = p; }
 export function getAiProvider(): AiProvider { return activeProvider; }
 

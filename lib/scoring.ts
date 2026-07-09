@@ -186,59 +186,47 @@ export function computeICHealthScore(macro: Pick<MacroState, "liquidity_cycle" |
   return Math.max(0, Math.min(100, 100 - (Number(csc) * 0.25 + (100 - Number(lcc)) * 0.35 + Number(rpc) * 0.20 + Number(grc) * 0.10 + Number(hsc) * 0.10)));
 }
 
+// A1 — UNIFIED MACRO VOICE. The stock score's macro tilt now derives from the SAME
+// stationary risk-on gauge the validated allocator uses (macro_state.risk_on), not from
+// the legacy ic_score/ted_spread/fear_greed grab-bag. When risk_on is absent it falls back
+// to a regime + recession/credit estimate, so the score and the allocator can never speak
+// with contradictory numbers. Correlation (selection regime) is surfaced separately via
+// stockPickingRegime, so it's intentionally NOT folded into this backdrop tilt.
 export function getMacroTilt(
-  macroState: { regime_id?: string | null; recession_prob?: number | null; credit_stress?: number | null; ic_score?: number | null; cartera_quadrant?: string | null; fear_greed?: number | null; ted_spread?: number | null; hy_oas?: number | null },
+  macroState: { regime_id?: string | null; recession_prob?: number | null; credit_stress?: number | null; risk_on?: number | null; hy_oas?: number | null; implied_corr?: number | null; ic_score?: number | null },
   sector: string
 ): { tilt: number; label: string; color: string; reasons: string[] } {
-  let tilt = 0;
   const reasons: string[] = [];
   const regime = macroState.regime_id ?? "neutral";
   const rpc = macroState.recession_prob != null ? Number(macroState.recession_prob) : 50;
   const csc = macroState.credit_stress  != null ? Number(macroState.credit_stress)  : 50;
-  const ic  = macroState.ic_score       != null ? Number(macroState.ic_score)        : null;
-  const fg  = macroState.fear_greed     != null ? Number(macroState.fear_greed)      : null;
-  const ted = macroState.ted_spread     != null ? Number(macroState.ted_spread)      : null;
+  const hy  = macroState.hy_oas != null ? Number(macroState.hy_oas) : null;
+
+  const REGIME_BASE: Record<string, number> = { expansion: 70, reflation: 58, neutral: 50, stagflation: 32, contraction: 22 };
+  const ro = macroState.risk_on != null
+    ? Math.max(0, Math.min(100, Number(macroState.risk_on)))
+    : Math.max(0, Math.min(100, (REGIME_BASE[regime] ?? 50) - (rpc - 50) * 0.3 - (csc - 50) * 0.2));
+
+  let tilt = Math.round(((ro - 50) / 50) * 10); // liquidity-led backdrop, ±10
+  reasons.push(`Risk-on gauge ${ro.toFixed(0)}/100 → ${ro >= 60 ? "risk-on" : ro >= 40 ? "neutral" : "risk-off"} backdrop`);
 
   const growthSectors    = ["Technology", "Consumer Cyclical", "Communication Services", "Real Estate"];
   const defensiveSectors = ["Utilities", "Consumer Defensive", "Healthcare"];
   const cyclicalSectors  = ["Energy", "Materials", "Industrials", "Financials"];
-
-  if (regime === "expansion") {
-    tilt += 8;
-    reasons.push("Expansion regime favors equities");
-    if (growthSectors.includes(sector))   { tilt += 4; reasons.push(`Growth tilt benefits ${sector}`); }
-  } else if (regime === "reflation") {
-    tilt += 3;
-    if (cyclicalSectors.includes(sector)) { tilt += 5; reasons.push(`Reflation favors ${sector}`); }
-  } else if (regime === "stagflation") {
-    tilt -= 8;
-    reasons.push("Stagflation — unfavorable macro backdrop");
-    if (growthSectors.includes(sector))    { tilt -= 5; reasons.push(`Growth tech underperforms in stagflation`); }
-    if (defensiveSectors.includes(sector)) { tilt += 3; reasons.push(`${sector} defensive tilt partially offsets`); }
-  } else if (regime === "contraction") {
-    tilt -= 12;
-    reasons.push("Contraction regime — risk-off");
-    if (defensiveSectors.includes(sector)) { tilt += 4; reasons.push(`${sector} is defensive`); }
+  if (ro >= 60) {
+    if (growthSectors.includes(sector))        { tilt += 3; reasons.push(`Risk-on favors ${sector} (growth)`); }
+    else if (cyclicalSectors.includes(sector)) { tilt += 2; reasons.push(`Risk-on lifts ${sector} (cyclical)`); }
+    else if (defensiveSectors.includes(sector)) { tilt -= 1; reasons.push(`${sector} lags in a risk-on tape`); }
+  } else if (ro < 40) {
+    if (defensiveSectors.includes(sector))     { tilt += 3; reasons.push(`${sector} is defensive in risk-off`); }
+    else if (growthSectors.includes(sector))   { tilt -= 3; reasons.push(`${sector} (growth) hurt in risk-off`); }
+    else if (cyclicalSectors.includes(sector)) { tilt -= 2; reasons.push(`${sector} (cyclical) soft in risk-off`); }
   }
 
-  if (rpc > 60) { tilt -= 5; reasons.push(`High recession probability (${rpc.toFixed(0)})`); }
+  // Secondary confirmations — kept small; the risk-on gauge already folds most of this in.
+  if (rpc > 60) { tilt -= 4; reasons.push(`High recession probability (${rpc.toFixed(0)})`); }
   else if (rpc > 40) { tilt -= 2; reasons.push(`Elevated recession probability`); }
-  if (csc > 60) { tilt -= 4; reasons.push(`Credit stress elevated`); }
-
-  // IC score adds direct macro health signal (independent of regime category)
-  if (ic != null) {
-    if (ic < 25)       { tilt -= 4; reasons.push(`Macro health very weak (IC ${ic.toFixed(0)})`); }
-    else if (ic < 40)  { tilt -= 2; reasons.push(`Macro health below average (IC ${ic.toFixed(0)})`); }
-    else if (ic > 72)  { tilt += 3; reasons.push(`Strong macro health (IC ${ic.toFixed(0)})`); }
-  }
-
-  // TED spread — interbank stress (above 50 bps is elevated; above 100 bps is crisis territory)
-  if (ted != null && ted > 100) { tilt -= 3; reasons.push(`TED spread elevated (${ted.toFixed(0)} bps)`); }
-  else if (ted != null && ted > 50) { tilt -= 1; reasons.push(`TED spread slightly elevated`); }
-
-  // Extreme fear creates buying opportunity; extreme greed signals risk
-  if (fg != null && fg < 20)  { tilt += 2; reasons.push(`Extreme fear — contrarian positive`); }
-  if (fg != null && fg > 80)  { tilt -= 2; reasons.push(`Extreme greed — elevated risk`); }
+  if (csc > 60 || (hy != null && hy > 500)) { tilt -= 3; reasons.push(`Credit stress elevated`); }
 
   tilt = Math.max(-20, Math.min(20, tilt));
   const label = tilt >= 6 ? "Favorable" : tilt >= -2 ? "Neutral" : tilt >= -8 ? "Caution" : "Unfavorable";

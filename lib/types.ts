@@ -111,6 +111,13 @@ export interface MacroState {
   credit_divergence?: boolean | null;
   /* Dalio Debt Cycle */
   dalio_stage?: number | null;
+  /* A2/A3 — micro→macro breadth (the bottom-up arrow) + the confirmation/divergence loop */
+  breadth_200dma?: number | null;
+  breadth_50dma?: number | null;
+  breadth_mom?: number | null;
+  breadth_1m?: number | null;
+  breadth_updated_at?: string | null;
+  regime_confirmation?: string | null;
 }
 
 /* ── Stock Analysis (from Supabase sl_analyses) ── */

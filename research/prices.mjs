@@ -92,6 +92,16 @@ export async function momentum(ticker, date) {
 }
 export async function hasPriceAt(ticker, date) { return idxOnOrBefore(await series(ticker), date) >= 0; }
 
+// Is the (adjusted) price on `date` above its trailing n-day simple moving average?
+// Returns null when there isn't enough history. Used by the breadth aggregator.
+export async function aboveSMA(ticker, n, date) {
+  const r = await series(ticker); const i = idxOnOrBefore(r, date);
+  if (i < 0 || i < n - 1) return null;
+  let sum = 0; for (let k = i - n + 1; k <= i; k++) sum += r[k].adj;
+  const sma = sum / n, px = r[i].adj;
+  return px > 0 && sma > 0 ? px > sma : null;
+}
+
 // Full history of daily log total-returns (adj-based), memoized via the same cache.
 // Used by correlation.mjs to build the realized-correlation engine. PIT-safe: callers
 // slice a trailing window ending on-or-before their as-of date.
