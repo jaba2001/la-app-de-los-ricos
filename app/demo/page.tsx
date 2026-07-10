@@ -12,7 +12,7 @@ import { regimeConfirmation } from "@/lib/regimeLoop";
 import { buildAllocation, computeRiskOn, ALLOC_ASSETS, ASSET_META } from "@/lib/allocation";
 import { secularRegime } from "@/lib/secular";
 import { stockPickingRegime } from "@/lib/microScore";
-import { ALLOCATOR_BACKTEST as A } from "@/lib/trackRecord";
+import { GROWTH_BACKTEST as A } from "@/lib/trackRecord";
 import type { MacroState } from "@/lib/types";
 import PaperFund from "@/components/macro/PaperFund";
 
@@ -104,7 +104,7 @@ export default function Demo() {
           {alloc && (
             <section style={{ ...card, marginBottom: "var(--sr-sp-4)" }}>
               <div className="sr-flex-between" style={{ marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
-                <div style={label}>Target allocation · risk-on blend (pre-momentum)</div>
+                <div style={label}>Target allocation · Growth mandate (pre-trend-gate)</div>
                 <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: alloc.tiltColor }}>{alloc.tiltLabel}</span>
               </div>
               <div style={{ display: "flex", height: 24, borderRadius: 6, overflow: "hidden", border: "1px solid var(--sr-border)", marginBottom: 6 }}>
@@ -119,7 +119,7 @@ export default function Demo() {
                   <span key={a} className="sr-hint" style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 2, background: ASSET_META[a].color, display: "inline-block" }} />{a} {((alloc.weights[a] || 0) * 100).toFixed(0)}%</span>
                 ))}
               </div>
-              <div className="sr-hint">The logged-in app adds the 12-1m momentum gate and inverse-vol sizing on top of this blend — the full validated strategy ({A.strategy.label}).</div>
+              <div className="sr-hint">The logged-in app adds the 12-1m trend gate on top, plus a Defensive profile (risk-parity, −7.5% max drawdown) for conservative mandates.</div>
             </section>
           )}
 
@@ -145,7 +145,7 @@ export default function Demo() {
       {/* Validated numbers + CTA */}
       <section style={{ ...card, background: "color-mix(in srgb, var(--sr-amber) 6%, var(--sr-surface))", borderColor: "color-mix(in srgb, var(--sr-amber) 26%, transparent)", textAlign: "center" }}>
         <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, marginBottom: 6 }}>
-          The strategy behind this read: Sharpe {A.strategy.sharpe.toFixed(2)} · max drawdown {A.strategy.maxDrawdown}% <span style={{ color: "var(--sr-text-3)", fontWeight: 400 }}>(SPY {A.spy.sharpe.toFixed(2)} · {A.spy.maxDrawdown}%)</span> — {A.months} months, out-of-sample, net of costs.
+          The Growth mandate behind this read: CAGR {A.strategy.cagr}% · Sharpe {A.strategy.sharpe.toFixed(2)} · max drawdown {A.strategy.maxDrawdown}% — beats the 60/40 ({A.benchmark.cagr}% · {A.benchmark.sharpe.toFixed(2)} · {A.benchmark.maxDrawdown}%) on every metric, {A.months} months net of costs. <span style={{ color: "var(--sr-text-3)", fontWeight: 400 }}>SPY did {A.spy.cagr}% with {A.spy.maxDrawdown}% — if you can hold through that, index and chill; we say so.</span>
         </div>
         <div style={{ display: "flex", gap: "var(--sr-sp-3)", justifyContent: "center", marginTop: "var(--sr-sp-3)", flexWrap: "wrap" }}>
           <button onClick={() => router.push("/login")} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "10px 26px", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>

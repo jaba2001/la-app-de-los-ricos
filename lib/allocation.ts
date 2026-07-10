@@ -38,6 +38,23 @@ export function computeRiskOn(c: { lcc: number | null; rpc: number | null; csc: 
   return Math.max(0, Math.min(100, 0.5 * lcc + 0.25 * (100 - rpc) + 0.25 * (100 - csc)));
 }
 
+// ── Risk profiles (2026-07-10 aggressive lab, research/aggressive_lab.mjs) ────────────
+// GROWTH is the default product profile: 100% equities when the gauge is risk-on (≥50),
+// the defensive basket otherwise, then the same 12-1m trend gate — NO risk-parity (it
+// dilutes the return engine). Measured 2007-2026: +459.8% (CAGR 9.2%) · Sharpe 0.96 ·
+// maxDD −17.6% — beats the static 60/40 on return, Sharpe AND drawdown in every window
+// tested, with ~⅓ of SPY's drawdown. Leverage (2× SSO), short hedges (SH) and long-vol
+// (VXX) were measured and REJECTED: none beat this risk-adjusted (aggressive_lab.json).
+// DEFENSIVE is the original low-vol blend + risk-parity (Sharpe 1.01 · maxDD −7.5%).
+export type RiskProfile = "growth" | "defensive";
+
+/** Growth profile weights: regime switch, not a blend. */
+export function growthWeights(riskOn: number): Weights {
+  return riskOn >= 50
+    ? { SPY: 1, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0 }
+    : { ...RISK_OFF };
+}
+
 /** Blend RISK_ON/RISK_OFF baskets by the 0-100 risk-on gauge. */
 export function blendWeights(riskOn: number): Weights {
   const t = Math.max(0, Math.min(1, (riskOn ?? 50) / 100));
@@ -86,6 +103,7 @@ export function riskParity(weights: Weights, vols: Partial<Record<AllocAsset, nu
 
 export interface Allocation {
   riskOn: number;
+  profile: RiskProfile;
   tiltLabel: "Risk-on" | "Neutral" | "Risk-off";
   tiltColor: string;
   weights: Weights;
@@ -96,19 +114,23 @@ export interface Allocation {
 }
 
 /** Full target allocation from the risk-on gauge + (optional) 12-1m momentum + (optional)
- *  inverse-vol risk-parity sizing (A6). */
-export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Record<AllocAsset, number | null>>; vols?: Partial<Record<AllocAsset, number | null>> }): Allocation {
+ *  inverse-vol risk-parity sizing (A6, defensive profile only). Default profile: growth. */
+export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Record<AllocAsset, number | null>>; vols?: Partial<Record<AllocAsset, number | null>>; profile?: RiskProfile }): Allocation {
   const riskOn = Math.max(0, Math.min(100, opts.riskOn));
-  const base = blendWeights(riskOn);
+  const profile: RiskProfile = opts.profile ?? "growth";
+  const base = profile === "growth" ? growthWeights(riskOn) : blendWeights(riskOn);
   const momentumApplied = !!opts.momentum && Object.values(opts.momentum).some((v) => v != null);
   const gated = applyDualMomentum(base, opts.momentum ?? {});
   const movedToCash = gated.movedToCash;
-  const riskParityApplied = !!opts.vols && Object.values(opts.vols).some((v) => v != null);
+  // Risk-parity is part of the DEFENSIVE mandate only — on growth it dilutes the engine.
+  const riskParityApplied = profile === "defensive" && !!opts.vols && Object.values(opts.vols).some((v) => v != null);
   const weights = riskParityApplied ? riskParity(gated.weights, opts.vols!) : gated.weights;
   const tiltLabel = riskOn >= 60 ? "Risk-on" : riskOn >= 40 ? "Neutral" : "Risk-off";
   const tiltColor = riskOn >= 60 ? "var(--sr-pos)" : riskOn >= 40 ? "var(--sr-warn)" : "var(--sr-neg)";
   const rationale: string[] = [
-    `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: blend ${riskOn.toFixed(0)}% risk-on basket / ${(100 - riskOn).toFixed(0)}% defensive basket.`,
+    profile === "growth"
+      ? `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: Growth mandate holds ${riskOn >= 50 ? "100% equities" : "the defensive basket"} (switch at 50).`
+      : `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: blend ${riskOn.toFixed(0)}% risk-on basket / ${(100 - riskOn).toFixed(0)}% defensive basket.`,
   ];
   if (momentumApplied) {
     rationale.push(movedToCash.length
@@ -118,5 +140,5 @@ export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Recor
     rationale.push(`Momentum data unavailable — showing the risk-on tilt without the trend gate.`);
   }
   if (riskParityApplied) rationale.push(`Inverse-vol (risk-parity) sizing applied — sleeves weighted by 1/volatility (validated: −7.5% max drawdown vs −10.1%).`);
-  return { riskOn, tiltLabel, tiltColor, weights, movedToCash, momentumApplied, riskParityApplied, rationale };
+  return { riskOn, profile, tiltLabel, tiltColor, weights, movedToCash, momentumApplied, riskParityApplied, rationale };
 }

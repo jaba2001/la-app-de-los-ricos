@@ -10,9 +10,9 @@ import {
 } from "../lib/technicalIndicators.ts";
 import { runBacktest } from "../lib/backtest.ts";
 import { normalizeFundamentals } from "../lib/normalize.ts";
-import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, ALLOC_ASSETS } from "../lib/allocation.ts";
-import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs } from "../research/allocate.mjs";
-import { ALLOCATOR_BACKTEST } from "../lib/trackRecord.ts";
+import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, growthWeights as gwTs, ALLOC_ASSETS } from "../lib/allocation.ts";
+import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs, growthWeights as gwJs } from "../research/allocate.mjs";
+import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -323,6 +323,14 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   for (const k of ALLOC_ASSETS) ok(Math.abs(da.weights[k] - db.weights[k]) < 1e-12, `parity dualMomentum: ${k}`);
   ok(da.movedToCash.slice().sort().join() === db.movedToCash.slice().sort().join(), `parity dualMomentum: movedToCash (${da.movedToCash} vs ${db.movedToCash})`);
   ok(da.weights.SPY === 0 && da.weights.DBC === 0 && da.weights.TLT > 0, "dualMomentum: negative sleeves gated, positive kept");
+
+  // Growth profile parity + semantics (the default product mandate).
+  for (const ro of [0, 49.9, 50, 63, 100]) {
+    const a = gwTs(ro), b = gwJs(ro);
+    for (const k of ALLOC_ASSETS) ok(Math.abs(a[k] - b[k]) < 1e-12, `parity growthWeights(${ro}): ${k}`);
+    approx(ALLOC_ASSETS.reduce((s, k) => s + a[k], 0), 1, 1e-9, `growthWeights(${ro}): sums to 1`);
+  }
+  ok(gwTs(50).SPY === 1 && gwTs(49.9).SPY < 1, "growth: switch at exactly 50");
 }
 
 // ── Claims anti-drift (F1.2) ──────────────────────────────────────────────────
@@ -346,6 +354,22 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
     ok(ALLOCATOR_BACKTEST.months === m.months, `claims drift: months ${ALLOCATOR_BACKTEST.months} vs measured ${m.months}`);
   } else {
     console.log("  (claims anti-drift: research/out/backtest_assets_summary.json not present — skipped)");
+  }
+
+  // Same guard for the GROWTH profile claims vs the latest aggressive_lab.json.
+  const labPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "aggressive_lab.json");
+  if (existsSync(labPath)) {
+    const lab = JSON.parse(readFileSync(labPath, "utf8"));
+    const pairsG = [["strategy", "AGG-switch (binary)"], ["benchmark", "Static 60/40"], ["spy", "SPY buy & hold"]];
+    for (const [claim, key] of pairsG) {
+      const c = GROWTH_BACKTEST[claim], meas = lab.results?.[key];
+      ok(!!meas, `growth claims: measured "${key}" present`);
+      if (!meas) continue;
+      ok(Math.abs(c.totalReturn - meas.total) <= Math.max(3, Math.abs(meas.total) * 0.02), `growth drift: ${claim} total ${c.totalReturn} vs ${meas.total.toFixed(1)}`);
+      ok(Math.abs(c.sharpe - meas.sharpe) <= 0.03, `growth drift: ${claim} sharpe ${c.sharpe} vs ${meas.sharpe.toFixed(2)}`);
+      ok(Math.abs(c.maxDrawdown - meas.maxDD) <= 0.5, `growth drift: ${claim} maxDD ${c.maxDrawdown} vs ${meas.maxDD.toFixed(1)}`);
+    }
+    ok(GROWTH_BACKTEST.months === lab.months, `growth drift: months ${GROWTH_BACKTEST.months} vs ${lab.months}`);
   }
 
   // Same guard for the A5 ensemble weights vs the latest measured signals_ic.json.

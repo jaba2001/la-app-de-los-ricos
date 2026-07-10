@@ -41,6 +41,14 @@ export function targetWeights(regimeId) {
 const RISK_ON  = { SPY: 0.55, TLT: 0.10, IEF: 0.10, GLD: 0.05, DBC: 0.15, BIL: 0.05 };
 const RISK_OFF = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.05, BIL: 0.15 };
 
+/** Growth profile (2026-07-10 lab): regime SWITCH, not a blend — 100% equities when the
+ *  gauge is risk-on (≥50), defensive basket otherwise. Lock-step with lib/allocation.ts. */
+export function growthWeights(riskOn) {
+  return riskOn >= 50
+    ? { SPY: 1, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0 }
+    : { ...RISK_OFF };
+}
+
 /** Blend RISK_ON/RISK_OFF baskets by riskOn (0-100). */
 export function blendWeights(riskOn) {
   const t = Math.max(0, Math.min(1, (riskOn ?? 50) / 100));

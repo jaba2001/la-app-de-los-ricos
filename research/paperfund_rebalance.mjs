@@ -9,8 +9,8 @@
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { ASSETS, blendWeights, applyDualMomentum, riskParity } from "./allocate.mjs";
-import { fwdReturn, returnsSeries } from "./prices.mjs";
+import { ASSETS, growthWeights, applyDualMomentum } from "./allocate.mjs";
+import { fwdReturn } from "./prices.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -34,29 +34,25 @@ async function fetchRiskOn() {
 const riskOn = (process.env.RISK_ON != null ? Number(process.env.RISK_ON) : await fetchRiskOn()) ?? 50;
 console.log(`\n  PAPER FUND rebalance · ${today} · risk-on ${riskOn.toFixed(1)}`);
 
-// 2) blend the risk-on/off baskets, then 3) gate on 12-1m absolute momentum.
-const base = blendWeights(riskOn);
+// 2) GROWTH mandate (2026-07-10 lab, user-approved): regime switch — 100% equities when
+// risk-on (≥50), defensive basket otherwise — then 3) the 12-1m momentum gate. No
+// risk-parity (defensive-mandate feature; it dilutes the return engine). The fund's
+// mandate change is disclosed in the rebalance note, like any fund would.
+const base = growthWeights(riskOn);
 const mom = {};
 for (const a of ASSETS) {
   try { mom[a] = await fwdReturn(a, addMonths(today, -12), addMonths(today, -1)); } catch { mom[a] = null; }
 }
 const gated = applyDualMomentum(base, mom).weights;
 const movedToCash = applyDualMomentum(base, mom).movedToCash;
-// A6 — inverse-vol (risk-parity) sizing: trailing 63-day realized vol per asset.
-const vols = {};
-for (const a of ASSETS) {
-  try { const r = await returnsSeries(a); const win = r.slice(-63).map((x) => x.ret); if (win.length >= 40) { const m = win.reduce((s, x) => s + x, 0) / win.length; vols[a] = Math.sqrt(win.reduce((s, x) => s + (x - m) ** 2, 0) / (win.length - 1)); } else vols[a] = null; }
-  catch { vols[a] = null; }
-}
-const weights = riskParity(gated, vols);
 // round + renormalize for a clean snapshot
-let sum = 0; for (const a of ASSETS) sum += weights[a];
-const w = {}; for (const a of ASSETS) w[a] = +(weights[a] / (sum || 1)).toFixed(4);
+let sum = 0; for (const a of ASSETS) sum += gated[a];
+const w = {}; for (const a of ASSETS) w[a] = +(gated[a] / (sum || 1)).toFixed(4);
 
 console.log("  target weights:", Object.entries(w).map(([a, v]) => `${a} ${(v * 100).toFixed(0)}%`).join("  "));
 console.log("  moved to cash:", movedToCash.length ? movedToCash.join(", ") : "none");
 
-const row = { rebalance_date: today, weights: w, risk_on: +riskOn.toFixed(1), moved_to_cash: movedToCash, note: `risk-on ${riskOn.toFixed(0)}; momentum gate → ${movedToCash.length ? movedToCash.join("/") + " to cash" : "all sleeves kept"}` };
+const row = { rebalance_date: today, weights: w, risk_on: +riskOn.toFixed(1), moved_to_cash: movedToCash, note: `GROWTH mandate (adopted 2026-07-10): risk-on ${riskOn.toFixed(0)} → ${riskOn >= 50 ? "100% equities" : "defensive basket"}; momentum gate → ${movedToCash.length ? movedToCash.join("/") + " to cash" : "all sleeves kept"}` };
 writeFileSync(join(OUT, "paperfund_rebalance.json"), JSON.stringify(row, null, 2));
 console.log(`  → wrote research/out/paperfund_rebalance.json`);
 

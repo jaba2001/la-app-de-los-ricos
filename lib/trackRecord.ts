@@ -36,6 +36,25 @@ export interface BacktestSummary {
 // Sources: research/backtest_assets.mjs (REGIME=stationary, 2007-2026),
 // research/walkforward.mjs (OOS), research/backtest.mjs --full 500 (0A momentum).
 
+// ── GROWTH profile (default product mandate, 2026-07-10 aggressive lab) ─────────────
+// research/aggressive_lab.mjs, 234 months 2007-2026, net of 10bp/side, stationary regime.
+// The honest claim: beats the static 60/40 on return, Sharpe AND drawdown in EVERY window
+// tested (full / 2007-2019 / 2020-2026); ~85% of SPY's CAGR with a third of its drawdown.
+// It does NOT beat SPY's total return — nothing unlevered did; leverage (2× SSO), short
+// hedges (SH) and long-vol (VXX) were measured and rejected (worse risk-adjusted).
+export const GROWTH_BACKTEST = {
+  period: "Jan 2007 – Jun 2026",
+  months: 234,
+  strategy:  { label: "Growth — regime switch + trend gate", totalReturn: 459.8, cagr: 9.2, sharpe: 0.96, maxDrawdown: -17.6 },
+  benchmark: { label: "Static 60/40",                        totalReturn: 368.0, cagr: 8.2, sharpe: 0.86, maxDrawdown: -28.8 },
+  spy:       { label: "SPY buy & hold",                      totalReturn: 652.2, cagr: 10.9, sharpe: 0.72, maxDrawdown: -50.7 },
+  subPeriods: [
+    { label: "2007–2019", strat: "+183% · 0.96 · −16%", benchmark: "+161% · 0.88 · −29%", spy: "+196% · 0.62 · −51%" },
+    { label: "2020–2026", strat: "+97% · 0.98 · −18%",  benchmark: "+80% · 0.83 · −20%",  spy: "+154% · 0.89 · −24%" },
+  ],
+  rejected: "Measured and rejected as inferior risk-adjusted: 2× leverage (SSO), short-hedge overlays (SH), long-vol (VXX static & timed), monthly vol-targeting, QQQ concentration. See research/out/aggressive_lab.json.",
+};
+
 export const ALLOCATOR_BACKTEST = {
   period: "Jan 2007 – Jun 2026",
   months: 234,

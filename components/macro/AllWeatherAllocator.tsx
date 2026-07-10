@@ -4,8 +4,9 @@ import { authedFetch } from "@/lib/proxy";
 import type { MacroState } from "@/lib/types";
 import {
   ALLOC_ASSETS, ASSET_META, computeRiskOn, buildAllocation,
-  type AllocAsset,
+  type AllocAsset, type RiskProfile,
 } from "@/lib/allocation";
+import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as D } from "@/lib/trackRecord";
 
 interface Props { macro: MacroState | null; }
 
@@ -56,6 +57,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
   const [mom, setMom] = useState<Partial<Record<AllocAsset, number | null>> | null>(null);
   const [vols, setVols] = useState<Partial<Record<AllocAsset, number | null>> | null>(null);
   const [momLoading, setMomLoading] = useState(true);
+  const [profile, setProfile] = useState<RiskProfile>("growth");
 
   useEffect(() => {
     let alive = true;
@@ -82,7 +84,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
     return computeRiskOn({ lcc: macro.liquidity_cycle, rpc: macro.recession_prob, csc: macro.credit_stress });
   }, [macro]);
 
-  const alloc = useMemo(() => buildAllocation({ riskOn, momentum: mom ?? undefined, vols: vols ?? undefined }), [riskOn, mom, vols]);
+  const alloc = useMemo(() => buildAllocation({ riskOn, momentum: mom ?? undefined, vols: vols ?? undefined, profile }), [riskOn, mom, vols, profile]);
 
   if (!macro) return null;
 
@@ -95,7 +97,20 @@ export default function AllWeatherAllocator({ macro }: Props) {
         <div>
           <div className="section-label" style={{ margin: 0 }}>All-Weather Allocator</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 460, lineHeight: 1.5 }}>
-            Liquidity-led risk-on tilt across six liquid ETFs, with a 12-1m momentum trend gate and inverse-vol (risk-parity) sizing. The multi-asset engine — where the measured edge lives.
+            {profile === "growth"
+              ? "Growth mandate: 100% equities when the liquidity-led gauge is risk-on, the defensive basket when it isn't, with a 12-1m trend gate. The return engine."
+              : "Defensive mandate: continuous risk-on blend across six ETFs, trend gate and inverse-vol (risk-parity) sizing. The lowest-drawdown engine."}
+          </div>
+          <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+            {(["growth", "defensive"] as const).map((p) => (
+              <button key={p} onClick={() => setProfile(p)} style={{
+                fontSize: "10px", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em",
+                padding: "3px 10px", borderRadius: "var(--sr-radius-pill)", cursor: "pointer",
+                background: profile === p ? "color-mix(in srgb, var(--sr-amber) 16%, transparent)" : "var(--sr-surface-2)",
+                border: `1px solid ${profile === p ? "color-mix(in srgb, var(--sr-amber) 45%, transparent)" : "var(--sr-border)"}`,
+                color: profile === p ? "var(--sr-amber)" : "var(--sr-text-3)",
+              }}>{p}</button>
+            ))}
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -149,11 +164,16 @@ export default function AllWeatherAllocator({ macro }: Props) {
 
       {/* Validated backtest anchor */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
-        {[
-          { k: "Backtest 2007–2026", v: "Sharpe 1.01" },
-          { k: "Max drawdown", v: "−7.5%" },
-          { k: "vs SPY buy & hold", v: "0.72 · −50.7%" },
-        ].map((s) => (
+        {(profile === "growth" ? [
+          { k: "Backtest 2007–2026", v: `+${G.strategy.totalReturn.toFixed(0)}% · Sharpe ${G.strategy.sharpe.toFixed(2)}` },
+          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}%` },
+          { k: "vs 60/40 (honest benchmark)", v: `+${G.benchmark.totalReturn.toFixed(0)}% · ${G.benchmark.sharpe.toFixed(2)} · ${G.benchmark.maxDrawdown}%` },
+          { k: "vs SPY (full disclosure)", v: `+${G.spy.totalReturn.toFixed(0)}% · ${G.spy.maxDrawdown}%` },
+        ] : [
+          { k: "Backtest 2007–2026", v: `Sharpe ${D.strategy.sharpe.toFixed(2)}` },
+          { k: "Max drawdown", v: `${D.strategy.maxDrawdown}%` },
+          { k: "vs SPY buy & hold", v: `${D.spy.sharpe.toFixed(2)} · ${D.spy.maxDrawdown}%` },
+        ]).map((s) => (
           <div key={s.k}>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>
             <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-text)" }} className="num">{s.v}</div>
@@ -161,7 +181,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
         ))}
       </div>
       <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        Out-of-sample, net of costs, regime-independent control beaten in both sub-periods. Educational — not investment advice; ETF examples, not recommendations.
+        Out-of-sample, net of costs, benchmarks beaten in both sub-periods (Growth vs 60/40; Defensive vs the regime-free control). Leverage, short hedges and long-vol were measured and rejected. Educational — not investment advice; ETF examples, not recommendations.
       </div>
     </div>
   );
