@@ -58,10 +58,12 @@ export async function POST(request) {
   try { body = await request.json(); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
-  if (typeof body.max_tokens !== 'number' || body.max_tokens > 4096) return json({ error: 'max_tokens missing or >4096' }, 400);
+  // Number.isFinite rejects NaN/Infinity (typeof NaN === 'number' would pass); floor ≥1
+  // so a 0/negative value can't reach the providers as an invalid request.
+  if (!Number.isFinite(body.max_tokens) || body.max_tokens < 1 || body.max_tokens > 4096) return json({ error: 'max_tokens must be a number in [1, 4096]' }, 400);
   if (!Array.isArray(body.messages) || body.messages.length === 0) return json({ error: 'messages array required' }, 400);
 
-  const maxTokens = Math.min(4096, body.max_tokens);
+  const maxTokens = Math.floor(Math.min(4096, body.max_tokens));
   const prompt = body.messages.map((m) => (typeof m.content === 'string' ? m.content : '')).join('\n').trim();
   if (!prompt) return json({ error: 'empty prompt' }, 400);
 

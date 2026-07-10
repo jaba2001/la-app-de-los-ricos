@@ -30,8 +30,9 @@ export async function POST(request) {
   if (!ALLOWED_MODELS.has(body.model)) {
     return new Response(JSON.stringify({error:'Model not allowed', allowed: [...ALLOWED_MODELS]}), {status:400, headers:{'Content-Type':'application/json'}});
   }
-  if (typeof body.max_tokens !== 'number' || body.max_tokens > 4096) {
-    return new Response(JSON.stringify({error:'max_tokens missing or >4096'}), {status:400, headers:{'Content-Type':'application/json'}});
+  // Number.isFinite rejects NaN/Infinity (typeof NaN === 'number' would pass).
+  if (!Number.isFinite(body.max_tokens) || body.max_tokens < 1 || body.max_tokens > 4096) {
+    return new Response(JSON.stringify({error:'max_tokens must be a number in [1, 4096]'}), {status:400, headers:{'Content-Type':'application/json'}});
   }
   if (!Array.isArray(body.messages) || body.messages.length === 0) {
     return new Response(JSON.stringify({error:'messages array required'}), {status:400, headers:{'Content-Type':'application/json'}});
