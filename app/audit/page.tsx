@@ -53,8 +53,8 @@ export default function AuditPage() {
       {loaded && rows.length > 0 && (
         <div className="sr-grid-3" style={{ marginBottom: "var(--sr-sp-5)" }}>
           <div className="sr-tile"><div className="sr-tile-label">Logged runs</div><div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700 }} className="num">{stats.total}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Grounded</div><div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: "var(--sr-pos)" }} className="num">{stats.pct}%</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{stats.grounded}/{stats.total} clean</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Flagged figures</div><div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: stats.flagged ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">{stats.flagged}</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>runs with unverified numbers</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">Grounded</div><div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: "var(--sr-pos)" }} className="num">{stats.pct}%</div><div className="sr-hint">{stats.grounded}/{stats.total} clean</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">Flagged figures</div><div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: stats.flagged ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">{stats.flagged}</div><div className="sr-hint">runs with unverified numbers</div></div>
         </div>
       )}
 

@@ -65,7 +65,7 @@ export default function EarningsTone({ ticker }: Props) {
             style={{ width: "100%", resize: "vertical", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface)", border: "1px solid var(--sr-border)", color: "var(--sr-text)", fontSize: "var(--sr-t-xs)", lineHeight: 1.5, fontFamily: "inherit", outline: "none" }}
           />
           <div className="sr-flex-between" style={{ marginTop: "var(--sr-sp-2)" }}>
-            <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{transcript.length.toLocaleString()} chars {transcript.length > 16000 ? "(first 16k analyzed)" : ""}</span>
+            <span className="sr-hint">{transcript.length.toLocaleString()} chars {transcript.length > 16000 ? "(first 16k analyzed)" : ""}</span>
             <button className="btn-primary" onClick={analyze} disabled={loading}>{loading ? "Analyzing…" : "✦ Analyze tone"}</button>
           </div>
         </div>

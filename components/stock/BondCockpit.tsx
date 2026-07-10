@@ -116,7 +116,7 @@ function TreasuryCalc({ coupon, setCoupon, maturity, setMaturity, synthYtm, synt
     <div>
       <div className="section-label" style={{ margin: "0 0 var(--sr-sp-2)" }}>Treasury calculator (FRED curve)</div>
       {curveLen === 0 ? (
-        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>Treasury curve not available.</div>
+        <div className="sr-hint">Treasury curve not available.</div>
       ) : (
         <>
           <div style={{ display: "flex", gap: "var(--sr-sp-4)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>

@@ -37,12 +37,12 @@ export interface BacktestSummary {
 // research/walkforward.mjs (OOS), research/backtest.mjs --full 500 (0A momentum).
 
 export const ALLOCATOR_BACKTEST = {
-  period: "Jul 2007 – Jun 2026",
-  months: 228,
-  strategy: { label: "Risk-on tilt + dual-momentum + risk-parity", totalReturn: 151.1, sharpe: 1.02, maxDrawdown: -7.5 },
-  strategyNoRP: { label: "Risk-on tilt + dual-momentum (no risk-parity)", totalReturn: 210.1, sharpe: 1.01, maxDrawdown: -10.1 },
-  control:  { label: "Dual-momentum only (no regime)", totalReturn: 185.3, sharpe: 0.88, maxDrawdown: -14.0 },
-  spy:      { label: "SPY buy & hold", totalReturn: 602.3, sharpe: 0.71, maxDrawdown: -50.7 },
+  period: "Jan 2007 – Jun 2026",
+  months: 234,
+  strategy: { label: "Risk-on tilt + dual-momentum + risk-parity", totalReturn: 153.5, sharpe: 1.01, maxDrawdown: -7.5 },
+  strategyNoRP: { label: "Risk-on tilt + dual-momentum (no risk-parity)", totalReturn: 220.1, sharpe: 1.02, maxDrawdown: -10.1 },
+  control:  { label: "Dual-momentum only (no regime)", totalReturn: 192.2, sharpe: 0.89, maxDrawdown: -14.0 },
+  spy:      { label: "SPY buy & hold", totalReturn: 652.2, sharpe: 0.72, maxDrawdown: -50.7 },
   walkForward: { period: "2011–2026", oosMonths: 178, oosSharpe: 0.99, overfitGap: 0.01 },
   subPeriods: [
     { label: "pre-2020 (out-of-sample)", strat: 0.93, control: 0.75, spy: 0.60 },

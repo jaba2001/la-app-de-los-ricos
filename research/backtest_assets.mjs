@@ -115,14 +115,21 @@ async function volAsOf(asset, date, win = 63) {
   vsCache.set(k, v); return v;
 }
 // Re-weight the gated risk sleeves ∝ 1/vol (BIL/cash kept as-is), preserving the total
-// risk-sleeve allocation. Falls back to the input weight when vol is unknown.
+// risk-sleeve allocation. A sleeve with no vol reading gets the MEAN inverse-vol of the
+// available sleeves (neutral sizing) — same fallback as allocate.mjs/lib/allocation.ts,
+// so the backtest validates exactly what production runs.
 async function riskParity(weights, date) {
   const risk = ASSETS.filter((a) => a !== "BIL" && (weights[a] || 0) > 0);
   const cashW = weights.BIL || 0;
   const riskTotal = risk.reduce((s, a) => s + weights[a], 0);
   if (riskTotal <= 0) return { ...weights };
+  const vols = {};
+  for (const a of risk) vols[a] = await volAsOf(a, date);
+  const avail = risk.filter((a) => vols[a] != null && vols[a] > 0);
+  if (avail.length === 0) return { ...weights };
+  const meanInv = avail.reduce((s, a) => s + 1 / vols[a], 0) / avail.length;
   const inv = {}; let invSum = 0;
-  for (const a of risk) { const v = await volAsOf(a, date); const iv = v && v > 0 ? 1 / v : (weights[a] / riskTotal); inv[a] = iv; invSum += iv; }
+  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : meanInv; inv[a] = iv; invSum += iv; }
   const out = { BIL: cashW };
   for (const a of risk) out[a] = riskTotal * (inv[a] / invSum);
   return out;

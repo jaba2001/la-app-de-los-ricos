@@ -67,15 +67,21 @@ export function applyDualMomentum(weights, mom) {
 
 /**
  * A6 — inverse-volatility (risk-parity) sizing of the gated risk sleeves (BIL untouched).
- * Validated OOS 2007-2026: Sharpe 1.02 vs 1.01, max drawdown −7.5% vs −10.1%. Kept in
+ * Validated OOS 2007-2026: Sharpe 1.01 vs 1.02, max drawdown −7.5% vs −10.1%. Kept in
  * lock-step with lib/allocation.ts. `vols` = each asset's recent realized volatility.
  */
 export function riskParity(weights, vols) {
   const risk = ASSETS.filter((a) => a !== "BIL" && (weights[a] || 0) > 0);
   const riskTotal = risk.reduce((s, a) => s + weights[a], 0);
   if (riskTotal <= 0) return { ...weights };
+  // A sleeve with no vol reading gets the MEAN inverse-vol of the available sleeves
+  // (neutral sizing) — mixing a weight-share with 1/vol values would crush or inflate it
+  // depending on the vol scale. No vols at all → weights unchanged.
+  const avail = risk.filter((a) => vols[a] != null && vols[a] > 0);
+  if (avail.length === 0) return { ...weights };
+  const meanInv = avail.reduce((s, a) => s + 1 / vols[a], 0) / avail.length;
   const inv = {}; let invSum = 0;
-  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : weights[a] / riskTotal; inv[a] = iv; invSum += iv; }
+  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : meanInv; inv[a] = iv; invSum += iv; }
   const out = { ...weights };
   for (const a of risk) out[a] = riskTotal * (inv[a] / invSum);
   return out;

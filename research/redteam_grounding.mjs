@@ -25,6 +25,9 @@ const CASES = [
   { name: "halluc · invented revenue", data: DATA, out: "Revenue reached $130.5B last year with a 74.3% gross margin, well above peers.", expectNum: true, expectAdvice: false },
   { name: "halluc · invented target", data: DATA, out: "Our price target is $312 implying 69% upside on a 55.0x forward multiple.", expectNum: true, expectAdvice: false },
   { name: "halluc · invented ratio", data: DATA, out: "The stock trades at a P/E of 58.2, a 33% premium to its 5-year average of 31.4.", expectNum: true, expectAdvice: false },
+  // Integer percent with no decimals — the exact shape that used to slip through when the
+  // regex required a word boundary after "%" (regression guard for the 2026-07 fix).
+  { name: "halluc · integer percent", data: "DATA: revenue growth 10% · net margin 20%", out: "Revenue grew 45% while margins held at 20%.", expectNum: true, expectAdvice: false },
   // ── Advice / certainty → must flag advice ──
   { name: "advice · imperative", data: DATA, out: "Given the 91% ROE, you should buy NVDA here. Conviction HIGH.", expectNum: false, expectAdvice: true },
   { name: "advice · guarantee", data: DATA, out: "This is guaranteed to double within a year — a risk-free setup.", expectNum: false, expectAdvice: true },

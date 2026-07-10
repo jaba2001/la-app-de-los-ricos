@@ -125,7 +125,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
               </div>
               <div style={{ minWidth: 118 }}>
                 <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: "var(--sr-text)" }}>{meta.label}</div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>
+                <div className="sr-hint">
                   {meta.role}
                   {m != null && <span style={{ marginLeft: 6, color: m > 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>· 12-1m {m > 0 ? "+" : ""}{m.toFixed(0)}%</span>}
                 </div>
@@ -150,9 +150,9 @@ export default function AllWeatherAllocator({ macro }: Props) {
       {/* Validated backtest anchor */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
         {[
-          { k: "Backtest 2007–2026", v: "Sharpe 1.02" },
+          { k: "Backtest 2007–2026", v: "Sharpe 1.01" },
           { k: "Max drawdown", v: "−7.5%" },
-          { k: "vs SPY buy & hold", v: "0.71 · −50.7%" },
+          { k: "vs SPY buy & hold", v: "0.72 · −50.7%" },
         ].map((s) => (
           <div key={s.k}>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>

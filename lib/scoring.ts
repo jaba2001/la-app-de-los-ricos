@@ -1,21 +1,26 @@
 import type { ScoreInputs, Scores, MacroState } from "./types";
 
+// FMP-stable profiles say "Financial Services" / "Basic Materials"; older sources and the
+// GICS convention say "Financials" / "Materials". Every sector map carries BOTH spellings so
+// no name silently falls out of sector-relative valuation, its sector ETF, or the macro tilt.
 export const SECTOR_PE_BM: Record<string, number> = {
-  Technology: 28, Healthcare: 22, Financials: 14, "Consumer Cyclical": 20,
-  "Consumer Defensive": 18, Industrials: 18, Energy: 12, Materials: 14,
+  Technology: 28, Healthcare: 22, Financials: 14, "Financial Services": 14,
+  "Consumer Cyclical": 20, "Consumer Defensive": 18, Industrials: 18, Energy: 12,
+  Materials: 14, "Basic Materials": 14,
   Utilities: 16, "Real Estate": 22, "Communication Services": 22,
 };
 
 export const SECTOR_EV_BM: Record<string, number> = {
-  Technology: 22, Healthcare: 18, Financials: 12, "Consumer Cyclical": 14,
-  "Consumer Defensive": 14, Industrials: 14, Energy: 7, Materials: 10,
+  Technology: 22, Healthcare: 18, Financials: 12, "Financial Services": 12,
+  "Consumer Cyclical": 14, "Consumer Defensive": 14, Industrials: 14, Energy: 7,
+  Materials: 10, "Basic Materials": 10,
   Utilities: 12, "Real Estate": 20, "Communication Services": 16,
 };
 
 export const SECTOR_ETF: Record<string, string> = {
-  Technology: "XLK", Healthcare: "XLV", Financials: "XLF",
+  Technology: "XLK", Healthcare: "XLV", Financials: "XLF", "Financial Services": "XLF",
   "Consumer Cyclical": "XLY", "Consumer Defensive": "XLP",
-  Industrials: "XLI", Energy: "XLE", Materials: "XLB",
+  Industrials: "XLI", Energy: "XLE", Materials: "XLB", "Basic Materials": "XLB",
   Utilities: "XLU", "Real Estate": "XLRE", "Communication Services": "XLC",
 };
 
@@ -152,10 +157,13 @@ export function calcScores(inp: ScoreInputs): Scores {
   else if (regime === "stagflation") { hW = 1.2;  mW = 0.75; gW = 0.75; }
   else if (regime === "contraction") { hW = 1.25; mW = 0.6;  gW = 0.7;  vW = 1.05; }
 
-  value    = Math.min(25, Math.round(value    * vW));
-  health   = Math.min(30, Math.round(health   * hW));
-  momentum = Math.min(25, Math.round(momentum * mW));
-  growth   = Math.min(20, Math.round(growth   * gW));
+  // Clamp to the published pillar bounds [0..cap]. Penalties (short float, negative FCF
+  // divergence, inst. selling…) offset points WITHIN a pillar but can't take it below 0 —
+  // otherwise a name with only penalty signals renders a negative gauge.
+  value    = Math.max(0, Math.min(25, Math.round(value    * vW)));
+  health   = Math.max(0, Math.min(30, Math.round(health   * hW)));
+  momentum = Math.max(0, Math.min(25, Math.round(momentum * mW)));
+  growth   = Math.max(0, Math.min(20, Math.round(growth   * gW)));
 
   // B2 — Rate sensitivity penalty (high leverage in hostile macro)
   if (inp.debtEquity != null && inp.debtEquity > 1.5 &&
@@ -212,7 +220,7 @@ export function getMacroTilt(
 
   const growthSectors    = ["Technology", "Consumer Cyclical", "Communication Services", "Real Estate"];
   const defensiveSectors = ["Utilities", "Consumer Defensive", "Healthcare"];
-  const cyclicalSectors  = ["Energy", "Materials", "Industrials", "Financials"];
+  const cyclicalSectors  = ["Energy", "Materials", "Basic Materials", "Industrials", "Financials", "Financial Services"];
   if (ro >= 60) {
     if (growthSectors.includes(sector))        { tilt += 3; reasons.push(`Risk-on favors ${sector} (growth)`); }
     else if (cyclicalSectors.includes(sector)) { tilt += 2; reasons.push(`Risk-on lifts ${sector} (cyclical)`); }

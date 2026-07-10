@@ -66,6 +66,19 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   const empty = calcScores({});
   ok(empty.total === 0, `empty inputs → 0 total (${empty.total})`);
 
+  // Penalty-only inputs must floor at 0, never render a negative gauge (2026-07 fix):
+  // short float 30% (−5), rel volume 0.1 (−1), inst. selling −5% (−3), FCF −30 vs EPS 0 (−3),
+  // capex 50% of revenue (−2), implied CAGR 35% (−4), TV share 0.8 (−2).
+  const penalties = calcScores({ shortFloat: 0.30, relVolume: 0.1, instTrans: -0.05, fcfGrowthYoy: -30, epsGrowth: 0, capexToRevenue: 0.5, impliedGrowthCagr: 35, tvShare: 0.8 });
+  ok(penalties.value >= 0, `penalty-only value floors at 0 (${penalties.value})`);
+  ok(penalties.health >= 0, `penalty-only health floors at 0 (${penalties.health})`);
+  ok(penalties.momentum >= 0, `penalty-only momentum floors at 0 (${penalties.momentum})`);
+  ok(penalties.total >= 0, `penalty-only total floors at 0 (${penalties.total})`);
+
+  // Sector aliases: FMP-stable spellings score identically to the GICS spellings.
+  ok(calcScores({ pe: 20, sector: "Financial Services" }).value === calcScores({ pe: 20, sector: "Financials" }).value, "sector alias: Financial Services = Financials");
+  ok(calcScores({ pe: 20, sector: "Basic Materials" }).value === calcScores({ pe: 20, sector: "Materials" }).value, "sector alias: Basic Materials = Materials");
+
   // Weak company scores low.
   const weak = calcScores({ pe: 60, pb: 8, evEbitda: 30, debtEquity: 3, currentRatio: 0.5, interestCoverage: 1, roic: 2, revenueGrowth: -10, epsGrowth: -20, priceChange1M: -20, priceChange3M: -30, priceChange6M: -40, marketCap: 5e9, regime: "contraction" });
   ok(weak.total < strong.total, `weak < strong (${weak.total} < ${strong.total})`);

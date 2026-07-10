@@ -11,13 +11,13 @@
 
 export interface NumToken { raw: string; value: number; specific: boolean; }
 
-const UNIT = /[%$]|bp\b|bps\b|[BMKT]\b/;
-
 /** Extract numeric tokens from text: $1.2B, 4.34%, 310bp, 1,234, -5.2, 58. */
 export function extractNumbers(text: string): NumToken[] {
   const out: NumToken[] = [];
-  // optional $ , sign , digits with thousands , decimal , optional unit suffix
-  const re = /(-?\$?\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?|-?\$?\s?\d+(?:\.\d+)?)(\s?(?:%|bps?|[BMKT])\b)?/g;
+  // optional $ , sign , digits with thousands , decimal , optional unit suffix.
+  // `%` takes no \b (it's a non-word char, so `%\b` fails before a space/EOL and
+  // integer percents like "25%" would slip through the gate as qualitative).
+  const re = /(-?\$?\s?\d{1,3}(?:,\d{3})+(?:\.\d+)?|-?\$?\s?\d+(?:\.\d+)?)(\s?(?:%|bps?\b|[BMKT]\b))?/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(text)) !== null) {
     const rawNum = m[1], suffix = (m[2] || "").trim();
@@ -52,11 +52,24 @@ export interface GroundingResult { ok: boolean; violations: number[]; checked: n
  */
 export function checkGrounding(output: string, dataBlock: string): GroundingResult {
   const dataVals = extractNumbers(dataBlock).map((t) => t.value);
+  // Percent claims are often trivially derived from two data figures ("$210 is 14% above
+  // $184.20", "27% gap") — let a %-token also match any pairwise ratio or share of the
+  // data values. Only % tokens get this wider net; dollar figures and multiples must
+  // appear in the data directly.
+  const derivedPcts: number[] = [];
+  for (let i = 0; i < dataVals.length; i++) {
+    for (let j = 0; j < dataVals.length; j++) {
+      if (i === j || dataVals[j] === 0) continue;
+      const r = dataVals[i] / dataVals[j];
+      derivedPcts.push(Math.abs(r - 1) * 100, Math.abs(r) * 100);
+    }
+  }
   const outTokens = extractNumbers(output).filter((t) => t.specific && !isYear(t.value));
   const violations: number[] = [];
   const seen = new Set<number>();
   for (const t of outTokens) {
     if (present(t.value, dataVals)) continue;
+    if (t.raw.includes("%") && present(Math.abs(t.value), derivedPcts)) continue;
     if (seen.has(t.value)) continue;
     seen.add(t.value);
     violations.push(t.value);

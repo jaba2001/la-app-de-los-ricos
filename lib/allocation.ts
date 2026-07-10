@@ -5,8 +5,8 @@
 // momentum moves any risk sleeve with negative 12-1m trend to cash.
 //
 // Validated out-of-sample over 2007-2026 (research/backtest_assets.mjs, REGIME=stationary):
-// RiskOn tilt + dual-momentum → Sharpe 1.01, max drawdown −10.1%, beating a regime-free
-// dual-momentum control (0.88) and SPY buy&hold (0.71 / −50.7%) in BOTH sub-periods.
+// RiskOn tilt + dual-momentum → Sharpe 1.02, max drawdown −10.1%, beating a regime-free
+// dual-momentum control (0.89) and SPY buy&hold (0.72 / −50.7%) in BOTH sub-periods.
 // Keep this file in lock-step with research/allocate.mjs (same constants & rules).
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -62,16 +62,23 @@ export function applyDualMomentum(weights: Weights, mom: Partial<Record<AllocAss
  * A6 — inverse-volatility (risk-parity) sizing of the gated risk sleeves. Re-weights the
  * non-cash sleeves ∝ 1/vol (preserving the total risk allocation; BIL/cash untouched), so a
  * low-vol bond and a high-vol commodity don't carry equal risk at equal weight. Validated
- * OOS 2007-2026: Sharpe 1.02 vs 1.01, max drawdown −7.5% vs −10.1% — same return, less pain.
+ * OOS 2007-2026: Sharpe 1.01 vs 1.02, max drawdown −7.5% vs −10.1% — a hair of Sharpe
+ * traded for a materially shallower drawdown.
  * `vols` = each asset's recent realized volatility; missing vol → the input weight is kept.
  */
 export function riskParity(weights: Weights, vols: Partial<Record<AllocAsset, number | null>>): Weights {
   const risk = ALLOC_ASSETS.filter((a) => a !== "BIL" && (weights[a] || 0) > 0);
   const riskTotal = risk.reduce((s, a) => s + weights[a], 0);
   if (riskTotal <= 0) return { ...weights };
+  // A sleeve with no vol reading gets the MEAN inverse-vol of the available sleeves
+  // (neutral sizing) — mixing a weight-share with 1/vol values would crush or inflate it
+  // depending on the vol scale. No vols at all → weights unchanged.
+  const avail = risk.filter((a) => vols[a] != null && (vols[a] as number) > 0);
+  if (avail.length === 0) return { ...weights };
+  const meanInv = avail.reduce((s, a) => s + 1 / (vols[a] as number), 0) / avail.length;
   const inv: Record<string, number> = {};
   let invSum = 0;
-  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : weights[a] / riskTotal; inv[a] = iv; invSum += iv; }
+  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : meanInv; inv[a] = iv; invSum += iv; }
   const out = { ...weights };
   for (const a of risk) out[a] = riskTotal * (inv[a] / invSum);
   return out;

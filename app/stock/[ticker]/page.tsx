@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -99,6 +99,12 @@ export default function StockTickerPage() {
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
   const [autoChecked, setAutoChecked] = useState(false);
+  // Epoch guard: the App Router REUSES this component when navigating between tickers,
+  // so an analyze() still in flight for the previous ticker would land late and overwrite
+  // the new ticker's UI. Each ticker change / analyze call bumps the epoch; stale runs
+  // see the mismatch and stop touching state (their DB upserts are keyed by their own
+  // ticker, so those are allowed to finish).
+  const runRef = useRef(0);
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -106,6 +112,7 @@ export default function StockTickerPage() {
 
   useEffect(() => {
     if (!session || !ticker) return;
+    runRef.current += 1; // invalidate any in-flight analyze() from the previous ticker
     setWatchlisted(false);
     setWatchlistId(null);
     // Reset analysis state so navigating between tickers re-checks the snapshot
@@ -116,6 +123,9 @@ export default function StockTickerPage() {
     setScores(null);
     setSavedAnalysis(null);
     setError("");
+    setLoading(false);
+    setFetchProgress(0);
+    setFailedApis(0);
     supabase.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
   }, [session, ticker]);
@@ -145,13 +155,15 @@ export default function StockTickerPage() {
 
   const analyze = useCallback(async () => {
     if (!session || !ticker) return;
+    const run = ++runRef.current;
+    const live = () => runRef.current === run;
     setHasAnalyzed(true);
     setLoading(true);
     setFetchProgress(0);
     setError("");
 
     const track = <T,>(p: PromiseLike<T>): Promise<T> =>
-      Promise.resolve(p).finally(() => setFetchProgress(c => c + 1));
+      Promise.resolve(p).finally(() => { if (live()) setFetchProgress(c => c + 1); });
 
     try {
       const today = new Date().toISOString().split("T")[0];
@@ -165,6 +177,7 @@ export default function StockTickerPage() {
       const macroData = macroRes.status === "fulfilled"
         ? (macroRes.value as { data: MacroState }).data
         : contextMacro;
+      if (!live()) return;
       setMacro(macroData);
       if (macroData) setMacroContext(macroData);
 
@@ -186,6 +199,7 @@ export default function StockTickerPage() {
         .eq("user_id", session.user.id)
         .maybeSingle();
 
+      if (!live()) return;
       let stockData: StockData;
 
       if (snap?.data) {
@@ -301,6 +315,7 @@ export default function StockTickerPage() {
       // ─────────────────────────────────────────────────────────────
 
       // Count truly missing sources (after FMP + Finnhub fallback)
+      if (!live()) return;
       const coreFmpFailed = [quoteRes, profileRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, estimatesRes, holdersRes, insiderRes, dcfRes].filter(r => r.status === "rejected").length;
       setFailedApis(
         coreFmpFailed
@@ -468,6 +483,7 @@ export default function StockTickerPage() {
       } // end cache miss
 
       // ── Common: RDCF + scoring + upsert ──────────────────────────
+      if (!live()) return;
       setData(stockData);
 
       const mergedMetrics = stockData.metrics;
@@ -523,6 +539,7 @@ export default function StockTickerPage() {
 
       stockData.rdcf = rdcfSnapshot;
       stockData.fcfQuality = { capexToRevenue, fcfYield, fcfGrowthYoy };
+      if (!live()) return;
       setData({ ...stockData });
 
       // Compute momentum from daily close prices (history is newest-first from FMP)
@@ -568,6 +585,7 @@ export default function StockTickerPage() {
         salesQoQ:         stockData.finviz?.salesQoQ ?? null,
         operatingMargin:  stockData.finviz?.operatingMargin ?? null,
       });
+      if (!live()) return;
       setScores(calc);
 
       const rating = getRating(calc.total);
@@ -586,7 +604,7 @@ export default function StockTickerPage() {
         reverse_dcf: rdcfSnapshot,
       }, { onConflict: "ticker,analysis_date,user_id" }).select().single();
 
-      if (saved) setSavedAnalysis(saved as StockAnalysis);
+      if (saved && live()) setSavedAnalysis(saved as StockAnalysis);
 
       // ── Live track record: immutable score snapshot (append-only, 1/ticker/day) ──
       // Seals the score with a timestamp and the point-in-time price, so realized
@@ -607,9 +625,9 @@ export default function StockTickerPage() {
       }, { onConflict: "user_id,ticker,score_date", ignoreDuplicates: true });
 
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Analysis failed");
+      if (live()) setError(e instanceof Error ? e.message : "Analysis failed");
     }
-    setLoading(false);
+    if (live()) setLoading(false);
   }, [session, ticker]);
 
   useEffect(() => {

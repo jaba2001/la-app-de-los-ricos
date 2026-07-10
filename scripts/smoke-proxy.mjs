@@ -54,8 +54,9 @@ const ROUTES = [
   ["GET", `/api/edgar?symbol=${SYM}`, 401],
   ["GET", `/api/simfin?symbol=${SYM}`, 401],
   ["GET", `/api/finviz/quote?symbol=${SYM}`, 401],
-  // POST-only route: a GET returns 405 (exists) — proves the path is mounted.
+  // POST-only routes: a GET returns 405 (exists) — proves the path is mounted.
   ["GET", `/api/anthropic/messages`, 401, 405],
+  ["GET", `/api/llm`, 401, 405],
 ];
 
 const timeout = (ms) => new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms));

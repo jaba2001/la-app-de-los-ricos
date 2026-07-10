@@ -7,6 +7,8 @@ interface Track { as_of: string; inception: string; nav: number; spy_nav: number
 interface Reb { rebalance_date: string; weights: Record<string, number>; risk_on: number | null; moved_to_cash: string[] | null; }
 
 const pct = (v: number | null | undefined, d = 1) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${v.toFixed(d)}%`);
+// An "Accruing" track row can exist before the weekly measure fills nav/sharpe — never .toFixed(null).
+const fnum = (v: number | null | undefined, d = 1) => (v == null || !isFinite(v) ? "—" : v.toFixed(d));
 const GRADE_COLOR: Record<string, string> = { A: "var(--sr-pos)", B: "var(--sr-pos)", C: "var(--sr-warn)", D: "var(--sr-warn)", F: "var(--sr-neg)", Accruing: "var(--sr-text-3)" };
 
 export default function PaperFund() {
@@ -53,10 +55,10 @@ export default function PaperFund() {
 
       {track && track.inception && (
         <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-tile"><div className="sr-tile-label">NAV (base 100)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{track.nav.toFixed(1)}</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>SPY {track.spy_nav.toFixed(1)}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Total return</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: track.total_ret >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{pct(track.total_ret)}</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>SPY {pct(track.spy_ret)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">NAV (base 100)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{fnum(track.nav)}</div><div className="sr-hint">SPY {fnum(track.spy_nav)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">Total return</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: (track.total_ret ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{pct(track.total_ret)}</div><div className="sr-hint">SPY {pct(track.spy_ret)}</div></div>
           <div className="sr-tile"><div className="sr-tile-label">Max drawdown</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{pct(track.max_dd, 0)}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Sharpe (ann.)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{track.sharpe.toFixed(2)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">Sharpe (ann.)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{fnum(track.sharpe, 2)}</div></div>
         </div>
       )}
       {track?.inception && (

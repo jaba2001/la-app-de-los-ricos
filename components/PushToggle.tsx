@@ -36,7 +36,7 @@ export default function PushToggle() {
         {on ? "🔔 Regime alerts on" : "🔕 Enable regime alerts"}
       </button>
       {msg && <span style={{ fontSize: "10px", color: "var(--sr-neg)" }}>{msg}</span>}
-      {!msg && <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>Get notified on breadth divergences &amp; risk-off shifts.</span>}
+      {!msg && <span className="sr-hint">Get notified on breadth divergences &amp; risk-off shifts.</span>}
     </div>
   );
 }

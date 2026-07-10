@@ -59,7 +59,7 @@ export default function Landing() {
           <div key={s.k} style={{ ...card, textAlign: "center", padding: "var(--sr-sp-4)" }}>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>
             <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-pos)", margin: "4px 0 2px" }} className="num">{s.v}</div>
-            <div style={{ fontSize: "10px", color: "var(--sr-text-3)" }}>{s.s}</div>
+            <div className="sr-hint">{s.s}</div>
           </div>
         ))}
       </section>
