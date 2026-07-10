@@ -1,11 +1,16 @@
-name: Scora — weekly macro breadth
+name: Scora — daily macro breadth
 
 # The micro→macro arrow (A2/A3): aggregates the S&P 500 into breadth (% above 200/50-day,
 # % with positive momentum) and writes it to macro_state, then compares it to the top-down
 # risk-on gauge to set regime_confirmation (confirmed / divergent). Free (Yahoo prices).
+#
+# DAILY (F3.1) because the divergence is the system's early warning — a weekly read could
+# sit on a narrowing tape for days. Weekdays at 10:30 UTC: the latest US close is already
+# settled on Yahoo, and it lands BEFORE the ic-proxy macro-refresh (11:00) and push-alerts
+# (11:30) crons, so the alert always compares today's breadth against the fresh gauge.
 on:
   schedule:
-    - cron: "0 14 * * 1" # Mondays 14:00 UTC (after discovery warms the universe)
+    - cron: "30 10 * * 1-5" # weekdays 10:30 UTC (prior US close settled; before push-alerts)
   workflow_dispatch: {}
 
 jobs:

@@ -194,7 +194,7 @@ export default function StockScreener() {
             <thead><tr>
               <th>Ticker</th><th>Sector</th><th style={{ textAlign: "right" }}>Base Score</th>
               <th style={{ textAlign: "right" }}>Macro Tilt</th><th style={{ textAlign: "right" }}>Scora Score</th>
-              <th>Rating</th><th></th>
+              <th>Rating</th><th>As of</th><th></th>
             </tr></thead>
             <tbody>
               {sorted.map(w => {
@@ -204,6 +204,10 @@ export default function StockScreener() {
                 const tilt = liveTilt ?? (a?.macro_tilt != null ? Number(a.macro_tilt) : null);
                 const ic = a ? Number(a.score_total) + (tilt ?? 0) : null;
                 const rating = a ? getRating(Number(a.score_total)) : null;
+                // Rows are each ticker's LATEST analysis, which can be days apart — the
+                // date makes cross-ticker comparisons honest; >7 days flags as stale.
+                const daysOld = a?.analysis_date ? Math.max(0, Math.floor((Date.now() - new Date(a.analysis_date + "T00:00:00Z").getTime()) / 86400000)) : null;
+                const stale = daysOld != null && daysOld > 7;
                 return (
                   <tr key={w.ticker} style={{ cursor: "pointer" }} onClick={() => router.push(`/stock/${w.ticker}`)}>
                     <td style={{ fontWeight: 700, color: "var(--sr-text)" }}>
@@ -222,6 +226,19 @@ export default function StockScreener() {
                       {ic != null ? ic.toFixed(0) : isAnalyzing ? "…" : "—"}
                     </td>
                     <td>{rating ? <Pill label={rating.label} color={rating.color} /> : "—"}</td>
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      <span className="num" style={{ fontSize: "var(--sr-t-xs)", color: stale ? "var(--sr-warn)" : "var(--sr-text-3)" }} title={a?.analysis_date ? `Scored on ${a.analysis_date}${stale ? " — stale, re-analyze to compare fairly" : ""}` : undefined}>
+                        {a?.analysis_date ? (daysOld === 0 ? "today" : daysOld === 1 ? "1d ago" : `${daysOld}d ago`) : "—"}
+                        {stale ? " ⚠" : ""}
+                      </span>
+                      {a && !isAnalyzing && (
+                        <button
+                          title="Re-analyze with fresh data"
+                          style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 4px", fontSize: "var(--sr-t-xs)" }}
+                          onClick={e => { e.stopPropagation(); quickAnalyze(w.ticker); }}
+                        >↻</button>
+                      )}
+                    </td>
                     <td>
                       <button
                         style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "4px 8px", fontSize: "var(--sr-t-base)" }}

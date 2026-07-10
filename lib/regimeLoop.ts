@@ -24,7 +24,7 @@ export function regimeConfirmation(riskOn: number | null | undefined, breadth200
   const ro = riskOn == null ? null : Number(riskOn);
   const bd = breadth200 == null ? null : Number(breadth200);
   if (ro == null || bd == null || isNaN(ro) || isNaN(bd)) {
-    return { state: "unknown", gap: null, label: "No breadth read", detail: "Breadth data not available yet — the aggregator populates it weekly.", color: "var(--sr-text-3)", convictionMult: 1 };
+    return { state: "unknown", gap: null, label: "No breadth read", detail: "Breadth data not available yet — the aggregator populates it each weekday.", color: "var(--sr-text-3)", convictionMult: 1 };
   }
   const gap = Math.round(ro - bd);
 
