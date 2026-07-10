@@ -16,9 +16,13 @@ const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type":
 // Map the current macro state to an alert "key" + message. "ok" = nothing to send.
 function alertFor(m) {
   const ro = m.risk_on != null ? Number(m.risk_on) : null;
-  const conf = m.regime_confirmation;
-  if (conf === "divergent-bearish") {
-    return { key: "divergence", title: "Scora — breadth divergence", body: `Risk-on ${ro?.toFixed(0) ?? "?"} but only ${m.breadth_200dma?.toFixed(0) ?? "?"}% of names are above their 200-day. Participation is narrowing — an early warning.` };
+  const bd = m.breadth_200dma != null ? Number(m.breadth_200dma) : null;
+  // Divergence: trust the stored confirmation, but ALSO derive it live from the same row
+  // (risk_on − breadth ≥ 12, same GAP_DIVERGE as lib/regimeLoop.ts) so the alert never
+  // depends on which cron wrote last — breadth is daily now (F3.1) and this stays fresh.
+  const gapDiverges = ro != null && bd != null && ro - bd >= 12;
+  if (m.regime_confirmation === "divergent-bearish" || gapDiverges) {
+    return { key: "divergence", title: "Scora — breadth divergence", body: `Risk-on ${ro?.toFixed(0) ?? "?"} but only ${bd?.toFixed(0) ?? "?"}% of names are above their 200-day. Participation is narrowing — an early warning.` };
   }
   if (ro != null && ro < 40) {
     return { key: "risk-off", title: "Scora — backdrop turned risk-off", body: `The liquidity-led risk-on gauge fell to ${ro.toFixed(0)}/100. The validated allocator tilts to duration, gold and cash.` };
