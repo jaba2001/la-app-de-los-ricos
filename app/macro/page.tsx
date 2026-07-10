@@ -7,6 +7,8 @@ import { useMacroContext } from "@/lib/MacroContext";
 import dynamic from "next/dynamic";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
+import WelcomeBanner from "@/components/WelcomeBanner";
+import RegimeAlert from "@/components/RegimeAlert";
 
 const TabSk = () => <Sk w="100%" h={400} />;
 
@@ -117,6 +119,8 @@ export default function MacroPage() {
 
       {/* Content */}
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1200, margin: "0 auto" }}>
+        <RegimeAlert macro={macro} />
+        <WelcomeBanner />
         {error && (
           <div style={{
             padding: "var(--sr-sp-3) var(--sr-sp-4)",

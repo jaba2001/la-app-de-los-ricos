@@ -12,10 +12,18 @@ const hanken = Hanken_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Scora Research",
-  description: "Macro + Stock research platform",
+  metadataBase: new URL("https://scora-research.vercel.app"),
+  title: { default: "Scora Research — the top-down system that corrects itself", template: "%s · Scora Research" },
+  description: "Regime-driven multi-asset allocation, validated out-of-sample, plus an AI layer that can't invent a number — enforced in code. Free. Risk, managed and auditable.",
+  keywords: ["macro regime", "asset allocation", "risk parity", "stock research", "grounded AI", "backtest", "top-down"],
   manifest: "/manifest.json",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Scora Research" },
+  openGraph: {
+    title: "Scora Research — the top-down system that corrects itself",
+    description: "Regime-driven allocation validated out-of-sample + AI that can't hallucinate figures. Free, auditable, honest.",
+    url: "/", siteName: "Scora Research", type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Scora Research", description: "Validated regime allocation + auditable AI. Free." },
 };
 
 export const viewport: Viewport = {
