@@ -8,11 +8,12 @@
 //
 // La lógica de cómputo vive en lib/macro.js, portada VERBATIM desde
 // IC-DataLayer/IC_DataLayer_v2.js (classifyRegime + computeCompositeScores).
-// El upsert escribe las MISMAS columnas que escribe IC DataLayer (origin
-// ≈ línea 4707), conflict key `id` (fila única id=1). Es idempotente: misma
-// clave → actualiza, no duplica. NO escribe `ic_score` (el writer de la web
-// tampoco lo hace; queda intacto). Mismo patrón de auth/Supabase que los crons
-// `13f-refresh` y `alerts-check`.
+// El upsert escribe las columnas del row que arma lib/macro.js (incluido
+// `ic_score`, calculado server-side desde los composites), conflict key `id`
+// (fila única id=1). Es idempotente: misma clave → actualiza, no duplica. Las
+// columnas que NO van en el row (p. ej. breadth_*, escritas por el cron diario
+// de scora) quedan intactas gracias a merge-duplicates. Mismo patrón de
+// auth/Supabase que los crons `13f-refresh` y `alerts-check`.
 import { buildMacroState } from '../../../../lib/macro.js';
 
 export const runtime = 'edge';
