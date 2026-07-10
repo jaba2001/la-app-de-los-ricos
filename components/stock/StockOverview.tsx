@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
+import { topDownContext } from "@/lib/topDown";
 import { classifyInstrument } from "@/lib/instrument";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
@@ -345,6 +346,44 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   <strong style={{ color: pick.color }}>Stock-picking: {pick.label}</strong>
                   <span style={{ color: "var(--sr-text-3)" }}> — {pick.detail}</span>
                 </div>
+              </div>
+            );
+          })()}
+
+          {/* Top-Down Context (A4) — the cascade composed: L1 secular → L2 risk-on → loop → L4 selection + IC ensemble */}
+          {instr.isEquity && !loading && scores && (() => {
+            const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
+            const td = topDownContext({
+              macro, sector: (data?.profile?.sector as string) ?? null,
+              subScores: { value: scores.value, health: scores.health, momentum: scores.momentum, growth: scores.growth },
+              mom12_1,
+            });
+            const toneColor = (t: string) => t === "pos" ? "var(--sr-pos)" : t === "neg" ? "var(--sr-neg)" : t === "warn" ? "var(--sr-warn)" : "var(--sr-text-2)";
+            return (
+              <div className="card">
+                <div className="section-label">Top-down context</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{td.summary}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {td.layers.map((L, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-2)" }} title={L.note}>
+                      <span className="num" style={{ fontSize: "10px", fontWeight: 700, color: toneColor(L.tone), minWidth: 20 }}>{L.code}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", minWidth: 62 }}>{L.label}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: toneColor(L.tone) }}>{L.value}</span>
+                    </div>
+                  ))}
+                </div>
+                {td.ensemble && td.ensemble.contributions.length > 0 && (
+                  <div style={{ marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
+                    <div className="sr-flex-between" style={{ marginBottom: 4 }}>
+                      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>IC-weighted composite · {td.ensemble.regime} corr</span>
+                      <span className="num" style={{ fontSize: "var(--sr-t-sm)", fontWeight: 800, color: td.ensemble.color }}>{td.ensemble.composite}/100</span>
+                    </div>
+                    <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${td.ensemble.composite}%`, background: td.ensemble.color }} /></div>
+                    <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 5 }}>
+                      Weighted by measured IC: {td.ensemble.contributions.map((c) => `${c.factor} ${(c.weight * 100).toFixed(0)}%`).join(" · ")}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })()}

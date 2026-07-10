@@ -89,7 +89,11 @@ for (const date of dates) {
     const traj = (mom121 ?? 0) + 0.4 * (mom.m6 ?? 0) + 1.2 * (scores.growth ?? 0);
     const fwd = {}, alpha = {};
     for (const m of HORIZONS) { const r = await fwdReturn(t, date, addMonths(date, m)); const s = await spyFwd(date, m); fwd[m] = r; alpha[m] = r != null && s != null ? r - s : null; }
-    rows.push({ date, t, ic, mom: mom121, traj, sector, regime: macro.regime_id, fwd, alpha });
+    // A0 — store the individual sub-scores so we can measure each factor's IC by regime
+    // (the input to the A5 IC-weighted ensemble). value/health/momentum/growth are the
+    // production factors; mom121 is the pure price-momentum ranker.
+    rows.push({ date, t, ic, mom: mom121, traj, sector, regime: macro.regime_id, fwd, alpha,
+      f_value: scores.value ?? null, f_health: scores.health ?? null, f_momentum: scores.momentum ?? null, f_growth: scores.growth ?? null });
   }
 }
 console.log(`  scored ${rows.length} name-months\n`);
@@ -207,7 +211,48 @@ if (corrDates.length >= 9) {
     : `WEAK — neither momentum (${momLo?.toFixed(3)}) nor trajectory (${trLo?.toFixed(3)}) is decisively positive in low correlation. Even the right factor mix struggles on this universe → the durable edge stays in allocation.`;
   report.correlation.gate0A_phase4 = verdict;
   console.log(`\n  Gate 0A (Phase 4): ${verdict}`);
+
+  // ── A0 · per-factor IC by correlation regime → the weights for the A5 ensemble ──
+  // Measure each production factor's IC in each regime. RenTech discipline: a factor is
+  // only trusted (and weighted) where its measured IC is positive. The ensemble weights
+  // are derived from THIS evidence, not hand-set.
+  console.log("\n  ── A0 · per-factor IC by correlation regime (feeds the A5 ensemble) ──");
+  const factorDefs = [
+    ["value",    (r) => r.f_value],
+    ["health",   (r) => r.f_health],
+    ["momentum", (r) => r.f_momentum],
+    ["growth",   (r) => r.f_growth],
+    ["mom12_1",  (r) => r.mom],
+  ];
+  const factorIC = {}; // { factor: [icLow, icMid, icHigh] }
+  const bucketList = corrBuckets();
+  for (const [name, sel] of factorDefs) {
+    const perBucket = bucketList.map((g) => {
+      const ics = [];
+      for (const d of g.ds) { const gg = rows.filter((r) => r.date === d && r.fwd[3] != null && sel(r) != null); if (gg.length >= 8) { const s = spearman(gg.map(sel), gg.map((r) => r.fwd[3])); if (s != null) ics.push(s); } }
+      return mean(ics);
+    });
+    factorIC[name] = perBucket;
+    console.log(`  ${name.padEnd(9)} IC  low ${fmtIC(perBucket[0])}   mid ${fmtIC(perBucket[1])}   high ${fmtIC(perBucket[2])}`);
+  }
+  report.correlation.factorIC = factorIC;
+  // Derive ensemble weights: keep only factors with positive IC in that regime, weight ∝ IC.
+  const regimeKeys = ["low", "mid", "high"];
+  const ensembleWeights = {};
+  regimeKeys.forEach((rk, i) => {
+    const w = {};
+    let sum = 0;
+    for (const [name] of factorDefs) { const ic = factorIC[name]?.[i]; if (ic != null && ic > 0) { w[name] = ic; sum += ic; } }
+    for (const k in w) w[k] = +(w[k] / sum).toFixed(3);
+    ensembleWeights[rk] = w;
+  });
+  report.correlation.ensembleWeights = ensembleWeights;
+  console.log("\n  A5 ensemble weights (∝ positive IC, per regime):");
+  for (const rk of regimeKeys) console.log(`  ${rk.padEnd(5)} ${Object.entries(ensembleWeights[rk]).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join("  ") || "(no factor with +IC)"}`);
+  writeFileSync(join(OUT, "signals_ic.json"), JSON.stringify({ generatedAt: new Date().toISOString(), universe: UNIVERSE.length, factorIC, ensembleWeights }, null, 2));
+  console.log(`  → wrote research/out/signals_ic.json`);
 }
+function fmtIC(v) { return v == null ? "  —  " : (v >= 0 ? "+" : "") + v.toFixed(3); }
 
 writeFileSync(join(OUT, "backtest_summary.json"), JSON.stringify(report, null, 2));
 console.log(`\n  → wrote research/out/backtest_summary.json`);
