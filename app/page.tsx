@@ -44,6 +44,7 @@ export default function Landing() {
         </p>
         <div style={{ display: "flex", gap: "var(--sr-sp-3)", justifyContent: "center", marginTop: "var(--sr-sp-5)", flexWrap: "wrap" }}>
           <button onClick={go} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "12px 28px", fontSize: "var(--sr-t-base)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
+          <button onClick={() => router.push("/demo")} style={{ background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid color-mix(in srgb, var(--sr-amber) 40%, var(--sr-border))", borderRadius: "var(--sr-radius)", padding: "12px 24px", fontSize: "var(--sr-t-base)", fontWeight: 600, cursor: "pointer" }}>Live demo — no signup</button>
           <button onClick={() => router.push("/track-record")} style={{ background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", padding: "12px 24px", fontSize: "var(--sr-t-base)", fontWeight: 600, cursor: "pointer" }}>See the evidence</button>
         </div>
       </section>

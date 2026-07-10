@@ -251,6 +251,68 @@ if (corrDates.length >= 9) {
   for (const rk of regimeKeys) console.log(`  ${rk.padEnd(5)} ${Object.entries(ensembleWeights[rk]).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join("  ") || "(no factor with +IC)"}`);
   writeFileSync(join(OUT, "signals_ic.json"), JSON.stringify({ generatedAt: new Date().toISOString(), universe: UNIVERSE.length, factorIC, ensembleWeights }, null, 2));
   console.log(`  → wrote research/out/signals_ic.json`);
+
+  // ── F4.2 · OOS gate for the A5 ensemble ────────────────────────────────────
+  // The in-sample weights above describe the whole window — circular if they were ever
+  // allowed to DRIVE the score. This gate is the honest test: derive the weights on the
+  // EARLY 60% of months (corr-regime cutoffs from the train window too), then measure
+  // the frozen ensemble's IC on the LATE 40%, against the monolithic score on the SAME
+  // dates. Only a PASS here would justify promoting the ensemble beyond informational.
+  const SPLIT = dates[Math.floor(dates.length * 0.6)];
+  const trainCorrVals = [...corrByDate.entries()].filter(([d]) => d < SPLIT).map(([, c]) => c).sort((a, b) => a - b);
+  if (trainCorrVals.length >= 6) {
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    const qv = (arr, p) => arr[Math.min(arr.length - 1, Math.floor(arr.length * p))];
+    const loCut = qv(trainCorrVals, 1 / 3), hiCut = qv(trainCorrVals, 2 / 3);
+    const regimeOfDate = (d) => { const c = corrByDate.get(d); return c == null ? null : c <= loCut ? "low" : c >= hiCut ? "high" : "mid"; };
+
+    // Train weights: per-factor IC on train dates only, per regime, ∝ positive IC.
+    const trainW = {};
+    for (const rk of regimeKeys) {
+      let sum = 0; const w = {};
+      for (const [name, sel] of factorDefs) {
+        const ics = [];
+        for (const d of dates.filter((dd) => dd < SPLIT && regimeOfDate(dd) === rk)) {
+          const gg = rows.filter((r) => r.date === d && r.fwd[3] != null && sel(r) != null);
+          if (gg.length >= 8) { const s = spearman(gg.map(sel), gg.map((r) => r.fwd[3])); if (s != null) ics.push(s); }
+        }
+        const ic = mean(ics);
+        if (ic != null && ic > 0) { w[name] = ic; sum += ic; }
+      }
+      for (const k in w) w[k] = w[k] / sum;
+      trainW[rk] = w;
+    }
+
+    // Frozen ensemble composite (same normalization as lib/ensemble.ts) on TEST dates.
+    const NORM_F = { value: (v) => clamp01(v / 25), health: (v) => clamp01(v / 30), momentum: (v) => clamp01(v / 25), growth: (v) => clamp01(v / 20), mom12_1: (v) => clamp01((v + 30) / 60) };
+    const selOf = Object.fromEntries(factorDefs);
+    const composite = (r, rk) => {
+      let acc = 0, ws = 0;
+      for (const [f, w] of Object.entries(trainW[rk] || {})) { const raw = selOf[f](r); if (raw == null || isNaN(raw)) continue; acc += w * NORM_F[f](raw); ws += w; }
+      return ws > 0 ? acc / ws : null;
+    };
+    const testDates = dates.filter((d) => d >= SPLIT && regimeOfDate(d) != null);
+    const icOnTest = (scoreFn) => {
+      const ics = [];
+      for (const d of testDates) {
+        const rk = regimeOfDate(d);
+        const gg = rows.filter((r) => r.date === d && r.fwd[3] != null && scoreFn(r, rk) != null);
+        if (gg.length >= 8) { const s = spearman(gg.map((r) => scoreFn(r, rk)), gg.map((r) => r.fwd[3])); if (s != null) ics.push(s); }
+      }
+      return { ic: mean(ics), months: ics.length };
+    };
+    const ens = icOnTest((r, rk) => composite(r, rk));
+    const mono = icOnTest((r) => r.ic);
+    const oosPass = ens.ic != null && mono.ic != null && ens.ic > 0 && ens.ic > mono.ic;
+    const oosVerdict = oosPass
+      ? `PASS — frozen train-window ensemble earns OOS IC ${fmtIC(ens.ic)} vs the monolithic score's ${fmtIC(mono.ic)} over ${ens.months} test months. Promoting it beyond informational is now defensible.`
+      : `KEEP INFORMATIONAL — frozen ensemble OOS IC ${fmtIC(ens.ic)} vs score ${fmtIC(mono.ic)} over ${ens.months} test months does not clear the bar (must be >0 AND beat the score). The card stays a transparent read, not a score input.`;
+    report.correlation.ensembleOOS = { split: SPLIT, loCut, hiCut, trainWeights: trainW, testMonths: testDates.length, ensembleIC: ens.ic, scoreIC: mono.ic, pass: oosPass, verdict: oosVerdict };
+    console.log(`\n  ── F4.2 · ensemble OOS gate (train < ${SPLIT} · test ≥ ${SPLIT}) ──`);
+    for (const rk of regimeKeys) console.log(`  train weights ${rk.padEnd(5)} ${Object.entries(trainW[rk]).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join("  ") || "(none positive)"}`);
+    console.log(`  OOS IC — ensemble ${fmtIC(ens.ic)} (${ens.months} mo) · monolithic score ${fmtIC(mono.ic)} (${mono.months} mo)`);
+    console.log(`  Gate F4.2: ${oosVerdict}`);
+  }
 }
 function fmtIC(v) { return v == null ? "  —  " : (v >= 0 ? "+" : "") + v.toFixed(3); }
 

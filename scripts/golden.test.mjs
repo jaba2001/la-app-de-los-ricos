@@ -13,6 +13,7 @@ import { normalizeFundamentals } from "../lib/normalize.ts";
 import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, ALLOC_ASSETS } from "../lib/allocation.ts";
 import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs } from "../research/allocate.mjs";
 import { ALLOCATOR_BACKTEST } from "../lib/trackRecord.ts";
+import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -345,6 +346,19 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
     ok(ALLOCATOR_BACKTEST.months === m.months, `claims drift: months ${ALLOCATOR_BACKTEST.months} vs measured ${m.months}`);
   } else {
     console.log("  (claims anti-drift: research/out/backtest_assets_summary.json not present — skipped)");
+  }
+
+  // Same guard for the A5 ensemble weights vs the latest measured signals_ic.json.
+  const icPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "signals_ic.json");
+  if (existsSync(icPath)) {
+    const measured = JSON.parse(readFileSync(icPath, "utf8")).ensembleWeights ?? {};
+    for (const rk of ["low", "mid", "high"]) {
+      const shipped = ENSEMBLE_WEIGHTS[rk] ?? {}, meas = measured[rk] ?? {};
+      const factors = new Set([...Object.keys(shipped), ...Object.keys(meas)]);
+      for (const f of factors) {
+        ok(Math.abs((shipped[f] ?? 0) - (meas[f] ?? 0)) <= 0.05, `ensemble drift: ${rk}.${f} shipped ${(shipped[f] ?? 0)} vs measured ${(meas[f] ?? 0)}`);
+      }
+    }
   }
 }
 

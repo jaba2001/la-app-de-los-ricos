@@ -24,7 +24,8 @@ export interface Instrument {
 const GOLD = new Set(["GLD","IAU","GLDM","SGOL","BAR","AAAU","OUNZ","IAUM"]);
 const SILVER = new Set(["SLV","SIVR"]);
 const PLATINUM = new Set(["PPLT"]); const PALLADIUM = new Set(["PALL"]);
-const COPPER = new Set(["CPER","COPX"]);
+const COPPER = new Set(["CPER"]);
+const COPPER_MINERS = new Set(["COPX"]); // miners = equities (not the metal), but copper-driven
 const PRECIOUS = new Set(["DBP","GLTR"]);
 const MINERS = new Set(["GDX","GDXJ","SIL","SILJ","REMX","NUGT"]); // equity ETFs, metal-driven
 
@@ -79,6 +80,7 @@ export function classifyInstrument(ticker: string, profile?: { isEtf?: boolean; 
   if (PALLADIUM.has(t)) return I("metal","Palladium","Metals",D_METAL,"Palladium — auto-catalyst metal.");
   if (COPPER.has(t)) return I("metal","Copper","Metals",D_COPPER,"Copper — the growth/reflation barometer ('Dr. Copper').");
   if (PRECIOUS.has(t)) return I("metal","Precious basket","Metals",D_METAL,"Diversified precious metals.");
+  if (COPPER_MINERS.has(t)) return I("sector-etf","Copper miners","Sector equity",D_COPPER,"Copper miners — leveraged equity play on copper (growth/reflation).");
   if (MINERS.has(t)) return I("sector-etf","Mining equities","Sector equity",D_GOLD,"Miners — leveraged equity play on the underlying metal.");
 
   // Commodities

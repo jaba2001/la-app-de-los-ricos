@@ -16,8 +16,14 @@ export type CorrRegime = "low" | "mid" | "high";
 // conservative than a curated universe (which inflates momentum). Only factors with positive
 // measured IC in a regime get weight. low = a stock-picker's tape (12-1m momentum leads);
 // mid = value earns its keep; high = quality/health (a macro tape rewards balance sheets).
+// A golden test compares these against the latest signals_ic.json so they can't silently drift.
+//
+// F4.2 OOS GATE (2026-07-10, train <2023-11 / test ≥2023-11): the frozen train-window
+// ensemble earned OOS IC −0.047 vs the monolithic score's −0.002 over 32 test months →
+// KEEP INFORMATIONAL. This composite is a transparent read, NOT a score input; promoting
+// it requires re-running the gate in research/backtest.mjs and clearing it (>0 AND > score).
 export const ENSEMBLE_WEIGHTS: Record<CorrRegime, Partial<Record<"value" | "health" | "momentum" | "growth" | "mom12_1", number>>> = {
-  low:  { mom12_1: 0.59, growth: 0.23, value: 0.18 },
+  low:  { mom12_1: 0.62, growth: 0.25, value: 0.13 },
   mid:  { value: 0.99, health: 0.01 },
   high: { health: 0.83, momentum: 0.17 },
 };
