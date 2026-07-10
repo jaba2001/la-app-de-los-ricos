@@ -5,7 +5,8 @@ const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.a
 
 export async function authedFetch<T = unknown>(
   path: string,
-  options?: RequestInit
+  options?: RequestInit,
+  timeoutMs = 30_000
 ): Promise<T> {
   const { data: { session } } = await supabase.auth.getSession();
   const headers: Record<string, string> = {
@@ -14,7 +15,12 @@ export async function authedFetch<T = unknown>(
   };
   if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
 
-  const res = await fetch(`${BASE}${path}`, { ...options, headers });
+  // A hung upstream must not hold the caller hostage — analyze() fires ~30 of these in
+  // parallel and one stalled endpoint used to block the whole run. Callers can pass
+  // their own signal (options.signal wins) or a custom timeoutMs (LLM calls use 60s).
+  const signal = options?.signal
+    ?? (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(timeoutMs) : undefined);
+  const res = await fetch(`${BASE}${path}`, { ...options, headers, signal });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
     throw new Error(`[proxy ${res.status}] ${path}: ${text}`);
@@ -55,7 +61,7 @@ const anthropicProvider: AiProvider = {
     const res = await authedFetch<AnthropicResponse>("/api/anthropic/messages", {
       method: "POST",
       body: JSON.stringify({ model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
-    });
+    }, 60_000);
     return parseAnthropic(res);
   },
 };
@@ -68,7 +74,7 @@ const freeLlmProvider: AiProvider = {
     const res = await authedFetch<AnthropicResponse>("/api/llm", {
       method: "POST",
       body: JSON.stringify({ max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
-    });
+    }, 60_000);
     return parseAnthropic(res);
   },
 };

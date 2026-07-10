@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
 import { fwdReturn, returnsSeries } from "./prices.mjs";
 import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
 import { regimeStationaryAsOf, preloadStationary } from "./regimeStationary.mjs";
-import { ASSETS, targetWeights, applyDualMomentum, blendWeights } from "./allocate.mjs";
+import { ASSETS, targetWeights, applyDualMomentum, blendWeights, riskParity as riskParityWithVols } from "./allocate.mjs";
 
 // REGIME=stationary → use the historically-valid stationary regime (Phase 1); default
 // = production regime (reliable ~2019+ only). See regimeStationary.mjs for why.
@@ -114,25 +114,13 @@ async function volAsOf(asset, date, win = 63) {
   if (hi >= win) { const w = r.slice(hi - win + 1, hi + 1).map((x) => x.ret); const m = w.reduce((s, x) => s + x, 0) / w.length; v = Math.sqrt(w.reduce((s, x) => s + (x - m) ** 2, 0) / (w.length - 1)); }
   vsCache.set(k, v); return v;
 }
-// Re-weight the gated risk sleeves ∝ 1/vol (BIL/cash kept as-is), preserving the total
-// risk-sleeve allocation. A sleeve with no vol reading gets the MEAN inverse-vol of the
-// available sleeves (neutral sizing) — same fallback as allocate.mjs/lib/allocation.ts,
-// so the backtest validates exactly what production runs.
+// Collect trailing vols as of `date` and delegate the math to the SHARED riskParity in
+// allocate.mjs — the exact function production runs (lib/allocation.ts is its TS twin,
+// guarded by a parity test in scripts/golden.test.mjs). One code path, no drift.
 async function riskParity(weights, date) {
-  const risk = ASSETS.filter((a) => a !== "BIL" && (weights[a] || 0) > 0);
-  const cashW = weights.BIL || 0;
-  const riskTotal = risk.reduce((s, a) => s + weights[a], 0);
-  if (riskTotal <= 0) return { ...weights };
   const vols = {};
-  for (const a of risk) vols[a] = await volAsOf(a, date);
-  const avail = risk.filter((a) => vols[a] != null && vols[a] > 0);
-  if (avail.length === 0) return { ...weights };
-  const meanInv = avail.reduce((s, a) => s + 1 / vols[a], 0) / avail.length;
-  const inv = {}; let invSum = 0;
-  for (const a of risk) { const v = vols[a]; const iv = v != null && v > 0 ? 1 / v : meanInv; inv[a] = iv; invSum += iv; }
-  const out = { BIL: cashW };
-  for (const a of risk) out[a] = riskTotal * (inv[a] / invSum);
-  return out;
+  for (const a of ASSETS) { if (a !== "BIL" && (weights[a] || 0) > 0) vols[a] = await volAsOf(a, date); }
+  return riskParityWithVols(weights, vols);
 }
 const stepRiskOnDM_RP = async (date, macro) => {
   const base = blendWeights(macro.risk_on);

@@ -10,6 +10,12 @@ import {
 } from "../lib/technicalIndicators.ts";
 import { runBacktest } from "../lib/backtest.ts";
 import { normalizeFundamentals } from "../lib/normalize.ts";
+import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, ALLOC_ASSETS } from "../lib/allocation.ts";
+import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs } from "../research/allocate.mjs";
+import { ALLOCATOR_BACKTEST } from "../lib/trackRecord.ts";
+import { readFileSync, existsSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 let passed = 0, failed = 0;
 const fails = [];
@@ -275,6 +281,71 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(s.value > 0, `norm→score: VALUE no longer zero (${s.value})`);
   ok(s.growth > 0, `norm→score: GROWTH no longer zero (${s.growth})`);
   ok(s.health > 0, `norm→score: HEALTH populated (${s.health})`);
+}
+
+// ── Allocator parity (F1.1) ──────────────────────────────────────────────────
+// The allocator exists twice on purpose (lib/allocation.ts for the app, research/
+// allocate.mjs for the backtest/paper fund — .mjs scripts can't import a .ts that this
+// one imports from). These tests run BOTH with identical inputs and demand identical
+// outputs, so a fix applied to one can never silently miss the other again (that drift
+// is exactly how the 2026-07 riskParity fallback bug survived).
+{
+  const W = { SPY: 0.4, TLT: 0.15, IEF: 0.15, GLD: 0.1, DBC: 0.1, BIL: 0.1 };
+  const volCases = [
+    ["all vols", { SPY: 0.012, TLT: 0.009, IEF: 0.005, GLD: 0.010, DBC: 0.014, BIL: 0.001 }],
+    ["one missing", { SPY: 0.012, TLT: 0.009, IEF: 0.005, GLD: 0.010 }],
+    ["null vol", { SPY: 0.012, TLT: null, IEF: 0.005, GLD: 0.010, DBC: 0.014 }],
+    ["no vols", {}],
+  ];
+  for (const [label, vols] of volCases) {
+    const a = rpTs(W, vols), b = rpJs(W, vols);
+    for (const k of ALLOC_ASSETS) ok(Math.abs((a[k] || 0) - (b[k] || 0)) < 1e-12, `parity riskParity ${label}: ${k} (${a[k]} vs ${b[k]})`);
+    approx(ALLOC_ASSETS.reduce((s, k) => s + (a[k] || 0), 0), 1, 1e-9, `riskParity ${label}: total preserved`);
+    ok(Math.abs(a.BIL - W.BIL) < 1e-12, `riskParity ${label}: BIL untouched`);
+  }
+  // Inverse-vol ordering: the low-vol sleeve must end up with MORE weight than the
+  // high-vol one (IEF vol 0.005 vs DBC 0.014, equal-ish input weights).
+  const rp = rpTs(W, volCases[0][1]);
+  ok(rp.IEF > rp.DBC, `riskParity: inverse-vol ordering IEF>DBC (${rp.IEF.toFixed(3)} > ${rp.DBC.toFixed(3)})`);
+  // No vols at all → weights unchanged (never a rescale from garbage).
+  const un = rpTs(W, {});
+  ok(ALLOC_ASSETS.every((k) => Math.abs(un[k] - W[k]) < 1e-12), "riskParity: no vols → unchanged");
+
+  for (const ro of [0, 25, 40, 50, 63, 100]) {
+    const a = bwTs(ro), b = bwJs(ro);
+    for (const k of ALLOC_ASSETS) ok(Math.abs(a[k] - b[k]) < 1e-12, `parity blendWeights(${ro}): ${k}`);
+    approx(ALLOC_ASSETS.reduce((s, k) => s + a[k], 0), 1, 1e-9, `blendWeights(${ro}): sums to 1`);
+  }
+
+  const mom = { SPY: -3, TLT: 5, GLD: null, DBC: -0.1 };
+  const da = dmTs(bwTs(60), mom), db = dmJs(bwJs(60), mom);
+  for (const k of ALLOC_ASSETS) ok(Math.abs(da.weights[k] - db.weights[k]) < 1e-12, `parity dualMomentum: ${k}`);
+  ok(da.movedToCash.slice().sort().join() === db.movedToCash.slice().sort().join(), `parity dualMomentum: movedToCash (${da.movedToCash} vs ${db.movedToCash})`);
+  ok(da.weights.SPY === 0 && da.weights.DBC === 0 && da.weights.TLT > 0, "dualMomentum: negative sleeves gated, positive kept");
+}
+
+// ── Claims anti-drift (F1.2) ──────────────────────────────────────────────────
+// The numbers the product ADVERTISES (lib/trackRecord.ts → landing, /track-record,
+// AllWeatherAllocator) must match what the backtest actually measures. research/out is
+// gitignored, so CI (no backtest run) skips this; any local run after a backtest
+// refresh fails loudly if the hard-coded claims have drifted from the measurement.
+{
+  const summaryPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "backtest_assets_summary.json");
+  if (existsSync(summaryPath)) {
+    const m = JSON.parse(readFileSync(summaryPath, "utf8"));
+    const pairs = [["strategy", "riskOnRP"], ["strategyNoRP", "riskOnDM"], ["control", "momOnly"], ["spy", "spy"]];
+    for (const [claim, key] of pairs) {
+      const c = ALLOCATOR_BACKTEST[claim], meas = m[key];
+      ok(!!c && !!meas, `claims: ${claim}/${key} present`);
+      if (!c || !meas) continue;
+      ok(Math.abs(c.totalReturn - meas.total) <= Math.max(3, Math.abs(meas.total) * 0.02), `claims drift: ${claim} total ${c.totalReturn} vs measured ${meas.total.toFixed(1)}`);
+      ok(Math.abs(c.sharpe - meas.sharpe) <= 0.03, `claims drift: ${claim} sharpe ${c.sharpe} vs measured ${meas.sharpe.toFixed(2)}`);
+      ok(Math.abs(c.maxDrawdown - meas.maxDD) <= 0.5, `claims drift: ${claim} maxDD ${c.maxDrawdown} vs measured ${meas.maxDD.toFixed(1)}`);
+    }
+    ok(ALLOCATOR_BACKTEST.months === m.months, `claims drift: months ${ALLOCATOR_BACKTEST.months} vs measured ${m.months}`);
+  } else {
+    console.log("  (claims anti-drift: research/out/backtest_assets_summary.json not present — skipped)");
+  }
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
