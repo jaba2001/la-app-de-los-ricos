@@ -9,4 +9,6 @@ export default withPWA({
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
+  // Load our Web Push handlers into the generated service worker.
+  workboxOptions: { importScripts: ["/push-sw.js"] },
 })(nextConfig);

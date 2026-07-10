@@ -9,6 +9,7 @@ import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import RegimeAlert from "@/components/RegimeAlert";
+import PushToggle from "@/components/PushToggle";
 
 const TabSk = () => <Sk w="100%" h={400} />;
 
@@ -120,6 +121,7 @@ export default function MacroPage() {
       {/* Content */}
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1200, margin: "0 auto" }}>
         <RegimeAlert macro={macro} />
+        <PushToggle />
         <WelcomeBanner />
         {error && (
           <div style={{
