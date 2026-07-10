@@ -23,7 +23,7 @@ function renderMd(text: string) {
   });
 }
 
-interface ModState { text: string; violations: number[]; advice: string[]; loading: boolean; error: string; }
+interface ModState { text: string; violations: (number | string)[]; advice: string[]; loading: boolean; error: string; }
 const EMPTY: ModState = { text: "", violations: [], advice: [], loading: false, error: "" };
 
 export default function DueDiligence({ data, macro, scores, icScore, loading, ticker }: Props) {

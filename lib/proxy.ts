@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { checkGrounding } from "./grounding";
+import { checkGrounding, checkDirection } from "./grounding";
 
 const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
 
@@ -97,7 +97,9 @@ export async function aiAnalyze(prompt: string, maxTokens = 1000, tier: keyof ty
 
 // ── Audited generation (Phase 7) — grounding gate + audit trail ──────────────────────
 export interface AuditOpts { module: string; ticker?: string; dataBlock?: string; sources?: string[]; maxTokens?: number; tier?: keyof typeof AI_MODELS; }
-export interface AuditedResult { text: string; violations: number[]; grounded: boolean; }
+// violations mixes the numeric gate's flagged figures (numbers) with the directional
+// gate's inconsistent-claim descriptions (strings); consumers render length/join.
+export interface AuditedResult { text: string; violations: (number | string)[]; grounded: boolean; }
 
 /**
  * Like aiAnalyze, but (1) runs the code-level grounding gate over the output vs the DATA
@@ -110,6 +112,11 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
   const model = AI_MODELS[opts.tier ?? "fast"];
   const text = await activeProvider.complete(model, opts.maxTokens ?? 1000, prompt);
   const gate = opts.dataBlock ? checkGrounding(text, opts.dataBlock) : { ok: true, violations: [] as number[], checked: 0 };
+  // Directional gate (F2.1): real numbers arranged into a false claim ("$165 sits above
+  // the $184.20 price") — independent of the DATA block, always applicable.
+  const dir = checkDirection(text);
+  const violations: (number | string)[] = [...gate.violations, ...dir.violations];
+  const grounded = gate.ok && dir.ok;
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) await supabase.from("ai_audit_log").insert({
@@ -120,9 +127,9 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
       prompt_chars: prompt.length,
       sources: opts.sources ?? null,
       output: text.slice(0, 8000),
-      violations: gate.violations,
-      grounded: gate.ok,
+      violations,
+      grounded,
     });
   } catch { /* audit is best-effort — never block the user's answer */ }
-  return { text, violations: gate.violations, grounded: gate.ok };
+  return { text, violations, grounded };
 }

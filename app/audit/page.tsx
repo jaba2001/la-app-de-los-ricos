@@ -8,7 +8,7 @@ import { Sk } from "@/components/ui/Skeleton";
 interface AuditRow {
   id: number; ticker: string | null; module: string; model: string | null;
   prompt_chars: number | null; sources: string[] | null; output: string | null;
-  violations: number[] | null; grounded: boolean | null; created_at: string;
+  violations: (number | string)[] | null; grounded: boolean | null; created_at: string;
 }
 
 const MODULE_LABEL: Record<string, string> = {
