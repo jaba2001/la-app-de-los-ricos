@@ -14,6 +14,7 @@ import { secularRegime } from "@/lib/secular";
 import { stockPickingRegime } from "@/lib/microScore";
 import { ALLOCATOR_BACKTEST as A } from "@/lib/trackRecord";
 import type { MacroState } from "@/lib/types";
+import PaperFund from "@/components/macro/PaperFund";
 
 const card = { background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg, 14px)", padding: "var(--sr-sp-5)" } as const;
 const label = { fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" } as const;
@@ -137,6 +138,9 @@ export default function Demo() {
           </section>
         </>
       )}
+
+      {/* The living proof — the autonomous paper fund, read-only (anon SELECT policy) */}
+      <PaperFund />
 
       {/* Validated numbers + CTA */}
       <section style={{ ...card, background: "color-mix(in srgb, var(--sr-amber) 6%, var(--sr-surface))", borderColor: "color-mix(in srgb, var(--sr-amber) 26%, transparent)", textAlign: "center" }}>
