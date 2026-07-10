@@ -11,12 +11,15 @@
 
 export type CorrRegime = "low" | "mid" | "high";
 
-// Measured IC-proportional weights per correlation regime (research/out/signals_ic.json).
-// low correlation = a stock-picker's tape (momentum dominates); high = a macro tape.
+// Measured IC-proportional weights per correlation regime — from the SURVIVORSHIP-FREE
+// --full 120 run (research/out/signals_ic.json, incl. point-in-time removed members). More
+// conservative than a curated universe (which inflates momentum). Only factors with positive
+// measured IC in a regime get weight. low = a stock-picker's tape (12-1m momentum leads);
+// mid = value earns its keep; high = quality/health (a macro tape rewards balance sheets).
 export const ENSEMBLE_WEIGHTS: Record<CorrRegime, Partial<Record<"value" | "health" | "momentum" | "growth" | "mom12_1", number>>> = {
-  low:  { mom12_1: 0.59, value: 0.16, momentum: 0.15, growth: 0.11 },
-  mid:  { health: 0.33, momentum: 0.29, growth: 0.29, value: 0.09 },
-  high: { momentum: 0.84, growth: 0.16 },
+  low:  { mom12_1: 0.59, growth: 0.23, value: 0.18 },
+  mid:  { value: 0.99, health: 0.01 },
+  high: { health: 0.83, momentum: 0.17 },
 };
 
 // ^COR3M (CBOE implied correlation) thresholds — same cut points as stockPickingRegime.

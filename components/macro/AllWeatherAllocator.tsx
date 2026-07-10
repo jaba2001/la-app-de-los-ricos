@@ -39,9 +39,22 @@ function mom12_1(closes: Close[]): number | null {
   const c12 = closeOnOrBefore(closes, shiftMonths(last, -12));
   return c1 != null && c12 != null && c12 > 0 ? (c1 / c12 - 1) * 100 : null;
 }
+// Trailing 63-day realized volatility (std of daily log returns) — for A6 risk-parity sizing.
+function vol63(closes: Close[]): number | null {
+  if (closes.length < 45) return null;
+  const rets: number[] = [];
+  for (let i = Math.max(1, closes.length - 63); i < closes.length; i++) {
+    const p0 = closes[i - 1].close, p1 = closes[i].close;
+    if (p0 > 0 && p1 > 0) rets.push(Math.log(p1 / p0));
+  }
+  if (rets.length < 40) return null;
+  const m = rets.reduce((s, x) => s + x, 0) / rets.length;
+  return Math.sqrt(rets.reduce((s, x) => s + (x - m) ** 2, 0) / (rets.length - 1));
+}
 
 export default function AllWeatherAllocator({ macro }: Props) {
   const [mom, setMom] = useState<Partial<Record<AllocAsset, number | null>> | null>(null);
+  const [vols, setVols] = useState<Partial<Record<AllocAsset, number | null>> | null>(null);
   const [momLoading, setMomLoading] = useState(true);
 
   useEffect(() => {
@@ -50,14 +63,15 @@ export default function AllWeatherAllocator({ macro }: Props) {
     Promise.all(
       ALLOC_ASSETS.map((t) =>
         authedFetch<unknown>(`/api/fmp/historical-price-eod/full?symbol=${t}`)
-          .then((raw) => [t, mom12_1(toCloses(raw))] as const)
-          .catch(() => [t, null] as const)
+          .then((raw) => { const c = toCloses(raw); return [t, mom12_1(c), vol63(c)] as const; })
+          .catch(() => [t, null, null] as const)
       )
-    ).then((pairs) => {
+    ).then((triples) => {
       if (!alive) return;
       const m: Partial<Record<AllocAsset, number | null>> = {};
-      for (const [t, v] of pairs) m[t] = v;
-      setMom(m); setMomLoading(false);
+      const v: Partial<Record<AllocAsset, number | null>> = {};
+      for (const [t, mv, vv] of triples) { m[t] = mv; v[t] = vv; }
+      setMom(m); setVols(v); setMomLoading(false);
     });
     return () => { alive = false; };
   }, []);
@@ -68,7 +82,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
     return computeRiskOn({ lcc: macro.liquidity_cycle, rpc: macro.recession_prob, csc: macro.credit_stress });
   }, [macro]);
 
-  const alloc = useMemo(() => buildAllocation({ riskOn, momentum: mom ?? undefined }), [riskOn, mom]);
+  const alloc = useMemo(() => buildAllocation({ riskOn, momentum: mom ?? undefined, vols: vols ?? undefined }), [riskOn, mom, vols]);
 
   if (!macro) return null;
 
@@ -81,7 +95,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
         <div>
           <div className="section-label" style={{ margin: 0 }}>All-Weather Allocator</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 460, lineHeight: 1.5 }}>
-            Liquidity-led risk-on tilt across six liquid ETFs, with a 12-1m momentum trend gate. The multi-asset engine — where the measured edge lives.
+            Liquidity-led risk-on tilt across six liquid ETFs, with a 12-1m momentum trend gate and inverse-vol (risk-parity) sizing. The multi-asset engine — where the measured edge lives.
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -136,8 +150,8 @@ export default function AllWeatherAllocator({ macro }: Props) {
       {/* Validated backtest anchor */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
         {[
-          { k: "Backtest 2007–2026", v: "Sharpe 1.01" },
-          { k: "Max drawdown", v: "−10.1%" },
+          { k: "Backtest 2007–2026", v: "Sharpe 1.02" },
+          { k: "Max drawdown", v: "−7.5%" },
           { k: "vs SPY buy & hold", v: "0.71 · −50.7%" },
         ].map((s) => (
           <div key={s.k}>

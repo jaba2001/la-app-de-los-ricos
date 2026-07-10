@@ -13,7 +13,7 @@
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { fwdReturn } from "./prices.mjs";
+import { fwdReturn, returnsSeries } from "./prices.mjs";
 import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
 import { regimeStationaryAsOf, preloadStationary } from "./regimeStationary.mjs";
 import { ASSETS, targetWeights, applyDualMomentum, blendWeights } from "./allocate.mjs";
@@ -101,9 +101,44 @@ const stepRiskOnDM = async (date, macro) => {
   return applyDualMomentum(base, mom).weights;
 };
 
-const [reg, regDM, riskOn, riskOnDM, momOnly, s6040, spy] = [
+// A6 — risk-aware (inverse-volatility) sizing. Trailing realized vol per asset ending at
+// `date`, memoized. "The covariance structure IS the object" — size by risk, not by a fixed
+// basket, so a low-vol bond and a high-vol commodity don't carry the same risk at equal weight.
+const vsCache = new Map();
+async function volAsOf(asset, date, win = 63) {
+  const k = `${asset}/${date}/${win}`;
+  if (vsCache.has(k)) return vsCache.get(k);
+  const r = await returnsSeries(asset);
+  let hi = -1; for (let i = 0; i < r.length; i++) { if (r[i].date <= date) hi = i; else break; }
+  let v = null;
+  if (hi >= win) { const w = r.slice(hi - win + 1, hi + 1).map((x) => x.ret); const m = w.reduce((s, x) => s + x, 0) / w.length; v = Math.sqrt(w.reduce((s, x) => s + (x - m) ** 2, 0) / (w.length - 1)); }
+  vsCache.set(k, v); return v;
+}
+// Re-weight the gated risk sleeves ∝ 1/vol (BIL/cash kept as-is), preserving the total
+// risk-sleeve allocation. Falls back to the input weight when vol is unknown.
+async function riskParity(weights, date) {
+  const risk = ASSETS.filter((a) => a !== "BIL" && (weights[a] || 0) > 0);
+  const cashW = weights.BIL || 0;
+  const riskTotal = risk.reduce((s, a) => s + weights[a], 0);
+  if (riskTotal <= 0) return { ...weights };
+  const inv = {}; let invSum = 0;
+  for (const a of risk) { const v = await volAsOf(a, date); const iv = v && v > 0 ? 1 / v : (weights[a] / riskTotal); inv[a] = iv; invSum += iv; }
+  const out = { BIL: cashW };
+  for (const a of risk) out[a] = riskTotal * (inv[a] / invSum);
+  return out;
+}
+const stepRiskOnDM_RP = async (date, macro) => {
+  const base = blendWeights(macro.risk_on);
+  const mom = {};
+  for (const a of ASSETS) mom[a] = await mom12_1(a, date);
+  const gated = applyDualMomentum(base, mom).weights;
+  return riskParity(gated, date);
+};
+
+const [reg, regDM, riskOn, riskOnDM, riskOnRP, momOnly, s6040, spy] = [
   await runStrategy(stepRegime), await runStrategy(stepRegimeDM),
   await runStrategy(stepRiskOn), await runStrategy(stepRiskOnDM),
+  await runStrategy(stepRiskOnDM_RP),
   await runStrategy(stepMomOnly), await runStrategy(step6040), await runStrategy(stepSPY)];
 
 const line = (name, r) => `  ${name.padEnd(26)} ${pct(r.total).padStart(7)}%   Sharpe ${r.sharpe != null ? r.sharpe.toFixed(2) : "—"}   maxDD ${pct(r.maxDD).padStart(6)}%`;
@@ -112,6 +147,7 @@ console.log(line("Regime discrete", reg));
 console.log(line("Regime discrete + DualMom", regDM));
 console.log(line("RiskOn tilt (continuous)", riskOn));
 console.log(line("RiskOn tilt + DualMom", riskOnDM));
+console.log(line("RiskOn + DualMom + RiskParity", riskOnRP));
 console.log(line("DualMom-only (no regime)", momOnly));
 console.log(line("Static 60/40", s6040));
 console.log(line("SPY buy & hold", spy));
@@ -153,5 +189,13 @@ const verdict = overlayAdds
   : `OVERLAY DOES NOT ADD (even recalibrated) — RiskOn+DM Sharpe ${dRisk.toFixed(2)} ≤ DualMom-only ${dMom.toFixed(2)} (DD ${pct(riskOnDM.maxDD)}% vs ${pct(momOnly.maxDD)}%). Dual-momentum is the edge; demote regime to optional context.`;
 console.log(`\n  Verdict: ${verdict}`);
 
-writeFileSync(join(OUT, "backtest_assets_summary.json"), JSON.stringify({ generatedAt: new Date().toISOString(), months: dates.length, regime: reg, regimeDualMom: regDM, riskOn, riskOnDM, momOnly, static6040: s6040, spy, verdict }, null, 2));
+// A6 gate — does inverse-vol (risk-parity) sizing improve the validated allocator OOS?
+const baseS = riskOnDM.sharpe ?? 0, rpS = riskOnRP.sharpe ?? 0;
+const rpBetter = rpS > baseS + 0.03 || (Math.abs(rpS - baseS) <= 0.05 && riskOnRP.maxDD > riskOnDM.maxDD + 1);
+const a6verdict = rpBetter
+  ? `A6 RISK-PARITY EARNS ITS PLACE — Sharpe ${rpS.toFixed(2)} vs ${baseS.toFixed(2)}, maxDD ${pct(riskOnRP.maxDD)}% vs ${pct(riskOnDM.maxDD)}%. Ship inverse-vol sizing to the allocator/paper fund.`
+  : `A6 RISK-PARITY DOES NOT ADD — Sharpe ${rpS.toFixed(2)} ≤ ${baseS.toFixed(2)} (maxDD ${pct(riskOnRP.maxDD)}% vs ${pct(riskOnDM.maxDD)}%). Keep the current sizing; risk-parity stays optional context, not core.`;
+console.log(`\n  Gate A6: ${a6verdict}`);
+
+writeFileSync(join(OUT, "backtest_assets_summary.json"), JSON.stringify({ generatedAt: new Date().toISOString(), months: dates.length, regime: reg, regimeDualMom: regDM, riskOn, riskOnDM, riskOnRP, momOnly, static6040: s6040, spy, verdict, a6verdict }, null, 2));
 console.log(`\n  → wrote research/out/backtest_assets_summary.json\n`);

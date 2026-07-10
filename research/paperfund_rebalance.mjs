@@ -9,8 +9,8 @@
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { ASSETS, blendWeights, applyDualMomentum } from "./allocate.mjs";
-import { fwdReturn } from "./prices.mjs";
+import { ASSETS, blendWeights, applyDualMomentum, riskParity } from "./allocate.mjs";
+import { fwdReturn, returnsSeries } from "./prices.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -40,7 +40,15 @@ const mom = {};
 for (const a of ASSETS) {
   try { mom[a] = await fwdReturn(a, addMonths(today, -12), addMonths(today, -1)); } catch { mom[a] = null; }
 }
-const { weights, movedToCash } = applyDualMomentum(base, mom);
+const gated = applyDualMomentum(base, mom).weights;
+const movedToCash = applyDualMomentum(base, mom).movedToCash;
+// A6 — inverse-vol (risk-parity) sizing: trailing 63-day realized vol per asset.
+const vols = {};
+for (const a of ASSETS) {
+  try { const r = await returnsSeries(a); const win = r.slice(-63).map((x) => x.ret); if (win.length >= 40) { const m = win.reduce((s, x) => s + x, 0) / win.length; vols[a] = Math.sqrt(win.reduce((s, x) => s + (x - m) ** 2, 0) / (win.length - 1)); } else vols[a] = null; }
+  catch { vols[a] = null; }
+}
+const weights = riskParity(gated, vols);
 // round + renormalize for a clean snapshot
 let sum = 0; for (const a of ASSETS) sum += weights[a];
 const w = {}; for (const a of ASSETS) w[a] = +(weights[a] / (sum || 1)).toFixed(4);
