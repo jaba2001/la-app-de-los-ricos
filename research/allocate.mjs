@@ -13,7 +13,9 @@
 //   expansion · reflation · stagflation · contraction · neutral
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL"];
+export const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"];
+// Grayscale/CAIA small-BTC-sleeve constant (Growth only, carved from equities, never leverage).
+export const BTC_SLEEVE = 0.05;
 
 // Regime → target weights (sum to 1). Grounded in the regime-rotation literature:
 // expansion = risk-on equities; reflation = equities + real assets (commodities);
@@ -41,12 +43,13 @@ export function targetWeights(regimeId) {
 const RISK_ON  = { SPY: 0.55, TLT: 0.10, IEF: 0.10, GLD: 0.05, DBC: 0.15, BIL: 0.05 };
 const RISK_OFF = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.05, BIL: 0.15 };
 
-/** Growth profile (2026-07-10 lab): regime SWITCH, not a blend — 100% equities when the
- *  gauge is risk-on (≥50), defensive basket otherwise. Lock-step with lib/allocation.ts. */
-export function growthWeights(riskOn) {
-  return riskOn >= 50
-    ? { SPY: 1, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0 }
-    : { ...RISK_OFF };
+/** Growth profile (2026-07 lab): regime SWITCH, not a blend — equities when risk-on (≥50),
+ *  defensive basket otherwise. A small BTC sleeve (carved from equities, never leverage) is
+ *  held when risk-on AND BTC's 12-1m trend is up. Lock-step with lib/allocation.ts. */
+export function growthWeights(riskOn, btcMom12_1) {
+  if (riskOn < 50) return { ...RISK_OFF, BTCUSD: 0 };
+  const btc = btcMom12_1 != null && btcMom12_1 > 0 ? BTC_SLEEVE : 0;
+  return { SPY: 1 - btc, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0, BTCUSD: btc };
 }
 
 /** Blend RISK_ON/RISK_OFF baskets by riskOn (0-100). */

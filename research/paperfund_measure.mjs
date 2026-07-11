@@ -11,7 +11,7 @@ import { priceAsOf } from "./prices.mjs";
 const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
 const today = new Date().toISOString().slice(0, 10);
-const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL"];
+const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"];
 
 async function fetchRebalances() {
   if (!SB_KEY) return [];

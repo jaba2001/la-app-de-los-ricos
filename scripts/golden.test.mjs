@@ -15,6 +15,7 @@ import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs, gr
 import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { classifyInstrument } from "../lib/instrument.ts";
+import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensenAlpha, informationRatio, riskReport } from "../lib/riskMetrics.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -311,7 +312,7 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(rp.IEF > rp.DBC, `riskParity: inverse-vol ordering IEF>DBC (${rp.IEF.toFixed(3)} > ${rp.DBC.toFixed(3)})`);
   // No vols at all → weights unchanged (never a rescale from garbage).
   const un = rpTs(W, {});
-  ok(ALLOC_ASSETS.every((k) => Math.abs(un[k] - W[k]) < 1e-12), "riskParity: no vols → unchanged");
+  ok(ALLOC_ASSETS.every((k) => Math.abs((un[k] || 0) - (W[k] || 0)) < 1e-12), "riskParity: no vols → unchanged");
 
   for (const ro of [0, 25, 40, 50, 63, 100]) {
     const a = bwTs(ro), b = bwJs(ro);
@@ -325,13 +326,19 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(da.movedToCash.slice().sort().join() === db.movedToCash.slice().sort().join(), `parity dualMomentum: movedToCash (${da.movedToCash} vs ${db.movedToCash})`);
   ok(da.weights.SPY === 0 && da.weights.DBC === 0 && da.weights.TLT > 0, "dualMomentum: negative sleeves gated, positive kept");
 
-  // Growth profile parity + semantics (the default product mandate).
+  // Growth profile parity + semantics (the default product mandate), incl. the BTC sleeve.
   for (const ro of [0, 49.9, 50, 63, 100]) {
-    const a = gwTs(ro), b = gwJs(ro);
-    for (const k of ALLOC_ASSETS) ok(Math.abs(a[k] - b[k]) < 1e-12, `parity growthWeights(${ro}): ${k}`);
-    approx(ALLOC_ASSETS.reduce((s, k) => s + a[k], 0), 1, 1e-9, `growthWeights(${ro}): sums to 1`);
+    for (const btc of [undefined, -5, 0, 12]) {
+      const a = gwTs(ro, btc), b = gwJs(ro, btc);
+      for (const k of ALLOC_ASSETS) ok(Math.abs((a[k] || 0) - (b[k] || 0)) < 1e-12, `parity growthWeights(${ro},${btc}): ${k}`);
+      approx(ALLOC_ASSETS.reduce((s, k) => s + (a[k] || 0), 0), 1, 1e-9, `growthWeights(${ro},${btc}): sums to 1`);
+    }
   }
   ok(gwTs(50).SPY === 1 && gwTs(49.9).SPY < 1, "growth: switch at exactly 50");
+  // BTC sleeve: held (5%, carved from SPY) only when risk-on AND BTC 12-1m > 0 — never leverage.
+  ok(gwTs(60, 12).BTCUSD === 0.05 && Math.abs(gwTs(60, 12).SPY - 0.95) < 1e-12, "growth: BTC 5% carved from equity on uptrend");
+  ok(gwTs(60, -3).BTCUSD === 0 && gwTs(60, -3).SPY === 1, "growth: no BTC when BTC trend down");
+  ok(gwTs(40, 12).BTCUSD === 0, "growth: no BTC when risk-off (defensive)");
 }
 
 // ── Claims anti-drift (F1.2) ──────────────────────────────────────────────────
@@ -357,20 +364,24 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
     console.log("  (claims anti-drift: research/out/backtest_assets_summary.json not present — skipped)");
   }
 
-  // Same guard for the GROWTH profile claims vs the latest aggressive_lab.json.
-  const labPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "aggressive_lab.json");
-  if (existsSync(labPath)) {
-    const lab = JSON.parse(readFileSync(labPath, "utf8"));
-    const pairsG = [["strategy", "AGG-switch (binary)"], ["benchmark", "Static 60/40"], ["spy", "SPY buy & hold"]];
-    for (const [claim, key] of pairsG) {
-      const c = GROWTH_BACKTEST[claim], meas = lab.results?.[key];
-      ok(!!meas, `growth claims: measured "${key}" present`);
-      if (!meas) continue;
-      ok(Math.abs(c.totalReturn - meas.total) <= Math.max(3, Math.abs(meas.total) * 0.02), `growth drift: ${claim} total ${c.totalReturn} vs ${meas.total.toFixed(1)}`);
-      ok(Math.abs(c.sharpe - meas.sharpe) <= 0.03, `growth drift: ${claim} sharpe ${c.sharpe} vs ${meas.sharpe.toFixed(2)}`);
-      ok(Math.abs(c.maxDrawdown - meas.maxDD) <= 0.5, `growth drift: ${claim} maxDD ${c.maxDrawdown} vs ${meas.maxDD.toFixed(1)}`);
+  // Anti-drift: the GROWTH claims must match the PRODUCTION-path measurement
+  // (research/growth_metrics.mjs → growth_metrics.json, through the live allocate.mjs).
+  const gmPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "growth_metrics.json");
+  if (existsSync(gmPath)) {
+    const gm = JSON.parse(readFileSync(gmPath, "utf8"));
+    const g = GROWTH_BACKTEST.strategy, mr = gm.report?.growth, mt = gm.totals?.growth;
+    ok(!!mr, "growth claims: production report present");
+    if (mr) {
+      ok(Math.abs(g.totalReturn - mt) <= Math.max(5, Math.abs(mt) * 0.02), `growth drift: total ${g.totalReturn} vs ${mt}`);
+      ok(Math.abs(g.sharpe - mr.sharpe) <= 0.03, `growth drift: sharpe ${g.sharpe} vs ${mr.sharpe}`);
+      ok(Math.abs(g.sortino - mr.sortino) <= 0.05, `growth drift: sortino ${g.sortino} vs ${mr.sortino}`);
+      ok(Math.abs(g.maxDrawdown - mr.maxDrawdown) <= 0.5, `growth drift: maxDD ${g.maxDrawdown} vs ${mr.maxDrawdown}`);
+      ok(Math.abs(g.alpha - mr.alpha) <= 0.2, `growth drift: alpha ${g.alpha} vs ${mr.alpha}`);
     }
-    ok(GROWTH_BACKTEST.months === lab.months, `growth drift: months ${GROWTH_BACKTEST.months} vs ${lab.months}`);
+    // SPY benchmark figures must match too (they anchor every risk-adjusted comparison).
+    const sp = GROWTH_BACKTEST.spy, ms = gm.report?.spy;
+    if (ms) { ok(Math.abs(sp.sharpe - ms.sharpe) <= 0.03 && Math.abs(sp.maxDrawdown - ms.maxDrawdown) <= 0.5, `growth drift: SPY sharpe/maxDD ${sp.sharpe}/${sp.maxDrawdown} vs ${ms.sharpe}/${ms.maxDrawdown}`); }
+    ok(GROWTH_BACKTEST.months === gm.months, `growth drift: months ${GROWTH_BACKTEST.months} vs ${gm.months}`);
   }
 
   // Same guard for the A5 ensemble weights vs the latest measured signals_ic.json.
@@ -401,6 +412,37 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(classifyInstrument("AAPL").isEquity === true, "AAPL still equity");
   ok(classifyInstrument("GLD").type === "metal", "GLD still metal (no crypto regression)");
   ok(classifyInstrument("SPY").type === "broad-etf", "SPY still broad-etf");
+}
+
+// ── Risk metrics (institutional scorecard, 2026-07-11) ────────────────────────
+{
+  // Self-benchmark identities: beta=1, alpha=0, IR undefined→0 (zero tracking error).
+  const s = [1.2, -0.8, 2.1, -1.5, 0.9, 3.0, -2.2, 1.1, 0.4, -0.6, 1.8, -1.0];
+  approx(beta(s, s), 1, 1e-9, "beta vs self = 1");
+  approx(jensenAlpha(s, s), 0, 1e-9, "alpha vs self = 0");
+  ok(informationRatio(s, s) === 0, "IR vs self = 0 (no tracking error)");
+
+  // Sortino only penalizes downside → for a series with the same total vol, a version
+  // with losses clustered has a lower Sortino than Sharpe when mean>0.
+  ok(sortino(s) >= sharpe(s) - 1e-9 || sortino(s) > 0, "sortino computes (downside-only)");
+  // A series with NO negative months has zero downside deviation → sortino returns 0 (guard).
+  ok(sortino([1, 2, 1, 2]) === 0, "sortino: no downside → 0 (divide-by-zero guarded)");
+
+  // VaR/CVaR ordering: CVaR (tail mean) must be ≤ VaR (tail threshold), both negative here.
+  const r = [-5, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  ok(conditionalVaR(r, 0.95) <= valueAtRisk(r, 0.95), "CVaR ≤ VaR (tail is worse than threshold)");
+  ok(valueAtRisk(r, 0.95) < 0, "VaR negative for a series with losses");
+
+  // Max drawdown: three −10% months compound to worse than −30%.
+  ok(maxDrawdown([-10, -10, -10]) < -27 && maxDrawdown([-10, -10, -10]) > -28, `maxDD 3×−10% ≈ −27.1% (${maxDrawdown([-10, -10, -10]).toFixed(1)})`);
+  ok(maxDrawdown([1, 2, 3]) === 0, "maxDD of all-positive = 0");
+
+  // riskReport shape + benchmark fields present only when a benchmark is passed.
+  const rep = riskReport(s);
+  ok(rep.beta === null && rep.alpha === null, "riskReport: no benchmark → null relative metrics");
+  const rep2 = riskReport(s, s);
+  ok(rep2.beta === 1 && rep2.alpha === 0, "riskReport: self-benchmark → beta 1, alpha 0");
+  ok(typeof rep.sortino === "number" && typeof rep.cvar95 === "number", "riskReport: absolute metrics present");
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────

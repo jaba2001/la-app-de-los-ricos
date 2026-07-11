@@ -36,23 +36,27 @@ export interface BacktestSummary {
 // Sources: research/backtest_assets.mjs (REGIME=stationary, 2007-2026),
 // research/walkforward.mjs (OOS), research/backtest.mjs --full 500 (0A momentum).
 
-// ── GROWTH profile (default product mandate, 2026-07-10 aggressive lab) ─────────────
-// research/aggressive_lab.mjs, 234 months 2007-2026, net of 10bp/side, stationary regime.
-// The honest claim: beats the static 60/40 on return, Sharpe AND drawdown in EVERY window
-// tested (full / 2007-2019 / 2020-2026); ~85% of SPY's CAGR with a third of its drawdown.
-// It does NOT beat SPY's total return — nothing unlevered did; leverage (2× SSO), short
-// hedges (SH) and long-vol (VXX) were measured and rejected (worse risk-adjusted).
+// ── GROWTH profile (default product mandate) — the EXACT production path ─────────────
+// research/growth_metrics.mjs, 234 months 2007-2026, net 10bp/side, stationary regime,
+// measured through the LIVE allocate.mjs (growthWeights + dual-momentum + 5% BTC sleeve).
+// Benchmark = the S&P 500 (the only reference that matters). The honest, provable claim is
+// RISK-ADJUSTED outperformance: the index's return profile at a THIRD of its drawdown and
+// half its tail risk — Sharpe 0.99 vs 0.72, Sortino 1.79 vs 1.07, Calmar 0.56 vs 0.22,
+// Jensen α +5.96%/yr. It does NOT beat SPY's raw total return (+506% vs +652%), shown
+// openly; NO strategy did (leverage, CPPI, crypto all measured & rejected — never levered).
+// The full risk report (Sortino/VaR/CVaR/α/IR) drives lib/riskMetrics.ts-backed UI.
 export const GROWTH_BACKTEST = {
   period: "Jan 2007 – Jun 2026",
   months: 234,
-  strategy:  { label: "Growth — regime switch + trend gate", totalReturn: 459.8, cagr: 9.2, sharpe: 0.96, maxDrawdown: -17.6 },
-  benchmark: { label: "Static 60/40",                        totalReturn: 368.0, cagr: 8.2, sharpe: 0.86, maxDrawdown: -28.8 },
-  spy:       { label: "SPY buy & hold",                      totalReturn: 652.2, cagr: 10.9, sharpe: 0.72, maxDrawdown: -50.7 },
+  strategy:  { label: "Growth — regime switch + trend gate + 5% BTC sleeve", totalReturn: 506.0, cagr: 9.68, sharpe: 0.99, sortino: 1.79, calmar: 0.56, maxDrawdown: -17.3, var95: -4.11, cvar95: -5.6, alpha: 5.96, informationRatio: -0.14 },
+  spy:       { label: "S&P 500 (SPY) buy & hold", totalReturn: 652.2, cagr: 10.9, sharpe: 0.72, sortino: 1.07, calmar: 0.22, maxDrawdown: -50.7, var95: -8.21, cvar95: -11.18 },
+  bench6040: { label: "Static 60/40 (context)", totalReturn: 368.0, cagr: 8.24, sharpe: 0.86, sortino: 1.33, calmar: 0.29, maxDrawdown: -28.8 },
+  noBtc:     { label: "Growth without the BTC sleeve", totalReturn: 460.0, cagr: 9.23, sharpe: 0.96, sortino: 1.71, maxDrawdown: -17.6 },
   subPeriods: [
-    { label: "2007–2019", strat: "+183% · 0.96 · −16%", benchmark: "+161% · 0.88 · −29%", spy: "+196% · 0.62 · −51%" },
-    { label: "2020–2026", strat: "+97% · 0.98 · −18%",  benchmark: "+80% · 0.83 · −20%",  spy: "+154% · 0.89 · −24%" },
+    { label: "2007–2019", strat: "+183% · Sharpe 0.96 · −16% DD", spy: "+196% · 0.62 · −51%" },
+    { label: "2020–2026", strat: "+97% · Sharpe 0.98 · −18% DD",  spy: "+154% · 0.89 · −24%" },
   ],
-  rejected: "Measured and rejected as inferior risk-adjusted: 2× leverage (SSO), short-hedge overlays (SH), long-vol (VXX static & timed), monthly vol-targeting, QQQ concentration. See research/out/aggressive_lab.json.",
+  rejected: "Measured and rejected — none beats SPY on total return with lower drawdown, and we never use leverage: regime-conditional leverage (SSO 1.3-1.5×), CPPI, short-hedge overlays (SH), long-vol (VXX), monthly vol-targeting. See research/out/beat_index_lab.json.",
 };
 
 export const ALLOCATOR_BACKTEST = {

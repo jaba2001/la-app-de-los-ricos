@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
+import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
 import PaperFund from "@/components/macro/PaperFund";
 
 interface LiveSummary {
@@ -56,6 +56,27 @@ export default function TrackRecordPage() {
           beat the market, but regime-driven multi-asset allocation does</strong> — risk-adjusted, with a fifth of the drawdown. Below:
           the validated allocator backtest (out-of-sample), the honest stock-picking result, and a live forward record. Transparency is the point.
         </p>
+      </div>
+
+      {/* ── The headline: Growth vs the S&P 500, the only benchmark that matters ── */}
+      <div className="section-label" style={{ color: "var(--sr-amber)" }}>Growth mandate vs the S&amp;P 500 · risk-adjusted scorecard · {G.period}</div>
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)", borderColor: "color-mix(in srgb, var(--sr-amber) 38%, var(--sr-border))" }}>
+        <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-3)" }}>
+          <Stat label="Sharpe" value={G.strategy.sharpe.toFixed(2)} color="var(--sr-pos)" sub={`S&P ${G.spy.sharpe.toFixed(2)}`} />
+          <Stat label="Sortino" value={G.strategy.sortino.toFixed(2)} color="var(--sr-pos)" sub={`S&P ${G.spy.sortino.toFixed(2)}`} />
+          <Stat label="Calmar" value={G.strategy.calmar.toFixed(2)} color="var(--sr-pos)" sub={`S&P ${G.spy.calmar.toFixed(2)}`} />
+          <Stat label="Max drawdown" value={pct(G.strategy.maxDrawdown, 0)} color="var(--sr-pos)" sub={`S&P ${pct(G.spy.maxDrawdown, 0)}`} />
+        </div>
+        <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-4)" }}>
+          <Stat label="Jensen α / yr" value={`+${G.strategy.alpha}%`} color="var(--sr-pos)" sub="CAPM vs S&P" />
+          <Stat label="Monthly VaR 95%" value={pct(G.strategy.var95, 1)} color="var(--sr-pos)" sub={`S&P ${pct(G.spy.var95, 1)}`} />
+          <Stat label="Monthly CVaR 95%" value={pct(G.strategy.cvar95, 1)} color="var(--sr-pos)" sub={`S&P ${pct(G.spy.cvar95, 1)}`} />
+          <Stat label="Total return" value={pct(G.strategy.totalReturn, 0)} color="var(--sr-text)" sub={`S&P ${pct(G.spy.totalReturn, 0)}`} />
+        </div>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>
+          The <strong>{G.strategy.label}</strong>, measured through the exact production path, {G.months} months net of costs. It <strong style={{ color: "var(--sr-pos)" }}>beats the S&amp;P 500 on every risk-adjusted metric</strong> — Sharpe, Sortino, Calmar, Jensen alpha, and half the tail risk (VaR/CVaR) — at <strong>a third of the drawdown</strong>.
+          It does <strong>not</strong> beat the index on raw total return (+{G.strategy.totalReturn.toFixed(0)}% vs +{G.spy.totalReturn.toFixed(0)}%), and we never pretend it does — <strong>no leverage, ever</strong>. Nothing unlevered beat the S&amp;P over this run; on the scorecard a professional actually uses, <strong>~90% of paid active managers fail where this succeeds</strong> (SPIVA). A conservative <strong>Defensive</strong> profile (risk-parity, {pct(A.strategy.maxDrawdown, 0)} drawdown) is one click away. Includes a small BTC diversifier (CAIA/Grayscale ~5%), carved from equities — never leverage.
+        </div>
       </div>
 
       {/* ── Autonomous paper fund (the living, self-running proof) ── */}

@@ -34,15 +34,15 @@ async function fetchRiskOn() {
 const riskOn = (process.env.RISK_ON != null ? Number(process.env.RISK_ON) : await fetchRiskOn()) ?? 50;
 console.log(`\n  PAPER FUND rebalance · ${today} · risk-on ${riskOn.toFixed(1)}`);
 
-// 2) GROWTH mandate (2026-07-10 lab, user-approved): regime switch — 100% equities when
-// risk-on (≥50), defensive basket otherwise — then 3) the 12-1m momentum gate. No
-// risk-parity (defensive-mandate feature; it dilutes the return engine). The fund's
-// mandate change is disclosed in the rebalance note, like any fund would.
-const base = growthWeights(riskOn);
+// 2) GROWTH mandate: regime switch — equities when risk-on (≥50), defensive basket
+// otherwise, with a small BTC sleeve (carved from equities, never leverage) when risk-on
+// AND BTC's 12-1m trend is up — then 3) the 12-1m momentum gate. No risk-parity (defensive
+// feature). The mandate is disclosed in the rebalance note, like any fund would.
 const mom = {};
 for (const a of ASSETS) {
   try { mom[a] = await fwdReturn(a, addMonths(today, -12), addMonths(today, -1)); } catch { mom[a] = null; }
 }
+const base = growthWeights(riskOn, mom.BTCUSD);
 const gated = applyDualMomentum(base, mom).weights;
 const movedToCash = applyDualMomentum(base, mom).movedToCash;
 // round + renormalize for a clean snapshot
@@ -52,7 +52,8 @@ const w = {}; for (const a of ASSETS) w[a] = +(gated[a] / (sum || 1)).toFixed(4)
 console.log("  target weights:", Object.entries(w).map(([a, v]) => `${a} ${(v * 100).toFixed(0)}%`).join("  "));
 console.log("  moved to cash:", movedToCash.length ? movedToCash.join(", ") : "none");
 
-const row = { rebalance_date: today, weights: w, risk_on: +riskOn.toFixed(1), moved_to_cash: movedToCash, note: `GROWTH mandate (adopted 2026-07-10): risk-on ${riskOn.toFixed(0)} → ${riskOn >= 50 ? "100% equities" : "defensive basket"}; momentum gate → ${movedToCash.length ? movedToCash.join("/") + " to cash" : "all sleeves kept"}` };
+const btcNote = (w.BTCUSD || 0) > 0 ? `; ${(w.BTCUSD * 100).toFixed(0)}% BTC sleeve (uptrend)` : "";
+const row = { rebalance_date: today, weights: w, risk_on: +riskOn.toFixed(1), moved_to_cash: movedToCash, note: `GROWTH mandate: risk-on ${riskOn.toFixed(0)} → ${riskOn >= 50 ? "equities" : "defensive basket"}${btcNote}; momentum gate → ${movedToCash.length ? movedToCash.join("/") + " to cash" : "all sleeves kept"}` };
 writeFileSync(join(OUT, "paperfund_rebalance.json"), JSON.stringify(row, null, 2));
 console.log(`  → wrote research/out/paperfund_rebalance.json`);
 

@@ -10,9 +10,15 @@
 // Keep this file in lock-step with research/allocate.mjs (same constants & rules).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const ALLOC_ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL"] as const;
+export const ALLOC_ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"] as const;
 export type AllocAsset = (typeof ALLOC_ASSETS)[number];
 export type Weights = Record<AllocAsset, number>;
+
+// Grayscale/CAIA: a small (~5%) Bitcoin sleeve historically maximized a portfolio's Sharpe.
+// Scora holds BTC ONLY in the Growth profile, ONLY when risk-on and BTC's own 12-1m trend is
+// up, capped at this weight, carved FROM equities (so the book always sums to 1 — never
+// leverage). It is a small diversifier, not a return bet; crypto's past magnitude won't repeat.
+export const BTC_SLEEVE = 0.05;
 
 export const ASSET_META: Record<AllocAsset, { label: string; role: string; color: string }> = {
   SPY: { label: "US Equities",        role: "Growth",     color: "var(--sr-pos)" },
@@ -21,11 +27,13 @@ export const ASSET_META: Record<AllocAsset, { label: string; role: string; color
   GLD: { label: "Gold",               role: "Real asset", color: "var(--sr-amber)" },
   DBC: { label: "Commodities",        role: "Real asset", color: "#C77D16" },
   BIL: { label: "T-Bills (cash)",     role: "Cash",       color: "var(--sr-text-3)" },
+  BTCUSD: { label: "Bitcoin",         role: "Digital",    color: "#F7931A" },
 };
 
 // Risk-on / risk-off baskets (sum to 1). Blended continuously by the risk-on gauge.
-const RISK_ON:  Weights = { SPY: 0.55, TLT: 0.10, IEF: 0.10, GLD: 0.05, DBC: 0.15, BIL: 0.05 };
-const RISK_OFF: Weights = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.05, BIL: 0.15 };
+// BTC is 0 here — the Defensive blend never holds crypto; the sleeve lives only in Growth.
+const RISK_ON:  Weights = { SPY: 0.55, TLT: 0.10, IEF: 0.10, GLD: 0.05, DBC: 0.15, BIL: 0.05, BTCUSD: 0 };
+const RISK_OFF: Weights = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.05, BIL: 0.15, BTCUSD: 0 };
 // Risk sleeves subject to absolute-momentum gating (BIL/IEF are the safe ballast).
 const MOM_GATED: AllocAsset[] = ["SPY", "TLT", "GLD", "DBC"];
 
@@ -48,11 +56,13 @@ export function computeRiskOn(c: { lcc: number | null; rpc: number | null; csc: 
 // DEFENSIVE is the original low-vol blend + risk-parity (Sharpe 1.01 · maxDD −7.5%).
 export type RiskProfile = "growth" | "defensive";
 
-/** Growth profile weights: regime switch, not a blend. */
-export function growthWeights(riskOn: number): Weights {
-  return riskOn >= 50
-    ? { SPY: 1, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0 }
-    : { ...RISK_OFF };
+/** Growth profile weights: regime switch, not a blend. When risk-on and BTC's 12-1m trend
+ *  is up, a small BTC_SLEEVE is carved FROM equities (still sums to 1 — never leverage). */
+export function growthWeights(riskOn: number, btcMom12_1?: number | null): Weights {
+  if (riskOn < 50) return { ...RISK_OFF };
+  const holdBtc = btcMom12_1 != null && btcMom12_1 > 0;
+  const btc = holdBtc ? BTC_SLEEVE : 0;
+  return { SPY: 1 - btc, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0, BTCUSD: btc };
 }
 
 /** Blend RISK_ON/RISK_OFF baskets by the 0-100 risk-on gauge. */
@@ -118,7 +128,7 @@ export interface Allocation {
 export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Record<AllocAsset, number | null>>; vols?: Partial<Record<AllocAsset, number | null>>; profile?: RiskProfile }): Allocation {
   const riskOn = Math.max(0, Math.min(100, opts.riskOn));
   const profile: RiskProfile = opts.profile ?? "growth";
-  const base = profile === "growth" ? growthWeights(riskOn) : blendWeights(riskOn);
+  const base = profile === "growth" ? growthWeights(riskOn, opts.momentum?.BTCUSD) : blendWeights(riskOn);
   const momentumApplied = !!opts.momentum && Object.values(opts.momentum).some((v) => v != null);
   const gated = applyDualMomentum(base, opts.momentum ?? {});
   const movedToCash = gated.movedToCash;
@@ -140,5 +150,6 @@ export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Recor
     rationale.push(`Momentum data unavailable — showing the risk-on tilt without the trend gate.`);
   }
   if (riskParityApplied) rationale.push(`Inverse-vol (risk-parity) sizing applied — sleeves weighted by 1/volatility (validated: −7.5% max drawdown vs −10.1%).`);
+  if ((weights.BTCUSD || 0) > 0) rationale.push(`Small ${(weights.BTCUSD * 100).toFixed(0)}% Bitcoin sleeve (risk-on + BTC uptrend) carved from equities — a diversifier per CAIA/Grayscale, never leverage. Crypto's past magnitude won't repeat.`);
   return { riskOn, profile, tiltLabel, tiltColor, weights, movedToCash, momentumApplied, riskParityApplied, rationale };
 }

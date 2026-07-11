@@ -165,14 +165,14 @@ export default function AllWeatherAllocator({ macro }: Props) {
       {/* Validated backtest anchor */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
         {(profile === "growth" ? [
-          { k: "Backtest 2007–2026", v: `+${G.strategy.totalReturn.toFixed(0)}% · Sharpe ${G.strategy.sharpe.toFixed(2)}` },
-          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}%` },
-          { k: "vs 60/40 (honest benchmark)", v: `+${G.benchmark.totalReturn.toFixed(0)}% · ${G.benchmark.sharpe.toFixed(2)} · ${G.benchmark.maxDrawdown}%` },
-          { k: "vs SPY (full disclosure)", v: `+${G.spy.totalReturn.toFixed(0)}% · ${G.spy.maxDrawdown}%` },
+          { k: "Sharpe vs S&P 500", v: `${G.strategy.sharpe.toFixed(2)} · SPY ${G.spy.sharpe.toFixed(2)}` },
+          { k: "Sortino vs S&P 500", v: `${G.strategy.sortino.toFixed(2)} · SPY ${G.spy.sortino.toFixed(2)}` },
+          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}% · SPY ${G.spy.maxDrawdown}%` },
+          { k: "Jensen α / yr · CVaR95", v: `+${G.strategy.alpha}% · ${G.strategy.cvar95}%` },
         ] : [
           { k: "Backtest 2007–2026", v: `Sharpe ${D.strategy.sharpe.toFixed(2)}` },
           { k: "Max drawdown", v: `${D.strategy.maxDrawdown}%` },
-          { k: "vs SPY buy & hold", v: `${D.spy.sharpe.toFixed(2)} · ${D.spy.maxDrawdown}%` },
+          { k: "vs S&P 500 buy & hold", v: `${D.spy.sharpe.toFixed(2)} · ${D.spy.maxDrawdown}%` },
         ]).map((s) => (
           <div key={s.k}>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>
@@ -181,7 +181,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
         ))}
       </div>
       <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        Out-of-sample, net of costs, benchmarks beaten in both sub-periods (Growth vs 60/40; Defensive vs the regime-free control). Leverage, short hedges and long-vol were measured and rejected. Educational — not investment advice; ETF examples, not recommendations.
+        Out-of-sample, net of costs. Growth beats the S&amp;P 500 on every risk-adjusted metric in both sub-periods (never on raw return — no leverage, ever; the index returned more at ~3× the drawdown). Educational — not investment advice; ETF examples, not recommendations.
       </div>
     </div>
   );

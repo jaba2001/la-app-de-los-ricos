@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
+import { GROWTH_BACKTEST as G } from "@/lib/trackRecord";
 
 export default function Landing() {
   const { session, loading } = useAuth();
@@ -49,13 +49,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Validated numbers */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-6)" }}>
+      {/* Validated numbers — vs the S&P 500, the only benchmark that matters */}
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
         {[
-          { k: "Growth CAGR", v: `${G.strategy.cagr}%`, s: `60/40: ${G.benchmark.cagr}% · SPY: ${G.spy.cagr}%` },
-          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}%`, s: `60/40: ${G.benchmark.maxDrawdown}% · SPY: ${G.spy.maxDrawdown}%` },
-          { k: "Sharpe", v: G.strategy.sharpe.toFixed(2), s: `60/40: ${G.benchmark.sharpe.toFixed(2)} · SPY: ${G.spy.sharpe.toFixed(2)}` },
-          { k: "Tested through", v: `${G.months}m`, s: `${G.period} · defensive profile: ${A.strategy.maxDrawdown}% DD` },
+          { k: "Sharpe ratio", v: G.strategy.sharpe.toFixed(2), s: `S&P 500: ${G.spy.sharpe.toFixed(2)}` },
+          { k: "Sortino ratio", v: G.strategy.sortino.toFixed(2), s: `S&P 500: ${G.spy.sortino.toFixed(2)}` },
+          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}%`, s: `S&P 500: ${G.spy.maxDrawdown}%` },
+          { k: "Jensen α / yr", v: `+${G.strategy.alpha}%`, s: `vs the S&P 500 (CAPM)` },
         ].map((s) => (
           <div key={s.k} style={{ ...card, textAlign: "center", padding: "var(--sr-sp-4)" }}>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>
@@ -64,11 +64,14 @@ export default function Landing() {
           </div>
         ))}
       </section>
+      <p style={{ textAlign: "center", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", margin: "0 auto var(--sr-sp-6)", maxWidth: 640, lineHeight: 1.6 }}>
+        {G.period}, net of costs. The S&P returned more in raw terms (+{G.spy.totalReturn.toFixed(0)}% vs +{G.strategy.totalReturn.toFixed(0)}%) — we show it openly — but at <strong style={{ color: "var(--sr-text-2)" }}>2.9× the drawdown</strong>. On the professional scorecard, Growth beats the index; ~90% of paid managers don&apos;t (SPIVA).
+      </p>
 
       {/* Three pillars */}
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--sr-sp-4)", marginBottom: "var(--sr-sp-6)" }}>
         {[
-          { t: "Beats the benchmark you'd actually hold", d: `If you can stomach a −51% drawdown, buy the index — we say so openly. If you can't, your real alternative is the 60/40, and the Growth mandate beats it on return, Sharpe AND drawdown in every window tested (2007-2026). Leverage, short hedges and long-vol were measured and rejected.`, tag: "validated OOS" },
+          { t: "Beats the S&P 500 where it counts", d: `Not on raw return — almost nothing does, and we never pretend otherwise (no leverage, ever). On the risk-adjusted scorecard a professional actually uses: Sharpe ${G.strategy.sharpe.toFixed(2)} vs ${G.spy.sharpe.toFixed(2)}, Sortino ${G.strategy.sortino.toFixed(2)} vs ${G.spy.sortino.toFixed(2)}, +${G.strategy.alpha}%/yr Jensen alpha, and a third of the drawdown. The thing ~90% of paid managers fail to do (SPIVA).`, tag: "validated OOS · net of costs" },
           { t: "AI that can't hallucinate", d: "Every AI answer is checked against the data it was given, in code — not just in the prompt. Fabricated figures are flagged and logged. A weaker, free model stays safe because governance doesn't depend on the model.", tag: "code-enforced gate" },
           { t: "A self-correcting top-down loop", d: "Secular clock → risk-on allocation → sector rotation → selection, with a breadth loop that flags when the macro read and the market's participation diverge — an early warning, not a forecast.", tag: "macro ↔ micro" },
         ].map((p) => (

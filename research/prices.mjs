@@ -59,15 +59,20 @@ async function fromTiingo(ticker) {
   } catch { return []; }
 }
 
+// Canonical symbol → Yahoo symbol. We use FMP's crypto format (BTCUSD) as the ONE
+// canonical ticker across the app, backtest and paper fund; Yahoo needs the hyphen form.
+const YAHOO_ALIAS = { BTCUSD: "BTC-USD", ETHUSD: "ETH-USD" };
+
 async function series(ticker) {
   if (mem.has(ticker)) return mem.get(ticker);
+  const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
   const path = join(DIR, ticker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
   let rows = null;
   if (existsSync(path)) { try { const c = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(c) && c.length && c[0].raw != null) rows = c; } catch { rows = null; } }
   if (!rows) {
     await sleep(160);
-    rows = await fromYahoo(ticker);
-    if (!rows.length) rows = await fromTiingo(ticker); // delisted / Yahoo-miss
+    rows = await fromYahoo(yTicker);
+    if (!rows.length) rows = await fromTiingo(yTicker); // delisted / Yahoo-miss
     if (rows.length) writeFileSync(path, JSON.stringify(rows));
   }
   rows = rows ?? [];
