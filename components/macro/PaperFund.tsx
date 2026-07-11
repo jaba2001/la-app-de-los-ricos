@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ALLOC_ASSETS, ASSET_META, blendWeights, type Weights } from "@/lib/allocation";
 
-interface Track { as_of: string; inception: string; nav: number; spy_nav: number; total_ret: number; spy_ret: number; max_dd: number; sharpe: number; grade: string; }
+interface Track { as_of: string; inception: string; nav: number; spy_nav: number; bench6040_nav?: number | null; bench6040_ret?: number | null; total_ret: number; spy_ret: number; max_dd: number; sharpe: number; grade: string; }
 interface Reb { rebalance_date: string; weights: Record<string, number>; risk_on: number | null; moved_to_cash: string[] | null; }
 
 const pct = (v: number | null | undefined, d = 1) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${v.toFixed(d)}%`);
@@ -55,8 +55,8 @@ export default function PaperFund() {
 
       {track && track.inception && (
         <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-tile"><div className="sr-tile-label">NAV (base 100)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{fnum(track.nav)}</div><div className="sr-hint">SPY {fnum(track.spy_nav)}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Total return</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: (track.total_ret ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{pct(track.total_ret)}</div><div className="sr-hint">SPY {pct(track.spy_ret)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">NAV (base 100)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{fnum(track.nav)}</div><div className="sr-hint">60/40 {fnum(track.bench6040_nav)} · SPY {fnum(track.spy_nav)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">Total return</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: (track.total_ret ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{pct(track.total_ret)}</div><div className="sr-hint">60/40 {pct(track.bench6040_ret)} · SPY {pct(track.spy_ret)}</div></div>
           <div className="sr-tile"><div className="sr-tile-label">Max drawdown</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{pct(track.max_dd, 0)}</div></div>
           <div className="sr-tile"><div className="sr-tile-label">Sharpe (ann.)</div><div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{fnum(track.sharpe, 2)}</div></div>
         </div>
