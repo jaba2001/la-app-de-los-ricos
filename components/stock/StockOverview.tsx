@@ -7,6 +7,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 import { topDownContext } from "@/lib/topDown";
+import { timeframeReads, type RegimeId } from "@/lib/timeframes";
 import { classifyInstrument } from "@/lib/instrument";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
@@ -384,6 +385,55 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     </div>
                   </div>
                 )}
+              </div>
+            );
+          })()}
+
+          {/* Timeframe reads (2026-07) — the honest multi-timeframe context: structural (macro
+              tailwind for sector+factor) → trend (12-1m + relative strength) → timing (reversion).
+              Explainability + discipline, not a new alpha score. */}
+          {instr.isEquity && !loading && scores && (() => {
+            const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
+            const sectorCl = closePrices(data?.sectorEtfHistory ?? []);
+            const sectorRet6m = periodRet(sectorCl, 126);
+            const rsVsSector = ret6m != null && sectorRet6m != null ? ret6m - sectorRet6m : null;
+            // Factor profile proxy from the sub-scores (dominant style is what the monthly read needs).
+            const ft = { value: (scores.value / 25) * 20, growth: scores.growth, momentum: (scores.momentum / 25) * 20, quality: (scores.health / 30) * 20, size: 10 };
+            const tf = timeframeReads({
+              regime: (macro?.regime_id as RegimeId) ?? null,
+              riskOn: macro?.risk_on != null ? Number(macro.risk_on) : null,
+              sector: (data?.profile?.sector as string) ?? null,
+              factorTilts: ft, mom12_1, rsVsSector, rsVsSpy: alpha6m, rsi14, pctFrom200dma: vs200,
+            });
+            const confColor = tf.confluence === "structural-buy" ? "var(--sr-pos)" : tf.confluence === "avoid" || tf.confluence === "bounce-vs-macro" ? "var(--sr-neg)" : "var(--sr-warn)";
+            const confLabel: Record<string, string> = { "structural-buy": "Structural buy", "leader-extended": "Leader · extended", "bounce-vs-macro": "Bounce vs macro", "improving": "Improving setup", "avoid": "Avoid", "mixed": "Mixed signals" };
+            const rows: { k: string; q: string; r: typeof tf.monthly }[] = [
+              { k: "Monthly", q: "Own it? · macro tailwind", r: tf.monthly },
+              { k: "Weekly", q: "Trending & leading?", r: tf.weekly },
+              { k: "Daily", q: "Good entry or chasing?", r: tf.daily },
+            ];
+            const barColor = (s: number) => s >= 60 ? "var(--sr-pos)" : s >= 45 ? "var(--sr-warn)" : "var(--sr-neg)";
+            return (
+              <div className="card">
+                <div className="sr-flex-between" style={{ marginBottom: 4 }}>
+                  <div className="section-label" style={{ margin: 0 }}>Timeframes · top-down</div>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: confColor, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${confColor} 14%, transparent)` }}>{confLabel[tf.confluence]}</span>
+                </div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tf.summary}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
+                  {rows.map(({ k, q, r }) => (
+                    <div key={k} title={r.reasons.join(" · ")}>
+                      <div className="sr-flex-between" style={{ marginBottom: 3 }}>
+                        <span style={{ fontSize: "var(--sr-t-xs)" }}><strong style={{ color: "var(--sr-text)" }}>{k}</strong> <span style={{ color: "var(--sr-text-3)" }}>· {q}</span></span>
+                        <span className="num" style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: barColor(r.score) }}>{r.score} · {r.label}</span>
+                      </div>
+                      <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${r.score}%`, background: barColor(r.score) }} /></div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-3)", lineHeight: 1.5 }}>
+                  Monthly gates: strength against a macro headwind is a bounce, not a buy. Daily is a reversion/entry filter (short-term momentum fades), not a momentum score. Context &amp; discipline — the validated edge is the regime allocation.
+                </div>
               </div>
             );
           })()}

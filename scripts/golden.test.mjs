@@ -15,6 +15,7 @@ import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs, gr
 import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { classifyInstrument } from "../lib/instrument.ts";
+import { timeframeReads } from "../lib/timeframes.ts";
 import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensenAlpha, informationRatio, riskReport } from "../lib/riskMetrics.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -412,6 +413,35 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(classifyInstrument("AAPL").isEquity === true, "AAPL still equity");
   ok(classifyInstrument("GLD").type === "metal", "GLD still metal (no crypto regression)");
   ok(classifyInstrument("SPY").type === "broad-etf", "SPY still broad-etf");
+}
+
+// ── Multi-timeframe context layer (2026-07-11) ────────────────────────────────
+{
+  const growthFt = { value: 3, growth: 16, momentum: 12, quality: 8, size: 6 };
+  const valueFt = { value: 16, growth: 3, momentum: 4, quality: 10, size: 8 };
+  // Structural buy: risk-on + growth sector + growth factor in expansion + strong trend + fair entry.
+  const sb = timeframeReads({ regime: "expansion", riskOn: 72, sector: "Technology", factorTilts: growthFt, mom12_1: 35, rsVsSector: 8, rsVsSpy: 12, rsi14: 55, pctFrom200dma: 8 });
+  ok(sb.confluence === "structural-buy", `structural-buy confluence (${sb.confluence})`);
+  ok(sb.monthly.score >= 62 && sb.weekly.score >= 62, "structural buy: monthly+weekly high");
+  ok(sb.convictionMult === 1.0, "structural buy conviction 1.0");
+  // Leader but overbought (RSI 82) → wait for pullback.
+  const lx = timeframeReads({ regime: "expansion", riskOn: 72, sector: "Technology", factorTilts: growthFt, mom12_1: 35, rsVsSector: 8, rsVsSpy: 12, rsi14: 82, pctFrom200dma: 25 });
+  ok(lx.confluence === "leader-extended", `leader-extended when overbought (${lx.confluence})`);
+  ok(lx.daily.score < sb.daily.score, "overbought → lower daily/entry score than neutral RSI");
+  // Bounce against the macro: growth stock, risk-OFF/contraction, but strong recent trend.
+  const bo = timeframeReads({ regime: "contraction", riskOn: 25, sector: "Technology", factorTilts: growthFt, mom12_1: 20, rsVsSector: 5, rsVsSpy: 5, rsi14: 60, pctFrom200dma: 5 });
+  ok(bo.confluence === "bounce-vs-macro", `bounce-vs-macro (${bo.confluence})`);
+  ok(bo.monthly.score < 45 && bo.convictionMult <= 0.6 + 1e-9, "bounce: macro headwind gates conviction down");
+  // Measured factor rotation: a VALUE name is macro-favored in contraction, a GROWTH name isn't.
+  const valContraction = timeframeReads({ regime: "contraction", riskOn: 50, sector: "Financials", factorTilts: valueFt, mom12_1: 0, rsVsSector: 0, rsVsSpy: 0, rsi14: 50, pctFrom200dma: 0 });
+  const growthContraction = timeframeReads({ regime: "contraction", riskOn: 50, sector: "Financials", factorTilts: growthFt, mom12_1: 0, rsVsSector: 0, rsVsSpy: 0, rsi14: 50, pctFrom200dma: 0 });
+  ok(valContraction.monthly.score > growthContraction.monthly.score, `value>growth macro read in contraction (${valContraction.monthly.score} > ${growthContraction.monthly.score})`);
+  // Daily is a REVERSION filter: oversold RSI scores HIGHER (better entry) than overbought.
+  const os = timeframeReads({ regime: "neutral", riskOn: 50, sector: null, factorTilts: null, mom12_1: null, rsVsSector: null, rsVsSpy: null, rsi14: 25, pctFrom200dma: null });
+  const ob = timeframeReads({ regime: "neutral", riskOn: 50, sector: null, factorTilts: null, mom12_1: null, rsVsSector: null, rsVsSpy: null, rsi14: 80, pctFrom200dma: null });
+  ok(os.daily.score > ob.daily.score, "daily reversion: oversold entry > overbought");
+  // All scores bounded 0-100.
+  for (const r of [sb, lx, bo, os, ob]) for (const tf of [r.monthly, r.weekly, r.daily]) ok(tf.score >= 0 && tf.score <= 100, `timeframe score bounded (${tf.score})`);
 }
 
 // ── Risk metrics (institutional scorecard, 2026-07-11) ────────────────────────
