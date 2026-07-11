@@ -1,5 +1,21 @@
 import type { ScoreInputs, Scores, MacroState } from "./types";
 
+// Regime→factor rotation, MEASURED (research/regime_sector_lab.mjs) and VALIDATED (a regime
+// growth/value rotation earned Sharpe 1.24 vs SPY 0.74 over 2000-2026, regime_factor_validate).
+// +1 favored / −1 disfavored per style, by regime. Kept inline (this module is node-loaded by
+// the golden test → no runtime value imports); lib/regimeSectors.ts is the canonical copy for
+// the UI, and golden behavioral tests pin both to the same sign structure. Single meaning, two
+// small copies — the same parity discipline as the allocator's TS/MJS twins.
+type MacroStyle = "value" | "growth" | "momentum" | "quality" | "size";
+const REGIME_FACTOR_SIGNS: Record<string, Record<MacroStyle, number>> = {
+  expansion:   { growth: +1, value: -1, momentum:  0, quality:  0, size: -1 },
+  reflation:   { growth: +1, value: -1, momentum: +1, quality:  0, size:  0 },
+  stagflation: { growth: +1, value: -1, momentum:  0, quality: +1, size: -1 },
+  contraction: { growth: -1, value: +1, momentum:  0, quality: +1, size:  0 },
+  neutral:     { growth: -1, value: +1, momentum:  0, quality: -1, size:  0 },
+};
+const FAVORED_STYLE_LABEL: Record<string, string> = { expansion: "Growth", reflation: "Growth", stagflation: "Growth", contraction: "Value", neutral: "Value" };
+
 // FMP-stable profiles say "Financial Services" / "Basic Materials"; older sources and the
 // GICS convention say "Financials" / "Materials". Every sector map carries BOTH spellings so
 // no name silently falls out of sector-relative valuation, its sector ETF, or the macro tilt.
@@ -202,7 +218,8 @@ export function computeICHealthScore(macro: Pick<MacroState, "liquidity_cycle" |
 // stockPickingRegime, so it's intentionally NOT folded into this backdrop tilt.
 export function getMacroTilt(
   macroState: { regime_id?: string | null; recession_prob?: number | null; credit_stress?: number | null; risk_on?: number | null; hy_oas?: number | null; implied_corr?: number | null; ic_score?: number | null },
-  sector: string
+  sector: string,
+  factorTilts?: { value: number; growth: number; momentum: number; quality: number; size: number } | null
 ): { tilt: number; label: string; color: string; reasons: string[] } {
   const reasons: string[] = [];
   const regime = macroState.regime_id ?? "neutral";
@@ -229,6 +246,23 @@ export function getMacroTilt(
     if (defensiveSectors.includes(sector))     { tilt += 3; reasons.push(`${sector} is defensive in risk-off`); }
     else if (growthSectors.includes(sector))   { tilt -= 3; reasons.push(`${sector} (growth) hurt in risk-off`); }
     else if (cyclicalSectors.includes(sector)) { tilt -= 2; reasons.push(`${sector} (cyclical) soft in risk-off`); }
+  }
+
+  // Regime→FACTOR rotation (measured & validated: Sharpe 1.24 vs SPY 0.74, 2000-2026). Tilt a
+  // name UP when its dominant style is what the regime rewards (growth in expansion/reflation,
+  // value in contraction/neutral). Small ±4 — validated at the basket level, a directional
+  // nudge at single-name. `factorTilts` optional → callers without a style profile are unchanged.
+  const fsign = REGIME_FACTOR_SIGNS[regime];
+  if (factorTilts && fsign) {
+    const styles: [MacroStyle, number][] = [["growth", factorTilts.growth], ["value", factorTilts.value], ["momentum", factorTilts.momentum], ["quality", factorTilts.quality], ["size", factorTilts.size]];
+    const [domStyle, domVal] = styles.slice().sort((a, b) => b[1] - a[1])[0];
+    const total = styles.reduce((s, [, v]) => s + Math.max(0, v), 0);
+    const strength = total > 0 ? Math.min(1, (domVal / total) * 2) : 0; // how dominant the top style is
+    const ft = Math.round((fsign[domStyle] ?? 0) * 4 * strength); // ±4 pts max
+    if (ft !== 0) {
+      tilt += ft;
+      reasons.push(`${domStyle[0].toUpperCase() + domStyle.slice(1)}-leaning name ${ft > 0 ? "has a macro tailwind" : "faces a macro headwind"} in ${regime} (favors ${FAVORED_STYLE_LABEL[regime] ?? "—"}) — measured factor rotation`);
+    }
   }
 
   // Secondary confirmations — kept small; the risk-on gauge already folds most of this in.

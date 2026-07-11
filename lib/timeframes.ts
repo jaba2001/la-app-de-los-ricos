@@ -27,9 +27,10 @@ export type RegimeId = "expansion" | "reflation" | "stagflation" | "contraction"
 
 const clamp = (x: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
 
-// ── MEASURED regime→factor rotation (regime_sector_lab.mjs, avg fwd-1m excess vs SPY) ──
-// +1 favored / −1 disfavored / 0 neutral, per style, by regime. The growth↔value cyclicality
-// is the cleanest macro→equity signal in the data; the rest are directional and small.
+// Measured regime→factor rotation (inline: this module is node-loaded by the golden test, so
+// no runtime value imports; lib/regimeSectors.ts holds the canonical copy for the UI, and the
+// golden tests pin both to the same signs). Growth leads risk-on/reflationary regimes, value
+// leads contraction/neutral — validated Sharpe 1.24 vs SPY 0.74 (regime_factor_validate.mjs).
 const REGIME_FACTOR: Record<RegimeId, { growth: number; value: number; momentum: number; quality: number; size: number }> = {
   expansion:   { growth: +1, value: -1, momentum:  0, quality:  0, size: -1 },
   reflation:   { growth: +1, value: -1, momentum: +1, quality:  0, size:  0 },

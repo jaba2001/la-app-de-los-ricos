@@ -16,6 +16,7 @@ import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { classifyInstrument } from "../lib/instrument.ts";
 import { timeframeReads } from "../lib/timeframes.ts";
+import { favoredStyle, favoredSectors, regimeFactorTilt, REGIME_FACTOR, REGIME_FACTOR_STATS } from "../lib/regimeSectors.ts";
 import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensenAlpha, informationRatio, riskReport } from "../lib/riskMetrics.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -134,6 +135,55 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   // Factor tilts each capped at 20.
   const ft = calcFactorTilts({ pe: 8, pfcf: 8, evEbitda: 5, epsGrowth: 40, revenueGrowth: 40, roic: 30, roe: 30, grossMargin: 80, interestCoverage: 20, marketCap: 1e8, priceChange1M: 20, priceChange3M: 30, priceChange6M: 40 });
   for (const k of ["value", "growth", "momentum", "quality", "size"]) ok(ft[k] <= 20 && ft[k] >= 0, `factor ${k} in [0,20] (${ft[k]})`);
+
+  // Regime→FACTOR tilt folded into the score (measured & validated Sharpe 1.24). A growth-
+  // leaning name gets a macro tailwind in reflation and a headwind in contraction; value inverts.
+  const growthProfile = { value: 2, growth: 18, momentum: 12, quality: 8, size: 5 };
+  const valueProfile = { value: 18, growth: 2, momentum: 4, quality: 10, size: 8 };
+  const mNeutral = { regime_id: "reflation", risk_on: 50 };
+  const gRefl = getMacroTilt(mNeutral, "Technology", growthProfile).tilt;
+  const gReflNoFt = getMacroTilt(mNeutral, "Technology").tilt;
+  ok(gRefl > gReflNoFt, `growth name gets +factor tilt in reflation (${gRefl} > ${gReflNoFt})`);
+  const gContr = getMacroTilt({ regime_id: "contraction", risk_on: 50 }, "Technology", growthProfile).tilt;
+  const gContrNoFt = getMacroTilt({ regime_id: "contraction", risk_on: 50 }, "Technology").tilt;
+  ok(gContr < gContrNoFt, `growth name gets −factor tilt in contraction (${gContr} < ${gContrNoFt})`);
+  const vContr = getMacroTilt({ regime_id: "contraction", risk_on: 50 }, "Financials", valueProfile).tilt;
+  ok(vContr > gContr, `value beats growth macro tilt in contraction (${vContr} > ${gContr})`);
+  // Backward compatible: no factorTilts → identical to before (optional param).
+  ok(getMacroTilt(mNeutral, "Technology").tilt === gReflNoFt, "no factorTilts → unchanged tilt");
+  // Still bounded after the factor term.
+  ok(gRefl >= -20 && gRefl <= 20 && vContr >= -20 && vContr <= 20, "factor-tilted macro tilt still bounded");
+}
+
+// ── Regime→sector/factor rotation lib (the differentiator, measured) ──────────
+{
+  // Favored style matches the validated rotation: growth in expansion/reflation, value in contraction.
+  ok(favoredStyle("expansion").favored === "growth" && favoredStyle("reflation").favored === "growth", "favored style: growth in expansion/reflation");
+  ok(favoredStyle("contraction").favored === "value" && favoredStyle("neutral").favored === "value", "favored style: value in contraction/neutral");
+  ok(favoredStyle("nonsense") === null, "favored style: unknown regime → null");
+  // Favored sectors are ranked, non-empty for real regimes, empty for unknown.
+  ok(favoredSectors("reflation").length === 3 && favoredSectors("reflation")[0].etf === "XLK", "favored sectors: reflation top = Tech");
+  ok(favoredSectors("contraction")[0].etf === "XLE", "favored sectors: contraction top = Energy");
+  ok(favoredSectors("nonsense").length === 0, "favored sectors: unknown → empty");
+  // regimeFactorTilt sign matches: growth up in reflation, down in contraction.
+  ok(regimeFactorTilt("reflation", "growth", 1) > 0 && regimeFactorTilt("contraction", "growth", 1) < 0, "regimeFactorTilt: growth sign flips reflation↔contraction");
+  ok(regimeFactorTilt("contraction", "value", 1) > 0, "regimeFactorTilt: value up in contraction");
+  ok(regimeFactorTilt(null, "growth", 1) === 0 && regimeFactorTilt("reflation", null, 1) === 0, "regimeFactorTilt: null-safe");
+  // Anti-drift: the canonical REGIME_FACTOR signs match what scoring/timeframes encode inline.
+  for (const rg of ["expansion", "reflation", "stagflation", "contraction", "neutral"]) {
+    ok(REGIME_FACTOR[rg].growth === (rg === "contraction" || rg === "neutral" ? -1 : 1), `REGIME_FACTOR ${rg} growth sign`);
+    ok(REGIME_FACTOR[rg].value === -REGIME_FACTOR[rg].growth, `REGIME_FACTOR ${rg} value = −growth`);
+  }
+  // Claims anti-drift vs the measured validation (skipped in CI if the JSON isn't present).
+  const rfvPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "regime_factor_validate.json");
+  if (existsSync(rfvPath)) {
+    const rfv = JSON.parse(readFileSync(rfvPath, "utf8"));
+    const rot = rfv.results?.["Regime rotation (G/V)"], spy = rfv.results?.["SPY"];
+    if (rot && spy) {
+      ok(Math.abs(REGIME_FACTOR_STATS.rotationSharpe - rot.sharpe) <= 0.03, `regime-factor drift: rotation Sharpe ${REGIME_FACTOR_STATS.rotationSharpe} vs ${rot.sharpe}`);
+      ok(rot.sharpe > spy.sharpe, "regime rotation Sharpe still beats SPY (validation holds)");
+    }
+  }
 }
 
 // ── Technical indicators ─────────────────────────────────────────────────────

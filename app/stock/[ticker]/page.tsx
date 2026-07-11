@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
-import { calcScores, getRating, getMacroTilt, SECTOR_ETF } from "@/lib/scoring";
+import { calcScores, calcFactorTilts, getRating, getMacroTilt, SECTOR_ETF, type FactorTilts } from "@/lib/scoring";
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
 import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
@@ -88,6 +88,7 @@ export default function StockTickerPage() {
   const [data, setData] = useState<StockData | null>(null);
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
+  const [factorTilts, setFactorTilts] = useState<FactorTilts | null>(null);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
   const { macro: contextMacro, setMacro: setMacroContext } = useMacroContext();
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
@@ -121,6 +122,7 @@ export default function StockTickerPage() {
     setAutoChecked(false);
     setData(null);
     setScores(null);
+    setFactorTilts(null);
     setSavedAnalysis(null);
     setError("");
     setLoading(false);
@@ -548,8 +550,7 @@ export default function StockTickerPage() {
       const priceChange3M = cl.length > 63  ? ((cl[0] - cl[63])  / cl[63])  * 100 : null;
       const priceChange6M = cl.length > 126 ? ((cl[0] - cl[126]) / cl[126]) * 100 : null;
 
-      const macroTiltData = macroData ? getMacroTilt(macroData, sector) : null;
-      const calc = calcScores({
+      const scoreInputs = {
         pe:               mergedMetrics?.peRatioTTM as number ?? null,
         pb:               mergedMetrics?.priceToBookRatioTTM as number ?? null,
         evEbitda:         mergedMetrics?.enterpriseValueOverEBITDATTM as number ?? null,
@@ -584,9 +585,15 @@ export default function StockTickerPage() {
         epsQoQ:           stockData.finviz?.epsQoQ ?? null,
         salesQoQ:         stockData.finviz?.salesQoQ ?? null,
         operatingMargin:  stockData.finviz?.operatingMargin ?? null,
-      });
+      };
+      const calc = calcScores(scoreInputs);
+      // Factor profile (value/growth/momentum/quality/size) → feeds the measured regime→factor
+      // tilt in getMacroTilt (growth favored in expansion/reflation, value in contraction).
+      const ftilts = calcFactorTilts(scoreInputs);
+      const macroTiltData = macroData ? getMacroTilt(macroData, sector, ftilts) : null;
       if (!live()) return;
       setScores(calc);
+      setFactorTilts(ftilts);
 
       const rating = getRating(calc.total);
       const { data: saved } = await supabase.from("sl_analyses").upsert({
@@ -647,7 +654,7 @@ export default function StockTickerPage() {
   const profile = data?.profile;
   const quote   = data?.quote;
   const sector  = (profile?.sector as string) ?? "";
-  const macroTilt = macro ? getMacroTilt(macro, sector) : null;
+  const macroTilt = macro ? getMacroTilt(macro, sector, factorTilts) : null;
   const icScore   = scores && macroTilt ? Math.max(0, Math.min(100, scores.total + macroTilt.tilt)) : null;
   const rating    = icScore != null ? getRating(icScore) : (scores ? getRating(scores.total) : null);
 

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
-import { calcScores, getRating, getMacroTilt } from "@/lib/scoring";
+import { calcScores, calcFactorTilts, getRating, getMacroTilt } from "@/lib/scoring";
 import { stockPickingRegime } from "@/lib/microScore";
 import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
@@ -68,9 +68,7 @@ export default function StockScreener() {
       const { metrics, ratios } = normalizeFundamentals({ fmpKeyMetrics, fmpRatios, fmpGrowth, finnhubMetric: fhM, profile });
 
       const sector = profile?.sector as string ?? null;
-      const tiltResult = macroState && sector ? getMacroTilt(macroState, sector) : { tilt: 0 };
-
-      const calc = calcScores({
+      const scoreInputs = {
         pe:               metrics?.peRatioTTM              as number ?? null,
         pb:               metrics?.priceToBookRatioTTM     as number ?? null,
         evEbitda:         metrics?.enterpriseValueOverEBITDATTM as number ?? null,
@@ -92,7 +90,9 @@ export default function StockScreener() {
         priceChange1M:    null,
         priceChange3M:    null,
         priceChange6M:    null,
-      });
+      };
+      const calc = calcScores(scoreInputs);
+      const tiltResult = macroState && sector ? getMacroTilt(macroState, sector, calcFactorTilts(scoreInputs)) : { tilt: 0 };
 
       const rating = getRating(calc.total);
       const row = {

@@ -208,7 +208,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       {/* Layer 1 secular → Layer 2 multi-asset → Regime Radar (macro-driven, shown regardless of watchlist) */}
       <SecularClock macro={macro} />
       <AllWeatherAllocator macro={macro} />
-      <SectorRotation />
+      <SectorRotation regime={macro?.regime_id ?? null} />
       <RegimeRadar macro={macro} />
       <ScoraBrief macro={macro} />
 

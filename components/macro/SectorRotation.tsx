@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { SECTORS, rankSectors, SECTOR_ROTATION_STATS as S } from "@/lib/sectors";
+import { favoredSectors, favoredStyle, REGIME_FACTOR_STATS as RF } from "@/lib/regimeSectors";
 
 interface Close { date: string; close: number; }
 function toCloses(raw: unknown): Close[] {
@@ -25,8 +26,10 @@ function mom12_1(closes: Close[]): number | null {
   return c1 != null && c12 != null && c12 > 0 ? (c1 / c12 - 1) * 100 : null;
 }
 
-export default function SectorRotation() {
+export default function SectorRotation({ regime = null }: { regime?: string | null }) {
   const [mom, setMom] = useState<Record<string, number | null> | null>(null);
+  const favSectors = favoredSectors(regime, 3);
+  const favStyle = favoredStyle(regime);
 
   useEffect(() => {
     let alive = true;
@@ -84,8 +87,30 @@ export default function SectorRotation() {
         </div>
       )}
 
+      {/* Macro-favored (this regime) — the differentiator: which sectors/factor the current
+          regime historically rewards (measured; a regime growth/value rotation earned Sharpe
+          1.24 vs SPY 0.74 over 2000-2026). Complements the momentum ranking above. */}
+      {favStyle && (
+        <div style={{ marginTop: "var(--sr-sp-4)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
+          <div className="sr-flex-between" style={{ marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
+            <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Macro-favored · {regime} regime</span>
+            <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-amber)" }}>Style: {favStyle.label} leads</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)", marginBottom: 8 }}>
+            {favSectors.map((s) => (
+              <span key={s.etf} title={`Avg fwd-1m excess vs SPY +${s.excess.toFixed(2)}%`} style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-pos)", padding: "3px 10px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-pos) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--sr-pos) 28%, transparent)" }}>
+                {s.etf} · {s.name} <span className="num" style={{ color: "var(--sr-text-3)" }}>+{s.excess.toFixed(1)}%</span>
+              </span>
+            ))}
+          </div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
+            The regime picks the tailwind, not the name: measured over {RF.period}, a regime {favStyle.label.toLowerCase()}/{favStyle.favored === "growth" ? "value" : "growth"} rotation earned Sharpe {RF.rotationSharpe} vs the S&P&apos;s {RF.spySharpe}. Scora tilts a name&apos;s score up when its style + sector match the regime — the differentiator, at the level where macro actually predicts.
+          </div>
+        </div>
+      )}
+
       <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        Backtest {S.period}: top-{S.topK} rotation Sharpe {S.strategy.sharpe} · drawdown {S.strategy.maxDrawdown}% — half of SPY&apos;s ({S.spy.maxDrawdown}%) and well above an equal-weight-sectors basket ({S.equalWeight.sharpe} / {S.equalWeight.maxDrawdown}%). A risk refinement within the equity sleeve, not a headline alpha.
+        Momentum rotation backtest {S.period}: top-{S.topK} Sharpe {S.strategy.sharpe} · drawdown {S.strategy.maxDrawdown}% — half of SPY&apos;s ({S.spy.maxDrawdown}%) and above equal-weight sectors ({S.equalWeight.sharpe} / {S.equalWeight.maxDrawdown}%). A risk refinement within the equity sleeve.
       </div>
     </div>
   );
