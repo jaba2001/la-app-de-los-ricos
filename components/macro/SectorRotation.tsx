@@ -104,7 +104,7 @@ export default function SectorRotation({ regime = null }: { regime?: string | nu
             ))}
           </div>
           <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-            The regime picks the tailwind, not the name: measured over {RF.period}, a regime {favStyle.label.toLowerCase()}/{favStyle.favored === "growth" ? "value" : "growth"} rotation earned Sharpe {RF.rotationSharpe} vs the S&P&apos;s {RF.spySharpe}. Scora tilts a name&apos;s score up when its style + sector match the regime — the differentiator, at the level where macro actually predicts.
+            The regime picks the tailwind, not the name. The <strong>style</strong> rotation is what Scora folds into the score: a regime {favStyle.label.toLowerCase()}/{favStyle.favored === "growth" ? "value" : "growth"} tilt earned Sharpe {RF.rotationSharpe} vs the S&P&apos;s {RF.spySharpe} over {RF.period}. The sectors above are the <strong>historical tendency</strong> for this regime — context, not a live basket (out-of-sample, concentrating into them doesn&apos;t beat the index).
           </div>
         </div>
       )}
