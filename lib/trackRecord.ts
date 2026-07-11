@@ -56,7 +56,7 @@ export const GROWTH_BACKTEST = {
     { label: "2007–2019", strat: "+183% · Sharpe 0.96 · −16% DD", spy: "+196% · 0.62 · −51%" },
     { label: "2020–2026", strat: "+97% · Sharpe 0.98 · −18% DD",  spy: "+154% · 0.89 · −24%" },
   ],
-  rejected: "Measured and rejected — none beats SPY on total return with lower drawdown, and we never use leverage: regime-conditional leverage (SSO 1.3-1.5×), CPPI, short-hedge overlays (SH), long-vol (VXX), monthly vol-targeting. See research/out/beat_index_lab.json.",
+  rejected: "Measured and rejected — none beats SPY on total return with lower drawdown, and we never use leverage: regime-conditional leverage (SSO 1.3-1.5×), CPPI, short-hedge overlays (SH), long-vol (VXX), monthly vol-targeting (beat_index_lab.json). Options collars / protective puts too (options_collar_lab.json, BS-priced via VIX): they barely move the -17% drawdown (-17% to -18.4%) while slashing return (+506%→+256-402%) and every risk-adjusted metric — because the regime switch already provides the drawdown protection an options hedge would, upstream and for free, so the premium is pure drag.",
 };
 
 export const ALLOCATOR_BACKTEST = {

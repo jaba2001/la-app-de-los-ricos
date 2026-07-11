@@ -65,13 +65,13 @@ export default function Landing() {
         ))}
       </section>
       <p style={{ textAlign: "center", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", margin: "0 auto var(--sr-sp-6)", maxWidth: 640, lineHeight: 1.6 }}>
-        {G.period}, net of costs. The S&P returned more in raw terms (+{G.spy.totalReturn.toFixed(0)}% vs +{G.strategy.totalReturn.toFixed(0)}%) — we show it openly — but at <strong style={{ color: "var(--sr-text-2)" }}>2.9× the drawdown</strong>. On the professional scorecard, Growth beats the index; ~90% of paid managers don&apos;t (SPIVA).
+        {G.period}, net of costs. The S&P returned more in raw terms (+{G.spy.totalReturn.toFixed(0)}% vs +{G.strategy.totalReturn.toFixed(0)}%) — we show it openly — but at <strong style={{ color: "var(--sr-text-2)" }}>2.9× the drawdown</strong>. Even on raw return, most active managers can&apos;t match it: <strong>~90% of active US large-cap funds trail the S&P 500 over 15 years</strong> (SPIVA U.S. Scorecard, S&P Dow Jones Indices). Scora doesn&apos;t chase raw return — it wins the risk-adjusted one.
       </p>
 
       {/* Three pillars */}
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--sr-sp-4)", marginBottom: "var(--sr-sp-6)" }}>
         {[
-          { t: "Beats the S&P 500 where it counts", d: `Not on raw return — almost nothing does, and we never pretend otherwise (no leverage, ever). On the risk-adjusted scorecard a professional actually uses: Sharpe ${G.strategy.sharpe.toFixed(2)} vs ${G.spy.sharpe.toFixed(2)}, Sortino ${G.strategy.sortino.toFixed(2)} vs ${G.spy.sortino.toFixed(2)}, +${G.strategy.alpha}%/yr Jensen alpha, and a third of the drawdown. The thing ~90% of paid managers fail to do (SPIVA).`, tag: "validated OOS · net of costs" },
+          { t: "Beats the S&P 500 where it counts", d: `Not on raw return — almost nothing does, and we never pretend otherwise (no leverage, ever). On the risk-adjusted scorecard a professional actually uses: Sharpe ${G.strategy.sharpe.toFixed(2)} vs ${G.spy.sharpe.toFixed(2)}, Sortino ${G.strategy.sortino.toFixed(2)} vs ${G.spy.sortino.toFixed(2)}, +${G.strategy.alpha}%/yr Jensen alpha, and a third of the drawdown — free, transparent and rules-based.`, tag: "validated OOS · net of costs" },
           { t: "AI that can't hallucinate", d: "Every AI answer is checked against the data it was given, in code — not just in the prompt. Fabricated figures are flagged and logged. A weaker, free model stays safe because governance doesn't depend on the model.", tag: "code-enforced gate" },
           { t: "A self-correcting top-down loop", d: "Secular clock → risk-on allocation → sector rotation → selection, with a breadth loop that flags when the macro read and the market's participation diverge — an early warning, not a forecast.", tag: "macro ↔ micro" },
         ].map((p) => (
