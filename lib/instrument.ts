@@ -5,7 +5,7 @@
 // ticker to /stock/{ticker}; this decides which panel that page shows.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type InstrumentType = "equity" | "bond-etf" | "metal" | "commodity" | "broad-etf" | "sector-etf";
+export type InstrumentType = "equity" | "bond-etf" | "metal" | "commodity" | "broad-etf" | "sector-etf" | "crypto";
 
 // A macro driver for the instrument's tilt. `good` = the direction that is favorable for
 // the instrument; `field` = the macro_state column to read (string; read defensively).
@@ -55,6 +55,15 @@ const EM = new Set(["VWO","EEM","IEMG","SPEM","SCHE"]);
 
 const SECTOR = new Set(["XLK","XLF","XLE","XLV","XLI","XLP","XLY","XLB","XLU","XLRE","XLC","VGT","VFH","VDE","VHT","VIS","VDC","VCR","VAW","VPU","SMH","SOXX","ARKK","URA","ICLN","TAN","XBI","IBB","KRE","ITB","JETS","XME","XOP","VNQ","IYR","KWEB","FDN","IGV","HACK","BOTZ","LIT","XHB","XRT","OIH","FCG","PAVE","IHI","XAR"]);
 
+// ── Digital assets (crypto) — read by momentum + macro drivers, never by P/E. CAIA/
+// Grayscale: a small (≈5%) BTC sleeve historically maximized a portfolio's Sharpe;
+// crypto is a high-beta liquidity/real-yield play (same driver family as gold, amplified).
+// Coins arrive from Yahoo as "BTC-USD"; the classifier also accepts bare "BTC"/"BTCUSD".
+const CRYPTO_MAJOR = new Set(["BTC","ETH","BTC-USD","ETH-USD","BTCUSD","ETHUSD","WBTC","WETH"]);
+const CRYPTO_ALT = new Set(["SOL","ADA","AVAX","DOT","MATIC","LINK","XRP","LTC","BCH","DOGE","SOL-USD","ADA-USD","AVAX-USD","XRP-USD","LTC-USD","DOGE-USD","LINK-USD"]);
+// Spot / futures crypto ETFs (equity wrappers, but crypto-driven, no fundamentals).
+const CRYPTO_ETF = new Set(["IBIT","FBTC","GBTC","ARKB","BITB","HODL","BRRR","EZBC","BTCO","BITO","BTF","ETHE","ETHA","FETH","ETHW","BITX","BTCW"]);
+
 // driver presets
 const D_GOLD: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"}];
 const D_METAL: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
@@ -66,12 +75,18 @@ const D_HY: MacroDriver[] = [{label:"HY credit spread",good:"low",field:"hy_oas"
 const D_IG: MacroDriver[] = [{label:"10y yield (falling helps)",good:"low",field:"dgs10",unit:"%"},{label:"Credit spread (BBB)",good:"low",field:"bbb_oas",unit:"bp"}];
 const D_TIPS: MacroDriver[] = [{label:"Breakeven inflation",good:"high",field:"breakeven_10y",unit:"%"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"}];
 const D_RISK: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Recession risk",good:"low",field:"recession_prob"}];
+const D_CRYPTO: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Risk-on gauge",good:"high",field:"risk_on"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
 
 function has(sym: string, ...sets: Set<string>[]) { return sets.some((s) => s.has(sym)); }
 
 /** Classify a ticker (+ optional FMP profile) into an instrument. Default = equity. */
 export function classifyInstrument(ticker: string, profile?: { isEtf?: boolean; sector?: string; industry?: string } | null): Instrument {
   const t = (ticker || "").toUpperCase();
+
+  // Digital assets (crypto) — checked first: BTC-USD etc. must never fall through to equity.
+  if (CRYPTO_MAJOR.has(t)) return I("crypto", t.startsWith("ETH") ? "Ethereum" : "Bitcoin", "Digital assets", D_CRYPTO, "Crypto — a high-beta liquidity / real-yield play. Read by momentum + macro drivers, not fundamentals. Size small (CAIA/Grayscale: ~5% BTC historically maximized portfolio Sharpe); past returns won't repeat.");
+  if (CRYPTO_ALT.has(t)) return I("crypto","Altcoin","Digital assets",D_CRYPTO,"Altcoin — higher-beta digital asset. Read by momentum + macro drivers; far more speculative than BTC/ETH.");
+  if (CRYPTO_ETF.has(t)) return I("crypto","Crypto ETF","Digital assets",D_CRYPTO,"Spot/futures crypto ETF — a wrapper on the underlying coin. Read by momentum + macro drivers, not fundamentals.");
 
   // Metals
   if (GOLD.has(t)) return I("metal","Gold","Metals",D_GOLD,"Gold — a real-yield / dollar / liquidity play. Read by momentum and its macro drivers, not fundamentals.");

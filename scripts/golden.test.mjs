@@ -14,6 +14,7 @@ import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, gr
 import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs, growthWeights as gwJs } from "../research/allocate.mjs";
 import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
+import { classifyInstrument } from "../lib/instrument.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -384,6 +385,22 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
       }
     }
   }
+}
+
+// ── Instrument classifier (crypto in the micro layer, 2026-07-11) ─────────────
+{
+  const crypto = ["BTC-USD", "ETH-USD", "IBIT", "GBTC", "SOL-USD"];
+  for (const t of crypto) {
+    const i = classifyInstrument(t);
+    ok(i.type === "crypto", `classify ${t} → crypto (${i.type})`);
+    ok(i.isEquity === false, `${t} is not equity`);
+    ok(i.drivers.length > 0 && i.drivers.some((d) => d.field === "risk_on"), `${t} has macro drivers incl. risk_on`);
+  }
+  // Crypto must be checked BEFORE the equity fallthrough — BTC-USD is not a stock.
+  ok(classifyInstrument("BTC").type === "crypto", "bare BTC → crypto");
+  ok(classifyInstrument("AAPL").isEquity === true, "AAPL still equity");
+  ok(classifyInstrument("GLD").type === "metal", "GLD still metal (no crypto regression)");
+  ok(classifyInstrument("SPY").type === "broad-etf", "SPY still broad-etf");
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────
