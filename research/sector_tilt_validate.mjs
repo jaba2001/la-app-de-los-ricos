@@ -129,15 +129,26 @@ async function growthWithEquity(equityRetFn) {
 function tiltEquityRet(K, pool) {
   return async (i) => { const ranked = rankPast(i, pool); const held = ranked ? ranked.slice(0, K) : ["SPY"]; return held[0] === "SPY" ? rows[i].spy : mean(held.map((s) => rows[i].sec[s]).filter((x) => x != null)); };
 }
-console.log(`\n  ── DECISIVE: sector-tilt as the Growth equity sleeve (full allocator, 2000-2026) vs plain SPY sleeve ──`);
+// Momentum-rotation equity sleeve (the VALIDATED sector signal): top-K by 12-1m each month.
+function momEquityRet(K) {
+  return async (i) => {
+    const r = rows[i]; const ms = [];
+    for (const s of SECTORS) { const m = await mom(s, r.d); if (m != null) ms.push([s, m]); }
+    const held = ms.sort((a, b) => b[1] - a[1]).slice(0, K).map((x) => x[0]);
+    return held.length ? mean(held.map((s) => r.sec[s]).filter((x) => x != null)) : r.spy;
+  };
+}
+console.log(`\n  ── DECISIVE: sector strategies as the Growth equity sleeve (full allocator, 2000-2026) vs plain SPY sleeve ──`);
 const gSpy = await growthWithEquity(async (i) => rows[i].spy);
 const gTilt3 = await growthWithEquity(tiltEquityRet(3, SECTORS));
 const gTilt2 = await growthWithEquity(tiltEquityRet(2, SECTORS));
-const repSpy = riskReport(gSpy, spyRets), repT3 = riskReport(gTilt3, spyRets), repT2 = riskReport(gTilt2, spyRets);
+const gMom3 = await growthWithEquity(momEquityRet(3));
+const repSpy = riskReport(gSpy, spyRets), repT3 = riskReport(gTilt3, spyRets), repT2 = riskReport(gTilt2, spyRets), repM3 = riskReport(gMom3, spyRets);
 const gl = (name, rep, rets) => { out["FULL:" + name] = { total: +stats(rets).total.toFixed(1), ...rep }; console.log(`  ${name.padEnd(30)} total +${stats(rets).total.toFixed(0)}% · Sharpe ${rep.sharpe} · Sortino ${rep.sortino} · maxDD ${rep.maxDrawdown}% · α ${rep.alpha}`); };
 gl("Growth · plain SPY sleeve", repSpy, gSpy);
-gl("Growth · sector-tilt top-3", repT3, gTilt3);
-gl("Growth · sector-tilt top-2", repT2, gTilt2);
+gl("Growth · regime-tilt top-3", repT3, gTilt3);
+gl("Growth · regime-tilt top-2", repT2, gTilt2);
+gl("Growth · momentum-rotation top-3", repM3, gMom3);
 
 const better = repT3.sharpe > repSpy.sharpe + 0.02 || repT2.sharpe > repSpy.sharpe + 0.02;
 const verdict = better
