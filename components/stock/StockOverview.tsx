@@ -8,6 +8,7 @@ import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 import { topDownContext } from "@/lib/topDown";
 import { timeframeReads, type RegimeId } from "@/lib/timeframes";
+import { ratingFrom, RATING_COLOR, type Rating } from "@/lib/rating";
 import { classifyInstrument } from "@/lib/instrument";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
@@ -405,34 +406,46 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               sector: (data?.profile?.sector as string) ?? null,
               factorTilts: ft, mom12_1, rsVsSector, rsVsSpy: alpha6m, rsi14, pctFrom200dma: vs200,
             });
-            const confColor = tf.confluence === "structural-buy" ? "var(--sr-pos)" : tf.confluence === "avoid" || tf.confluence === "bounce-vs-macro" ? "var(--sr-neg)" : "var(--sr-warn)";
-            const confLabel: Record<string, string> = { "structural-buy": "Structural buy", "leader-extended": "Leader · extended", "bounce-vs-macro": "Bounce vs macro", "improving": "Improving setup", "avoid": "Avoid", "mixed": "Mixed signals" };
-            const rows: { k: string; q: string; r: typeof tf.monthly }[] = [
-              { k: "Monthly", q: "Own it? · macro tailwind", r: tf.monthly },
-              { k: "Weekly", q: "Trending & leading?", r: tf.weekly },
-              { k: "Daily", q: "Good entry or chasing?", r: tf.daily },
+            const pickR = stockPickingRegime(macro?.implied_corr ?? null);
+            const corrRegime = pickR.regime === "favorable" ? "low" : pickR.regime === "unfavorable" ? "high" : "mid";
+            const rt = ratingFrom(icScore ?? scores.total, tf, { corrRegime });
+            const convColor = rt.conviction === "High" ? "var(--sr-pos)" : rt.conviction === "Medium" ? "var(--sr-warn)" : "var(--sr-text-3)";
+            const rows: { k: string; q: string; r: typeof tf.monthly; tk: "monthly" | "weekly" | "daily" }[] = [
+              { k: "Monthly", q: "Own it? · macro tailwind", r: tf.monthly, tk: "monthly" },
+              { k: "Weekly", q: "Trending & leading?", r: tf.weekly, tk: "weekly" },
+              { k: "Daily", q: "Good entry or chasing?", r: tf.daily, tk: "daily" },
             ];
             const barColor = (s: number) => s >= 60 ? "var(--sr-pos)" : s >= 45 ? "var(--sr-warn)" : "var(--sr-neg)";
+            const chip = (rat: Rating, small = false) => (
+              <span style={{ fontSize: small ? "9px" : "11px", fontWeight: 800, color: RATING_COLOR[rat], padding: small ? "1px 6px" : "2px 9px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${RATING_COLOR[rat]} 15%, transparent)`, whiteSpace: "nowrap" }}>{rat}</span>
+            );
             return (
               <div className="card">
-                <div className="sr-flex-between" style={{ marginBottom: 4 }}>
-                  <div className="section-label" style={{ margin: 0 }}>Timeframes · top-down</div>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: confColor, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${confColor} 14%, transparent)` }}>{confLabel[tf.confluence]}</span>
+                <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
+                  <div className="section-label" style={{ margin: 0 }}>Rating · top-down</div>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: convColor }}>{rt.conviction} conviction · {rt.convictionPct}%</span>
                 </div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tf.summary}</div>
+                <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
+                  {chip(rt.rating)}
+                  <span className="num" style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{rt.directional}/100 directional</span>
+                </div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tf.summary} <span style={{ color: "var(--sr-text-2)" }}>{rt.note}</span></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
-                  {rows.map(({ k, q, r }) => (
+                  {rows.map(({ k, q, r, tk }) => (
                     <div key={k} title={r.reasons.join(" · ")}>
                       <div className="sr-flex-between" style={{ marginBottom: 3 }}>
                         <span style={{ fontSize: "var(--sr-t-xs)" }}><strong style={{ color: "var(--sr-text)" }}>{k}</strong> <span style={{ color: "var(--sr-text-3)" }}>· {q}</span></span>
-                        <span className="num" style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: barColor(r.score) }}>{r.score} · {r.label}</span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          <span className="num" style={{ fontSize: "10px", fontWeight: 600, color: "var(--sr-text-3)" }}>{r.score}</span>
+                          {chip(rt.perTimeframe[tk], true)}
+                        </span>
                       </div>
                       <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${r.score}%`, background: barColor(r.score) }} /></div>
                     </div>
                   ))}
                 </div>
                 <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-                  Monthly gates: strength against a macro headwind is a bounce, not a buy. Daily is a reversion/entry filter (short-term momentum fades), not a momentum score. Context &amp; discipline — the validated edge is the regime allocation.
+                  No &quot;Hold&quot; by design — every name gets a directional call; conviction (not a neutral label) carries the honesty. Monthly gates the call; daily is a reversion/entry filter. The full-score cross-sectional IC is ~0, so the direction leans on the trend + regime reads, not the raw score.
                 </div>
               </div>
             );

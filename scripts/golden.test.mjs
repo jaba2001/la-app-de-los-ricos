@@ -16,6 +16,7 @@ import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { classifyInstrument } from "../lib/instrument.ts";
 import { timeframeReads } from "../lib/timeframes.ts";
+import { ratingFrom, toRating, RATING_COLOR } from "../lib/rating.ts";
 import { favoredStyle, favoredSectors, regimeFactorTilt, REGIME_FACTOR, REGIME_FACTOR_STATS } from "../lib/regimeSectors.ts";
 import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensenAlpha, informationRatio, riskReport } from "../lib/riskMetrics.ts";
 import { readFileSync, existsSync } from "fs";
@@ -492,6 +493,38 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   ok(os.daily.score > ob.daily.score, "daily reversion: oversold entry > overbought");
   // All scores bounded 0-100.
   for (const r of [sb, lx, bo, os, ob]) for (const tf of [r.monthly, r.weekly, r.daily]) ok(tf.score >= 0 && tf.score <= 100, `timeframe score bounded (${tf.score})`);
+}
+
+// ── Directional rating: Strong Buy/Buy/Sell/Strong Sell, NO Hold (2026-07-12) ──────────
+{
+  const growthFt = { value: 3, growth: 16, momentum: 12, quality: 8, size: 6 };
+  const RATINGS = new Set(["Strong Buy", "Buy", "Sell", "Strong Sell"]);
+  // 4-way cut, median splits buy/sell, extremes are "Strong" — and NEVER Hold/Neutral.
+  ok(toRating(60) === "Strong Buy" && toRating(50) === "Buy" && toRating(49.9) === "Sell" && toRating(39.9) === "Strong Sell", "toRating: 4-way cut");
+  for (const x of [0, 39, 40, 49, 50, 59, 60, 100]) ok(RATINGS.has(toRating(x)), `toRating(${x}) never Hold (${toRating(x)})`);
+
+  const bull = timeframeReads({ regime: "expansion", riskOn: 74, sector: "Technology", factorTilts: growthFt, mom12_1: 40, rsVsSector: 10, rsVsSpy: 12, rsi14: 50, pctFrom200dma: 8 });
+  const bear = timeframeReads({ regime: "contraction", riskOn: 28, sector: "Technology", factorTilts: growthFt, mom12_1: -22, rsVsSector: -10, rsVsSpy: -9, rsi14: 82, pctFrom200dma: 24 });
+  const flat = timeframeReads({ regime: "neutral", riskOn: 50, sector: null, factorTilts: null, mom12_1: 0, rsVsSector: null, rsVsSpy: null, rsi14: 50, pctFrom200dma: 0 });
+  const rBull = ratingFrom(72, bull, { corrRegime: "low" });
+  const rBear = ratingFrom(30, bear, { corrRegime: "low" });
+  const rFlat = ratingFrom(50, flat, { corrRegime: "mid" });
+
+  ok(rBull.directional > rBear.directional, `directional bull>bear (${rBull.directional}>${rBear.directional})`);
+  ok(rBull.rating === "Strong Buy" || rBull.rating === "Buy", `bull → buy-side (${rBull.rating})`);
+  ok(rBear.rating === "Sell" || rBear.rating === "Strong Sell", `bear → sell-side (${rBear.rating})`);
+  for (const r of [rBull, rBear, rFlat]) {
+    ok(RATINGS.has(r.rating), `rating in 4-set (${r.rating})`);
+    for (const k of ["monthly", "weekly", "daily"]) ok(RATINGS.has(r.perTimeframe[k]), `perTimeframe ${k} in 4-set (${r.perTimeframe[k]})`);
+    ok(r.convictionPct >= 0 && r.convictionPct <= 100, `conviction 0-100 (${r.convictionPct})`);
+  }
+  // Honest conviction: near the median → Low (decisive label, truthful certainty).
+  ok(rFlat.conviction === "Low", `median → Low conviction (${rFlat.conviction})`);
+  // Correlation regime caps conviction where selection has no measured IC (high-corr < low-corr).
+  ok(ratingFrom(72, bull, { corrRegime: "high" }).convictionPct < rBull.convictionPct, "high-corr caps conviction below low-corr");
+  // Directional monotonic in the score (timeframes fixed).
+  ok(ratingFrom(80, bull, { corrRegime: "low" }).directional >= ratingFrom(40, bull, { corrRegime: "low" }).directional, "directional monotonic in score");
+  for (const rat of ["Strong Buy", "Buy", "Sell", "Strong Sell"]) ok(typeof RATING_COLOR[rat] === "string" && RATING_COLOR[rat].length > 0, `rating color present (${rat})`);
 }
 
 // ── Risk metrics (institutional scorecard, 2026-07-11) ────────────────────────

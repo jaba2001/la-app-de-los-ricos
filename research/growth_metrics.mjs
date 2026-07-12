@@ -21,7 +21,8 @@ if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const addMonths = (d, n) => { const x = new Date(d); x.setUTCMonth(x.getUTCMonth() + n); return x.toISOString().slice(0, 10); };
 const monthStarts = (from, to) => { const out = []; let d = from.slice(0, 8) + "01"; while (d <= to) { out.push(d); d = addMonths(d, 1); } return out; };
 const today = new Date().toISOString().slice(0, 10);
-const dates = monthStarts(START, addMonths(today, -1));
+const END = process.env.BT_END || addMonths(today, -1);
+const dates = monthStarts(START, END);
 console.log(`\n  GROWTH METRICS · ${dates.length} monthly rebalances ${dates[0]}→${dates.at(-1)} · production path (with 5% BTC sleeve)`);
 await preloadStationary();
 

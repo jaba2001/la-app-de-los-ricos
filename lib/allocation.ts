@@ -37,6 +37,14 @@ const RISK_OFF: Weights = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.0
 // Risk sleeves subject to absolute-momentum gating (BIL/IEF are the safe ballast).
 const MOM_GATED: AllocAsset[] = ["SPY", "TLT", "GLD", "DBC"];
 
+// Capture-tuned risk-off basket (2026-07-12 capture_lab.mjs): a 60% equity FLOOR when the
+// gauge is risk-off, instead of the old full-defensive switch (SPY 15%). The absolute-
+// momentum gate still moves that equity to cash in a sustained downtrend, so the tail is
+// covered — but in ordinary risk-off chop we stay largely invested and capture the upside
+// the old beta-0.32 default gave away. Measured: ~74pp more total return at essentially the
+// same Sharpe and a slightly shallower drawdown (the old default was over-tuned for min DD).
+const GROWTH_RISKOFF: Weights = { SPY: 0.60, TLT: 0.15, IEF: 0.10, GLD: 0.15, DBC: 0, BIL: 0, BTCUSD: 0 };
+
 /**
  * Liquidity-led risk-on gauge (0-100). Composites are 0-100 (production values live, or
  * stationary percentiles in the backtest): liquidity up = risk-on; recession & stress = risk-off.
@@ -46,20 +54,21 @@ export function computeRiskOn(c: { lcc: number | null; rpc: number | null; csc: 
   return Math.max(0, Math.min(100, 0.5 * lcc + 0.25 * (100 - rpc) + 0.25 * (100 - csc)));
 }
 
-// ── Risk profiles (2026-07-10 aggressive lab, research/aggressive_lab.mjs) ────────────
-// GROWTH is the default product profile: 100% equities when the gauge is risk-on (≥50),
-// the defensive basket otherwise, then the same 12-1m trend gate — NO risk-parity (it
-// dilutes the return engine). Measured 2007-2026: +459.8% (CAGR 9.2%) · Sharpe 0.96 ·
-// maxDD −17.6% — beats the static 60/40 on return, Sharpe AND drawdown in every window
-// tested, with ~⅓ of SPY's drawdown. Leverage (2× SSO), short hedges (SH) and long-vol
-// (VXX) were measured and REJECTED: none beat this risk-adjusted (aggressive_lab.json).
-// DEFENSIVE is the original low-vol blend + risk-parity (Sharpe 1.01 · maxDD −7.5%).
+// ── Risk profiles (2026-07-12 capture retune, research/capture_lab.mjs) ────────────────
+// GROWTH is the default product profile: 100% equities when the gauge is risk-on (≥50), a
+// 60% equity FLOOR + light defensive ballast otherwise, then the same 12-1m trend gate — NO
+// risk-parity (it dilutes the return engine). Measured 2007-2026: +636.7% (CAGR 10.78%) ·
+// Sharpe 1.00 · maxDD −16.2% — nearly matches SPY's total return (+652%/10.9%) at ⅓ the
+// drawdown, and BEAT it outright in 2007-2019 (+204% vs +196%). The old min-drawdown switch
+// (β0.32, +506%) left ~130pp of return on the table. Leverage (2× SSO), short hedges (SH),
+// long-vol (VXX), CPPI and capture variants past β~0.5 all measured and REJECTED
+// (aggressive_lab/capture_lab.json). DEFENSIVE = low-vol blend + risk-parity (Sharpe 1.02 · maxDD −10.1%).
 export type RiskProfile = "growth" | "defensive";
 
 /** Growth profile weights: regime switch, not a blend. When risk-on and BTC's 12-1m trend
  *  is up, a small BTC_SLEEVE is carved FROM equities (still sums to 1 — never leverage). */
 export function growthWeights(riskOn: number, btcMom12_1?: number | null): Weights {
-  if (riskOn < 50) return { ...RISK_OFF };
+  if (riskOn < 50) return { ...GROWTH_RISKOFF };
   const holdBtc = btcMom12_1 != null && btcMom12_1 > 0;
   const btc = holdBtc ? BTC_SLEEVE : 0;
   return { SPY: 1 - btc, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0, BTCUSD: btc };
@@ -139,7 +148,7 @@ export function buildAllocation(opts: { riskOn: number; momentum?: Partial<Recor
   const tiltColor = riskOn >= 60 ? "var(--sr-pos)" : riskOn >= 40 ? "var(--sr-warn)" : "var(--sr-neg)";
   const rationale: string[] = [
     profile === "growth"
-      ? `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: Growth mandate holds ${riskOn >= 50 ? "100% equities" : "the defensive basket"} (switch at 50).`
+      ? `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: Growth mandate holds ${riskOn >= 50 ? "100% equities" : "a 60% equity floor + defensive ballast"} (floor at 50).`
       : `Liquidity-led risk gauge at ${riskOn.toFixed(0)}/100 → ${tiltLabel}: blend ${riskOn.toFixed(0)}% risk-on basket / ${(100 - riskOn).toFixed(0)}% defensive basket.`,
   ];
   if (momentumApplied) {

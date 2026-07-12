@@ -43,11 +43,17 @@ export function targetWeights(regimeId) {
 const RISK_ON  = { SPY: 0.55, TLT: 0.10, IEF: 0.10, GLD: 0.05, DBC: 0.15, BIL: 0.05 };
 const RISK_OFF = { SPY: 0.15, TLT: 0.25, IEF: 0.20, GLD: 0.20, DBC: 0.05, BIL: 0.15 };
 
-/** Growth profile (2026-07 lab): regime SWITCH, not a blend — equities when risk-on (≥50),
- *  defensive basket otherwise. A small BTC sleeve (carved from equities, never leverage) is
- *  held when risk-on AND BTC's 12-1m trend is up. Lock-step with lib/allocation.ts. */
+// Capture-tuned risk-off basket (2026-07-12 capture_lab.mjs): 60% equity FLOOR in risk-off
+// (the momentum gate still moves it to cash in a sustained downtrend). Lock-step with the
+// GROWTH_RISKOFF constant in lib/allocation.ts.
+const GROWTH_RISKOFF = { SPY: 0.60, TLT: 0.15, IEF: 0.10, GLD: 0.15, DBC: 0, BIL: 0, BTCUSD: 0 };
+
+/** Growth profile (2026-07-12 capture retune): risk-on (≥50) → 100% equities; risk-off →
+ *  a 60% equity floor + light defensive ballast (not the old full switch). A small BTC sleeve
+ *  (carved from equities, never leverage) is held when risk-on AND BTC's 12-1m trend is up.
+ *  Lock-step with lib/allocation.ts. */
 export function growthWeights(riskOn, btcMom12_1) {
-  if (riskOn < 50) return { ...RISK_OFF, BTCUSD: 0 };
+  if (riskOn < 50) return { ...GROWTH_RISKOFF };
   const btc = btcMom12_1 != null && btcMom12_1 > 0 ? BTC_SLEEVE : 0;
   return { SPY: 1 - btc, TLT: 0, IEF: 0, GLD: 0, DBC: 0, BIL: 0, BTCUSD: btc };
 }

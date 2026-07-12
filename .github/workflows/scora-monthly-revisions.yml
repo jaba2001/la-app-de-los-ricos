@@ -1,0 +1,30 @@
+name: Scora — monthly analyst-revision tracking
+
+# Free "measure-before-you-pay" harness. We proved the deep point-in-time estimate archive is
+# the paid product (Finnhub free gives only ~4 months of recommendation history), so revision
+# alpha cannot be BACKTESTED for free. This accumulates it FORWARD: each month it snapshots
+# every name's analyst consensus level + revision momentum + price into sl_revisions, and once
+# ≥2 monthly snapshots exist it computes the live cross-sectional IC of the revision signal vs
+# next-month returns. After ~6-12 months the evidence says — on our own universe — whether a
+# paid PIT estimate feed (~$100s/mo) is justified. All free (Finnhub recommendation trends).
+#
+# Requires two repo secrets: FINNHUB_KEY (new — add it) and SUPABASE_SERVICE_KEY (already set
+# for the scoring/measurement crons).
+on:
+  schedule:
+    - cron: "0 15 3 * *" # 3rd of each month, 15:00 UTC (after the monthly score cron on the 2nd)
+  workflow_dispatch: {} # allow manual runs
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Snapshot analyst revisions → sl_revisions (+ live IC)
+        env:
+          FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/cron-revisions.mjs
