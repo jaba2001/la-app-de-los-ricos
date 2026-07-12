@@ -1,7 +1,7 @@
 // Shared scoring adapter: point-in-time fundamentals + raw price + momentum → the
 // exact production ScoreInputs → calcScores (no re-implementation of the formula).
 // Used by the PoC, the historical backtest, and the live cron — one code path.
-import { calcScores, getMacroTilt } from "../lib/scoring.ts";
+import { calcScores, calcFactorTilts, getMacroTilt } from "../lib/scoring.ts";
 
 /** Assemble ScoreInputs from a fundamentalsAsOf() bundle + raw price + momentum + sector. */
 export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
@@ -36,12 +36,17 @@ export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
   };
 }
 
-/** Full score for a name: base scores + macro-tilted IC score (0-100). */
+/** Full score for a name: base scores + macro-tilted IC score (0-100). Matches the production
+ *  app path — the macro tilt now folds in the stock's FACTOR profile (regime→factor rotation),
+ *  exactly like getMacroTilt(macro, sector, factorTilts) in page.tsx/screener. Set
+ *  FACTOR_FOLD=0 to measure the score WITHOUT the fold (A/B validation only). */
 export function scoreStock(f, rawPrice, mom, sector, macroState = null) {
   const regime = macroState?.regime_id ?? null;
   const inputs = buildInputs(f, rawPrice, mom, sector, regime);
   const scores = calcScores(inputs);
-  const tilt = macroState ? getMacroTilt(macroState, sector || "").tilt : 0;
+  const useFold = process.env.FACTOR_FOLD !== "0";
+  const factorTilts = useFold ? calcFactorTilts(inputs) : null;
+  const tilt = macroState ? getMacroTilt(macroState, sector || "", factorTilts).tilt : 0;
   const ic = Math.max(0, Math.min(100, scores.total + tilt));
   return { inputs, scores, tilt, ic };
 }
