@@ -564,6 +564,9 @@ export default function StockTickerPage() {
         roa:              mergedRatios?.returnOnAssetsTTM != null ? (mergedRatios.returnOnAssetsTTM as number) * 100 : null,
         netMargin:        mergedRatios?.netProfitMarginTTM != null ? (mergedRatios.netProfitMarginTTM as number) * 100 : null,
         grossMargin:      mergedRatios?.grossProfitMarginTTM != null ? (mergedRatios.grossProfitMarginTTM as number) * 100 : null,
+        // GP/assets (Novy-Marx gross profitability) = grossMargin × assetTurnover — both already normalized; null → graceful no-op.
+        grossProfitability: mergedRatios?.grossProfitMarginTTM != null && mergedRatios?.assetTurnoverTTM != null
+          ? (mergedRatios.grossProfitMarginTTM as number) * (mergedRatios.assetTurnoverTTM as number) * 100 : null,
         revenueGrowth:    mergedRatios?.revenueGrowthTTM != null ? (mergedRatios.revenueGrowthTTM as number) * 100 : null,
         epsGrowth:        mergedRatios?.netIncomeGrowthTTM != null ? (mergedRatios.netIncomeGrowthTTM as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,

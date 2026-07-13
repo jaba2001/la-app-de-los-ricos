@@ -137,6 +137,23 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   const ft = calcFactorTilts({ pe: 8, pfcf: 8, evEbitda: 5, epsGrowth: 40, revenueGrowth: 40, roic: 30, roe: 30, grossMargin: 80, interestCoverage: 20, marketCap: 1e8, priceChange1M: 20, priceChange3M: 30, priceChange6M: 40 });
   for (const k of ["value", "growth", "momentum", "quality", "size"]) ok(ft[k] <= 20 && ft[k] >= 0, `factor ${k} in [0,20] (${ft[k]})`);
 
+  // ── Novy-Marx gross profitability strengthens quality (2026-07-13, qgv_lab finding) ──
+  {
+    const base = { pe: 18, roic: 10, roe: 14, grossMargin: 45, interestCoverage: 8, revenueGrowth: 12, epsGrowth: 8, debtEquity: 0.4, currentRatio: 1.8, sector: "Technology", marketCap: 5e10 };
+    const withGP = { ...base, grossProfitability: 45 };  // high GP/assets — the regime-robust quality signal
+    // The QUALITY factor (which getMacroTilt rotates by regime) rises with gross profitability.
+    ok(calcFactorTilts(withGP).quality > calcFactorTilts(base).quality, `gross profitability lifts the quality factor (${calcFactorTilts(withGP).quality} > ${calcFactorTilts(base).quality})`);
+    // Non-financial HEALTH rises with gross profitability (always-on quality).
+    ok(calcScores(withGP).health > calcScores(base).health, `gross profitability lifts non-financial health (${calcScores(withGP).health} > ${calcScores(base).health})`);
+    // Graceful: null grossProfitability = exact prior behavior (optional, no-op).
+    ok(calcScores({ ...base, grossProfitability: null }).total === calcScores(base).total, "null grossProfitability → no-op (score)");
+    ok(calcFactorTilts({ ...base, grossProfitability: null }).quality === calcFactorTilts(base).quality, "null grossProfitability → no-op (factor)");
+    // Financials use ROE/ROA-based health → gross profitability isn't double-counted there.
+    ok(calcScores({ ...base, sector: "Financials", grossProfitability: 45 }).health === calcScores({ ...base, sector: "Financials" }).health, "financials: gross profitability not added to sector health");
+    // Still capped [0,20] with the new signal.
+    ok(calcFactorTilts({ ...base, grossProfitability: 90, roic: 40, roe: 40, grossMargin: 90 }).quality <= 20, "quality still capped at 20 with gross profitability");
+  }
+
   // Regime→FACTOR tilt folded into the score (measured & validated Sharpe 1.24). A growth-
   // leaning name gets a macro tailwind in reflation and a headwind in contraction; value inverts.
   const growthProfile = { value: 2, growth: 18, momentum: 12, quality: 8, size: 5 };

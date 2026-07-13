@@ -24,6 +24,8 @@ export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
     roic:             pos(invested) && f.oiTTM != null ? (f.oiTTM * 0.79 / invested) * 100 : null,
     roe:              pos(f.equity) && f.niTTM != null ? (f.niTTM / f.equity) * 100 : null,
     roa:              pos(f.assets) && f.niTTM != null ? (f.niTTM / f.assets) * 100 : null,
+    grossProfitability: pos(f.assets) && f.gpTTM != null ? (f.gpTTM / f.assets) * 100 : null, // Novy-Marx quality
+
     grossMargin:      pos(f.revTTM) && f.gpTTM != null ? (f.gpTTM / f.revTTM) * 100 : null,
     netMargin:        pos(f.revTTM) && f.niTTM != null ? (f.niTTM / f.revTTM) * 100 : null,
     operatingMargin:  pos(f.revTTM) && f.oiTTM != null ? f.oiTTM / f.revTTM : null,

@@ -93,6 +93,10 @@ export function calcScores(inp: ScoreInputs): Scores {
     if (inp.interestCoverage != null) health += inp.interestCoverage > 10 ? 10 : inp.interestCoverage > 5 ? 6 : inp.interestCoverage > 2 ? 3 : 0;
     if (inp.netDebtEbitda != null) health += inp.netDebtEbitda < 1 ? 5 : inp.netDebtEbitda < 3 ? 3 : 0;
     if (inp.roic != null) health += inp.roic > 20 ? 5 : inp.roic > 12 ? 3 : 0;
+    // Novy-Marx gross profitability (gross profit / total assets) — the most regime-ROBUST
+    // quality signal (measured: best/near-best Sharpe in every backtest window, qgv_lab.mjs).
+    // Rewards asset-light, high-moat models the way net margin can't. Always-on quality.
+    if (inp.grossProfitability != null) health += inp.grossProfitability > 40 ? 4 : inp.grossProfitability > 25 ? 2 : inp.grossProfitability > 12 ? 1 : 0;
   }
 
   let momentum = 0;
@@ -307,9 +311,14 @@ export function calcFactorTilts(inp: ScoreInputs): FactorTilts {
   momentum = Math.min(20, momentum);
 
   let quality = 0;
+  // Novy-Marx gross profitability (GP/assets) leads the quality factor — measured as the most
+  // regime-robust of the QGV pillars (qgv_lab.mjs). This is the factor that getMacroTilt rotates
+  // by regime (quality favored in stagflation/contraction), so a cleaner quality signal sharpens
+  // the measured, VALIDATED regime→factor tilt (Sharpe 1.24 vs SPY 0.74).
+  if (inp.grossProfitability != null) quality += inp.grossProfitability > 40 ? 5 : inp.grossProfitability > 25 ? 3 : inp.grossProfitability > 12 ? 1 : 0;
   if (inp.roic != null)             quality += inp.roic > 25 ? 6 : inp.roic > 15 ? 4 : inp.roic > 8 ? 2 : 0;
-  if (inp.roe != null)              quality += inp.roe > 20 ? 5 : inp.roe > 12 ? 3 : inp.roe > 5 ? 1 : 0;
-  if (inp.grossMargin != null)      quality += inp.grossMargin > 60 ? 5 : inp.grossMargin > 40 ? 3 : inp.grossMargin > 25 ? 1 : 0;
+  if (inp.roe != null)              quality += inp.roe > 20 ? 4 : inp.roe > 12 ? 3 : inp.roe > 5 ? 1 : 0;
+  if (inp.grossMargin != null)      quality += inp.grossMargin > 60 ? 4 : inp.grossMargin > 40 ? 2 : inp.grossMargin > 25 ? 1 : 0;
   if (inp.interestCoverage != null) quality += inp.interestCoverage > 12 ? 4 : inp.interestCoverage > 5 ? 2 : inp.interestCoverage > 2 ? 1 : 0;
   quality = Math.min(20, quality);
 

@@ -82,6 +82,9 @@ export default function StockScreener() {
         roa:              ratios?.returnOnAssetsTTM != null ? (ratios.returnOnAssetsTTM as number) * 100 : null,
         netMargin:        ratios?.netProfitMarginTTM != null ? (ratios.netProfitMarginTTM as number) * 100 : null,
         grossMargin:      ratios?.grossProfitMarginTTM != null ? (ratios.grossProfitMarginTTM as number) * 100 : null,
+        grossProfitability: ratios?.grossProfitMarginTTM != null && ratios?.assetTurnoverTTM != null
+          ? (ratios.grossProfitMarginTTM as number) * (ratios.assetTurnoverTTM as number) * 100 : null, // GP/assets (Novy-Marx)
+
         revenueGrowth:    ratios?.revenueGrowthTTM     != null ? (ratios.revenueGrowthTTM     as number) * 100 : null,
         epsGrowth:        ratios?.netIncomeGrowthTTM   != null ? (ratios.netIncomeGrowthTTM   as number) * 100 : null,
         marketCap:        quote?.marketCap as number ?? null,

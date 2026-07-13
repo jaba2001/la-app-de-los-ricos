@@ -156,6 +156,7 @@ export interface ScoreInputs {
   roe?: number | null;
   roa?: number | null;          // return on assets % — used for financial-sector health
   netMargin?: number | null;    // net profit margin % — used for financial-sector health
+  grossProfitability?: number | null; // gross profit / total assets % (Novy-Marx) — the most regime-robust quality signal (measured: best Sharpe across all backtest windows, qgv_lab.mjs)
   netDebtEbitda?: number | null;
   regime?: string | null;
   sector?: string | null;
