@@ -11,6 +11,7 @@ import { netManagedMoney, wowChange, netAsPctOfOI, goldSilverRatio, positioningR
 import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
 import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf } from "../lib/quality.ts";
 import { waccBridge, dcfMatrix, sectorComps } from "../lib/valuation.ts";
+import { effectiveDuration, impliedCreditLoss, bondMetrics } from "../lib/bonds.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -201,6 +202,14 @@ approx("comps PE-based", cmp.peBased, 140, 1e-9);
 approx("comps EV-based", cmp.evBased, 86, 1e-9);
 approx("comps mid", cmp.mid, 113, 1e-9);
 ok("comps null no sector", sectorComps({ sector: null, eps: 5, ebitda: 200, netDebt: 100, sharesOut: 50 }) === null);
+
+// ── FASE 3 · bonds ──
+const bmMod = bondMetrics(5, 5, 10).modified;
+approx("effective ≈ modified (bullet)", effectiveDuration(5, 5, 10), bmMod, 5e-2);
+const cl = impliedCreditLoss(300, 0.6);
+approx("credit PD 1y", cl.impliedPD1y, 0.05, 1e-4);
+approx("credit PD 5y", cl.impliedPD5y, 0.2262, 1e-3);
+ok("credit PD zero spread", impliedCreditLoss(0).impliedPD1y === 0);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

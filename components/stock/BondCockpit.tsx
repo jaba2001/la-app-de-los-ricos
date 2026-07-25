@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import type { MacroState } from "@/lib/types";
-import { bondEtfModel, bondMetrics, treasuryCurve, curveYield, priceChangePct, regimeRateView } from "@/lib/bonds";
+import { bondEtfModel, bondMetrics, treasuryCurve, curveYield, priceChangePct, regimeRateView, effectiveDuration, impliedCreditLoss } from "@/lib/bonds";
 
 interface Props { ticker: string; macro: MacroState | null; price: number | null; }
 
@@ -27,6 +27,8 @@ export default function BondCockpit({ ticker, macro, price }: Props) {
   }
 
   const { meta, baseYield, spreadBp: modelSpread, metrics, curveAt } = model;
+  const isCredit = meta.category === "IG credit" || meta.category === "High yield" || meta.category === "Aggregate";
+  const credit = isCredit && modelSpread > 0 ? impliedCreditLoss(modelSpread, 0.6) : null;
   const dY = (rateBp + spreadBp) / 100; // total yield shift in %-points
   const impact = priceChangePct(metrics.modified, metrics.convexity, dY);
   const totalReturn1y = baseYield + impact; // carry + price move
@@ -85,6 +87,15 @@ export default function BondCockpit({ ticker, macro, price }: Props) {
           <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>carry {baseYield.toFixed(1)}% + price {pctSigned(impact)}</div>
         </div>
       </div>
+
+      {/* Credit loss decomposition (OAS → implied PD) */}
+      {credit && (
+        <div style={{ marginTop: "var(--sr-sp-3)", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-2)" }}>
+          {stat("OAS", `${modelSpread.toFixed(0)}bp`, "credit spread")}
+          {stat("Implied PD (1y)", `${(credit.impliedPD1y * 100).toFixed(1)}%`, `LGD ${(credit.lgd * 100).toFixed(0)}%`)}
+          {stat("Implied PD (5y)", `${(credit.impliedPD5y * 100).toFixed(0)}%`, "cumulative")}
+        </div>
+      )}
 
       {/* ★ Regime overlay — the edge */}
       <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
@@ -161,6 +172,7 @@ function TreasuryCalc({ coupon, setCoupon, maturity, setMaturity, synthYtm, synt
               <span>YTM (curve): <strong className="num" style={{ color: "var(--sr-text)" }}>{synthYtm.toFixed(2)}%</strong></span>
               <span>Price: <strong className="num" style={{ color: "var(--sr-text)" }}>${synth.price.toFixed(2)}</strong></span>
               <span>Mod. duration: <strong className="num" style={{ color: "var(--sr-text)" }}>{synth.modified.toFixed(1)}y</strong></span>
+              <span>Eff. duration: <strong className="num" style={{ color: "var(--sr-text)" }}>{effectiveDuration(coupon, synthYtm, maturity).toFixed(1)}y</strong></span>
               <span>Convexity: <strong className="num" style={{ color: "var(--sr-text)" }}>{synth.convexity.toFixed(1)}</strong></span>
             </div>
           )}

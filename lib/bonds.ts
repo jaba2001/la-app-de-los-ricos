@@ -63,6 +63,28 @@ export function priceChangePct(modified: number, convexity: number, dYieldPct: n
   return (-modified * dy + 0.5 * convexity * dy * dy) * 100;
 }
 
+/** Effective duration (years) — numerical, reprices ±shock. For a bullet bond it ≈ modified
+ *  duration; the method generalizes to bonds with embedded options (callables) where the
+ *  closed-form modified duration breaks down. shockBp in basis points. */
+export function effectiveDuration(couponPct: number, ytmPct: number, years: number, shockBp = 50, face = 100): number {
+  const dyPct = shockBp / 100;                       // shift in %-points
+  const p0 = bondPrice(couponPct, ytmPct, years, face);
+  const pUp = bondPrice(couponPct, ytmPct + dyPct, years, face);
+  const pDn = bondPrice(couponPct, ytmPct - dyPct, years, face);
+  if (p0 <= 0) return 0;
+  return (pDn - pUp) / (2 * p0 * (dyPct / 100));
+}
+
+/** Decompose a credit OAS into an implied default probability (credit triangle:
+ *  spread ≈ PD × LGD). Returns annual + 5-year cumulative PD for a given loss-given-default. */
+export interface CreditLoss { impliedPD1y: number; impliedPD5y: number; lgd: number; oasBp: number; }
+export function impliedCreditLoss(oasBp: number, lgd = 0.6): CreditLoss {
+  const spread = oasBp / 10000;                      // bp → decimal
+  const pd1 = Math.max(0, Math.min(1, spread / lgd));
+  const pd5 = 1 - Math.pow(1 - pd1, 5);
+  return { impliedPD1y: Math.round(pd1 * 10000) / 10000, impliedPD5y: Math.round(pd5 * 10000) / 10000, lgd, oasBp };
+}
+
 // ── Treasury curve from macro_state (FRED) + interpolation ───────────────────────────
 export interface CurvePoint { t: number; y: number; }
 
