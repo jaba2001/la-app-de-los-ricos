@@ -13,6 +13,7 @@ import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf
 import { waccBridge, dcfMatrix, sectorComps } from "../lib/valuation.ts";
 import { effectiveDuration, impliedCreditLoss, bondMetrics } from "../lib/bonds.ts";
 import { difference, fitAR, forecastARIMA } from "../lib/arima.ts";
+import { esgLite } from "../lib/esg.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -250,6 +251,14 @@ ok("arima method", af.method === "arima" && af.points.length === 3);
 approx("arima next", af.points[0], 21, 0.6);
 approx("arima next+1", af.points[1], 22, 0.6);
 ok("arima too short → null", forecastARIMA([1, 2, 3, 4, 5], 3) === null);
+
+// ── FASE 6 · ESG-lite ──
+const esgE = esgLite({ sector: "Energy" });
+const esgT = esgLite({ sector: "Technology" });
+ok("esg Energy E < Tech E", esgE.e < esgT.e);
+ok("esg overall in range", esgE.overall >= 0 && esgE.overall <= 100 && esgT.overall >= 0 && esgT.overall <= 100);
+ok("esg governance sweet-spot lifts G", esgLite({ sector: "Financials", insiderOwn: 0.10, instOwn: 0.7, shortFloat: 0.02 }).g > esgLite({ sector: "Financials", insiderOwn: 0.60, shortFloat: 0.25 }).g);
+ok("esg null unknown sector", esgLite({ sector: "Nonexistent" }) === null);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

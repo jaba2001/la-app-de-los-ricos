@@ -4,8 +4,12 @@ import type { StockData } from "@/app/stock/[ticker]/page";
 import type { SubScores, SubScore } from "@/lib/scoring";
 import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndicators";
 import { computeQuality, type QualityScores } from "@/lib/quality";
+import { esgLite } from "@/lib/esg";
+import type { FactorTilts } from "@/lib/scoring";
 
-interface Props { subScores: SubScores | null; data: StockData | null; rf?: number | null; }
+interface Props { subScores: SubScores | null; data: StockData | null; rf?: number | null; factorTilts?: FactorTilts | null; }
+
+const FACTOR_LABELS: [keyof FactorTilts, string][] = [["value", "Value"], ["growth", "Growth"], ["momentum", "Momentum"], ["quality", "Quality"], ["size", "Size"]];
 
 // ── Quality-inputs adapter: FMP/EDGAR statement fields → lib/quality inputs (null-safe) ──
 type Row = Record<string, unknown>;
@@ -158,11 +162,16 @@ function Gauge({ title, sub }: { title: string; sub: SubScore | null }) {
 
 const ZBAND_COLOR: Record<string, string> = { safe: "var(--sr-pos)", grey: "var(--sr-warn)", distress: "var(--sr-neg)" };
 
-export default function StockSignals({ subScores, data, rf }: Props) {
+export default function StockSignals({ subScores, data, rf, factorTilts }: Props) {
   const ohlcv = useMemo(() => toOHLCV(data?.history ?? []), [data]);
   const stage = useMemo(() => (ohlcv.length >= 30 ? trendStage(ohlcv) : null), [ohlcv]);
   const bb = useMemo(() => (ohlcv.length >= 31 ? detectBaseBreakout(ohlcv) : null), [ohlcv]);
   const quality = useMemo(() => (data ? buildQuality(data, rf ?? null) : null), [data, rf]);
+  const esg = useMemo(() => {
+    const sector = String((data?.profile as Row)?.sector ?? "") || null;
+    const fv = data?.finviz;
+    return esgLite({ sector, insiderOwn: fv?.insiderOwn ?? null, instOwn: fv?.instOwn ?? null, shortFloat: fv?.shortFloat ?? null });
+  }, [data]);
   const price = ohlcv.length ? ohlcv[ohlcv.length - 1].close : null;
   const hasQuality = quality && (quality.altman || quality.accruals || quality.dupont || quality.merton || quality.piotroski || quality.beneish);
 
@@ -309,6 +318,49 @@ export default function StockSignals({ subScores, data, rf }: Props) {
           </div>
         )}
       </div>
+
+      {/* Factor exposure + ESG-lite lenses (Fase 6) */}
+      {(factorTilts || esg) && (
+        <div className="card">
+          <div className="section-label">Lentes · factor &amp; ESG</div>
+          <div className="sr-grid-2" style={{ gap: "var(--sr-sp-5)" }}>
+            {factorTilts && (
+              <div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Exposición a factores</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {FACTOR_LABELS.map(([k, label]) => {
+                    const v = factorTilts[k];              // 0-20
+                    return (
+                      <div key={k} style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
+                        <div style={{ minWidth: 78, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{label}</div>
+                        <div style={{ flex: 1, height: 8, background: "var(--sr-surface-3)", borderRadius: 4, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${Math.min(100, v * 5)}%`, background: "var(--sr-amber)", borderRadius: 4 }} />
+                        </div>
+                        <div style={{ minWidth: 26, textAlign: "right", fontSize: "var(--sr-t-xs)", fontWeight: 700 }} className="num">{v}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>El estilo dominante es el que la rotación por régimen premia o penaliza (medido).</div>
+              </div>
+            )}
+            {esg && (
+              <div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>ESG-lite (proxy gratis)</div>
+                <div className="sr-grid-4" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+                  {([["E", esg.e], ["S", esg.s], ["G", esg.g], ["Overall", esg.overall]] as [string, number][]).map(([l, val]) => (
+                    <div key={l} className="sr-tile" style={{ textAlign: "center" }}>
+                      <div className="sr-tile-label">{l}</div>
+                      <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: val >= 66 ? "var(--sr-pos)" : val >= 40 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">{val}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.5 }}>{esg.note}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

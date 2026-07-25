@@ -16,6 +16,21 @@ export const GEO_REGIONS: RegionBrief[] = [
   { region: "India / South Asia", role: "Rising demographic and manufacturing alternative to China.", watch: "Supply-chain diversification, energy imports, regional tensions.", assets: "EM equity, domestic demand plays." },
 ];
 
+// ── Commodity / energy chokepoints & dependencies (Fase 6, from "Geopolítica" Bloque 4) ──
+// Static knowledge base: the physical chokepoints and supply concentrations that turn a regional
+// shock into a global price move. Narrative context for the geopolitics read — not a live signal.
+export interface Chokepoint { name: string; commodity: string; risk: string; beneficiaries: string; }
+export const CHOKEPOINTS: Chokepoint[] = [
+  { name: "Strait of Hormuz", commodity: "Crude oil & LNG (~20% of global oil)", risk: "Iran–Gulf tension can close or threaten transit → crude spike.", beneficiaries: "Energy, defense, US shale, tankers." },
+  { name: "Bab-el-Mandeb / Suez", commodity: "Oil & container trade Europe↔Asia", risk: "Red Sea attacks reroute ships around Africa → freight + delivery costs up.", beneficiaries: "Shipping rates, oil, inventories-heavy retailers hurt." },
+  { name: "Strait of Malacca", commodity: "Asia-bound oil & trade (~25% of traded goods)", risk: "China's 'Malacca dilemma' — a blockade chokes Chinese energy imports.", beneficiaries: "Overland pipelines, alt routes, defense." },
+  { name: "Taiwan Strait", commodity: "Advanced semiconductors (TSMC ~90% leading-edge)", risk: "A Taiwan crisis would halt the world's leading-edge chip supply.", beneficiaries: "Onshore fabs (US/Japan), chip-equipment, defense." },
+  { name: "Russian pipeline gas", commodity: "Natural gas to Europe", risk: "Cut-offs / sanctions force LNG imports → European gas & power prices.", beneficiaries: "US LNG, Qatar, European utilities hurt, coal." },
+  { name: "China rare-earth refining", commodity: "Rare earths & processing (~70-90%)", risk: "Export controls choke magnets for EVs, wind, defense.", beneficiaries: "Ex-China miners/refiners, recyclers, defense primes." },
+  { name: "Panama Canal", commodity: "US grain, LNG, container trade", risk: "Drought cuts transits → longer routes, higher costs.", beneficiaries: "Shipping, US Gulf exporters affected." },
+  { name: "LatAm copper & lithium", commodity: "Copper (Chile/Peru), lithium (Chile/Argentina)", risk: "Politics/resource-nationalism disrupts the energy-transition metals.", beneficiaries: "Diversified miners, recyclers, substitutes." },
+];
+
 export interface GeoRead { level: "Low" | "Elevated" | "High"; color: string; drivers: string[]; tilt: string }
 
 /** Turn the macro composites into a plain-language geopolitical read + asset tilt. */

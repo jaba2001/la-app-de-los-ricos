@@ -1,6 +1,6 @@
 "use client";
 import type { MacroState } from "@/lib/types";
-import { GEO_REGIONS, geopoliticalRead } from "@/lib/geopolitics";
+import { GEO_REGIONS, CHOKEPOINTS, geopoliticalRead } from "@/lib/geopolitics";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface Props { macro: MacroState | null; loading: boolean; }
@@ -48,6 +48,27 @@ export default function MacroGeopolitics({ macro, loading }: Props) {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Chokepoints & supply concentrations (Fase 6) */}
+      <div className="card" style={{ padding: 0, marginTop: "var(--sr-sp-5)" }}>
+        <div className="section-label" style={{ padding: "var(--sr-sp-4) var(--sr-sp-4) 0" }}>Chokepoints &amp; supply concentrations — where a regional shock goes global</div>
+        <table className="sr-table">
+          <thead><tr><th>Chokepoint</th><th>What flows through</th><th>Risk</th><th>Who benefits / is hurt</th></tr></thead>
+          <tbody>
+            {CHOKEPOINTS.map((c) => (
+              <tr key={c.name}>
+                <td style={{ fontWeight: 700, color: "var(--sr-text)", whiteSpace: "nowrap" }}>{c.name}</td>
+                <td style={{ color: "var(--sr-text-2)" }}>{c.commodity}</td>
+                <td style={{ color: "var(--sr-text-2)" }}>{c.risk}</td>
+                <td style={{ color: "var(--sr-text-3)" }}>{c.beneficiaries}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="sr-hint" style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", lineHeight: 1.5 }}>
+          Physical dependencies from the geopolitics knowledge base — narrative context for the read above, not a live signal.
+        </div>
       </div>
     </div>
   );

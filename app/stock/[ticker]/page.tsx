@@ -900,7 +900,7 @@ export default function StockTickerPage() {
                 {data && <AlertConfig ticker={ticker} price={quote?.price as number ?? null} ratingLabel={rating?.label ?? null} rdcfUpside={data?.rdcf?.upside ?? null} tech={techState} />}
               </>
             )}
-            {activeTab === "signals"      && <StockSignals    subScores={subScores} data={data} rf={macro?.dgs10 as number ?? null} />}
+            {activeTab === "signals"      && <StockSignals    subScores={subScores} data={data} rf={macro?.dgs10 as number ?? null} factorTilts={factorTilts} />}
             {activeTab === "fundamentals" && (
               <>
                 <StockFundamentals data={data} loading={loading} ticker={ticker} />
