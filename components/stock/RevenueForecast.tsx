@@ -2,6 +2,9 @@
 import { useMemo } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { forecastSeries } from "@/lib/forecast";
+import { forecastARIMA } from "@/lib/arima";
+
+interface Fc { method: string; points: number[]; lower: number[]; upper: number[]; growthRate: number | null; r2: number | null; arima: boolean; }
 
 interface Props { data: StockData | null; }
 
@@ -19,8 +22,20 @@ export default function RevenueForecast({ data }: Props) {
     // income is newest-first → take up to 12 quarters, reverse to oldest→newest
     const revs = inc.slice(0, 12).map((q) => Number(q.revenue)).filter((v) => isFinite(v) && v > 0).reverse();
     if (revs.length < 4) return null;
-    const fc = forecastSeries(revs, 4);
-    if (!fc) return null;
+    // Prefer ARIMA with enough history; fall back to the geometric/linear trend.
+    let fc: Fc | null = null;
+    if (revs.length >= 8) {
+      const a = forecastARIMA(revs, 4);
+      if (a) {
+        const last = revs[revs.length - 1];
+        fc = { method: `ARIMA(${a.order.p},${a.order.d},${a.order.q})`, points: a.points, lower: a.lower, upper: a.upper, growthRate: last > 0 ? a.points[0] / last - 1 : null, r2: null, arima: true };
+      }
+    }
+    if (!fc) {
+      const f = forecastSeries(revs, 4);
+      if (!f) return null;
+      fc = { method: f.method, points: f.points, lower: f.lower, upper: f.upper, growthRate: f.growthRate, r2: f.r2, arima: false };
+    }
 
     // TTM FCF margin (last 4 quarters) → project FCF off the revenue path (light 3-statement link)
     const cf = data?.cashFlow ?? [];
@@ -48,18 +63,18 @@ export default function RevenueForecast({ data }: Props) {
 
   return (
     <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-      <div className="section-label">Revenue trajectory forecast · {fc.method} trend</div>
+      <div className="section-label">Revenue trajectory forecast · {fc.method}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-        Fits a {fc.method === "geometric" ? "compound-growth" : "linear"} trend to the last {model.revs.length} quarters and projects the next 4 with an ~80% band. Educational, not guidance.
+        Fits {fc.arima ? "an ARIMA model" : `a ${fc.method === "geometric" ? "compound-growth" : "linear"} trend`} to the last {model.revs.length} quarters and projects the next 4 with an ~80% band. Educational, not guidance.
       </div>
 
       <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-3)" }}>
         <div className="sr-tile">
           <div className="sr-tile-label">Qtr growth (fit)</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: gColor }}>
-            {fc.growthRate != null ? `${fc.growthRate >= 0 ? "+" : ""}${(fc.growthRate * 100).toFixed(1)}%` : "linear"}
+            {fc.growthRate != null ? `${fc.growthRate >= 0 ? "+" : ""}${(fc.growthRate * 100).toFixed(1)}%` : "—"}
           </div>
-          <div className="sr-hint">R² {fc.r2.toFixed(2)}</div>
+          <div className="sr-hint">{fc.r2 != null ? `R² ${fc.r2.toFixed(2)}` : fc.method}</div>
         </div>
         <div className="sr-tile">
           <div className="sr-tile-label">TTM revenue</div>

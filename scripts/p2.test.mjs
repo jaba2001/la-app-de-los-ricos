@@ -12,6 +12,7 @@ import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
 import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf } from "../lib/quality.ts";
 import { waccBridge, dcfMatrix, sectorComps } from "../lib/valuation.ts";
 import { effectiveDuration, impliedCreditLoss, bondMetrics } from "../lib/bonds.ts";
+import { difference, fitAR, forecastARIMA } from "../lib/arima.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -232,6 +233,23 @@ ok("straddle built", strad != null && strad.legs.length === 2);
 ok("straddle ~delta-neutral", Math.abs(strad.netDelta) < 0.2);
 ok("straddle unbounded up", strad.maxProfit === null && strad.maxLoss < 0);
 ok("collar built with 3 legs", buildStrategy("collar", 100, { vol: 0.3, rate: 0.04, t: 0.5 }).legs.length === 3);
+
+// ── FASE 5 · ARIMA ──
+const df = difference([1, 2, 4, 7], 1);
+ok("difference length", df.length === 3);
+approx("difference last", df[2], 3, 1e-9);
+// AR(1): yₜ = 0.5·yₜ₋₁ + 10, y₀=0 → perfect recovery
+const ar1 = [0]; for (let i = 1; i < 30; i++) ar1.push(0.5 * ar1[i - 1] + 10);
+const arfit = fitAR(ar1, 1);
+approx("fitAR coef ≈0.5", arfit.coef[0], 0.5, 1e-4);
+approx("fitAR intercept ≈10", arfit.intercept, 10, 1e-3);
+// Linear trend → forecast continues +1
+const linTrend = Array.from({ length: 20 }, (_, i) => i + 1);
+const af = forecastARIMA(linTrend, 3);
+ok("arima method", af.method === "arima" && af.points.length === 3);
+approx("arima next", af.points[0], 21, 0.6);
+approx("arima next+1", af.points[1], 22, 0.6);
+ok("arima too short → null", forecastARIMA([1, 2, 3, 4, 5], 3) === null);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);
