@@ -21,6 +21,7 @@ const MacroNews       = dynamic(() => import("@/components/macro/MacroNews"),   
 const MacroAI         = dynamic(() => import("@/components/macro/MacroAI"),         { loading: TabSk, ssr: false });
 const MacroPortfolio  = dynamic(() => import("@/components/macro/MacroPortfolio"),  { loading: TabSk, ssr: false });
 const MacroHistoricalAnalog = dynamic(() => import("@/components/macro/MacroHistoricalAnalog"), { loading: TabSk, ssr: false });
+const MacroGeopolitics = dynamic(() => import("@/components/macro/MacroGeopolitics"), { loading: TabSk, ssr: false });
 
 const TABS = [
   { id: "overview",    label: "Overview" },
@@ -28,6 +29,7 @@ const TABS = [
   { id: "markets",     label: "Markets" },
   { id: "monitors",    label: "Monitors" },
   { id: "analog",      label: "Historical Analog" },
+  { id: "geopolitics", label: "Geopolitics" },
   { id: "portfolio",   label: "Portfolio" },
   { id: "news",        label: "News" },
   { id: "ai",          label: "AI Synthesis" },
@@ -89,7 +91,7 @@ export default function MacroPage() {
           <button
             key={t.id}
             className={`subtab ${activeTab === t.id ? "active" : ""}`}
-            onClick={() => setActiveTab(t.id)}
+            onClick={(e) => { setActiveTab(t.id); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
           >
             {t.label}
           </button>
@@ -178,6 +180,7 @@ export default function MacroPage() {
             {activeTab === "markets"    && <MacroMarkets    macro={macro} loading={loading} />}
             {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
             {activeTab === "analog"     && <MacroHistoricalAnalog macro={macro} loading={loading} />}
+            {activeTab === "geopolitics" && <MacroGeopolitics macro={macro} loading={loading} />}
             {activeTab === "portfolio"  && <MacroPortfolio  macro={macro} loading={loading} />}
             {activeTab === "news"       && <MacroNews />}
             {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}

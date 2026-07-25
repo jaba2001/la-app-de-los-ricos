@@ -100,6 +100,33 @@ export default function BondCockpit({ ticker, macro, price }: Props) {
         </div>
       </div>
 
+      {/* Credit market context (P2-12) — HY OAS tiers from macro_state, free (FRED) */}
+      {macro?.hy_oas != null && (
+        <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
+          <div className="sr-flex-between" style={{ marginBottom: 6 }}>
+            <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-text)" }}>Credit market context</span>
+            {macro.hy_oas_momentum != null && (
+              <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: macro.hy_oas_momentum > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }}>
+                spreads {macro.hy_oas_momentum > 0 ? "widening" : "tightening"} ({bp(Math.round(macro.hy_oas_momentum))})
+              </span>
+            )}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-2)" }}>
+            {stat("HY OAS", `${macro.hy_oas.toFixed(0)}bp`, "high yield")}
+            {stat("BBB OAS", macro.bbb_oas != null ? `${macro.bbb_oas.toFixed(0)}bp` : "—", "investment grade")}
+            {stat("BB OAS", macro.hy_bb_oas != null ? `${macro.hy_bb_oas.toFixed(0)}bp` : "—", "top of junk")}
+            {stat("CCC OAS", macro.hy_ccc_oas != null ? `${macro.hy_ccc_oas.toFixed(0)}bp` : "—", "distress tier")}
+          </div>
+          <div className="sr-hint" style={{ marginTop: 6, lineHeight: 1.5 }}>
+            {macro.hy_oas < 350 ? "Spreads are tight — credit is complacent; little cushion if defaults tick up."
+              : macro.hy_oas > 600 ? "Spreads are wide — credit is pricing stress; carry is rich but default risk is real."
+              : "Spreads are mid-range — credit neither cheap nor euphoric."}
+            {macro.credit_divergence ? " ⚠ Hidden divergence: public HY looks calm but the private-credit proxy is weakening." : ""}
+            {" A covenant-quality read needs issuer-level covenant data (paid) — see the roadmap's paid-data tier."}
+          </div>
+        </div>
+      )}
+
       <div style={{ marginTop: "var(--sr-sp-4)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
         <TreasuryCalc {...{ coupon, setCoupon, maturity, setMaturity, synthYtm, synth, curveLen: curve.length }} />
       </div>
