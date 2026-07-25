@@ -1,6 +1,6 @@
 // P2 math self-tests — BSM greeks, trend forecast, mean-variance optimizer.
 // Run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
-import { blackScholes, breakEven, payoffAtExpiry } from "../lib/greeks.ts";
+import { blackScholes, breakEven, payoffAtExpiry, analyzeStrategy, buildStrategy } from "../lib/greeks.ts";
 import { forecastSeries } from "../lib/forecast.ts";
 import { minVariance, maxSharpe, portfolioStats, covariance, invert } from "../lib/optimize.ts";
 import { calcSubScores } from "../lib/scoring.ts";
@@ -210,6 +210,28 @@ const cl = impliedCreditLoss(300, 0.6);
 approx("credit PD 1y", cl.impliedPD1y, 0.05, 1e-4);
 approx("credit PD 5y", cl.impliedPD5y, 0.2262, 1e-3);
 ok("credit PD zero spread", impliedCreditLoss(0).impliedPD1y === 0);
+
+// ── FASE 4 · option strategies ──
+// Bull call spread: long 100c @6, short 110c @2 → debit 4, max profit 6, max loss −4, BE 104.
+const bcs = analyzeStrategy([{ kind: "call", qty: 1, strike: 100, premium: 6 }, { kind: "call", qty: -1, strike: 110, premium: 2 }], 100);
+approx("bull-call net premium", bcs.netPremium, 4, 1e-9);
+approx("bull-call max profit", bcs.maxProfit, 6, 0.2);
+approx("bull-call max loss", bcs.maxLoss, -4, 0.1);
+ok("bull-call one breakeven ≈104", bcs.breakevens.length === 1 && Math.abs(bcs.breakevens[0] - 104) < 0.6);
+// Long call: unbounded profit, loss capped at premium.
+const lc = analyzeStrategy([{ kind: "call", qty: 1, strike: 100, premium: 5 }], 100);
+ok("long call unbounded profit", lc.maxProfit === null);
+approx("long call max loss", lc.maxLoss, -5, 0.1);
+// Short call: unbounded loss, profit capped at credit.
+const sc = analyzeStrategy([{ kind: "call", qty: -1, strike: 100, premium: 5 }], 100);
+ok("short call unbounded loss", sc.maxLoss === null);
+approx("short call max profit", sc.maxProfit, 5, 0.1);
+// buildStrategy: straddle ~ delta-neutral, unbounded up, bounded loss.
+const strad = buildStrategy("straddle", 100, { vol: 0.3, rate: 0.04, t: 0.5 });
+ok("straddle built", strad != null && strad.legs.length === 2);
+ok("straddle ~delta-neutral", Math.abs(strad.netDelta) < 0.2);
+ok("straddle unbounded up", strad.maxProfit === null && strad.maxLoss < 0);
+ok("collar built with 3 legs", buildStrategy("collar", 100, { vol: 0.3, rate: 0.04, t: 0.5 }).legs.length === 3);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

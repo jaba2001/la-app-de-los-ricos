@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { blackScholes, breakEven, payoffAtExpiry, type OptionType } from "@/lib/greeks";
+import { blackScholes, breakEven, payoffAtExpiry, buildStrategy, STRATEGY_LABELS, type OptionType, type StrategyName } from "@/lib/greeks";
 
 interface Props { ticker: string; price: number | null; rate: number | null; }
 
@@ -40,6 +40,12 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
     [spot, strike, days, ivPct, ratePct, divPct, type]
   );
   const be = breakEven(strike, g.price, type);
+
+  const [strategy, setStrategy] = useState<StrategyName>("collar");
+  const strat = useMemo(
+    () => buildStrategy(strategy, spot, { vol: ivPct / 100, rate: ratePct / 100, q: divPct / 100, t: days / 365 }),
+    [strategy, spot, ivPct, ratePct, divPct, days]
+  );
 
   const payoffPts = useMemo(() => {
     const mults = [-0.2, -0.1, 0, 0.1, 0.2];
@@ -108,6 +114,47 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
           ))}
         </div>
         <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>Max loss on a long option = the premium (${g.price.toFixed(2)}). Break-even at ${be.toFixed(2)}.</div>
+      </div>
+
+      {/* Multi-leg strategies (Fase 4) */}
+      <div className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
+        <div className="section-label">Estrategias multi-pata</div>
+        <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
+          Estructuras armadas alrededor del spot (strikes ATM / ±5-10%), valoradas con Black-Scholes y tus inputs. Ideal para proteger un holding (collar) o definir riesgo (spreads).
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-1)", marginBottom: "var(--sr-sp-3)" }}>
+          {(Object.keys(STRATEGY_LABELS) as StrategyName[]).map((s) => (
+            <button key={s} className={`subtab ${strategy === s ? "active" : ""}`} onClick={() => setStrategy(s)}>{STRATEGY_LABELS[s]}</button>
+          ))}
+        </div>
+
+        {strat ? (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
+              {stat("Net " + (strat.netPremium >= 0 ? "debit" : "credit"), `$${Math.abs(strat.netPremium).toFixed(2)}`, strat.netPremium >= 0 ? "paid" : "received")}
+              {stat("Max profit", strat.maxProfit == null ? "∞" : `$${strat.maxProfit.toFixed(2)}`)}
+              {stat("Max loss", strat.maxLoss == null ? "∞" : `$${strat.maxLoss.toFixed(2)}`)}
+              {stat("Break-even", strat.breakevens.length ? strat.breakevens.map((b) => `$${b.toFixed(0)}`).join(" / ") : "—")}
+              {stat("Net delta", strat.netDelta.toFixed(2), "per share")}
+              {stat("Net theta/day", strat.netTheta.toFixed(3))}
+            </div>
+            <table className="sr-table">
+              <thead><tr><th>Leg</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Strike</th><th style={{ textAlign: "right" }}>Premium</th></tr></thead>
+              <tbody>
+                {strat.legs.map((l, i) => (
+                  <tr key={i}>
+                    <td style={{ textTransform: "capitalize", fontWeight: 600, color: l.qty >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{l.qty >= 0 ? "Long" : "Short"} {l.kind}</td>
+                    <td style={{ textAlign: "right" }} className="num">{l.qty}</td>
+                    <td style={{ textAlign: "right" }} className="num">{l.strike != null ? `$${l.strike.toFixed(2)}` : "—"}</td>
+                    <td style={{ textAlign: "right" }} className="num">${l.premium.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        ) : (
+          <div className="sr-hint">Introduce spot, vol y días válidos para construir la estrategia.</div>
+        )}
       </div>
     </div>
   );
