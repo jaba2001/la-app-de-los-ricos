@@ -294,7 +294,11 @@ if (corrDates.length >= 9) {
     }
 
     // Frozen ensemble composite (same normalization as lib/ensemble.ts) on TEST dates.
-    const NORM_F = { value: (v) => clamp01(v / 25), health: (v) => clamp01(v / 30), momentum: (v) => clamp01(v / 25), growth: (v) => clamp01(v / 20), mom12_1: (v) => clamp01((v + 30) / 60) };
+    const NORM_F = {
+      value: (v) => clamp01(v / 25), health: (v) => clamp01(v / 30), momentum: (v) => clamp01(v / 25), growth: (v) => clamp01(v / 20), mom12_1: (v) => clamp01((v + 30) / 60),
+      // Fase 7 quality/credit rankers (higher = better).
+      altmanZ: (v) => clamp01(v / 6), accrualsQ: (v) => clamp01((v + 0.15) / 0.3), dupontRoe: (v) => clamp01((v + 0.1) / 0.4), piotroski: (v) => clamp01(v / 9),
+    };
     const selOf = Object.fromEntries(factorDefs);
     const composite = (r, rk) => {
       let acc = 0, ws = 0;
