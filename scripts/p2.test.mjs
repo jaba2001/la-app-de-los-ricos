@@ -9,6 +9,7 @@ import { equalWeightPlan } from "../lib/kelly.ts";
 import { computeExposure, detectTheme } from "../lib/exposure.ts";
 import { netManagedMoney, wowChange, netAsPctOfOI, goldSilverRatio, positioningRead } from "../lib/metals.ts";
 import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
+import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf } from "../lib/quality.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -144,6 +145,44 @@ ok("SCHD/QQQ zero overlap", overlap(getEtf("SCHD"), getEtf("QQQ")).overlapPct ==
 const alts = cheaperAlternatives("SPY");
 ok("SPY has cheaper alts", alts.length >= 2);
 ok("cheapest alt first", alts[0].expenseRatio <= alts[alts.length - 1].expenseRatio);
+
+// ── FASE 1 · quality/credit scores ──
+ok("normCdf(0)=0.5", Math.abs(normCdf(0) - 0.5) < 1e-6);
+ok("normCdf(1.96)≈0.975", Math.abs(normCdf(1.96) - 0.975) < 1e-3);
+// Altman Z (manufacturing): TA1000 WC200 RE300 EBIT150 MktEq1200 TL400 Sales900
+const az = altmanZ({ workingCapital: 200, retainedEarnings: 300, ebit: 150, marketCap: 1200, bookEquity: 500, totalLiabilities: 400, sales: 900, totalAssets: 1000 });
+approx("altman Z", az.z, 3.86, 1e-2);
+ok("altman Z safe", az.band === "safe" && az.model === "Z");
+const azp = altmanZ({ workingCapital: 200, retainedEarnings: 300, ebit: 150, marketCap: 1200, bookEquity: 500, totalLiabilities: 400, sales: 900, totalAssets: 1000, serviceOrFinancial: true });
+approx("altman Z''", azp.z, 7.86, 2e-2);
+ok("altman Z'' model", azp.model === "Z''");
+ok("altman null on no TA", altmanZ({ workingCapital: 1, retainedEarnings: 1, ebit: 1, marketCap: 1, bookEquity: 1, totalLiabilities: 1, sales: 1, totalAssets: 0 }) === null);
+// Accruals
+approx("accruals ratio", accrualsRatio(100, 150, 1000).ratio, -0.05, 1e-9);
+ok("accruals high quality", accrualsRatio(100, 150, 1000).quality === "high");
+ok("accruals low quality", accrualsRatio(200, 50, 1000).quality === "low");
+// DuPont — both decompositions reconstruct ROE = NI/equity = 0.2
+const dp = dupont({ netIncome: 100, sales: 900, totalAssets: 1000, totalEquity: 500, pretaxIncome: 130, ebit: 150 });
+approx("dupont roe3 = ROE", dp.roe3, 0.2, 1e-3);
+approx("dupont roe5 = ROE", dp.roe5, 0.2, 1e-3);
+approx("dupont asset turnover", dp.assetTurnover, 0.9, 1e-3);
+ok("dupont null missing", dupont({ netIncome: 1, sales: 0, totalAssets: 1, totalEquity: 1 }) === null);
+// Merton — E100 F100 σE0.6 rf2%
+const mt = mertonPD({ marketCap: 100, totalDebt: 100, equityVol: 0.6, riskFreePct: 2 });
+approx("merton assetVol", mt.assetVol, 0.4, 1e-2);
+approx("merton dd", mt.distanceToDefault, 1.58, 5e-2);
+ok("merton pd in range", mt.pd > 0.04 && mt.pd < 0.07);
+ok("merton null no vol", mertonPD({ marketCap: 100, totalDebt: 100, equityVol: null, riskFreePct: 2 }) === null);
+// Piotroski — all 9 true
+const pf = piotroskiF({ roa: 0.1, roaPrev: 0.05, cfo: 100, netIncome: 80, totalAssets: 1000, leverage: 0.2, leveragePrev: 0.3, currentRatio: 2, currentRatioPrev: 1.5, shares: 100, sharesPrev: 100, grossMargin: 0.4, grossMarginPrev: 0.35, assetTurnover: 0.9, assetTurnoverPrev: 0.8 });
+ok("piotroski 9/9", pf.score === 9 && pf.max === 9);
+const pfPartial = piotroskiF({ roa: 0.1, roaPrev: null, cfo: null, netIncome: null, totalAssets: null, leverage: null, leveragePrev: null, currentRatio: null, currentRatioPrev: null, shares: null, sharesPrev: null, grossMargin: null, grossMarginPrev: null, assetTurnover: null, assetTurnoverPrev: null });
+ok("piotroski partial max scales", pfPartial.score === 1 && pfPartial.max === 1);
+// Beneish — clean case → M low, unlikely
+const bm = beneishM({ receivables: 100, receivablesPrev: 100, sales: 1000, salesPrev: 1000, grossProfit: 400, grossProfitPrev: 400, totalAssets: 2000, totalAssetsPrev: 2000, currentAssets: 800, currentAssetsPrev: 800, ppe: 600, ppePrev: 600, depreciation: 100, depreciationPrev: 100, sga: 200, sgaPrev: 200, totalDebt: 500, totalDebtPrev: 500, netIncome: 100, operatingCashFlow: 120 });
+approx("beneish M clean", bm.m, -2.53, 3e-2);
+ok("beneish unlikely", bm.flag === "unlikely");
+ok("beneish null incomplete", beneishM({ receivables: null, receivablesPrev: 100, sales: 1000, salesPrev: 1000, grossProfit: 400, grossProfitPrev: 400, totalAssets: 2000, totalAssetsPrev: 2000, currentAssets: 800, currentAssetsPrev: 800, ppe: 600, ppePrev: 600, depreciation: 100, depreciationPrev: 100, sga: 200, sgaPrev: 200, totalDebt: 500, totalDebtPrev: 500, netIncome: 100, operatingCashFlow: 120 }) === null);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);
