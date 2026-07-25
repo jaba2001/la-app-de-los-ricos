@@ -22,6 +22,8 @@ const MacroAI         = dynamic(() => import("@/components/macro/MacroAI"),     
 const MacroPortfolio  = dynamic(() => import("@/components/macro/MacroPortfolio"),  { loading: TabSk, ssr: false });
 const MacroHistoricalAnalog = dynamic(() => import("@/components/macro/MacroHistoricalAnalog"), { loading: TabSk, ssr: false });
 const MacroGeopolitics = dynamic(() => import("@/components/macro/MacroGeopolitics"), { loading: TabSk, ssr: false });
+const MetalsCockpit    = dynamic(() => import("@/components/macro/MetalsCockpit"),    { loading: TabSk, ssr: false });
+const EtfLab           = dynamic(() => import("@/components/macro/EtfLab"),           { loading: TabSk, ssr: false });
 
 const TABS = [
   { id: "overview",    label: "Overview" },
@@ -30,6 +32,8 @@ const TABS = [
   { id: "monitors",    label: "Monitors" },
   { id: "analog",      label: "Historical Analog" },
   { id: "geopolitics", label: "Geopolitics" },
+  { id: "metals",      label: "Metals" },
+  { id: "etf",         label: "ETF Lab" },
   { id: "portfolio",   label: "Portfolio" },
   { id: "news",        label: "News" },
   { id: "ai",          label: "AI Synthesis" },
@@ -181,6 +185,8 @@ export default function MacroPage() {
             {activeTab === "monitors"   && <MacroMonitors   macro={macro} loading={loading} />}
             {activeTab === "analog"     && <MacroHistoricalAnalog macro={macro} loading={loading} />}
             {activeTab === "geopolitics" && <MacroGeopolitics macro={macro} loading={loading} />}
+            {activeTab === "metals"     && <MetalsCockpit   macro={macro} loading={loading} />}
+            {activeTab === "etf"        && <EtfLab />}
             {activeTab === "portfolio"  && <MacroPortfolio  macro={macro} loading={loading} />}
             {activeTab === "news"       && <MacroNews />}
             {activeTab === "ai"         && <MacroAI         macro={macro} loading={loading} />}

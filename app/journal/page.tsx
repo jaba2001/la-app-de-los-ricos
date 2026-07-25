@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import PortfolioOptimizer from "@/components/journal/PortfolioOptimizer";
+import ExposureAudit from "@/components/journal/ExposureAudit";
+import PositionSizer from "@/components/journal/PositionSizer";
 
 interface JournalTrade {
   id: number; ticker: string; side: string; shares: number; price: number;
@@ -240,6 +242,14 @@ export default function JournalPage() {
           </table>
         )}
       </div>
+
+      {/* Exposure & concentration audit */}
+      {openTrades.length > 0 && (
+        <ExposureAudit trades={openTrades.map(t => ({ ticker: t.ticker, shares: t.shares, price: t.price, thesis: t.thesis, sector: t.sector }))} marks={marks} />
+      )}
+
+      {/* Position sizing calculator */}
+      <PositionSizer />
 
       {/* Portfolio optimizer (P2-13) */}
       {openTrades.length > 0 && (

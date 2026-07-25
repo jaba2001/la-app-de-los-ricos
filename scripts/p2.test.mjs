@@ -3,6 +3,12 @@
 import { blackScholes, breakEven, payoffAtExpiry } from "../lib/greeks.ts";
 import { forecastSeries } from "../lib/forecast.ts";
 import { minVariance, maxSharpe, portfolioStats, covariance, invert } from "../lib/optimize.ts";
+import { calcSubScores } from "../lib/scoring.ts";
+import { smaLast, trendStage, detectBaseBreakout } from "../lib/technicalIndicators.ts";
+import { equalWeightPlan } from "../lib/kelly.ts";
+import { computeExposure, detectTheme } from "../lib/exposure.ts";
+import { netManagedMoney, wowChange, netAsPctOfOI, goldSilverRatio, positioningRead } from "../lib/metals.ts";
+import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -63,6 +69,81 @@ ok("port sharpe > 0", stats.sharpe > 0);
 const cv = covariance([[1, 2, 3, 4], [2, 4, 6, 8]]);
 ok("cov symmetric", Math.abs(cv[0][1] - cv[1][0]) < 1e-12);
 ok("cov positive var", cv[0][0] > 0 && cv[1][1] > 0);
+
+// ── T1.1 · Moat & Cash-Flow sub-scores ──
+const subHi = calcSubScores({ grossProfitability: 50, roic: 25, grossMargin: 65, capexToRevenue: 0.03, fcfYield: 0.09, fcfGrowthYoy: 30, epsGrowth: 10, pfcf: 12 });
+approx("moat top-tier", subHi.moat.score, 10, 1e-9);
+approx("cashflow top-tier", subHi.cashFlow.score, 10, 1e-9);
+const subNull = calcSubScores({});
+ok("moat null when no inputs", subNull.moat === null);
+ok("cashflow null when no inputs", subNull.cashFlow === null);
+const subPartial = calcSubScores({ grossProfitability: 30 });
+approx("moat partial normalized", subPartial.moat.score, 7.5, 1e-9);
+ok("moat partial one factor", subPartial.moat.factors.length === 1);
+
+// ── T1.2 · SMA / stage / base breakout ──
+approx("smaLast basic", smaLast([1, 2, 3, 4, 5], 5), 3, 1e-9);
+ok("smaLast too short → null", smaLast([1, 2], 5) === null);
+const upBars = Array.from({ length: 180 }, (_, i) => { const c = 100 + i; return { open: c, high: c, low: c, close: c, volume: 100 }; });
+const upStage = trendStage(upBars);
+ok("uptrend → stage 2", upStage.stage === 2);
+ok("uptrend above sma150", upStage.aboveSma150 === true);
+ok("uptrend positive slope", upStage.slopePct > 0);
+const downBars = Array.from({ length: 180 }, (_, i) => { const c = 300 - i; return { open: c, high: c, low: c, close: c, volume: 100 }; });
+ok("downtrend → stage 4", trendStage(downBars).stage === 4);
+const flat = Array.from({ length: 160 }, () => ({ open: 100, high: 100, low: 100, close: 100, volume: 100 }));
+const brkData = [...flat.slice(0, 159), { open: 100, high: 110, low: 100, close: 110, volume: 300 }];
+const brk = detectBaseBreakout(brkData);
+ok("base breakout detected", brk.status === "base-breakout");
+ok("base breakout volume confirmed", brk.volumeConfirmed === true);
+ok("base breakout above trend", brk.aboveTrend === true);
+ok("flat base → in-base", detectBaseBreakout(flat).status === "in-base");
+
+// ── T1.4 · equal-weight sizing ──
+const plan10 = equalWeightPlan(100000, 10, 0);
+approx("equal-weight full", plan10.fullWeight, 0.1, 1e-9);
+approx("equal-weight $/full", plan10.fullDollars, 10000, 1e-9);
+approx("equal-weight dd20", plan10.drawdownImpact20, 2, 1e-9);
+ok("equal-weight within cap", plan10.exceedsCap === false);
+ok("2 names exceed cap", equalWeightPlan(100000, 2, 0).exceedsCap === true);
+const planMix = equalWeightPlan(100000, 4, 2);
+approx("mixed full weight", planMix.fullWeight, 0.2, 1e-9);
+approx("mixed half weight", planMix.halfWeight, 0.1, 1e-9);
+ok("sizing null on zero pv", equalWeightPlan(0, 10) === null);
+ok("sizing null on zero names", equalWeightPlan(100000, 0, 0) === null);
+
+// ── T1.3 · exposure & theme ──
+ok("theme AI", detectTheme("AI infrastructure play") === "AI");
+ok("theme energy", detectTheme("oil and gas midstream") === "Energy / Oil & Gas");
+ok("theme none", detectTheme("miscellaneous idea") === null);
+ok("theme null input", detectTheme(null) === null);
+const exp = computeExposure([{ ticker: "A", value: 60, sector: "Tech" }, { ticker: "B", value: 40, sector: "Tech" }]);
+approx("exposure top weight", exp.topWeight, 0.6, 1e-9);
+approx("exposure sector weight", exp.bySector[0].weight, 1, 1e-9);
+approx("exposure hhi", exp.hhi, 0.52, 1e-9);
+ok("exposure flags concentration", exp.flags.length >= 2);
+
+// ── T2.1 · metals COT math ──
+approx("managed-money net", netManagedMoney({ managedLong: 141060, managedShort: 17474 }), 123586, 1e-9);
+approx("gold/silver ratio", goldSilverRatio(300, 30), 100, 1e-9);
+ok("gsr null guard", goldSilverRatio(null, 30) === null);
+approx("cot wow change", wowChange([
+  { date: "2026-07-14", managedLong: 100, managedShort: 20, openInterest: 1000 },
+  { date: "2026-07-21", managedLong: 150, managedShort: 20, openInterest: 1000 },
+]), 50, 1e-9);
+approx("net as pct of OI", netAsPctOfOI({ date: "x", managedLong: 200, managedShort: 0, openInterest: 1000 }), 0.2, 1e-9);
+ok("positioning tone pos", positioningRead({ date: "x", managedLong: 300, managedShort: 0, openInterest: 1000 }, 10).tone === "pos");
+
+// ── T2.2 · ETF overlap & cost ──
+const ovSame = overlap(getEtf("SPY"), getEtf("VOO"));
+ok("SPY/VOO overlap measurable", ovSame.measurable === true);
+ok("SPY/VOO overlap high", ovSame.overlapPct > 30);
+ok("SPY/VOO shares 10", ovSame.shared.length === 10);
+ok("SPY/AGG not measurable", overlap(getEtf("SPY"), getEtf("AGG")).measurable === false);
+ok("SCHD/QQQ zero overlap", overlap(getEtf("SCHD"), getEtf("QQQ")).overlapPct === 0);
+const alts = cheaperAlternatives("SPY");
+ok("SPY has cheaper alts", alts.length >= 2);
+ok("cheapest alt first", alts[0].expenseRatio <= alts[alts.length - 1].expenseRatio);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

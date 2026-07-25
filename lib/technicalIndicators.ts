@@ -361,3 +361,83 @@ export function computeTLResult(
     pocMid: vp.pocMid, vaHigh: vp.vaHigh, vaLow: vp.vaLow,
   };
 }
+
+// ── 150-day trend line · stage classification · base breakout ─────────────────
+// A long-term trend layer on top of the confluence engine above. The 150-day SMA is
+// the canonical intermediate-term trend line; its 20-bar slope + the price's position
+// relative to it classify a name into one of four trend stages, and a tight-base
+// breakout on expanding volume is the classic accumulation entry. All pure & headless.
+
+/** Trailing SMA of the last `period` values (values oldest→newest). */
+export function smaLast(values: number[], period: number): number | null {
+  if (values.length < period || period <= 0) return null;
+  let s = 0;
+  for (let i = values.length - period; i < values.length; i++) s += values[i];
+  return s / period;
+}
+
+export type TrendStage = 1 | 2 | 3 | 4;
+export interface StageResult {
+  stage: TrendStage;
+  label: string;             // Basing | Advancing | Topping | Declining
+  sma150: number | null;
+  slopePct: number | null;   // 20-bar % slope of the SMA-150
+  aboveSma150: boolean;
+}
+
+/** Classify the trend stage from daily OHLCV (oldest→newest) via the 150-day SMA and its slope.
+ *  1 Basing · 2 Advancing · 3 Topping · 4 Declining. Degrades to a price-vs-line read when the
+ *  history is too short for a slope. */
+export function trendStage(data: OHLCV[], smaPeriod = 150, slopeLookback = 20): StageResult {
+  const closes = data.map(d => d.close);
+  const sma = smaLast(closes, smaPeriod);
+  const price = closes.length ? closes[closes.length - 1] : NaN;
+  const above = sma != null && price > sma;
+  let slopePct: number | null = null;
+  if (closes.length >= smaPeriod + slopeLookback) {
+    const smaNow = smaLast(closes, smaPeriod)!;
+    const smaPrev = smaLast(closes.slice(0, closes.length - slopeLookback), smaPeriod)!;
+    slopePct = smaPrev > 0 ? ((smaNow - smaPrev) / smaPrev) * 100 : null;
+  }
+  const RISE = 0.5, FALL = -0.5;
+  let stage: TrendStage;
+  if (sma == null) stage = above ? 2 : 1;
+  else if (above && (slopePct == null || slopePct > RISE)) stage = 2;
+  else if (!above && (slopePct == null || slopePct < FALL)) stage = 4;
+  else if (above) stage = 3;
+  else stage = 1;
+  const LABEL: Record<TrendStage, string> = { 1: "Basing", 2: "Advancing", 3: "Topping", 4: "Declining" };
+  return { stage, label: LABEL[stage], sma150: sma, slopePct, aboveSma150: above };
+}
+
+export interface BaseBreakout {
+  status: "base-breakout" | "in-base" | "none";
+  baseHigh: number | null;
+  baseLow: number | null;
+  rangePct: number | null;     // tightness of the base (high/low − 1)
+  volumeRatio: number | null;  // last-bar volume vs the base average
+  volumeConfirmed: boolean;    // ratio ≥ volMult
+  aboveTrend: boolean;         // last close above the 150-day SMA
+}
+
+/** Detect a tight consolidation over the `lookback` bars before the last bar and whether the
+ *  last bar breaks above the base high (with volume ≥ volMult× the base average). data oldest→newest. */
+export function detectBaseBreakout(data: OHLCV[], lookback = 30, rangeMax = 0.25, volMult = 2): BaseBreakout {
+  const none: BaseBreakout = { status: "none", baseHigh: null, baseLow: null, rangePct: null, volumeRatio: null, volumeConfirmed: false, aboveTrend: false };
+  if (data.length < lookback + 1) return none;
+  const base = data.slice(data.length - lookback - 1, data.length - 1);
+  const last = data[data.length - 1];
+  const baseHigh = Math.max(...base.map(b => b.high));
+  const baseLow  = Math.min(...base.map(b => b.low));
+  const rangePct = baseLow > 0 ? baseHigh / baseLow - 1 : null;
+  const avgVol = base.reduce((s, b) => s + b.volume, 0) / base.length;
+  const volumeRatio = avgVol > 0 ? last.volume / avgVol : null;
+  const volumeConfirmed = volumeRatio != null && volumeRatio >= volMult;
+  const sma150 = smaLast(data.map(d => d.close), 150);
+  const aboveTrend = sma150 != null && last.close > sma150;
+  const isTight = rangePct != null && rangePct <= rangeMax;
+  let status: BaseBreakout["status"] = "none";
+  if (isTight && last.close > baseHigh) status = "base-breakout";
+  else if (isTight) status = "in-base";
+  return { status, baseHigh, baseLow, rangePct, volumeRatio, volumeConfirmed, aboveTrend };
+}

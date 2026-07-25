@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
-import { calcScores, calcFactorTilts, getRating, getMacroTilt, SECTOR_ETF, type FactorTilts } from "@/lib/scoring";
+import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, SECTOR_ETF, type FactorTilts, type SubScores } from "@/lib/scoring";
+import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndicators";
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
 import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
@@ -15,6 +16,7 @@ import { Sk } from "@/components/ui/Skeleton";
 const TabSk = () => <Sk w="100%" h={500} />;
 
 const StockOverview     = dynamic(() => import("@/components/stock/StockOverview"),     { loading: TabSk, ssr: false });
+const StockSignals      = dynamic(() => import("@/components/stock/StockSignals"),      { loading: TabSk, ssr: false });
 const StockFundamentals = dynamic(() => import("@/components/stock/StockFundamentals"), { loading: TabSk, ssr: false });
 const StockValuation    = dynamic(() => import("@/components/stock/StockValuation"),    { loading: TabSk, ssr: false });
 const StockChart        = dynamic(() => import("@/components/stock/StockChart"),        { loading: TabSk, ssr: false });
@@ -32,6 +34,7 @@ const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForeca
 
 const TABS = [
   { id: "overview",      label: "Overview" },
+  { id: "signals",       label: "Signals" },
   { id: "fundamentals",  label: "Fundamentals" },
   { id: "valuation",     label: "Valuation" },
   { id: "report",        label: "Report" },
@@ -94,6 +97,7 @@ export default function StockTickerPage() {
   const [data, setData] = useState<StockData | null>(null);
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
+  const [subScores, setSubScores] = useState<SubScores | null>(null);
   const [factorTilts, setFactorTilts] = useState<FactorTilts | null>(null);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
   const { macro: contextMacro, setMacro: setMacroContext } = useMacroContext();
@@ -128,6 +132,7 @@ export default function StockTickerPage() {
     setAutoChecked(false);
     setData(null);
     setScores(null);
+    setSubScores(null);
     setFactorTilts(null);
     setSavedAnalysis(null);
     setError("");
@@ -602,6 +607,7 @@ export default function StockTickerPage() {
       const macroTiltData = macroData ? getMacroTilt(macroData, sector, ftilts) : null;
       if (!live()) return;
       setScores(calc);
+      setSubScores(calcSubScores(scoreInputs));
       setFactorTilts(ftilts);
 
       const rating = getRating(calc.total);
@@ -663,6 +669,24 @@ export default function StockTickerPage() {
         if (snap) analyze();  // fresh snapshot → cheap cache-hit load
       });
   }, [session, ticker, hasAnalyzed, autoChecked, analyze]);
+
+  // Technical state for in-app alert evaluation (crossed_sma150 / base_breakout / stage_change).
+  const techState = useMemo(() => {
+    const hist = data?.history ?? [];
+    if (hist.length < 31) return null;
+    const ohlcv: OHLCV[] = hist.slice(0, 260)
+      .map(h => ({ open: Number(h.open), high: Number(h.high), low: Number(h.low), close: Number(h.close), volume: Number(h.volume) }))
+      .filter(b => isFinite(b.close) && isFinite(b.high) && isFinite(b.low))
+      .reverse();
+    if (ohlcv.length < 31) return null;
+    const stage = trendStage(ohlcv);
+    const bb = detectBaseBreakout(ohlcv);
+    return {
+      aboveSma150: stage.aboveSma150,
+      stage: stage.stage,
+      baseBreakout: bb.status === "base-breakout" && bb.volumeConfirmed && bb.aboveTrend,
+    };
+  }, [data]);
 
   if (authLoading || !session) return null;
 
@@ -872,9 +896,10 @@ export default function StockTickerPage() {
             {activeTab === "overview"     && (
               <>
                 <StockOverview data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />
-                {data && <AlertConfig ticker={ticker} price={quote?.price as number ?? null} ratingLabel={rating?.label ?? null} rdcfUpside={data?.rdcf?.upside ?? null} />}
+                {data && <AlertConfig ticker={ticker} price={quote?.price as number ?? null} ratingLabel={rating?.label ?? null} rdcfUpside={data?.rdcf?.upside ?? null} tech={techState} />}
               </>
             )}
+            {activeTab === "signals"      && <StockSignals    subScores={subScores} data={data} />}
             {activeTab === "fundamentals" && (
               <>
                 <StockFundamentals data={data} loading={loading} ticker={ticker} />

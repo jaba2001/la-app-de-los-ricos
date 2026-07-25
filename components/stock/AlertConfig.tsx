@@ -4,11 +4,13 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { Sk } from "@/components/ui/Skeleton";
 
+interface TechState { aboveSma150: boolean; stage: number; baseBreakout: boolean; }
 interface Props {
   ticker: string;
   price: number | null;
   ratingLabel?: string | null;   // current Scora rating (for rating_buy eval)
   rdcfUpside?: number | null;     // reverse-DCF upside % (for rdcf_cheap eval)
+  tech?: TechState | null;        // technical state (for crossed_sma150 / base_breakout eval)
 }
 
 interface Alert {
@@ -22,20 +24,26 @@ const KIND_LABEL: Record<string, string> = {
   price_below: "Price falls below",
   rating_buy: "Scora rating turns Buy",
   rdcf_cheap: "Reverse-DCF says cheap",
+  crossed_sma150: "Price above 150-day MA",
+  base_breakout: "Base breakout (volume-confirmed)",
+  stage_change: "Trend stage changes",
 };
 
-/** In-app evaluation: is this alert's condition met right now, given live inputs? */
-function isTriggeredNow(a: Alert, price: number | null, ratingLabel?: string | null, rdcfUpside?: number | null): boolean {
+/** In-app evaluation: is this alert's condition met right now, given live inputs? stage_change is
+ *  a transition the cron detects (needs the prior stage), so it isn't lit live here. */
+function isTriggeredNow(a: Alert, price: number | null, ratingLabel?: string | null, rdcfUpside?: number | null, tech?: TechState | null): boolean {
   switch (a.kind) {
     case "price_above": return price != null && a.threshold != null && price >= a.threshold;
     case "price_below": return price != null && a.threshold != null && price <= a.threshold;
     case "rating_buy":  return !!ratingLabel && /buy/i.test(ratingLabel);
     case "rdcf_cheap":  return rdcfUpside != null && rdcfUpside > 0;
+    case "crossed_sma150": return tech?.aboveSma150 === true;
+    case "base_breakout":  return tech?.baseBreakout === true;
     default: return false;
   }
 }
 
-export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside }: Props) {
+export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside, tech }: Props) {
   const { session } = useAuth();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,7 +133,7 @@ export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside }: 
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
             {alerts.map(a => {
-              const live = a.active && isTriggeredNow(a, price, ratingLabel, rdcfUpside);
+              const live = a.active && isTriggeredNow(a, price, ratingLabel, rdcfUpside, tech);
               return (
                 <div key={a.id} style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: `1px solid ${live ? "color-mix(in srgb, var(--sr-pos) 45%, transparent)" : "var(--sr-border)"}`, opacity: a.active ? 1 : 0.55 }}>
                   <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text)", flex: 1 }}>

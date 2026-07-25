@@ -334,3 +334,61 @@ export function calcFactorTilts(inp: ScoreInputs): FactorTilts {
 
   return { value, growth, momentum, quality, size };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NAMED SUB-SCORES (0-10) — Moat & Cash-Flow Quality. These do NOT change the Scora
+// Score: they repackage signals calcScores already folds into `health` into two
+// plain, self-standing 0-10 gauges the UI can surface. Each is normalized over the
+// signals actually present, so a name with only 2 of 4 inputs still gets a fair 0-10.
+// Pure & type-only → runs headless in the golden/p2 tests.
+// ─────────────────────────────────────────────────────────────────────────────
+export interface SubScoreFactor { label: string; strength: number; } // strength 0..1 (null inputs omitted)
+export interface SubScore { score: number; factors: SubScoreFactor[]; }
+export interface SubScores { moat: SubScore | null; cashFlow: SubScore | null; }
+
+/** Grade a value into 0..1 against ascending or descending thresholds. */
+function grade(v: number, thresholds: number[], descending = false): number {
+  // thresholds ascending → higher v = better (returns i/(n) as it clears each band).
+  // descending → lower v = better.
+  const n = thresholds.length;
+  if (descending) {
+    for (let i = 0; i < n; i++) if (v < thresholds[i]) return (n - i) / n;
+    return 0;
+  }
+  for (let i = n - 1; i >= 0; i--) if (v > thresholds[i]) return (i + 1) / n;
+  return 0;
+}
+
+function normalize(parts: { label: string; weight: number; strength: number | null }[]): SubScore | null {
+  const present = parts.filter(p => p.strength != null) as { label: string; weight: number; strength: number }[];
+  if (present.length === 0) return null;
+  const got = present.reduce((s, p) => s + p.weight * p.strength, 0);
+  const max = present.reduce((s, p) => s + p.weight, 0);
+  return {
+    score: Math.round((got / max) * 10 * 10) / 10, // one decimal, 0-10
+    factors: present.map(p => ({ label: p.label, strength: Math.round(p.strength * 100) / 100 })),
+  };
+}
+
+export function calcSubScores(inp: ScoreInputs): SubScores {
+  // MOAT — durable, hard-to-replicate economics: gross profitability (Novy-Marx), returns on
+  // capital, pricing power (gross margin), and capital-light operations.
+  const moat = normalize([
+    { label: "Gross profitability", weight: 4, strength: inp.grossProfitability != null ? grade(inp.grossProfitability, [8, 15, 25, 40]) : null },
+    { label: "Return on capital",   weight: 3, strength: inp.roic != null ? grade(inp.roic, [8, 12, 20]) : null },
+    { label: "Pricing power",       weight: 2, strength: inp.grossMargin != null ? grade(inp.grossMargin, [25, 40, 60]) : null },
+    { label: "Capital-light",       weight: 1, strength: inp.capexToRevenue != null && inp.capexToRevenue >= 0 ? grade(inp.capexToRevenue, [0.05, 0.10, 0.20], true) : null },
+  ]);
+
+  // CASH-FLOW QUALITY — real cash generation, not accounting earnings: FCF yield, FCF growing
+  // ahead of earnings (a clean-accounting tell), reasonable price-to-FCF, low capital intensity.
+  const divergence = inp.fcfGrowthYoy != null && inp.epsGrowth != null ? inp.fcfGrowthYoy - inp.epsGrowth : null;
+  const cashFlow = normalize([
+    { label: "FCF yield",           weight: 3, strength: inp.fcfYield != null ? grade(inp.fcfYield * 100, [0, 3, 5, 8]) : null },
+    { label: "FCF vs earnings",     weight: 3, strength: divergence != null ? grade(divergence, [-5, 5, 15]) : null },
+    { label: "Price to FCF",        weight: 2, strength: inp.pfcf != null && inp.pfcf > 0 ? grade(inp.pfcf, [15, 25, 40], true) : null },
+    { label: "Low capital intensity", weight: 2, strength: inp.capexToRevenue != null && inp.capexToRevenue >= 0 ? grade(inp.capexToRevenue, [0.10, 0.20], true) : null },
+  ]);
+
+  return { moat, cashFlow };
+}
