@@ -135,6 +135,12 @@ export interface StockAnalysis {
   macro_tilt: number;
   sector: string | null;
   reverse_dcf?: Record<string, unknown> | null;
+  // Valuation multiples (P1-8) — optional; populated on analyze, null for older rows.
+  pe?: number | null;
+  ev_ebitda?: number | null;
+  pfcf?: number | null;
+  roic?: number | null;       // percent
+  fcf_yield?: number | null;  // percent
 }
 
 /* ── Score inputs / outputs ── */

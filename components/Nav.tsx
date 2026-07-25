@@ -9,6 +9,7 @@ const MAIN_TABS = [
   { label: "Discovery", href: "/discovery" },
   { label: "Stocks", href: "/stock" },
   { label: "Watchlist", href: "/watchlist" },
+  { label: "Journal", href: "/journal" },
   { label: "Track Record", href: "/track-record" },
   { label: "Audit", href: "/audit" },
 ];
