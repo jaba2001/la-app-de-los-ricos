@@ -10,6 +10,7 @@ import { computeExposure, detectTheme } from "../lib/exposure.ts";
 import { netManagedMoney, wowChange, netAsPctOfOI, goldSilverRatio, positioningRead } from "../lib/metals.ts";
 import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
 import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf } from "../lib/quality.ts";
+import { waccBridge, dcfMatrix, sectorComps } from "../lib/valuation.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -183,6 +184,23 @@ const bm = beneishM({ receivables: 100, receivablesPrev: 100, sales: 1000, sales
 approx("beneish M clean", bm.m, -2.53, 3e-2);
 ok("beneish unlikely", bm.flag === "unlikely");
 ok("beneish null incomplete", beneishM({ receivables: null, receivablesPrev: 100, sales: 1000, salesPrev: 1000, grossProfit: 400, grossProfitPrev: 400, totalAssets: 2000, totalAssetsPrev: 2000, currentAssets: 800, currentAssetsPrev: 800, ppe: 600, ppePrev: 600, depreciation: 100, depreciationPrev: 100, sga: 200, sgaPrev: 200, totalDebt: 500, totalDebtPrev: 500, netIncome: 100, operatingCashFlow: 120 }) === null);
+
+// ── FASE 2 · valuation ──
+const wb = waccBridge({ rf: 4, beta: 1.2, erp: 5.5, taxRate: 0.21, marketCap: 800, totalDebt: 200, interestExpense: 10 });
+approx("wacc cost of equity", wb.costOfEquity, 10.6, 1e-2);
+approx("wacc cost of debt AT", wb.costOfDebtAfterTax, 3.95, 1e-2);
+approx("wacc weight equity", wb.weightEquity, 0.8, 1e-3);
+approx("wacc blended", wb.wacc, 9.27, 2e-2);
+ok("wacc null no mcap", waccBridge({ rf: 4, beta: 1, marketCap: 0, totalDebt: 1, interestExpense: 1 }) === null);
+const dm = dcfMatrix({ revenueTTM: 1000, fcfMarginTTM: 0.15, netDebt: 0, sharesOut: 100 }, [8, 10], [5, 10]);
+ok("dcf matrix dims", dm.grid.length === 2 && dm.grid[0].length === 2);
+ok("dcf matrix cell positive", typeof dm.grid[0][0] === "number" && dm.grid[0][0] > 0);
+ok("dcf matrix higher g → higher value", dm.grid[0][1] > dm.grid[0][0]);
+const cmp = sectorComps({ sector: "Technology", eps: 5, ebitda: 200, netDebt: 100, sharesOut: 50 });
+approx("comps PE-based", cmp.peBased, 140, 1e-9);
+approx("comps EV-based", cmp.evBased, 86, 1e-9);
+approx("comps mid", cmp.mid, 113, 1e-9);
+ok("comps null no sector", sectorComps({ sector: null, eps: 5, ebitda: 200, netDebt: 100, sharesOut: 50 }) === null);
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

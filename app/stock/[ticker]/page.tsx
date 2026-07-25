@@ -31,6 +31,7 @@ const StockNews         = dynamic(() => import("@/components/stock/StockNews"), 
 const AlertConfig       = dynamic(() => import("@/components/stock/AlertConfig"),       { ssr: false });
 const OptionsCalc       = dynamic(() => import("@/components/stock/OptionsCalc"),       { loading: TabSk, ssr: false });
 const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForecast"),   { ssr: false });
+const ValuationLab      = dynamic(() => import("@/components/stock/ValuationLab"),      { ssr: false });
 
 const TABS = [
   { id: "overview",      label: "Overview" },
@@ -906,7 +907,12 @@ export default function StockTickerPage() {
                 {data && <RevenueForecast data={data} />}
               </>
             )}
-            {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
+            {activeTab === "valuation"    && (
+              <>
+                <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />
+                {data && <ValuationLab data={data} macro={macro} />}
+              </>
+            )}
             {activeTab === "report"       && <StockReport      data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} ticker={ticker} />}
             {activeTab === "diligence"    && <DueDiligence     data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} ticker={ticker} />}
             {activeTab === "chart"        && <StockChart       data={data} loading={loading} ticker={ticker} icScore={icScore} dgs2={macro?.dgs2 as number ?? null} />}
