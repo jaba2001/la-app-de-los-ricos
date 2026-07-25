@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
-import { aiAnalyze } from "@/lib/proxy";
+import { aiAnalyzeAudited } from "@/lib/proxy";
 import { buildStockThesis, type StockThesisInput } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
+import { GroundedBadge } from "@/components/ui/GroundedBadge";
 
 interface Props { input: StockThesisInput; macro: MacroState | null; }
 
@@ -24,6 +25,7 @@ function render(text: string) {
 
 export default function StockThesis({ input, macro }: Props) {
   const [thesis, setThesis] = useState("");
+  const [violations, setViolations] = useState<(number | string)[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cards, setCards] = useState<KbCard[]>([]);
@@ -33,11 +35,15 @@ export default function StockThesis({ input, macro }: Props) {
   useEffect(() => { fetchDocChunks(input.ticker).then(setDocs).catch(() => setDocs([])); }, [input.ticker]);
 
   async function generate() {
-    setLoading(true); setError("");
+    setLoading(true); setError(""); setViolations([]);
     try {
       const kb = renderKb(selectCards(cards, ["momentum", "stock-picking", "correlation", "edge"]));
       const filings = renderDocChunks(docs);
-      setThesis(await aiAnalyze(buildStockThesis(input, macro, kb, filings), 700));
+      const prompt = buildStockThesis(input, macro, kb, filings);
+      const sources = [...docs.map((d) => `${d.form} ${d.section}`), ...(kb ? ["kb"] : [])];
+      // dataBlock = the full prompt: any figure the model outputs that isn't in its input is flagged.
+      const res = await aiAnalyzeAudited(prompt, { module: "stock-thesis", ticker: input.ticker, dataBlock: prompt, sources, maxTokens: 700 });
+      setThesis(res.text); setViolations(res.violations);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate thesis");
     }
@@ -61,8 +67,11 @@ export default function StockThesis({ input, macro }: Props) {
       {error && <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{error}</div>}
       {loading && <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>{[85, 65, 80, 55].map((w, i) => <Sk key={i} w={`${w}%`} h={13} />)}</div>}
       {thesis && !loading && (
-        <div style={{ fontSize: "var(--sr-t-xs)", lineHeight: 1.65, color: "var(--sr-text-2)", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
-          {render(thesis)}
+        <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
+          <GroundedBadge violations={violations} />
+          <div style={{ fontSize: "var(--sr-t-xs)", lineHeight: 1.65, color: "var(--sr-text-2)" }}>
+            {render(thesis)}
+          </div>
         </div>
       )}
     </div>

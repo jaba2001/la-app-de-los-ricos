@@ -4,10 +4,11 @@ import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores } from "@/lib/types";
 import { forwardValuation, footballField, dupont, bubbleGauge, type ValuationResult } from "@/lib/researchReport";
 import { trajectoryRating } from "@/lib/microScore";
-import { aiAnalyze } from "@/lib/proxy";
+import { aiAnalyzeAudited } from "@/lib/proxy";
 import { buildResearchReport } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
+import { GroundedBadge } from "@/components/ui/GroundedBadge";
 
 interface Props { data: StockData | null; macro: MacroState | null; scores: Scores | null; icScore: number | null; loading: boolean; ticker: string; }
 
@@ -26,6 +27,7 @@ function renderMd(text: string) {
 
 export default function StockReport({ data, macro, scores, icScore, loading, ticker }: Props) {
   const [note, setNote] = useState("");
+  const [noteViol, setNoteViol] = useState<(number | string)[]>([]);
   const [gen, setGen] = useState(false);
   const [err, setErr] = useState("");
   const [cards, setCards] = useState<KbCard[]>([]);
@@ -84,7 +86,7 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
 
   async function generate() {
     if (!data || !model) return;
-    setGen(true); setErr("");
+    setGen(true); setErr(""); setNoteViol([]);
     try {
       const kb = renderKb(selectCards(cards, ["momentum", "stock-picking", "valuation", "edge", "quality"]));
       const filings = renderDocChunks(docs);
@@ -97,7 +99,9 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
         pe: model.pe, evEbitda: model.evEbitda, netDebtEbitda: model.netDebtEbitda,
         scoreTotal: icScore, trajectory: model.traj,
       }, kb, filings);
-      setNote(await aiAnalyze(prompt, 900));
+      const sources = [...docs.map((d) => `${d.form} ${d.section}`), ...(kb ? ["kb"] : [])];
+      const res = await aiAnalyzeAudited(prompt, { module: "research-report", ticker, dataBlock: prompt, sources, maxTokens: 900 });
+      setNote(res.text); setNoteViol(res.violations);
     } catch (e) { setErr(e instanceof Error ? e.message : "Failed to generate report"); }
     setGen(false);
   }
@@ -235,7 +239,12 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
         </div>
         {err && <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{err}</div>}
         {gen && <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>{[90, 70, 85, 60, 75].map((w, i) => <Sk key={i} w={`${w}%`} h={13} />)}</div>}
-        {note && !gen && <div style={{ fontSize: "var(--sr-t-xs)", lineHeight: 1.65, color: "var(--sr-text-2)", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>{renderMd(note)}</div>}
+        {note && !gen && (
+          <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
+            <GroundedBadge violations={noteViol} />
+            <div style={{ fontSize: "var(--sr-t-xs)", lineHeight: 1.65, color: "var(--sr-text-2)" }}>{renderMd(note)}</div>
+          </div>
+        )}
       </div>
     </div>
   );

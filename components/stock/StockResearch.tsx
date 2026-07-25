@@ -3,10 +3,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
-import { aiAnalyze } from "@/lib/proxy";
+import { aiAnalyzeAudited } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { getRating, calcFactorTilts, SECTOR_PE_BM, SECTOR_EV_BM } from "@/lib/scoring";
 
 interface Props {
@@ -47,10 +48,12 @@ function computeMoat(metrics: Record<string, unknown> | null, ratios: Record<str
 export default function StockResearch({ data, scores, loading, ticker, macro, macroTilt }: Props) {
   const router = useRouter();
   const [aiVerdict, setAiVerdict] = useState("");
+  const [verdictViol, setVerdictViol] = useState<(number | string)[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState("");
 
   const [earningsAI, setEarningsAI] = useState("");
+  const [earningsViol, setEarningsViol] = useState<(number | string)[]>([]);
   const [earningsLoading, setEarningsLoading] = useState(false);
 
   const [peerScores, setPeerScores] = useState<Record<string, StockAnalysis>>({});
@@ -91,8 +94,10 @@ ${eps.map((e: Record<string, unknown>) => { const act = e.actual ?? e.actualEarn
 
 Provide a concise earnings quality analysis (2-3 paragraphs): revenue trend, margin trajectory, EPS beat/miss pattern, and key risk or catalyst for next quarter.`;
 
+    setEarningsViol([]);
     try {
-      setEarningsAI(await aiAnalyze(prompt, 600));
+      const res = await aiAnalyzeAudited(prompt, { module: "earnings-analysis", ticker, dataBlock: prompt, maxTokens: 600 });
+      setEarningsAI(res.text); setEarningsViol(res.violations);
     } catch { setEarningsAI("Failed to generate earnings analysis."); }
     setEarningsLoading(false);
   }
@@ -114,6 +119,7 @@ Provide a concise earnings quality analysis (2-3 paragraphs): revenue trend, mar
     if (!data || !scores || !macro) return;
     setAiLoading(true);
     setAiError("");
+    setVerdictViol([]);
     try {
       const prompt = `You are a senior equity analyst. Provide a comprehensive investment verdict for ${ticker} based on the data below. Write 4-5 paragraphs covering: (1) business quality and moat, (2) financial health, (3) valuation, (4) macro context and risks, (5) final verdict with conviction level.
 
@@ -140,7 +146,8 @@ Moat score: ${moat?.score ?? "—"}/100 (${moatLabel})
 
 Be specific, analytical, and data-driven. Write in English.`;
 
-      setAiVerdict(await aiAnalyze(prompt, 1000));
+      const res = await aiAnalyzeAudited(prompt, { module: "investment-verdict", ticker, dataBlock: prompt, maxTokens: 1000 });
+      setAiVerdict(res.text); setVerdictViol(res.violations);
     } catch (e) {
       setAiError(e instanceof Error ? e.message : "AI analysis failed");
     }
@@ -194,8 +201,11 @@ Be specific, analytical, and data-driven. Write in English.`;
             <Sk w="95%" h={14} /><Sk w="80%" h={14} /><Sk w="88%" h={14} />
           </div>
         ) : earningsAI ? (
-          <div style={{ fontSize: "var(--sr-t-sm)", lineHeight: 1.8, color: "var(--sr-text-2)", whiteSpace: "pre-wrap", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)" }}>
-            {earningsAI}
+          <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)" }}>
+            <GroundedBadge violations={earningsViol} />
+            <div style={{ fontSize: "var(--sr-t-sm)", lineHeight: 1.8, color: "var(--sr-text-2)", whiteSpace: "pre-wrap" }}>
+              {earningsAI}
+            </div>
           </div>
         ) : (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", textAlign: "center", padding: "var(--sr-sp-6) 0" }}>
@@ -300,8 +310,11 @@ Be specific, analytical, and data-driven. Write in English.`;
         )}
 
         {aiVerdict && !aiLoading && (
-          <div style={{ fontSize: "var(--sr-t-base)", lineHeight: 1.8, color: "var(--sr-text-2)", whiteSpace: "pre-wrap", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)" }}>
-            {aiVerdict}
+          <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)" }}>
+            <GroundedBadge violations={verdictViol} />
+            <div style={{ fontSize: "var(--sr-t-base)", lineHeight: 1.8, color: "var(--sr-text-2)", whiteSpace: "pre-wrap" }}>
+              {aiVerdict}
+            </div>
           </div>
         )}
 

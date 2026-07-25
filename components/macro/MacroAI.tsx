@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import type { MacroState } from "@/lib/types";
-import { aiAnalyze } from "@/lib/proxy";
+import { aiAnalyzeAudited } from "@/lib/proxy";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { Sk } from "@/components/ui/Skeleton";
+import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { computeICHealthScore } from "@/lib/scoring";
 
 interface Props { macro: MacroState | null; loading: boolean; }
@@ -237,6 +238,7 @@ function buildHTMLReport(macro: MacroState, synthesis: string, date: string): st
 
 export default function MacroAI({ macro, loading }: Props) {
   const [synthesis, setSynthesis] = useState("");
+  const [synthViol, setSynthViol] = useState<(number | string)[]>([]);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
@@ -250,8 +252,8 @@ export default function MacroAI({ macro, loading }: Props) {
     setError("");
     try {
       const prompt = buildOPLAPrompt(macro);
-      const content = await aiAnalyze(prompt, 1800);
-      setSynthesis(content);
+      const res = await aiAnalyzeAudited(prompt, { module: "macro-synthesis", dataBlock: prompt, sources: ["macro_state"], maxTokens: 1800 });
+      setSynthesis(res.text); setSynthViol(res.violations);
       setSaved(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate synthesis");
@@ -391,11 +393,11 @@ export default function MacroAI({ macro, loading }: Props) {
             )}
 
             {synthesis && !generating && (
-              <div style={{
-                fontSize: "var(--sr-t-base)", lineHeight: 1.8, color: "var(--sr-text-2)",
-                whiteSpace: "pre-wrap", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)",
-              }}>
-                {synthesis}
+              <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-4)" }}>
+                <GroundedBadge violations={synthViol} />
+                <div style={{ fontSize: "var(--sr-t-base)", lineHeight: 1.8, color: "var(--sr-text-2)", whiteSpace: "pre-wrap" }}>
+                  {synthesis}
+                </div>
               </div>
             )}
 

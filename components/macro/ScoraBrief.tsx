@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
-import { aiAnalyze } from "@/lib/proxy";
+import { aiAnalyzeAudited } from "@/lib/proxy";
 import { buildAllocationBrief } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, type KbCard } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
+import { GroundedBadge } from "@/components/ui/GroundedBadge";
 
 interface Props { macro: MacroState | null; }
 
@@ -25,6 +26,7 @@ function render(text: string) {
 
 export default function ScoraBrief({ macro }: Props) {
   const [brief, setBrief] = useState("");
+  const [violations, setViolations] = useState<(number | string)[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [cards, setCards] = useState<KbCard[]>([]);
@@ -33,10 +35,12 @@ export default function ScoraBrief({ macro }: Props) {
 
   async function generate() {
     if (!macro) return;
-    setLoading(true); setError("");
+    setLoading(true); setError(""); setViolations([]);
     try {
       const kb = renderKb(selectCards(cards, ["allocation", "regime", "secular", "risk-on", "edge", "methodology"]));
-      setBrief(await aiAnalyze(buildAllocationBrief(macro, kb), 700));
+      const prompt = buildAllocationBrief(macro, kb);
+      const res = await aiAnalyzeAudited(prompt, { module: "allocation-brief", dataBlock: prompt, sources: ["macro_state", ...(kb ? ["kb"] : [])], maxTokens: 700 });
+      setBrief(res.text); setViolations(res.violations);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to generate brief");
     }
@@ -68,8 +72,11 @@ export default function ScoraBrief({ macro }: Props) {
         </div>
       )}
       {brief && !loading && (
-        <div style={{ fontSize: "var(--sr-t-sm)", lineHeight: 1.7, color: "var(--sr-text-2)", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
-          {render(brief)}
+        <div style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
+          <GroundedBadge violations={violations} />
+          <div style={{ fontSize: "var(--sr-t-sm)", lineHeight: 1.7, color: "var(--sr-text-2)" }}>
+            {render(brief)}
+          </div>
         </div>
       )}
       {!brief && !loading && !error && (

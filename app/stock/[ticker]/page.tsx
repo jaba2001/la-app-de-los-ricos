@@ -25,6 +25,10 @@ const StockSmartMoney   = dynamic(() => import("@/components/stock/StockSmartMon
 const StockScreener     = dynamic(() => import("@/components/stock/StockScreener"),     { loading: TabSk, ssr: false });
 const StockCompare      = dynamic(() => import("@/components/stock/StockCompare"),      { loading: TabSk, ssr: false });
 const StockSentiment    = dynamic(() => import("@/components/stock/StockSentiment"),    { loading: TabSk, ssr: false });
+const StockNews         = dynamic(() => import("@/components/stock/StockNews"),         { loading: TabSk, ssr: false });
+const AlertConfig       = dynamic(() => import("@/components/stock/AlertConfig"),       { ssr: false });
+const OptionsCalc       = dynamic(() => import("@/components/stock/OptionsCalc"),       { loading: TabSk, ssr: false });
+const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForecast"),   { ssr: false });
 
 const TABS = [
   { id: "overview",      label: "Overview" },
@@ -36,6 +40,8 @@ const TABS = [
   { id: "research",      label: "Research" },
   { id: "smartmoney",    label: "Smart Money" },
   { id: "sentiment",     label: "Sentiment" },
+  { id: "news",          label: "News" },
+  { id: "options",       label: "Options" },
   { id: "screener",      label: "Screener" },
   { id: "compare",       label: "Compare" },
 ];
@@ -612,6 +618,12 @@ export default function StockTickerPage() {
         macro_tilt: macroTiltData?.tilt ?? null,
         sector,
         reverse_dcf: rdcfSnapshot,
+        // P1-8 valuation multiples (raw ratios; roic & fcf_yield as %)
+        pe:        (mergedMetrics?.peRatioTTM as number) ?? null,
+        ev_ebitda: (mergedMetrics?.enterpriseValueOverEBITDATTM as number) ?? null,
+        pfcf:      (mergedMetrics?.priceToFreeCashFlowsRatioTTM as number) ?? null,
+        roic:      mergedMetrics?.roicTTM != null ? (mergedMetrics.roicTTM as number) * 100 : null,
+        fcf_yield: fcfYield != null ? fcfYield * 100 : null,
       }, { onConflict: "ticker,analysis_date,user_id" }).select().single();
 
       if (saved && live()) setSavedAnalysis(saved as StockAnalysis);
@@ -686,7 +698,8 @@ export default function StockTickerPage() {
       ["ROIC %", data.metrics?.roicTTM != null ? ((data.metrics.roicTTM as number)*100).toFixed(1) : ""],
       ["Net Debt/EBITDA", String(data.metrics?.netDebtToEBITDATTM ?? "")],
     ];
-    const csv = rows.map(([k, v]) => `"${k}","${v}"`).join("\n");
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`; // RFC-4180 quote-escaping
+    const csv = rows.map(([k, v]) => `${esc(k)},${esc(v)}`).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
@@ -781,7 +794,11 @@ export default function StockTickerPage() {
         {/* Sub-tabs */}
         <div style={{ padding: "0 var(--sr-sp-6)", display: "flex", gap: "var(--sr-sp-1)", height: "var(--sr-subnav-h)", alignItems: "center", overflowX: "auto" }}>
           {TABS.map(t => (
-            <button key={t.id} className={`subtab ${activeTab === t.id ? "active" : ""}`} onClick={() => setActiveTab(t.id)}>
+            <button
+              key={t.id}
+              className={`subtab ${activeTab === t.id ? "active" : ""}`}
+              onClick={(e) => { setActiveTab(t.id); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
+            >
               {t.label}
             </button>
           ))}
@@ -852,8 +869,18 @@ export default function StockTickerPage() {
                 ⚠ {failedApis} data source{failedApis > 1 ? "s" : ""} unavailable — some fields may show "—"
               </div>
             )}
-            {activeTab === "overview"     && <StockOverview    data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />}
-            {activeTab === "fundamentals" && <StockFundamentals data={data} loading={loading} ticker={ticker} />}
+            {activeTab === "overview"     && (
+              <>
+                <StockOverview data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />
+                {data && <AlertConfig ticker={ticker} price={quote?.price as number ?? null} ratingLabel={rating?.label ?? null} rdcfUpside={data?.rdcf?.upside ?? null} />}
+              </>
+            )}
+            {activeTab === "fundamentals" && (
+              <>
+                <StockFundamentals data={data} loading={loading} ticker={ticker} />
+                {data && <RevenueForecast data={data} />}
+              </>
+            )}
             {activeTab === "valuation"    && <StockValuation   data={data} macro={macro} loading={loading} ticker={ticker} />}
             {activeTab === "report"       && <StockReport      data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} ticker={ticker} />}
             {activeTab === "diligence"    && <DueDiligence     data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} ticker={ticker} />}
@@ -861,8 +888,10 @@ export default function StockTickerPage() {
             {activeTab === "research"     && <StockResearch    data={data} scores={scores} loading={loading} ticker={ticker} macro={macro} macroTilt={macroTilt} />}
             {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
             {activeTab === "sentiment"    && <StockSentiment   data={data} loading={loading} />}
+            {activeTab === "news"         && <StockNews        ticker={ticker} />}
+            {activeTab === "options"      && <OptionsCalc      ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} />}
             {activeTab === "screener"     && <StockScreener />}
-            {activeTab === "compare"      && <StockCompare     ticker={ticker} />}
+            {activeTab === "compare"      && <StockCompare     ticker={ticker} peers={data?.peers ?? []} />}
           </>
         )}
       </div>
