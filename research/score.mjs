@@ -2,6 +2,48 @@
 // exact production ScoreInputs → calcScores (no re-implementation of the formula).
 // Used by the PoC, the historical backtest, and the live cron — one code path.
 import { calcScores, calcFactorTilts, getMacroTilt } from "../lib/scoring.ts";
+import { altmanZ, accrualsRatio, dupont, piotroskiF } from "../lib/quality.ts";
+
+/** Point-in-time quality/credit rankers (Fase 7) from EDGAR bundles + raw price. `fPrev` is the
+ *  fundamentals bundle ~1yr earlier (for Piotroski). Returns scalars where HIGHER = better, so a
+ *  positive IC in the backtest means the signal predicts higher forward returns. */
+export function computeQualitySignals({ f, fPrev, rawPrice, sector }) {
+  const mcap = f.shares && rawPrice ? rawPrice * f.shares : null;
+  const totLiab = f.assets != null && f.equity != null ? f.assets - f.equity : null;
+  const serviceOrFinancial = /financial|real estate/i.test(sector || "");
+  const az = altmanZ({
+    workingCapital: f.curA != null && f.curL != null ? f.curA - f.curL : null,
+    retainedEarnings: f.retainedEarnings ?? null, ebit: f.oiTTM ?? null,
+    marketCap: mcap, bookEquity: f.equity ?? null, totalLiabilities: totLiab,
+    sales: f.revTTM ?? null, totalAssets: f.assets ?? null, serviceOrFinancial,
+  });
+  const acc = accrualsRatio(f.niTTM ?? null, f.ocfTTM ?? null, f.assets ?? null);
+  const dp = dupont({ netIncome: f.niTTM ?? null, sales: f.revTTM ?? null, totalAssets: f.assets ?? null, totalEquity: f.equity ?? null, pretaxIncome: f.pretaxIncome ?? null, ebit: f.oiTTM ?? null });
+  let pio = null;
+  if (fPrev) {
+    const r = piotroskiF({
+      roa: f.niTTM != null && f.assets ? f.niTTM / f.assets : null,
+      roaPrev: fPrev.niTTM != null && fPrev.assets ? fPrev.niTTM / fPrev.assets : null,
+      cfo: f.ocfTTM ?? null, netIncome: f.niTTM ?? null, totalAssets: f.assets ?? null,
+      leverage: f.debt != null && f.assets ? f.debt / f.assets : null,
+      leveragePrev: fPrev.debt != null && fPrev.assets ? fPrev.debt / fPrev.assets : null,
+      currentRatio: f.curA != null && f.curL ? f.curA / f.curL : null,
+      currentRatioPrev: fPrev.curA != null && fPrev.curL ? fPrev.curA / fPrev.curL : null,
+      shares: f.shares ?? null, sharesPrev: fPrev.shares ?? null,
+      grossMargin: f.gpTTM != null && f.revTTM ? f.gpTTM / f.revTTM : null,
+      grossMarginPrev: fPrev.gpTTM != null && fPrev.revTTM ? fPrev.gpTTM / fPrev.revTTM : null,
+      assetTurnover: f.revTTM != null && f.assets ? f.revTTM / f.assets : null,
+      assetTurnoverPrev: fPrev.revTTM != null && fPrev.assets ? fPrev.revTTM / fPrev.assets : null,
+    });
+    pio = r ? r.score : null;
+  }
+  return {
+    altmanZ: az ? az.z : null,          // higher = safer
+    accrualsQ: acc ? -acc.ratio : null, // negate → higher = better earnings quality
+    dupontRoe: dp ? dp.roe3 : null,     // higher = better
+    piotroski: pio,                     // higher = stronger
+  };
+}
 
 /** Assemble ScoreInputs from a fundamentalsAsOf() bundle + raw price + momentum + sector. */
 export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {

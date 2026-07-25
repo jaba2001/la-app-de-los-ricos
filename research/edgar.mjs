@@ -189,6 +189,9 @@ export async function fundamentalsAsOf(cik, asOf) {
     curA: I(["AssetsCurrent"]), curL: I(["LiabilitiesCurrent"]),
     cash: I(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"]),
     debt: (ltd ?? 0) + (ltdC ?? 0),
+    // Fase 7 additions for the quality/credit rankers (Altman Z, DuPont 5-factor).
+    retainedEarnings: I(["RetainedEarningsAccumulatedDeficit"]),
+    pretaxIncome: F(["IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest", "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments"])?.val ?? null,
     shares: sharesAsOf(fj, asOf),
     asOfLatestFiling: rev?.latestFiled ?? ni?.latestFiled ?? null,
   };

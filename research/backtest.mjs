@@ -12,7 +12,7 @@ import { fileURLToPath } from "url";
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, fwdReturn, momentum, hasPriceAt } from "./prices.mjs";
 import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
-import { scoreStock } from "./score.mjs";
+import { scoreStock, computeQualitySignals } from "./score.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { buildCorrEngine, corrAsOf } from "./correlation.mjs";
 
@@ -87,13 +87,18 @@ for (const date of dates) {
     // growth (from the production sub-scores). Both are pure rankers for the IC test.
     const mom121 = await fwdReturn(t, addMonths(date, -12), addMonths(date, -1));
     const traj = (mom121 ?? 0) + 0.4 * (mom.m6 ?? 0) + 1.2 * (scores.growth ?? 0);
+    // Fase 7 — point-in-time quality/credit rankers (need last-year's bundle for Piotroski).
+    const fPrev = await fundamentalsAsOf(cik, addMonths(date, -12));
+    const q = computeQualitySignals({ f, fPrev, rawPrice: raw, sector });
     const fwd = {}, alpha = {};
     for (const m of HORIZONS) { const r = await fwdReturn(t, date, addMonths(date, m)); const s = await spyFwd(date, m); fwd[m] = r; alpha[m] = r != null && s != null ? r - s : null; }
     // A0 — store the individual sub-scores so we can measure each factor's IC by regime
     // (the input to the A5 IC-weighted ensemble). value/health/momentum/growth are the
-    // production factors; mom121 is the pure price-momentum ranker.
+    // production factors; mom121 is the pure price-momentum ranker; the quality/credit
+    // rankers (Fase 7) are measured alongside them.
     rows.push({ date, t, ic, mom: mom121, traj, sector, regime: macro.regime_id, fwd, alpha,
-      f_value: scores.value ?? null, f_health: scores.health ?? null, f_momentum: scores.momentum ?? null, f_growth: scores.growth ?? null });
+      f_value: scores.value ?? null, f_health: scores.health ?? null, f_momentum: scores.momentum ?? null, f_growth: scores.growth ?? null,
+      altmanZ: q.altmanZ, accrualsQ: q.accrualsQ, dupontRoe: q.dupontRoe, piotroski: q.piotroski });
   }
 }
 console.log(`  scored ${rows.length} name-months\n`);
@@ -223,6 +228,11 @@ if (corrDates.length >= 9) {
     ["momentum", (r) => r.f_momentum],
     ["growth",   (r) => r.f_growth],
     ["mom12_1",  (r) => r.mom],
+    // Fase 7 quality/credit rankers (higher = better for all).
+    ["altmanZ",   (r) => r.altmanZ],
+    ["accrualsQ", (r) => r.accrualsQ],
+    ["dupontRoe", (r) => r.dupontRoe],
+    ["piotroski", (r) => r.piotroski],
   ];
   const factorIC = {}; // { factor: [icLow, icMid, icHigh] }
   const bucketList = corrBuckets();
