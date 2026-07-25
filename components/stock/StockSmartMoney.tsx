@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { supabase } from "@/lib/supabase";
+import { computeSmartMoneySignal } from "@/lib/smartMoney";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
@@ -43,6 +44,9 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
     ((b.date ?? b.transactionDate) as string ?? "").localeCompare((a.date ?? a.transactionDate) as string ?? "")
   );
 
+  // Net smart-money read + TradeVision-style buckets, computed from the data already loaded.
+  const signal = computeSmartMoneySignal(insiders, allCongress);
+
   // Sector Relative Strength
   const tickCl   = closes(data?.history ?? []);
   const sectorCl = closes(data?.sectorEtfHistory ?? []);
@@ -59,8 +63,47 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
     return { label, tickRet, sectorRet, alpha };
   });
 
+  const toneColor = (tone: "pos" | "neg" | "neu") => tone === "pos" ? "var(--sr-pos)" : tone === "neg" ? "var(--sr-neg)" : "var(--sr-text-3)";
+
   return (
     <div className="animate-fade-in">
+      {/* Smart Money Signal — net read + buckets over insider/13-F/Congress (free-data, TradeVision-style) */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap" }}>
+          <div className="section-label" style={{ margin: 0 }}>Smart Money Signal — {ticker}</div>
+          <span className="sr-hint">Insider · 13-F · Congress · free data</span>
+        </div>
+        {loading ? <Sk w="100%" h={120} /> : (
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 240px) 1fr", gap: "var(--sr-sp-5)", alignItems: "stretch" }}>
+            {/* Net read */}
+            <div className="sr-tile" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, borderColor: `color-mix(in srgb, ${signal.color} 35%, transparent)`, background: `color-mix(in srgb, ${signal.color} 7%, var(--sr-surface-2))` }}>
+              <div className="sr-tile-label">Net read</div>
+              <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: signal.color, lineHeight: 1.1 }}>{signal.label}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
+                <span className="num" style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: signal.color }}>{signal.netScore > 0 ? "+" : ""}{signal.netScore}</span>
+                <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-3)", color: "var(--sr-text-2)", fontWeight: 600 }}>{signal.conviction} conviction</span>
+              </div>
+              <div className="sr-hint" style={{ marginTop: 4 }}>
+                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider · {signal.congress.buyCount}B / {signal.congress.sellCount}S congress
+                {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? ` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M` : ""}
+              </div>
+            </div>
+            {/* Buckets */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
+              {signal.highlights.map((h, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: `1px solid color-mix(in srgb, ${toneColor(h.tone)} 22%, transparent)` }}>
+                  <span style={{ flexShrink: 0, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(h.tone), minWidth: 108 }}>{h.label}</span>
+                  <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.5 }}>{h.detail}</span>
+                </div>
+              ))}
+              <div className="sr-hint" style={{ marginTop: 2 }}>
+                Net read weights open-market insider buys/sells (cluster buys strongest) + STOCK-Act disclosures. Not a recommendation.
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Sector Relative Strength */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>

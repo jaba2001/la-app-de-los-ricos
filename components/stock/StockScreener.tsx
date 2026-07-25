@@ -12,6 +12,15 @@ import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 
+// Data Explorer — optional metric columns the user can toggle on/off over the watchlist
+// (TIKR-style). Every metric is already computed & stored in sl_analyses; no new fetch.
+const EXTRA_COLS: { key: string; label: string; get: (a: StockAnalysis) => number | null }[] = [
+  { key: "score_val",    label: "Value",    get: a => (a.score_val    != null ? Number(a.score_val)    : null) },
+  { key: "score_hlth",   label: "Health",   get: a => (a.score_hlth   != null ? Number(a.score_hlth)   : null) },
+  { key: "score_mom",    label: "Momentum", get: a => (a.score_mom    != null ? Number(a.score_mom)    : null) },
+  { key: "score_growth", label: "Growth",   get: a => (a.score_growth != null ? Number(a.score_growth) : null) },
+];
+
 export default function StockScreener() {
   const { session } = useAuth();
   const { macro: macroState } = useMacroContext();
@@ -22,6 +31,7 @@ export default function StockScreener() {
   const [loading, setLoading] = useState(true);
   const [analyzingTickers, setAnalyzingTickers] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<"ic_score" | "score_total" | "macro_tilt">("ic_score");
+  const [extraCols, setExtraCols] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!session) return;
@@ -110,6 +120,12 @@ export default function StockScreener() {
         rating: rating.label,
         macro_tilt: tiltResult.tilt,
         sector,
+        // P1-8 valuation multiples (fcf_yield needs the cash-flow statement → null in the quick path)
+        pe:        (metrics?.peRatioTTM as number) ?? null,
+        ev_ebitda: (metrics?.enterpriseValueOverEBITDATTM as number) ?? null,
+        pfcf:      (metrics?.priceToFreeCashFlowsRatioTTM as number) ?? null,
+        roic:      metrics?.roicTTM != null ? (metrics.roicTTM as number) * 100 : null,
+        fcf_yield: null,
       };
 
       await supabase.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
@@ -149,6 +165,43 @@ export default function StockScreener() {
 
   const picking = stockPickingRegime(macroState?.implied_corr ?? null);
 
+  function toggleCol(key: string) {
+    setExtraCols(prev => {
+      const s = new Set(prev);
+      if (s.has(key)) s.delete(key); else s.add(key);
+      return s;
+    });
+  }
+
+  // Export the full watchlist (all base + toggled metric columns) — the "Data Explorer" export.
+  function exportWatchlistCSV() {
+    const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`; // RFC-4180 quote-escaping
+    const cols = EXTRA_COLS.filter(c => extraCols.has(c.key));
+    const header = ["Ticker", "Sector", "Base Score", ...cols.map(c => c.label), "Macro Tilt", "Scora Score", "Rating", "As Of"];
+    const lines = [header.map(esc).join(",")];
+    for (const w of sorted) {
+      const a = analyses[w.ticker];
+      const tilt = macroState && a?.sector ? getMacroTilt(macroState, a.sector).tilt : (a?.macro_tilt != null ? Number(a.macro_tilt) : null);
+      const ic = a ? Number(a.score_total) + (tilt ?? 0) : null;
+      const cells = [
+        w.ticker,
+        a?.sector ?? "",
+        a ? Number(a.score_total).toFixed(0) : "",
+        ...cols.map(c => { const v = a ? c.get(a) : null; return v != null ? v.toFixed(0) : ""; }),
+        tilt != null ? String(tilt) : "",
+        ic != null ? ic.toFixed(0) : "",
+        a?.rating ?? "",
+        a?.analysis_date ?? "",
+      ];
+      lines.push(cells.map(esc).join(","));
+    }
+    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url; link.download = `scora_watchlist_${new Date().toISOString().slice(0, 10)}.csv`; link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="animate-fade-in">
       {/* Stock-picking regime — validated Phase 4 context: does selecting names pay right now? */}
@@ -171,7 +224,7 @@ export default function StockScreener() {
       </form>
 
       {/* Sort controls */}
-      <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)" }}>
+      <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)", flexWrap: "wrap", alignItems: "center" }}>
         <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>Sort by:</span>
         {([["ic_score", "Scora Score"], ["score_total", "Base Score"], ["macro_tilt", "Macro Tilt"]] as const).map(([key, label]) => (
           <button
@@ -182,6 +235,24 @@ export default function StockScreener() {
             {label}
           </button>
         ))}
+      </div>
+
+      {/* Data Explorer — toggle metric columns + export */}
+      <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap", alignItems: "center" }}>
+        <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>Columns:</span>
+        {EXTRA_COLS.map(c => (
+          <button key={c.key} className={`subtab ${extraCols.has(c.key) ? "active" : ""}`} onClick={() => toggleCol(c.key)}>
+            {extraCols.has(c.key) ? "✓ " : "+ "}{c.label}
+          </button>
+        ))}
+        {watchlist.length > 0 && (
+          <button
+            onClick={exportWatchlistCSV}
+            style={{ marginLeft: "auto", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)", padding: "5px 10px", cursor: "pointer" }}
+          >
+            ↓ Export CSV
+          </button>
+        )}
       </div>
 
       {/* Table */}
@@ -196,6 +267,9 @@ export default function StockScreener() {
           <table className="sr-table">
             <thead><tr>
               <th>Ticker</th><th>Sector</th><th style={{ textAlign: "right" }}>Base Score</th>
+              {EXTRA_COLS.filter(c => extraCols.has(c.key)).map(c => (
+                <th key={c.key} style={{ textAlign: "right" }}>{c.label}</th>
+              ))}
               <th style={{ textAlign: "right" }}>Macro Tilt</th><th style={{ textAlign: "right" }}>Scora Score</th>
               <th>Rating</th><th>As of</th><th></th>
             </tr></thead>
@@ -221,6 +295,10 @@ export default function StockScreener() {
                     </td>
                     <td style={{ color: "var(--sr-text-3)" }}>{a?.sector ?? "—"}</td>
                     <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_total).toFixed(0) : isAnalyzing ? "…" : "—"}</td>
+                    {EXTRA_COLS.filter(c => extraCols.has(c.key)).map(c => {
+                      const v = a ? c.get(a) : null;
+                      return <td key={c.key} style={{ textAlign: "right", color: "var(--sr-text-2)" }} className="num">{v != null ? v.toFixed(0) : isAnalyzing ? "…" : "—"}</td>;
+                    })}
                     <td style={{ textAlign: "right", color: tilt != null ? (tilt > 0 ? "var(--sr-pos)" : tilt < 0 ? "var(--sr-neg)" : "var(--sr-text-3)") : "var(--sr-text-3)" }} className="num">
                       {tilt != null ? `${tilt > 0 ? "+" : ""}${tilt}` : "—"}
                       {liveTilt != null && <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginLeft: 3 }} title="Live tilt from current macro">↻</span>}

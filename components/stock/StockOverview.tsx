@@ -427,7 +427,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 </div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
                   {chip(rt.rating)}
-                  <span className="num" style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>{rt.directional}/100 directional</span>
+                  <span className="num sr-hint">{rt.directional}/100 directional</span>
                 </div>
                 <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tf.summary} <span style={{ color: "var(--sr-text-2)" }}>{rt.note}</span></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>

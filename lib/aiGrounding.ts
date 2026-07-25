@@ -220,3 +220,36 @@ TRANSCRIPT EXCERPT (${ticker}${transcript.length > 16000 ? ", truncated" : ""}):
 ${text || "(no transcript provided)"}
 """`;
 }
+
+export interface NewsHeadline { headline: string; summary?: string; source?: string; datetime?: string }
+
+/**
+ * Grounded NEWS relevance filter (P1-5, TradeVision's "filter 10k stories/day" idea, done
+ * honestly). The model sorts the supplied headlines into market-moving vs noise and tags
+ * sentiment — using ONLY the headlines/summaries given, no outside knowledge, no invented
+ * facts or figures. This is the disciplined, cite-the-headline read that a generic AI news
+ * feed can't promise.
+ */
+export function buildNewsRelevance(ticker: string, items: NewsHeadline[]): string {
+  const list = items.slice(0, 20).map((it, i) => {
+    const when = it.datetime ? ` (${it.datetime})` : "";
+    const src = it.source ? ` [${it.source}]` : "";
+    const sum = it.summary ? ` — ${it.summary.slice(0, 220)}` : "";
+    return `${i + 1}.${src}${when} ${it.headline}${sum}`;
+  }).join("\n");
+  return `${GROUNDING_RULES}
+- Additional rule: use ONLY the headlines/summaries below. Do NOT add facts, figures, prices or events that are not in this list. If nothing is material, say so. Never invent a number.
+
+You are Scora's news analyst for ${ticker}. Classify the items and output exactly:
+## Market-moving
+- [short headline] — Bullish | Bearish | Neutral · why it matters (≤12 words, grounded in the item)
+## Noise
+- [short headline] — why it's not decision-relevant (≤10 words)
+## Net read
+[1-2 sentences: what, on balance, this news flow means for ${ticker}, strictly per the items]
+
+NEWS ITEMS (${ticker}, newest first):
+"""
+${list || "(no recent news)"}
+"""`;
+}
