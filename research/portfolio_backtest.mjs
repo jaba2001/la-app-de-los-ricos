@@ -14,6 +14,7 @@ import { regimeAsOf, preloadRegimeSeries } from "./regimeReal.mjs";
 import { scoreStock } from "./score.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { sharpe, sortino, maxDrawdown, calmar, valueAtRisk, conditionalVaR, beta as betaOf, informationRatio, jensenAlpha, annualVol } from "../lib/riskMetrics.ts";
+import { normCdf } from "../lib/quality.ts";
 
 const START = "2020-01-01";
 const COST_BPS = 10;
@@ -25,6 +26,33 @@ const addMonths = (d, n) => { const x = new Date(d); x.setUTCMonth(x.getUTCMonth
 const monthStarts = (from, to) => { const out = []; let d = from.slice(0, 8) + "01"; while (d <= to) { out.push(d); d = addMonths(d, 1); } return out; };
 const mean = (a) => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0);
 const pct = (v, d = 1) => (v == null ? "—" : `${v >= 0 ? "+" : ""}${v.toFixed(d)}`);
+
+// ── Significance helpers (Probabilistic / Deflated Sharpe — Bailey & López de Prado) ──
+function moments(r) {
+  const n = r.length, m = mean(r);
+  const sd = Math.sqrt(r.reduce((s, x) => s + (x - m) ** 2, 0) / (n - 1));
+  const sk = sd > 0 ? (r.reduce((s, x) => s + ((x - m) / sd) ** 3, 0) / n) : 0;
+  const ku = sd > 0 ? (r.reduce((s, x) => s + ((x - m) / sd) ** 4, 0) / n) : 3;
+  return { n, m, sd, srP: sd > 0 ? m / sd : 0, skew: sk, kurt: ku };
+}
+// Inverse standard-normal CDF (Acklam's rational approximation).
+function invNorm(p) {
+  if (p <= 0) return -Infinity; if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e1, 2.209460984245205e2, -2.759285104469687e2, 1.383577518672690e2, -3.066479806614716e1, 2.506628277459239e0];
+  const b = [-5.447609879822406e1, 1.615858368580409e2, -1.556989798598866e2, 6.680131188771972e1, -1.328068155288572e1];
+  const c = [-7.784894002430293e-3, -3.223964580411365e-1, -2.400758277161838e0, -2.549732539343734e0, 4.374664141464968e0, 2.938163982698783e0];
+  const d = [7.784695709041462e-3, 3.224671290700398e-1, 2.445134137142996e0, 3.754408661907416e0];
+  const pl = 0.02425;
+  if (p < pl) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if (p > 1 - pl) { const q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  const q = p - 0.5, r = q * q;
+  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+}
+/** Probabilistic Sharpe Ratio: P(true SR > srBench) given non-normality. srP/srBench per-period. */
+function psr(srP, T, skew, kurt, srBench = 0) {
+  const den = Math.sqrt(Math.max(1e-9, 1 - skew * srP + ((kurt - 1) / 4) * srP * srP));
+  return normCdf(((srP - srBench) * Math.sqrt(T - 1)) / den);
+}
 
 const FULL = process.argv.includes("--full");
 const USE_MACRO = process.argv.includes("--macro");
@@ -137,6 +165,7 @@ function bootstrapSharpe(port, block = 6, iters = 2000) {
 }
 
 const report = { generatedAt: new Date().toISOString(), mode: FULL ? "full-sp500-pit" : "curated", macro: USE_MACRO, universe: UNIVERSE.length, months: 0, sectorCap: SECTOR_CAP, byN: {} };
+const perConfig = [];
 console.log("  ── Top-N portfolio vs SPY (monthly, sector-capped, net of 10bps/side) ──");
 console.log("  N   Total%   SPY%   Sharpe  Sortino  Calmar   maxDD%   Jensenα%  β    IR    up/down cap    VaR95%  CVaR95%  Sharpe95%CI");
 for (const N of N_LIST) {
@@ -155,7 +184,40 @@ for (const N of N_LIST) {
     timing: tm?.timing ?? null, sharpeCI: boot,
   };
   report.byN[N] = row;
+  perConfig.push({ N, port, spy, mo: moments(port) });
   console.log(`  ${String(N).padEnd(3)} ${pct(tot).padStart(7)} ${pct(spyTot).padStart(6)}  ${row.sharpe.toFixed(2).padStart(5)}  ${row.sortino.toFixed(2).padStart(6)}  ${row.calmar.toFixed(2).padStart(6)}  ${row.maxDrawdown.toFixed(1).padStart(6)}  ${pct(row.jensenAlpha).padStart(7)}  ${row.beta.toFixed(2)}  ${row.informationRatio.toFixed(2).padStart(5)}  ${(row.upCapture ?? 0).toFixed(2)}/${(row.downCapture ?? 0).toFixed(2)}  ${row.var95.toFixed(1).padStart(6)}  ${row.cvar95.toFixed(1).padStart(6)}   ${boot ? `[${boot.lo.toFixed(2)},${boot.hi.toFixed(2)}]` : "—"}`);
+}
+
+// ── Significance / blindaje (PSR + Deflated Sharpe + OOS split) ──────────────────
+if (perConfig.length) {
+  const T = perConfig[0].mo.n;
+  const spyMo = moments(perConfig[0].spy);
+  // Deflation threshold SR0 from the N-sweep trials (Bailey-López de Prado).
+  const srps = perConfig.map((c) => c.mo.srP);
+  const varSR = srps.length > 1 ? srps.reduce((s, x) => s + (x - mean(srps)) ** 2, 0) / (srps.length - 1) : 0;
+  const M = srps.length, GAMMA = 0.5772156649;
+  const SR0 = M > 1 ? Math.sqrt(varSR) * ((1 - GAMMA) * invNorm(1 - 1 / M) + GAMMA * invNorm(1 - 1 / (M * Math.E))) : 0;
+  const best = perConfig.slice().sort((a, b) => b.mo.srP - a.mo.srP)[0];
+  const psrVsSpy = psr(best.mo.srP, T, best.mo.skew, best.mo.kurt, spyMo.srP);
+  const dsr = psr(best.mo.srP, T, best.mo.skew, best.mo.kurt, SR0);
+  // OOS split (train first 60% / test last 40%) for the best config.
+  const cut = Math.floor(best.port.length * 0.6);
+  const trainR = best.port.slice(0, cut), testR = best.port.slice(cut);
+  const trTot = (r) => (r.reduce((a, x) => a * (1 + x), 1) - 1) * 100;
+  report.significance = {
+    trials: M, srBenchMonthly: +spyMo.srP.toFixed(4), deflationThresholdSR0: +SR0.toFixed(4),
+    bestN: best.N, bestSharpeMonthly: +best.mo.srP.toFixed(4), skew: +best.mo.skew.toFixed(2), kurt: +best.mo.kurt.toFixed(2),
+    PSR_vs_SPY: +psrVsSpy.toFixed(3), DSR: +dsr.toFixed(3),
+    oos: { split: cut, trainSharpe: sharpe(trainR), testSharpe: sharpe(testR), trainTotal: +trTot(trainR).toFixed(1), testTotal: +trTot(testR).toFixed(1), spyTrainTotal: +trTot(best.spy.slice(0, cut)).toFixed(1), spyTestTotal: +trTot(best.spy.slice(cut)).toFixed(1) },
+  };
+  console.log(`\n  ── Significance / blindaje (best config N=${best.N}) ──`);
+  console.log(`  PSR vs SPY: ${(psrVsSpy * 100).toFixed(1)}%  (prob. the portfolio's true Sharpe beats SPY's — want >95%)`);
+  console.log(`  Deflated Sharpe (vs ${M}-trial threshold SR0=${SR0.toFixed(3)}/mo): ${(dsr * 100).toFixed(1)}%  (want >95% to call the Sharpe real)`);
+  console.log(`  OOS split @ ${cut}mo — train Sharpe ${sharpe(trainR).toFixed(2)} (port ${pct(trTot(trainR))}% vs SPY ${pct(trTot(best.spy.slice(0, cut)))}%) · test Sharpe ${sharpe(testR).toFixed(2)} (port ${pct(trTot(testR))}% vs SPY ${pct(trTot(best.spy.slice(cut)))}%)`);
+  report.verdict = (psrVsSpy > 0.95 && dsr > 0.95)
+    ? "ROBUST — selection portfolio's Sharpe beats SPY and survives the multi-trial deflation."
+    : "NOT ROBUST — the selection portfolio does NOT significantly beat SPY after PSR/deflation; the measured edge is in the regime allocator (C3), not stock selection.";
+  console.log(`  VERDICT: ${report.verdict}`);
 }
 
 writeFileSync(join(OUT, "portfolio_backtest.json"), JSON.stringify(report, null, 2));
