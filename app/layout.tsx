@@ -4,6 +4,9 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { MacroProvider } from "@/lib/MacroContext";
 import Nav from "@/components/Nav";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -37,6 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={hanken.variable}>
       <body>
         <AuthProvider>
+          {/* Renders nothing — mounts PostHog and keeps identity in sync. Must be
+              inside AuthProvider (reads the session). No-op without a PostHog key. */}
+          <AnalyticsProvider />
           <MacroProvider>
             <Nav />
             <main style={{
@@ -61,6 +67,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </footer>
           </MacroProvider>
         </AuthProvider>
+        {/* Delivery metrics (Core Web Vitals per route). Complements PostHog:
+            PostHog measures behaviour, these measure how fast it arrives. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

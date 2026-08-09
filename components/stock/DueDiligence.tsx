@@ -36,7 +36,14 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
   const [downside, setDownside] = useState(20);
 
   useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
-  useEffect(() => { fetchDocChunks(ticker).then(setDocs).catch(() => setDocs([])); }, [ticker]);
+  // Due diligence is looking for what could go wrong, so the retrieval query is weighted
+  // to the downside: dependencies, concentration, legal and governance exposure.
+  useEffect(() => {
+    fetchDocChunks(ticker, undefined, {
+      query: "risk factors litigation regulatory investigation dependence concentration single supplier customer covenant debt impairment going concern material weakness governance",
+      perSection: 4,
+    }).then(setDocs).catch(() => setDocs([]));
+  }, [ticker]);
 
   const dataBlock = useMemo(() => {
     if (!data) return "";

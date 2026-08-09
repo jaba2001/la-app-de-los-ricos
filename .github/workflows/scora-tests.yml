@@ -1,9 +1,13 @@
-name: Scora — tests (golden + red-team)
+name: Scora — tests (golden + red-team + build)
 
-# Continuous verification of the two guarantees that must never silently regress:
+# Continuous verification of the guarantees that must never silently regress:
 #  1. the pure calculation core (golden.test.mjs) — the math behind every score,
-#  2. the AI grounding gate (redteam_grounding.mjs) — "the AI can't hallucinate figures".
-# Both are headless, deterministic, need no secrets. Either failing fails the build.
+#  2. the AI grounding gate (redteam_grounding.mjs) — "the AI can't hallucinate figures",
+#  3. type safety, the CSS system, and that the app actually builds.
+#
+# (1) and (2) protect the moat and need no dependencies. (3) was previously verified by
+# hand on every batch ("tsc --noEmit EXIT 0" in the roadmap notes) — that's discipline,
+# not a guarantee, so it runs here now. All headless, deterministic, no secrets.
 on:
   push:
     branches: [main]
@@ -18,7 +22,26 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
+
+      # Steps 1-2 run without node_modules — they only need the type-stripping loader.
       - name: Golden tests (calculation core)
         run: node --experimental-strip-types --no-warnings scripts/golden.test.mjs
       - name: Red-team the grounding gate
         run: node --experimental-strip-types --no-warnings research/redteam_grounding.mjs
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: P2 maths self-tests
+        run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: CSS regression guard
+        run: node scripts/css-lint.mjs
+
+      # No secrets: lib/supabase.ts falls back to placeholder credentials and every
+      # integration (PostHog, Sentry, push, Resend) no-ops when its env var is absent.
+      # A build that needs secrets to compile would be the actual bug.
+      - name: Build
+        run: npx next build

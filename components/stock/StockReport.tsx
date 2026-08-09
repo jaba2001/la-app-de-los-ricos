@@ -34,7 +34,14 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
   const [docs, setDocs] = useState<KbDoc[]>([]);
 
   useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
-  useEffect(() => { fetchDocChunks(ticker).then(setDocs).catch(() => setDocs([])); }, [ticker]);
+  // A full research note needs balance: what the business is and how it earns, alongside
+  // the risks. Broader query and more passages per section than the thesis.
+  useEffect(() => {
+    fetchDocChunks(ticker, undefined, {
+      query: "business segments products customers competition market share revenue growth margin pricing capital expenditure risk factors outlook demand",
+      perSection: 4,
+    }).then(setDocs).catch(() => setDocs([]));
+  }, [ticker]);
 
   // ── Derive valuation inputs from already-fetched data (zero extra API calls) ──────
   const model = useMemo(() => {

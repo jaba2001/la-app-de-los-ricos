@@ -9,6 +9,7 @@ import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndic
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
 import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
+import { track } from "@/lib/analytics";
 import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
@@ -822,7 +823,7 @@ export default function StockTickerPage() {
             <button
               key={t.id}
               className={`subtab ${activeTab === t.id ? "active" : ""}`}
-              onClick={(e) => { setActiveTab(t.id); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
+              onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "stock", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
             >
               {t.label}
             </button>

@@ -8,6 +8,7 @@ import { calcScores, calcFactorTilts, getRating, getMacroTilt } from "@/lib/scor
 import { stockPickingRegime } from "@/lib/microScore";
 import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
+import { track } from "@/lib/analytics";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
@@ -56,6 +57,7 @@ export default function StockScreener() {
 
   async function quickAnalyze(ticker: string) {
     if (!session) return;
+    track("screener_run", { ticker, columns: extraCols.size, watchlist_size: watchlist.length });
     setAnalyzingTickers(prev => new Set([...prev, ticker]));
     try {
       const [quoteRes, profileRes, metricsRes, ratiosRes, growthRes, fhMetricRes] = await Promise.allSettled([
@@ -177,6 +179,7 @@ export default function StockScreener() {
   function exportWatchlistCSV() {
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`; // RFC-4180 quote-escaping
     const cols = EXTRA_COLS.filter(c => extraCols.has(c.key));
+    track("export_csv", { scope: "watchlist", rows: sorted.length, columns: cols.length });
     const header = ["Ticker", "Sector", "Base Score", ...cols.map(c => c.label), "Macro Tilt", "Scora Score", "Rating", "As Of"];
     const lines = [header.map(esc).join(",")];
     for (const w of sorted) {

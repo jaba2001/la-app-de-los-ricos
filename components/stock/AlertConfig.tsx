@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
+import { track } from "@/lib/analytics";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface TechState { aboveSma150: boolean; stage: number; baseBreakout: boolean; }
@@ -81,7 +82,7 @@ export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside, te
       user_id: session.user.id, ticker: ticker.toUpperCase(), kind, threshold: thr, active: true, one_shot: oneShot,
     });
     if (error) setError(error.message);
-    else { setThreshold(""); await load(); }
+    else { track("alert_created", { kind, one_shot: oneShot, has_threshold: thr != null }); setThreshold(""); await load(); }
   }
 
   async function toggleActive(a: Alert) {

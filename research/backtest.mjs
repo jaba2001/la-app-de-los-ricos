@@ -259,7 +259,11 @@ if (corrDates.length >= 9) {
   report.correlation.ensembleWeights = ensembleWeights;
   console.log("\n  A5 ensemble weights (∝ positive IC, per regime):");
   for (const rk of regimeKeys) console.log(`  ${rk.padEnd(5)} ${Object.entries(ensembleWeights[rk]).map(([k, v]) => `${k} ${(v * 100).toFixed(0)}%`).join("  ") || "(no factor with +IC)"}`);
-  writeFileSync(join(OUT, "signals_ic.json"), JSON.stringify({ generatedAt: new Date().toISOString(), universe: UNIVERSE.length, factorIC, ensembleWeights }, null, 2));
+  // `full` records whether this run used point-in-time S&P 500 membership. Without it a
+  // consumer can't tell a survivorship-BIASED curated run from the survivorship-free one,
+  // and the two produce very different IC structures (curated inflates momentum, deflates
+  // value). The golden drift guard refuses to compare against a non-full run because of it.
+  writeFileSync(join(OUT, "signals_ic.json"), JSON.stringify({ generatedAt: new Date().toISOString(), full: FULL, cap: FULL ? CAP : null, universe: UNIVERSE.length, factorIC, ensembleWeights }, null, 2));
   console.log(`  → wrote research/out/signals_ic.json`);
 
   // ── F4.2 · OOS gate for the A5 ensemble ────────────────────────────────────

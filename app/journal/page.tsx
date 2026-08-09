@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
+import { track } from "@/lib/analytics";
 import PortfolioOptimizer from "@/components/journal/PortfolioOptimizer";
 import ExposureAudit from "@/components/journal/ExposureAudit";
 import PositionSizer from "@/components/journal/PositionSizer";
@@ -102,7 +103,7 @@ export default function JournalPage() {
       thesis: f.thesis.trim() || null,
     });
     if (error) setError(error.message);
-    else { setF({ ...f, ticker: "", shares: "", price: "", thesis: "" }); await load(); }
+    else { track("journal_trade_added", { side: f.side, has_thesis: !!f.thesis.trim() }); setF({ ...f, ticker: "", shares: "", price: "", thesis: "" }); await load(); }
     setSaving(false);
   }
 

@@ -7,6 +7,7 @@ import { useMacroContext } from "@/lib/MacroContext";
 import dynamic from "next/dynamic";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
+import { track } from "@/lib/analytics";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import RegimeAlert from "@/components/RegimeAlert";
 import PushToggle from "@/components/PushToggle";
@@ -95,7 +96,7 @@ export default function MacroPage() {
           <button
             key={t.id}
             className={`subtab ${activeTab === t.id ? "active" : ""}`}
-            onClick={(e) => { setActiveTab(t.id); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
+            onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "macro", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
           >
             {t.label}
           </button>

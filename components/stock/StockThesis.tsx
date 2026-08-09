@@ -32,7 +32,15 @@ export default function StockThesis({ input, macro }: Props) {
   const [docs, setDocs] = useState<KbDoc[]>([]);
 
   useEffect(() => { fetchKbCards().then(setCards).catch(() => {}); }, []);
-  useEffect(() => { fetchDocChunks(input.ticker).then(setDocs).catch(() => setDocs([])); }, [input.ticker]);
+  // The thesis needs both sides: what drives the business (bull) and what threatens it
+  // (bear). Retrieving on both keeps the bear case grounded in real risk language rather
+  // than the boilerplate that opens Item 1A.
+  useEffect(() => {
+    fetchDocChunks(input.ticker, undefined, {
+      query: "competition competitive advantage demand growth drivers pricing power margin customer concentration supply risk decline loss of customers",
+      perSection: 3,
+    }).then(setDocs).catch(() => setDocs([]));
+  }, [input.ticker]);
 
   async function generate() {
     setLoading(true); setError(""); setViolations([]);

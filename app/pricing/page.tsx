@@ -1,6 +1,10 @@
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { track } from "@/lib/analytics";
+
+const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
 
 const TIERS = [
   {
@@ -28,6 +32,88 @@ const TIERS = [
     cta: "Notify me",
   },
 ];
+
+/**
+ * Pro-tier waitlist. Replaces a "Notify me" button that called router.push("/macro") and
+ * recorded nothing — the one place in the product where someone declares intent to pay.
+ * The count in sl_waitlist is the signal that decides whether Pro (and Stripe) is worth
+ * building at all, so it has to be captured before that decision, not after.
+ */
+function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; accessToken: string | null }) {
+  const [email, setEmail] = useState(defaultEmail);
+  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [error, setError] = useState("");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (state === "sending") return;
+    setState("sending"); setError("");
+    try {
+      // Send the session token rather than a user id in the body: the proxy attributes the
+      // row from the VERIFIED token (lib/auth.js optionalUser) and ignores any client-
+      // supplied id, since that would be an unauthenticated claim of identity. Logged-out
+      // visitors simply send no token and land with a null user_id, which is the point.
+      const res = await fetch(`${PROXY}/api/waitlist`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
+          email,
+          tier: "pro",
+          source: "pricing",
+          referrer: typeof document !== "undefined" ? document.referrer.slice(0, 200) : null,
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) { setState("error"); setError(body?.error || "Something went wrong. Try again."); return; }
+      track("waitlist_submitted");
+      setState("done");
+    } catch {
+      setState("error");
+      setError("Network error. Try again in a moment.");
+    }
+  }
+
+  if (state === "done") {
+    return (
+      <div style={{ marginTop: "var(--sr-sp-5)", fontSize: "var(--sr-t-sm)", color: "var(--sr-pos)", lineHeight: 1.5 }}>
+        ✓ You&apos;re on the list. We&apos;ll email you once — when there&apos;s something real to try.
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} style={{ marginTop: "var(--sr-sp-5)", display: "flex", flexDirection: "column", gap: 8 }}>
+      <input
+        type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com" aria-label="Email for the Pro waitlist"
+        style={{
+          width: "100%", borderRadius: "var(--sr-radius)", padding: "9px 12px",
+          fontSize: "var(--sr-t-sm)", background: "var(--sr-surface-2)",
+          border: "1px solid var(--sr-border)", color: "var(--sr-text)",
+        }}
+      />
+      <button
+        type="submit" disabled={state === "sending"}
+        style={{
+          width: "100%", borderRadius: "var(--sr-radius)", padding: "10px 0",
+          fontSize: "var(--sr-t-sm)", fontWeight: 700,
+          cursor: state === "sending" ? "default" : "pointer",
+          background: "var(--sr-amber)", color: "#0a1120", border: "none",
+          opacity: state === "sending" ? 0.6 : 1,
+        }}
+      >
+        {state === "sending" ? "Adding…" : "Notify me"}
+      </button>
+      {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4 }}>{error}</div>}
+      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
+        One email when Pro launches. No newsletter, no sharing.
+      </div>
+    </form>
+  );
+}
 
 export default function Pricing() {
   const { session } = useAuth();
@@ -62,11 +148,17 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <button onClick={go} style={{
-              width: "100%", marginTop: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", padding: "10px 0", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer",
-              background: t.highlight ? "var(--sr-amber)" : "var(--sr-surface-2)", color: t.highlight ? "#0a1120" : "var(--sr-text)",
-              border: t.highlight ? "none" : "1px solid var(--sr-border)",
-            }}>{t.cta}</button>
+            {/* Free tier keeps the straight CTA into the app. Pro captures the email —
+                it's the only intent-to-pay signal the product ever gets. */}
+            {t.name === "Pro" ? (
+              <WaitlistForm defaultEmail={session?.user?.email ?? ""} accessToken={session?.access_token ?? null} />
+            ) : (
+              <button onClick={go} style={{
+                width: "100%", marginTop: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", padding: "10px 0", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer",
+                background: t.highlight ? "var(--sr-amber)" : "var(--sr-surface-2)", color: t.highlight ? "#0a1120" : "var(--sr-text)",
+                border: t.highlight ? "none" : "1px solid var(--sr-border)",
+              }}>{t.cta}</button>
+            )}
           </div>
         ))}
       </div>

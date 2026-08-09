@@ -1,4 +1,6 @@
 "use client";
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 export default function Error({
   error,
@@ -7,6 +9,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // This boundary already showed the user a good error page; what it never did was
+  // tell US. Without this, a 3am crash on /stock/NVDA is invisible.
+  useEffect(() => { Sentry.captureException(error); }, [error]);
+
   return (
     <div style={{
       minHeight: "80vh", display: "flex", alignItems: "center", justifyContent: "center",

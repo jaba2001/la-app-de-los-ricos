@@ -454,15 +454,30 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   }
 
   // Same guard for the A5 ensemble weights vs the latest measured signals_ic.json.
+  //
+  // ONLY comparable against a SURVIVORSHIP-FREE run. ENSEMBLE_WEIGHTS were derived from
+  // `backtest.mjs --full 120` (point-in-time S&P 500 membership); the default CURATED
+  // universe is survivorship-biased by construction — it keeps only names still listed
+  // today, which inflates momentum IC and deflates value IC. Comparing the two produces
+  // large, meaningless "drift" (a 2026-07-26 curated 43-name run reported mid.value 0.03
+  // vs the shipped 0.99) and would pressure someone into overwriting good weights with
+  // biased ones. So: skip unless the artifact says it came from a --full run.
   const icPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "signals_ic.json");
   if (existsSync(icPath)) {
-    const measured = JSON.parse(readFileSync(icPath, "utf8")).ensembleWeights ?? {};
+    const icRun = JSON.parse(readFileSync(icPath, "utf8"));
+    const measured = icRun.ensembleWeights ?? {};
+    // `full` is absent on artifacts written before this flag existed — treat unknown
+    // provenance as not comparable rather than assuming it's fine.
+    if (icRun.full !== true) {
+      console.log(`  … ensemble drift check skipped: signals_ic.json is not a --full run (universe ${icRun.universe ?? "?"}, full=${icRun.full ?? "unknown"}). Re-run: node --experimental-strip-types research/backtest.mjs --full 120`);
+    } else {
     for (const rk of ["low", "mid", "high"]) {
       const shipped = ENSEMBLE_WEIGHTS[rk] ?? {}, meas = measured[rk] ?? {};
       const factors = new Set([...Object.keys(shipped), ...Object.keys(meas)]);
       for (const f of factors) {
         ok(Math.abs((shipped[f] ?? 0) - (meas[f] ?? 0)) <= 0.05, `ensemble drift: ${rk}.${f} shipped ${(shipped[f] ?? 0)} vs measured ${(meas[f] ?? 0)}`);
       }
+    }
     }
   }
 }
