@@ -6,6 +6,7 @@
 // SUPABASE_SERVICE_KEY, FMP_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
 import webpush from "web-push";
 import { crossedUpSma150, baseBreakoutConfirmed, trendStage } from "../../../../lib/technicals.js";
+import { assertCron, pgv } from '../../../../lib/cron.js';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,7 +57,7 @@ function triggered(kind, threshold, price) {
 }
 
 export async function GET(request) {
-  if (request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`) return json({ error: "Unauthorized" }, 401);
+  const denied = assertCron(request); if (denied) return denied;
   if (!KEY || !SB) return json({ error: "Supabase not configured" }, 500);
   if (!process.env.FMP_KEY) return json({ error: "FMP_KEY missing" }, 500);
   const pushReady = !!(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
@@ -79,7 +80,7 @@ export async function GET(request) {
   const subsCache = {};
   async function subsFor(userId) {
     if (subsCache[userId]) return subsCache[userId];
-    const r = await fetch(`${SB}/rest/v1/push_subscriptions?user_id=eq.${userId}&select=endpoint,p256dh,auth`, { headers: sbHeaders });
+    const r = await fetch(`${SB}/rest/v1/push_subscriptions?user_id=eq.${pgv(userId)}&select=endpoint,p256dh,auth`, { headers: sbHeaders });
     const s = r.ok ? await r.json() : [];
     return (subsCache[userId] = Array.isArray(s) ? s : []);
   }
@@ -93,7 +94,7 @@ export async function GET(request) {
 
     // mark fired (so the next run dedupes even if push isn't configured yet). one-shot alerts
     // auto-pause (active=false) so they never re-fire; recurring ones re-arm after 24h.
-    await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${a.id}`, {
+    await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
       method: "PATCH",
       headers: { ...sbHeaders, Prefer: "return=minimal" },
       body: JSON.stringify({ last_triggered_at: new Date().toISOString(), last_value: price, ...(a.one_shot ? { active: false } : {}) }),
@@ -141,7 +142,7 @@ export async function GET(request) {
         const prev = a.last_value != null ? Number(a.last_value) : null;
         if (prev == null) {
           // first observation → record silently
-          await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${a.id}`, { method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" }, body: JSON.stringify({ last_value: st }) }).catch(() => {});
+          await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, { method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" }, body: JSON.stringify({ last_value: st }) }).catch(() => {});
           continue;
         }
         if (st !== prev) { fire = true; msg = `changed trend stage (${prev} → ${st})`; patch = { last_value: st }; }
@@ -149,7 +150,7 @@ export async function GET(request) {
       if (!fire) continue;
       techFired++;
 
-      await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${a.id}`, {
+      await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
         method: "PATCH",
         headers: { ...sbHeaders, Prefer: "return=minimal" },
         body: JSON.stringify({ last_triggered_at: new Date().toISOString(), ...patch, ...(a.one_shot ? { active: false } : {}) }),

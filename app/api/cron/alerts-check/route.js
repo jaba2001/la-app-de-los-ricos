@@ -5,6 +5,7 @@
 // cualquier usuario autenticado las vea). Dedupe: no re-emite el mismo
 // alert_type si ya hay uno en las últimas 24h.
 import { sendEmail, alertEmailHtml } from '../../../../lib/email.js';
+import { assertCron, pgv } from '../../../../lib/cron.js';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -23,7 +24,7 @@ async function fetchObs(seriesId) {
 
 async function alreadyAlertedToday(alertType) {
   const since = new Date(Date.now() - 86400000).toISOString();
-  const url = `${process.env.SUPABASE_URL}/rest/v1/alerts_log?alert_type=eq.${alertType}&triggered_at=gte.${since}&user_id=is.null&select=id&limit=1`;
+  const url = `${process.env.SUPABASE_URL}/rest/v1/alerts_log?alert_type=eq.${pgv(alertType)}&triggered_at=gte.${pgv(since)}&user_id=is.null&select=id&limit=1`;
   const r = await fetch(url, {
     headers: {
       apikey: process.env.SUPABASE_SERVICE_KEY,
@@ -50,9 +51,7 @@ async function insertAlert(row) {
 }
 
 export async function GET(request) {
-  if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const denied = assertCron(request); if (denied) return denied;
 
   const checks = [];
   const toInsert = [];

@@ -5,6 +5,7 @@
 // self-generated keypair, no third-party service. Env: CRON_SECRET, SUPABASE_URL,
 // SUPABASE_SERVICE_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
 import webpush from "web-push";
+import { assertCron } from '../../../../lib/cron.js';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,7 +32,7 @@ function alertFor(m) {
 }
 
 export async function GET(request) {
-  if (request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`) return json({ error: "Unauthorized" }, 401);
+  const denied = assertCron(request); if (denied) return denied;
   if (!KEY || !SB) return json({ error: "Supabase not configured" }, 500);
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return json({ ok: true, skipped: "VAPID not configured" }, 200);
 

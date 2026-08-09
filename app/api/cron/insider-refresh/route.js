@@ -3,13 +3,14 @@
 // so we build the market-wide leaderboard from FMP's stable API instead
 // (insider-trading/latest = recent Form 4s across all issuers). FMP_KEY is
 // already configured in this project's Vercel env for the /api/fmp proxy.
+import { assertCron } from '../../../../lib/cron.js';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 export async function GET(request) {
-  if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`)
-    return new Response('Unauthorized', { status: 401 });
+  const denied = assertCron(request); if (denied) return denied;
 
   if (!process.env.FMP_KEY)
     return new Response(JSON.stringify({ error: 'FMP_KEY missing' }), {

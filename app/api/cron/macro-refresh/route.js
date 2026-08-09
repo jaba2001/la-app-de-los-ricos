@@ -15,14 +15,13 @@
 // de scora) quedan intactas gracias a merge-duplicates. Mismo patrón de
 // auth/Supabase que los crons `13f-refresh` y `alerts-check`.
 import { buildMacroState } from '../../../../lib/macro.js';
+import { assertCron } from '../../../../lib/cron.js';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
-  if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const denied = assertCron(request); if (denied) return denied;
 
   if (!process.env.FRED_KEY) {
     return new Response(JSON.stringify({ error: 'FRED_KEY missing' }), {

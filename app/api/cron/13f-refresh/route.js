@@ -1,3 +1,5 @@
+import { assertCron } from '../../../../lib/cron.js';
+
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
@@ -43,9 +45,7 @@ async function fetchInfoTableXml(cikInt, accNo) {
 }
 
 export async function GET(request) {
-  if (request.headers.get('Authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const denied = assertCron(request); if (denied) return denied;
 
   const allRows = [];
   const errors = [];
