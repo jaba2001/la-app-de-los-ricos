@@ -1,10 +1,12 @@
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../lib/cache.js';
 
 export const runtime = 'edge';
 
+const SIMFIN_TTL = 43200; // 12 h — statements don't change intraday
 const BASE = 'https://backend.simfin.com/api/v3';
-const CORS = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
 const EMPTY = JSON.stringify({ income: [], balanceSheet: [], cashFlow: [], annualIncome: [], source: 'simfin' });
 
 // SimFin compact format: { columns: [...names], data: [[...row], ...] }
@@ -52,8 +54,9 @@ const ANNUAL    = new Set(['FY','ANNUAL','H1','H2']);
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request);
   if (authErr) return authErr;
-  const rl = await checkRateLimit('simfin', user.id, 5, 60);
+  const rl = await checkRateLimit('simfin', user.id, 5, 60, request);
   if (rl) return rl;
+  const CORS = corsHeaders(request, { 'Content-Type': 'application/json' });
 
   const sfKey = process.env.SIMFIN_KEY ?? '';
   if (!sfKey) {
@@ -67,6 +70,17 @@ export async function GET(request) {
   // Only handles European tickers (contain a dot, e.g. ASML.AS, SAP.XETRA)
   if (!sym || !sym.includes('.')) {
     return new Response(EMPTY, { status: 200, headers: CORS });
+  }
+
+  // 12 h shared entry — statements don't change intraday, and SimFin's free tier is the
+  // tightest quota of any upstream here (hence the 5/min rate limit above).
+  const key = cacheKey('simfin', sym, new URLSearchParams());
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: { ...CORS, 'Cache-Control': `public, max-age=${SIMFIN_TTL}, s-maxage=${SIMFIN_TTL}`, 'X-Scora-Cache': 'HIT' },
+    });
   }
 
   // Strip exchange suffix: ASML.AS → ASML, SAP.XETRA → SAP, SHEL.L → SHEL
@@ -166,21 +180,22 @@ export async function GET(request) {
       };
     });
 
+    const body = JSON.stringify({ income, balanceSheet, cashFlow, annualIncome, currency, source: 'simfin', ticker: baseTicker });
+    await cacheSet(key, { status: 200, body }, SIMFIN_TTL);
+
     return new Response(
-      JSON.stringify({ income, balanceSheet, cashFlow, annualIncome, currency, source: 'simfin', ticker: baseTicker }),
-      { status: 200, headers: { ...CORS, 'Cache-Control': 'public, max-age=43200, s-maxage=43200' } } // 12h — statements don't change intraday
+      body,
+      { status: 200, headers: { ...CORS, 'Cache-Control': `public, max-age=${SIMFIN_TTL}, s-maxage=${SIMFIN_TTL}`, 'X-Scora-Cache': 'MISS' } }
     );
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'SimFin fetch failed', detail: String(err) }), {
+    // Log the detail server-side; don't echo upstream internals back to the caller.
+    console.error('simfin fetch failed:', err);
+    return new Response(JSON.stringify({ error: 'SimFin fetch failed' }), {
       status: 502, headers: CORS,
     });
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  }});
+export async function OPTIONS(request) {
+  return preflight(request);
 }

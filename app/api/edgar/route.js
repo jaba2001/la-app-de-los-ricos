@@ -1,9 +1,12 @@
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../lib/cache.js';
 
 export const runtime = 'edge';
 
 const UA = 'ScoraMVP alealvarado804@gmail.com';
+const EDGAR_TTL = 86400; // 24 h — XBRL company facts only change when a filing lands
 // Module-level CIK map cache (persists while Edge instance is warm)
 let _map = null;
 
@@ -80,14 +83,14 @@ function addQ4(qFacts, aFacts) {
 
 const findVal = (arr, date) => arr.find(f => f.end === date)?.val ?? null;
 
-const CORS = { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' };
 const EMPTY = JSON.stringify({ income: [], balanceSheet: [], cashFlow: [], annualIncome: [] });
 
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request);
   if (authErr) return authErr;
-  const rl = await checkRateLimit('edgar', user.id, 5, 60);
+  const rl = await checkRateLimit('edgar', user.id, 5, 60, request);
   if (rl) return rl;
+  const CORS = corsHeaders(request, { 'Content-Type': 'application/json' });
 
   const url = new URL(request.url);
   const sym = (url.searchParams.get('symbol') ?? '').toUpperCase().trim();
@@ -95,6 +98,19 @@ export async function GET(request) {
   // European tickers (contain a dot) are not on EDGAR — return empty gracefully
   if (!sym || !/^[A-Z0-9]{1,10}$/.test(sym)) {
     return new Response(EMPTY, { status: 200, headers: { ...CORS, 'Cache-Control': 'public, max-age=3600, s-maxage=3600' } });
+  }
+
+  // Highest-value cache in the proxy: one call here fans out to 13 parallel XBRL
+  // requests against the SEC, which enforces fair-access limits (hence the tight 5/min
+  // rate limit above). 24 h TTL because company facts only change when a filing lands —
+  // same reasoning, and the same value, as the FMP statements endpoints.
+  const key = cacheKey('edgar', 'companyfacts', new URLSearchParams({ symbol: sym }));
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: { ...CORS, 'Cache-Control': `public, max-age=${EDGAR_TTL}, s-maxage=${EDGAR_TTL}`, 'X-Scora-Cache': 'HIT' },
+    });
   }
 
   try {
@@ -200,17 +216,22 @@ export async function GET(request) {
       };
     });
 
-    return new Response(JSON.stringify({ income, balanceSheet, cashFlow, annualIncome, source: 'edgar', cik }), {
+    const body = JSON.stringify({ income, balanceSheet, cashFlow, annualIncome, source: 'edgar', cik });
+    await cacheSet(key, { status: 200, body }, EDGAR_TTL);
+
+    return new Response(body, {
       status: 200,
-      headers: { ...CORS, 'Cache-Control': 'public, max-age=3600, s-maxage=3600' },
+      headers: { ...CORS, 'Cache-Control': `public, max-age=${EDGAR_TTL}, s-maxage=${EDGAR_TTL}`, 'X-Scora-Cache': 'MISS' },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'EDGAR fetch failed', detail: String(err) }), {
+    // Log the detail server-side; don't echo upstream internals back to the caller.
+    console.error('edgar fetch failed:', err);
+    return new Response(JSON.stringify({ error: 'EDGAR fetch failed' }), {
       status: 502, headers: CORS,
     });
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

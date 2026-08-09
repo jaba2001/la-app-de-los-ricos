@@ -4,8 +4,12 @@
 // the Metals cockpit as the honest "institutional positioning" read. Auth-gated + 6h cache.
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../lib/cache.js';
 
 export const runtime = 'edge';
+
+const COT_TTL = 21600; // 6 h — COT prints weekly (Friday)
 
 // CFTC contract-market codes → metal.
 const CODES = {
@@ -38,14 +42,22 @@ async function fetchCot(code) {
 
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('cot', user.id, 30, 60); if (rl) return rl;
+  const rl = await checkRateLimit('cot', user.id, 30, 60, request); if (rl) return rl;
 
   const market = (new URL(request.url).searchParams.get('market') || 'all').toLowerCase();
-  const headers = {
+  const headers = corsHeaders(request, {
     'Content-Type': 'application/json',
     'Cache-Control': 'public, max-age=21600, s-maxage=21600', // 6h — COT prints weekly (Fri)
-    'Access-Control-Allow-Origin': '*',
-  };
+  });
+
+  // COT prints once a week (Friday), so a 6 h shared cache is very safe — and `market=all`
+  // fans out to one CFTC request per metal, which is exactly what we don't want repeated
+  // per user.
+  const key = cacheKey('cot', market, new URLSearchParams());
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, { status: hit.status, headers: { ...headers, 'X-Scora-Cache': 'HIT' } });
+  }
 
   try {
     if (market === 'all') {
@@ -54,24 +66,21 @@ export async function GET(request) {
         const rows = await fetchCot(CODES[k].code);
         return [k, { market: k, name: CODES[k].name, unit: CODES[k].unit, rows }];
       }));
-      return new Response(JSON.stringify(Object.fromEntries(results)), { status: 200, headers });
+      const body = JSON.stringify(Object.fromEntries(results));
+      await cacheSet(key, { status: 200, body }, COT_TTL);
+      return new Response(body, { status: 200, headers: { ...headers, 'X-Scora-Cache': 'MISS' } });
     }
     const def = CODES[market];
     if (!def) return new Response(JSON.stringify({ error: 'Unknown market', market }), { status: 400, headers });
     const rows = await fetchCot(def.code);
-    return new Response(JSON.stringify({ market, name: def.name, unit: def.unit, rows }), { status: 200, headers });
+    const body = JSON.stringify({ market, name: def.name, unit: def.unit, rows });
+    await cacheSet(key, { status: 200, body }, COT_TTL);
+    return new Response(body, { status: 200, headers: { ...headers, 'X-Scora-Cache': 'MISS' } });
   } catch (e) {
     return new Response(JSON.stringify({ error: 'CFTC fetch failed', detail: String(e?.message ?? e) }), { status: 502, headers });
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

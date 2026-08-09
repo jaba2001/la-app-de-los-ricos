@@ -1,5 +1,9 @@
 import { requireUser }    from '../../../../lib/auth.js';
 import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../../lib/cache.js';
+
+const CONGRESS_TTL = 43200; // 12 h — STOCK Act disclosures lag 30-45 days by statute
 
 // Public datasets — no API key required (STOCK Act disclosures)
 const SENATE_URL = 'https://senate-stock-watcher-data.s3-us-east-2.amazonaws.com/aggregate/all_transactions.json';
@@ -22,14 +26,31 @@ export async function GET(request, { params }) {
   const { user, error: authErr } = await requireUser(request);
   if (authErr) return authErr;
 
-  const rl = await checkRateLimit('congress', user.id, 20, 60);
+  const rl = await checkRateLimit('congress', user.id, 20, 60, request);
   if (rl) return rl;
 
   const ticker = (params.ticker || '').toUpperCase().replace(/[^A-Z.\-]/g, '');
   if (!ticker || ticker.length > 8) {
     return new Response(JSON.stringify({ error: 'Invalid ticker' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+    });
+  }
+
+  // Each miss downloads the FULL Senate + House transaction dumps (multi-MB) just to keep
+  // the rows for one ticker. STOCK Act disclosures land on a 30-45 day statutory delay, so
+  // a 12 h shared entry is generous. `next: { revalidate }` on the fetches below only helps
+  // within a warm isolate; this survives across them and across users.
+  const key = cacheKey('congress', ticker, new URLSearchParams());
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=3600, s-maxage=${CONGRESS_TTL}`,
+        'X-Scora-Cache': 'HIT',
+      }),
     });
   }
 
@@ -90,23 +111,26 @@ export async function GET(request, { params }) {
 
   trades.sort((a, b) => b.date.localeCompare(a.date));
 
-  return new Response(JSON.stringify(trades.slice(0, 30)), {
+  const body = JSON.stringify(trades.slice(0, 30));
+  // Only cache when at least one chamber actually answered. An empty result is a normal,
+  // cacheable answer for most tickers (few names have congressional trades), but an empty
+  // result because BOTH dumps timed out is an outage — storing that for 12 h would keep
+  // serving "no trades" long after the sources came back.
+  const anySourceOk =
+    (senateRes.status === 'fulfilled' && senateRes.value.ok) ||
+    (houseRes.status === 'fulfilled' && houseRes.value.ok);
+  if (anySourceOk) await cacheSet(key, { status: 200, body }, CONGRESS_TTL);
+
+  return new Response(body, {
     status: 200,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=3600, s-maxage=43200',
-      'Access-Control-Allow-Origin': '*',
-    },
+      'Cache-Control': `public, max-age=3600, s-maxage=${CONGRESS_TTL}`,
+      'X-Scora-Cache': 'MISS',
+    }),
   });
 }
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

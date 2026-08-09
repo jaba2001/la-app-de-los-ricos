@@ -10,6 +10,7 @@
 // Returns {} on total failure so the caller shows "—" exactly as before (no regression).
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../lib/cors.js';
 
 export const runtime = 'edge';
 
@@ -52,35 +53,31 @@ async function fromFinra(symbol) {
   return null;
 }
 
-function json(obj, status, ttl) {
+function json(request, obj, status, ttl) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
       'Cache-Control': `public, max-age=${ttl}, s-maxage=${ttl}`,
-    },
+    }),
   });
 }
 
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('shortint', user.id, 20, 60); if (rl) return rl;
+  const rl = await checkRateLimit('shortint', user.id, 20, 60, request); if (rl) return rl;
 
   const url = new URL(request.url);
   const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
-  if (!symbol || !/^[A-Z.\-]{1,10}$/.test(symbol)) return json({ error: 'Invalid symbol' }, 400, 0);
+  if (!symbol || !/^[A-Z.\-]{1,10}$/.test(symbol)) return json(request, { error: 'Invalid symbol' }, 400, 0);
 
   let data = null;
   try { data = await fromNasdaq(symbol); } catch { /* fall through to FINRA */ }
   if (!data) { try { data = await fromFinra(symbol); } catch { /* give up gracefully */ } }
   // 6h cache; short interest only updates bi-monthly so this is very safe.
-  return json(data ?? {}, 200, 21600);
+  return json(request, data ?? {}, 200, 21600);
 }
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' },
-  });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

@@ -1,4 +1,8 @@
 import { requireUser } from '../../../../lib/auth.js';
+import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../../lib/cache.js';
+import * as Sentry from '@sentry/nextjs';
 
 export const runtime = 'edge';
 
@@ -98,6 +102,10 @@ function parseFinvizHtml(html) {
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request);
   if (authErr) return authErr;
+  // Scrapes finviz.com HTML: unbounded calls risk getting the egress IP blocked, so this
+  // is throttled tighter than the JSON APIs. 6h cache means the UI barely notices.
+  const rl = await checkRateLimit('finviz', user.id, 15, 60, request);
+  if (rl) return rl;
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
@@ -105,7 +113,22 @@ export async function GET(request) {
   if (!symbol || !/^[A-Z.\-]{1,15}$/.test(symbol)) {
     return new Response(JSON.stringify({ error: 'Invalid symbol' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+    });
+  }
+
+  // Cache first — this route scrapes HTML and is the one most likely to get the egress
+  // IP blocked, so every avoided upstream call is worth more here than anywhere else.
+  const key = cacheKey('finviz', 'quote', url.searchParams);
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+        'X-Scora-Cache': 'HIT',
+      }),
     });
   }
 
@@ -124,45 +147,61 @@ export async function GET(request) {
       // Finviz blocked or unavailable — return empty gracefully
       return new Response('{}', {
         status: 200,
-        headers: {
+        headers: corsHeaders(request, {
           'Content-Type': 'application/json',
           'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
-          'Access-Control-Allow-Origin': '*',
-        },
+        }),
       });
     }
 
     const html = await res.text();
     const data = parseFinvizHtml(html);
+    const fields = Object.keys(data).length;
 
-    return new Response(JSON.stringify(data), {
+    // This route parses HTML with regexes against a site we don't control. When Finviz
+    // changes its markup the parser doesn't throw — it returns {} and the analysis simply
+    // scores with less data. That silent degradation is the same failure mode as the FMP
+    // field rename that already bit this project once, so make it loud.
+    //
+    // Threshold is ZERO fields, deliberately: ETFs and ADRs legitimately return only a
+    // handful of fundamentals, so any "too few fields" rule would cry wolf. Zero is
+    // unambiguous. htmlChars separates the two causes — short means we were served a
+    // block/captcha page, long means the markup changed.
+    if (fields === 0) {
+      try {
+        Sentry.captureMessage('finviz parse returned no fields — markup change or block page', {
+          level: 'warning',
+          tags: { subsystem: 'finviz-scrape' },
+          extra: { symbol, htmlChars: html.length },
+        });
+      } catch { /* never break the response */ }
+    }
+
+    const body = JSON.stringify(data);
+    // Never cache a degraded parse: 6 h of {} would freeze the outage in place long
+    // after Finviz recovered.
+    if (fields > 0) await cacheSet(key, { status: 200, body }, CACHE_TTL);
+
+    return new Response(body, {
       status: 200,
-      headers: {
+      headers: corsHeaders(request, {
         'Content-Type': 'application/json',
         'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
-        'Access-Control-Allow-Origin': '*',
-      },
+        'X-Scora-Cache': 'MISS',
+      }),
     });
   } catch {
     // Network error — return empty gracefully, never fail the analysis
     return new Response('{}', {
       status: 200,
-      headers: {
+      headers: corsHeaders(request, {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=300, s-maxage=300',
-        'Access-Control-Allow-Origin': '*',
-      },
+      }),
     });
   }
 }
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

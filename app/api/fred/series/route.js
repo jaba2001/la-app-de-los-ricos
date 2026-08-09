@@ -1,5 +1,6 @@
 import { requireUser } from '../../../../lib/auth.js';
 import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../../lib/cors.js';
 
 export const runtime = 'edge';
 
@@ -7,16 +8,20 @@ const VALID_SERIES = /^[A-Z0-9_]{2,30}$/;
 
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('fred', user.id, 10, 60); if (rl) return rl;
+  const rl = await checkRateLimit('fred', user.id, 10, 60, request); if (rl) return rl;
+  const json = (obj, status) => new Response(JSON.stringify(obj), {
+    status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+  });
+
   const url = new URL(request.url);
   const seriesId = url.searchParams.get('series_id');
 
   if (!seriesId || !VALID_SERIES.test(seriesId)) {
-    return new Response(JSON.stringify({error:'Invalid series_id'}), {status:400, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Invalid series_id' }, 400);
   }
 
   if (!process.env.FRED_KEY) {
-    return new Response(JSON.stringify({error:'Server misconfigured: FRED_KEY missing'}), {status:500, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Server misconfigured: FRED_KEY missing' }, 500);
   }
 
   const upstream = new URL('https://api.stlouisfed.org/fred/series/observations');
@@ -34,14 +39,13 @@ export async function GET(request) {
   const body = await res.text();
   return new Response(body, {
     status: res.status,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
       'Cache-Control': 'public, max-age=3600, s-maxage=3600',
-      'Access-Control-Allow-Origin': '*',
-    },
+    }),
   });
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' }});
+export async function OPTIONS(request) {
+  return preflight(request);
 }

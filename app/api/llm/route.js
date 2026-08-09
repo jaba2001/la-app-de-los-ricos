@@ -8,6 +8,7 @@
 //        GEMINI_KEY, GROQ_KEY, optional GEMINI_MODEL / GROQ_MODEL.
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../lib/cors.js';
 
 export const runtime = 'edge';
 const MAX_BODY_BYTES = 50 * 1024;
@@ -49,13 +50,16 @@ async function callProvider(name, prompt, maxTokens) {
 
 export async function POST(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('llm', user.id, 5, 60); if (rl) return rl;
+  const rl = await checkRateLimit('llm', user.id, 5, 60, request); if (rl) return rl;
+  const json = (obj, status) => jsonFor(request, obj, status);
 
-  const cl = parseInt(request.headers.get('content-length') || '0', 10);
-  if (cl > MAX_BODY_BYTES) return json({ error: 'Payload too large', limit_bytes: MAX_BODY_BYTES }, 413);
+  // Measure the parsed body, not Content-Length: that header is caller-controlled and
+  // absent on chunked uploads, so trusting it let an unbounded payload through.
+  const raw = await request.text();
+  if (raw.length > MAX_BODY_BYTES) return json({ error: 'Payload too large', limit_bytes: MAX_BODY_BYTES }, 413);
 
   let body;
-  try { body = await request.json(); }
+  try { body = JSON.parse(raw); }
   catch { return json({ error: 'Invalid JSON' }, 400); }
 
   // Number.isFinite rejects NaN/Infinity (typeof NaN === 'number' would pass); floor ≥1
@@ -83,10 +87,12 @@ export async function POST(request) {
   return json({ content: [{ type: 'text', text }], provider: used }, 200);
 }
 
-function json(obj, status) {
-  return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+function jsonFor(request, obj, status) {
+  return new Response(JSON.stringify(obj), {
+    status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+  });
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } });
+export async function OPTIONS(request) {
+  return preflight(request, 'POST, OPTIONS');
 }

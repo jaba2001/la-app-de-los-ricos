@@ -1,5 +1,7 @@
 import { requireUser } from '../../../../lib/auth.js';
 import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../../lib/cache.js';
 
 export const runtime = 'edge';
 
@@ -14,33 +16,37 @@ const ALLOWED = new Set([
   'search','senate-trading','house-disclosure','insider-trading',
 ]);
 
+// A segment may only be a plain path atom. Without this, an encoded slash lets a caller
+// smuggle traversal past the allowlist ("quote%2F..%2F..%2Fother" passes startsWith
+// "quote/" and then new URL() normalises the ".." away), reaching any upstream endpoint
+// with our API key attached.
+const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
+
 export async function GET(request, { params }) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('fmp', user.id, 40, 60); if (rl) return rl;
-  const path = params.path.join('/');
+  const rl = await checkRateLimit('fmp', user.id, 40, 60, request); if (rl) return rl;
+  const json = (obj, status) => new Response(JSON.stringify(obj), {
+    status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+  });
+
+  const segments = params.path;
+  if (!segments.every(s => SAFE_SEGMENT.test(s) && s !== '..')) {
+    return json({ error: 'Invalid path' }, 400);
+  }
+  const path = segments.join('/');
   if (![...ALLOWED].some(p => path === p || path.startsWith(p + '/'))) {
-    return new Response(JSON.stringify({error:'Endpoint not allowed', path}), {status:403, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Endpoint not allowed', path }, 403);
   }
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
   if (symbol && !/^[A-Z.\-]{1,15}$/.test(symbol)) {
-    return new Response(JSON.stringify({error:'Invalid symbol'}), {status:400, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Invalid symbol' }, 400);
   }
 
   if (!process.env.FMP_KEY) {
-    return new Response(JSON.stringify({error:'Server misconfigured: FMP_KEY missing'}), {status:500, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Server misconfigured: FMP_KEY missing' }, 500);
   }
-
-  const fmpBase = path === 'news'
-    ? `https://financialmodelingprep.com/api/v3/stock_news`
-    : `https://financialmodelingprep.com/stable/${path}`;
-  const upstream = new URL(fmpBase);
-  for (const [k,v] of url.searchParams) upstream.searchParams.set(k, v);
-  upstream.searchParams.set('apikey', process.env.FMP_KEY);
-
-  const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
-  const body = await res.text();
 
   // Dynamic cache TTL by endpoint — financial statements change quarterly, prices are live
   const CACHE_TTL =
@@ -58,23 +64,43 @@ export async function GET(request, { params }) {
       ? 21600                  // 6 h    — analyst updates infrequent intraday
     : 3600;                    // 1 h    — sensible default for everything else
 
+  // Shared cache lookup. Deliberately AFTER requireUser + checkRateLimit so it can never
+  // be used to bypass auth or the cost guard — it only skips the upstream call.
+  const key = cacheKey('fmp', path, url.searchParams);
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+        'X-Scora-Cache': 'HIT',
+      }),
+    });
+  }
+
+  const fmpBase = path === 'news'
+    ? `https://financialmodelingprep.com/api/v3/stock_news`
+    : `https://financialmodelingprep.com/stable/${path}`;
+  const upstream = new URL(fmpBase);
+  for (const [k,v] of url.searchParams) upstream.searchParams.set(k, v);
+  upstream.searchParams.set('apikey', process.env.FMP_KEY);
+
+  const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
+  const body = await res.text();
+
+  await cacheSet(key, { status: res.status, body }, CACHE_TTL);
+
   return new Response(body, {
     status: res.status,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
       'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
-      'Access-Control-Allow-Origin': '*',
-    },
+      'X-Scora-Cache': 'MISS',
+    }),
   });
 }
 
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function OPTIONS(request) {
+  return preflight(request);
 }

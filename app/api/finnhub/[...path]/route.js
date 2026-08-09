@@ -1,5 +1,7 @@
 import { requireUser } from '../../../../lib/auth.js';
 import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { corsHeaders, preflight } from '../../../../lib/cors.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../../lib/cache.js';
 
 export const runtime = 'edge';
 
@@ -13,22 +15,66 @@ const ALLOWED = new Set([
   'stock/metric', 'stock/price-target',
 ]);
 
+// A segment may only be a plain path atom. Without this, an encoded slash lets a caller
+// smuggle traversal past the allowlist ("quote%2F..%2F..%2Fother" passes startsWith
+// "quote/" and then new URL() normalises the ".." away), reaching any upstream endpoint
+// with our API key attached.
+const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
+
 export async function GET(request, { params }) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('finnhub', user.id, 60, 60); if (rl) return rl;
-  const path = params.path.join('/');
+  const rl = await checkRateLimit('finnhub', user.id, 60, 60, request); if (rl) return rl;
+  const json = (obj, status) => new Response(JSON.stringify(obj), {
+    status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+  });
+
+  const segments = params.path;
+  if (!segments.every(s => SAFE_SEGMENT.test(s) && s !== '..')) {
+    return json({ error: 'Invalid path' }, 400);
+  }
+  const path = segments.join('/');
   if (![...ALLOWED].some(p => path === p || path.startsWith(p + '/'))) {
-    return new Response(JSON.stringify({error:'Endpoint not allowed', path}), {status:403, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Endpoint not allowed', path }, 403);
   }
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
   if (symbol && !/^[A-Z.\-:]{1,12}$/.test(symbol)) {
-    return new Response(JSON.stringify({error:'Invalid symbol'}), {status:400, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Invalid symbol' }, 400);
   }
 
   if (!process.env.FINNHUB_KEY) {
-    return new Response(JSON.stringify({error:'Server misconfigured: FINNHUB_KEY missing'}), {status:500, headers:{'Content-Type':'application/json'}});
+    return json({ error: 'Server misconfigured: FINNHUB_KEY missing' }, 500);
+  }
+
+  // Per-endpoint TTL. These MIRROR the values the FMP route already uses for the
+  // equivalent kind of data (profile 7d, filings/insider 24h, TTM metrics 12h, analyst
+  // 6h) rather than inventing a new freshness policy — Finnhub previously used a flat
+  // 60s for everything, which is right for a quote and needlessly strict for a company
+  // profile. Anything not listed keeps the original 60s.
+  const CACHE_TTL =
+    /^profile2/.test(path)
+      ? 604800                 // 7 d    — company profile is near-static
+    : /^(stock\/insider-transactions|stock\/insider-sentiment|stock\/financials-reported|stock\/transcripts|stock\/short-interest)/.test(path)
+      ? 86400                  // 24 h   — filings-derived, updates daily at best
+    : /^stock\/metric/.test(path)
+      ? 43200                  // 12 h   — TTM metrics
+    : /^(stock\/earnings|calendar\/earnings|stock\/recommendation|stock\/price-target)/.test(path)
+      ? 21600                  // 6 h    — analyst/earnings data
+    : 60;                      // 1 min  — quotes, news, everything else (unchanged)
+
+  // After requireUser + checkRateLimit, so the cache can never bypass either.
+  const key = cacheKey('finnhub', path, url.searchParams);
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+        'X-Scora-Cache': 'HIT',
+      }),
+    });
   }
 
   const upstream = new URL(`https://finnhub.io/api/v1/${path}`);
@@ -37,16 +83,19 @@ export async function GET(request, { params }) {
 
   const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
   const body = await res.text();
+
+  await cacheSet(key, { status: res.status, body }, CACHE_TTL);
+
   return new Response(body, {
     status: res.status,
-    headers: {
+    headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=60, s-maxage=60',
-      'Access-Control-Allow-Origin': '*',
-    },
+      'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+      'X-Scora-Cache': 'MISS',
+    }),
   });
 }
 
-export async function OPTIONS() {
-  return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' }});
+export async function OPTIONS(request) {
+  return preflight(request);
 }
