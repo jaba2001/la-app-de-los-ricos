@@ -35,10 +35,28 @@ jobs:
 
       - name: P2 maths self-tests
         run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
+      # Guards the filing-grounding path: chunking that loses no text, and a prompt budget
+      # that caps the whole block instead of re-truncating each passage (the original bug).
+      - name: Retrieval tests
+        run: node --experimental-strip-types --no-warnings scripts/retrieval.test.mjs
       - name: Typecheck
         run: npx tsc --noEmit
       - name: CSS regression guard
         run: node scripts/css-lint.mjs
+
+      # The 10-K section parser is pure heuristics over documents we don't control, so its
+      # failures are silent: you get a thesis grounded in the wrong paragraph, not an error.
+      # This runs the current parser and a frozen copy of the pre-2026-08-10 one over the
+      # same real filings and fails if the change lost ground.
+      #
+      # Six tickers, not all 28, because each one is an SEC download: NVDA (the over-broad
+      # NAV filter), AMAT (colon separator), DELL (em-dash separator), AMD (why a plain
+      # hyphen must NOT be a separator), CSCO (citation-aware terminator) and STX
+      # (earliest-wins selection). Between them they exercise every fix. If SEC is
+      # unreachable the harness skips those tickers and says so rather than failing the
+      # build. Run the full 28 locally before changing the parser.
+      - name: 10-K parser regression (subset)
+        run: node --experimental-strip-types --no-warnings research/parser_regression.mjs NVDA AMAT DELL AMD CSCO STX
 
       # No secrets: lib/supabase.ts falls back to placeholder credentials and every
       # integration (PostHog, Sentry, push, Resend) no-ops when its env var is absent.

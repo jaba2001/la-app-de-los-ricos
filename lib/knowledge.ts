@@ -7,6 +7,12 @@
 // KB of a few dozen cards); accumulate cards over time and it still works.
 // ─────────────────────────────────────────────────────────────────────────────
 import { supabase } from "./supabase";
+// Las partes PURAS del renderizado viven en ./filingRender para poder testearlas sin
+// arrastrar el cliente de Supabase (scripts/retrieval.test.mjs). Se reexportan aquí
+// para que los llamadores existentes no cambien.
+import { renderDocChunks, DEFAULT_FILING_QUERY, type KbDoc } from "./filingRender";
+export { renderDocChunks, DEFAULT_FILING_QUERY };
+export type { KbDoc };
 
 export interface KbCard { id: string; topic: string; claim: string; source: string; tags: string[]; weight: number; }
 
@@ -37,18 +43,7 @@ ${lines}`;
 // kb_docs holds Business / Risk Factors / MD&A sections pulled from SEC EDGAR (free) by
 // research/ingest_filings.mjs. The stock thesis retrieves the ticker's chunks and cites
 // them, so bull/bear points can be grounded in the actual filing, not model memory.
-export interface KbDoc { ticker: string; form: string; section: string; text: string; filed_date: string | null; fiscal_year: number | null; }
 
-/**
- * Default retrieval query, used when a caller has nothing more specific.
- *
- * This exists because the previous behaviour — take the first 1 500 chars of each section
- * — meant the model almost always received the boilerplate preamble of Item 1A rather than
- * any actual risk. These are the terms an analyst reads a 10-K FOR, so even the
- * "no context" path now returns substance instead of a header.
- */
-export const DEFAULT_FILING_QUERY =
-  "risk competition customers concentration demand pricing margin supply chain regulation litigation growth revenue";
 
 /**
  * Retrieve the filing passages relevant to `query` for this ticker.
@@ -94,33 +89,3 @@ export async function fetchDocChunks(
   return docs.sort((a, b) => (rank[a.section] ?? 9) - (rank[b.section] ?? 9));
 }
 
-/**
- * Render filing passages as a grounded block the model must cite.
- *
- * `budgetChars` caps the WHOLE block rather than each passage. Retrieval now returns
- * several ~900-char chunks per section, so a per-passage cap would re-introduce exactly
- * the truncation this replaced; what actually needs bounding is the prompt.
- * Passages arrive in relevance order, so trimming from the end drops the least relevant.
- */
-export function renderDocChunks(docs: KbDoc[], budgetChars = 9000): string {
-  if (!docs.length) return "";
-  const t = docs[0].ticker;
-  const parts: string[] = [];
-  let used = 0;
-  for (const d of docs) {
-    const fy = d.fiscal_year ? ` FY${d.fiscal_year}` : "";
-    const body = (d.text || "").trim();
-    if (!body) continue;
-    const block = `--- ${d.form}${fy} · ${d.section} ---\n${body}`;
-    if (used + block.length > budgetChars) {
-      const room = budgetChars - used;
-      if (room > 400) parts.push(block.slice(0, room)); // partial passage still beats none
-      break;
-    }
-    parts.push(block);
-    used += block.length;
-  }
-  if (!parts.length) return "";
-  return `COMPANY FILINGS — verbatim excerpts from ${t}'s latest SEC 10-K, selected as the passages most relevant to this analysis. Use these for company-specific facts and cite the section in parentheses, e.g. "(10-K, Risk Factors)". Do NOT use any knowledge about ${t} beyond these excerpts and the metrics provided; if a detail isn't here, say it's not in the filing.
-${parts.join("\n\n")}`;
-}

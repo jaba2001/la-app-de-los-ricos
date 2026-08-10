@@ -36,6 +36,11 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // There is a package-lock.json both here and in the repo root, so Next guesses at the
+  // workspace root and warns on every build. Pointing it at this project silences the
+  // warning and, more importantly, keeps build tracing scoped to the files this app
+  // actually uses instead of the whole parent tree.
+  outputFileTracingRoot: import.meta.dirname,
   async headers() {
     return [
       {

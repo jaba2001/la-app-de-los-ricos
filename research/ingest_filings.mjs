@@ -12,6 +12,7 @@ import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tickerToCik } from "./edgar.mjs";
+import { htmlToText, extractSections } from "./sectionParser.mjs";
 
 const UA = "Scora Research contact@scora.app"; // SEC requires a descriptive UA
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
@@ -32,7 +33,7 @@ const DEFAULT = [
 // standard preamble and the grounded thesis ended up citing the header instead of the
 // risks. Now the section is chunked and retrieved by relevance, so the store can hold the
 // real thing; the prompt still only ever receives the handful of chunks that matched.
-const MAX_SECTION = 60000;
+// El tope por sección (MAX_SECTION) lo aplica ./sectionParser.mjs, no este fichero.
 
 // Retrieval chunking. ~900 chars is a few paragraphs — big enough to carry a complete
 // risk or driver, small enough that an irrelevant chunk costs little context. The overlap
@@ -77,73 +78,12 @@ async function getText(url) {
 }
 async function getJSON(url) { const t = await getText(url); if (!t) return null; try { return JSON.parse(t); } catch { return null; } }
 
-// HTML → readable text: drop script/style/tables-of-numbers noise, tags → space,
-// decode the handful of entities EDGAR uses, collapse whitespace.
-function htmlToText(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;|&#160;|&#xa0;/gi, " ")
-    .replace(/&amp;/gi, "&").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
-    .replace(/&#8217;|&#x2019;|&rsquo;/gi, "’").replace(/&#8220;|&#8221;|&ldquo;|&rdquo;/gi, '"')
-    .replace(/&#8212;|&mdash;/gi, "—").replace(/&#8211;|&ndash;/gi, "–")
-    .replace(/&#\d+;|&[a-z]+;/gi, " ")
-    .replace(/[ \t ]+/g, " ")
-    .replace(/\s*\n\s*/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-// A "heading" match is a CROSS-REFERENCE ("…see Item 1A. Risk Factors of this Form 10-K",
-// "Item 1 Business and Note 15…"), not the real section title, when it's immediately
-// followed by citation language. Those must be rejected or they hijack the extraction.
-const XREF = /^\s*(of\s+(this|our)\b|in\s+(part|this|note)\b|and\s+note\b|and\s+legal\b|and\s+other\b|,|"|”|;|–|-|section\b|above\b|below\b|for\s+(a|additional|further)\b|of\s+the\s+notes)/i;
-// A real section body doesn't reference OTHER items, the TOC, or "this Form 10-K" in its
-// opening line — those markers mean we've matched a cross-reference sentence, not the title.
-const NAV = /(table of contents|in\s+part\s+i{1,2}\b|on\s+form\s*10-?k|in\s+this\s+annual\s+report|of\s+this\s+annual\s+report|financial\s+statements\s+included|notes\s+to\s+(consolidated|the)|item\s*[2-9][a-b]?\b)/i;
-
-// Pick the REAL section body, not a TOC entry, running header, or cross-reference.
-// Among every "Item X …" heading occurrence: reject cross-references (citation tail), then
-// keep the candidate whose body (up to the next section heading) is the LONGEST — the real
-// section is by far the longest run of prose; TOC/header matches have tiny gaps.
-function bestSection(text, startRe, endRes) {
-  const ms = [...text.matchAll(new RegExp(startRe.source, "gi"))];
-  if (!ms.length) return null;
-  const cands = [];
-  for (const m of ms) {
-    const s = m.index, headingEnd = s + m[0].length;
-    const before = text.slice(Math.max(0, s - 18), s);
-    if (/\b(in|see|to|under|within|refer\s+to)\s+$/i.test(before)) continue; // "…discussion in Item 7…" = a cross-reference mid-sentence, not a heading
-    const tail = text.slice(headingEnd, headingEnd + 140);
-    if (XREF.test(tail)) continue;                 // heading followed by citation language
-    if (NAV.test(tail.slice(0, 140))) continue;    // opening references another item / the TOC
-    const after = text.slice(headingEnd);
-    let e = after.length;
-    for (const er of endRes) { const mm = after.search(new RegExp(er.source, "i")); if (mm >= 0 && mm < e) e = mm; }
-    cands.push({ s, end: headingEnd + e, len: e });
-  }
-  if (!cands.length) return null;
-  const best = cands.reduce((a, b) => (b.len > a.len ? b : a));
-  if (best.len < 1200) return null; // too short → a TOC/header match, not the real section
-  return text.slice(best.s, best.end).replace(/\s+/g, " ").trim().slice(0, MAX_SECTION);
-}
-
-// Some filers (MSFT, INTC…) render section titles with per-letter letter-spacing, so
-// after stripping tags a heading reads "RIS K FACTORS" / "B USINESS" / "MANAGEMENT S
-// DISCUSSION". Match each keyword letter-by-letter with optional whitespace between —
-// which still matches ordinary contiguous headings too.
-const sp = (w) => w.split("").map((c) => c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("\\s*");
-function extractSections(text) {
-  const out = {};
-  const biz = bestSection(text, new RegExp(`item\\s*1[.\\s)]+${sp("business")}`), [/item\s*1a[.\s)]/, /item\s*2[.\s)]/]);
-  const risk = bestSection(text, new RegExp(`item\\s*1a[.\\s)]+${sp("risk")}\\s*${sp("factors")}`), [/item\s*1b[.\s)]/, /item\s*2[.\s)]/, /item\s*3[.\s)]/]);
-  const mda = bestSection(text, new RegExp(`item\\s*7[.\\s)]+${sp("management")}[\\s’'\`]*s\\s+${sp("discussion")}`), [/item\s*7a[.\s)]/, /item\s*8[.\s)]/]);
-  if (biz) out["Business"] = biz;
-  if (risk) out["Risk Factors"] = risk;
-  if (mda) out["MD&A"] = mda;
-  return out;
-}
+// El parser de secciones (htmlToText / extractSections) vive ahora en
+// ./sectionParser.mjs, importado arriba. Estaba aquí en línea, y eso significaba que el
+// arnés de regresión no podía ejercitarlo sin duplicarlo — un parser de heurísticas que
+// no se puede contrastar contra filings reales se rompe en silencio. Ver
+// research/parser_regression.mjs, que compara esta versión con la anterior sobre 28
+// 10-K cacheados y falla si pierde terreno.
 
 async function ingestTicker(t) {
   const cik = await tickerToCik(t);
