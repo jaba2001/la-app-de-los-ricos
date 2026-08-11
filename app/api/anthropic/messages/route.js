@@ -1,5 +1,5 @@
 import { requireUser } from '../../../../lib/auth.js';
-import { checkRateLimit } from '../../../../lib/ratelimit.js';
+import { checkRateLimit, clientIp } from '../../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../../lib/cors.js';
 
 export const runtime = 'edge';
@@ -15,6 +15,11 @@ const MAX_BODY_BYTES = 50 * 1024; // 50 KB
 export async function POST(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
   const rl = await checkRateLimit('anthropic', user.id, 5, 60, request); if (rl) return rl;
+  // Segunda dimensión, por IP. Esta es la única ruta que cuesta dinero de verdad
+  // (Anthropic), y el límite por usuario no acota el gasto: registrarse es gratis, así
+  // que N cuentas dan N veces la cuota. 20/min deja holgura a varias personas tras un
+  // mismo NAT y aun así pone techo a una granja de cuentas.
+  const rlIp = await checkRateLimit('anthropic-ip', clientIp(request), 20, 60, request); if (rlIp) return rlIp;
   const json = (obj, status) => new Response(JSON.stringify(obj), {
     status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
   });

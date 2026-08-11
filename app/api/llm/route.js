@@ -7,7 +7,7 @@
 //   Env: LLM_PROVIDER=gemini|groq, LLM_FALLBACK=groq|gemini (optional),
 //        GEMINI_KEY, GROQ_KEY, optional GEMINI_MODEL / GROQ_MODEL.
 import { requireUser } from '../../../lib/auth.js';
-import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { checkRateLimit, clientIp } from '../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/cors.js';
 
 export const runtime = 'edge';
@@ -51,6 +51,10 @@ async function callProvider(name, prompt, maxTokens) {
 export async function POST(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
   const rl = await checkRateLimit('llm', user.id, 5, 60, request); if (rl) return rl;
+  // Segunda dimensión por IP: el límite por usuario no acota el gasto porque
+  // registrarse es gratis. Aquí los proveedores son gratuitos, pero tienen cuota y
+  // agotarla deja la app sin capa de IA para todos.
+  const rlIp = await checkRateLimit('llm-ip', clientIp(request), 20, 60, request); if (rlIp) return rlIp;
   const json = (obj, status) => jsonFor(request, obj, status);
 
   // Measure the parsed body, not Content-Length: that header is caller-controlled and

@@ -19,7 +19,12 @@ const ALLOWED = new Set([
 // smuggle traversal past the allowlist ("quote%2F..%2F..%2Fother" passes startsWith
 // "quote/" and then new URL() normalises the ".." away), reaching any upstream endpoint
 // with our API key attached.
+// Se rechazan además "." y ".." como segmento completo: son los únicos que new URL()
+// colapsa al normalizar, y con ellos fuera el path validado y el path pedido son
+// literalmente el mismo string. Validar una cosa y pedir otra es el patrón que abrió
+// el agujero original; esto lo cierra por construcción, no por análisis.
 const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
+const isDotSegment = (s) => s === '.' || s === '..';
 
 export async function GET(request, { params }) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
@@ -29,7 +34,7 @@ export async function GET(request, { params }) {
   });
 
   const segments = params.path;
-  if (!segments.every(s => SAFE_SEGMENT.test(s) && s !== '..')) {
+  if (!segments.every(s => SAFE_SEGMENT.test(s) && !isDotSegment(s))) {
     return json({ error: 'Invalid path' }, 400);
   }
   const path = segments.join('/');

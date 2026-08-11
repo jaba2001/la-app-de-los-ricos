@@ -13,7 +13,7 @@
 //   - Writes with SUPABASE_SERVICE_KEY so sl_waitlist can stay fully RLS-locked (no anon
 //     policy), and the Resend key never reaches the browser.
 //   - user_id comes from a VERIFIED token (optionalUser), never from the request body.
-import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { checkRateLimit, clientIp } from '../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/cors.js';
 import { sendEmail } from '../../../lib/email.js';
 import { optionalUser } from '../../../lib/auth.js';
@@ -48,13 +48,12 @@ export async function POST(request) {
     status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
   });
 
-  // No user id to key the limiter on, so use the client IP. Vercel always sets
-  // x-forwarded-for; the 'unknown' fallback shares one bucket, which is the safe direction
-  // (stricter, never more permissive).
+  // No hay user id que usar como clave, así que se limita por IP (ver clientIp).
   //
-  // failClosed: with no requireUser behind it, a degraded limiter would leave an anonymous
-  // unlimited endpoint that also sends an email per call. Refusing beats spamming.
-  const ip = (request.headers.get('x-forwarded-for') || '').split(',')[0].trim() || 'unknown';
+  // failClosed: sin requireUser detrás, un limitador degradado dejaría un endpoint
+  // anónimo e ilimitado que además manda un email por llamada. Rechazar es mejor que
+  // repartir un cañón de spam.
+  const ip = clientIp(request);
   const rl = await checkRateLimit('waitlist', ip, 5, 3600, request, { failClosed: true });
   if (rl) return rl;
 
