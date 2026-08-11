@@ -6,7 +6,12 @@ import { withSentryConfig } from '@sentry/nextjs';
 // people learn to stop reading build output.
 process.env.SENTRY_SUPPRESS_GLOBAL_ERROR_HANDLER_FILE_WARNING = '1';
 
-const nextConfig = {};
+const nextConfig = {
+  // Hay un package-lock.json aquí y otro en la raíz del workspace, así que Next adivina el
+  // root y avisa en cada build. Apuntarlo a este proyecto silencia el aviso y mantiene el
+  // trazado de ficheros acotado a lo que esta app usa de verdad.
+  outputFileTracingRoot: import.meta.dirname,
+};
 
 export default withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
