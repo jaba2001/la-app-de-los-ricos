@@ -11,6 +11,7 @@ import { track } from "@/lib/analytics";
 import WelcomeBanner from "@/components/WelcomeBanner";
 import RegimeAlert from "@/components/RegimeAlert";
 import PushToggle from "@/components/PushToggle";
+import MacroBrief from "@/components/macro/MacroBrief";
 
 const TabSk = () => <Sk w="100%" h={400} />;
 
@@ -127,6 +128,7 @@ export default function MacroPage() {
 
       {/* Content */}
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1200, margin: "0 auto" }}>
+        <MacroBrief />
         <RegimeAlert macro={macro} />
         <PushToggle />
         <WelcomeBanner />

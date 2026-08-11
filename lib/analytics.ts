@@ -39,7 +39,8 @@ export type AnalyticsEvent =
   | "alert_created"         // per-ticker alerts
   | "journal_trade_added"   // trade journal engagement
   | "waitlist_submitted"    // Pro-tier intent (Fase 3)
-  | "signup_completed";     // funnel endpoint
+  | "signup_completed"      // funnel endpoint
+  | "brief_played";         // el brief hablado se reprodujo (retención)
 
 /** Fire an event. Silently ignored when analytics isn't configured. */
 export function track(event: AnalyticsEvent, props?: Record<string, unknown>): void {
