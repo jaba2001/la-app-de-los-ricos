@@ -78,10 +78,12 @@ export default function MacroBrief() {
             <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }}>
               {brief.cadence === "daily" ? "Daily" : "Weekly"} macro brief
             </div>
+            {/* No "text only" caption when there's no audio: text IS the intended state,
+                and labelling it reads as an apology for a missing feature. The play button
+                simply isn't there, which says everything it needs to. */}
             <div className="sr-hint">
               {brief.brief_date}
               {brief.audio_url && brief.duration_sec ? ` · ${mmss(brief.duration_sec)}` : ""}
-              {!brief.audio_url ? " · text only" : ""}
             </div>
           </div>
         </div>
