@@ -40,7 +40,12 @@ export type AnalyticsEvent =
   | "journal_trade_added"   // trade journal engagement
   | "waitlist_submitted"    // Pro-tier intent (Fase 3)
   | "signup_completed"      // funnel endpoint
-  | "brief_played";         // el brief hablado se reprodujo (retención)
+  | "brief_played"          // el brief hablado se reprodujo (retención)
+  // Embudo de pago (Fase 11). Los dos por separado, no un solo "checkout": la diferencia
+  // entre ambos ES la métrica — cuántos abren el checkout y cuántos lo terminan. Con un
+  // único evento habría que deducir el abandono, que es lo que hay que medir.
+  | "checkout_started"      // pulsó Upgrade y se le mandó a Stripe
+  | "checkout_completed";   // volvió con el pago hecho
 
 /** Fire an event. Silently ignored when analytics isn't configured. */
 export function track(event: AnalyticsEvent, props?: Record<string, unknown>): void {

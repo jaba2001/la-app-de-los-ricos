@@ -1,44 +1,67 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { useEntitlements } from "@/lib/entitlements";
 import { track } from "@/lib/analytics";
 
 const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
 
-const TIERS = [
-  {
-    name: "Free", price: "€0", tagline: "The whole engine, forever.",
-    highlight: false,
-    features: [
-      "Macro regime + validated allocator",
-      "Live track record & AI audit trail",
-      "Stock, bond & instrument analysis",
-      "1 full deep-dive analysis / day",
-      "Discovery screener (stocks + cross-asset)",
-    ],
-    cta: "Start free",
-  },
-  {
-    name: "Pro", price: "€0*", tagline: "For heavy users — when it exists.",
-    highlight: true,
-    features: [
-      "Everything in Free",
-      "Unlimited AI thesis, reports & due-diligence",
-      "Regime-change & divergence alerts",
-      "Watchlist signal notifications",
-      "HTML research-note export",
-    ],
-    cta: "Notify me",
-  },
-];
+interface StripeConfig {
+  enabled: boolean;
+  test_mode: boolean;
+  price: { unit_amount: number; currency: string; interval: string | null } | null;
+}
 
 /**
- * Pro-tier waitlist. Replaces a "Notify me" button that called router.push("/macro") and
- * recorded nothing — the one place in the product where someone declares intent to pay.
- * The count in sl_waitlist is the signal that decides whether Pro (and Stripe) is worth
- * building at all, so it has to be captured before that decision, not after.
+ * Estado de los pagos, preguntado al proxy.
+ *
+ * No hay una NEXT_PUBLIC_STRIPE_ENABLED a propósito: sería una segunda copia de la verdad, y
+ * el día que no coincida con la del servidor el usuario ve un botón de pagar que devuelve
+ * 503. Mientras no responda, `null` significa "aún no se sabe" y la tarjeta no promete nada.
  */
+function useStripeConfig(): StripeConfig | null {
+  const [cfg, setCfg] = useState<StripeConfig | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${PROXY}/api/stripe/config`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (!cancelled && d) setCfg(d as StripeConfig); })
+      // Proxy caído o versión antigua sin la ruta: se cae a la lista de espera, que es el
+      // estado correcto mientras no se demuestre que hay pagos.
+      .catch(() => { if (!cancelled) setCfg({ enabled: false, test_mode: false, price: null }); });
+    return () => { cancelled = true; };
+  }, []);
+  return cfg;
+}
+
+function formatPrice(p: StripeConfig["price"]): string | null {
+  if (!p) return null;
+  const amount = (p.unit_amount / 100).toLocaleString("en-IE", {
+    style: "currency", currency: p.currency.toUpperCase(),
+    // 9 € se lee mejor que 9,00 €; 9,50 € necesita sus decimales.
+    minimumFractionDigits: p.unit_amount % 100 === 0 ? 0 : 2,
+  });
+  return p.interval === "year" ? `${amount}/yr` : p.interval === "month" ? `${amount}/mo` : amount;
+}
+
+const FREE_FEATURES = [
+  "Macro regime + validated allocator",
+  "Live track record & AI audit trail",
+  "Stock, bond & instrument analysis",
+  "1 full deep-dive analysis / day",
+  "Discovery screener (stocks + cross-asset)",
+];
+
+const PRO_FEATURES = [
+  "Everything in Free",
+  "Unlimited AI thesis, reports & due-diligence",
+  "Regime-change & divergence alerts",
+  "Watchlist signal notifications",
+  "HTML research-note export",
+];
+
+/** Lista de espera. Es el estado por defecto y el que decide si Pro llega a existir. */
 function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; accessToken: string | null }) {
   const [email, setEmail] = useState(defaultEmail);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -49,10 +72,9 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
     if (state === "sending") return;
     setState("sending"); setError("");
     try {
-      // Send the session token rather than a user id in the body: the proxy attributes the
-      // row from the VERIFIED token (lib/auth.js optionalUser) and ignores any client-
-      // supplied id, since that would be an unauthenticated claim of identity. Logged-out
-      // visitors simply send no token and land with a null user_id, which is the point.
+      // Se manda el token de sesión, no un id de usuario: el proxy atribuye la fila desde el
+      // token VERIFICADO (lib/auth.js optionalUser) e ignora cualquier id del cuerpo, que
+      // sería una afirmación de identidad sin autenticar.
       const res = await fetch(`${PROXY}/api/waitlist`, {
         method: "POST",
         headers: {
@@ -60,9 +82,7 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
-          email,
-          tier: "pro",
-          source: "pricing",
+          email, tier: "pro", source: "pricing",
           referrer: typeof document !== "undefined" ? document.referrer.slice(0, 200) : null,
         }),
       });
@@ -95,16 +115,7 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
           border: "1px solid var(--sr-border)", color: "var(--sr-text)",
         }}
       />
-      <button
-        type="submit" disabled={state === "sending"}
-        style={{
-          width: "100%", borderRadius: "var(--sr-radius)", padding: "10px 0",
-          fontSize: "var(--sr-t-sm)", fontWeight: 700,
-          cursor: state === "sending" ? "default" : "pointer",
-          background: "var(--sr-amber)", color: "#0a1120", border: "none",
-          opacity: state === "sending" ? 0.6 : 1,
-        }}
-      >
+      <button type="submit" disabled={state === "sending"} className="sr-btn-amber" style={{ opacity: state === "sending" ? 0.6 : 1 }}>
         {state === "sending" ? "Adding…" : "Notify me"}
       </button>
       {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4 }}>{error}</div>}
@@ -115,10 +126,150 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
   );
 }
 
+/** Botón de pago. Solo aparece cuando el servidor confirma que puede cobrar. */
+function UpgradeButton({ accessToken, onNeedsLogin }: { accessToken: string | null; onNeedsLogin: () => void }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function go() {
+    if (busy) return;
+    if (!accessToken) { onNeedsLogin(); return; }
+    setBusy(true); setError("");
+    try {
+      const res = await fetch(`${PROXY}/api/stripe/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body?.url) {
+        setBusy(false);
+        setError(body?.error || "Could not start checkout. Try again.");
+        return;
+      }
+      track("checkout_started");
+      // Se sale a Stripe: no se quita el estado ocupado, porque la página se está yendo y
+      // rehabilitar el botón solo invita a un segundo clic que abriría otro checkout.
+      window.location.href = body.url;
+    } catch {
+      setBusy(false);
+      setError("Network error. Try again in a moment.");
+    }
+  }
+
+  return (
+    <div style={{ marginTop: "var(--sr-sp-5)" }}>
+      <button onClick={go} disabled={busy} className="sr-btn-amber" style={{ opacity: busy ? 0.6 : 1 }}>
+        {busy ? "Opening checkout…" : "Upgrade to Pro"}
+      </button>
+      {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4, marginTop: 8 }}>{error}</div>}
+      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5, marginTop: 8 }}>
+        Cancel anytime from the billing portal. Card details never touch our servers.
+      </div>
+    </div>
+  );
+}
+
+/** Estado de quien ya paga: cuándo se renueva y cómo cancelar sin escribirnos. */
+function ManageBilling({ accessToken, sub }: {
+  accessToken: string | null;
+  sub: { current_period_end: string | null; cancel_at_period_end: boolean; status: string } | null;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function openPortal() {
+    if (busy || !accessToken) return;
+    setBusy(true); setError("");
+    try {
+      const res = await fetch(`${PROXY}/api/stripe/portal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok || !body?.url) { setBusy(false); setError(body?.error || "Could not open billing."); return; }
+      window.location.href = body.url;
+    } catch {
+      setBusy(false);
+      setError("Network error. Try again in a moment.");
+    }
+  }
+
+  const until = sub?.current_period_end
+    ? new Date(sub.current_period_end).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric" })
+    : null;
+
+  return (
+    <div style={{ marginTop: "var(--sr-sp-5)" }}>
+      <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-pos)", fontWeight: 700, marginBottom: 8 }}>
+        ✓ You&apos;re on Pro
+      </div>
+      {until && (
+        <div className="sr-hint" style={{ marginBottom: 10, lineHeight: 1.5 }}>
+          {/* Cancelada pero pagada hasta el final del periodo: decirlo evita el susto de
+              "he cancelado y sigo teniendo acceso, ¿me van a cobrar otra vez?". */}
+          {sub?.cancel_at_period_end ? `Access until ${until}. Won't renew.` : `Renews ${until}.`}
+        </div>
+      )}
+      {sub?.status === "past_due" && (
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.5, marginBottom: 10 }}>
+          Last payment failed. Update your card to keep Pro — access continues meanwhile.
+        </div>
+      )}
+      <button onClick={openPortal} disabled={busy} style={{
+        width: "100%", borderRadius: "var(--sr-radius)", padding: "10px 0",
+        fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: busy ? "default" : "pointer",
+        background: "var(--sr-surface-2)", color: "var(--sr-text)",
+        border: "1px solid var(--sr-border)", opacity: busy ? 0.6 : 1,
+      }}>
+        {busy ? "Opening…" : "Manage billing"}
+      </button>
+      {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4, marginTop: 8 }}>{error}</div>}
+    </div>
+  );
+}
+
 export default function Pricing() {
   const { session } = useAuth();
+  const { isPro, loading: entLoading, subscription, refresh } = useEntitlements();
+  const cfg = useStripeConfig();
   const router = useRouter();
-  const go = () => router.push(session ? "/macro" : "/login");
+
+  // ?checkout=success|cancelled. Se lee de window en vez de useSearchParams porque ese hook
+  // obliga a envolver la página en <Suspense> y, sin él, Next falla la generación estática
+  // del build. Aquí no hace falta: solo se necesita en el cliente y una vez.
+  const [outcome, setOutcome] = useState<"success" | "cancelled" | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("checkout");
+    if (q === "success" || q === "cancelled") {
+      setOutcome(q);
+      // Se limpia la URL: recargar no debe repetir el mensaje, y menos aún parecer un
+      // segundo cobro.
+      window.history.replaceState({}, "", window.location.pathname);
+      if (q === "success") track("checkout_completed");
+    }
+  }, []);
+
+  // Tras pagar, el webhook puede tardar unos segundos en escribir la fila. Se reintenta un
+  // rato corto en vez de enseñar "Free" a quien acaba de pagar.
+  const tries = useRef(0);
+  const waitingForWebhook = outcome === "success" && !isPro && !entLoading;
+  useEffect(() => {
+    if (!waitingForWebhook || tries.current >= 10) return;
+    const t = setTimeout(() => { tries.current += 1; refresh(); }, 2000);
+    return () => clearTimeout(t);
+  }, [waitingForWebhook, refresh, isPro]);
+
+  const go = useCallback(() => router.push(session ? "/macro" : "/login"), [router, session]);
+  const token = session?.access_token ?? null;
+  const priceLabel = formatPrice(cfg?.price ?? null);
+
+  // Qué enseña la tarjeta Pro. El orden importa: quien ya paga ve su gestión aunque el
+  // config tarde; y mientras no se sepa si hay pagos, no se promete un botón que puede fallar.
+  const proBody = isPro
+    ? <ManageBilling accessToken={token} sub={subscription} />
+    : cfg?.enabled
+      ? <UpgradeButton accessToken={token} onNeedsLogin={() => router.push("/login")} />
+      : <WaitlistForm defaultEmail={session?.user?.email ?? ""} accessToken={token} />;
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--sr-sp-6)" }}>
@@ -129,42 +280,100 @@ export default function Pricing() {
         </p>
       </div>
 
+      {outcome === "success" && (
+        <div role="status" style={{
+          marginBottom: "var(--sr-sp-5)", padding: "var(--sr-sp-4)", borderRadius: "var(--sr-radius-lg, 14px)",
+          background: "color-mix(in srgb, var(--sr-pos) 10%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--sr-pos) 40%, transparent)",
+          fontSize: "var(--sr-t-sm)", lineHeight: 1.6,
+        }}>
+          {isPro
+            ? "✓ Payment received — Pro is active. Thank you."
+            : "✓ Payment received. Activating your account… this usually takes a few seconds."}
+        </div>
+      )}
+      {outcome === "cancelled" && (
+        <div role="status" style={{
+          marginBottom: "var(--sr-sp-5)", padding: "var(--sr-sp-4)", borderRadius: "var(--sr-radius-lg, 14px)",
+          background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)",
+          fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6,
+        }}>
+          Checkout cancelled — nothing was charged. The free tier keeps working as before.
+        </div>
+      )}
+
+      {cfg?.test_mode && (
+        // Si esto sale en producción es un error de configuración grave: se está enseñando un
+        // checkout que no cobra. Vale más gritarlo que descubrirlo por los ingresos a cero.
+        <div style={{
+          marginBottom: "var(--sr-sp-5)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)",
+          background: "color-mix(in srgb, var(--sr-amber) 12%, transparent)",
+          border: "1px dashed color-mix(in srgb, var(--sr-amber) 55%, transparent)",
+          fontSize: "var(--sr-t-xs)", textAlign: "center",
+        }}>
+          Stripe is in <strong>test mode</strong> — no real charges. Use card 4242 4242 4242 4242.
+        </div>
+      )}
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--sr-sp-4)" }}>
-        {TIERS.map((t) => (
-          <div key={t.name} style={{
-            background: "var(--sr-surface)", borderRadius: 16, padding: "var(--sr-sp-5)",
-            border: t.highlight ? "1.5px solid color-mix(in srgb, var(--sr-amber) 55%, transparent)" : "1px solid var(--sr-border)",
-            boxShadow: t.highlight ? "0 0 0 4px color-mix(in srgb, var(--sr-amber) 8%, transparent)" : "none",
-          }}>
-            <div className="sr-flex-between" style={{ alignItems: "baseline" }}>
-              <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>{t.name}</span>
-              <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">{t.price}</span>
-            </div>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, marginBottom: "var(--sr-sp-4)" }}>{t.tagline}</div>
-            <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
-              {t.features.map((f) => (
-                <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
-                  <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{f}
-                </li>
-              ))}
-            </ul>
-            {/* Free tier keeps the straight CTA into the app. Pro captures the email —
-                it's the only intent-to-pay signal the product ever gets. */}
-            {t.name === "Pro" ? (
-              <WaitlistForm defaultEmail={session?.user?.email ?? ""} accessToken={session?.access_token ?? null} />
-            ) : (
-              <button onClick={go} style={{
-                width: "100%", marginTop: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", padding: "10px 0", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer",
-                background: t.highlight ? "var(--sr-amber)" : "var(--sr-surface-2)", color: t.highlight ? "#0a1120" : "var(--sr-text)",
-                border: t.highlight ? "none" : "1px solid var(--sr-border)",
-              }}>{t.cta}</button>
-            )}
+        {/* Free */}
+        <div style={{
+          background: "var(--sr-surface)", borderRadius: 16, padding: "var(--sr-sp-5)",
+          border: "1px solid var(--sr-border)",
+        }}>
+          <div className="sr-flex-between" style={{ alignItems: "baseline" }}>
+            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>Free</span>
+            <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">€0</span>
           </div>
-        ))}
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, marginBottom: "var(--sr-sp-4)" }}>
+            The whole engine, forever.
+          </div>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
+            {FREE_FEATURES.map((f) => (
+              <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
+                <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{f}
+              </li>
+            ))}
+          </ul>
+          <button onClick={go} style={{
+            width: "100%", marginTop: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", padding: "10px 0",
+            fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer",
+            background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid var(--sr-border)",
+          }}>Start free</button>
+        </div>
+
+        {/* Pro */}
+        <div style={{
+          background: "var(--sr-surface)", borderRadius: 16, padding: "var(--sr-sp-5)",
+          border: "1.5px solid color-mix(in srgb, var(--sr-amber) 55%, transparent)",
+          boxShadow: "0 0 0 4px color-mix(in srgb, var(--sr-amber) 8%, transparent)",
+        }}>
+          <div className="sr-flex-between" style={{ alignItems: "baseline" }}>
+            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>Pro</span>
+            <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">
+              {/* El importe viene de Stripe. Mientras no haya pagos sigue el "€0*" honesto de
+                  siempre, que la nota al pie explica. */}
+              {priceLabel ?? "€0*"}
+            </span>
+          </div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, marginBottom: "var(--sr-sp-4)" }}>
+            {cfg?.enabled ? "For heavy users." : "For heavy users — when it exists."}
+          </div>
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
+            {PRO_FEATURES.map((f) => (
+              <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
+                <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{f}
+              </li>
+            ))}
+          </ul>
+          {proBody}
+        </div>
       </div>
 
       <p style={{ fontSize: "10px", color: "var(--sr-text-3)", textAlign: "center", marginTop: "var(--sr-sp-5)", lineHeight: 1.6, maxWidth: 620, marginInline: "auto" }}>
-        * No monthly cost to you. If a paid tier launches, any processor fee applies only to what you actually earn — never a fixed charge. Educational tool, not investment advice.
+        {cfg?.enabled
+          ? "Billing is handled by Stripe; card details never reach our servers. Cancel anytime. Educational tool, not investment advice."
+          : "* No monthly cost to you. If a paid tier launches, any processor fee applies only to what you actually earn — never a fixed charge. Educational tool, not investment advice."}
       </p>
     </div>
   );

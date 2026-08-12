@@ -393,6 +393,25 @@ input, textarea { font-family: inherit; }
   color: var(--sr-text-3);
 }
 
+/* Primary action button (amber fill, full width).
+   Extraída al aparecer el segundo botón idéntico en /pricing: la tarjeta Pro alterna
+   entre "Notify me" y "Upgrade to Pro" según haya pagos activos, y mantener dos copias
+   del mismo bloque inline garantizaba que un retoque tocara solo una de las dos.
+   El color de texto es fijo a propósito: es el fondo ámbar quien pide un texto oscuro,
+   no el tema, así que no debe cambiar en modo claro. */
+.sr-btn-amber {
+  width: 100%;
+  border-radius: var(--sr-radius);
+  padding: 10px 0;
+  font-size: var(--sr-t-sm);
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--sr-amber);
+  color: #0a1120;
+  border: none;
+}
+.sr-btn-amber:disabled { cursor: default; }
+
 /* Header row: content left, value/action right */
 .sr-flex-between {
   display: flex;
