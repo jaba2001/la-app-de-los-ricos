@@ -19,15 +19,55 @@ const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// Default seed universe — liquid US filers with 10-Ks that the app's users hit most
-// (AI-capex / memory complex + mega-cap tech + high-traffic names). Foreign issuers
-// (ASML=20-F) are skipped. INTC is a known structural miss: its primary 10-K doc is a
-// paginated wrapper whose section headings only appear as TOC page-refs, so the item-
-// heading parser can't anchor the bodies — it skips gracefully rather than store garbage.
-const DEFAULT = [
-  "NVDA","AAPL","MSFT","AMD","MU","GOOGL","META","AMZN","AVGO","WDC","STX","INTC",
-  "TSLA","NFLX","ORCL","CRM","QCOM","TXN","DELL","PLTR","ADBE","NOW","PANW","AMAT","LRCX","ANET","CSCO","IBM",
-];
+// Universo por defecto — filers estadounidenses líquidos, ORGANIZADO POR SECTOR.
+//
+// Antes eran 28 nombres, todos tecnología. Eso hacía que la recuperación de 10-K
+// funcionase de maravilla para NVDA y devolviese vacío para JPM, XOM o UNH — y un vacío
+// no se distingue, desde fuera, de una búsqueda rota. Peor: el sesgo sectorial se colaba
+// en cualquier comparación entre empresas que se apoyara en esta base.
+//
+// Se listan por sector GICS a propósito, en vez de un array plano: así se ve de un
+// vistazo dónde hay hueco, que es la pregunta que uno se hace al mirar esta lista.
+//
+// Solo emisores DOMÉSTICOS: los extranjeros presentan 20-F, no 10-K (ASML, TSM, SAP…) y
+// el script los salta solo. INTC es un fallo estructural conocido: su documento principal
+// es un envoltorio paginado cuyos encabezados de sección solo aparecen como referencias
+// del índice, así que el parser no puede anclar los cuerpos — se salta en vez de guardar
+// basura. Cualquier ticker sin CIK o sin 10-K se salta igual, sin romper la ejecución.
+const UNIVERSE = {
+  tech: [
+    "NVDA","AAPL","MSFT","AMD","MU","AVGO","WDC","STX","INTC","ORCL","CRM","QCOM",
+    "TXN","DELL","PLTR","ADBE","NOW","PANW","AMAT","LRCX","ANET","CSCO","IBM","ACN",
+    "INTU","ADI","KLAC","SNPS","CDNS","MSI","APH","GLW","HPQ","HPE","NTAP","FTNT",
+  ],
+  comm: ["GOOGL","META","NFLX","DIS","CMCSA","VZ","T","TMUS","CHTR","EA","TTWO","WBD","OMC","LYV"],
+  discretionary: [
+    "AMZN","TSLA","HD","MCD","NKE","SBUX","LOW","TJX","BKNG","ORLY","AZO","CMG",
+    "YUM","MAR","HLT","GM","F","LVS","RCL","DHI","LEN","EBAY","ROST","APTV","GPC",
+  ],
+  staples: ["PG","KO","PEP","COST","WMT","PM","MO","MDLZ","CL","KMB","GIS","SYY","KR","HSY","STZ","K","CHD","CLX","TSN","ADM"],
+  health: [
+    "UNH","JNJ","LLY","ABBV","MRK","PFE","TMO","ABT","DHR","BMY","AMGN","GILD",
+    "CVS","CI","ELV","HCA","ISRG","SYK","BSX","MDT","VRTX","REGN","ZTS","MCK",
+    "HUM","BIIB","BDX","EW","IDXX","IQV","A",
+  ],
+  financials: [
+    "JPM","BAC","WFC","C","GS","MS","BLK","SCHW","AXP","USB","PNC","TFC","COF",
+    "BK","SPGI","CME","ICE","MCO","AIG","MET","PRU","ALL","PGR","TRV","CB","AFL",
+    "STT","FITB","NTRS","DFS","MMC","AON","NDAQ",
+  ],
+  industrials: [
+    "CAT","BA","HON","UNP","UPS","RTX","LMT","GE","DE","MMM","NOC","GD","FDX",
+    "CSX","NSC","EMR","ETN","ITW","PH","ADP","WM","JCI","CMI","PCAR","ROK","CARR",
+    "OTIS","PAYX","VRSK","LHX","TDG",
+  ],
+  energy: ["XOM","CVX","COP","EOG","SLB","PSX","MPC","VLO","OXY","WMB","KMI","OKE","HAL","DVN","FANG","HES","BKR","TRGP"],
+  materials: ["LIN","APD","SHW","ECL","NEM","FCX","DOW","DD","PPG","NUE","VMC","MLM","IFF","ALB","STLD","PKG"],
+  utilities: ["NEE","DUK","SO","D","AEP","SRE","EXC","XEL","ED","PEG","WEC","ES","AEE","DTE","PPL","FE","EIX"],
+  realestate: ["PLD","AMT","EQIX","CCI","PSA","SPG","O","WELL","DLR","AVB","EQR","VTR","ARE","EXR","MAA","INVH"],
+};
+
+const DEFAULT = Object.values(UNIVERSE).flat();
 // Chars kept per section. Was 2 200 — sized for the old "inject the whole section into
 // the prompt" model, which meant a 10-K's Risk Factors (tens of pages) was cut down to its
 // standard preamble and the grounded thesis ended up citing the header instead of the

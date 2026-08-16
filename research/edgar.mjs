@@ -31,14 +31,48 @@ async function getJSON(url, cacheFile, ttlDays = 30) {
 }
 
 /** ticker → zero-padded 10-digit CIK (free SEC map, cached in-process + disk). */
+/**
+ * CIK fijados a mano para tickers que el mapa de la SEC no resuelve bien.
+ *
+ * company_tickers.json (y su gemelo company_tickers_exchange.json — mismas 10.398
+ * entradas) NO es un índice completo: falla justo en las empresas que han cambiado de
+ * nombre o han estado en una operación corporativa. Comprobado, y son dos fallos distintos:
+ *
+ *   · Ticker distinto en la SEC — BK cotiza allí como "BNY" tras el rebranding de Bank of
+ *     New York Mellon, y MMC como "MRSH".
+ *   · Sin ticker alguno (`tickers: []`) — K, DFS, HES y XOM. Son empresas adquiridas o
+ *     reorganizadas a las que la SEC ha retirado la metadata de cotización. Sus 10-K
+ *     siguen publicados y son perfectamente válidos.
+ *
+ * XOM es el caso que más engaña: el mapa SÍ devuelve un CIK (2115436), pero es el de
+ * "ExxonMobil Holdings Corp", la sociedad nueva de la reorganización, que todavía no ha
+ * presentado ningún 10-K. Es decir, devuelve una respuesta plausible y equivocada — por eso
+ * estas excepciones tienen PRIORIDAD sobre el mapa en lugar de usarse solo cuando falla.
+ *
+ * Cada CIK está verificado contra data.sec.gov/submissions: nombre correcto y 10-K real.
+ * Antes de tocar esta tabla, compruébalo igual — un CIK inventado ingiere los estados
+ * financieros de otra empresa sin dar ningún error.
+ */
+const MANUAL_CIK = {
+  K:   "0000055067", // KELLANOVA
+  BK:  "0001390777", // Bank of New York Mellon Corp (en la SEC: "BNY")
+  DFS: "0001393612", // Discover Financial Services
+  MMC: "0000062709", // MARSH & MCLENNAN COMPANIES (en la SEC: "MRSH")
+  HES: "0000004447", // HESS CORP
+  AEP: "0000004904", // AMERICAN ELECTRIC POWER CO INC
+  XOM: "0000034088", // EXXON MOBIL CORP — no la holding nueva
+};
+
 export async function tickerToCik(ticker) {
+  const t = ticker.toUpperCase();
+  if (MANUAL_CIK[t]) return MANUAL_CIK[t];
   if (!mem.has("__map")) {
     const j = await getJSON("https://www.sec.gov/files/company_tickers.json", "company_tickers.json", 7);
     const m = {};
     if (j) for (const k in j) m[j[k].ticker.toUpperCase()] = String(j[k].cik_str).padStart(10, "0");
     mem.set("__map", m);
   }
-  return mem.get("__map")[ticker.toUpperCase()] ?? null;
+  return mem.get("__map")[t] ?? null;
 }
 
 async function companyFacts(cik) {
