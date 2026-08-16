@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
+import QuotaPill from "@/components/ui/QuotaPill";
 
 const MAIN_TABS = [
   { label: "Macro", href: "/macro" },
@@ -198,8 +199,9 @@ export default function Nav() {
         )}
       </div>
 
-      {/* Sign out */}
-      <div style={{ display: "flex", alignItems: "center", flexShrink: 0, marginLeft: "auto" }}>
+      {/* Cuota de IA + sign out */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto" }}>
+        <QuotaPill />
         <button
           className="btn-ghost"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}

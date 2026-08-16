@@ -1,8 +1,39 @@
 import { supabase } from "./supabase";
 import { checkGrounding, checkDirection } from "./grounding";
 import { track } from "./analytics";
+import { setQuota } from "./quotaState";
 
 const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
+
+/**
+ * Se ha agotado la cuota diaria de IA.
+ *
+ * Es un Error normal con un `message` YA LEGIBLE, y eso es lo que lo hace útil: las nueve
+ * pantallas que llaman a la IA hacen `setError(e.message)`, así que con el mensaje bien
+ * puesto aquí todas mejoran a la vez y ninguna hay que tocarla. Si en su lugar se dejara
+ * escapar el error genérico, el usuario leería
+ * `[proxy 429] /api/anthropic/messages: {"error":"Daily AI limit…}` — el texto correcto
+ * envuelto en ruido que parece una avería.
+ *
+ * Los campos estructurados quedan disponibles para quien quiera pintar algo mejor que una
+ * línea de texto (un enlace a /pricing, por ejemplo).
+ */
+export class QuotaError extends Error {
+  readonly limit: number;
+  readonly used: number;
+  readonly plan: string;
+  readonly upgradeUrl: string | null;
+  readonly resetsAt: string | null;
+  constructor(msg: string, d: { limit?: number; used?: number; plan?: string; upgrade_url?: string | null; resets_at?: string | null }) {
+    super(msg);
+    this.name = "QuotaError";
+    this.limit = d.limit ?? 0;
+    this.used = d.used ?? 0;
+    this.plan = d.plan ?? "free";
+    this.upgradeUrl = d.upgrade_url ?? null;
+    this.resetsAt = d.resets_at ?? null;
+  }
+}
 
 export async function authedFetch<T = unknown>(
   path: string,
@@ -22,8 +53,31 @@ export async function authedFetch<T = unknown>(
   const signal = options?.signal
     ?? (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(timeoutMs) : undefined);
   const res = await fetch(`${BASE}${path}`, { ...options, headers, signal });
+
+  // Las rutas de IA devuelven el estado de la cuota en cabeceras, tanto si van bien como si
+  // rechazan. Leerlas aquí es lo que permite avisar ANTES de chocarse con el límite; el
+  // resto de rutas no las mandan y esto no hace nada.
+  const qLimit = res.headers.get("X-Scora-Quota-Limit");
+  if (qLimit) {
+    setQuota({
+      limit: Number(qLimit),
+      remaining: Number(res.headers.get("X-Scora-Quota-Remaining") ?? 0),
+      plan: res.headers.get("X-Scora-Plan") ?? "free",
+    });
+  }
+
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
+    if (res.status === 429) {
+      // Puede ser la cuota diaria o el limitador por minuto: ambos son 429 y solo el
+      // primero trae `plan`. Se distingue por ese campo, no por el texto del mensaje.
+      let body: { error?: unknown; plan?: unknown; limit?: number; used?: number; upgrade_url?: string | null; resets_at?: string | null } | null = null;
+      try { body = JSON.parse(text); } catch { /* cuerpo no-JSON: cae al error genérico */ }
+      if (body && typeof body.error === "string" && typeof body.plan === "string") {
+        setQuota({ limit: body.limit ?? 0, remaining: 0, plan: body.plan });
+        throw new QuotaError(body.error, body as ConstructorParameters<typeof QuotaError>[1]);
+      }
+    }
     throw new Error(`[proxy ${res.status}] ${path}: ${text}`);
   }
   return res.json() as Promise<T>;

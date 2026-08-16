@@ -45,21 +45,51 @@ function formatPrice(p: StripeConfig["price"]): string | null {
   return p.interval === "year" ? `${amount}/yr` : p.interval === "month" ? `${amount}/mo` : amount;
 }
 
-const FREE_FEATURES = [
-  "Macro regime + validated allocator",
-  "Live track record & AI audit trail",
-  "Stock, bond & instrument analysis",
-  "1 full deep-dive analysis / day",
-  "Discovery screener (stocks + cross-asset)",
-];
+/**
+ * Los límites de IA se PIDEN al proxy, no se escriben aquí.
+ *
+ * Viven en variables de entorno del servidor para poder ajustarlos sin desplegar; una copia
+ * en esta página se desincronizaría en el primer cambio y estaríamos anunciando una cifra
+ * distinta de la que se aplica. Mientras no responda se dice "AI analysis daily", sin
+ * número: vago pero cierto, que es preferible a concreto y falso.
+ */
+function useAiLimits(): { free: number; pro: number } | null {
+  const [limits, setLimits] = useState<{ free: number; pro: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${PROXY}/api/ai/limits`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !d) return;
+        if (Number.isFinite(d.free) && Number.isFinite(d.pro)) setLimits(d);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+  return limits;
+}
 
-const PRO_FEATURES = [
-  "Everything in Free",
-  "Unlimited AI thesis, reports & due-diligence",
-  "Regime-change & divergence alerts",
-  "Watchlist signal notifications",
-  "HTML research-note export",
-];
+function freeFeatures(limits: { free: number; pro: number } | null) {
+  return [
+    "Macro regime + validated allocator",
+    "Live track record & AI audit trail",
+    "Stock, bond & instrument analysis",
+    limits ? `${limits.free} AI analyses / day` : "AI analysis daily",
+    "Discovery screener (stocks + cross-asset)",
+  ];
+}
+
+function proFeatures(limits: { free: number; pro: number } | null) {
+  return [
+    "Everything in Free",
+    // "Ilimitado" sería mentira: hay un tope, alto pero real. Decir la cifra vale más que
+    // una promesa que el primer usuario intensivo descubriría que es falsa.
+    limits ? `${limits.pro} AI analyses / day (${Math.round(limits.pro / Math.max(1, limits.free))}× Free)` : "Far higher AI limits",
+    "Regime-change & divergence alerts",
+    "Watchlist signal notifications",
+    "HTML research-note export",
+  ];
+}
 
 /** Lista de espera. Es el estado por defecto y el que decide si Pro llega a existir. */
 function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; accessToken: string | null }) {
@@ -232,6 +262,7 @@ export default function Pricing() {
   const { session } = useAuth();
   const { isPro, loading: entLoading, subscription, refresh } = useEntitlements();
   const cfg = useStripeConfig();
+  const limits = useAiLimits();
   const router = useRouter();
 
   // ?checkout=success|cancelled. Se lee de window en vez de useSearchParams porque ese hook
@@ -329,7 +360,7 @@ export default function Pricing() {
             The whole engine, forever.
           </div>
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
-            {FREE_FEATURES.map((f) => (
+            {freeFeatures(limits).map((f) => (
               <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
                 <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{f}
               </li>
@@ -360,7 +391,7 @@ export default function Pricing() {
             {cfg?.enabled ? "For heavy users." : "For heavy users — when it exists."}
           </div>
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
-            {PRO_FEATURES.map((f) => (
+            {proFeatures(limits).map((f) => (
               <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
                 <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{f}
               </li>
