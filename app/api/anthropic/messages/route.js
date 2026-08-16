@@ -1,6 +1,8 @@
 import { requireUser } from '../../../../lib/auth.js';
 import { checkRateLimit, clientIp } from '../../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../../lib/cors.js';
+import { checkDailyQuota } from '../../../../lib/quota.js';
+import { isPro } from '../../../../lib/entitlements.js';
 
 export const runtime = 'edge';
 
@@ -51,6 +53,16 @@ export async function POST(request) {
     return json({ error: 'messages array required' }, 400);
   }
 
+  // Cuota diaria. DESPUÉS de validar el cuerpo: una petición malformada no debe gastar el
+  // día de nadie. Y antes de llamar a Anthropic, que es lo que cuesta dinero.
+  //
+  // Los límites por minuto de arriba acotan la ráfaga; esto acota el TOTAL, que es lo que
+  // determina la factura — 5/min sostenidos serían 7.200 llamadas diarias. Es además la
+  // única diferencia real entre Free y Pro.
+  const pro = await isPro(user.id);
+  const q = await checkDailyQuota(user.id, pro, request);
+  if (q.limited) return q.limited;
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -64,7 +76,15 @@ export async function POST(request) {
   const text = await res.text();
   return new Response(text, {
     status: res.status,
-    headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
+    headers: corsHeaders(request, {
+      'Content-Type': 'application/json',
+      // Se devuelve el estado de la cuota en la propia respuesta para que la interfaz
+      // pueda avisar ("te queda 1") sin una segunda petición — y sobre todo para que el
+      // usuario no descubra el límite solo al chocarse con él.
+      'X-Scora-Quota-Limit': String(q.limit),
+      'X-Scora-Quota-Remaining': String(Math.max(0, q.limit - q.used)),
+      'X-Scora-Plan': pro ? 'pro' : 'free',
+    }),
   });
 }
 

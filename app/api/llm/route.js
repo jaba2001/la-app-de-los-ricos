@@ -9,6 +9,8 @@
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit, clientIp } from '../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/cors.js';
+import { checkDailyQuota } from '../../../lib/quota.js';
+import { isPro } from '../../../lib/entitlements.js';
 
 export const runtime = 'edge';
 const MAX_BODY_BYTES = 50 * 1024;
@@ -75,6 +77,16 @@ export async function POST(request) {
   const prompt = body.messages.map((m) => (typeof m.content === 'string' ? m.content : '')).join('\n').trim();
   if (!prompt) return json({ error: 'empty prompt' }, 400);
 
+  // Misma cuota diaria que la ruta de Anthropic, aunque aquí los proveedores sean gratis.
+  // Dos motivos:
+  //   · Su plan gratuito tiene un tope por CLAVE, compartido entre todos los usuarios: sin
+  //     límite por persona, uno solo puede dejar la app sin IA para los demás.
+  //   · Si esta ruta no tuviera cuota, cambiar LLM_PROVIDER dejaría a Pro sin nada que
+  //     ofrecer. El nivel del plan no puede depender de qué proveedor esté configurado.
+  const pro = await isPro(user.id);
+  const q = await checkDailyQuota(user.id, pro, request);
+  if (q.limited) return q.limited;
+
   // Build the provider chain: primary, then optional fallback (deduped).
   const primary = (process.env.LLM_PROVIDER || 'gemini').toLowerCase();
   const fallback = (process.env.LLM_FALLBACK || '').toLowerCase();
@@ -88,7 +100,15 @@ export async function POST(request) {
   if (text == null) return json({ error: lastErr?.message || 'All LLM providers failed' }, 502);
 
   // Normalize to Anthropic shape so the client parses it identically.
-  return json({ content: [{ type: 'text', text }], provider: used }, 200);
+  return new Response(JSON.stringify({ content: [{ type: 'text', text }], provider: used }), {
+    status: 200,
+    headers: corsHeaders(request, {
+      'Content-Type': 'application/json',
+      'X-Scora-Quota-Limit': String(q.limit),
+      'X-Scora-Quota-Remaining': String(Math.max(0, q.limit - q.used)),
+      'X-Scora-Plan': pro ? 'pro' : 'free',
+    }),
+  });
 }
 
 function jsonFor(request, obj, status) {
