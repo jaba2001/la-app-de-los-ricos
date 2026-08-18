@@ -6,7 +6,7 @@
 // volatilidad de 35, decir "rotación" en un día en que todo se movió junto, o rellenar con
 // texto un hueco donde falta el dato. Todo eso es puro y se prueba aquí entero.
 import {
-  buildDailyClose, classifyBreadth, rankSectorDay, regimeShift, SECTOR_UNIVERSE,
+  buildDailyClose, classifyBreadth, rankSectorDay, regimeShift, SECTOR_UNIVERSE, parseYahooQuote,
 } from "../lib/dailyClose.js";
 
 let bad = 0, n = 0;
@@ -191,6 +191,75 @@ for (const m of [null, {}, { regime_id: 123 }, { vix: "x" }]) {
   const round = JSON.parse(JSON.stringify(rep));
   ok("contrato: round-trip JSON conserva el payload", JSON.stringify(round) === JSON.stringify(rep));
   ok("contrato: round-trip conserva los 11 sectores", round.sectors.length === 11);
+}
+
+// ── parseYahooQuote: la fuente de precios del cierre ────────────────────────────
+// POR QUÉ IMPORTA: se descubrió probando contra la API REAL que el plan de FMP de este
+// proyecto no cubre ETFs (HTTP 402 en XLK/XLF/GLD/QQQ, y la forma batch siempre). El cron
+// habría respondido 503 sin escribir fila y /daily habría estado vacío para siempre, con
+// el build y todos los tests en verde. Estas comprobaciones fijan el parseo del sustituto.
+{
+  const meta = (o) => ({ chart: { result: [{ meta: { regularMarketPrice: 100, chartPreviousClose: 100, regularMarketTime: 1787083200, ...o } }] } });
+
+  // Cálculo del cambio diario.
+  {
+    const q = parseYahooQuote(meta({ regularMarketPrice: 110, chartPreviousClose: 100 }));
+    check('yahoo: +10%', Math.round(q.pct * 1000) / 1000, 10);
+  }
+  {
+    const q = parseYahooQuote(meta({ regularMarketPrice: 95, chartPreviousClose: 100 }));
+    check('yahoo: -5%', Math.round(q.pct * 1000) / 1000, -5);
+  }
+  {
+    const q = parseYahooQuote(meta({ regularMarketPrice: 100, chartPreviousClose: 100 }));
+    check('yahoo: sin cambio = 0', q.pct, 0);
+  }
+  // Caso real medido el 18-08-2026 (XLK): 185.62 sobre 186.09.
+  {
+    const q = parseYahooQuote(meta({ regularMarketPrice: 185.62, chartPreviousClose: 186.09 }));
+    ok('yahoo: caso real XLK ≈ -0.25%', Math.abs(q.pct - (-0.2526)) < 0.001);
+  }
+
+  // `previousClose` sirve de reserva cuando falta `chartPreviousClose`.
+  {
+    const j = { chart: { result: [{ meta: { regularMarketPrice: 110, previousClose: 100 } }] } };
+    const q = parseYahooQuote(j);
+    ok('yahoo: usa previousClose como reserva', q !== null && Math.round(q.pct) === 10);
+  }
+
+  // Fecha del dato: permite fechar el informe por la sesión real, no por el reloj del cron.
+  {
+    const q = parseYahooQuote(meta({ regularMarketTime: 1787083200 }));
+    ok('yahoo: asOf es un día ISO', /^\d{4}-\d{2}-\d{2}$/.test(q.asOf));
+  }
+  {
+    const q = parseYahooQuote(meta({ regularMarketTime: null }));
+    check('yahoo: sin marca de tiempo, asOf null', q.asOf, null);
+  }
+
+  // Degradación: nada de esto puede devolver un número inventado.
+  check('yahoo: null', parseYahooQuote(null), null);
+  check('yahoo: undefined', parseYahooQuote(undefined), null);
+  check('yahoo: objeto vacío', parseYahooQuote({}), null);
+  check('yahoo: sin result', parseYahooQuote({ chart: {} }), null);
+  check('yahoo: result vacío', parseYahooQuote({ chart: { result: [] } }), null);
+  check('yahoo: sin meta', parseYahooQuote({ chart: { result: [{}] } }), null);
+  check('yahoo: sin precio', parseYahooQuote(meta({ regularMarketPrice: null })), null);
+  check('yahoo: sin cierre previo', parseYahooQuote(meta({ chartPreviousClose: null, previousClose: null })), null);
+  // Un cierre previo de 0 daría Infinity: tiene que caer, no colarse en el informe.
+  check('yahoo: cierre previo 0 → null', parseYahooQuote(meta({ chartPreviousClose: 0 })), null);
+  check('yahoo: precio 0 → null', parseYahooQuote(meta({ regularMarketPrice: 0 })), null);
+  check('yahoo: precio negativo → null', parseYahooQuote(meta({ regularMarketPrice: -5 })), null);
+  check('yahoo: precio no numérico → null', parseYahooQuote(meta({ regularMarketPrice: "x" })), null);
+  check('yahoo: respuesta de error de la API', parseYahooQuote({ chart: { result: null, error: { code: "Not Found" } } }), null);
+
+  // Invariante: nunca lanza, y si devuelve algo es un número finito.
+  for (const j of [null, {}, { chart: null }, { chart: { result: [null] } }, meta({}), meta({ regularMarketPrice: NaN }), "texto", 42]) {
+    try {
+      const q = parseYahooQuote(j);
+      ok('yahoo: o null o un pct finito', q === null || Number.isFinite(q.pct));
+    } catch (e) { bad++; n++; console.log(`FAIL  parseYahooQuote lanzó: ${e.message}`); }
+  }
 }
 console.log(`\n${bad === 0 ? "✓" : "✗"} dailyClose: ${n - bad} passed, ${bad} failed`);
 process.exit(bad === 0 ? 0 : 1);

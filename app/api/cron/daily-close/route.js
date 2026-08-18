@@ -9,10 +9,11 @@
 // informe es plantilla sobre valores medidos, y los huecos se declaran (`gaps`) en vez de
 // rellenarse.
 //
-// Coste: 12 cotizaciones FMP al día. Nada más.
-// Env: CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_KEY, FMP_KEY.
+// Coste: 12 peticiones al día a la API chart de Yahoo (gratis, sin clave). Ninguna a FMP —
+// su plan aquí no cubre ETFs; ver `fetchQuotes`.
+// Env: CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_KEY.
 import { assertCron, pgv } from '../../../../lib/cron.js';
-import { buildDailyClose, SECTOR_UNIVERSE } from '../../../../lib/dailyClose.js';
+import { buildDailyClose, SECTOR_UNIVERSE, parseYahooQuote } from '../../../../lib/dailyClose.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -24,28 +25,45 @@ const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type':
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-/** Cotización batch de FMP: un solo GET para los 12 símbolos. */
+// Yahoo bloquea las peticiones sin User-Agent de navegador; lib/macro.js hace lo mismo.
+const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36';
+
+/**
+ * Cotizaciones de los 12 símbolos, una petición por símbolo, en paralelo.
+ *
+ * NO se usa FMP aquí: verificado contra la API real el 18-08-2026, el plan de este
+ * proyecto **no cubre ETFs** — XLK, XLF, GLD y QQQ devuelven HTTP 402 tanto en
+ * `/stable/quote` como en `/stable/historical-price-eod` (SPY y las acciones sí pasan), y
+ * la forma batch `?symbol=A,B,C` devuelve 402 siempre. Un informe sin los 11 sectoriales
+ * pierde justo la parte que lo diferencia. Ver `parseYahooQuote` en lib/dailyClose.js.
+ *
+ * Cada símbolo degrada por separado: el que falle queda a null y el informe lo declara en
+ * `gaps` en vez de inventarlo.
+ */
 async function fetchQuotes(symbols) {
   const out = {};
-  try {
-    const u = `https://financialmodelingprep.com/stable/quote?symbol=${encodeURIComponent(symbols.join(','))}&apikey=${process.env.FMP_KEY}`;
-    const r = await fetch(u, { headers: { Accept: 'application/json' } });
-    if (!r.ok) return out;
-    const arr = await r.json();
-    if (!Array.isArray(arr)) return out;
-    for (const q of arr) {
-      const sym = String(q?.symbol || '').toUpperCase();
-      const chg = Number(q?.changePercentage ?? q?.changesPercentage);
-      if (sym) out[sym] = Number.isFinite(chg) ? chg : null;
-    }
-  } catch { /* se devuelve lo que haya; los huecos se declaran en el informe */ }
-  return out;
+  const dates = [];
+  await Promise.all(symbols.map(async (sym) => {
+    out[sym] = null;
+    try {
+      const u = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(sym)}?range=5d&interval=1d`;
+      const r = await fetch(u, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
+      if (!r.ok) return;
+      const q = parseYahooQuote(await r.json());
+      if (q) { out[sym] = q.pct; if (q.asOf) dates.push(q.asOf); }
+    } catch { /* este símbolo queda a null; el informe lo declara */ }
+  }));
+  // La fecha del propio dato manda sobre el reloj del servidor: si el cron se dispara en
+  // un festivo, el informe se fecha en la última sesión real en vez de inventar un día.
+  dates.sort();
+  return { quotes: out, asOf: dates.length ? dates[dates.length - 1] : null };
 }
 
 export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
   if (!SB || !KEY) return json({ error: 'Supabase not configured' }, 500);
-  if (!process.env.FMP_KEY) return json({ error: 'FMP_KEY missing' }, 500);
+  // Sin guarda de FMP_KEY: este cron ya no la usa, y abortar por una variable que no
+  // necesita lo dejaría muerto por una razón falsa.
 
   // 1 · los dos snapshots macro más recientes (el previo detecta el cambio de régimen)
   const mRes = await fetch(`${SB}/rest/v1/macro_state?select=*&order=snapshot_date.desc&limit=2`, { headers: sbHeaders });
@@ -53,14 +71,16 @@ export async function GET(request) {
   const macro = Array.isArray(mRows) && mRows[0] ? mRows[0] : null;
   const prevMacro = Array.isArray(mRows) && mRows[1] ? mRows[1] : null;
 
-  // 2 · una sola llamada para índice + sectores
+  // 2 · índice + sectores
   const symbols = ['SPY', ...SECTOR_UNIVERSE.map((s) => s.etf)];
-  const quotes = await fetchQuotes(symbols);
+  const { quotes, asOf } = await fetchQuotes(symbols);
   const sectors = SECTOR_UNIVERSE.map((s) => ({ ...s, changePct: quotes[s.etf] ?? null }));
   const spy = quotes.SPY != null ? { changePct: quotes.SPY } : null;
 
-  // 3 · construir. La fecha la marca el snapshot macro si existe; si no, hoy en UTC.
-  const date = (macro && macro.snapshot_date ? String(macro.snapshot_date) : new Date().toISOString()).slice(0, 10);
+  // 3 · construir. La fecha sale del propio dato de mercado; si no hay, del snapshot macro;
+  // y como último recurso, del reloj. Fechar el informe por el reloj cuando el mercado no
+  // ha abierto crearía una fila para un día que no existió.
+  const date = (asOf || (macro && macro.snapshot_date ? String(macro.snapshot_date) : new Date().toISOString())).slice(0, 10);
   const report = buildDailyClose({ macro, prevMacro, spy, sectors, date });
 
   // Un informe sin NADA medido no se publica: sería una página con la marca Scora que no
