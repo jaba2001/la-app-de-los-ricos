@@ -46,11 +46,24 @@ export interface GradedSignal {
   caveat: string;
 }
 
-/** |IC| a partir del cual una señal es interesante en equity. En la práctica un IC de
- *  0.05 sostenido ya es notable; 0.10 es mucho. Por encima de 0.15 desconfía del dato. */
-const IC_STRONG = 0.10;
-const IC_USEFUL = 0.05;
-const IC_WEAK = 0.02;
+/**
+ * EFECTO MÍNIMO DETECTABLE del IC en el universo de Scora.
+ *
+ * No es una banda elegida a ojo: `research/momentum_audit.mjs` (A8, 2026-08-17) midió que la
+ * desviación típica del IC transversal mensual es ~0.22, lo que con 192 meses deja el MDE al
+ * 80% de potencia en **0.044**. Detectar un IC de 0.03 exigiría 411 meses (34 años); uno de
+ * 0.02, setenta y siete años.
+ *
+ * Consecuencia dura: por debajo de esto un IC NO es "débil", es **indetectable**. Puntuarlo
+ * como si fuera evidencia parcial sería falso rigor — el mismo pecado que este módulo existe
+ * para evitar. Por eso la banda inferior vale CERO puntos y lo dice con todas las letras.
+ */
+export const MDE_IC = 0.044;
+
+/** Señal fuerte: el doble del efecto mínimo detectable. */
+const IC_STRONG = 2 * MDE_IC;
+/** Umbral de detectabilidad. Debajo, la muestra no puede distinguirlo del ruido. */
+const IC_USEFUL = MDE_IC;
 
 /**
  * Nota una señal a partir de su evidencia. Cuatro ejes, ninguno opcional en espíritu:
@@ -66,10 +79,9 @@ export function gradeSignal(ev: SignalEvidence): GradedSignal {
     reasons.push("Sin IC medida: no sabemos si predice algo.");
   } else {
     const a = Math.abs(ic);
-    if (a >= IC_STRONG) { points += 40; reasons.push(`IC ${ic.toFixed(3)}: fuerte para renta variable.`); }
-    else if (a >= IC_USEFUL) { points += 28; reasons.push(`IC ${ic.toFixed(3)}: útil, dentro de lo esperable.`); }
-    else if (a >= IC_WEAK) { points += 14; reasons.push(`IC ${ic.toFixed(3)}: débil, cerca del ruido.`); }
-    else { reasons.push(`IC ${ic.toFixed(3)}: indistinguible de cero.`); }
+    if (a >= IC_STRONG) { points += 40; reasons.push(`IC ${ic.toFixed(3)}: más del doble del efecto mínimo detectable (${MDE_IC}).`); }
+    else if (a >= IC_USEFUL) { points += 26; reasons.push(`IC ${ic.toFixed(3)}: por encima del efecto mínimo detectable (${MDE_IC}).`); }
+    else { reasons.push(`IC ${ic.toFixed(3)}: POR DEBAJO del efecto mínimo detectable (${MDE_IC}). No es una señal débil — con esta muestra es indetectable, y un IC así solo se "confirma" por azar.`); }
     if (ic < 0) reasons.push("Ojo: el signo es NEGATIVO — predice al revés de como se usa.");
   }
 

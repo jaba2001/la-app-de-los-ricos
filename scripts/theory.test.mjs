@@ -19,7 +19,7 @@ import {
 } from "../lib/greeks.ts";
 import { amihudIlliquidity, arbitrageCost, arbitrageCapitalStress, STRUCTURAL_EDGES } from "../lib/frictions.ts";
 import { computeGovernance, jensenFcfTest, shareholderYield } from "../lib/governance.ts";
-import { gradeSignal, GRADE_COLOR, GRADE_LABEL } from "../lib/signalGrade.ts";
+import { gradeSignal, GRADE_COLOR, GRADE_LABEL, MDE_IC } from "../lib/signalGrade.ts";
 
 let pass = 0, fail = 0;
 function approx(name, got, want, tol = 1e-3) {
@@ -391,6 +391,16 @@ function heteroSeries(p, n, seed) {
   // El caso REAL de Scora: IC ~0.01, sin gate OOS, 201 ensayos. No puede salir bien parado.
   const real = gradeSignal({ ic: 0.0103, oos: "not-tested", sampleSize: 9257, pointInTime: true, trials: 201 });
   ok("el caso real de seleccion sale C o D", real.grade === "C" || real.grade === "D");
+
+  // MDE (momentum_audit A8, 2026-08-17): por debajo de 0.044 el IC es INDETECTABLE con esta
+  // muestra, no "debil". Puntuarlo como evidencia parcial seria falso rigor.
+  const bajoMde = gradeSignal({ ic: MDE_IC - 0.01, oos: "passed", sampleSize: 9000, pointInTime: true });
+  const sobreMde = gradeSignal({ ic: MDE_IC + 0.01, oos: "passed", sampleSize: 9000, pointInTime: true });
+  ok("IC bajo el MDE no suma puntos de IC", sobreMde.points - bajoMde.points >= 20);
+  ok("IC bajo el MDE lo dice explicitamente", bajoMde.reasons.some((r) => r.includes("POR DEBAJO")));
+  ok("un IC de 0.02 no puntua (exigiria 77 anos de datos)",
+    gradeSignal({ ic: 0.02, oos: "passed", sampleSize: 9000, pointInTime: true }).points ===
+    gradeSignal({ ic: 0.0, oos: "passed", sampleSize: 9000, pointInTime: true }).points);
 }
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} teoría: ${pass} passed, ${fail} failed`);

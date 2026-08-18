@@ -13,7 +13,7 @@ import signalsIc from "@/research/out/signals_ic.json";
 import backtestSummary from "@/research/out/backtest_summary.json";
 import portfolioBacktest from "@/research/out/portfolio_backtest.json";
 import trialsLedger from "@/research/out/trials_ledger.json";
-import { gradeSignal, GRADE_COLOR, GRADE_LABEL, type OosStatus } from "@/lib/signalGrade";
+import { gradeSignal, GRADE_COLOR, GRADE_LABEL, MDE_IC, type OosStatus } from "@/lib/signalGrade";
 import { FACTOR_LABEL } from "@/lib/ensemble";
 
 export const metadata: Metadata = {
@@ -93,6 +93,12 @@ export default function EvidencePage() {
           the index by picking stocks on free data is the moat, not the failure — Grossman &amp; Stiglitz (1980) showed
           markets can&rsquo;t be perfectly efficient either, because then nobody would pay to gather information. The
           return to research exists; it just isn&rsquo;t where retail products claim it is.
+        </p>
+        <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
+          Scope matters: this is measured on <strong>US large caps with free data</strong>. It is not a claim that no
+          one can ever beat an index. Where margin plausibly remains — less efficient universes, factor combinations
+          gated by regime, risk and drawdown control rather than selection — is a different question, and one that has
+          to be answered with the same measurement discipline rather than asserted.
         </p>
       </div>
 
@@ -190,7 +196,18 @@ export default function EvidencePage() {
         <div className="section-label">How to read this page</div>
         <ul style={{ margin: 0, paddingLeft: "1.1rem", color: "var(--sr-text-2)", fontSize: "var(--sr-t-sm)", lineHeight: 1.75 }}>
           <li>Every number comes from a committed artifact in <code>research/out/</code>. The test suite fails if a file is missing or if the constants shipped in the code drift from it.</li>
-          <li>An information coefficient near zero means <em>no predictive power</em>. In equities a sustained 0.05 is already notable; treat anything above 0.15 as a data problem, not a discovery.</li>
+          <li>
+            An information coefficient near zero means <em>no predictive power</em>. More precisely: this universe&rsquo;s
+            <strong>minimum detectable effect is IC {MDE_IC}</strong> at 80% power (measured — the cross-sectional IC has
+            a standard deviation of ~0.22, so 192 months buys you that much resolution and no more). Below it a
+            coefficient is not &ldquo;weak&rdquo;, it is <em>undetectable</em>: confirming an IC of 0.02 would take
+            seventy-seven years of data. Grades score it as zero, not as partial credit.
+          </li>
+          <li>
+            Benchmark caveat: the headline compares against SPY. A cap-weighted index is not the only fair yardstick —
+            the same signal can beat SPY and lose badly against its own equal-weighted universe, which is the benchmark
+            that shares the universe&rsquo;s selection bias. Read single-benchmark claims here, including ours, with that in mind.
+          </li>
           <li>Grades penalise multiplicity: {totalTrials} trials on the same history raise the bar for all of them. Only one market history exists, and every pass spends it.</li>
           <li>Point-in-time universe means delisted and removed names are included as of each date — no survivorship bias inflating the result.</li>
           <li>Past measurement is not a forecast. Nothing here is investment advice.</li>
