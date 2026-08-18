@@ -35,6 +35,13 @@ jobs:
 
       - name: P2 maths self-tests
         run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
+      # Los módulos teóricos (PLAN_TEORIA_FINANCIERA_SCORA.md): CAPM/APT, Ledoit-Wolf,
+      # Black-Litterman, límites al arbitraje, costes de agencia y la medición con BSM.
+      # Incluye dos invariantes que no pueden romperse en silencio: la descomposición de
+      # varianza del modelo factorial debe sumar R², y Black-Litterman con confianza 0 debe
+      # devolver EXACTAMENTE los pesos de mercado (es la honestidad hecha aritmética).
+      - name: Theory module tests
+        run: node --experimental-strip-types --no-warnings scripts/theory.test.mjs
       # Guards the filing-grounding path: chunking that loses no text, and a prompt budget
       # that caps the whole block instead of re-truncating each passage (the original bug).
       - name: Retrieval tests
