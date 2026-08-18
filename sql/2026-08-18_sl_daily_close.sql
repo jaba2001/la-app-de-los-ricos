@@ -37,13 +37,31 @@ CREATE POLICY sl_daily_close_read ON sl_daily_close FOR SELECT USING (true);
 -- `anon` y `authenticated` necesitan el grant de SELECT; RLS es quien acota el resto.
 GRANT SELECT ON sl_daily_close TO anon, authenticated;
 
+-- DEFENSA EN PROFUNDIDAD (añadido al aplicar, 2026-08-18).
+-- El proyecto concede por defecto ALL a anon/authenticated en las tablas de `public` —
+-- se comprobó que `sl_alerts` y `sl_analyses` arrastran exactamente los mismos grants.
+-- Para INSERT/UPDATE/DELETE da igual: con RLS activo y solo política de SELECT, esos
+-- comandos ya son imposibles (verificado ejecutando un INSERT como `anon`: bloqueado).
+--
+-- TRUNCATE es la excepción que sí importa: NO está sujeto a RLS. Solo lo frena el grant,
+-- y la anon key es pública, así que sin esto cualquiera podría vaciar el histórico.
+REVOKE INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER
+  ON sl_daily_close FROM anon, authenticated;
+
 -- Índice para "los últimos N días" (la portada de /daily y el sitemap).
 CREATE INDEX IF NOT EXISTS sl_daily_close_date_idx ON sl_daily_close (close_date DESC);
 
+-- APLICADA EN PRODUCCIÓN el 2026-08-18 (proyecto ic-ai-system). Estado verificado:
+--   anon:           SELECT ✓ · INSERT ✗ · DELETE ✗ · TRUNCATE ✗
+--   authenticated:  SELECT ✓ · TRUNCATE ✗
+--   service_role:   INSERT ✓  (el cron escribe)
+--
 -- Verificar:
 --   select policyname, cmd from pg_policies
 --   where schemaname='public' and tablename='sl_daily_close';
 -- Esperado: sl_daily_close_read [SELECT]. Nada más.
+--
+--   select has_table_privilege('anon','sl_daily_close','TRUNCATE');  -- debe ser false
 --
 --   -- con la anon key debe devolver filas:
 --   select close_date from sl_daily_close order by close_date desc limit 5;
