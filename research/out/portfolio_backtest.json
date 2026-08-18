@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-08-18T11:56:18.553Z",
+  "mode": "curated",
+  "macro": false,
+  "universe": 43,
+  "months": 79,
+  "sectorCap": 0.3,
+  "byN": {
+    "20": {
+      "total": 184.7758771565632,
+      "spyTotal": 156.06921246089735,
+      "sharpe": 0.9911979040792386,
+      "sortino": 1.6999718034967641,
+      "calmar": 0.6430125443164522,
+      "maxDrawdown": -27.280387842367748,
+      "jensenAlpha": 2.4470424284918844,
+      "beta": 0.9464888352368586,
+      "informationRatio": 0.2961849524878772,
+      "upCapture": 1.0412103765923226,
+      "downCapture": 0.9869830008066868,
+      "var95": -8.108964315954326,
+      "cvar95": -9.787298128133992,
+      "annVol": 17.69879365066074,
+      "timing": 0.4549251212387057,
+      "sharpeCI": {
+        "lo": 0.5492374323692378,
+        "hi": 1.8165157146302968
+      }
+    },
+    "30": {
+      "total": 189.53638968073312,
+      "spyTotal": 156.06921246089735,
+      "sharpe": 0.9940415246570817,
+      "sortino": 1.6856116128817085,
+      "calmar": 0.6993621367459483,
+      "maxDrawdown": -25.516308893165363,
+      "jensenAlpha": 2.3234024605785337,
+      "beta": 0.9732675646504036,
+      "informationRatio": 0.4142075970895789,
+      "upCapture": 1.0415262041103832,
+      "downCapture": 0.9700146096138366,
+      "var95": -8.26523382348757,
+      "cvar95": -10.496211607588396,
+      "annVol": 17.953448058283552,
+      "timing": 0.23286409381587156,
+      "sharpeCI": {
+        "lo": 0.5722294418135742,
+        "hi": 1.8649011123340677
+      }
+    },
+    "40": {
+      "total": 189.9980970108113,
+      "spyTotal": 156.06921246089735,
+      "sharpe": 0.9913482338035341,
+      "sortino": 1.6898531340973024,
+      "calmar": 0.7186738637414113,
+      "maxDrawdown": -24.883422536058355,
+      "jensenAlpha": 2.2521113259757843,
+      "beta": 0.9801210206411578,
+      "informationRatio": 0.4354462718973724,
+      "upCapture": 1.0254311594967538,
+      "downCapture": 0.9368498662823442,
+      "var95": -7.755198881880837,
+      "cvar95": -11.073549543498958,
+      "annVol": 18.040573338259698,
+      "timing": 0.326510767625572,
+      "sharpeCI": {
+        "lo": 0.5634705819645021,
+        "hi": 1.818949840802689
+      }
+    }
+  },
+  "significance": {
+    "trials": 3,
+    "srBenchMonthly": 0.258,
+    "deflationThresholdSR0": 0.0004,
+    "bestN": 30,
+    "bestSharpeMonthly": 0.287,
+    "skew": -0.28,
+    "kurt": 3.05,
+    "PSR_vs_SPY": 0.595,
+    "DSR": 0.992,
+    "cumulativeTrials": 201,
+    "deflationThresholdSR0_cumulative": 0.3162,
+    "DSR_cumulative": 0.404,
+    "cumulativeSharpeSdMonthly": 0.11428,
+    "cumulativeNote": "DSR es la cota OPTIMISTA (M y var(SR) de este script). DSR_cumulative es la CONSERVADORA (M del libro de ensayos + dispersion agrupada entre laboratorios). La verdad esta entre ambas: agrupar familias distintas infla var(SR) sobre lo que supone Bailey-Lopez de Prado. Ninguna de las dos rescata el veredicto, que ya cae por PSR vs SPY.",
+    "oos": {
+      "split": 47,
+      "trainSharpe": 0.7473782603780398,
+      "testSharpe": 1.6372526520503905,
+      "trainTotal": 68.7,
+      "testTotal": 71.6,
+      "spyTrainTotal": 51.3,
+      "spyTestTotal": 69.3
+    }
+  },
+  "verdict": "NOT ROBUST — the selection portfolio does NOT significantly beat SPY after PSR/deflation; the measured edge is in the regime allocator (C3), not stock selection."
+}

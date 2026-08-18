@@ -17,4 +17,21 @@ tsconfig.tsbuildinfo
 
 # research pipeline caches/outputs (regenerable)
 research/.cache/
-research/out/
+research/out/*
+
+# …salvo los ARTEFACTOS DE EVIDENCIA. No son "regenerables" en el sentido que importa:
+# son la justificación de constantes que van en el código (ENSEMBLE_WEIGHTS,
+# GROWTH_BACKTEST, ALLOCATOR_BACKTEST…) y la entrada de los guardianes anti-deriva del
+# golden test. Mientras estuvieron ignorados, esos guardianes se saltaban en SILENCIO en
+# cada checkout limpio y los pesos derivaron meses sin que nadie lo viera. Un guardián que
+# se salta solo es peor que no tener guardián: da la señal verde sin haber mirado.
+# Son ficheros de 1-105 KB. Versionarlos es el precio de que la evidencia sea reproducible.
+!research/out/signals_ic.json
+!research/out/growth_metrics.json
+!research/out/backtest_assets_summary.json
+!research/out/regime_factor_validate.json
+!research/out/portfolio_backtest.json
+!research/out/capture_lab.json
+!research/out/allocator_lab.json
+!research/out/backtest_summary.json
+!research/out/trials_ledger.json

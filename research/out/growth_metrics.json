@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-07-12T15:59:06.943Z",
+  "months": 234,
+  "window": {
+    "start": "2007-01-01"
+  },
+  "totals": {
+    "growth": 636.7,
+    "growthNoBtc": 580.4,
+    "defensive": 220.1,
+    "bench6040": 368,
+    "spy": 652.2
+  },
+  "report": {
+    "growth": {
+      "cagr": 10.78,
+      "vol": 10.81,
+      "sharpe": 1,
+      "sortino": 1.74,
+      "calmar": 0.66,
+      "maxDrawdown": -16.2,
+      "var95": -4.25,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 5.1,
+      "informationRatio": -0.08,
+      "treynor": 22.14
+    },
+    "growthNoBtc": {
+      "cagr": 10.33,
+      "vol": 10.65,
+      "sharpe": 0.98,
+      "sortino": 1.67,
+      "calmar": 0.64,
+      "maxDrawdown": -16.2,
+      "var95": -4.21,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 4.73,
+      "informationRatio": -0.12,
+      "treynor": 21.48
+    },
+    "defensive": {
+      "cagr": 6.15,
+      "vol": 6.05,
+      "sharpe": 1.02,
+      "sortino": 1.7,
+      "calmar": 0.61,
+      "maxDrawdown": -10.1,
+      "var95": -2.42,
+      "cvar95": -3.65,
+      "beta": 0.22,
+      "alpha": 3.55,
+      "informationRatio": -0.41,
+      "treynor": 27.76
+    },
+    "bench6040": {
+      "cagr": 8.24,
+      "vol": 9.84,
+      "sharpe": 0.86,
+      "sortino": 1.33,
+      "calmar": 0.29,
+      "maxDrawdown": -28.8,
+      "var95": -4.44,
+      "cvar95": -6.46,
+      "beta": 0.58,
+      "alpha": 1.64,
+      "informationRatio": -0.45,
+      "treynor": 14.59
+    },
+    "spy": {
+      "cagr": 10.9,
+      "vol": 16.36,
+      "sharpe": 0.72,
+      "sortino": 1.07,
+      "calmar": 0.22,
+      "maxDrawdown": -50.7,
+      "var95": -8.21,
+      "cvar95": -11.18,
+      "beta": null,
+      "alpha": null,
+      "informationRatio": null,
+      "treynor": null
+    }
+  }
+}

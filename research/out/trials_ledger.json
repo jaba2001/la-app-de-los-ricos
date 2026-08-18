@@ -1,0 +1,221 @@
+{
+  "generatedAt": "2026-08-18T11:56:32.219Z",
+  "totalTrials": 201,
+  "artifacts": 26,
+  "isLowerBound": true,
+  "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
+  "sharpeSamples": 127,
+  "sharpeMeanMonthly": 0.19944,
+  "sharpeStdDevMonthly": 0.11428,
+  "entries": [
+    {
+      "file": "signals_ic.json",
+      "lab": "signals_ic",
+      "note": "IC por factor y régimen",
+      "trials": 27,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T11:40:06.277Z"
+    },
+    {
+      "file": "beat_index_lab_2018-07-01.json",
+      "lab": "beat_index_lab",
+      "note": "Intentos de batir al índice",
+      "trials": 11,
+      "sharpesFound": 11,
+      "generatedAt": "2026-07-11T10:31:14.193Z"
+    },
+    {
+      "file": "momentum_audit_long.json",
+      "lab": "momentum_audit",
+      "note": "Auditoría de momentum",
+      "trials": 11,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T11:40:10.650Z"
+    },
+    {
+      "file": "sector_tilt_validate.json",
+      "lab": "sector_tilt_validate",
+      "note": "Validación del tilt sectorial",
+      "trials": 11,
+      "sharpesFound": 11,
+      "generatedAt": "2026-07-11T16:58:03.133Z"
+    },
+    {
+      "file": "aggressive_lab.json",
+      "lab": "aggressive_lab",
+      "note": "Apalancamiento, coberturas cortas, long-vol, CPPI",
+      "trials": 10,
+      "sharpesFound": 10,
+      "generatedAt": "2026-07-10T22:55:36.708Z"
+    },
+    {
+      "file": "regime_sector_lab.json",
+      "lab": "regime_sector_lab",
+      "note": "Rotación sectorial y de factores por régimen",
+      "trials": 10,
+      "sharpesFound": 0,
+      "generatedAt": "2026-07-11T15:58:12.932Z"
+    },
+    {
+      "file": "momentum_audit.json",
+      "lab": "momentum_audit",
+      "note": "Auditoría de momentum",
+      "trials": 9,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T02:48:48.357Z"
+    },
+    {
+      "file": "qgv_lab_2016-01-01_2020-01-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:55:45.132Z"
+    },
+    {
+      "file": "qgv_lab_2021-01-01_2023-06-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:55:51.638Z"
+    },
+    {
+      "file": "qgv_lab_2022-01-01_2023-06-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:53:41.313Z"
+    },
+    {
+      "file": "backtest_assets_summary.json",
+      "lab": "backtest_assets_summary",
+      "note": "Políticas multi-activo",
+      "trials": 8,
+      "sharpesFound": 8,
+      "generatedAt": "2026-07-10T12:35:56.976Z"
+    },
+    {
+      "file": "beat_index_lab.json",
+      "lab": "beat_index_lab",
+      "note": "Intentos de batir al índice",
+      "trials": 8,
+      "sharpesFound": 8,
+      "generatedAt": "2026-07-11T10:30:06.740Z"
+    },
+    {
+      "file": "capture_lab.json",
+      "lab": "capture_lab",
+      "note": "Variantes de captura (beta alta) vs SPY",
+      "trials": 7,
+      "sharpesFound": 7,
+      "generatedAt": "2026-07-12T15:50:17.491Z"
+    },
+    {
+      "file": "multitimeframe_lab_full.json",
+      "lab": "multitimeframe_lab",
+      "note": "Momentum por horizonte y confluencia",
+      "trials": 7,
+      "sharpesFound": 0,
+      "generatedAt": "2026-07-11T15:25:36.818Z"
+    },
+    {
+      "file": "qgv_lab.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 7,
+      "sharpesFound": 7,
+      "generatedAt": "2026-07-13T19:48:56.758Z"
+    },
+    {
+      "file": "allocator_lab.json",
+      "lab": "allocator_lab",
+      "note": "Políticas de asignación del curso vs C3",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-26T07:24:03.041Z"
+    },
+    {
+      "file": "ls_lab.json",
+      "lab": "ls_lab",
+      "note": "Long/short por factor con puertas de correlación",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-12T15:59:47.306Z"
+    },
+    {
+      "file": "options_collar_lab.json",
+      "lab": "options_collar_lab",
+      "note": "Collars y overlays de opciones",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-11T14:48:59.296Z"
+    },
+    {
+      "file": "growth_metrics_2007-01-01.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T16:01:25.446Z"
+    },
+    {
+      "file": "growth_metrics_2020-01-01.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T16:01:26.218Z"
+    },
+    {
+      "file": "growth_metrics.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T15:59:06.943Z"
+    },
+    {
+      "file": "regime_factor_validate.json",
+      "lab": "regime_factor_validate",
+      "note": "Validación de la rotación growth/value",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-11T16:21:37.750Z"
+    },
+    {
+      "file": "momentum_lab.json",
+      "lab": "momentum_lab",
+      "note": "Señales de momentum (sesión 2026-08-17)",
+      "trials": 4,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T02:56:18.874Z"
+    },
+    {
+      "file": "momentum_lab_smoke.json",
+      "lab": "momentum_lab",
+      "note": "Señales de momentum (sesión 2026-08-17)",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-17T23:47:13.656Z"
+    },
+    {
+      "file": "portfolio_backtest.json",
+      "lab": "portfolio_backtest",
+      "note": "Barrido de N de la cartera de selección",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T11:56:18.553Z"
+    },
+    {
+      "file": "factor_dist.json",
+      "lab": "factor_dist",
+      "note": "Distribuciones de factores",
+      "trials": 0,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T03:13:46.948Z"
+    }
+  ],
+  "uncounted": []
+}

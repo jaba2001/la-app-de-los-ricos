@@ -1,0 +1,266 @@
+{
+  "generatedAt": "2026-08-18T11:40:05.914Z",
+  "universe": 120,
+  "mode": "full-sp500-pit",
+  "macroOverlay": false,
+  "rebalances": 79,
+  "nameMonths": 9257,
+  "buyThreshold": 60,
+  "horizons": {
+    "1": {
+      "buyN": 2843,
+      "buyHit": 0.48153359127682027,
+      "buyAlpha": -0.15028495271254452,
+      "restN": 6414,
+      "restHit": 0.47630183972560025,
+      "restAlpha": -0.19762385459509293
+    },
+    "3": {
+      "buyN": 2843,
+      "buyHit": 0.455856489623637,
+      "buyAlpha": -0.47457359799036675,
+      "restN": 6414,
+      "restHit": 0.46195821640162144,
+      "restAlpha": -0.6344135436420587
+    },
+    "6": {
+      "buyN": 2843,
+      "buyHit": 0.4421385860007035,
+      "buyAlpha": -0.7443344394836602,
+      "restN": 6414,
+      "restHit": 0.4471468662301216,
+      "restAlpha": -1.3554289523549055
+    },
+    "12": {
+      "buyN": 2843,
+      "buyHit": 0.4263102356665494,
+      "buyAlpha": -1.200921845939024,
+      "restN": 6414,
+      "restHit": 0.4334268787028375,
+      "restAlpha": -2.608869113415501
+    }
+  },
+  "regimes": {
+    "expansion": {
+      "months": 74,
+      "n": 2667,
+      "alpha": -0.34598408299199085
+    },
+    "reflation": {
+      "months": 2,
+      "n": 65,
+      "alpha": 0.15357483556963428
+    },
+    "stagflation": {
+      "months": 0,
+      "n": 0,
+      "alpha": null
+    },
+    "contraction": {
+      "months": 3,
+      "n": 111,
+      "alpha": -3.9320320185495152
+    }
+  },
+  "caveats": [
+    "point-in-time S&P 500 membership (incl. removed names)",
+    "fully-delisted names omitted (Yahoo) — add Tiingo for a bias-free universe",
+    "pure-micro score (regime is descriptive only)",
+    "sector benchmarks held constant"
+  ],
+  "informationCoefficient": 0.01034356145081628,
+  "deciles": [
+    0.46665401140645174,
+    -1.3862687685952455,
+    -1.5031501997929773,
+    -0.9943748545322484,
+    -0.34618563127610846,
+    0.2533880402284696,
+    -1.0294188257126768,
+    -0.24514162671876427,
+    0.15905286461285928,
+    -1.2229663003273088
+  ],
+  "topMinusBottom": -1.6896203117337605,
+  "equity": {
+    "buyTotalReturn": 108.8070005623476,
+    "spyTotalReturn": 156.06921246089735,
+    "sharpe": 0.7032265200503665,
+    "maxDrawdown": -29.81639419634009,
+    "months": 79,
+    "avgMonthlyExcess": -0.2498070237932549
+  },
+  "correlation": {
+    "months": 79,
+    "scores": {
+      "valueQuality": [
+        {
+          "label": "LOW  corr (stock-pickers)",
+          "months": 26,
+          "avgCorr": 0.12861300862448205,
+          "ic": -0.011536835188890888,
+          "decileSpread": -1.9774471283720478
+        },
+        {
+          "label": "MID  corr",
+          "months": 27,
+          "avgCorr": 0.21195396585470933,
+          "ic": 0.014512287622497204,
+          "decileSpread": -2.1098769048093127
+        },
+        {
+          "label": "HIGH corr (macro tape)",
+          "months": 26,
+          "avgCorr": 0.39705938860399037,
+          "ic": 0.02789489629685479,
+          "decileSpread": -0.48120504572280787
+        }
+      ],
+      "momentum": [
+        {
+          "label": "LOW  corr (stock-pickers)",
+          "months": 26,
+          "avgCorr": 0.12861300862448205,
+          "ic": 0.0667311622217864,
+          "decileSpread": 4.922130634018464
+        },
+        {
+          "label": "MID  corr",
+          "months": 27,
+          "avgCorr": 0.21195396585470933,
+          "ic": -0.035275905916856636,
+          "decileSpread": -1.0393388817596678
+        },
+        {
+          "label": "HIGH corr (macro tape)",
+          "months": 26,
+          "avgCorr": 0.39705938860399037,
+          "ic": -0.0841070968869789,
+          "decileSpread": -3.795810417206588
+        }
+      ],
+      "trajectory": [
+        {
+          "label": "LOW  corr (stock-pickers)",
+          "months": 26,
+          "avgCorr": 0.12861300862448205,
+          "ic": 0.07443292541512471,
+          "decileSpread": 4.610483740184902
+        },
+        {
+          "label": "MID  corr",
+          "months": 27,
+          "avgCorr": 0.21195396585470933,
+          "ic": -0.021820708748431332,
+          "decileSpread": -1.345002526995836
+        },
+        {
+          "label": "HIGH corr (macro tape)",
+          "months": 26,
+          "avgCorr": 0.39705938860399037,
+          "ic": -0.07858254019240556,
+          "decileSpread": -3.200023093709555
+        }
+      ]
+    },
+    "gate0A_phase4": "PASS — a momentum/trajectory score earns positive low-corr IC (mom 0.067, traj 0.074) where value/quality fails (-0.012). Build the micro 2.0 around momentum/trajectory, gated by correlation.",
+    "factorIC": {
+      "value": [
+        0.015174710347775563,
+        0.07426621133723603,
+        -0.010780334957024082
+      ],
+      "health": [
+        -0.06326126636584924,
+        -0.01205752399972388,
+        0.06887481631075529
+      ],
+      "momentum": [
+        0.0034019355826343267,
+        -0.026015702866735504,
+        0.014581122952780766
+      ],
+      "growth": [
+        0.03359417187233833,
+        -0.007087972349879914,
+        -0.04459706789185405
+      ],
+      "mom12_1": [
+        0.0667311622217864,
+        -0.035275905916856636,
+        -0.0841070968869789
+      ],
+      "altmanZ": [
+        -0.0035895121205096543,
+        0.021211196775075925,
+        0.06962667470736444
+      ],
+      "accrualsQ": [
+        0.006479020563866672,
+        0.02173403021306838,
+        -0.024089315833097116
+      ],
+      "dupontRoe": [
+        -0.06592738676786379,
+        -0.043016912555430664,
+        0.03860520898770484
+      ],
+      "piotroski": [
+        -0.02095778751478167,
+        -0.011510972549979749,
+        -0.08923104318893937
+      ]
+    },
+    "ensembleWeights": {
+      "low": {
+        "value": 0.121,
+        "momentum": 0.027,
+        "growth": 0.268,
+        "mom12_1": 0.532,
+        "accrualsQ": 0.052
+      },
+      "mid": {
+        "value": 0.634,
+        "altmanZ": 0.181,
+        "accrualsQ": 0.185
+      },
+      "high": {
+        "health": 0.359,
+        "momentum": 0.076,
+        "altmanZ": 0.363,
+        "dupontRoe": 0.201
+      }
+    },
+    "ensembleOOS": {
+      "split": "2023-12-01",
+      "loCut": 0.2195636945374989,
+      "hiCut": 0.33377157030760396,
+      "trainWeights": {
+        "low": {
+          "value": 0.10125939153370325,
+          "health": 0.1519229991433104,
+          "growth": 0.008763048329758424,
+          "altmanZ": 0.4287544553208766,
+          "accrualsQ": 0.2199395088661191,
+          "piotroski": 0.08936059680623216
+        },
+        "mid": {
+          "value": 0.5684120103649583,
+          "momentum": 0.13565414551270522,
+          "accrualsQ": 0.2959338441223365
+        },
+        "high": {
+          "health": 0.3200191713569471,
+          "growth": 0.0819170126797703,
+          "altmanZ": 0.3229302505195356,
+          "dupontRoe": 0.27513356544374695
+        }
+      },
+      "testMonths": 32,
+      "ensembleIC": -0.047627066102724006,
+      "scoreIC": -0.004518784841132946,
+      "pass": false,
+      "verdict": "KEEP INFORMATIONAL — frozen ensemble OOS IC -0.048 vs score -0.005 over 32 test months does not clear the bar (must be >0 AND beat the score). The card stays a transparent read, not a score input."
+    }
+  }
+}
