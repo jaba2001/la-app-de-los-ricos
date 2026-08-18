@@ -96,7 +96,18 @@ for (const date of dates) {
     // (the input to the A5 IC-weighted ensemble). value/health/momentum/growth are the
     // production factors; mom121 is the pure price-momentum ranker; the quality/credit
     // rankers (Fase 7) are measured alongside them.
+    // Fase F4 — señales de AGENCIA (Jensen & Meckling 1976), point-in-time desde el bundle
+    // de hace 12 meses que Piotroski ya necesita. Crecimiento de activos (Cooper-Gulen-Schill
+    // 2008) y emisión neta de acciones (Pontiff & Woodgate 2008) tienen IC documentada en la
+    // literatura; aquí se MIDEN, no se suponen. Se guardan con el signo YA invertido para que
+    // "mayor = mejor" como el resto de rankers: crecer activos deprisa y diluir predicen
+    // retornos BAJOS, así que el ranker es su negativo.
+    const agAssetGrowth = f.assets != null && fPrev?.assets != null && fPrev.assets !== 0
+      ? -((f.assets / fPrev.assets - 1) * 100) : null;
+    const agNetIssuance = f.shares != null && fPrev?.shares != null && fPrev.shares !== 0
+      ? -((f.shares / fPrev.shares - 1) * 100) : null;
     rows.push({ date, t, ic, mom: mom121, traj, sector, regime: macro.regime_id, fwd, alpha,
+      agAssetGrowth, agNetIssuance,
       f_value: scores.value ?? null, f_health: scores.health ?? null, f_momentum: scores.momentum ?? null, f_growth: scores.growth ?? null,
       altmanZ: q.altmanZ, accrualsQ: q.accrualsQ, dupontRoe: q.dupontRoe, piotroski: q.piotroski });
   }
@@ -265,6 +276,43 @@ if (corrDates.length >= 9) {
   // value). The golden drift guard refuses to compare against a non-full run because of it.
   writeFileSync(join(OUT, "signals_ic.json"), JSON.stringify({ generatedAt: new Date().toISOString(), full: FULL, cap: FULL ? CAP : null, universe: UNIVERSE.length, factorIC, ensembleWeights }, null, 2));
   console.log(`  → wrote research/out/signals_ic.json`);
+
+  // ── F4 · IC de las señales de AGENCIA ──────────────────────────────────────
+  // Deliberadamente FUERA de `factorDefs`: medirlas es el objetivo, pero si entraran en
+  // ensembleWeights se colarían en el composite sin haber pasado ningún gate, y además
+  // romperían el guardián anti-deriva del golden (que compara los pesos medidos con los
+  // que viajan en lib/ensemble.ts). Se miden, se publican, y ahí se quedan hasta que
+  // alguien las someta a un OOS y lo aprueben.
+  //
+  // MDE: la desviación típica del IC transversal mensual en este universo es ~0.22
+  // (momentum_audit A8), así que con N meses el efecto mínimo detectable al 80% de
+  // potencia es 2.8·0.22/sqrt(N). Sin declararlo, "no significativo" no significa nada.
+  const AGENCY = [["agAssetGrowth", "crecim. activos (neg)"], ["agNetIssuance", "emisión neta (neg)"]];
+  const IC_SD = 0.22;
+  const agency = {};
+  console.log("\n  ── F4 · IC de las señales de agencia (medidas, NO promovidas) ──");
+  const monthsWithData = new Set(rows.filter((r) => r.agAssetGrowth != null || r.agNetIssuance != null).map((r) => r.date)).size;
+  const mde = monthsWithData > 0 ? (2.8 * IC_SD) / Math.sqrt(monthsWithData) : null;
+  for (const [key, label] of AGENCY) {
+    const perMonth = [];
+    for (const d of dates) {
+      const g = rows.filter((r) => r.date === d && r[key] != null && r.fwd[3] != null);
+      if (g.length < 5) continue;
+      const c = spearman(g.map((r) => r[key]), g.map((r) => r.fwd[3]));
+      if (c != null) perMonth.push(c);
+    }
+    const icAvg = mean(perMonth);
+    const detectable = icAvg != null && mde != null && Math.abs(icAvg) >= mde;
+    agency[key] = { label, ic: icAvg, months: perMonth.length, mde, detectable };
+    console.log(`  ${label.padEnd(24)} IC ${fmtIC(icAvg)}  (${perMonth.length} meses · MDE ${mde ? mde.toFixed(3) : "—"} · ${detectable ? "DETECTABLE" : "por debajo del MDE"})`);
+  }
+  report.agencySignals = {
+    mde, icStdDevAssumed: IC_SD, monthsWithData, signals: agency,
+    verdict: Object.values(agency).some((a) => a.detectable)
+      ? "Alguna señal de agencia supera el MDE — merece un gate OOS antes de promoverla."
+      : "Ninguna señal de agencia supera el efecto mínimo detectable con esta muestra. NO es 'no funciona': es 'esta muestra no puede saberlo'. Se quedan como contexto.",
+  };
+  console.log(`  ${report.agencySignals.verdict}`);
 
   // ── F4.2 · OOS gate for the A5 ensemble ────────────────────────────────────
   // The in-sample weights above describe the whole window — circular if they were ever

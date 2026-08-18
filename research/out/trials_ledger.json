@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-18T11:56:32.219Z",
-  "totalTrials": 201,
-  "artifacts": 26,
+  "generatedAt": "2026-08-18T17:37:07.046Z",
+  "totalTrials": 204,
+  "artifacts": 27,
   "isLowerBound": true,
   "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
   "sharpeSamples": 127,
@@ -14,7 +14,7 @@
       "note": "IC por factor y régimen",
       "trials": 27,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-18T11:40:06.277Z"
+      "generatedAt": "2026-08-18T17:35:33.320Z"
     },
     {
       "file": "beat_index_lab_2018-07-01.json",
@@ -193,6 +193,14 @@
       "generatedAt": "2026-08-18T02:56:18.874Z"
     },
     {
+      "file": "factor_lab.json",
+      "lab": "factor_lab",
+      "note": "Hipótesis de fricción: ¿la IC es mayor donde el arbitraje es caro?",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T17:36:09.852Z"
+    },
+    {
       "file": "momentum_lab_smoke.json",
       "lab": "momentum_lab",
       "note": "Señales de momentum (sesión 2026-08-17)",
@@ -214,7 +222,7 @@
       "note": "Distribuciones de factores",
       "trials": 0,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-18T03:13:46.948Z"
+      "generatedAt": "2026-08-18T12:10:06.036Z"
     }
   ],
   "uncounted": []

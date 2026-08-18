@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T11:56:18.553Z",
+  "generatedAt": "2026-08-18T17:37:37.622Z",
   "mode": "curated",
   "macro": false,
   "universe": 43,
@@ -23,8 +23,8 @@
       "annVol": 17.69879365066074,
       "timing": 0.4549251212387057,
       "sharpeCI": {
-        "lo": 0.5492374323692378,
-        "hi": 1.8165157146302968
+        "lo": 0.5621859015073258,
+        "hi": 1.7991854276049593
       }
     },
     "30": {
@@ -44,8 +44,8 @@
       "annVol": 17.953448058283552,
       "timing": 0.23286409381587156,
       "sharpeCI": {
-        "lo": 0.5722294418135742,
-        "hi": 1.8649011123340677
+        "lo": 0.5916855186572866,
+        "hi": 1.8286775124977697
       }
     },
     "40": {
@@ -65,8 +65,8 @@
       "annVol": 18.040573338259698,
       "timing": 0.326510767625572,
       "sharpeCI": {
-        "lo": 0.5634705819645021,
-        "hi": 1.818949840802689
+        "lo": 0.5720126609166266,
+        "hi": 1.7996031053455186
       }
     }
   },
@@ -80,9 +80,9 @@
     "kurt": 3.05,
     "PSR_vs_SPY": 0.595,
     "DSR": 0.992,
-    "cumulativeTrials": 201,
-    "deflationThresholdSR0_cumulative": 0.3162,
-    "DSR_cumulative": 0.404,
+    "cumulativeTrials": 204,
+    "deflationThresholdSR0_cumulative": 0.3168,
+    "DSR_cumulative": 0.402,
     "cumulativeSharpeSdMonthly": 0.11428,
     "cumulativeNote": "DSR es la cota OPTIMISTA (M y var(SR) de este script). DSR_cumulative es la CONSERVADORA (M del libro de ensayos + dispersion agrupada entre laboratorios). La verdad esta entre ambas: agrupar familias distintas infla var(SR) sobre lo que supone Bailey-Lopez de Prado. Ninguna de las dos rescata el veredicto, que ya cae por PSR vs SPY.",
     "oos": {

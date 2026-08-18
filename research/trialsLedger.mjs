@@ -47,6 +47,7 @@ const LABS = [
   ["momentum_lab", "Señales de momentum (sesión 2026-08-17)"],
   ["momentum_audit", "Auditoría de momentum"],
   ["factor_dist", "Distribuciones de factores"],
+  ["factor_lab", "Hipótesis de fricción: ¿la IC es mayor donde el arbitraje es caro?"],
   ["signals_ic", "IC por factor y régimen"],
 ];
 

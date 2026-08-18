@@ -35,3 +35,4 @@ research/out/*
 !research/out/allocator_lab.json
 !research/out/backtest_summary.json
 !research/out/trials_ledger.json
+!research/out/factor_lab.json

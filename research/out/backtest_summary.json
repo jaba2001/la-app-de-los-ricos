@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T11:40:05.914Z",
+  "generatedAt": "2026-08-18T17:35:32.960Z",
   "universe": 120,
   "mode": "full-sp500-pit",
   "macroOverlay": false,
@@ -262,5 +262,27 @@
       "pass": false,
       "verdict": "KEEP INFORMATIONAL — frozen ensemble OOS IC -0.048 vs score -0.005 over 32 test months does not clear the bar (must be >0 AND beat the score). The card stays a transparent read, not a score input."
     }
+  },
+  "agencySignals": {
+    "mde": 0.06930541469704307,
+    "icStdDevAssumed": 0.22,
+    "monthsWithData": 79,
+    "signals": {
+      "agAssetGrowth": {
+        "label": "crecim. activos (neg)",
+        "ic": -0.007093512277861811,
+        "months": 79,
+        "mde": 0.06930541469704307,
+        "detectable": false
+      },
+      "agNetIssuance": {
+        "label": "emisión neta (neg)",
+        "ic": 0.014662095949229141,
+        "months": 79,
+        "mde": 0.06930541469704307,
+        "detectable": false
+      }
+    },
+    "verdict": "Ninguna señal de agencia supera el efecto mínimo detectable con esta muestra. NO es 'no funciona': es 'esta muestra no puede saberlo'. Se quedan como contexto."
   }
 }
