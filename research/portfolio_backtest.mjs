@@ -15,6 +15,7 @@ import { scoreStock } from "./score.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { sharpe, sortino, maxDrawdown, calmar, valueAtRisk, conditionalVaR, beta as betaOf, informationRatio, jensenAlpha, annualVol } from "../lib/riskMetrics.ts";
 import { normCdf } from "../lib/quality.ts";
+import { readLedgerTotal, readLedgerDispersion } from "./trialsLedger.mjs";
 
 const START = "2020-01-01";
 const COST_BPS = 10;
@@ -200,6 +201,31 @@ if (perConfig.length) {
   const best = perConfig.slice().sort((a, b) => b.mo.srP - a.mo.srP)[0];
   const psrVsSpy = psr(best.mo.srP, T, best.mo.skew, best.mo.kurt, spyMo.srP);
   const dsr = psr(best.mo.srP, T, best.mo.skew, best.mo.kurt, SR0);
+
+  // ── M ACUMULADO (2026-08-18) ────────────────────────────────────────────────
+  // `M` de arriba son los ensayos DE ESTA EJECUCIÓN (el barrido de N). Pero el M que exige
+  // la deflación es todo lo que se ha evaluado sobre LOS MISMOS DATOS, y research/ lleva
+  // una docena de laboratorios barriendo la misma historia. research/out/trials_ledger.json
+  // los cuenta (cota inferior). Se reporta el DSR con AMBOS: el de siempre para
+  // continuidad, y el honesto — que es el que hay que creerse.
+  // Dos cotas, no una. SR0 = sqrt(var(SR)) x f(M), y AMBOS factores estan mal medidos si
+  // solo miras este script:
+  //   - f(M): M=3 aqui, pero se han evaluado 200+ variantes sobre los mismos datos.
+  //   - var(SR): las 3 configs del barrido de N dan Sharpe casi identico, asi que la
+  //     varianza sale ~0 y la deflacion no muerde. La dispersion real entre todo lo
+  //     probado va de -0.02 (long/short) a 1.02 (asignador).
+  // Cota OPTIMISTA = lo de siempre (M y var de este script).
+  // Cota CONSERVADORA = M acumulado del libro de ensayos + dispersion agrupada.
+  // Agrupar familias de estrategia distintas infla var(SR) por encima de lo que supone el
+  // marco de Bailey-Lopez de Prado (que asume M intentos sobre EL MISMO problema), asi que
+  // la verdad esta ENTRE las dos. Publicarlas ambas es mas honesto que elegir una.
+  const disp = readLedgerDispersion();
+  const M_CUM = disp ? Math.max(M, disp.trials) : null;
+  const SD_CUM = disp ? Math.max(Math.sqrt(varSR), disp.sdMonthly) : null;
+  const SR0_CUM = M_CUM && M_CUM > 1 && SD_CUM != null
+    ? SD_CUM * ((1 - GAMMA) * invNorm(1 - 1 / M_CUM) + GAMMA * invNorm(1 - 1 / (M_CUM * Math.E)))
+    : null;
+  const dsrCum = SR0_CUM != null ? psr(best.mo.srP, T, best.mo.skew, best.mo.kurt, SR0_CUM) : null;
   // OOS split (train first 60% / test last 40%) for the best config.
   const cut = Math.floor(best.port.length * 0.6);
   const trainR = best.port.slice(0, cut), testR = best.port.slice(cut);
@@ -208,13 +234,24 @@ if (perConfig.length) {
     trials: M, srBenchMonthly: +spyMo.srP.toFixed(4), deflationThresholdSR0: +SR0.toFixed(4),
     bestN: best.N, bestSharpeMonthly: +best.mo.srP.toFixed(4), skew: +best.mo.skew.toFixed(2), kurt: +best.mo.kurt.toFixed(2),
     PSR_vs_SPY: +psrVsSpy.toFixed(3), DSR: +dsr.toFixed(3),
+    cumulativeTrials: M_CUM, deflationThresholdSR0_cumulative: SR0_CUM != null ? +SR0_CUM.toFixed(4) : null,
+    DSR_cumulative: dsrCum != null ? +dsrCum.toFixed(3) : null,
+    cumulativeSharpeSdMonthly: SD_CUM != null ? +SD_CUM.toFixed(5) : null,
+    cumulativeNote: "DSR es la cota OPTIMISTA (M y var(SR) de este script). DSR_cumulative es la CONSERVADORA (M del libro de ensayos + dispersion agrupada entre laboratorios). La verdad esta entre ambas: agrupar familias distintas infla var(SR) sobre lo que supone Bailey-Lopez de Prado. Ninguna de las dos rescata el veredicto, que ya cae por PSR vs SPY.",
     oos: { split: cut, trainSharpe: sharpe(trainR), testSharpe: sharpe(testR), trainTotal: +trTot(trainR).toFixed(1), testTotal: +trTot(testR).toFixed(1), spyTrainTotal: +trTot(best.spy.slice(0, cut)).toFixed(1), spyTestTotal: +trTot(best.spy.slice(cut)).toFixed(1) },
   };
   console.log(`\n  ── Significance / blindaje (best config N=${best.N}) ──`);
   console.log(`  PSR vs SPY: ${(psrVsSpy * 100).toFixed(1)}%  (prob. the portfolio's true Sharpe beats SPY's — want >95%)`);
   console.log(`  Deflated Sharpe (vs ${M}-trial threshold SR0=${SR0.toFixed(3)}/mo): ${(dsr * 100).toFixed(1)}%  (want >95% to call the Sharpe real)`);
+  if (dsrCum != null) {
+    console.log(`  Deflated Sharpe CONSERVADOR — M acumulado ${M_CUM} ensayos, sd ${SD_CUM.toFixed(4)}/mo (SR0=${SR0_CUM.toFixed(3)}/mo): ${(dsrCum * 100).toFixed(1)}%`);
+    console.log(`    (la cota de arriba usa M=${M} y la varianza de este script; la verdad esta entre ambas — ver cumulativeNote)`);
+  } else {
+    console.log(`  (sin research/out/trials_ledger.json: ejecuta research/trialsLedger.mjs para el M acumulado)`);
+  }
   console.log(`  OOS split @ ${cut}mo — train Sharpe ${sharpe(trainR).toFixed(2)} (port ${pct(trTot(trainR))}% vs SPY ${pct(trTot(best.spy.slice(0, cut)))}%) · test Sharpe ${sharpe(testR).toFixed(2)} (port ${pct(trTot(testR))}% vs SPY ${pct(trTot(best.spy.slice(cut)))}%)`);
-  report.verdict = (psrVsSpy > 0.95 && dsr > 0.95)
+  const dsrEffective = dsrCum != null ? dsrCum : dsr;
+  report.verdict = (psrVsSpy > 0.95 && dsrEffective > 0.95)
     ? "ROBUST — selection portfolio's Sharpe beats SPY and survives the multi-trial deflation."
     : "NOT ROBUST — the selection portfolio does NOT significantly beat SPY after PSR/deflation; the measured edge is in the regime allocator (C3), not stock selection.";
   console.log(`  VERDICT: ${report.verdict}`);
