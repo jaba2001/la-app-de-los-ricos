@@ -27,6 +27,7 @@ import { fileURLToPath } from "url";
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, momentum } from "./prices.mjs";
 import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
+import { metricsOf, SECTOR_ALIASES } from "./fundamentalMetrics.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -37,13 +38,6 @@ const MIN_N = 8;   // por debajo de esto, un cuantil sectorial es una anécdota,
 const limitArg = process.argv.indexOf("--limit");
 const LIMIT = limitArg >= 0 ? parseInt(process.argv[limitArg + 1], 10) : 0;
 
-// Las dos grafías de sector que conviven en el proyecto (FMP dice "Financial Services",
-// GICS y EDGAR dicen "Financials"). Se emiten AMBAS para que `lookupDist` acierte venga
-// de donde venga el nombre — el mismo criterio que ya siguen los mapas de scoring.ts.
-const SECTOR_ALIASES = {
-  "Financials": ["Financial Services"], "Financial Services": ["Financials"],
-  "Materials": ["Basic Materials"], "Basic Materials": ["Materials"],
-};
 
 function quantile(sorted, p) {
   if (!sorted.length) return null;
@@ -53,47 +47,6 @@ function quantile(sorted, p) {
   return lo === hi ? sorted[lo] : sorted[lo] + (idx - lo) * (sorted[hi] - sorted[lo]);
 }
 
-/** Métricas de un nombre, en las unidades de ScoreInputs. null donde no se pueda calcular. */
-function metricsOf(f, raw, mom) {
-  const mcap = f.shares > 0 && raw > 0 ? raw * f.shares : null;
-  const ev = mcap != null ? mcap + (f.debt ?? 0) - (f.cash ?? 0) : null;
-  const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
-  const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
-  const invested = (f.equity ?? 0) + (f.debt ?? 0);
-  const pos = (x) => (x != null && isFinite(x) && x > 0 ? x : null);
-
-  return {
-    // Valoración — sólo con denominador positivo: un PER negativo no es "barato", es otra cosa,
-    // y meterlo en la distribución contamina los cuantiles bajos justo donde más duele.
-    pe: mcap != null && pos(f.niTTM) ? mcap / f.niTTM : null,
-    pb: mcap != null && pos(f.equity) ? mcap / f.equity : null,
-    evEbitda: ev != null && pos(ebitda) ? ev / ebitda : null,
-    pfcf: mcap != null && pos(fcf) ? mcap / fcf : null,
-    // Rentabilidad (porcentaje)
-    roe: pos(f.equity) && f.niTTM != null ? (f.niTTM / f.equity) * 100 : null,
-    roa: pos(f.assets) && f.niTTM != null ? (f.niTTM / f.assets) * 100 : null,
-    roic: invested > 0 && f.oiTTM != null ? ((f.oiTTM * 0.79) / invested) * 100 : null,
-    grossMargin: pos(f.revTTM) && f.gpTTM != null ? (f.gpTTM / f.revTTM) * 100 : null,
-    netMargin: pos(f.revTTM) && f.niTTM != null ? (f.niTTM / f.revTTM) * 100 : null,
-    grossProfitability: pos(f.assets) && f.gpTTM != null ? (f.gpTTM / f.assets) * 100 : null,
-    // Fracciones
-    operatingMargin: pos(f.revTTM) && f.oiTTM != null ? f.oiTTM / f.revTTM : null,
-    capexToRevenue: pos(f.revTTM) && f.capexTTM != null ? f.capexTTM / f.revTTM : null,
-    fcfYield: mcap != null && fcf != null ? fcf / mcap : null,
-    // Solidez (ratios)
-    debtEquity: pos(f.equity) ? (f.debt ?? 0) / f.equity : null,
-    currentRatio: pos(f.curL) && f.curA != null ? f.curA / f.curL : null,
-    interestCoverage: pos(f.interestTTM) && f.oiTTM != null ? f.oiTTM / f.interestTTM : null,
-    netDebtEbitda: pos(ebitda) ? ((f.debt ?? 0) - (f.cash ?? 0)) / ebitda : null,
-    // Crecimiento (porcentaje)
-    revenueGrowth: pos(f.revPrevTTM) && f.revTTM != null ? (f.revTTM / f.revPrevTTM - 1) * 100 : null,
-    epsGrowth: pos(f.niPrevTTM) && f.niTTM != null ? (f.niTTM / f.niPrevTTM - 1) * 100 : null,
-    // Momentum (porcentaje)
-    priceChange1M: mom?.m1 ?? null,
-    priceChange3M: mom?.m3 ?? null,
-    priceChange6M: mom?.m6 ?? null,
-  };
-}
 
 const table = await loadSP500Historical();
 let members = table ? [...new Set(membersAsOf(table, today) || [])] : CURATED;
