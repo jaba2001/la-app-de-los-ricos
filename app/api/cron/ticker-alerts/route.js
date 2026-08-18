@@ -7,6 +7,7 @@
 import webpush from "web-push";
 import { crossedUpSma150, baseBreakoutConfirmed, trendStage } from "../../../../lib/technicals.js";
 import { assertCron, pgv } from '../../../../lib/cron.js';
+import { evaluateAnalysisAlert, ANALYSIS_KINDS } from '../../../../lib/alertKinds.js';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -66,8 +67,11 @@ export async function GET(request) {
   // 1) active price alerts
   const alertsRes = await fetch(`${SB}/rest/v1/sl_alerts?active=eq.true&kind=in.(price_above,price_below)&select=id,user_id,ticker,kind,threshold,last_triggered_at,one_shot`, { headers: sbHeaders });
   if (!alertsRes.ok) return json({ error: "sl_alerts read failed", status: alertsRes.status }, 500);
-  const alerts = await alertsRes.json();
-  if (!Array.isArray(alerts) || alerts.length === 0) return json({ ok: true, checked: 0, sent: 0 });
+  const alertsRaw = await alertsRes.json();
+  // NOTE (2026-08-18): esto hacía `return` cuando no había alertas de PRECIO, lo que se
+  // saltaba los bloques técnico y de análisis. Un usuario con solo alertas técnicas nunca
+  // recibía nada. Ahora el bloque de precio simplemente se queda vacío y el cron sigue.
+  const alerts = Array.isArray(alertsRaw) ? alertsRaw : [];
 
   // 2) skip alerts fired in the last 24h, then price the distinct tickers once each
   const now = Date.now();
@@ -170,5 +174,67 @@ export async function GET(request) {
     }
   }
 
-  return json({ ok: true, checked: fresh.length, priced: tickers.length, fired, techFired, techPriced, sent, pushReady, errors: errors.slice(0, 5) });
+  // ── Analysis alerts (rating_buy / rdcf_cheap) ────────────────────────────────
+  // Estos dos se declaraban en la UI pero el cron NUNCA los evaluaba: se creaban y no
+  // llegaba push. Se resuelven leyendo `sl_analyses` (el análisis que el propio usuario ya
+  // guardó) — cero llamadas a FMP. Se dispara en la TRANSICIÓN y solo si el análisis es
+  // reciente; ver lib/alertKinds.js y scripts/alertkinds.test.mjs.
+  let anFired = 0, anChecked = 0;
+  const anRes = await fetch(`${SB}/rest/v1/sl_alerts?active=eq.true&kind=in.(${ANALYSIS_KINDS.join(",")})&select=id,user_id,ticker,kind,last_triggered_at,last_value,one_shot`, { headers: sbHeaders });
+  const anAlerts = anRes.ok ? await anRes.json() : [];
+  if (Array.isArray(anAlerts) && anAlerts.length > 0) {
+    const anFresh = anAlerts.filter(a => !a.last_triggered_at || (now - new Date(a.last_triggered_at).getTime()) > DAY_MS);
+    anChecked = anFresh.length;
+
+    // Un análisis por (usuario, ticker) aunque varias alertas lo compartan.
+    const anCache = {};
+    async function latestAnalysis(userId, ticker) {
+      const key = `${userId}:${ticker}`;
+      if (key in anCache) return anCache[key];
+      const url = `${SB}/rest/v1/sl_analyses?user_id=eq.${pgv(userId)}&ticker=eq.${pgv(ticker)}&select=rating,reverse_dcf,analysis_date&order=analysis_date.desc&limit=1`;
+      const r = await fetch(url, { headers: sbHeaders });
+      const rows = r.ok ? await r.json() : [];
+      return (anCache[key] = Array.isArray(rows) && rows[0] ? rows[0] : null);
+    }
+
+    for (const a of anFresh) {
+      const analysis = await latestAnalysis(a.user_id, String(a.ticker).toUpperCase());
+      const { fire, nextValue, detail } = evaluateAnalysisAlert(a.kind, a, analysis, now);
+
+      // Sembrar last_value aunque no se dispare: sin la referencia previa nunca se
+      // detectaría la transición siguiente.
+      if (!fire) {
+        // `a.last_value` null debe contar como "sin referencia", no como 0: si no, un
+        // upside de exactamente 0 no llegaría a sembrarse y la transición se perdería.
+        const prevVal = a.last_value == null ? null : Number(a.last_value);
+        if (nextValue != null && prevVal !== nextValue) {
+          await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+            method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
+            body: JSON.stringify({ last_value: nextValue }),
+          }).catch(() => {});
+        }
+        continue;
+      }
+      anFired++;
+
+      await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+        method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
+        body: JSON.stringify({ last_triggered_at: new Date().toISOString(), last_value: nextValue, ...(a.one_shot ? { active: false } : {}) }),
+      }).catch(() => {});
+
+      if (!pushReady) continue;
+      const payload = JSON.stringify({
+        title: `Scora — ${a.ticker} ${a.kind === "rating_buy" ? "rating turned Buy" : "reverse-DCF says cheap"}`,
+        body: `${a.ticker} ${detail}.`,
+        url: `/stock/${a.ticker}`, tag: `scora-analysis-${a.ticker}`,
+      });
+      const subs = await subsFor(a.user_id);
+      await Promise.all(subs.map(async s => {
+        try { await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, payload); sent++; }
+        catch (e) { errors.push(`${a.ticker}:${e?.statusCode ?? e?.message ?? "push failed"}`); }
+      }));
+    }
+  }
+
+  return json({ ok: true, checked: fresh.length, priced: tickers.length, fired, techFired, techPriced, anChecked, anFired, sent, pushReady, errors: errors.slice(0, 5) });
 }
