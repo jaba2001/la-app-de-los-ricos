@@ -4,12 +4,38 @@ import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { Sk } from "@/components/ui/Skeleton";
 import { authedFetch } from "@/lib/proxy";
+import { gradeMetric, gradeColor, explainGrade, type MetricGrade, type FactorDistTable } from "@/lib/percentile";
+import { loadFactorDist, metricsFromRatios } from "@/lib/factorDist";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, LineChart, Line, ComposedChart, Area,
 } from "recharts";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
+
+/* ── Grados sector-relativos (F2 · P0-1) ────────────────────────────────────────
+   Un margen del 42% no significa lo mismo en software que en distribución. Aquí se
+   enseña, junto al número crudo, en qué PERCENTIL de su propio sector cae — que es
+   como se juzga de verdad. El número nunca se sustituye por la letra: esconder la
+   cifra detrás de un grado es la crítica más repetida a Seeking Alpha. */
+function GradeChip({ g }: { g: MetricGrade | null }) {
+  if (!g) return null;
+  return (
+    <div
+      title={explainGrade(g) ?? undefined}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3,
+        padding: "1px 6px", borderRadius: "var(--sr-radius-pill)",
+        fontSize: "10px", fontWeight: 700, lineHeight: 1.5,
+        color: gradeColor(g.grade),
+        background: `color-mix(in srgb, ${gradeColor(g.grade)} 13%, transparent)`,
+      }}
+    >
+      {g.grade}
+      <span style={{ fontWeight: 500, opacity: 0.8 }}>p{Math.round(g.pctl)}</span>
+    </div>
+  );
+}
 
 const n = (v: unknown, d = 2, suffix = "", prefix = "") => {
   if (v == null || v === "" || isNaN(Number(v))) return "—";
@@ -241,27 +267,52 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
   const ratios = data?.ratios;
   const metrics = data?.metrics;
   const peers = data?.peers ?? [];
+  const sector = (data?.profile?.sector as string) ?? null;
+
+  // Distribuciones sectoriales (F2). Se cargan una vez y en diferido: si el fichero no
+  // está publicado, `dist` se queda en null y los grados simplemente no aparecen.
+  const [dist, setDist] = useState<FactorDistTable | null>(null);
+  useEffect(() => { let alive = true; loadFactorDist().then((t) => { if (alive) setDist(t); }); return () => { alive = false; }; }, []);
+  const graded = useMemo(() => {
+    if (!dist || !ratios) return {} as Record<string, MetricGrade | null>;
+    const m = metricsFromRatios(ratios as Record<string, unknown>);
+    const out: Record<string, MetricGrade | null> = {};
+    for (const k of ["grossMargin", "operatingMargin", "netMargin", "roic", "roe", "roa"]) {
+      out[k] = gradeMetric(k, m[k], dist, sector);
+    }
+    return out;
+  }, [dist, ratios, sector]);
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
       {/* Margins & Profitability */}
       <div className="card">
-        <div className="section-label">Profitability (TTM)</div>
+        <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
+          <div className="section-label" style={{ margin: 0 }}>Profitability (TTM)</div>
+          {sector && Object.values(graded).some(Boolean) && (
+            <div className="sr-hint">
+              Grades are percentiles within <strong style={{ color: "var(--sr-text-2)" }}>{sector}</strong>
+            </div>
+          )}
+        </div>
         <div className="sr-grid-4">
           {[
-            { label: "Gross Margin",    val: pct(ratios?.grossProfitMarginTTM) },
-            { label: "Operating Margin",val: pct(ratios?.operatingProfitMarginTTM) },
-            { label: "Net Margin",      val: pct(ratios?.netProfitMarginTTM) },
-            { label: "FCF/Share (TTM)", val: n(ratios?.freeCashFlowPerShareTTM, 2, "", "$") },
-            { label: "ROIC",            val: pct(ratios?.returnOnInvestedCapitalTTM ?? ratios?.returnOnCapitalEmployedTTM) },
-            { label: "ROE",             val: pct(ratios?.returnOnEquityTTM) },
-            { label: "ROA",             val: pct(ratios?.returnOnAssetsTTM) },
-            { label: "EBITDA/Share",    val: n(ratios?.ebitdaPerShareTTM, 2, "", "$") },
-          ].map(({ label, val }) => (
+            { label: "Gross Margin",    val: pct(ratios?.grossProfitMarginTTM), g: graded.grossMargin },
+            { label: "Operating Margin",val: pct(ratios?.operatingProfitMarginTTM), g: graded.operatingMargin },
+            { label: "Net Margin",      val: pct(ratios?.netProfitMarginTTM), g: graded.netMargin },
+            { label: "FCF/Share (TTM)", val: n(ratios?.freeCashFlowPerShareTTM, 2, "", "$"), g: null },
+            { label: "ROIC",            val: pct(ratios?.returnOnInvestedCapitalTTM ?? ratios?.returnOnCapitalEmployedTTM), g: graded.roic },
+            { label: "ROE",             val: pct(ratios?.returnOnEquityTTM), g: graded.roe },
+            { label: "ROA",             val: pct(ratios?.returnOnAssetsTTM), g: graded.roa },
+            { label: "EBITDA/Share",    val: n(ratios?.ebitdaPerShareTTM, 2, "", "$"), g: null },
+          ].map(({ label, val, g }) => (
             <div key={label} className="sr-tile">
               <div className="sr-tile-label">{label}</div>
               {loading ? <Sk w={50} h={20} /> : (
-                <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>
+                <>
+                  <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>
+                  <GradeChip g={g ?? null} />
+                </>
               )}
             </div>
           ))}
