@@ -8,6 +8,7 @@ import { authedFetch } from "@/lib/proxy";
 import { track } from "@/lib/analytics";
 import PortfolioOptimizer from "@/components/journal/PortfolioOptimizer";
 import ExposureAudit from "@/components/journal/ExposureAudit";
+import FactorExposure from "@/components/journal/FactorExposure";
 import PositionSizer from "@/components/journal/PositionSizer";
 
 interface JournalTrade {
@@ -247,6 +248,15 @@ export default function JournalPage() {
       {/* Exposure & concentration audit */}
       {openTrades.length > 0 && (
         <ExposureAudit trades={openTrades.map(t => ({ ticker: t.ticker, shares: t.shares, price: t.price, thesis: t.thesis, sector: t.sector }))} marks={marks} />
+      )}
+
+      {/* Factor X-ray (APT): concentración por FACTOR, no por sector. Va justo detrás de la
+          auditoría por sector a propósito — el contraste entre las dos es el hallazgo. */}
+      {openTrades.length > 0 && (
+        <FactorExposure positions={openTrades.map(t => ({
+          ticker: t.ticker,
+          value: (marks[t.ticker] != null ? marks[t.ticker] : t.price) * t.shares,
+        }))} />
       )}
 
       {/* Position sizing calculator */}

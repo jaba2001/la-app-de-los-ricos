@@ -1,66 +1,13 @@
 "use client";
 import { useCallback, useMemo, useState } from "react";
-import { authedFetch } from "@/lib/proxy";
+import { fitFactorModel, scenarioImpact, explainLoadings, type FactorModel } from "@/lib/factorModel";
 import {
-  fitFactorModel, innovations, scenarioImpact, explainLoadings,
-  type FactorModel, type InnovationMethod,
-} from "@/lib/factorModel";
+  FACTOR_LABELS, SCENARIOS, fromHistory, monthlyCloses, pctReturns, fetchMacroInnovations,
+} from "@/lib/factorData";
 import { amihudIlliquidity, arbitrageCost } from "@/lib/frictions";
 import type { StockData } from "@/app/stock/[ticker]/page";
 
 interface Props { ticker: string; data: StockData | null }
-
-// ── Los factores de Chen, Roll & Ross (1986), con las series gratuitas de FRED ──
-// El paper propuso: producción industrial, inflación no anticipada, cambio en la inflación
-// esperada, prima de PLAZO y prima de CRÉDITO. Aquí van esas dos primas, la inflación
-// esperada, petróleo y dólar — más el mercado, que es el factor del CAPM.
-// `method` marca cómo se convierte el NIVEL en SORPRESA: un nivel no es un shock.
-const MACRO_FACTORS: { id: string; label: string; series: string; method: InnovationMethod; unit: string }[] = [
-  { id: "term",     label: "Prima de plazo (10a−3m)", series: "T10Y3M",        method: "diff", unit: "pp" },
-  { id: "credit",   label: "Spread de crédito HY",    series: "BAMLH0A0HYM2",  method: "diff", unit: "pp" },
-  { id: "infl",     label: "Inflación esperada 10a",  series: "T10YIE",        method: "diff", unit: "pp" },
-  { id: "oil",      label: "Petróleo (WTI)",          series: "DCOILWTICO",    method: "pct",  unit: "%" },
-  { id: "usd",      label: "Dólar (índice amplio)",   series: "DTWEXBGS",      method: "pct",  unit: "%" },
-];
-
-const FACTOR_LABELS: Record<string, string> = {
-  market: "el mercado", term: "la pendiente de tipos", credit: "el riesgo de crédito",
-  infl: "la inflación esperada", oil: "el petróleo", usd: "el dólar",
-};
-
-/** Cierre de fin de mes a partir de una serie diaria (más antiguo primero). */
-function monthlyCloses(rows: { date: string; close: number }[]): { date: string; close: number }[] {
-  const byMonth = new Map<string, { date: string; close: number }>();
-  for (const r of rows) {
-    if (!r.date || !isFinite(r.close) || r.close <= 0) continue;
-    const key = r.date.slice(0, 7);
-    const cur = byMonth.get(key);
-    if (!cur || r.date > cur.date) byMonth.set(key, r);
-  }
-  return [...byMonth.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([, v]) => v);
-}
-
-function pctReturns(closes: { close: number }[]): number[] {
-  const out: number[] = [];
-  for (let i = 1; i < closes.length; i++) out.push((closes[i].close / closes[i - 1].close - 1) * 100);
-  return out;
-}
-
-function fromHistory(rows: Record<string, unknown>[]): { date: string; close: number }[] {
-  // FMP devuelve el más reciente primero; se invierte a orden cronológico.
-  return rows
-    .map((h) => ({ date: String(h.date ?? ""), close: Number(h.adjClose ?? h.close) }))
-    .filter((r) => r.date && isFinite(r.close) && r.close > 0)
-    .reverse();
-}
-
-const SCENARIOS: { label: string; shocks: Record<string, number> }[] = [
-  { label: "Crédito +150 pb", shocks: { credit: 1.5 } },
-  { label: "Petróleo +30%", shocks: { oil: 30 } },
-  { label: "Dólar +5%", shocks: { usd: 5 } },
-  { label: "Mercado −10%", shocks: { market: -10 } },
-  { label: "Curva +100 pb", shocks: { term: 1 } },
-];
 
 export default function RiskModel({ ticker, data }: Props) {
   const [model, setModel] = useState<FactorModel | null>(null);
@@ -103,24 +50,11 @@ export default function RiskModel({ ticker, data }: Props) {
       }
       const start = stock[0].date.slice(0, 10);
 
-      // Series macro de FRED, ya agregadas a mensual por el propio FRED.
-      const macro = await Promise.all(MACRO_FACTORS.map(async (f) => {
-        try {
-          const res = await authedFetch<{ observations?: { date: string; value: string }[] }>(
-            `/api/fred/series?series_id=${f.series}&frequency=m&observation_start=${start}`
-          );
-          const vals = (res?.observations ?? [])
-            .map((o) => Number(o.value))
-            .filter((v) => isFinite(v));
-          return { f, vals };
-        } catch { return { f, vals: [] as number[] }; }
-      }));
-
-      const factors: Record<string, number[]> = { market: pctReturns(spy) };
-      for (const { f, vals } of macro) {
-        if (vals.length < 24) continue; // sin historial suficiente: se omite el factor
-        factors[f.id] = innovations(vals, f.method);
-      }
+      // Series macro de FRED, vía el módulo compartido con FactorExposure: mismos factores,
+      // mismas transformaciones, misma alineación. Si derivaran, la beta de un nombre y la de
+      // la cartera que lo contiene dejarían de ser comparables.
+      const { factors: macro } = await fetchMacroInnovations(start);
+      const factors: Record<string, number[]> = { market: pctReturns(spy), ...macro };
 
       const y = pctReturns(stock);
       const fitted = fitFactorModel(y, factors);
