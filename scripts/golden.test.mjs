@@ -1010,6 +1010,22 @@ function requireArtifact(name, regenCmd) {
       const explicit = ratingFrom(68, tf, { corrRegime: "low", horizon: "months" });
       ok(JSON.stringify(implicit) === JSON.stringify(explicit), "horizon: omitted === months (backward compatible)");
       ok(HORIZON_WEIGHTS.months.s === 0.40 && HORIZON_WEIGHTS.months.w === 0.30 && HORIZON_WEIGHTS.months.m === 0.20 && HORIZON_WEIGHTS.months.d === 0.10, "horizon: months preserves the original 40/30/20/10 blend");
+      // Los tres blends tienen que ser DISTINTOS entre sí, y cada uno fijado. Sin esto, un
+      // cambio que dejara `days` igual que `months` pasaba desapercibido: el caso
+      // emblemático de abajo compara years vs days y esa relación se mantiene igualmente.
+      // (Hueco encontrado por mutación el 18-08-2026.)
+      const wEq = (a, b) => a.s === b.s && a.w === b.w && a.m === b.m && a.d === b.d;
+      ok(!wEq(HORIZON_WEIGHTS.days, HORIZON_WEIGHTS.months), "horizon: days NO es months");
+      ok(!wEq(HORIZON_WEIGHTS.years, HORIZON_WEIGHTS.months), "horizon: years NO es months");
+      ok(!wEq(HORIZON_WEIGHTS.days, HORIZON_WEIGHTS.years), "horizon: days NO es years");
+      ok(HORIZON_WEIGHTS.days.s === 0.10 && HORIZON_WEIGHTS.days.w === 0.30 && HORIZON_WEIGHTS.days.m === 0.10 && HORIZON_WEIGHTS.days.d === 0.50, "horizon: days fija su blend 10/30/10/50");
+      ok(HORIZON_WEIGHTS.years.s === 0.55 && HORIZON_WEIGHTS.years.w === 0.10 && HORIZON_WEIGHTS.years.m === 0.35 && HORIZON_WEIGHTS.years.d === 0.00, "horizon: years fija su blend 55/10/35/0");
+      // Y las propiedades que DEFINEN cada horizonte, por si algún día se recalibran:
+      // el corto plazo pesa el timing por encima de todo, el largo plazo el fundamental.
+      ok(HORIZON_WEIGHTS.days.d > HORIZON_WEIGHTS.months.d && HORIZON_WEIGHTS.months.d > HORIZON_WEIGHTS.years.d, "horizon: el peso del read diario decrece de days a years");
+      ok(HORIZON_WEIGHTS.years.s > HORIZON_WEIGHTS.months.s && HORIZON_WEIGHTS.months.s > HORIZON_WEIGHTS.days.s, "horizon: el peso del score fundamental crece de days a years");
+      ok(HORIZON_WEIGHTS.days.d === Math.max(HORIZON_WEIGHTS.days.s, HORIZON_WEIGHTS.days.w, HORIZON_WEIGHTS.days.m, HORIZON_WEIGHTS.days.d), "horizon: en days manda el read diario");
+      ok(HORIZON_WEIGHTS.years.s === Math.max(HORIZON_WEIGHTS.years.s, HORIZON_WEIGHTS.years.w, HORIZON_WEIGHTS.years.m, HORIZON_WEIGHTS.years.d), "horizon: en years manda el score");
     }
     // Labels exist for every horizon (no undefined leaking into the selector).
     for (const h of ["days", "months", "years"]) {

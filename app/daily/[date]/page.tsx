@@ -24,13 +24,15 @@ export async function generateMetadata(
   { params }: { params: Promise<{ date: string }> }
 ): Promise<Metadata> {
   const { date } = await params;
-  if (!isIsoDay(date)) return { title: "Daily close · Scora Research" };
+  if (!isIsoDay(date)) return { title: "Daily close" };
   const rep = await fetchDailyClose(date);
-  if (!rep) return { title: `Daily close — ${date} · Scora Research` };
+  if (!rep) return { title: `Daily close — ${date}` };
 
   const summary = dailySummaryLine(rep);
   return {
-    title: `Daily close — ${formatDayLong(rep.date)} · Scora Research`,
+    // Sin sufijo de marca: el layout ya aplica `template: "%s · Scora Research"`, y
+    // añadirlo aquí lo duplicaba en la pestaña y en los resultados de búsqueda.
+    title: `Daily close — ${formatDayLong(rep.date)}`,
     description: summary,
     alternates: { canonical: `/daily/${rep.date}` },
     openGraph: {

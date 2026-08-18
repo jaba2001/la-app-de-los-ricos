@@ -15,13 +15,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const rep = await fetchDailyClose();
   if (!rep) {
     return {
-      title: "Daily close · Scora Research",
+      title: "Daily close",
       description: "The US market close, measured — sector dispersion, regime and breadth, published every trading day.",
     };
   }
   const summary = dailySummaryLine(rep);
   return {
-    title: `Daily close — ${formatDayLong(rep.date)} · Scora Research`,
+    // Sin sufijo de marca: el layout ya aplica `template: "%s · Scora Research"`, y
+    // añadirlo aquí lo duplicaba en la pestaña y en los resultados de búsqueda.
+    title: `Daily close — ${formatDayLong(rep.date)}`,
     description: summary,
     alternates: { canonical: `/daily/${rep.date}` },
     openGraph: {
