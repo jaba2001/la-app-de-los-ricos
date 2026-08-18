@@ -1,6 +1,10 @@
 "use client";
 import { useMemo, useState, useEffect } from "react";
-import { blackScholes, breakEven, payoffAtExpiry, buildStrategy, STRATEGY_LABELS, type OptionType, type StrategyName } from "@/lib/greeks";
+import {
+  blackScholes, breakEven, payoffAtExpiry, buildStrategy, STRATEGY_LABELS,
+  impliedVol, impliedProbability, noArbitrageBounds,
+  type OptionType, type StrategyName,
+} from "@/lib/greeks";
 
 interface Props { ticker: string; price: number | null; rate: number | null; }
 
@@ -40,6 +44,25 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
     [spot, strike, days, ivPct, ratePct, divPct, type]
   );
   const be = breakEven(strike, g.price, type);
+
+  // ── Medición: precio de mercado → volatilidad implícita ──────────────────────
+  // El giro que convierte la calculadora en instrumento: en vez de teclear una vol y
+  // obtener un precio, metes el precio que cotiza y sale la vol que ese precio implica.
+  const [marketPx, setMarketPx] = useState<number>(0);
+  const solved = useMemo(
+    () => (marketPx > 0 ? impliedVol(marketPx, spot, strike, days / 365, ratePct / 100, divPct / 100, type) : null),
+    [marketPx, spot, strike, days, ratePct, divPct, type]
+  );
+  const bounds = useMemo(
+    () => noArbitrageBounds(spot, strike, days / 365, ratePct / 100, divPct / 100, type),
+    [spot, strike, days, ratePct, divPct, type]
+  );
+  // Probabilidad neutral al riesgo de acabar por encima del strike: N(d2). Usa la vol
+  // resuelta si la hay, y si no la tecleada.
+  const prob = useMemo(
+    () => impliedProbability(spot, strike, days / 365, (solved ? solved.vol * 100 : ivPct) / 100, ratePct / 100, divPct / 100),
+    [spot, strike, days, solved, ivPct, ratePct, divPct]
+  );
 
   const [strategy, setStrategy] = useState<StrategyName>("collar");
   const strat = useMemo(
@@ -98,6 +121,55 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
           {stat("Rho", (g.rho / 100).toFixed(3), "per +1% rate")}
           {stat("Break-even", `$${be.toFixed(2)}`, `${((be / spot - 1) * 100).toFixed(1)}% from spot`)}
         </div>
+      </div>
+
+      {/* Medición: qué está descontando el mercado */}
+      <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
+        <div className="section-label">What the market is pricing</div>
+        <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
+          Above, you type a volatility and get a price. Here it runs the other way: paste the option&rsquo;s
+          <strong> market price</strong> (your broker shows it free) and Black-Scholes is inverted to recover the
+          volatility that price implies. That number is the market&rsquo;s forecast — not yours.
+        </div>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-3)", alignItems: "flex-end", marginBottom: "var(--sr-sp-3)" }}>
+          <Field label="Market price $" value={marketPx} onChange={setMarketPx} step={0.05} min={0} />
+          {solved && (
+            <button
+              className="btn-primary"
+              onClick={() => { setTouched(true); setIvPct(Number((solved.vol * 100).toFixed(2))); }}
+              style={{ padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}
+            >
+              Use {(solved.vol * 100).toFixed(1)}% above
+            </button>
+          )}
+        </div>
+
+        {marketPx > 0 && !solved && (
+          <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 10%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", lineHeight: 1.5 }}>
+            No implied volatility can be recovered from ${marketPx.toFixed(2)}.
+            {marketPx < bounds.lo || marketPx > bounds.hi
+              ? <> That price is outside the no-arbitrage range (${bounds.lo.toFixed(2)} – ${bounds.hi.toFixed(2)}), so no volatility reproduces it — check the inputs.</>
+              : <> This contract is so deep in- or out-of-the-money that its price barely depends on volatility, so the number is not identifiable. Showing one anyway would be false precision.</>}
+          </div>
+        )}
+
+        {solved && prob && (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--sr-sp-2)" }}>
+              {stat("Implied vol", `${(solved.vol * 100).toFixed(1)}%`, `± ${(solved.volUncertainty * 100).toFixed(2)} pts`)}
+              {stat("Your input", `${ivPct.toFixed(1)}%`, `${solved.vol * 100 > ivPct ? "market is higher" : "market is lower"}`)}
+              {stat("P(above strike)", `${(prob.above * 100).toFixed(1)}%`, "risk-neutral, N(d2)")}
+              {stat("P(below strike)", `${(prob.below * 100).toFixed(1)}%`, "risk-neutral")}
+              {stat("1σ move", `±${prob.expectedMovePct.toFixed(1)}%`, `to expiry (${days}d)`)}
+            </div>
+            <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
+              N(d2) is a <strong>risk-neutral</strong> probability, not a real-world one: it embeds the risk premium
+              investors charge for bearing the outcome, so it systematically overstates downside. Read it as
+              &ldquo;what the market charges&rdquo;, never as &ldquo;what will happen&rdquo;.
+            </div>
+          </>
+        )}
       </div>
 
       {/* Payoff at expiry */}

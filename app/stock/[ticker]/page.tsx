@@ -16,6 +16,7 @@ import { Sk } from "@/components/ui/Skeleton";
 
 const TabSk = () => <Sk w="100%" h={500} />;
 
+const Verdict           = dynamic(() => import("@/components/stock/Verdict"),           { ssr: false });
 const StockOverview     = dynamic(() => import("@/components/stock/StockOverview"),     { loading: TabSk, ssr: false });
 const StockSignals      = dynamic(() => import("@/components/stock/StockSignals"),      { loading: TabSk, ssr: false });
 const StockFundamentals = dynamic(() => import("@/components/stock/StockFundamentals"), { loading: TabSk, ssr: false });
@@ -31,12 +32,17 @@ const StockSentiment    = dynamic(() => import("@/components/stock/StockSentimen
 const StockNews         = dynamic(() => import("@/components/stock/StockNews"),         { loading: TabSk, ssr: false });
 const AlertConfig       = dynamic(() => import("@/components/stock/AlertConfig"),       { ssr: false });
 const OptionsCalc       = dynamic(() => import("@/components/stock/OptionsCalc"),       { loading: TabSk, ssr: false });
+const OptionsLab        = dynamic(() => import("@/components/stock/OptionsLab"),        { loading: TabSk, ssr: false });
+const RiskModel         = dynamic(() => import("@/components/stock/RiskModel"),         { loading: TabSk, ssr: false });
+const Governance        = dynamic(() => import("@/components/stock/Governance"),        { loading: TabSk, ssr: false });
 const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForecast"),   { ssr: false });
 const ValuationLab      = dynamic(() => import("@/components/stock/ValuationLab"),      { ssr: false });
 
 const TABS = [
   { id: "overview",      label: "Overview" },
   { id: "signals",       label: "Signals" },
+  { id: "riskmodel",     label: "Risk Model" },
+  { id: "governance",    label: "Governance" },
   { id: "fundamentals",  label: "Fundamentals" },
   { id: "valuation",     label: "Valuation" },
   { id: "report",        label: "Report" },
@@ -895,6 +901,11 @@ export default function StockTickerPage() {
                 ⚠ {failedApis} data source{failedApis > 1 ? "s" : ""} unavailable — some fields may show "—"
               </div>
             )}
+            {/* Answer-first: the call, three reasons and the falsifier — above every tab,
+                so the first five seconds answer the question instead of presenting
+                thirteen tabs of raw material. Depth stays exactly where it was. */}
+            <Verdict data={data} macro={macro} scores={scores} icScore={icScore} loading={loading} />
+
             {activeTab === "overview"     && (
               <>
                 <StockOverview data={data} macro={macro} scores={scores} icScore={icScore} rating={rating} macroTilt={macroTilt} loading={loading} ticker={ticker} savedAnalysis={savedAnalysis} />
@@ -902,6 +913,8 @@ export default function StockTickerPage() {
               </>
             )}
             {activeTab === "signals"      && <StockSignals    subScores={subScores} data={data} rf={macro?.dgs10 as number ?? null} factorTilts={factorTilts} />}
+            {activeTab === "riskmodel"    && <RiskModel      ticker={ticker} data={data} />}
+            {activeTab === "governance"   && <Governance     ticker={ticker} data={data} rf={macro?.dgs10 as number ?? null} />}
             {activeTab === "fundamentals" && (
               <>
                 <StockFundamentals data={data} loading={loading} ticker={ticker} />
@@ -921,7 +934,12 @@ export default function StockTickerPage() {
             {activeTab === "smartmoney"   && <StockSmartMoney  data={data} loading={loading} ticker={ticker} />}
             {activeTab === "sentiment"    && <StockSentiment   data={data} loading={loading} />}
             {activeTab === "news"         && <StockNews        ticker={ticker} />}
-            {activeTab === "options"      && <OptionsCalc      ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} />}
+            {activeTab === "options"      && (
+              <>
+                <OptionsLab  ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} history={data?.history} score={icScore} />
+                <OptionsCalc ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} />
+              </>
+            )}
             {activeTab === "screener"     && <StockScreener />}
             {activeTab === "compare"      && <StockCompare     ticker={ticker} peers={data?.peers ?? []} />}
           </>
