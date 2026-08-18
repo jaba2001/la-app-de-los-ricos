@@ -16,9 +16,13 @@ import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
 import { classifyInstrument } from "../lib/instrument.ts";
 import { timeframeReads } from "../lib/timeframes.ts";
-import { ratingFrom, toRating, RATING_COLOR } from "../lib/rating.ts";
+import { ratingFrom, toRating, RATING_COLOR, HORIZON_WEIGHTS, HORIZON_LABEL } from "../lib/rating.ts";
 import { favoredStyle, favoredSectors, regimeFactorTilt, REGIME_FACTOR, REGIME_FACTOR_STATS } from "../lib/regimeSectors.ts";
 import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensenAlpha, informationRatio, riskReport } from "../lib/riskMetrics.ts";
+import { attributeReturn, toDatedCloses, dominantDriver } from "../lib/attribution.ts";
+import { buildVerdict, factorTiltsFromScores, corrRegimeFrom, deriveTechnicals, smaOf, rsiOf, periodReturn } from "../lib/verdict.ts";
+import { setHorizon, readHorizon, subscribeHorizon, __resetHorizonForTests } from "../lib/horizon.ts";
+import { stockPickingRegime } from "../lib/microScore.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -29,6 +33,23 @@ function ok(cond, msg) {
   if (cond) { passed++; } else { failed++; fails.push(msg); }
 }
 function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, expected ~${b} ±${tol})`); }
+
+// ── Artefactos de evidencia (2026-08-18) ─────────────────────────────────────
+// Estos JSON justifican constantes que viajan en el código (ENSEMBLE_WEIGHTS,
+// GROWTH_BACKTEST, ALLOCATOR_BACKTEST, REGIME_FACTOR_STATS). Estaban en .gitignore, así
+// que en cada checkout limpio los guardianes anti-deriva se saltaban EN SILENCIO y daban
+// verde sin haber comprobado nada: los pesos del ensemble derivaron meses así
+// (mid.value 0.99 vs 0.634 medido) sin que ningún test se quejara.
+// Ahora están versionados y su ausencia es un FALLO, no un salto.
+function requireArtifact(name, regenCmd) {
+  const path = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", name);
+  if (existsSync(path)) {
+    try { return JSON.parse(readFileSync(path, "utf8")); }
+    catch (e) { ok(false, `artefacto ${name} ilegible (${e.message}) — regenera con: ${regenCmd}`); return null; }
+  }
+  ok(false, `FALTA el artefacto research/out/${name}: el guardián anti-deriva no puede comprobar nada. Está versionado; si lo has borrado, regenéralo con: ${regenCmd}`);
+  return null;
+}
 
 // ── Reverse DCF ──────────────────────────────────────────────────────────────
 {
@@ -193,9 +214,8 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
     ok(REGIME_FACTOR[rg].value === -REGIME_FACTOR[rg].growth, `REGIME_FACTOR ${rg} value = −growth`);
   }
   // Claims anti-drift vs the measured validation (skipped in CI if the JSON isn't present).
-  const rfvPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "regime_factor_validate.json");
-  if (existsSync(rfvPath)) {
-    const rfv = JSON.parse(readFileSync(rfvPath, "utf8"));
+  const rfv = requireArtifact("regime_factor_validate.json", "node --experimental-strip-types research/regime_factor_validate.mjs");
+  if (rfv) {
     const rot = rfv.results?.["Regime rotation (G/V)"], spy = rfv.results?.["SPY"];
     if (rot && spy) {
       ok(Math.abs(REGIME_FACTOR_STATS.rotationSharpe - rot.sharpe) <= 0.03, `regime-factor drift: rotation Sharpe ${REGIME_FACTOR_STATS.rotationSharpe} vs ${rot.sharpe}`);
@@ -416,9 +436,8 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
 // gitignored, so CI (no backtest run) skips this; any local run after a backtest
 // refresh fails loudly if the hard-coded claims have drifted from the measurement.
 {
-  const summaryPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "backtest_assets_summary.json");
-  if (existsSync(summaryPath)) {
-    const m = JSON.parse(readFileSync(summaryPath, "utf8"));
+  const m = requireArtifact("backtest_assets_summary.json", "node --experimental-strip-types research/backtest_assets.mjs");
+  if (m) {
     const pairs = [["strategy", "riskOnRP"], ["strategyNoRP", "riskOnDM"], ["control", "momOnly"], ["spy", "spy"]];
     for (const [claim, key] of pairs) {
       const c = ALLOCATOR_BACKTEST[claim], meas = m[key];
@@ -429,15 +448,12 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
       ok(Math.abs(c.maxDrawdown - meas.maxDD) <= 0.5, `claims drift: ${claim} maxDD ${c.maxDrawdown} vs measured ${meas.maxDD.toFixed(1)}`);
     }
     ok(ALLOCATOR_BACKTEST.months === m.months, `claims drift: months ${ALLOCATOR_BACKTEST.months} vs measured ${m.months}`);
-  } else {
-    console.log("  (claims anti-drift: research/out/backtest_assets_summary.json not present — skipped)");
   }
 
   // Anti-drift: the GROWTH claims must match the PRODUCTION-path measurement
   // (research/growth_metrics.mjs → growth_metrics.json, through the live allocate.mjs).
-  const gmPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "growth_metrics.json");
-  if (existsSync(gmPath)) {
-    const gm = JSON.parse(readFileSync(gmPath, "utf8"));
+  const gm = requireArtifact("growth_metrics.json", "node --experimental-strip-types research/growth_metrics.mjs");
+  if (gm) {
     const g = GROWTH_BACKTEST.strategy, mr = gm.report?.growth, mt = gm.totals?.growth;
     ok(!!mr, "growth claims: production report present");
     if (mr) {
@@ -462,9 +478,8 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   // large, meaningless "drift" (a 2026-07-26 curated 43-name run reported mid.value 0.03
   // vs the shipped 0.99) and would pressure someone into overwriting good weights with
   // biased ones. So: skip unless the artifact says it came from a --full run.
-  const icPath = join(dirname(fileURLToPath(import.meta.url)), "..", "research", "out", "signals_ic.json");
-  if (existsSync(icPath)) {
-    const icRun = JSON.parse(readFileSync(icPath, "utf8"));
+  const icRun = requireArtifact("signals_ic.json", "node --experimental-strip-types research/backtest.mjs --full 120");
+  if (icRun) {
     const measured = icRun.ensembleWeights ?? {};
     // `full` is absent on artifacts written before this flag existed — treat unknown
     // provenance as not comparable rather than assuming it's fine.
@@ -588,6 +603,458 @@ function approx(a, b, tol, msg) { ok(Math.abs(a - b) <= tol, `${msg} (got ${a}, 
   const rep2 = riskReport(s, s);
   ok(rep2.beta === 1 && rep2.alpha === 0, "riskReport: self-benchmark → beta 1, alpha 0");
   ok(typeof rep.sortino === "number" && typeof rep.cvar95 === "number", "riskReport: absolute metrics present");
+}
+
+// ── Return attribution ("why did it move?", 2026-08-17) ──────────────────────
+{
+  // Build newest-first dated closes from a newest-first list of daily returns (%).
+  // day 0 is the most recent bar.
+  const mkSeries = (rets, start = 100) => {
+    // Walk oldest→newest compounding, then emit newest-first with ISO dates.
+    const oldestFirst = [...rets].reverse();
+    const closes = [start];
+    for (const r of oldestFirst) closes.push(closes[closes.length - 1] * (1 + r / 100));
+    const out = [];
+    for (let i = closes.length - 1; i >= 0; i--) {
+      const d = new Date(Date.UTC(2026, 0, 1) + (closes.length - 1 - i) * -86400000);
+      out.push({ date: d.toISOString().slice(0, 10), close: closes[i] });
+    }
+    return out;
+  };
+  // Deterministic pseudo-random market path (no Math.random — golden means reproducible).
+  const n = 200;
+  const mktRets = Array.from({ length: n }, (_, i) => Math.sin(i * 1.7) * 0.9 + Math.cos(i * 0.4) * 0.5);
+  const market = mkSeries(mktRets);
+
+  // — Identity: buckets must sum to the realized return, always. —
+  {
+    const stockRets = mktRets.map((r, i) => 2 * r + Math.sin(i * 3.1) * 0.3);
+    const stock = mkSeries(stockRets);
+    for (const h of [1, 5, 21]) {
+      const a = attributeReturn({ stock, market, sector: null, horizonDays: h });
+      ok(a != null, `attribution h=${h}: returns a result`);
+      if (a) {
+        const sum = a.components.reduce((s, c) => s + c.contribution, 0);
+        approx(sum, a.totalReturn, 1e-9, `attribution h=${h}: components sum to total return`);
+        approx(a.systematicReturn + a.idioReturn, a.totalReturn, 1e-9, `attribution h=${h}: systematic + idio = total`);
+        ok(a.components.length === 2, `attribution h=${h}: no sector leg → 2 buckets`);
+        ok(a.sampleDays >= 40, `attribution h=${h}: sample size honored (${a.sampleDays})`);
+      }
+    }
+  }
+
+  // — A stock that IS 2× the market has beta 2 and (almost) no idiosyncratic move. —
+  {
+    const stock = mkSeries(mktRets.map((r) => 2 * r));
+    const a = attributeReturn({ stock, market, sector: null, horizonDays: 5 });
+    ok(a != null, "attribution 2×market: result");
+    if (a) {
+      approx(a.betaMarket, 2, 0.05, `attribution 2×market: beta ≈ 2 (${a.betaMarket.toFixed(3)})`);
+      ok(Math.abs(a.idioReturn) < Math.abs(a.totalReturn) * 0.15, `attribution 2×market: idio is small (${a.idioReturn.toFixed(3)} vs total ${a.totalReturn.toFixed(3)})`);
+      const drv = dominantDriver(a);
+      ok(drv?.key === "market", `attribution 2×market: dominant driver is market (got ${drv?.key})`);
+    }
+  }
+
+  // — A flat stock in a moving market: the market leg is offset by an equal residual. —
+  {
+    const stock = mkSeries(Array.from({ length: n }, () => 0));
+    const a = attributeReturn({ stock, market, sector: null, horizonDays: 5 });
+    ok(a != null, "attribution flat stock: result");
+    if (a) {
+      approx(a.totalReturn, 0, 1e-9, "attribution flat stock: total return is 0");
+      approx(a.betaMarket, 0, 1e-9, "attribution flat stock: beta 0 (no covariance)");
+      approx(a.idioReturn, 0, 1e-9, "attribution flat stock: idio 0");
+    }
+  }
+
+  // — Sector leg: orthogonalized, adds a third bucket, identity still exact. —
+  {
+    const sectorRets = mktRets.map((r, i) => 1.1 * r + Math.sin(i * 0.9) * 0.6);
+    const sector = mkSeries(sectorRets);
+    const stockRets = mktRets.map((r, i) => 1.0 * r + 0.8 * (Math.sin(i * 0.9) * 0.6) + Math.cos(i * 2.3) * 0.2);
+    const stock = mkSeries(stockRets);
+    const a = attributeReturn({ stock, market, sector, horizonDays: 21 });
+    ok(a != null, "attribution with sector: result");
+    if (a) {
+      ok(a.components.length === 3, "attribution with sector: 3 buckets");
+      ok(a.betaSector !== null && a.sectorExcessReturn !== null, "attribution with sector: sector stats present");
+      const sum = a.components.reduce((s, c) => s + c.contribution, 0);
+      approx(sum, a.totalReturn, 1e-9, "attribution with sector: components still sum to total");
+      const shares = a.components.reduce((s, c) => s + c.share, 0);
+      approx(shares, 1, 1e-9, "attribution with sector: shares sum to 1");
+      ok(a.components.every((c) => c.share >= 0 && c.share <= 1), "attribution: every share in [0,1]");
+    }
+  }
+
+  // — Sector identical to the market must NOT produce a degenerate second leg. —
+  // (unknown sector falls back to SPY upstream; caller passes null, and even if the same
+  //  array leaks through the identity must hold and shares stay finite)
+  {
+    const stock = mkSeries(mktRets.map((r, i) => 1.3 * r + Math.sin(i * 5.1) * 0.4));
+    const a = attributeReturn({ stock, market, sector: market, horizonDays: 5 });
+    ok(a != null, "attribution sector==market: result");
+    if (a) {
+      const sum = a.components.reduce((s, c) => s + c.contribution, 0);
+      approx(sum, a.totalReturn, 1e-9, "attribution sector==market: identity holds");
+      ok(a.components.every((c) => Number.isFinite(c.contribution) && Number.isFinite(c.share)), "attribution sector==market: no NaN/Infinity leaks");
+      approx(a.sectorExcessReturn ?? 0, 0, 1e-9, "attribution sector==market: sector excess is ~0 (fully orthogonalized away)");
+    }
+  }
+
+  // — Date alignment: a hole in the market series must not shift the stock series. —
+  // Window deliberately larger than the history so sampleDays reports the true overlap.
+  {
+    const stock = mkSeries(mktRets.map((r) => 2 * r));
+    const full = attributeReturn({ stock, market, sector: null, horizonDays: 5, betaWindow: 400 });
+    const holed = market.filter((_, i) => i !== 3 && i !== 17);
+    const a = attributeReturn({ stock, market: holed, sector: null, horizonDays: 5, betaWindow: 400 });
+    ok(a != null && full != null, "attribution with gaps: result");
+    if (a && full) {
+      // Index-aligning would smear the stock against the wrong days and wreck beta;
+      // date-aligning keeps it at 2 while simply using fewer observations.
+      approx(a.betaMarket, 2, 0.15, `attribution with gaps: beta still ≈2 (${a.betaMarket.toFixed(3)})`);
+      ok(a.sampleDays < full.sampleDays, `attribution with gaps: overlap shrinks (${a.sampleDays} < ${full.sampleDays})`);
+      ok(full.sampleDays > 120, `attribution: betaWindow can exceed the default (${full.sampleDays})`);
+      approx(a.components.reduce((s, c) => s + c.contribution, 0), a.totalReturn, 1e-9, "attribution with gaps: identity holds");
+    }
+  }
+
+  // — Degradation: bad inputs return null instead of a wrong answer. —
+  {
+    const stock = mkSeries(mktRets.map((r) => 2 * r));
+    ok(attributeReturn({ stock, market, sector: null, horizonDays: 0 }) === null, "attribution: horizon 0 → null");
+    ok(attributeReturn({ stock, market, sector: null, horizonDays: -5 }) === null, "attribution: negative horizon → null");
+    ok(attributeReturn({ stock, market, sector: null, horizonDays: NaN }) === null, "attribution: NaN horizon → null");
+    ok(attributeReturn({ stock: [], market, sector: null, horizonDays: 1 }) === null, "attribution: empty stock → null");
+    ok(attributeReturn({ stock, market: [], sector: null, horizonDays: 1 }) === null, "attribution: empty market → null");
+    ok(attributeReturn({ stock: stock.slice(0, 10), market: market.slice(0, 10), sector: null, horizonDays: 1 }) === null, "attribution: sample below minimum → null");
+    // Disjoint dates → no overlap → null, not a garbage beta. Shift every year back a
+    // decade so the two calendars cannot intersect at all.
+    const shifted = market.map((p) => ({ date: p.date.replace(/^\d{4}/, (y) => String(Number(y) - 10)), close: p.close }));
+    ok(shifted.every((p) => !market.some((m) => m.date === p.date)), "attribution: shifted calendar truly disjoint (test setup)");
+    ok(attributeReturn({ stock, market: shifted, sector: null, horizonDays: 1 }) === null, "attribution: no overlapping dates → null");
+  }
+
+  // — Beta clamp: a pathological series cannot let one bucket swallow the residual. —
+  {
+    const wild = mkSeries(mktRets.map((r, i) => 50 * r + Math.sin(i) * 0.01));
+    const a = attributeReturn({ stock: wild, market, sector: null, horizonDays: 5 });
+    ok(a != null && Math.abs(a.betaMarket) <= 3 + 1e-9, `attribution: beta clamped to ±3 (${a?.betaMarket.toFixed(2)})`);
+    if (a) approx(a.components.reduce((s, c) => s + c.contribution, 0), a.totalReturn, 1e-9, "attribution clamped: identity still exact");
+  }
+
+  // — toDatedCloses: sanitizes raw rows. —
+  {
+    const rows = [
+      { date: "2026-08-17T00:00:00Z", close: 101 },
+      { date: "2026-08-16", close: "100" },
+      { date: "2026-08-15", close: 0 },        // non-positive → dropped
+      { date: "2026-08-14", close: "abc" },    // NaN → dropped
+      { date: null, close: 99 },               // no date → dropped
+      null,                                     // null row → dropped
+    ];
+    const cleaned = toDatedCloses(rows);
+    ok(cleaned.length === 2, `toDatedCloses: keeps only usable rows (${cleaned.length})`);
+    ok(cleaned[0].date === "2026-08-17", "toDatedCloses: trims timestamp to ISO day");
+    ok(cleaned[1].close === 100, "toDatedCloses: coerces numeric strings");
+    ok(toDatedCloses(null).length === 0 && toDatedCloses(undefined).length === 0, "toDatedCloses: null/undefined → []");
+
+    // Provider order must not matter: an oldest-first feed would otherwise invert
+    // every sign downstream. Sorting by date makes that failure unrepresentable.
+    const oldestFirst = [
+      { date: "2026-08-14", close: 97 },
+      { date: "2026-08-15", close: 98 },
+      { date: "2026-08-16", close: 99 },
+      { date: "2026-08-17", close: 101 },
+    ];
+    const norm = toDatedCloses(oldestFirst);
+    ok(norm[0].date === "2026-08-17" && norm[norm.length - 1].date === "2026-08-14", "toDatedCloses: oldest-first input is normalized to newest-first");
+    // Duplicate days collapse to one bar (first occurrence wins).
+    const dupes = toDatedCloses([{ date: "2026-08-17", close: 101 }, { date: "2026-08-17", close: 999 }, { date: "2026-08-16", close: 99 }]);
+    ok(dupes.length === 2 && dupes[0].close === 101, `toDatedCloses: de-duplicates by day (${dupes.length} rows, first close ${dupes[0].close})`);
+
+    // End-to-end: the same data fed in reverse order must attribute identically.
+    {
+      const rev = (s) => [...s].reverse().map((p) => ({ date: p.date, close: p.close }));
+      const stockRows = mkSeries(mktRets.map((r) => 1.5 * r)).map((p) => ({ date: p.date, close: p.close }));
+      const marketRows = market.map((p) => ({ date: p.date, close: p.close }));
+      const fwd = attributeReturn({ stock: toDatedCloses(stockRows), market: toDatedCloses(marketRows), sector: null, horizonDays: 5 });
+      const bwd = attributeReturn({ stock: toDatedCloses(rev(stockRows)), market: toDatedCloses(rev(marketRows)), sector: null, horizonDays: 5 });
+      ok(fwd != null && bwd != null, "attribution order-invariance: both directions produce a result");
+      if (fwd && bwd) {
+        approx(bwd.totalReturn, fwd.totalReturn, 1e-9, "attribution order-invariance: same total return");
+        approx(bwd.betaMarket, fwd.betaMarket, 1e-9, "attribution order-invariance: same beta");
+        approx(bwd.idioReturn, fwd.idioReturn, 1e-9, "attribution order-invariance: same residual");
+      }
+    }
+  }
+
+  // — dominantDriver: refuses to attribute noise. —
+  {
+    const tiny = mkSeries(Array.from({ length: n }, (_, i) => (i === 0 ? 0.01 : Math.sin(i * 1.7) * 0.9)));
+    const a = attributeReturn({ stock: tiny, market, sector: null, horizonDays: 1 });
+    ok(a != null, "dominantDriver: setup result");
+    if (a) ok(dominantDriver(a) === null, `dominantDriver: sub-threshold move → null (total ${a.totalReturn.toFixed(3)}%)`);
+  }
+}
+
+// ── Verdict (answer-first headline, 2026-08-17) ──────────────────────────────
+{
+  const scores = { value: 18, health: 22, momentum: 19, growth: 14, total: 68 };
+  const tech = { mom12_1: 24, rsVsSector: 6, rsVsSpy: 9, rsi14: 58, pctFrom200dma: 12 };
+  const base = { scores, icScore: 71, regime: "expansion", riskOn: 62, impliedCorr: 15, sector: "Technology", technicals: tech };
+
+  // — The whole reason this module exists: it must reproduce, exactly, the manual
+  //   composition the Overview tab does inline. If these ever drift, the headline card
+  //   and the detail panel would show two different calls for the same stock. —
+  {
+    const v = buildVerdict(base);
+    const ft = factorTiltsFromScores(scores);
+    const tf = timeframeReads({
+      regime: "expansion", riskOn: 62, sector: "Technology", factorTilts: ft,
+      mom12_1: tech.mom12_1, rsVsSector: tech.rsVsSector, rsVsSpy: tech.rsVsSpy,
+      rsi14: tech.rsi14, pctFrom200dma: tech.pctFrom200dma,
+    });
+    const pickR = stockPickingRegime(15);
+    const corr = pickR.regime === "favorable" ? "low" : pickR.regime === "unfavorable" ? "high" : "mid";
+    const rt = ratingFrom(71, tf, { corrRegime: corr });
+    ok(v.rating === rt.rating, `verdict matches inline composition: rating (${v.rating} vs ${rt.rating})`);
+    ok(v.directional === rt.directional, `verdict matches inline composition: directional (${v.directional} vs ${rt.directional})`);
+    ok(v.convictionPct === rt.convictionPct, `verdict matches inline composition: conviction% (${v.convictionPct} vs ${rt.convictionPct})`);
+    ok(v.conviction === rt.conviction, "verdict matches inline composition: conviction label");
+    ok(v.summary === tf.summary && v.confluence === tf.confluence, "verdict matches inline composition: confluence + summary");
+    ok(v.note === rt.note, "verdict matches inline composition: note");
+    ok(JSON.stringify(v.perTimeframe) === JSON.stringify(rt.perTimeframe), "verdict matches inline composition: perTimeframe calls");
+    ok(v.timeframes.monthly.score === tf.monthly.score && v.timeframes.weekly.score === tf.weekly.score && v.timeframes.daily.score === tf.daily.score, "verdict matches inline composition: timeframe scores");
+    for (const k of ["monthly", "weekly", "daily"]) {
+      ok(["Strong Buy", "Buy", "Sell", "Strong Sell"].includes(v.perTimeframe[k]), `verdict: perTimeframe.${k} is a valid rating (${v.perTimeframe[k]})`);
+    }
+  }
+
+  // — Shape and contract. —
+  {
+    const v = buildVerdict(base);
+    ok(["Strong Buy", "Buy", "Sell", "Strong Sell"].includes(v.rating), `verdict: rating in the 4-way set (${v.rating})`);
+    ok(["Low", "Medium", "High"].includes(v.conviction), `verdict: conviction label valid (${v.conviction})`);
+    ok(v.directional >= 0 && v.directional <= 100, `verdict: directional in [0,100] (${v.directional})`);
+    ok(v.convictionPct >= 0 && v.convictionPct <= 100, `verdict: conviction% in [0,100] (${v.convictionPct})`);
+    ok(v.reasons.length > 0 && v.reasons.length <= 3, `verdict: 1-3 plain reasons (${v.reasons.length})`);
+    ok(v.reasons.every((r) => typeof r === "string" && r.length > 0), "verdict: no empty reasons");
+    ok(typeof v.whatWouldChangeIt === "string" && v.whatWouldChangeIt.length > 10, "verdict: falsifier present and non-trivial");
+    ok(typeof v.color === "string" && v.color.length > 0, "verdict: color present");
+  }
+
+  // — Determinism: a verdict that changes between identical calls cannot be audited. —
+  {
+    const a = buildVerdict(base), b = buildVerdict(base);
+    ok(JSON.stringify(a) === JSON.stringify(b), "verdict: deterministic for identical inputs");
+  }
+
+  // — Every confluence state has a falsifier (no undefined leaking into the UI). —
+  {
+    const states = ["structural-buy", "leader-extended", "bounce-vs-macro", "improving", "avoid", "mixed"];
+    const seen = new Set();
+    const probes = [
+      { regime: "expansion", riskOn: 70, mom12_1: 30, rsVsSector: 10, rsVsSpy: 12, rsi14: 55, pctFrom200dma: 10 },
+      { regime: "expansion", riskOn: 70, mom12_1: 40, rsVsSector: 15, rsVsSpy: 18, rsi14: 82, pctFrom200dma: 30 },
+      { regime: "contraction", riskOn: 20, mom12_1: 15, rsVsSector: 5, rsVsSpy: 4, rsi14: 60, pctFrom200dma: 5 },
+      { regime: "expansion", riskOn: 65, mom12_1: -20, rsVsSector: -8, rsVsSpy: -9, rsi14: 25, pctFrom200dma: -12 },
+      { regime: "contraction", riskOn: 15, mom12_1: -30, rsVsSector: -12, rsVsSpy: -15, rsi14: 35, pctFrom200dma: -20 },
+      { regime: "stagflation", riskOn: 45, mom12_1: 5, rsVsSector: 0, rsVsSpy: 1, rsi14: 50, pctFrom200dma: 0 },
+    ];
+    for (const p of probes) {
+      const v = buildVerdict({ ...base, regime: p.regime, riskOn: p.riskOn, technicals: { mom12_1: p.mom12_1, rsVsSector: p.rsVsSector, rsVsSpy: p.rsVsSpy, rsi14: p.rsi14, pctFrom200dma: p.pctFrom200dma } });
+      seen.add(v.confluence);
+      ok(typeof v.whatWouldChangeIt === "string" && v.whatWouldChangeIt.length > 10, `verdict falsifier present for confluence "${v.confluence}"`);
+      ok(states.includes(v.confluence), `verdict: confluence is a known state (${v.confluence})`);
+    }
+    ok(seen.size >= 3, `verdict probes exercise multiple confluence states (${seen.size})`);
+  }
+
+  // — Monotonic in the score, timeframes held fixed. —
+  {
+    const lo = buildVerdict({ ...base, icScore: 30 });
+    const hi = buildVerdict({ ...base, icScore: 90 });
+    ok(hi.directional > lo.directional, `verdict: directional monotonic in score (${lo.directional} → ${hi.directional})`);
+  }
+
+  // — corrRegimeFrom delegates to stockPickingRegime; check the boundaries agree. —
+  {
+    ok(corrRegimeFrom(null) === "mid", "corrRegime: null → mid");
+    ok(corrRegimeFrom(10) === "low", "corrRegime: 10 → low (dispersion favors selection)");
+    ok(corrRegimeFrom(19.9) === "low", "corrRegime: 19.9 → low");
+    ok(corrRegimeFrom(20) === "mid", "corrRegime: 20 → mid (boundary)");
+    ok(corrRegimeFrom(40) === "mid", "corrRegime: 40 → mid (boundary)");
+    ok(corrRegimeFrom(40.1) === "high", "corrRegime: 40.1 → high (macro tape)");
+    // Delegation is real, not a copied threshold table.
+    for (const c of [null, 5, 19.9, 20, 33, 40, 40.1, 80]) {
+      const expect = stockPickingRegime(c).regime === "favorable" ? "low" : stockPickingRegime(c).regime === "unfavorable" ? "high" : "mid";
+      ok(corrRegimeFrom(c) === expect, `corrRegime delegates for impliedCorr=${c}`);
+    }
+    // High correlation must not produce more conviction than low correlation.
+    const low = buildVerdict({ ...base, impliedCorr: 10 });
+    const high = buildVerdict({ ...base, impliedCorr: 70 });
+    ok(high.convictionPct <= low.convictionPct, `verdict: high correlation caps conviction (${high.convictionPct} ≤ ${low.convictionPct})`);
+  }
+
+  // — factorTiltsFromScores: the documented mapping, exactly. —
+  {
+    const ft = factorTiltsFromScores({ value: 25, health: 30, momentum: 25, growth: 14, total: 70 });
+    approx(ft.value, 20, 1e-9, "factorTilts: value 25/25 → 20");
+    approx(ft.quality, 20, 1e-9, "factorTilts: health 30/30 → 20");
+    approx(ft.momentum, 20, 1e-9, "factorTilts: momentum 25/25 → 20");
+    ok(ft.growth === 14 && ft.size === 10, "factorTilts: growth passes through, size fixed at 10");
+  }
+
+  // — Technical helpers. —
+  {
+    ok(smaOf([10, 20, 30], 3) === 20, "smaOf: mean of the window");
+    ok(smaOf([10, 20], 3) === null, "smaOf: too short → null");
+    ok(smaOf([10, 20, 30], 0) === null, "smaOf: non-positive period → null");
+
+    // Strictly rising newest-first series: every step was a gain → RSI 100.
+    ok(rsiOf([15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1], 14) === 100, "rsiOf: all gains → 100");
+    // Flat series has neither gains nor losses — 50 (neutral), not a divide-by-zero 100.
+    ok(rsiOf(new Array(15).fill(7), 14) === 50, "rsiOf: flat series → 50 (neutral, guarded)");
+    ok(rsiOf([1, 2, 3], 14) === null, "rsiOf: too short → null");
+
+    approx(periodReturn([110, 100], 1), 10, 1e-9, "periodReturn: +10%");
+    ok(periodReturn([110, 100], 5) === null, "periodReturn: horizon beyond history → null");
+    ok(periodReturn([110, 0], 1) === null, "periodReturn: zero base → null (no divide-by-zero)");
+    ok(periodReturn([110, 100], -1) === null, "periodReturn: negative horizon → null");
+  }
+
+  // — deriveTechnicals: degrades to nulls instead of NaN when history is thin. —
+  {
+    const thin = deriveTechnicals({ stockCloses: [10, 9, 8], spyCloses: [5, 4], sectorCloses: [], price: 10 });
+    ok(thin.mom12_1 === null && thin.rsVsSector === null && thin.rsVsSpy === null, "deriveTechnicals: thin history → nulls");
+    ok(thin.rsi14 === null && thin.pctFrom200dma === null, "deriveTechnicals: thin history → null rsi/200dma");
+    ok(Object.values(thin).every((v) => v === null || Number.isFinite(v)), "deriveTechnicals: never emits NaN");
+
+    // Full history: values are finite and the relative-strength legs are consistent.
+    const n = 300;
+    const stockCloses = Array.from({ length: n }, (_, i) => 100 * Math.pow(1.0008, n - i));
+    const spyCloses = Array.from({ length: n }, (_, i) => 400 * Math.pow(1.0004, n - i));
+    const sectorCloses = Array.from({ length: n }, (_, i) => 200 * Math.pow(1.0006, n - i));
+    const full = deriveTechnicals({ stockCloses, spyCloses, sectorCloses, price: stockCloses[0] });
+    ok(Object.values(full).every((v) => v !== null && Number.isFinite(v)), "deriveTechnicals: full history → all finite");
+    ok(full.rsVsSpy > full.rsVsSector, `deriveTechnicals: outperforms SPY more than its sector (${full.rsVsSpy.toFixed(2)} > ${full.rsVsSector.toFixed(2)})`);
+    ok(full.pctFrom200dma > 0, "deriveTechnicals: rising series sits above its 200-day average");
+    ok(full.mom12_1 > 0, "deriveTechnicals: rising series has positive 12-1 momentum");
+    // Falls back to the latest close when no live price is supplied.
+    const noPrice = deriveTechnicals({ stockCloses, spyCloses, sectorCloses, price: null });
+    approx(noPrice.pctFrom200dma, full.pctFrom200dma, 1e-9, "deriveTechnicals: null price falls back to latest close");
+  }
+
+  // — Horizon: the reader's holding period reshapes the blend. —
+  {
+    // Every row must be a proper weighting.
+    for (const [h, w] of Object.entries(HORIZON_WEIGHTS)) {
+      approx(w.s + w.w + w.m + w.d, 1, 1e-9, `horizon weights sum to 1 (${h})`);
+      ok([w.s, w.w, w.m, w.d].every((x) => x >= 0), `horizon weights non-negative (${h})`);
+    }
+    // "months" IS the historical blend — omitting horizon must not change a thing.
+    {
+      const tf = timeframeReads({ regime: "expansion", riskOn: 60, sector: "Technology", factorTilts: factorTiltsFromScores(scores), ...tech });
+      const implicit = ratingFrom(68, tf, { corrRegime: "low" });
+      const explicit = ratingFrom(68, tf, { corrRegime: "low", horizon: "months" });
+      ok(JSON.stringify(implicit) === JSON.stringify(explicit), "horizon: omitted === months (backward compatible)");
+      ok(HORIZON_WEIGHTS.months.s === 0.40 && HORIZON_WEIGHTS.months.w === 0.30 && HORIZON_WEIGHTS.months.m === 0.20 && HORIZON_WEIGHTS.months.d === 0.10, "horizon: months preserves the original 40/30/20/10 blend");
+    }
+    // Labels exist for every horizon (no undefined leaking into the selector).
+    for (const h of ["days", "months", "years"]) {
+      ok(typeof HORIZON_LABEL[h] === "string" && HORIZON_LABEL[h].length > 0, `horizon label present (${h})`);
+      const v = buildVerdict({ ...base, horizon: h });
+      ok(v.horizon === h, `verdict echoes the horizon it was computed for (${h})`);
+    }
+
+    // The emblematic case: strong fundamentals, wrecked short-term timing.
+    // A years reader should see a different call than a days reader — and saying so is
+    // more honest than averaging them into a number that describes nobody.
+    {
+      const strongFundamentals = { value: 22, health: 28, momentum: 8, growth: 16, total: 82 };
+      const badTiming = { mom12_1: -6, rsVsSector: -3, rsVsSpy: -4, rsi14: 22, pctFrom200dma: -14 };
+      const shared = { scores: strongFundamentals, icScore: 84, regime: "expansion", riskOn: 60, impliedCorr: 15, sector: "Technology", technicals: badTiming };
+      const years = buildVerdict({ ...shared, horizon: "years" });
+      const days = buildVerdict({ ...shared, horizon: "days" });
+      ok(years.directional > days.directional, `horizon: long view scores higher than short view on strong-fundamentals/bad-timing (${years.directional} vs ${days.directional})`);
+      // Same inputs, same timeframe reads — only the blend differs.
+      ok(JSON.stringify(years.timeframes) === JSON.stringify(days.timeframes), "horizon: timeframe reads are shared, only the blend changes");
+      ok(years.confluence === days.confluence, "horizon: confluence is horizon-independent");
+    }
+
+    // Mirror case: weak fundamentals but an excellent short-term setup.
+    {
+      const weakFundamentals = { value: 6, health: 9, momentum: 22, growth: 4, total: 30 };
+      const goodTiming = { mom12_1: 35, rsVsSector: 12, rsVsSpy: 14, rsi14: 52, pctFrom200dma: 6 };
+      const shared = { scores: weakFundamentals, icScore: 32, regime: "expansion", riskOn: 65, impliedCorr: 15, sector: "Technology", technicals: goodTiming };
+      const years = buildVerdict({ ...shared, horizon: "years" });
+      const days = buildVerdict({ ...shared, horizon: "days" });
+      ok(days.directional > years.directional, `horizon: short view scores higher on weak-fundamentals/good-setup (${days.directional} vs ${years.directional})`);
+    }
+
+    // Sensitivity: the days blend must react to the daily read; the years blend must not.
+    {
+      const mk = (rsi, pct) => ({ ...base, technicals: { ...tech, rsi14: rsi, pctFrom200dma: pct } });
+      const dOversold = ratingFrom(68, timeframeReads({ regime: "expansion", riskOn: 60, sector: "Technology", factorTilts: factorTiltsFromScores(scores), ...tech, rsi14: 20, pctFrom200dma: -15 }), { horizon: "years" });
+      const dOverbought = ratingFrom(68, timeframeReads({ regime: "expansion", riskOn: 60, sector: "Technology", factorTilts: factorTiltsFromScores(scores), ...tech, rsi14: 85, pctFrom200dma: 25 }), { horizon: "years" });
+      // years has zero weight on the daily read, so any difference must come from the
+      // monthly/weekly reads those inputs also feed — never from the daily leg itself.
+      ok(HORIZON_WEIGHTS.years.d === 0, "horizon: years puts no weight on the daily entry read");
+      ok(Number.isFinite(dOversold.directional) && Number.isFinite(dOverbought.directional), "horizon: years blend stays finite across timing extremes");
+      ok(buildVerdict(mk(20, -15)).horizon === "months", "horizon: default remains months when unspecified");
+    }
+  }
+
+  // — A verdict survives entirely-missing technicals (new listing, no history). —
+  {
+    const v = buildVerdict({ ...base, technicals: { mom12_1: null, rsVsSector: null, rsVsSpy: null, rsi14: null, pctFrom200dma: null } });
+    ok(["Strong Buy", "Buy", "Sell", "Strong Sell"].includes(v.rating), "verdict: still produces a call with no technicals");
+    ok(Number.isFinite(v.directional) && Number.isFinite(v.convictionPct), "verdict: no NaN with no technicals");
+  }
+}
+
+// ── Shared horizon store (2026-08-17) ────────────────────────────────────────
+{
+  __resetHorizonForTests();
+  // No localStorage in Node — the store must fall back to the default, not throw.
+  ok(readHorizon() === "months", `horizon store: defaults to months without storage (${readHorizon()})`);
+
+  let fired = 0;
+  const unsub = subscribeHorizon(() => { fired++; });
+
+  setHorizon("years");
+  ok(readHorizon() === "years", "horizon store: accepts a valid value");
+  ok(fired === 1, `horizon store: notifies subscribers on change (${fired})`);
+
+  // Re-setting the same value must not churn every subscribed component.
+  setHorizon("years");
+  ok(fired === 1, `horizon store: no notification when the value is unchanged (${fired})`);
+
+  // Garbage must not become state — this value drives a rating blend.
+  setHorizon("bogus");
+  ok(readHorizon() === "years", `horizon store: rejects an invalid value (${readHorizon()})`);
+  setHorizon(null);
+  setHorizon(undefined);
+  ok(readHorizon() === "years", "horizon store: rejects null/undefined");
+  ok(fired === 1, `horizon store: invalid values do not notify (${fired})`);
+
+  setHorizon("days");
+  ok(readHorizon() === "days" && fired === 2, "horizon store: switches again and notifies");
+
+  unsub();
+  setHorizon("months");
+  ok(fired === 2, "horizon store: unsubscribed listener stops receiving");
+  ok(readHorizon() === "months", "horizon store: value still updates after unsubscribe");
+
+  // Every value the store can hold must be a value the rating blend knows.
+  for (const h of ["days", "months", "years"]) {
+    __resetHorizonForTests();
+    setHorizon(h);
+    ok(HORIZON_WEIGHTS[readHorizon()] !== undefined, `horizon store: "${h}" maps to a known weight row`);
+  }
+  __resetHorizonForTests();
 }
 
 // ── Report ───────────────────────────────────────────────────────────────────

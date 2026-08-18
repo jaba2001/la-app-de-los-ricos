@@ -1,6 +1,6 @@
 // P2 math self-tests — BSM greeks, trend forecast, mean-variance optimizer.
 // Run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
-import { blackScholes, breakEven, payoffAtExpiry, analyzeStrategy, buildStrategy } from "../lib/greeks.ts";
+import { blackScholes, breakEven, payoffAtExpiry, analyzeStrategy, buildStrategy, volRank, rollingRealizedVol, buildIncomePlan, incomeGate, realizedVolFromCloses } from "../lib/greeks.ts";
 import { forecastSeries } from "../lib/forecast.ts";
 import { minVariance, maxSharpe, portfolioStats, covariance, invert } from "../lib/optimize.ts";
 import { calcSubScores } from "../lib/scoring.ts";
@@ -260,5 +260,114 @@ ok("esg overall in range", esgE.overall >= 0 && esgE.overall <= 100 && esgT.over
 ok("esg governance sweet-spot lifts G", esgLite({ sector: "Financials", insiderOwn: 0.10, instOwn: 0.7, shortFloat: 0.02 }).g > esgLite({ sector: "Financials", insiderOwn: 0.60, shortFloat: 0.25 }).g);
 ok("esg null unknown sector", esgLite({ sector: "Nonexistent" }) === null);
 
+
+// ── Vol rank + income (theta) plans ──────────────────────────────────────────
+{
+  // volRank: position between own extremes, and share of observations below.
+  const hist = Array.from({ length: 100 }, (_, i) => 0.10 + (i / 99) * 0.30); // 10% … 40%
+  const mid = volRank(0.25, hist);
+  ok("volRank returns a result on a full sample", mid !== null);
+  approx("volRank mid of range ~ 50", mid.rank, 50, 1);
+  approx("volRank low bound", volRank(0.10, hist).rank, 0, 1e-6);
+  approx("volRank high bound", volRank(0.40, hist).rank, 100, 1e-6);
+  ok("volRank reports the sample it ranked against", mid.sampleSize === 100);
+  approx("volRank low/high echo the range", mid.low + mid.high, 0.50, 1e-9);
+  ok("volRank percentile is a share of observations", mid.percentile > 45 && mid.percentile < 55);
+  // Rank and percentile disagree when one spike stretches the range — that is the point.
+  const spiked = [...Array.from({ length: 99 }, () => 0.15), 1.20];
+  const sp = volRank(0.16, spiked);
+  ok("volRank: a single spike compresses rank but not percentile", sp.rank < 5 && sp.percentile > 90);
+  // Guards.
+  ok("volRank: sample below minimum -> null", volRank(0.2, [0.1, 0.2, 0.3]) === null);
+  ok("volRank: non-positive current -> null", volRank(0, hist) === null);
+  ok("volRank: negative current -> null", volRank(-0.2, hist) === null);
+  ok("volRank: filters junk out of history", volRank(0.25, [...hist, NaN, Infinity, -1, 0]) !== null);
+  // Out-of-range current clamps instead of leaving the 0-100 scale.
+  ok("volRank: current above the historical high clamps to 100", volRank(0.9, hist).rank === 100);
+  ok("volRank: current below the historical low clamps to 0", volRank(0.01, hist).rank === 0);
+  // Flat history has no range — neither extreme is meaningful, so it sits in the middle.
+  approx("volRank: flat history -> 50", volRank(0.2, Array.from({ length: 40 }, () => 0.2)).rank, 50, 1e-9);
+  for (const [v, want] of [[0.11, "very low"], [0.19, "low"], [0.25, "average"], [0.33, "high"], [0.39, "very high"]]) {
+    ok(`volRank label ${want} at vol ${v}`, volRank(v, hist).label === want);
+  }
+
+  // realizedVol is order-invariant (variance ignores the sign flip a reversal causes),
+  // so a newest-first slice is safe to hand it.
+  const path = Array.from({ length: 60 }, (_, i) => 100 * Math.exp(0.0004 * i + 0.01 * Math.sin(i * 2.1)));
+  approx("realizedVol is order-invariant", realizedVolFromCloses([...path].reverse()), realizedVolFromCloses(path), 1e-12);
+
+  // rollingRealizedVol: newest-first in, newest-first out.
+  const roll = rollingRealizedVol(path, 21);
+  ok("rollingRealizedVol produces a series", roll.length > 0);
+  ok("rollingRealizedVol length = n - window", roll.length === path.length - 21);
+  ok("rollingRealizedVol values all finite and positive", roll.every((v) => isFinite(v) && v > 0));
+  ok("rollingRealizedVol: series shorter than the window -> empty", rollingRealizedVol([100, 101, 102], 21).length === 0);
+  ok("rollingRealizedVol feeds volRank", volRank(roll[0], roll, 5) !== null);
+
+  // ── Income plans ──
+  const mkt = { vol: 0.30, rate: 0.04, t: 30 / 365 };
+  const cc = buildIncomePlan("covered-call", 100, 105, mkt);
+  const csp = buildIncomePlan("cash-secured-put", 100, 95, mkt);
+  ok("covered call plan builds", cc !== null);
+  ok("cash-secured put plan builds", csp !== null);
+
+  // Capital committed differs by structure: shares vs secured cash.
+  approx("covered call commits the shares", cc.capital, 100, 1e-9);
+  approx("cash-secured put commits the strike in cash", csp.capital, 95, 1e-9);
+
+  // Break-even identities.
+  approx("covered call break-even = spot - premium", cc.breakEven, 100 - cc.premium, 1e-9);
+  approx("cash-secured put break-even = strike - premium", csp.breakEven, 95 - csp.premium, 1e-9);
+
+  // Yield: period -> annualized is a straight 365/days scale-up.
+  approx("covered call periodYield = premium/capital", cc.periodYield, (cc.premium / 100) * 100, 1e-9);
+  approx("annualized = period x 365/days", cc.annualizedYield, cc.periodYield * (365 / 30), 1e-6);
+  ok("annualized exceeds period yield for a sub-year holding", cc.annualizedYield > cc.periodYield);
+
+  // Probabilities are proper and internally consistent.
+  for (const p of [cc, csp]) {
+    ok("probAssignment in [0,1]", p.probAssignment >= 0 && p.probAssignment <= 1);
+    ok("pop in [0,1]", p.pop >= 0 && p.pop <= 1);
+  }
+  // Break-even sits below the short call strike, so winning is likelier than being assigned.
+  ok("covered call: POP > probability of assignment", cc.pop > cc.probAssignment);
+  // Further OTM -> less likely to be assigned.
+  ok("further-OTM call is less likely assigned", buildIncomePlan("covered-call", 100, 120, mkt).probAssignment < cc.probAssignment);
+  ok("further-OTM put is less likely assigned", buildIncomePlan("cash-secured-put", 100, 80, mkt).probAssignment < csp.probAssignment);
+  // Richer vol pays more premium.
+  ok("higher vol pays a bigger premium", buildIncomePlan("covered-call", 100, 105, { ...mkt, vol: 0.60 }).premium > cc.premium);
+  // Selling short-dated repeatedly annualizes higher than one long-dated write
+  // (premium grows with sqrt(t), the annualization divides by t) — the theta-seller rationale.
+  ok("short-dated writes annualize higher than long-dated", cc.annualizedYield > buildIncomePlan("covered-call", 100, 105, { ...mkt, t: 180 / 365 }).annualizedYield);
+
+  // Downside buffer + assignment return.
+  ok("covered call has a positive downside buffer", cc.downsideBufferPct > 0);
+  ok("covered call reports the if-assigned return", typeof cc.ifAssignedReturn === "number" && cc.ifAssignedReturn > 0);
+  ok("cash-secured put has no if-assigned return", csp.ifAssignedReturn === null);
+  ok("short legs carry the expected delta signs", cc.delta > 0 && csp.delta < 0);
+
+  // Guards: bad inputs return null rather than a nonsense plan.
+  ok("income plan: zero spot -> null", buildIncomePlan("covered-call", 0, 105, mkt) === null);
+  ok("income plan: zero strike -> null", buildIncomePlan("covered-call", 100, 0, mkt) === null);
+  ok("income plan: zero time -> null", buildIncomePlan("covered-call", 100, 105, { ...mkt, t: 0 }) === null);
+  ok("income plan: zero vol -> null", buildIncomePlan("covered-call", 100, 105, { ...mkt, vol: 0 }) === null);
+  ok("income plan: negative vol -> null", buildIncomePlan("covered-call", 100, 105, { ...mkt, vol: -0.3 }) === null);
+
+  // ── The gate: never encourage selling a put on a name the engine dislikes ──
+  const bad = incomeGate("cash-secured-put", 30);
+  ok("gate blocks selling puts on a poorly scored name", bad.allowed === false && bad.tone === "neg");
+  ok("gate warns on a middling score", incomeGate("cash-secured-put", 48).tone === "warn");
+  ok("gate approves selling puts on a well-scored name", incomeGate("cash-secured-put", 75).tone === "pos");
+  ok("gate warns that covered calls cap a strong name", incomeGate("covered-call", 85).tone === "warn");
+  ok("gate is relaxed about capping a weak name", incomeGate("covered-call", 45).tone === "pos");
+  ok("gate never blocks a covered call", incomeGate("covered-call", 10).allowed === true);
+  ok("gate handles a missing score", incomeGate("cash-secured-put", null).allowed === true && incomeGate("cash-secured-put", null).tone === "warn");
+  for (const k of ["covered-call", "cash-secured-put"]) {
+    for (const s of [null, 0, 39, 40, 54, 55, 69, 70, 100]) {
+      const g = incomeGate(k, s);
+      ok(`gate always returns a message (${k}, score ${s})`, typeof g.message === "string" && g.message.length > 0);
+    }
+  }
+}
 console.log(`\n${fail === 0 ? "✓" : "✗"} p2 math: ${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

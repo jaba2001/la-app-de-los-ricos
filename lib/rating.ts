@@ -46,15 +46,40 @@ const CONFLUENCE_NUDGE: Record<Timeframes["confluence"], number> = {
   "structural-buy": 6, "leader-extended": 3, "improving": 2, "mixed": 0, "bounce-vs-macro": -5, "avoid": -8,
 };
 
+/** The holding period the reader actually has. It is the first thing that decides whether
+ *  a name is a good idea, and almost no tool asks — so the same stock can honestly be a
+ *  Buy on a multi-year view and a Sell on a three-week one. Saying that out loud beats
+ *  averaging the two into a number that describes nobody. */
+export type Horizon = "days" | "months" | "years";
+
+/** Blend weights over (score, weekly, monthly, daily). Each row sums to 1.
+ *  `months` reproduces the historical fixed blend exactly, so it stays the default and
+ *  nothing that omits `horizon` changes behavior. */
+export const HORIZON_WEIGHTS: Record<Horizon, { s: number; w: number; m: number; d: number }> = {
+  // Trading horizon: fundamentals barely matter inside days; entry timing dominates.
+  days:   { s: 0.10, w: 0.30, m: 0.10, d: 0.50 },
+  // Swing/position horizon — the historical default blend.
+  months: { s: 0.40, w: 0.30, m: 0.20, d: 0.10 },
+  // Investing horizon: the score and the structural macro read carry it; today's
+  // overbought/oversold reading is noise at this distance.
+  years:  { s: 0.55, w: 0.10, m: 0.35, d: 0.00 },
+};
+
+export const HORIZON_LABEL: Record<Horizon, string> = {
+  days: "Days", months: "Months", years: "Years",
+};
+
 /** Overall + per-timeframe directional rating from the macro-tilted Scora Score (0-100) and
  *  the three timeframe reads. `corrRegime` (from implied correlation) modulates conviction. */
-export function ratingFrom(overallScore: number, tf: Timeframes, opts?: { corrRegime?: CorrRegime }): RatingResult {
+export function ratingFrom(overallScore: number, tf: Timeframes, opts?: { corrRegime?: CorrRegime; horizon?: Horizon }): RatingResult {
   const m = tf.monthly.score, w = tf.weekly.score, d = tf.daily.score;
   const s = Math.max(0, Math.min(100, overallScore));
   // Directional blend: the Scora score anchors; the WEEKLY trend (12-1m + relative strength —
   // where the measured cross-sectional IC actually lives) is weighted heavily; MONTHLY gates;
-  // DAILY nudges entry timing.
-  let D = 0.40 * s + 0.30 * w + 0.20 * m + 0.10 * d;
+  // DAILY nudges entry timing. The mix shifts with the reader's holding period; omitting
+  // `horizon` keeps the original fixed blend.
+  const kw = HORIZON_WEIGHTS[opts?.horizon ?? "months"];
+  let D = kw.s * s + kw.w * w + kw.m * m + kw.d * d;
   D = Math.max(0, Math.min(100, D + CONFLUENCE_NUDGE[tf.confluence]));
   const rating = toRating(D);
 

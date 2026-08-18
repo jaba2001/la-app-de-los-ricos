@@ -7,9 +7,12 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 import { topDownContext } from "@/lib/topDown";
-import { timeframeReads, type RegimeId } from "@/lib/timeframes";
-import { ratingFrom, RATING_COLOR, type Rating } from "@/lib/rating";
+import type { RegimeId } from "@/lib/timeframes";
+import { RATING_COLOR, type Rating } from "@/lib/rating";
 import { classifyInstrument } from "@/lib/instrument";
+import { buildVerdict, deriveTechnicals } from "@/lib/verdict";
+import { useHorizon } from "@/lib/horizon";
+import WhyMoved from "@/components/stock/WhyMoved";
 import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
 import InstrumentPanel from "@/components/stock/InstrumentPanel";
@@ -93,6 +96,9 @@ function Sparkline({ points, color }: { points: number[]; color: string }) {
 }
 
 export default function StockOverview({ data, macro, scores, icScore, rating, macroTilt, loading, ticker, savedAnalysis }: Props) {
+  // Shared with the answer-first Verdict bar — same holding period, same call.
+  const horizon = useHorizon();
+
   const profile = data?.profile;
   const metrics = data?.metrics;
   const ratios  = data?.ratios;
@@ -176,6 +182,9 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
   return (
     <div className="animate-fade-in">
+      {/* Answer-first: the move, decomposed, before any of the deeper panels. */}
+      <WhyMoved data={data} loading={loading} ticker={ticker} />
+
       {/* Previous analysis banner */}
       {savedAnalysis && !loading && (
         <div style={{
@@ -394,21 +403,25 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               tailwind for sector+factor) → trend (12-1m + relative strength) → timing (reversion).
               Explainability + discipline, not a new alpha score. */}
           {instr.isEquity && !loading && scores && (() => {
-            const mom12_1 = cl.length > 252 ? ((cl[21] - cl[252]) / cl[252]) * 100 : null;
-            const sectorCl = closePrices(data?.sectorEtfHistory ?? []);
-            const sectorRet6m = periodRet(sectorCl, 126);
-            const rsVsSector = ret6m != null && sectorRet6m != null ? ret6m - sectorRet6m : null;
-            // Factor profile proxy from the sub-scores (dominant style is what the monthly read needs).
-            const ft = { value: (scores.value / 25) * 20, growth: scores.growth, momentum: (scores.momentum / 25) * 20, quality: (scores.health / 30) * 20, size: 10 };
-            const tf = timeframeReads({
+            // Single source of the call: `buildVerdict` is the same function behind the
+            // answer-first Verdict bar, so the headline and this panel cannot drift into
+            // showing two different ratings for the same name.
+            const rt = buildVerdict({
+              scores,
+              icScore,
               regime: (macro?.regime_id as RegimeId) ?? null,
               riskOn: macro?.risk_on != null ? Number(macro.risk_on) : null,
+              impliedCorr: macro?.implied_corr != null ? Number(macro.implied_corr) : null,
               sector: (data?.profile?.sector as string) ?? null,
-              factorTilts: ft, mom12_1, rsVsSector, rsVsSpy: alpha6m, rsi14, pctFrom200dma: vs200,
+              technicals: deriveTechnicals({
+                stockCloses: cl,
+                spyCloses: spyCl,
+                sectorCloses: closePrices(data?.sectorEtfHistory ?? []),
+                price,
+              }),
+              horizon,
             });
-            const pickR = stockPickingRegime(macro?.implied_corr ?? null);
-            const corrRegime = pickR.regime === "favorable" ? "low" : pickR.regime === "unfavorable" ? "high" : "mid";
-            const rt = ratingFrom(icScore ?? scores.total, tf, { corrRegime });
+            const tf = rt.timeframes;
             const convColor = rt.conviction === "High" ? "var(--sr-pos)" : rt.conviction === "Medium" ? "var(--sr-warn)" : "var(--sr-text-3)";
             const rows: { k: string; q: string; r: typeof tf.monthly; tk: "monthly" | "weekly" | "daily" }[] = [
               { k: "Monthly", q: "Own it? · macro tailwind", r: tf.monthly, tk: "monthly" },
