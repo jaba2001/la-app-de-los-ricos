@@ -14,7 +14,7 @@ import { riskParity as rpTs, blendWeights as bwTs, applyDualMomentum as dmTs, gr
 import { riskParity as rpJs, blendWeights as bwJs, applyDualMomentum as dmJs, growthWeights as gwJs } from "../research/allocate.mjs";
 import { ALLOCATOR_BACKTEST, GROWTH_BACKTEST } from "../lib/trackRecord.ts";
 import { ENSEMBLE_WEIGHTS } from "../lib/ensemble.ts";
-import { classifyInstrument } from "../lib/instrument.ts";
+import { classifyInstrument, parseFxPair } from "../lib/instrument.ts";
 import { timeframeReads } from "../lib/timeframes.ts";
 import { ratingFrom, toRating, RATING_COLOR, HORIZON_WEIGHTS, HORIZON_LABEL } from "../lib/rating.ts";
 import { favoredStyle, favoredSectors, regimeFactorTilt, REGIME_FACTOR, REGIME_FACTOR_STATS } from "../lib/regimeSectors.ts";
@@ -23,6 +23,7 @@ import { attributeReturn, toDatedCloses, dominantDriver } from "../lib/attributi
 import { buildVerdict, factorTiltsFromScores, corrRegimeFrom, deriveTechnicals, smaOf, rsiOf, periodReturn } from "../lib/verdict.ts";
 import { setHorizon, readHorizon, subscribeHorizon, __resetHorizonForTests } from "../lib/horizon.ts";
 import { isIsoDay, signedPct, formatDayLong, dailySummaryLine, BREADTH_LABEL, BREADTH_NOTE } from "../lib/dailyClose.ts";
+import { setMode, readMode, subscribeMode, tabVisible, BEGINNER_TABS, __resetModeForTests } from "../lib/mode.ts";
 import { stockPickingRegime } from "../lib/microScore.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -514,6 +515,53 @@ function requireArtifact(name, regenCmd) {
   ok(classifyInstrument("SPY").type === "broad-etf", "SPY still broad-etf");
 }
 
+
+// ── Divisas en el clasificador (2026-08-18) ──────────────────────────────────
+{
+  // Pares reales: los tres formatos que llegan de los proveedores.
+  for (const t of ["EURUSD", "EUR/USD", "EUR-USD", "eurusd"]) {
+    const i = classifyInstrument(t);
+    ok(i.type === "fx", `classify ${t} → fx (${i.type})`);
+    ok(i.isEquity === false, `${t} no es equity`);
+    ok(i.label === "EUR/USD", `${t} se etiqueta EUR/USD (${i.label})`);
+  }
+  // Un par nunca puede caer en el análisis de acción: no tiene beneficios que valorar.
+  for (const t of ["USDJPY", "GBPUSD", "USDCHF", "AUDUSD", "USDMXN", "EURJPY"]) {
+    ok(classifyInstrument(t).type === "fx", `${t} → fx`);
+    ok(classifyInstrument(t).drivers.length > 0, `${t} trae drivers macro`);
+  }
+  // La dirección del dólar depende de qué lado del par es USD.
+  const eur = classifyInstrument("EURUSD"), usdjpy = classifyInstrument("USDJPY");
+  ok(eur.drivers.some((d) => d.field === "dxy" && d.good === "low"), "EURUSD: dólar débil es favorable");
+  ok(usdjpy.drivers.some((d) => d.field === "dxy" && d.good === "high"), "USDJPY: dólar fuerte es favorable");
+
+  // parseFxPair es conservador a propósito: solo dos códigos ISO reales.
+  ok(parseFxPair("EURUSD") !== null, "parseFxPair acepta un par real");
+  ok(parseFxPair("EUREUR") === null, "parseFxPair rechaza la misma divisa dos veces");
+  ok(parseFxPair("ABCDEF") === null, "parseFxPair rechaza códigos inventados");
+  ok(parseFxPair("GOOGL") === null, "parseFxPair rechaza un ticker de 5 letras");
+  ok(parseFxPair("MSFT") === null, "parseFxPair rechaza un ticker corto");
+  ok(parseFxPair("") === null, "parseFxPair con cadena vacía");
+  ok(parseFxPair(null) === null, "parseFxPair con null");
+  ok(parseFxPair("USDXYZ") === null, "parseFxPair rechaza si la cotizada no es ISO");
+  ok(parseFxPair("XYZUSD") === null, "parseFxPair rechaza si la base no es ISO");
+
+  // ETFs de divisa.
+  ok(classifyInstrument("UUP").type === "fx", "UUP → fx");
+  ok(classifyInstrument("UUP").drivers.some((d) => d.field === "dxy" && d.good === "high"), "UUP se beneficia de un dólar fuerte");
+  ok(classifyInstrument("FXE").type === "fx", "FXE → fx");
+  ok(classifyInstrument("FXE").drivers.some((d) => d.field === "dxy" && d.good === "low"), "FXE se beneficia de un dólar débil");
+
+  // NINGUNA regresión: lo que ya se clasificaba bien sigue igual.
+  ok(classifyInstrument("AAPL").isEquity === true, "fx no rompe AAPL");
+  ok(classifyInstrument("SPY").type === "broad-etf", "fx no rompe SPY");
+  ok(classifyInstrument("GLD").type === "metal", "fx no rompe GLD");
+  ok(classifyInstrument("BTC-USD").type === "crypto", "fx no rompe BTC-USD");
+  ok(classifyInstrument("TLT").type === "bond-etf", "fx no rompe TLT");
+  ok(classifyInstrument("XLK").type === "sector-etf", "fx no rompe XLK");
+  // El caso peligroso: un ticker de 6 letras que NO es un par debe seguir siendo acción.
+  ok(classifyInstrument("ADBEUS").isEquity === true, "un ticker de 6 letras no-ISO sigue siendo equity");
+}
 // ── Multi-timeframe context layer (2026-07-11) ────────────────────────────────
 {
   const growthFt = { value: 3, growth: 16, momentum: 12, quality: 8, size: 6 };
@@ -1149,6 +1197,61 @@ function requireArtifact(name, regenCmd) {
     ok(typeof BREADTH_LABEL[k] === "string" && BREADTH_LABEL[k].length > 0, `BREADTH_LABEL.${k} presente`);
     ok(typeof BREADTH_NOTE[k] === "string" && BREADTH_NOTE[k].length > 0, `BREADTH_NOTE.${k} presente`);
   }
+}
+
+// ── Modo de lectura Beginner/Pro (2026-08-18) ────────────────────────────────
+{
+  __resetModeForTests();
+  // Sin localStorage en Node: cae al defecto en vez de reventar.
+  ok(readMode() === "pro", `mode store: por defecto Pro, sin perder funcionalidad a nadie (${readMode()})`);
+
+  let fired = 0;
+  const unsub = subscribeMode(() => { fired++; });
+
+  setMode("beginner");
+  ok(readMode() === "beginner", "mode store: acepta un valor válido");
+  ok(fired === 1, `mode store: notifica al cambiar (${fired})`);
+  setMode("beginner");
+  ok(fired === 1, `mode store: no notifica si el valor no cambia (${fired})`);
+
+  // Basura: este valor decide qué ve el usuario, no puede entrar cualquier cosa.
+  for (const junk of ["experto", "", null, undefined, 3, {}]) {
+    setMode(junk);
+    ok(readMode() === "beginner", `mode store: rechaza ${JSON.stringify(junk)}`);
+  }
+  ok(fired === 1, `mode store: los valores inválidos no notifican (${fired})`);
+
+  unsub();
+  setMode("pro");
+  ok(fired === 1, "mode store: el suscriptor dado de baja deja de recibir");
+  ok(readMode() === "pro", "mode store: el valor sigue actualizándose tras la baja");
+
+  // tabVisible — el contrato con la ficha de acción.
+  // Pro no esconde NADA: es la promesa de que el modo no recorta capacidad.
+  const TODAS = ["overview","signals","riskmodel","governance","fundamentals","valuation","report",
+                 "diligence","chart","research","smartmoney","sentiment","news","options","screener","compare"];
+  for (const t of TODAS) ok(tabVisible(t, "pro"), `tabVisible: Pro muestra "${t}"`);
+
+  // Beginner muestra exactamente el subconjunto declarado, ni una más.
+  for (const t of BEGINNER_TABS) ok(tabVisible(t, "beginner"), `tabVisible: Beginner muestra "${t}"`);
+  const ocultas = TODAS.filter((t) => !BEGINNER_TABS.includes(t));
+  for (const t of ocultas) ok(!tabVisible(t, "beginner"), `tabVisible: Beginner oculta "${t}"`);
+  ok(ocultas.length > 0, "tabVisible: Beginner oculta algo (si no, el modo no serviría)");
+
+  // Overview SIEMPRE visible: es el destino al que se vuelve cuando la pestaña activa
+  // desaparece al cambiar de modo. Si faltara, la ficha se quedaría sin contenido.
+  ok(BEGINNER_TABS.includes("overview"), "tabVisible: overview existe en ambos modos (destino del fallback)");
+
+  // Una pestaña inventada no aparece por defecto en Beginner.
+  ok(!tabVisible("pestaña-que-no-existe", "beginner"), "tabVisible: id desconocido no se cuela en Beginner");
+  ok(tabVisible("pestaña-que-no-existe", "pro"), "tabVisible: Pro no filtra por lista, muestra todo");
+
+  // El subconjunto es coherente: sin duplicados y todas las entradas existen de verdad.
+  ok(new Set(BEGINNER_TABS).size === BEGINNER_TABS.length, "BEGINNER_TABS sin duplicados");
+  for (const t of BEGINNER_TABS) ok(TODAS.includes(t), `BEGINNER_TABS: "${t}" es una pestaña real de la ficha`);
+
+  __resetModeForTests();
+  ok(readMode() === "pro", "mode store: el reset devuelve al defecto");
 }
 // ── Report ───────────────────────────────────────────────────────────────────
 console.log(`\n${failed === 0 ? "✓" : "✗"} golden: ${passed} passed, ${failed} failed`);

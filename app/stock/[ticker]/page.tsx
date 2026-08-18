@@ -10,6 +10,7 @@ import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/l
 import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
 import { track } from "@/lib/analytics";
+import { useMode, setMode, tabVisible, BEGINNER_TABS } from "@/lib/mode";
 import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
@@ -102,6 +103,13 @@ export default function StockTickerPage() {
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("overview");
+  const mode = useMode();
+  const visibleTabs = useMemo(() => TABS.filter(t => tabVisible(t.id, mode)), [mode]);
+  // Si el modo cambia estando en una pestaña que Beginner oculta, su contenido seguiría
+  // pintándose sin pestaña resaltada. Se vuelve a Overview, que existe en ambos modos.
+  useEffect(() => {
+    if (!tabVisible(activeTab, mode)) setActiveTab("overview");
+  }, [mode, activeTab]);
   const [data, setData] = useState<StockData | null>(null);
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
@@ -825,7 +833,7 @@ export default function StockTickerPage() {
 
         {/* Sub-tabs */}
         <div style={{ padding: "0 var(--sr-sp-6)", display: "flex", gap: "var(--sr-sp-1)", height: "var(--sr-subnav-h)", alignItems: "center", overflowX: "auto" }}>
-          {TABS.map(t => (
+          {visibleTabs.map(t => (
             <button
               key={t.id}
               className={`subtab ${activeTab === t.id ? "active" : ""}`}
@@ -834,6 +842,17 @@ export default function StockTickerPage() {
               {t.label}
             </button>
           ))}
+          {/* Beginner recorta la superficie, no cambia un solo número: el motor es el
+              mismo y las mismas entradas dan la misma llamada en los dos modos. */}
+          <button
+            type="button"
+            className="subtab"
+            onClick={() => { const next = mode === "pro" ? "beginner" : "pro"; setMode(next); track("tab_opened", { page: "stock", tab: `mode:${next}` }); }}
+            title={mode === "pro" ? `Show only the ${BEGINNER_TABS.length} essential tabs` : "Show all tabs"}
+            style={{ marginLeft: "auto", flexShrink: 0, color: "var(--sr-text-3)" }}
+          >
+            {mode === "pro" ? "Beginner view" : `Pro view (${TABS.length} tabs)`}
+          </button>
         </div>
       </div>
 

@@ -167,6 +167,58 @@ export default function TrackRecordPage() {
         </ul>
       </div>
 
+      {/* ── Declaraciones formales ──
+          La página ya era honesta en el fondo: dice "net of costs", marca el forward como
+          UN-BACKTESTED y publica el resultado de stock-picking que NO funciona. Lo que
+          faltaba era decirlo en los términos exactos que la industria exige, porque la
+          distinción entre un resultado HIPOTÉTICO y uno REAL es precisamente la que se
+          usa para engañar — y esta página existe para no hacerlo. */}
+      <div className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
+        <div className="section-label">How to read these numbers</div>
+        <dl style={{ margin: 0, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.7 }}>
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-2)" }}>Hypothetical, not realized</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            The allocator and stock-picking results are <strong>hypothetical backtests</strong>: they were
+            computed by applying rules to historical data, not by trading an account. Hypothetical results
+            have inherent limitations — chief among them that they are prepared with the benefit of
+            hindsight and carry no financial risk. No account traded these returns.
+          </dd>
+
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-3)" }}>Net of what, exactly</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            Backtest returns are net of an assumed round-trip transaction cost applied at each rebalance.
+            They are <strong>gross of</strong> taxes, bid-ask spread beyond that assumption, market impact,
+            financing, and any subscription fee for this product. Your realized return would be lower.
+          </dd>
+
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-3)" }}>Survivorship</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            The stock-picking test runs on a <strong>point-in-time, survivorship-free</strong> universe —
+            it includes names that were later delisted or acquired. The allocator uses index ETFs, which
+            carry the index provider&apos;s own reconstitution rules rather than ours.
+          </dd>
+
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-3)" }}>Past performance</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            Past performance — hypothetical or realized — <strong>does not predict future results</strong>.
+            A strategy that beat its benchmark over the sample above can underperform for years.
+          </dd>
+
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-3)" }}>No testimonials, no selected trades</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            This page publishes the <strong>whole record</strong>, including the stock-picking result that
+            lost to the index. Scora does not publish testimonials, screenshots of winning trades, or
+            cherry-picked calls — a record you can only see the good half of is not a record.
+          </dd>
+
+          <dt style={{ fontWeight: 700, color: "var(--sr-text)", marginTop: "var(--sr-sp-3)" }}>Not investment advice</dt>
+          <dd style={{ margin: "2px 0 0 0" }}>
+            Scora Research is an educational tool. Nothing here is a recommendation to buy or sell any
+            security, and it is not personalized to your circumstances.
+          </dd>
+        </dl>
+      </div>
+
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-4)" }}>
         Allocator: research/backtest_assets.mjs (stationary regime) + walkforward.mjs · Stock-picking: research/backtest.mjs --full 500 · free data (EDGAR / Yahoo / Tiingo / FRED)
       </div>

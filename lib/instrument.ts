@@ -5,7 +5,7 @@
 // ticker to /stock/{ticker}; this decides which panel that page shows.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type InstrumentType = "equity" | "bond-etf" | "metal" | "commodity" | "broad-etf" | "sector-etf" | "crypto";
+export type InstrumentType = "equity" | "bond-etf" | "metal" | "commodity" | "broad-etf" | "sector-etf" | "crypto" | "fx";
 
 // A macro driver for the instrument's tilt. `good` = the direction that is favorable for
 // the instrument; `field` = the macro_state column to read (string; read defensively).
@@ -64,8 +64,16 @@ const CRYPTO_ALT = new Set(["SOL","ADA","AVAX","DOT","MATIC","LINK","XRP","LTC",
 // Spot / futures crypto ETFs (equity wrappers, but crypto-driven, no fundamentals).
 const CRYPTO_ETF = new Set(["IBIT","FBTC","GBTC","ARKB","BITB","HODL","BRRR","EZBC","BTCO","BITO","BTF","ETHE","ETHA","FETH","ETHW","BITX","BTCW"]);
 
+// ── Divisas (fx) — cierra el "stocks, crypto, indices, forex" del argumento de venta.
+// Un par de divisas no tiene P/E ni ROE: se lee por diferencial de tipos, dólar y régimen.
+// FMP entrega los pares como "EURUSD"; también se aceptan "EUR/USD" y "EUR-USD".
+const FIAT = new Set(["USD","EUR","JPY","GBP","CHF","AUD","CAD","NZD","SEK","NOK","DKK","MXN","BRL","ZAR","TRY","CNY","CNH","HKD","SGD","INR","KRW","PLN","HUF","CZK","ILS","THB"]);
+// ETFs de divisa: un envoltorio en formato acción sobre la misma exposición.
+const FX_ETF_LONG_USD = new Set(["UUP","USDU"]);                       // suben SI el dólar sube
+const FX_ETF_SHORT_USD = new Set(["UDN","FXE","FXY","FXB","FXF","FXA","FXC","FXSG"]); // suben si el dólar baja
+
 // driver presets
-const D_GOLD: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"}];
+const D_GOLD: MacroDriver[] =[{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"}];
 const D_METAL: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
 const D_COPPER: MacroDriver[] = [{label:"Recession risk",good:"low",field:"recession_prob"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
 const D_COMMOD: MacroDriver[] = [{label:"Core PCE (inflation)",good:"high",field:"core_pce_yoy",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
@@ -77,7 +85,28 @@ const D_TIPS: MacroDriver[] = [{label:"Breakeven inflation",good:"high",field:"b
 const D_RISK: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Recession risk",good:"low",field:"recession_prob"}];
 const D_CRYPTO: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Risk-on gauge",good:"high",field:"risk_on"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
 
+// Un par de divisas se mueve por el DIFERENCIAL de tipos y por el ciclo del dólar. Los
+// dos drivers se declaran desde el punto de vista de la divisa BASE (la de la izquierda):
+// para EURUSD, "dólar débil" es favorable; para USDJPY es al revés, y por eso el par se
+// invierte antes de asignar drivers.
+const D_FX_VS_USD: MacroDriver[] = [{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"US 10y yield",good:"low",field:"dgs10",unit:"%"}];
+const D_USD_BASE: MacroDriver[] = [{label:"US Dollar (DXY)",good:"high",field:"dxy"},{label:"US 10y yield",good:"high",field:"dgs10",unit:"%"}];
+
 function has(sym: string, ...sets: Set<string>[]) { return sets.some((s) => s.has(sym)); }
+
+/** Descompone un símbolo de divisas en base/cotizada, o null si no lo es.
+ *
+ *  Deliberadamente conservador: SOLO se acepta si las dos mitades son códigos ISO
+ *  conocidos. Un ticker cualquiera de seis letras no puede caer aquí por accidente y
+ *  perder su análisis de acción. */
+export function parseFxPair(ticker: string): { base: string; quote: string } | null {
+  const t = (ticker || "").toUpperCase().replace(/[/\-_]/g, "");
+  if (!/^[A-Z]{6}$/.test(t)) return null;
+  const base = t.slice(0, 3), quote = t.slice(3);
+  if (base === quote) return null;                 // "EUREUR" no es un par
+  if (!FIAT.has(base) || !FIAT.has(quote)) return null;
+  return { base, quote };
+}
 
 /** Classify a ticker (+ optional FMP profile) into an instrument. Default = equity. */
 export function classifyInstrument(ticker: string, profile?: { isEtf?: boolean; sector?: string; industry?: string } | null): Instrument {
@@ -87,6 +116,21 @@ export function classifyInstrument(ticker: string, profile?: { isEtf?: boolean; 
   if (CRYPTO_MAJOR.has(t)) return I("crypto", t.startsWith("ETH") ? "Ethereum" : "Bitcoin", "Digital assets", D_CRYPTO, "Crypto — a high-beta liquidity / real-yield play. Read by momentum + macro drivers, not fundamentals. Size small (CAIA/Grayscale: ~5% BTC historically maximized portfolio Sharpe); past returns won't repeat.");
   if (CRYPTO_ALT.has(t)) return I("crypto","Altcoin","Digital assets",D_CRYPTO,"Altcoin — higher-beta digital asset. Read by momentum + macro drivers; far more speculative than BTC/ETH.");
   if (CRYPTO_ETF.has(t)) return I("crypto","Crypto ETF","Digital assets",D_CRYPTO,"Spot/futures crypto ETF — a wrapper on the underlying coin. Read by momentum + macro drivers, not fundamentals.");
+
+  // Divisas — antes que nada basado en el perfil: un par nunca debe caer en "equity".
+  const pair = parseFxPair(t);
+  if (pair) {
+    const usdIsBase = pair.base === "USD";
+    return I(
+      "fx",
+      `${pair.base}/${pair.quote}`,
+      "Currencies",
+      usdIsBase ? D_USD_BASE : D_FX_VS_USD,
+      `Currency pair — the price of ${pair.base} in ${pair.quote}. No earnings to value: it moves on the rate differential between the two economies, the dollar cycle and risk appetite. Carry (holding the higher-yielding side) is the main long-run return, and it unwinds fast when volatility spikes.`
+    );
+  }
+  if (FX_ETF_LONG_USD.has(t)) return I("fx","US Dollar index","Currencies",D_USD_BASE,"Dollar ETF — long USD against a basket. A hedge on dollar strength, not a growth asset.");
+  if (FX_ETF_SHORT_USD.has(t)) return I("fx","Foreign currency ETF","Currencies",D_FX_VS_USD,"Currency ETF — long a foreign currency against the dollar. Rises when the dollar weakens.");
 
   // Metals
   if (GOLD.has(t)) return I("metal","Gold","Metals",D_GOLD,"Gold — a real-yield / dollar / liquidity play. Read by momentum and its macro drivers, not fundamentals.");
