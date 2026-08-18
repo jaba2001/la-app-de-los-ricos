@@ -45,7 +45,14 @@ export type AnalyticsEvent =
   // entre ambos ES la métrica — cuántos abren el checkout y cuántos lo terminan. Con un
   // único evento habría que deducir el abandono, que es lo que hay que medir.
   | "checkout_started"      // pulsó Upgrade y se le mandó a Stripe
-  | "checkout_completed";   // volvió con el pago hecho
+  | "checkout_completed"    // volvió con el pago hecho
+  // El cierre diario. La métrica que importa NO es la visita suelta sino el visitante
+  // RECURRENTE (≥3 días/semana): es lo que distingue hábito de curiosidad, y es el único
+  // número que dice si /daily está funcionando como producto y no solo como página.
+  // Se manda la fecha del informe para poder separar "vino a por el de hoy" de "estaba
+  // navegando el archivo", que son dos comportamientos distintos.
+  | "daily_viewed"          // abrió un cierre diario
+  | "daily_archive_opened"; // saltó a un día anterior desde el navegador de fechas
 
 /** Fire an event. Silently ignored when analytics isn't configured. */
 export function track(event: AnalyticsEvent, props?: Record<string, unknown>): void {

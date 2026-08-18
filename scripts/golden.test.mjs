@@ -22,6 +22,7 @@ import { sharpe, sortino, maxDrawdown, valueAtRisk, conditionalVaR, beta, jensen
 import { attributeReturn, toDatedCloses, dominantDriver } from "../lib/attribution.ts";
 import { buildVerdict, factorTiltsFromScores, corrRegimeFrom, deriveTechnicals, smaOf, rsiOf, periodReturn } from "../lib/verdict.ts";
 import { setHorizon, readHorizon, subscribeHorizon, __resetHorizonForTests } from "../lib/horizon.ts";
+import { isIsoDay, signedPct, formatDayLong, dailySummaryLine, BREADTH_LABEL, BREADTH_NOTE } from "../lib/dailyClose.ts";
 import { stockPickingRegime } from "../lib/microScore.ts";
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
@@ -1057,6 +1058,98 @@ function requireArtifact(name, regenCmd) {
   __resetHorizonForTests();
 }
 
+
+// ── /daily: capa pura del lector (2026-08-18) ────────────────────────────────
+{
+  // isIsoDay es una GUARDA DE SEGURIDAD, no un formateador: su valor llega desde la URL
+  // (/daily/[date]) y acaba dentro de una query a PostgREST. Todo lo que no sea un día
+  // ISO real tiene que caer aquí y devolver 404 antes de tocar la base.
+  ok(isIsoDay("2026-08-18"), "isIsoDay: día válido");
+  ok(isIsoDay("1999-01-01"), "isIsoDay: día válido antiguo");
+  ok(isIsoDay("2024-02-29"), "isIsoDay: 29 de febrero de un bisiesto es válido");
+  ok(!isIsoDay("2025-02-29"), "isIsoDay: 29 de febrero de un NO bisiesto se rechaza");
+  ok(!isIsoDay("2026-13-01"), "isIsoDay: mes 13 se rechaza");
+  ok(!isIsoDay("2026-00-10"), "isIsoDay: mes 0 se rechaza");
+  ok(!isIsoDay("2026-08-32"), "isIsoDay: día 32 se rechaza");
+  ok(!isIsoDay("2026-08-00"), "isIsoDay: día 0 se rechaza");
+  ok(!isIsoDay("2026-8-18"), "isIsoDay: sin cero a la izquierda se rechaza");
+  ok(!isIsoDay("26-08-18"), "isIsoDay: año de dos cifras se rechaza");
+  ok(!isIsoDay("2026-08-18T00:00:00Z"), "isIsoDay: con hora se rechaza");
+  ok(!isIsoDay("2026-08-18 "), "isIsoDay: con espacio final se rechaza");
+  ok(!isIsoDay(""), "isIsoDay: cadena vacía");
+  ok(!isIsoDay(null), "isIsoDay: null");
+  ok(!isIsoDay(undefined), "isIsoDay: undefined");
+  ok(!isIsoDay(20260818), "isIsoDay: número");
+  ok(!isIsoDay({}), "isIsoDay: objeto");
+  // Intentos de inyección: ninguno debe pasar.
+  for (const evil of [
+    "2026-08-18'--", "2026-08-18 or 1=1", "*", "2026-08-18*", "eq.anything",
+    "2026-08-18%00", "../../etc/passwd", "2026-08-18&select=*",
+  ]) {
+    ok(!isIsoDay(evil), `isIsoDay rechaza la inyección: ${JSON.stringify(evil)}`);
+  }
+
+  // signedPct: el signo se ve antes que el número, y el menos es un menos tipográfico.
+  ok(signedPct(1.234) === "+1.23%", `signedPct positivo (${signedPct(1.234)})`);
+  ok(signedPct(-1.234) === "−1.23%", `signedPct negativo usa menos tipográfico (${signedPct(-1.234)})`);
+  ok(signedPct(0) === "+0.00%", `signedPct cero cuenta como no negativo (${signedPct(0)})`);
+  ok(signedPct(-0.004) === "−0.00%", `signedPct redondea sin perder el signo (${signedPct(-0.004)})`);
+  ok(signedPct(12.3, 0) === "+12%", `signedPct respeta los decimales (${signedPct(12.3, 0)})`);
+
+  // formatDayLong: estable e independiente del locale del servidor.
+  ok(formatDayLong("2026-08-18").includes("August"), `formatDayLong mes en texto (${formatDayLong("2026-08-18")})`);
+  ok(formatDayLong("2026-08-18").includes("2026"), "formatDayLong incluye el año");
+  // Sin desfase de zona horaria: el 1 de enero no puede renderizarse como 31 de diciembre.
+  ok(formatDayLong("2026-01-01").includes("January 1"), `formatDayLong sin desfase de UTC (${formatDayLong("2026-01-01")})`);
+  ok(formatDayLong("basura") === "basura", "formatDayLong devuelve la entrada si no es un día ISO");
+
+  // dailySummaryLine: es el <title>, la meta description y la tarjeta social. Lleva la
+  // cifra, nunca un adjetivo, y no puede salir vacía.
+  const mk = (o) => ({
+    date: "2026-08-18", generatedAt: "2026-08-18T21:30:00Z",
+    regime: { id: "expansion", previousId: "expansion", changed: false, confirmed: true },
+    market: { spyChangePct: -1.02, vix: 14.2, hyOas: 312, dgs10: 4.23, riskOn: 61 },
+    breadth: { up: 3, down: 8, total: 11, dispersion: 0.42, agreement: 0.73, kind: "mixed" },
+    sectors: [], leaders: [], laggards: [], headline: "h", context: "c", gaps: [],
+    ...o,
+  });
+  {
+    const s = dailySummaryLine(mk({}));
+    ok(s.includes("−1.02%"), `summary lleva la cifra del índice (${s})`);
+    ok(s.includes("3/11"), `summary lleva el reparto de sectores (${s})`);
+    ok(s.includes("regime expansion"), `summary lleva el régimen (${s})`);
+  }
+  {
+    const s = dailySummaryLine(mk({ regime: { id: "contraction", previousId: "expansion", changed: true, confirmed: false } }));
+    ok(s.includes("regime → contraction"), `summary marca el cambio de régimen con flecha (${s})`);
+  }
+  // Degradación: sin ninguna pieza medida sigue devolviendo algo publicable.
+  {
+    const s = dailySummaryLine(mk({
+      market: { spyChangePct: null, vix: null, hyOas: null, dgs10: null, riskOn: null },
+      breadth: null,
+      regime: { id: null, previousId: null, changed: false, confirmed: false },
+    }));
+    ok(typeof s === "string" && s.length > 0, `summary nunca queda vacío (${s})`);
+    ok(!s.includes("null") && !s.includes("undefined") && !s.includes("NaN"), `summary sin fugas de null/NaN (${s})`);
+  }
+  // Ninguna combinación puede filtrar "null"/"undefined"/"NaN" al <title>.
+  for (const spy of [null, 0, -3.5, 2]) {
+    for (const br of [null, { up: 0, down: 11, total: 11, dispersion: 0.1, agreement: 1, kind: "beta" }]) {
+      for (const rg of [{ id: null, previousId: null, changed: false, confirmed: false }, { id: "slowdown", previousId: "expansion", changed: true, confirmed: true }]) {
+        const s = dailySummaryLine(mk({ market: { spyChangePct: spy, vix: null, hyOas: null, dgs10: null, riskOn: null }, breadth: br, regime: rg }));
+        ok(typeof s === "string" && s.length > 0 && !/null|undefined|NaN/.test(s), `summary limpio (spy=${spy}, breadth=${br ? br.kind : "null"}, regime=${rg.id})`);
+      }
+    }
+  }
+
+  // Las cuatro clases de día tienen etiqueta y explicación: la UI las indexa por `kind`,
+  // y una que faltara saldría como "undefined" en pantalla.
+  for (const k of ["beta", "rotation", "broad", "mixed"]) {
+    ok(typeof BREADTH_LABEL[k] === "string" && BREADTH_LABEL[k].length > 0, `BREADTH_LABEL.${k} presente`);
+    ok(typeof BREADTH_NOTE[k] === "string" && BREADTH_NOTE[k].length > 0, `BREADTH_NOTE.${k} presente`);
+  }
+}
 // ── Report ───────────────────────────────────────────────────────────────────
 console.log(`\n${failed === 0 ? "✓" : "✗"} golden: ${passed} passed, ${failed} failed`);
 if (failed > 0) { for (const f of fails) console.error("  ✗ " + f); process.exit(1); }
