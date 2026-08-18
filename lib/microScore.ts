@@ -13,7 +13,10 @@
 // The correlation gate is the "stock-picking regime": favorable when dispersion is high.
 // ─────────────────────────────────────────────────────────────────────────────
 import type { ScoreInputs } from "./types";
-import { calcScores } from "./scoring";
+// Explicit .ts extension so the golden-test runner (`node --experimental-strip-types`,
+// which resolves specifiers literally) can load this module. tsconfig has
+// `allowImportingTsExtensions`; tsc and the bundler are unaffected.
+import { calcScores } from "./scoring.ts";
 
 /**
  * Momentum/trajectory ranker. Higher = stronger price + earnings trajectory.
@@ -64,7 +67,11 @@ export function stockPickingRegime(impliedCorr: number | null): StockPickingRegi
     return { regime: "mixed", gate: 0.5, label: "Unknown", detail: "No correlation reading — showing momentum ungated.", color: "var(--sr-text-2)" };
   }
   if (impliedCorr < 20) {
-    return { regime: "favorable", gate: 1, label: "Favors selection", detail: "Low correlation — dispersion is high, momentum stock-picking pays (validated IC +0.07).", color: "var(--sr-pos)" };
+    // Redactado tras la auditoría de 2026-08-17 (research/momentum_audit.mjs, 192 meses):
+    // el "+0.07 validado" no se sostiene — ninguna especificación alcanza significancia y el
+    // efecto mínimo detectable del diseño es 0.044. Lo que SÍ se sostiene es el signo, y que
+    // es consistente en las 4 especificaciones probadas. La UI dice eso y no más.
+    return { regime: "favorable", gate: 1, label: "Favors selection", detail: "Low correlation — dispersion is high, and this is historically where selection has carried more signal (consistent in sign across specifications, though not statistically conclusive).", color: "var(--sr-pos)" };
   }
   if (impliedCorr <= 40) {
     return { regime: "mixed", gate: 0.5, label: "Mixed", detail: "Middling correlation — selection edge is muted; lean on allocation.", color: "var(--sr-warn)" };

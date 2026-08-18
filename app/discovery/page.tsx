@@ -61,8 +61,8 @@ export default function DiscoveryPage() {
             <>Metals, commodities, bonds, equity indices and sectors ranked by <strong style={{ color: "var(--sr-text)" }}>12-1m momentum</strong> — the
             same factor that drives the validated dual-momentum allocation. A cross-asset map of <em>what is leading right now</em>.</>
           ) : (
-            <>The S&amp;P 500 ranked by <strong style={{ color: "var(--sr-text)" }}>12-1m momentum</strong> — the factor that earns IC +0.07 (survivorship-free)
-            <em> when market correlation is low</em>, and crashes when it&apos;s high. The regime below tells you whether to trust this list right now.</>
+            <>The S&amp;P 500 ranked by <strong style={{ color: "var(--sr-text)" }}>12-1m momentum</strong>. This is a map of <em>what is leading right
+            now</em> — not a list of recommendations, and not a claim that these names will outperform.</>
           )}
         </p>
       </div>
@@ -86,6 +86,27 @@ export default function DiscoveryPage() {
           </div>
         </div>
       </div>
+
+      {/* MEASURED HONESTY (F1, 2026-08-17). This ranking used to be presented as an
+          opportunity list. It was audited over 192 months (2010-2026, 65,481 name-months,
+          research/momentum_audit.mjs) and the top decile UNDERPERFORMED simply holding the
+          index. Saying so is not a disclaimer — it is the product: no other platform tells
+          you when its own ranking stops working. Full numbers in §7.10 of the plan. */}
+      {!isX && (
+        <div style={{ padding: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px dashed var(--sr-border)" }}>
+          <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-text-2)", marginBottom: 4 }}>
+            What we measured, before you trust this list
+          </div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
+            Over <strong style={{ color: "var(--sr-text-2)" }}>192 months (2010–2026)</strong> on the point-in-time S&amp;P 500, picking the top momentum
+            decile returned <strong style={{ color: "var(--sr-neg)" }}>+728%</strong> — while holding <em>the same 400 names equally weighted</em>, with no
+            selection at all, returned <strong style={{ color: "var(--sr-text-2)" }}>+908%</strong>. Ranking by momentum
+            <strong style={{ color: "var(--sr-neg)" }}> lagged doing nothing by 180 points</strong>, and its information coefficient is statistically
+            indistinguishable from zero. What the data <em>does</em> show is that the signal is strongly time-varying — its dispersion is 16× what chance
+            would explain — which is why the regime below matters more than the ranking itself. Use this as a leadership map, not as a buy list.
+          </div>
+        </div>
+      )}
 
       {/* Group filter (sector for stocks · asset class for cross-asset) */}
       {loaded && (
@@ -139,7 +160,8 @@ export default function DiscoveryPage() {
       )}
 
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-4)" }}>
-        {asOf ? `As of ${asOf} · ` : ""}{rows.length} {isX ? "instruments" : "names"} · momentum from free EOD prices · {isX ? "research/discovery_instruments.mjs" : "research/discovery.mjs"}. Educational — not investment advice.
+        {asOf ? `As of ${asOf} · ` : ""}{rows.length} {isX ? "instruments" : "names"} · momentum from free EOD prices · {isX ? "research/discovery_instruments.mjs" : "research/discovery.mjs"}
+        {!isX && <> · audited in <code style={{ fontSize: "inherit" }}>research/momentum_audit.mjs</code> (192 months)</>}. Educational — not investment advice.
       </div>
     </div>
   );
