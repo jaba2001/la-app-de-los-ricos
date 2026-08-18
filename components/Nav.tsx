@@ -6,12 +6,15 @@ import { authedFetch } from "@/lib/proxy";
 import QuotaPill from "@/components/ui/QuotaPill";
 
 const MAIN_TABS = [
+  // Primero: es la pieza diaria, la razón de volver cada día (y es pública).
+  { label: "Daily", href: "/daily" },
   { label: "Macro", href: "/macro" },
   { label: "Discovery", href: "/discovery" },
   { label: "Stocks", href: "/stock" },
   { label: "Watchlist", href: "/watchlist" },
   { label: "Journal", href: "/journal" },
   { label: "Track Record", href: "/track-record" },
+  { label: "Evidence", href: "/evidence" },
   { label: "Audit", href: "/audit" },
 ];
 
