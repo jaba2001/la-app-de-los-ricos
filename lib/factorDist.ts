@@ -14,6 +14,30 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import type { FactorDistTable } from "./percentile";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ⚠️ LOS PERCENTILES NO ENTRAN EN EL SCORE. Medido el 2026-08-19
+// (`research/score_v2_validate.mjs`, 30 trimestres con distribuciones point-in-time):
+//
+//   IC v1 bandas      +0.0026     decil top +227%  (+47pp sobre el universo equiponderado)
+//   IC v2 percentiles −0.0185     decil top +142%  (−37pp)
+//   diferencia pareada −0.0210, t=−1,40 → NO significativa, pero el signo apunta a PEOR.
+//
+// La explicación es económica, no ruido: neutralizar por sector ELIMINA el alfa sectorial.
+// Las bandas absolutas premiaban implícitamente a los sectores con mejores métricas en
+// absoluto, que en 2019-2026 significaba inclinarse a tecnología y huir de utilities
+// endeudadas — justo lo que funcionó. v2 quita ese tilt por diseño.
+//
+// Son DOS PREGUNTAS DISTINTAS y no se responden con el mismo número:
+//   · "¿es buena PARA SU SECTOR?" → percentiles. EXPLICAN, y ahí se quedan (los grados de
+//     la ficha y los umbrales descalificadores, que son una regla de riesgo conservadora).
+//   · "¿qué compro?"              → comparación absoluta. SELECCIONA, y ahí sigue el v1.
+//
+// Misma regla que se aplicó al momentum: al score sólo entra lo que está medido. Cuando
+// haya evidencia (otra ventana, otro universo, o neutralización parcial en vez de total),
+// se reactiva poniendo esta constante a true y volviendo a correr el validador.
+// ─────────────────────────────────────────────────────────────────────────────
+export const SCORE_USES_SECTOR_PERCENTILES = false;
+
 let cache: FactorDistTable | null = null;
 let pending: Promise<FactorDistTable | null> | null = null;
 let failed = false;
@@ -72,4 +96,12 @@ export function metricsFromRatios(ratios: Record<string, unknown> | null | undef
     currentRatio: num(ratios?.currentRatioTTM),
     interestCoverage: num(ratios?.interestCoverageTTM),
   };
+}
+
+/** Distribución para el SCORE. Devuelve null mientras `SCORE_USES_SECTOR_PERCENTILES` sea
+ *  false: separar esta función de `loadFactorDist()` es lo que permite que los grados y los
+ *  descalificadores sigan usando percentiles mientras el score no. Un único punto de
+ *  control, y el motivo escrito justo arriba. */
+export async function distForScoring(): Promise<FactorDistTable | null> {
+  return SCORE_USES_SECTOR_PERCENTILES ? loadFactorDist() : null;
 }

@@ -9,7 +9,7 @@ import {
   gradeMetric, gradePillar, explainGrade, DIST_LEVELS, HIGHER_IS_BETTER,
   pctlFraction, pctlPoints, PCTL_ZERO_BELOW, PCTL_FULL_POINTS,
 } from "../lib/percentile.ts";
-import { calcScores } from "../lib/scoring.ts";
+import { calcScores, getRating, findDisqualifiers } from "../lib/scoring.ts";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) { pass++; } else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -178,6 +178,33 @@ ok(pctlPoints("pe", null, "Technology", TABLA, 7) === null, "pctlPoints: sin val
     ok(calcScores(banco, real).value <= calcScores(banco).value,
       `sector-relativo: ese mismo banco deja de llevarse el máximo (${calcScores(banco, real).value} ≤ 6)`);
   }
+}
+
+// ── umbrales descalificadores (P0-3) ─────────────────────────────────────────
+{
+  // Sin distribuciones no hay forma de saber qué es "el decil inferior de su sector",
+  // así que la función se calla en vez de inventarse un umbral absoluto.
+  ok(findDisqualifiers({ pe: 50, sector: "Technology" }, null).length === 0,
+    "descalificadores: sin distribución no se descalifica nada");
+
+  // Un pilar en el decil inferior tiene que topar la nota por bien que vaya el resto:
+  // la suma diría "está bien", el balance diría "esto puede quebrar".
+  const malaSalud = { q: [0.1, 0.2, 0.3, 0.5, 0.8, 1.2, 2, 3, 5], n: 100 };
+  const tablaSalud = { ALL: { debtEquity: malaSalud, currentRatio: { q: [0.5, 0.8, 1, 1.5, 2, 2.5, 3, 4, 6], n: 100 } } };
+  const enfermo = { debtEquity: 6, currentRatio: 0.4, sector: null };   // peor que el p99 en ambas
+  const dq = findDisqualifiers(enfermo, tablaSalud);
+  ok(dq.length === 1 && dq[0].pillar === "health", "descalificadores: detecta el pilar hundido");
+  ok(dq[0].reason.includes("capped"), "descalificadores: el motivo explica que la nota queda topada");
+
+  const sinTope = getRating(85);
+  ok(sinTope.label === "STRONG BUY" && !sinTope.capped, "rating: sin descalificadores, 85 sigue siendo STRONG BUY");
+  const conTope = getRating(85, dq);
+  ok(conTope.label === "CAUTION" && conTope.capped === true,
+    "rating: con un pilar en el decil inferior, un 85 queda topado en CAUTION");
+  ok(typeof conTope.reason === "string" && conTope.reason.length > 0,
+    "rating: el tope viene SIEMPRE con su motivo (a diferencia de Seeking Alpha, que sólo topa)");
+  ok(getRating(20, dq).label === "AVOID", "rating: el tope no puede MEJORAR una nota mala");
+  ok(getRating(60, []).label === "BUY", "rating: una lista vacía de descalificadores no cambia nada");
 }
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} percentile: ${pass} passed, ${fail} failed`);

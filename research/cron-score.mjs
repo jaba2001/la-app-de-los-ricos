@@ -20,8 +20,12 @@ import { fileURLToPath } from "url";
 const DIST_PATH = join(dirname(fileURLToPath(import.meta.url)), "out", "factor_dist.json");
 let DIST = null;
 try { if (existsSync(DIST_PATH)) DIST = JSON.parse(readFileSync(DIST_PATH, "utf8")).dist ?? null; } catch { DIST = null; }
-const SCORE_VERSION = DIST ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS;
-console.log(`score v${SCORE_VERSION} (${DIST ? "percentiles sector-relativos" : "bandas absolutas"})`);
+// Medido (research/score_v2_validate.mjs): v2 NO mejora a v1 contra retornos, así que las
+// cohortes se siguen sellando con bandas absolutas. La tabla se carga igualmente porque el
+// artefacto sirve para los grados de la ficha; simplemente no alimenta el score.
+const USE_SECTOR_PCTL = false;
+const SCORE_VERSION = USE_SECTOR_PCTL ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS;
+console.log(`score v${SCORE_VERSION} (${USE_SECTOR_PCTL ? "percentiles sector-relativos" : "bandas absolutas"})`);
 
 const DRY = process.argv.includes("--dry");
 const today = new Date().toISOString().slice(0, 10);
@@ -40,7 +44,7 @@ for (const t of CURATED) {
     if (!f || f.revTTM == null || raw == null || adj == null) continue;
     const sector = await sicSector(cik);
     const mom = await momentum(t, today);
-    const { scores, ic } = scoreStock(f, raw, mom, sector, null, DIST); // pure-micro base score (matches backtest)
+    const { scores, ic } = scoreStock(f, raw, mom, sector, null, USE_SECTOR_PCTL ? DIST : null); // pure-micro base score (matches backtest)
     rows.push({ score_date: today, ticker: t, score_total: scores.total, ic_score: Math.round(ic), sector, raw_price: raw, adj_price: adj, score_version: SCORE_VERSION });
   } catch (e) { console.error(`  ${t}: ${e.message}`); }
 }

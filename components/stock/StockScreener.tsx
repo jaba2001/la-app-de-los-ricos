@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, calcFactorTilts, getRating, getMacroTilt } from "@/lib/scoring";
-import { loadFactorDist } from "@/lib/factorDist";
+import { distForScoring } from "@/lib/factorDist";
 import { stockPickingRegime } from "@/lib/microScore";
 import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
@@ -108,7 +108,7 @@ export default function StockScreener() {
         priceChange6M:    null,
       };
       // F2: mismo criterio sector-relativo que la ficha de acción; sin tabla, bandas de siempre.
-      const calc = calcScores(scoreInputs, await loadFactorDist());
+      const calc = calcScores(scoreInputs, await distForScoring());
       const tiltResult = macroState && sector ? getMacroTilt(macroState, sector, calcFactorTilts(scoreInputs)) : { tilt: 0 };
 
       const rating = getRating(calc.total);

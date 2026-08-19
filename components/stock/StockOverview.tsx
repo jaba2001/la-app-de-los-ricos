@@ -23,7 +23,7 @@ interface Props {
   macro: MacroState | null;
   scores: Scores | null;
   icScore: number | null;
-  rating: { label: string; color: string } | null;
+  rating: { label: string; color: string; capped?: boolean; reason?: string } | null;
   macroTilt: { tilt: number; label: string; color: string; reasons: string[] } | null;
   loading: boolean;
   ticker: string;
@@ -306,6 +306,11 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   {icScore?.toFixed(0) ?? "—"}
                 </div>
                 {rating && <div style={{ marginTop: 6 }}><Pill label={rating.label} color={rating.color} /></div>}
+                {/* Cuando la nota va topada por un pilar hundido, el motivo se dice. Topar
+                    sin explicar es lo que hace Seeking Alpha; el valor está en la frase. */}
+                {rating?.capped && rating.reason && (
+                  <div className="sr-hint" style={{ marginTop: 6, color: "var(--sr-warn)" }}>{rating.reason}</div>
+                )}
                 {scores && macroTilt && macroTilt.tilt !== 0 && (
                   <div style={{ marginTop: 8, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
                     Base: <span className="num">{scores.total}</span>
@@ -317,9 +322,13 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     "sector-relativo" cambia por completo cómo hay que leer la nota — un 60
                     significa cosas distintas si se compara contra todo el mercado o contra
                     los pares del valor. */}
+                {/* Qué mide esta nota, en una línea. Sector-relativo se probó y NO mejoró
+                    los retornos (research/score_v2_validate.mjs), así que el score sigue
+                    comparando en absoluto; los percentiles por sector están en Fundamentals,
+                    que es donde sí aportan: explicar, no seleccionar. */}
                 <div className="sr-hint" style={{ marginTop: 8 }}>
-                  Each metric is scored against the distribution of its own sector, not against
-                  a fixed threshold. Full breakdown in Fundamentals.
+                  Scored on absolute thresholds across the market. Sector-relative percentiles —
+                  how it ranks against its own peers — are in Fundamentals.
                 </div>
               </div>
             )}

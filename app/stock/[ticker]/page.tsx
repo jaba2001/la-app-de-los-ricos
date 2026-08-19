@@ -4,8 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
-import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, SECTOR_ETF, SCORE_VERSION_SECTOR_PCTL, SCORE_VERSION_ABSOLUTE_BANDS, type FactorTilts, type SubScores } from "@/lib/scoring";
-import { loadFactorDist } from "@/lib/factorDist";
+import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, findDisqualifiers, SECTOR_ETF, SCORE_VERSION_SECTOR_PCTL, SCORE_VERSION_ABSOLUTE_BANDS, type FactorTilts, type SubScores, type Disqualifier } from "@/lib/scoring";
+import { loadFactorDist, distForScoring, SCORE_USES_SECTOR_PERCENTILES } from "@/lib/factorDist";
 import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndicators";
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
 import { computeReverseDCF } from "@/lib/reverseDcf";
@@ -116,6 +116,7 @@ export default function StockTickerPage() {
   const [scores, setScores] = useState<Scores | null>(null);
   const [subScores, setSubScores] = useState<SubScores | null>(null);
   const [factorTilts, setFactorTilts] = useState<FactorTilts | null>(null);
+  const [disqualifiers, setDisqualifiers] = useState<Disqualifier[]>([]);
   const [savedAnalysis, setSavedAnalysis] = useState<StockAnalysis | null>(null);
   const { macro: contextMacro, setMacro: setMacroContext } = useMacroContext();
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
@@ -620,18 +621,23 @@ export default function StockTickerPage() {
       // F2: el score se juzga contra la distribución del SECTOR cuando está disponible.
       // `loadFactorDist()` degrada a null si el fichero no está publicado, y entonces
       // calcScores cae a las bandas absolutas de siempre — la nota nunca deja de calcularse.
-      const factorDist = await loadFactorDist();
-      const calc = calcScores(scoreInputs, factorDist);
+      const factorDist = await loadFactorDist();          // grados y descalificadores
+      const scoringDist = await distForScoring();        // null: no validado contra retornos
+      const calc = calcScores(scoreInputs, scoringDist);
       // Factor profile (value/growth/momentum/quality/size) → feeds the measured regime→factor
       // tilt in getMacroTilt (growth favored in expansion/reflation, value in contraction).
       const ftilts = calcFactorTilts(scoreInputs);
       const macroTiltData = macroData ? getMacroTilt(macroData, sector, ftilts) : null;
+      // P0-3: un pilar en el decil inferior de su sector TOPA la nota. Sin `factorDist`
+      // la lista sale vacía y el rating es el de siempre.
+      const disq = findDisqualifiers(scoreInputs, factorDist);
       if (!live()) return;
       setScores(calc);
       setSubScores(calcSubScores(scoreInputs));
       setFactorTilts(ftilts);
+      setDisqualifiers(disq);
 
-      const rating = getRating(calc.total);
+      const rating = getRating(calc.total, disq);
       const { data: saved } = await supabase.from("sl_analyses").upsert({
         user_id: session.user.id,
         ticker: ticker.toUpperCase(),
@@ -645,7 +651,7 @@ export default function StockTickerPage() {
         // Con qué fórmula se calculó ESTE análisis. Sin esto, el historial del usuario
         // mezclaría notas de dos metodologías distintas sin que nada lo indicara: vería
         // "la nota de X bajó" sin poder saber si bajó la empresa o cambió la regla.
-        score_version: factorDist ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS,
+        score_version: SCORE_USES_SECTOR_PERCENTILES ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS,
         macro_tilt: macroTiltData?.tilt ?? null,
         sector,
         reverse_dcf: rdcfSnapshot,
@@ -720,7 +726,7 @@ export default function StockTickerPage() {
   const sector  = (profile?.sector as string) ?? "";
   const macroTilt = macro ? getMacroTilt(macro, sector, factorTilts) : null;
   const icScore   = scores && macroTilt ? Math.max(0, Math.min(100, scores.total + macroTilt.tilt)) : null;
-  const rating    = icScore != null ? getRating(icScore) : (scores ? getRating(scores.total) : null);
+  const rating    = icScore != null ? getRating(icScore, disqualifiers) : (scores ? getRating(scores.total, disqualifiers) : null);
 
   const ipoDate     = profile?.ipoDate as string | undefined;
   const isRecentIPO = ipoDate

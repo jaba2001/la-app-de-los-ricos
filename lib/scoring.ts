@@ -4,7 +4,7 @@ import type { ScoreInputs, Scores, MacroState } from "./types";
 // Con extensión .ts a propósito: `node --experimental-strip-types` (el que corre los golden)
 // no resuelve extensiones, y a diferencia de un `import type` —que desaparece al compilar—
 // éste es un import de VALOR y tiene que existir en runtime.
-import { pctlPoints, type FactorDistTable } from "./percentile.ts";
+import { pctlPoints, gradePillar, type FactorDistTable } from "./percentile.ts";
 
 /** Versión de la fórmula del score. Va sellada en cada cohorte de `sl_cohort`: cambiar el
  *  criterio sin versionarlo haría incomparables las cohortes nuevas con las viejas y
@@ -223,11 +223,51 @@ export function calcScores(inp: ScoreInputs, dist?: FactorDistTable | null): Sco
   return { value, health, momentum, growth, total };
 }
 
-export function getRating(total: number): { label: string; color: string } {
-  if (total >= 80) return { label: "STRONG BUY", color: "var(--sr-pos)" };
-  if (total >= 50) return { label: "BUY",         color: "var(--sr-pos)" };
-  if (total >= 35) return { label: "CAUTION",     color: "var(--sr-neg)" };
-  return               { label: "AVOID",          color: "var(--sr-neg)" };
+// ─────────────────────────────────────────────────────────────────────────────
+// UMBRALES DESCALIFICADORES (P0-3) — copiados de Seeking Alpha porque la idea es buena y
+// es gratis: un solo pilar podrido debe TOPAR la nota, por bien que vaya el resto.
+//
+// El fallo que corrige: los cuatro pilares se suman, así que una empresa con una salud
+// financiera en el decil inferior de su sector puede sacar BUY a base de momentum y
+// crecimiento. La suma dice "está bien"; el balance dice "esto puede quebrar". Topar es
+// más honesto que promediar, y —a diferencia de SA— aquí el motivo se dice en pantalla.
+//
+// Sólo funciona con distribuciones (hace falta saber qué es "el decil inferior DE SU
+// SECTOR"). Sin ellas devuelve lista vacía y el rating es el de siempre.
+// ─────────────────────────────────────────────────────────────────────────────
+export const DISQUALIFY_BELOW_PCTL = 10;
+
+export interface Disqualifier { pillar: string; pctl: number; reason: string }
+
+export function findDisqualifiers(inp: ScoreInputs, dist?: FactorDistTable | null): Disqualifier[] {
+  if (!dist) return [];
+  const etiquetas: Record<string, string> = { value: "Valuation", health: "Financial health", momentum: "Momentum", growth: "Growth" };
+  const out: Disqualifier[] = [];
+  for (const pilar of ["value", "health", "momentum", "growth"]) {
+    const g = gradePillar(pilar, inp as unknown as Record<string, number | null | undefined>, dist, inp.sector);
+    if (g && g.pctl < DISQUALIFY_BELOW_PCTL) {
+      out.push({
+        pillar: pilar,
+        pctl: g.pctl,
+        reason: `${etiquetas[pilar]} sits in the bottom ${DISQUALIFY_BELOW_PCTL}% of ${g.metrics[0]?.sector ?? "its sector"} (percentile ${Math.round(g.pctl)}) — the rating is capped regardless of the other pillars.`,
+      });
+    }
+  }
+  return out;
+}
+
+export function getRating(total: number, disqualifiers?: Disqualifier[] | null): { label: string; color: string; capped?: boolean; reason?: string } {
+  const base =
+    total >= 80 ? { label: "STRONG BUY", color: "var(--sr-pos)" }
+    : total >= 50 ? { label: "BUY",       color: "var(--sr-pos)" }
+    : total >= 35 ? { label: "CAUTION",   color: "var(--sr-neg)" }
+    :               { label: "AVOID",     color: "var(--sr-neg)" };
+  if (!disqualifiers?.length) return base;
+  // Topado a CAUTION: nunca puede salir una recomendación de compra con un pilar hundido.
+  if (base.label === "STRONG BUY" || base.label === "BUY") {
+    return { label: "CAUTION", color: "var(--sr-neg)", capped: true, reason: disqualifiers[0].reason };
+  }
+  return { ...base, capped: true, reason: disqualifiers[0].reason };
 }
 
 // Weighted composite health score, 0-100 (higher = healthier backdrop). Druckenmiller-style
