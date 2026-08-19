@@ -6,6 +6,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { authedFetch } from "@/lib/proxy";
 import { gradeMetric, gradeColor, explainGrade, type MetricGrade, type FactorDistTable } from "@/lib/percentile";
 import { loadFactorDist, metricsFromRatios } from "@/lib/factorDist";
+import { dividendGrades } from "@/lib/dividends";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, LineChart, Line, ComposedChart, Area,
@@ -318,6 +319,43 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
           ))}
         </div>
       </div>
+
+      {/* DIVIDEND GRADES (F5). Sale de datos que la página YA pide: cero llamadas nuevas y
+          cero coste por usuario. Si falta el historial de dividendos, crecimiento y
+          consistencia lo dicen en vez de inventarse una nota. */}
+      {(() => {
+        const dy = metrics?.dividendYieldTTM != null ? Number(metrics.dividendYieldTTM) * 100 : null;
+        if (!dy || dy <= 0) return null;
+        const dg = dividendGrades({
+          dividendYield: dy,
+          payoutRatio: ratios?.payoutRatioTTM != null ? Number(ratios.payoutRatioTTM) : null,
+          interestCoverage: ratios?.interestCoverageTTM != null ? Number(ratios.interestCoverageTTM) : null,
+          netDebtEbitda: metrics?.netDebtToEBITDATTM != null ? Number(metrics.netDebtToEBITDATTM) : null,
+          epsGrowth: ratios?.epsgrowthTTM != null ? Number(ratios.epsgrowthTTM) * 100 : null,
+        });
+        if (!dg.paysDividend) return null;
+        return (
+          <div className="card">
+            <div className="section-label">Dividend</div>
+            <div className="sr-grid-4">
+              {dg.grades.map((g) => (
+                <div key={g.key} className="sr-tile">
+                  <div className="sr-tile-label">{g.label}</div>
+                  <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: gradeColor(g.grade) }}>{g.grade}</div>
+                  <div className="sr-hint" style={{ marginTop: 2 }}>{g.reasons[0]}</div>
+                </div>
+              ))}
+            </div>
+            {dg.warnings.length > 0 && (
+              <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 8%, transparent)" }}>
+                {dg.warnings.map((w) => (
+                  <div key={w} className="sr-hint" style={{ color: "var(--sr-neg)" }}>⚠ {w}</div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Operating Efficiency (P9) */}
       {(() => {

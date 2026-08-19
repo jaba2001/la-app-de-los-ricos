@@ -10,6 +10,7 @@ const MAIN_TABS = [
   { label: "Daily", href: "/daily" },
   { label: "Macro", href: "/macro" },
   { label: "Discovery", href: "/discovery" },
+  { label: "Momentum", href: "/momentum" },
   { label: "Stocks", href: "/stock" },
   { label: "Watchlist", href: "/watchlist" },
   { label: "Journal", href: "/journal" },
