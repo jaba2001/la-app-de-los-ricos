@@ -52,7 +52,7 @@ export const SECTOR_ETF: Record<string, string> = {
   Utilities: "XLU", "Real Estate": "XLRE", "Communication Services": "XLC",
 };
 
-export function calcScores(inp: ScoreInputs, dist?: FactorDistTable | null): Scores {
+export function calcScores(inp: ScoreInputs, dist?: FactorDistTable | null, lambda: number = 1): Scores {
   // PERCENTILES SECTORIALES (F2). `dist` es OPCIONAL y ese detalle es la clave: sin tabla,
   // cada métrica cae exactamente en la banda absoluta de siempre y el score no se mueve ni
   // un punto — por eso los 862 golden siguen verdes sin tocarlos. Con tabla, cada métrica
@@ -61,8 +61,10 @@ export function calcScores(inp: ScoreInputs, dist?: FactorDistTable | null): Sco
   // deja de ser penalizada por una deuda que es la normal en su sector, y una tecnológica
   // barata para su sector deja de puntuar como cara sólo por compararla con un banco.
   //   `P(metrica, valor, max)` → puntos por percentil, o null si no hay con qué compararlo.
+  //   `lambda` gradúa cuánto pesa el sector frente al mercado entero (1 = sólo sector,
+  //   0 = sólo mercado). Se mide en research/score_v2_sweep.mjs antes de fijarlo.
   const P = (metric: string, v: number | null | undefined, max: number): number | null =>
-    dist ? pctlPoints(metric, v, inp.sector, dist, max) : null;
+    dist ? pctlPoints(metric, v, inp.sector, dist, max, lambda) : null;
 
   let value = 0;
   // Sector-relative valuation: a P/E of 12 is cheap for a bank but expensive for a

@@ -212,14 +212,32 @@ export function pctlPoints(
   value: number | null | undefined,
   sector: string | null | undefined,
   table: FactorDistTable | null | undefined,
-  max: number
+  max: number,
+  lambda: number = 1
 ): number | null {
   const higher = HIGHER_IS_BETTER[metric];
   if (higher === undefined || value == null || !isFinite(value) || !table) return null;
-  const dist = lookupDist(table, sector, metric);
-  if (!dist) return null;
-  const pctl = goodnessPctl(value, dist, higher);
-  const frac = pctlFraction(pctl);
+  const dSector = lookupDist(table, sector, metric);
+  if (!dSector) return null;
+  const pSector = goodnessPctl(value, dSector, higher);
+  if (pSector == null) return null;
+
+  // NEUTRALIZACIÓN PARCIAL. `lambda` mezcla el percentil DENTRO DEL SECTOR con el percentil
+  // contra TODO el universo:  λ=1 sólo sector · λ=0 sólo mercado · 0<λ<1 un punto intermedio.
+  //
+  // Existe porque la primera versión sólo probaba λ=1, y eso tira de golpe TODO el alfa
+  // sectorial: si un sector entero es mejor que otro, comparar a cada empresa únicamente
+  // con sus pares borra esa información. Medido, λ=1 empeoraba el score. Pero entre "ignorar
+  // el sector" y "sólo mirar el sector" hay un continuo que nadie había explorado.
+  const pMix = (() => {
+    if (lambda >= 1) return pSector;
+    const dAll = table["ALL"]?.[metric];
+    const pAll = dAll ? goodnessPctl(value, dAll, higher) : null;
+    if (pAll == null) return pSector;                 // sin agregado, se queda con el sectorial
+    return lambda * pSector + (1 - lambda) * pAll;
+  })();
+
+  const frac = pctlFraction(pMix);
   return frac == null ? null : max * frac;
 }
 
