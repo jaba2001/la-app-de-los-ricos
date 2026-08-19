@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node scripts/brief.test.mjs && node scripts/cachekey.test.mjs && node scripts/cors.test.mjs && node scripts/cron.test.mjs && node scripts/segment.test.mjs && node scripts/stripe.test.mjs && node scripts/quota.test.mjs"
+    "test": "node scripts/brief.test.mjs && node scripts/cachekey.test.mjs && node scripts/cors.test.mjs && node scripts/cron.test.mjs && node scripts/segment.test.mjs && node scripts/stripe.test.mjs && node scripts/quota.test.mjs && node scripts/alertkinds.test.mjs && node scripts/dailyclose.test.mjs && node scripts/macroalerts.test.mjs"
   },
   "keywords": [],
   "author": "",

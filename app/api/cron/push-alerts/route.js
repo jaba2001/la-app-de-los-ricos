@@ -6,6 +6,7 @@
 // SUPABASE_SERVICE_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
 import webpush from "web-push";
 import { assertCron } from '../../../../lib/cron.js';
+import { macroAlertFor } from '../../../../lib/macroAlerts.js';
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,22 +15,9 @@ const SB = process.env.SUPABASE_URL;
 const KEY = process.env.SUPABASE_SERVICE_KEY;
 const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
 
-// Map the current macro state to an alert "key" + message. "ok" = nothing to send.
-function alertFor(m) {
-  const ro = m.risk_on != null ? Number(m.risk_on) : null;
-  const bd = m.breadth_200dma != null ? Number(m.breadth_200dma) : null;
-  // Divergence: trust the stored confirmation, but ALSO derive it live from the same row
-  // (risk_on − breadth ≥ 12, same GAP_DIVERGE as lib/regimeLoop.ts) so the alert never
-  // depends on which cron wrote last — breadth is daily now (F3.1) and this stays fresh.
-  const gapDiverges = ro != null && bd != null && ro - bd >= 12;
-  if (m.regime_confirmation === "divergent-bearish" || gapDiverges) {
-    return { key: "divergence", title: "Scora — breadth divergence", body: `Risk-on ${ro?.toFixed(0) ?? "?"} but only ${bd?.toFixed(0) ?? "?"}% of names are above their 200-day. Participation is narrowing — an early warning.` };
-  }
-  if (ro != null && ro < 40) {
-    return { key: "risk-off", title: "Scora — backdrop turned risk-off", body: `The liquidity-led risk-on gauge fell to ${ro.toFixed(0)}/100. The validated allocator tilts to duration, gold and cash.` };
-  }
-  return { key: "ok" };
-}
+// La decisión de qué se notifica vive en lib/macroAlerts.js — pura y con tests
+// (scripts/macroalerts.test.mjs). Estaba aquí inline y sin cobertura, aunque decide lo que
+// se manda a todas las suscripciones a la vez.
 
 export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
@@ -38,20 +26,27 @@ export async function GET(request) {
 
   webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:alerts@scora.app", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
-  // current macro state + last sent key
+  // current macro state + last sent key + last observed regime
   const [msRes, stRes] = await Promise.all([
-    fetch(`${SB}/rest/v1/macro_state?id=eq.1&select=risk_on,breadth_200dma,regime_confirmation`, { headers: sbHeaders }),
-    fetch(`${SB}/rest/v1/push_alert_state?id=eq.1&select=last_confirmation`, { headers: sbHeaders }),
+    fetch(`${SB}/rest/v1/macro_state?id=eq.1&select=risk_on,breadth_200dma,regime_confirmation,regime_id`, { headers: sbHeaders }),
+    fetch(`${SB}/rest/v1/push_alert_state?id=eq.1&select=last_confirmation,last_regime`, { headers: sbHeaders }),
   ]);
   const macro = (await msRes.json())?.[0];
-  const last = (await stRes.json())?.[0]?.last_confirmation ?? null;
+  const state = (await stRes.json())?.[0] ?? {};
+  const last = state.last_confirmation ?? null;
+  const lastRegime = state.last_regime ?? null;
   if (!macro) return json({ error: "no macro_state" }, 500);
 
-  const alert = alertFor(macro);
+  const alert = macroAlertFor(macro, lastRegime);
   // Always record the current key so a future re-entry re-triggers; only SEND on a new actionable key.
-  await fetch(`${SB}/rest/v1/push_alert_state?id=eq.1`, { method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" }, body: JSON.stringify({ last_confirmation: alert.key, last_sent: new Date().toISOString() }) });
+  // `last_regime` se guarda SIEMPRE, dispare o no: es la referencia con la que se detecta
+  // la transición siguiente, y en la primera pasada es lo único que se hace (siembra).
+  await fetch(`${SB}/rest/v1/push_alert_state?id=eq.1`, {
+    method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
+    body: JSON.stringify({ last_confirmation: alert.key, last_regime: alert.regime ?? lastRegime, last_sent: new Date().toISOString() }),
+  });
 
-  if (alert.key === "ok" || alert.key === last) return json({ ok: true, sent: 0, state: alert.key, note: alert.key === last ? "unchanged" : "not actionable" }, 200);
+  if (alert.key === "ok" || alert.key === last) return json({ ok: true, sent: 0, state: alert.key, regime: alert.regime, seeded: lastRegime == null, note: alert.key === last ? "unchanged" : "not actionable" }, 200);
 
   // fetch all subscriptions and push
   const subs = await (await fetch(`${SB}/rest/v1/push_subscriptions?select=endpoint,p256dh,auth`, { headers: sbHeaders })).json();
