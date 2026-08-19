@@ -62,19 +62,47 @@ export interface StockPickingRegime {
  * (The backtest used realized single-stock correlation (0-1); the live product uses the
  * implied index — same signal, different vintage, as documented in the plan.)
  */
+/** Umbrales del gate. NO se estiman de los datos, y ahí está la gracia: son los mismos que
+ *  ya usaba el producto, y resultaron ser lo único que aguantó fuera de muestra. Cada vez
+ *  que se probó un umbral calculado a partir de la propia muestra (terciles in-sample), la
+ *  mejora se evaporaba al recalcularla con sólo el pasado: +44 pp → −2 pp. */
+export const GATE_CORR_LOW = 20;    // por debajo: dispersión alta, la selección respira
+export const GATE_CORR_HIGH = 40;   // por encima: el mercado se mueve como uno
+
+/**
+ * Escala la exposición a la selección de forma CONTINUA entre los dos umbrales, en vez de
+ * a saltos (1 / 0,5 / 0 como antes). Medido en `research/momentum_retry.mjs` sobre DOS
+ * ventanas independientes:
+ *
+ *              sin gate   con gate continuo
+ *   2019-2026   Sharpe 0,78 → 0,86
+ *   2010-2018   Sharpe 1,08 → 1,14
+ *
+ * Lo que replica es el SHARPE, no el retorno: el gate no genera alfa —el retorno extra de
+ * +18 pp en una ventana se volvió −7 pp en la otra— pero mejora el rendimiento ajustado por
+ * riesgo de forma reproducible. Que es exactamente lo que la teoría (Daniel-Moskowitz sobre
+ * crashes de momentum) predice que hace un gate: no te hace ganar más, te evita el desastre.
+ *
+ * Escalonar tiraba información —no es lo mismo una correlación de 21 que una de 39— y
+ * concentraba todo el resultado en acertar el corte exacto.
+ */
 export function stockPickingRegime(impliedCorr: number | null): StockPickingRegime {
   if (impliedCorr == null) {
     return { regime: "mixed", gate: 0.5, label: "Unknown", detail: "No correlation reading — showing momentum ungated.", color: "var(--sr-text-2)" };
   }
-  if (impliedCorr < 20) {
-    // Redactado tras la auditoría de 2026-08-17 (research/momentum_audit.mjs, 192 meses):
-    // el "+0.07 validado" no se sostiene — ninguna especificación alcanza significancia y el
-    // efecto mínimo detectable del diseño es 0.044. Lo que SÍ se sostiene es el signo, y que
-    // es consistente en las 4 especificaciones probadas. La UI dice eso y no más.
-    return { regime: "favorable", gate: 1, label: "Favors selection", detail: "Low correlation — dispersion is high, and this is historically where selection has carried more signal (consistent in sign across specifications, though not statistically conclusive).", color: "var(--sr-pos)" };
+  // Rampa continua: 1 en GATE_CORR_LOW o menos, 0 en GATE_CORR_HIGH o más, lineal entre medias.
+  const gate = Math.max(0, Math.min(1, (GATE_CORR_HIGH - impliedCorr) / (GATE_CORR_HIGH - GATE_CORR_LOW)));
+  const pct = Math.round(gate * 100);
+
+  // Las ETIQUETAS conservan los cortes de siempre (< 20 favorable · [20, 40] mixto · > 40
+  // desfavorable) porque lo que la medición respalda es el `gate` CONTINUO, no mover las
+  // fronteras del texto. Cambiar ambas cosas a la vez habría alterado en silencio lo que
+  // lee el usuario en los bordes exactos, y los golden lo cazaron: bien cazado.
+  if (impliedCorr < GATE_CORR_LOW) {
+    return { regime: "favorable", gate, label: "Favors selection", detail: `Low correlation — dispersion is high, and this is historically where selection has carried more signal. Selection weight ${pct}%.`, color: "var(--sr-pos)" };
   }
-  if (impliedCorr <= 40) {
-    return { regime: "mixed", gate: 0.5, label: "Mixed", detail: "Middling correlation — selection edge is muted; lean on allocation.", color: "var(--sr-warn)" };
+  if (impliedCorr <= GATE_CORR_HIGH) {
+    return { regime: "mixed", gate, label: "Mixed", detail: `Middling correlation — the selection edge is muted, so exposure is scaled back rather than switched off. Selection weight ${pct}%.`, color: "var(--sr-warn)" };
   }
-  return { regime: "unfavorable", gate: 0, label: "Macro tape", detail: "High correlation — names move as one; momentum crashes here. Allocation over selection.", color: "var(--sr-neg)" };
+  return { regime: "unfavorable", gate, label: "Macro tape", detail: `High correlation — names move as one and momentum crashes here. Selection weight ${pct}%; lean on allocation.`, color: "var(--sr-neg)" };
 }

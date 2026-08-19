@@ -23,6 +23,7 @@ import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { returnsSeries, fwdReturn } from "./prices.mjs";
+import { returnsSeriesLong } from "./pricesLong.mjs";
 import { buildCorrEngine, corrAsOf } from "./correlation.mjs";
 import { CURATED, loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { addMonths, monthStarts, mean, std, fx, spearman, loadPanel, idxOnOrBefore, signalsAt, pct } from "./momentumSignals.mjs";
@@ -30,9 +31,14 @@ import { addMonths, monthStarts, mean, std, fx, spearman, loadPanel, idxOnOrBefo
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const COST_BPS = 10, DECILE = 10;
+// --long: ventana 2010-2018 con la caché de historia larga. Es el FUERA DE MUESTRA del
+// gate: los umbrales absolutos 0,20/0,40 no se estimaron aquí, así que si el resultado
+// aguanta en un periodo que no se usó para elegirlos, deja de ser un candidato.
+const LONG = process.argv.includes("--long");
+const seriesFn = LONG ? returnsSeriesLong : returnsSeries;
 const today = new Date().toISOString().slice(0, 10);
-const START = process.env.BT_START || "2019-07-01";
-const END = addMonths(today, -2);
+const START = process.env.BT_START || (LONG ? "2010-07-01" : "2019-07-01");
+const END = process.env.BT_END || (LONG ? "2018-12-01" : addMonths(today, -2));
 const dates = monthStarts(START, END);
 const FULL = process.argv.includes("--full");
 const CAP = Number(process.argv.find((a) => /^\d+$/.test(a)) ?? 400);
@@ -51,12 +57,25 @@ if (FULL) {
 const isMember = (t, d) => !FULL || (memberSet.get(d)?.has(t) ?? false);
 console.log(`\n  MOMENTUM · SEGUNDA OPORTUNIDAD · ${UNIVERSE.length} nombres · ${dates.length} meses\n`);
 
-const spyRs = await returnsSeries("SPY");
+const spyRs = await seriesFn("SPY");
 const spyMap = new Map(spyRs.map((x) => [x.date, x.ret]));
-const spyPanel = await loadPanel("SPY");
+const spyPanel = await loadPanel("SPY", seriesFn);
 const panels = new Map();
-for (const t of UNIVERSE) { const p = await loadPanel(t); if (p) panels.set(t, p); }
-const corrEngine = await buildCorrEngine([...panels.keys()]);
+for (const t of UNIVERSE) { const p = await loadPanel(t, seriesFn); if (p) panels.set(t, p); }
+let corrEngine;
+if (LONG) {
+  // Mismo estimador de correlation.mjs, construido desde los paneles largos ya cargados.
+  const maps = new Map();
+  for (const [t, p] of panels) { const m = new Map(); for (let j = 0; j < p.dates.length; j++) m.set(p.dates[j], p.ret[j]); maps.set(t, m); }
+  corrEngine = { maps, spyDates: spyPanel.dates };
+} else {
+  corrEngine = await buildCorrEngine([...panels.keys()]);
+}
+const fwdDe = async (t, p, d) => {
+  if (!LONG) return fwdReturn(t, d, addMonths(d, 1));
+  const a = idxOnOrBefore(p.dates, d), b = idxOnOrBefore(p.dates, addMonths(d, 1));
+  return a < 0 || b <= a ? null : (Math.exp(p.cum[b] - p.cum[a]) - 1) * 100;
+};
 
 // VARIANTES DEL COMPUESTO. La original iba con rs_spy dentro (redundante) y con dist52w,
 // que resultó predecir AL REVÉS. Se prueban quitando lo que sobra, no añadiendo nada nuevo:
@@ -81,7 +100,7 @@ for (const d of dates) {
     if (i < 0) continue;
     const s = signalsAt(p, i, spyMap);
     if (!s) continue;
-    const fwd1 = await fwdReturn(t, d, addMonths(d, 1));
+    const fwd1 = await fwdDe(t, p, d);
     if (fwd1 == null) continue;
     bucket.push({ t, fwd1, ...s, rs_spy: spyMom != null ? s.mom12_1 - spyMom : null });
   }
@@ -220,7 +239,7 @@ console.log(`
   VEREDICTO: ${veredicto}`);
 console.log(`  (con ${Object.keys(VARIANTES).length + Object.keys(gates).length} combinaciones probadas, el mejor de la tabla está sesgado al alza: hace falta fuera de muestra antes de creérselo)\n`);
 
-writeFileSync(join(OUT, "momentum_retry.json"), JSON.stringify({
+writeFileSync(join(OUT, LONG ? "momentum_retry_oos.json" : "momentum_retry.json"), JSON.stringify({
   generatedAt: new Date().toISOString(), months: fechasOk.length, universe: panels.size,
   universeEW: { total: fx(ew.total, 1), sharpe: fx(ew.sharpe, 2) },
   variants: Object.fromEntries(Object.entries(resultados).map(([k, v]) => [k, { ic: v.ic, t: v.t, total: v.total, vsEW: v.vsEW, sharpe: v.sharpe }])),
