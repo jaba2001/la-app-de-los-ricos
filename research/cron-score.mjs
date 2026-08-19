@@ -7,6 +7,21 @@ import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, priceAsOf, momentum } from "./prices.mjs";
 import { scoreStock } from "./score.mjs";
 import { CURATED } from "./universe.mjs";
+import { SCORE_VERSION_ABSOLUTE_BANDS, SCORE_VERSION_SECTOR_PCTL } from "../lib/scoring.ts";
+import { readFileSync, existsSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+// F2 — distribuciones sectoriales. Si el artefacto existe, el score se calcula contra el
+// sector y la cohorte se sella como versión 2; si no, bandas absolutas y versión 1.
+// La VERSIÓN va en cada fila a propósito: cambiar el criterio sin sellarlo haría que las
+// cohortes nuevas y las viejas parecieran comparables sin serlo, y el track record se
+// rompería por dentro sin que nada fallara.
+const DIST_PATH = join(dirname(fileURLToPath(import.meta.url)), "out", "factor_dist.json");
+let DIST = null;
+try { if (existsSync(DIST_PATH)) DIST = JSON.parse(readFileSync(DIST_PATH, "utf8")).dist ?? null; } catch { DIST = null; }
+const SCORE_VERSION = DIST ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS;
+console.log(`score v${SCORE_VERSION} (${DIST ? "percentiles sector-relativos" : "bandas absolutas"})`);
 
 const DRY = process.argv.includes("--dry");
 const today = new Date().toISOString().slice(0, 10);
@@ -25,8 +40,8 @@ for (const t of CURATED) {
     if (!f || f.revTTM == null || raw == null || adj == null) continue;
     const sector = await sicSector(cik);
     const mom = await momentum(t, today);
-    const { scores, ic } = scoreStock(f, raw, mom, sector, null); // pure-micro base score (matches backtest)
-    rows.push({ score_date: today, ticker: t, score_total: scores.total, ic_score: Math.round(ic), sector, raw_price: raw, adj_price: adj });
+    const { scores, ic } = scoreStock(f, raw, mom, sector, null, DIST); // pure-micro base score (matches backtest)
+    rows.push({ score_date: today, ticker: t, score_total: scores.total, ic_score: Math.round(ic), sector, raw_price: raw, adj_price: adj, score_version: SCORE_VERSION });
   } catch (e) { console.error(`  ${t}: ${e.message}`); }
 }
 console.log(`scored ${rows.length}/${CURATED.length} names as of ${today}`);

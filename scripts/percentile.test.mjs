@@ -7,7 +7,9 @@ import { fileURLToPath } from "url";
 import {
   pctlOf, goodnessPctl, gradeFromPctl, gradeColor, lookupDist,
   gradeMetric, gradePillar, explainGrade, DIST_LEVELS, HIGHER_IS_BETTER,
+  pctlFraction, pctlPoints, PCTL_ZERO_BELOW, PCTL_FULL_POINTS,
 } from "../lib/percentile.ts";
+import { calcScores } from "../lib/scoring.ts";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) { pass++; } else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -112,6 +114,70 @@ if (existsSync(distPath)) {
   if (ener && tech) ok(ener.q[4] < tech.q[4], "real: Energy cotiza a múltiplos más bajos que Technology");
 } else {
   console.log("  (research/out/factor_dist.json no generado — se omiten las comprobaciones sobre datos reales)");
+}
+
+// ── conversión a puntos del score (F2) ───────────────────────────────────────
+near(pctlFraction(15), 0, 1e-9, "pctlFraction: en el umbral inferior no se puntúa");
+near(pctlFraction(75), 1, 1e-9, "pctlFraction: en el umbral superior se cobra todo");
+near(pctlFraction(45), 0.5, 1e-9, "pctlFraction: a mitad de camino, media puntuación");
+near(pctlFraction(5), 0, 1e-9, "pctlFraction: por debajo del suelo se recorta a 0");
+near(pctlFraction(99), 1, 1e-9, "pctlFraction: por encima del techo se recorta a 1");
+ok(pctlFraction(null) === null, "pctlFraction: null → null");
+
+// Las constantes están CALIBRADAS para que el cambio sea neutro en nivel (delta medio ≈ 0
+// sobre los 488 nombres del S&P 500). Este test existe para que nadie las mueva sin volver
+// a correr research/score_pctl_impact.mjs: cambiarlas a ojo desplaza la nota de TODOS.
+ok(PCTL_ZERO_BELOW === 15 && PCTL_FULL_POINTS === 75,
+  `calibración: los umbrales siguen en 15/75 (si cambian, recalibrar con score_pctl_impact.mjs)`);
+
+near(pctlPoints("pe", 55, "Technology", TABLA, 7), 7 * pctlFraction(goodnessPctl(55, TABLA.Technology.pe, false)), 1e-9,
+  "pctlPoints: puntos = máximo × fracción del percentil de bondad");
+ok(pctlPoints("pe", 55, "Technology", null, 7) === null, "pctlPoints: sin tabla → null");
+ok(pctlPoints("noExiste", 5, "Technology", TABLA, 7) === null, "pctlPoints: métrica sin dirección → null");
+ok(pctlPoints("pe", null, "Technology", TABLA, 7) === null, "pctlPoints: sin valor → null");
+
+// ── integración con calcScores ───────────────────────────────────────────────
+{
+  const inputs = { pe: 15, pb: 1.2, sector: "Financial Services", roe: 14, roa: 1.2, netMargin: 25, operatingMargin: 0.3 };
+  const sinDist = calcScores(inputs);
+  const conDistVacia = calcScores(inputs, null);
+  ok(sinDist.total === conDistVacia.total, "calcScores: pasar null como distribución = comportamiento de siempre");
+
+  if (existsSync(distPath)) {
+    const real = JSON.parse(readFileSync(distPath, "utf8")).dist;
+    const conDist = calcScores(inputs, real);
+    ok(typeof conDist.total === "number" && conDist.total >= 0 && conDist.total <= 100,
+      "calcScores: con distribución sigue devolviendo un score válido 0-100");
+
+    // OJO — el PER y el EV/EBITDA NO son buen ejemplo de lo que arregla la F2: ya tenían
+    // ajuste sectorial vía SECTOR_PE_BM / SECTOR_EV_BM (bandas 0.7×/1.0×/1.3× del benchmark
+    // del sector). Ahí la mejora es de precisión (un benchmark fijo a ojo → la distribución
+    // real medida), no de concepto. El agujero de verdad estaba en las métricas SIN ningún
+    // ajuste, y esas son las que fijan los dos tests siguientes.
+
+    // 1) DEUDA DE UNA UTILITY. Banda absoluta: debtEquity < 1.5 → 4 de 10. Pero la mediana
+    //    de Utilities es 1.44 (negocio regulado e intensivo en capital), así que la utility
+    //    MEDIANA de su sector cobraba 4/10 y una en su percentil 75 cobraba CERO — no por
+    //    estar mal gestionada, sino por ser una utility.
+    const util = { debtEquity: 1.4, sector: "Utilities" };
+    ok(calcScores(util, real).health > calcScores(util).health,
+      `sector-relativo: una utility con deuda/equity 1,4 (la mediana de su sector) mejora su salud con percentiles (${calcScores(util, real).health} vs ${calcScores(util).health})`);
+
+    // 2) P/B DE UNA TECNOLÓGICA. Banda absoluta: pb < 5 → 2 de 6. Pero la mediana de
+    //    Technology es 7,22: un P/B de 4,5 está en el percentil 25 de su sector, o sea
+    //    BARATA, y cobraba casi nada.
+    const tech = { pb: 4.5, sector: "Technology" };
+    ok(calcScores(tech, real).value > calcScores(tech).value,
+      `sector-relativo: una tecnológica con P/B 4,5 (percentil 25 de su sector) mejora su valoración con percentiles (${calcScores(tech, real).value} vs ${calcScores(tech).value})`);
+
+    // 3) Y el simétrico, para que no parezca que esto sólo reparte regalos: un banco con
+    //    P/B 1,4 es del montón en Financials (mediana 2,12) y con la banda absoluta se
+    //    llevaba el máximo por estar "por debajo de 1,5".
+    const banco = { pb: 1.4, sector: "Financial Services" };
+    ok(calcScores(banco).value === 6, "banda absoluta: un banco con P/B 1,4 se lleva el máximo del sub-score (6)");
+    ok(calcScores(banco, real).value <= calcScores(banco).value,
+      `sector-relativo: ese mismo banco deja de llevarse el máximo (${calcScores(banco, real).value} ≤ 6)`);
+  }
 }
 
 console.log(`\n${fail === 0 ? "✓" : "✗"} percentile: ${pass} passed, ${fail} failed`);

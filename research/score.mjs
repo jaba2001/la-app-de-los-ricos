@@ -84,10 +84,12 @@ export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
  *  app path — the macro tilt now folds in the stock's FACTOR profile (regime→factor rotation),
  *  exactly like getMacroTilt(macro, sector, factorTilts) in page.tsx/screener. Set
  *  FACTOR_FOLD=0 to measure the score WITHOUT the fold (A/B validation only). */
-export function scoreStock(f, rawPrice, mom, sector, macroState = null) {
+export function scoreStock(f, rawPrice, mom, sector, macroState = null, dist = null) {
   const regime = macroState?.regime_id ?? null;
   const inputs = buildInputs(f, rawPrice, mom, sector, regime);
-  const scores = calcScores(inputs);
+  // `dist` opcional (F2): con tabla de distribuciones el score es sector-relativo; sin ella
+  // caen las bandas absolutas y el backtest histórico sigue reproduciéndose igual que antes.
+  const scores = calcScores(inputs, dist);
   const useFold = process.env.FACTOR_FOLD !== "0";
   const factorTilts = useFold ? calcFactorTilts(inputs) : null;
   const tilt = macroState ? getMacroTilt(macroState, sector || "", factorTilts).tilt : 0;

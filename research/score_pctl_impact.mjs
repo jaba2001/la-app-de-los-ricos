@@ -25,7 +25,6 @@ import { rawPriceAsOf, momentum } from "./prices.mjs";
 import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
 import { metricsOf } from "./fundamentalMetrics.mjs";
 import { calcScores, getRating } from "../lib/scoring.ts";
-import { pctlOf, lookupDist, HIGHER_IS_BETTER } from "../lib/percentile.ts";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -35,53 +34,6 @@ const LIMIT = limitArg >= 0 ? parseInt(process.argv[limitArg + 1], 10) : 0;
 
 const distFile = JSON.parse(readFileSync(join(OUT, "factor_dist.json"), "utf8"));
 const DIST = distFile.dist;
-
-// ── el score por percentiles ─────────────────────────────────────────────────────
-// Escalones equivalentes a las bandas actuales (7/5/3/0 sobre un máximo de 7):
-// el decil alto se lleva todo, y a partir del percentil 40 no se puntúa.
-function fraccion(pctl) {
-  if (pctl == null) return null;
-  if (pctl >= 80) return 1;
-  if (pctl >= 60) return 5 / 7;
-  if (pctl >= 40) return 3 / 7;
-  return 0;
-}
-/** Puntos de una métrica: su máximo actual × la fracción que le toca por percentil. */
-function puntos(metrica, valor, sector, max) {
-  const higher = HIGHER_IS_BETTER[metrica];
-  if (higher === undefined || valor == null) return null;
-  const d = lookupDist(DIST, sector, metrica);
-  const crudo = pctlOf(valor, d);
-  if (crudo == null) return null;
-  const bondad = higher ? crudo : 100 - crudo;
-  const f = fraccion(bondad);
-  return f == null ? null : max * f;
-}
-
-// Mismos pilares, topes y pesos por métrica que lib/scoring.ts.
-const PILARES = {
-  value: { tope: 25, metricas: [["pe", 7], ["pb", 6], ["evEbitda", 6], ["pfcf", 6]] },
-  momentum: { tope: 25, metricas: [["priceChange1M", 9], ["priceChange3M", 8], ["priceChange6M", 8]] },
-  growth: { tope: 20, metricas: [["revenueGrowth", 11], ["epsGrowth", 9]] },
-};
-const HEALTH_GENERAL = { tope: 30, metricas: [["debtEquity", 10], ["currentRatio", 10], ["interestCoverage", 10], ["netDebtEbitda", 5], ["roic", 5], ["grossProfitability", 4]] };
-const HEALTH_FINANCIERO = { tope: 30, metricas: [["roe", 12], ["roa", 8], ["netMargin", 6], ["operatingMargin", 4]] };
-
-function scorePorPercentiles(m, sector) {
-  const esFinanciero = sector === "Financial Services" || sector === "Financials";
-  const health = esFinanciero ? HEALTH_FINANCIERO : HEALTH_GENERAL;
-  const salida = {};
-  for (const [nombre, cfg] of Object.entries({ ...PILARES, health })) {
-    let suma = 0;
-    for (const [metrica, max] of cfg.metricas) {
-      const p = puntos(metrica, m[metrica], sector, max);
-      if (p != null) suma += p;
-    }
-    salida[nombre] = Math.max(0, Math.min(cfg.tope, Math.round(suma)));
-  }
-  salida.total = salida.value + salida.health + salida.momentum + salida.growth;
-  return salida;
-}
 
 // ── recogida ─────────────────────────────────────────────────────────────────────
 const table = await loadSP500Historical();
@@ -102,9 +54,13 @@ for (const t of members) {
     if (!f || f.revTTM == null || raw == null) continue;
     const sector = (await sicSector(cik)) || null;
     const m = metricsOf(f, raw, await momentum(t, today));
-    // El score ACTUAL, tal cual lo calcula la app hoy (mismas entradas, mismas unidades).
-    const actual = calcScores({ ...m, sector, marketCap: f.shares > 0 ? raw * f.shares : null });
-    const nuevo = scorePorPercentiles(m, sector);
+    const inputs = { ...m, sector, marketCap: f.shares > 0 ? raw * f.shares : null };
+    // Ambos lados salen ya de la IMPLEMENTACIÓN REAL de producción: la única diferencia es
+    // pasarle o no la tabla de distribuciones. Antes esto comparaba contra una réplica del
+    // score escrita aquí, que servía para estimar el impacto pero no probaba el código que
+    // se va a desplegar. Ahora mide lo que de verdad va a correr.
+    const actual = calcScores(inputs);
+    const nuevo = calcScores(inputs, DIST);
     filas.push({ ticker: t, sector, actual, nuevo, delta: nuevo.total - actual.total,
       rActual: getRating(actual.total).label, rNuevo: getRating(nuevo.total).label });
   } catch { /* saltar */ }

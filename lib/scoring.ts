@@ -1,4 +1,16 @@
 import type { ScoreInputs, Scores, MacroState } from "./types";
+// `percentile.ts` es un módulo PURO sin dependencias, así que importarlo no rompe la regla
+// de "cargable en node por el golden test" que gobierna este fichero.
+// Con extensión .ts a propósito: `node --experimental-strip-types` (el que corre los golden)
+// no resuelve extensiones, y a diferencia de un `import type` —que desaparece al compilar—
+// éste es un import de VALOR y tiene que existir en runtime.
+import { pctlPoints, type FactorDistTable } from "./percentile.ts";
+
+/** Versión de la fórmula del score. Va sellada en cada cohorte de `sl_cohort`: cambiar el
+ *  criterio sin versionarlo haría incomparables las cohortes nuevas con las viejas y
+ *  rompería el track record por dentro, sin que nada fallara. */
+export const SCORE_VERSION_ABSOLUTE_BANDS = 1;   // bandas absolutas (histórico)
+export const SCORE_VERSION_SECTOR_PCTL = 2;      // percentiles sector-relativos (F2)
 
 // Regime→factor rotation, MEASURED (research/regime_sector_lab.mjs) and VALIDATED (a regime
 // growth/value rotation earned Sharpe 1.24 vs SPY 0.74 over 2000-2026, regime_factor_validate).
@@ -40,7 +52,18 @@ export const SECTOR_ETF: Record<string, string> = {
   Utilities: "XLU", "Real Estate": "XLRE", "Communication Services": "XLC",
 };
 
-export function calcScores(inp: ScoreInputs): Scores {
+export function calcScores(inp: ScoreInputs, dist?: FactorDistTable | null): Scores {
+  // PERCENTILES SECTORIALES (F2). `dist` es OPCIONAL y ese detalle es la clave: sin tabla,
+  // cada métrica cae exactamente en la banda absoluta de siempre y el score no se mueve ni
+  // un punto — por eso los 862 golden siguen verdes sin tocarlos. Con tabla, cada métrica
+  // se juzga contra la distribución REAL de su sector. Donde más cambia no es en el P/E
+  // (que ya tenía SECTOR_PE_BM) sino en las métricas que nunca tuvieron ajuste: una utility
+  // deja de ser penalizada por una deuda que es la normal en su sector, y una tecnológica
+  // barata para su sector deja de puntuar como cara sólo por compararla con un banco.
+  //   `P(metrica, valor, max)` → puntos por percentil, o null si no hay con qué compararlo.
+  const P = (metric: string, v: number | null | undefined, max: number): number | null =>
+    dist ? pctlPoints(metric, v, inp.sector, dist, max) : null;
+
   let value = 0;
   // Sector-relative valuation: a P/E of 12 is cheap for a bank but expensive for a
   // utility. When we know the sector, score P/E and EV/EBITDA against that sector's
@@ -49,23 +72,27 @@ export function calcScores(inp: ScoreInputs): Scores {
   const sectorPeBm = inp.sector ? SECTOR_PE_BM[inp.sector] : undefined;
   const sectorEvBm = inp.sector ? SECTOR_EV_BM[inp.sector] : undefined;
   if (inp.pe != null) {
-    if (sectorPeBm && inp.pe > 0) {
+    const p = P("pe", inp.pe, 7);
+    if (p != null) value += p;
+    else if (sectorPeBm && inp.pe > 0) {
       const r = inp.pe / sectorPeBm;
       value += r < 0.7 ? 7 : r < 1.0 ? 5 : r < 1.3 ? 3 : 0;
     } else {
       value += inp.pe < 15 ? 7 : inp.pe < 25 ? 5 : inp.pe < 35 ? 3 : 0;
     }
   }
-  if (inp.pb != null) value += inp.pb < 1.5 ? 6 : inp.pb < 3 ? 4 : inp.pb < 5 ? 2 : 0;
+  if (inp.pb != null) value += P("pb", inp.pb, 6) ?? (inp.pb < 1.5 ? 6 : inp.pb < 3 ? 4 : inp.pb < 5 ? 2 : 0);
   if (inp.evEbitda != null) {
-    if (sectorEvBm && inp.evEbitda > 0) {
+    const p = P("evEbitda", inp.evEbitda, 6);
+    if (p != null) value += p;
+    else if (sectorEvBm && inp.evEbitda > 0) {
       const r = inp.evEbitda / sectorEvBm;
       value += r < 0.7 ? 6 : r < 1.0 ? 4 : r < 1.3 ? 2 : 0;
     } else {
       value += inp.evEbitda < 8 ? 6 : inp.evEbitda < 15 ? 4 : inp.evEbitda < 25 ? 2 : 0;
     }
   }
-  if (inp.pfcf != null) value += inp.pfcf < 15 ? 6 : inp.pfcf < 25 ? 4 : inp.pfcf < 40 ? 2 : 0;
+  if (inp.pfcf != null) value += P("pfcf", inp.pfcf, 6) ?? (inp.pfcf < 15 ? 6 : inp.pfcf < 25 ? 4 : inp.pfcf < 40 ? 2 : 0);
   // Reverse DCF signal — market expectations premium/discount vs conservative growth
   if (inp.impliedGrowthCagr != null) {
     value += inp.impliedGrowthCagr > 30 ? -4
@@ -83,30 +110,30 @@ export function calcScores(inp: ScoreInputs): Scores {
   const isFinancial = inp.sector === "Financial Services" || inp.sector === "Financials";
   let health = 0;
   if (isFinancial) {
-    if (inp.roe != null)             health += inp.roe > 18 ? 12 : inp.roe > 13 ? 9 : inp.roe > 9 ? 6 : inp.roe > 5 ? 3 : 0;
-    if (inp.roa != null)             health += inp.roa > 1.4 ? 8 : inp.roa > 1.1 ? 6 : inp.roa > 0.8 ? 4 : inp.roa > 0.4 ? 2 : 0;
-    if (inp.netMargin != null)       health += inp.netMargin > 28 ? 6 : inp.netMargin > 20 ? 4 : inp.netMargin > 12 ? 2 : 0;
-    if (inp.operatingMargin != null) { const om = inp.operatingMargin * 100; health += om > 35 ? 4 : om > 20 ? 3 : om > 0 ? 1 : 0; }
+    if (inp.roe != null)             health += P("roe", inp.roe, 12) ?? (inp.roe > 18 ? 12 : inp.roe > 13 ? 9 : inp.roe > 9 ? 6 : inp.roe > 5 ? 3 : 0);
+    if (inp.roa != null)             health += P("roa", inp.roa, 8) ?? (inp.roa > 1.4 ? 8 : inp.roa > 1.1 ? 6 : inp.roa > 0.8 ? 4 : inp.roa > 0.4 ? 2 : 0);
+    if (inp.netMargin != null)       health += P("netMargin", inp.netMargin, 6) ?? (inp.netMargin > 28 ? 6 : inp.netMargin > 20 ? 4 : inp.netMargin > 12 ? 2 : 0);
+    if (inp.operatingMargin != null) { const om = inp.operatingMargin * 100; health += P("operatingMargin", inp.operatingMargin, 4) ?? (om > 35 ? 4 : om > 20 ? 3 : om > 0 ? 1 : 0); }
   } else {
-    if (inp.debtEquity != null) health += inp.debtEquity < 0.3 ? 10 : inp.debtEquity < 0.7 ? 7 : inp.debtEquity < 1.5 ? 4 : 0;
-    if (inp.currentRatio != null) health += inp.currentRatio > 2 ? 10 : inp.currentRatio > 1.5 ? 7 : inp.currentRatio > 1 ? 4 : 0;
-    if (inp.interestCoverage != null) health += inp.interestCoverage > 10 ? 10 : inp.interestCoverage > 5 ? 6 : inp.interestCoverage > 2 ? 3 : 0;
-    if (inp.netDebtEbitda != null) health += inp.netDebtEbitda < 1 ? 5 : inp.netDebtEbitda < 3 ? 3 : 0;
-    if (inp.roic != null) health += inp.roic > 20 ? 5 : inp.roic > 12 ? 3 : 0;
+    if (inp.debtEquity != null) health += P("debtEquity", inp.debtEquity, 10) ?? (inp.debtEquity < 0.3 ? 10 : inp.debtEquity < 0.7 ? 7 : inp.debtEquity < 1.5 ? 4 : 0);
+    if (inp.currentRatio != null) health += P("currentRatio", inp.currentRatio, 10) ?? (inp.currentRatio > 2 ? 10 : inp.currentRatio > 1.5 ? 7 : inp.currentRatio > 1 ? 4 : 0);
+    if (inp.interestCoverage != null) health += P("interestCoverage", inp.interestCoverage, 10) ?? (inp.interestCoverage > 10 ? 10 : inp.interestCoverage > 5 ? 6 : inp.interestCoverage > 2 ? 3 : 0);
+    if (inp.netDebtEbitda != null) health += P("netDebtEbitda", inp.netDebtEbitda, 5) ?? (inp.netDebtEbitda < 1 ? 5 : inp.netDebtEbitda < 3 ? 3 : 0);
+    if (inp.roic != null) health += P("roic", inp.roic, 5) ?? (inp.roic > 20 ? 5 : inp.roic > 12 ? 3 : 0);
     // Novy-Marx gross profitability (gross profit / total assets) — the most regime-ROBUST
     // quality signal (measured: best/near-best Sharpe in every backtest window, qgv_lab.mjs).
     // Rewards asset-light, high-moat models the way net margin can't. Always-on quality.
-    if (inp.grossProfitability != null) health += inp.grossProfitability > 40 ? 4 : inp.grossProfitability > 25 ? 2 : inp.grossProfitability > 12 ? 1 : 0;
+    if (inp.grossProfitability != null) health += P("grossProfitability", inp.grossProfitability, 4) ?? (inp.grossProfitability > 40 ? 4 : inp.grossProfitability > 25 ? 2 : inp.grossProfitability > 12 ? 1 : 0);
   }
 
   let momentum = 0;
-  if (inp.priceChange1M != null) momentum += inp.priceChange1M > 5 ? 9 : inp.priceChange1M > 0 ? 6 : inp.priceChange1M > -5 ? 3 : 0;
-  if (inp.priceChange3M != null) momentum += inp.priceChange3M > 10 ? 8 : inp.priceChange3M > 0 ? 5 : inp.priceChange3M > -10 ? 2 : 0;
-  if (inp.priceChange6M != null) momentum += inp.priceChange6M > 15 ? 8 : inp.priceChange6M > 0 ? 5 : inp.priceChange6M > -15 ? 2 : 0;
+  if (inp.priceChange1M != null) momentum += P("priceChange1M", inp.priceChange1M, 9) ?? (inp.priceChange1M > 5 ? 9 : inp.priceChange1M > 0 ? 6 : inp.priceChange1M > -5 ? 3 : 0);
+  if (inp.priceChange3M != null) momentum += P("priceChange3M", inp.priceChange3M, 8) ?? (inp.priceChange3M > 10 ? 8 : inp.priceChange3M > 0 ? 5 : inp.priceChange3M > -10 ? 2 : 0);
+  if (inp.priceChange6M != null) momentum += P("priceChange6M", inp.priceChange6M, 8) ?? (inp.priceChange6M > 15 ? 8 : inp.priceChange6M > 0 ? 5 : inp.priceChange6M > -15 ? 2 : 0);
 
   let growth = 0;
-  if (inp.revenueGrowth != null) growth += inp.revenueGrowth > 20 ? 11 : inp.revenueGrowth > 10 ? 8 : inp.revenueGrowth > 0 ? 5 : 0;
-  if (inp.epsGrowth != null) growth += inp.epsGrowth > 20 ? 9 : inp.epsGrowth > 10 ? 6 : inp.epsGrowth > 0 ? 3 : 0;
+  if (inp.revenueGrowth != null) growth += P("revenueGrowth", inp.revenueGrowth, 11) ?? (inp.revenueGrowth > 20 ? 11 : inp.revenueGrowth > 10 ? 8 : inp.revenueGrowth > 0 ? 5 : 0);
+  if (inp.epsGrowth != null) growth += P("epsGrowth", inp.epsGrowth, 9) ?? (inp.epsGrowth > 20 ? 9 : inp.epsGrowth > 10 ? 6 : inp.epsGrowth > 0 ? 3 : 0);
 
   // ── FCF quality signals (Features 1 & 6 from videos) ──────────────────────
 

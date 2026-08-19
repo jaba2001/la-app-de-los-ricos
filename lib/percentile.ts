@@ -1,10 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // PERCENTILES SECTOR-RELATIVOS (F2 · P0-1 de PLAN_SEEKINGALPHA_MARKET_MOMENTUM.md)
 //
-// El problema que resuelve: hoy `calcScores()` juzga con bandas ABSOLUTAS — "PER < 15 → 7
-// puntos". Eso es un umbral de los noventa y castiga por sistema a los sectores caros por
-// naturaleza: un PER de 12 es barato para un banco y carísimo para una utility regulada.
-// Seeking Alpha lleva desde el principio haciéndolo por PERCENTIL DENTRO DEL SECTOR, y es
+// El problema que resuelve: la mayoría de métricas del score se juzgan con bandas
+// ABSOLUTAS iguales para todos los sectores. El PER y el EV/EBITDA ya tenían un ajuste
+// (SECTOR_PE_BM / SECTOR_EV_BM, benchmarks fijos a ojo), pero el resto no, y ahí el sesgo
+// es grave. Medido sobre 488 nombres del S&P 500:
+//   · `debtEquity < 1.5 → 4 de 10`, pero la mediana de Utilities es 1,44 → la utility
+//     mediana de su sector cobraba 4/10 y la del percentil 75 cobraba CERO, no por estar
+//     mal gestionada sino por ser una utility (negocio regulado e intensivo en capital).
+//   · `pb < 1.5 → 6 de 6`, pero la mediana de Financials es 2,12 y la de Technology 7,22
+//     → un banco del montón se llevaba el máximo y una tecnológica en el percentil 25 de
+//     su sector (P/B 4,5, o sea barata) se llevaba 2 de 6.
+// Seeking Alpha lleva desde el principio comparando por PERCENTIL DENTRO DEL SECTOR, y es
 // —de todo lo que hacen— lo único que de verdad hay que copiarles: no es una apuesta de
 // alfa, es calidad de medición.
 //
@@ -168,6 +175,52 @@ export function gradePillar(
   const grade = gradeFromPctl(pctl);
   if (grade == null) return null;
   return { pillar, pctl: Math.round(pctl * 10) / 10, grade, metrics: graded, coverage: graded.length };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONVERSIÓN A PUNTOS DEL SCORE
+//
+// Aquí está la calibración, y es la parte que más fácil se hace mal: si la curva reparte
+// menos puntos que las bandas absolutas que sustituye, el score de TODO el universo baja y
+// parece que el método es más severo cuando en realidad sólo está mal escalado. Medido
+// (research/score_pctl_impact.mjs): con "pe < 25 → 5 de 7 puntos", más de medio universo
+// cobra el 71% de la nota, así que la curva tiene que dar ~0,68 de media para que el
+// cambio sea NEUTRO EN NIVEL y sólo redistribuya.
+//
+// De ahí la recta: sube desde el percentil 0 (que aún cobra algo, porque ser el peor de un
+// sector bueno no es lo mismo que no valer nada) hasta el 75, donde ya se lleva todo.
+// PCTL_FULL_POINTS es el único parámetro y está calibrado contra el universo real.
+// ─────────────────────────────────────────────────────────────────────────────
+export const PCTL_ZERO_BELOW = 15;     // por debajo de este percentil, la métrica no puntúa
+export const PCTL_FULL_POINTS = 75;    // a partir de aquí se cobra el 100%
+
+/** Fracción de los puntos de una métrica que corresponde a un percentil de bondad (0..1).
+ *  Recta entre los dos umbrales. Con 15/75 la fracción media del universo es 0,55, que es
+ *  la que iguala el reparto de las bandas absolutas: medido sobre los 488 nombres del
+ *  S&P 500, el score medio se mueve ~0 puntos. Si se cambian estas constantes hay que
+ *  volver a correr `research/score_pctl_impact.mjs` y comprobar que sigue siendo neutro,
+ *  o el cambio dejará de redistribuir y pasará a subir o bajar la nota de todo el mundo. */
+export function pctlFraction(pctl: number | null | undefined): number | null {
+  if (pctl == null || !isFinite(pctl)) return null;
+  return Math.max(0, Math.min(1, (pctl - PCTL_ZERO_BELOW) / (PCTL_FULL_POINTS - PCTL_ZERO_BELOW)));
+}
+
+/** Puntos que una métrica aporta al score, juzgada contra su sector.
+ *  `null` cuando falta el valor, la distribución o la dirección → el llamador cae a su banda. */
+export function pctlPoints(
+  metric: string,
+  value: number | null | undefined,
+  sector: string | null | undefined,
+  table: FactorDistTable | null | undefined,
+  max: number
+): number | null {
+  const higher = HIGHER_IS_BETTER[metric];
+  if (higher === undefined || value == null || !isFinite(value) || !table) return null;
+  const dist = lookupDist(table, sector, metric);
+  if (!dist) return null;
+  const pctl = goodnessPctl(value, dist, higher);
+  const frac = pctlFraction(pctl);
+  return frac == null ? null : max * frac;
 }
 
 /** Frase lista para pantalla. La letra sola es lo que critican de Seeking Alpha: el número

@@ -5,6 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, SECTOR_ETF, type FactorTilts, type SubScores } from "@/lib/scoring";
+import { loadFactorDist } from "@/lib/factorDist";
 import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndicators";
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
 import { computeReverseDCF } from "@/lib/reverseDcf";
@@ -616,7 +617,11 @@ export default function StockTickerPage() {
         salesQoQ:         stockData.finviz?.salesQoQ ?? null,
         operatingMargin:  stockData.finviz?.operatingMargin ?? null,
       };
-      const calc = calcScores(scoreInputs);
+      // F2: el score se juzga contra la distribución del SECTOR cuando está disponible.
+      // `loadFactorDist()` degrada a null si el fichero no está publicado, y entonces
+      // calcScores cae a las bandas absolutas de siempre — la nota nunca deja de calcularse.
+      const factorDist = await loadFactorDist();
+      const calc = calcScores(scoreInputs, factorDist);
       // Factor profile (value/growth/momentum/quality/size) → feeds the measured regime→factor
       // tilt in getMacroTilt (growth favored in expansion/reflation, value in contraction).
       const ftilts = calcFactorTilts(scoreInputs);
