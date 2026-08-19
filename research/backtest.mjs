@@ -80,6 +80,11 @@ for (const date of dates) {
     // used only to *label* the by-regime breakdown, never fed into the score, so the
     // headline isn't confounded by a coarse macro classifier. The production macro
     // overlay is validated separately once macro.js runs historically.
+    // SIN distribuciones sectoriales A PROPÓSITO (F2): `factor_dist.json` son los cuantiles
+    // de HOY, y usarlos para puntuar 2015 sería look-ahead descarado — estaríamos juzgando
+    // aquel mercado con los múltiplos de éste. El backtest se queda en bandas absolutas
+    // (score v1) hasta que existan distribuciones point-in-time por fecha. No "arreglar"
+    // esto pasándole DIST: no es un olvido.
     const { ic, scores } = scoreStock(f, raw, mom, sector, USE_MACRO ? macro : null);
     // Phase 4 — momentum/trajectory score to test 0A's hypothesis that the value/quality
     // score reads dispersion backwards. `mom121` = 12-1m price momentum (Jegadeesh-Titman,

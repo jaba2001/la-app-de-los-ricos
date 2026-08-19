@@ -312,6 +312,15 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     <span style={{ color: macroTilt.color, marginLeft: 4 }}>{macroTilt.tilt > 0 ? "+" : ""}{macroTilt.tilt} macro</span>
                   </div>
                 )}
+                {/* Divulgación de metodología (F2). No es letra pequeña por gusto: la norma
+                    europea de presentación objetiva pide que el criterio esté a la vista, y
+                    "sector-relativo" cambia por completo cómo hay que leer la nota — un 60
+                    significa cosas distintas si se compara contra todo el mercado o contra
+                    los pares del valor. */}
+                <div className="sr-hint" style={{ marginTop: 8 }}>
+                  Each metric is scored against the distribution of its own sector, not against
+                  a fixed threshold. Full breakdown in Fundamentals.
+                </div>
               </div>
             )}
           </div>

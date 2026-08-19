@@ -22,7 +22,7 @@ function spearman(x, y) {
 }
 
 async function readCohort() {
-  const r = await fetch(`${SB}/rest/v1/sl_cohort?select=score_date,ticker,score_total,adj_price&order=score_date.asc&limit=100000`, {
+  const r = await fetch(`${SB}/rest/v1/sl_cohort?select=score_date,ticker,score_total,adj_price,score_version&order=score_date.asc&limit=100000`, {
     headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
   });
   return r.ok ? await r.json() : [];
@@ -49,6 +49,30 @@ for (const r of cohort) {
 
 const dates = [...new Set(cohort.map((r) => r.score_date))];
 const buy = measured.filter((r) => r.score_total >= BUY);
+
+// ── DESGLOSE POR VERSIÓN DEL SCORE ───────────────────────────────────────────────
+// El IC agregado correlaciona score contra retorno mezclando cohortes calculadas con
+// fórmulas distintas (v1 bandas absolutas, v2 percentiles sector-relativos). No están en
+// la misma escala, así que ese número agregado es —literalmente— una media de dos cosas
+// que no se pueden promediar. Se sigue publicando por continuidad, pero el desglose es el
+// que hay que mirar, y `mixes_versions` avisa cuando el agregado no es de fiar.
+const versiones = [...new Set(measured.map((r) => r.score_version ?? 1))].sort();
+const byVersion = {};
+for (const v of versiones) {
+  const filas = measured.filter((r) => (r.score_version ?? 1) === v);
+  const compras = filas.filter((r) => r.score_total >= BUY);
+  byVersion[`v${v}`] = {
+    names: filas.length,
+    cohorts: [...new Set(filas.map((r) => r.score_date))].length,
+    ic: filas.length >= 5 ? spearman(filas.map((r) => r.score_total), filas.map((r) => r.ret)) : null,
+    buy_hit_rate: compras.length ? compras.filter((r) => r.alpha > 0).length / compras.length : null,
+    buy_avg_alpha: mean(compras.map((r) => r.alpha)),
+    label: v === 2 ? "percentiles sector-relativos" : "bandas absolutas",
+  };
+}
+if (versiones.length > 1) {
+  console.log(`⚠ el track record mezcla ${versiones.length} versiones del score (${versiones.map((v) => "v" + v).join(", ")}) — el agregado NO es comparable; mirar by_version`);
+}
 const summary = {
   id: 1, as_of: today,
   months_live: dates.length, cohorts: dates.length, names_scored: cohort.length,
@@ -58,6 +82,7 @@ const summary = {
   information_coefficient: measured.length >= 5 ? spearman(measured.map((r) => r.score_total), measured.map((r) => r.ret)) : null,
   sharpe: null, max_drawdown: null,
   by_horizon: { matured: measured.length, buyAvgAlpha: mean(buy.map((r) => r.alpha)) },
+  by_version: { ...byVersion, mixes_versions: versiones.length > 1 },
   updated_at: new Date().toISOString(),
 };
 console.log(summary);

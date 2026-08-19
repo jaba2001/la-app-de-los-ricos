@@ -1,0 +1,49 @@
+name: Scora — distribuciones sectoriales mensuales
+
+# Recalcula los cuantiles por sector de cada métrica del score (F2) y actualiza el fichero
+# que consume la app. Sin esto, las distribuciones se congelarían en la fecha en que se
+# generaron y el score acabaría comparando cada empresa contra un mercado que ya no existe:
+# los múltiplos sectoriales se mueven, y una tecnológica "barata para su sector" en 2026 no
+# lo es con los cuantiles de 2028.
+#
+# MENSUAL y no diario a propósito: son fundamentales trimestrales: un recálculo diario
+# gastaría llamadas a EDGAR para mover los cuantiles en la cuarta cifra, y encima haría que
+# la nota de un valor cambiara sin que hubiera cambiado nada suyo.
+#
+# Corre el día 4, DESPUÉS del cron de scoring (día 2), para que una cohorte no se selle a
+# mitad de una actualización de distribuciones y quede medio calculada con cada versión.
+on:
+  schedule:
+    - cron: "0 9 4 * *" # día 4 de cada mes, 09:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  distribuciones:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Recalcular cuantiles por sector
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # opcional — cobertura de deslistados
+        run: node --experimental-strip-types --no-warnings research/factor_dist.mjs
+
+      # El artefacto que sirve la app es `public/factor-dist.json`, así que el commit ES el
+      # despliegue: sin este paso el cálculo se haría y no lo vería nadie.
+      - name: Publicar si han cambiado
+        run: |
+          if git diff --quiet public/factor-dist.json; then
+            echo "Sin cambios en las distribuciones."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/factor-dist.json research/out/factor_dist.json 2>/dev/null || git add public/factor-dist.json
+            git commit -m "chore(f2): distribuciones sectoriales al $(date -u +%Y-%m-%d)"
+            git push
+          fi

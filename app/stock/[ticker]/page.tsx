@@ -4,7 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/proxy";
-import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, SECTOR_ETF, type FactorTilts, type SubScores } from "@/lib/scoring";
+import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, SECTOR_ETF, SCORE_VERSION_SECTOR_PCTL, SCORE_VERSION_ABSOLUTE_BANDS, type FactorTilts, type SubScores } from "@/lib/scoring";
 import { loadFactorDist } from "@/lib/factorDist";
 import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndicators";
 import { normalizeFundamentals, finnhubToFinvizFallback, mergeFinviz } from "@/lib/normalize";
@@ -642,6 +642,10 @@ export default function StockTickerPage() {
         score_mom: calc.momentum,
         score_growth: calc.growth,
         rating: rating.label,
+        // Con qué fórmula se calculó ESTE análisis. Sin esto, el historial del usuario
+        // mezclaría notas de dos metodologías distintas sin que nada lo indicara: vería
+        // "la nota de X bajó" sin poder saber si bajó la empresa o cambió la regla.
+        score_version: factorDist ? SCORE_VERSION_SECTOR_PCTL : SCORE_VERSION_ABSOLUTE_BANDS,
         macro_tilt: macroTiltData?.tilt ?? null,
         sector,
         reverse_dcf: rdcfSnapshot,
