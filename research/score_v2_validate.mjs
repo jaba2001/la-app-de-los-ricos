@@ -62,7 +62,14 @@ for (const fecha of fechas) {
   const dist = distAsOf(fecha);
   if (!dist) { console.log(`  ${fecha}  sin distribución previa → se omite (no se usa una futura)`); continue; }
   let miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
-  if (CAP > 0) miembros = miembros.slice(0, CAP);
+  // ⚠️ NO truncar: `membersAsOf` devuelve los tickers EN ORDEN ALFABÉTICO, así que un
+  // slice(0, N) borraba sistemáticamente de la S a la Z — 99 nombres en 2020, entre ellos
+  // UnitedHealth, Visa, Walmart, Exxon, Verizon y Wells Fargo. Un universo truncado por la
+  // inicial no es "el S&P 500". Si hace falta limitar por coste, se limita por FRECUENCIA
+  // de pertenencia (como los labs de momentum), nunca por orden alfabético.
+  if (CAP > 0 && miembros.length > CAP) {
+    console.log(`  ⚠ CAP=${CAP} ignorado: truncar por orden alfabético sesgaría el universo. Usando los ${miembros.length} miembros.`);
+  }
   const filas = await collectRows(miembros, fecha, sectorCache);
   const bucket = [];
   for (const f of filas) {
