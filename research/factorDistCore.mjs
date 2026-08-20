@@ -23,7 +23,18 @@ export function quantile(sorted, p) {
 }
 
 /** Recoge las métricas de cada nombre a una fecha. `sectorCache` evita repetir EDGAR. */
-export async function collectRows(tickers, asOf, sectorCache = new Map()) {
+/**
+ * `requirePrice` (por defecto true) exige precio para admitir la fila, porque las métricas
+ * de VALORACIÓN (PER, P/B, EV/EBITDA, P/FCF) no existen sin él y una distribución a medias
+ * es peor que ninguna.
+ *
+ * Pero las métricas de CALIDAD y SOLVENCIA —rentabilidad bruta sobre activos, ROIC,
+ * márgenes, cobertura de intereses, deuda— salen enteras de los estados financieros y no
+ * necesitan cotización. Ponerlo a false permite estudiarlas MÁS ATRÁS EN EL TIEMPO que la
+ * caché de precios, que arranca en 2018-06 y estaba dejando cualquier análisis anterior
+ * en cero filas sin decir por qué.
+ */
+export async function collectRows(tickers, asOf, sectorCache = new Map(), requirePrice = true) {
   const filas = [];
   for (const t of tickers) {
     try {
@@ -31,7 +42,7 @@ export async function collectRows(tickers, asOf, sectorCache = new Map()) {
       if (!cik) continue;
       const f = await fundamentalsAsOf(cik, asOf);
       const raw = await rawPriceAsOf(t, asOf);
-      if (!f || f.revTTM == null || raw == null) continue;
+      if (!f || f.revTTM == null || (requirePrice && raw == null)) continue;
       if (!sectorCache.has(t)) sectorCache.set(t, (await sicSector(cik)) || null);
       filas.push({ ticker: t, sector: sectorCache.get(t), m: metricsOf(f, raw, await momentum(t, asOf)) });
     } catch { /* saltar */ }
