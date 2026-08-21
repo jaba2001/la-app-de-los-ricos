@@ -60,18 +60,21 @@ create table if not exists public.sl_picks_position (
   -- Debe coincidir con SellReason de lib/picks.ts. El check impide que una razón nueva
   -- entre sin pasar por el motor.
   close_reason   text        check (close_reason in ('senal_bajo_umbral','descalificador','fuera_del_universo')),
-  created_at     timestamptz not null default now(),
-  -- Una posición abierta por ticker y versión: la cuarentena de 12 meses (§5) impide
-  -- reentrar antes, así que dos abiertas a la vez sólo pueden venir de un bug.
-  constraint sl_picks_position_una_abierta
-    exclude (ticker with =, rules_version with =) where (closed_on is null)
+  created_at     timestamptz not null default now()
 );
 
 comment on table public.sl_picks_position is
   'Posiciones de Scora Picks. Las cerradas NO se borran: §7 promete publicar todas las posiciones cerradas con su resultado, incluidas las que salieron mal.';
 
-create index if not exists sl_picks_position_abiertas_idx
-  on public.sl_picks_position (rules_version, ticker) where closed_on is null;
+-- Una sola posición ABIERTA por ticker y versión: la cuarentena de 12 meses (§5) impide
+-- reentrar antes, así que dos abiertas a la vez sólo pueden venir de un bug.
+--
+-- Es un índice único parcial y NO una constraint EXCLUDE, que fue el primer intento: un
+-- EXCLUDE con el operador `=` sobre tipos escalares usa GiST y exige la extensión
+-- `btree_gist`, así que la migración habría fallado en el primer `apply`. El índice parcial
+-- hace exactamente lo mismo sin depender de ninguna extensión.
+create unique index if not exists sl_picks_position_una_abierta
+  on public.sl_picks_position (ticker, rules_version) where closed_on is null;
 create index if not exists sl_picks_position_cerradas_idx
   on public.sl_picks_position (rules_version, closed_on desc) where closed_on is not null;
 
