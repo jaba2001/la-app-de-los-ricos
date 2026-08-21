@@ -19,6 +19,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/daily`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${base}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${base}/track-record`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    // /picks es público y se actualiza dos veces al mes: es la pieza compartible del
+    // producto, y la que un buscador debe poder indexar entera.
+    { url: `${base}/picks`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     // El Libro de Evidencia: publica hasta las señales que fallaron. Es el activo que
     // ningún competidor puede copiar sin admitir lo mismo, así que es contenido, no solo UI.
     { url: `${base}/evidence`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },

@@ -68,7 +68,13 @@ async function series(ticker) {
   const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
   const path = join(DIR, ticker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
   let rows = null;
-  if (existsSync(path)) { try { const c = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(c) && c.length && c[0].raw != null) rows = c; } catch { rows = null; } }
+  // ⚠️ Esta caché NO CADUCA: una vez escrito el fichero, se reutiliza para siempre. Es lo
+  // correcto para un backtest (que quiere datos estables y reproducibles) y VENENO para un
+  // proceso en vivo, que se quedaría clavado en la última fecha descargada sin fallar ni
+  // avisar. `PX_REFRESH=1` fuerza la recarga; lo usa `cron-picks.mjs`, que necesita el
+  // precio de hoy y el calendario de mercado real.
+  const refrescar = process.env.PX_REFRESH === "1";
+  if (!refrescar && existsSync(path)) { try { const c = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(c) && c.length && c[0].raw != null) rows = c; } catch { rows = null; } }
   if (!rows) {
     await sleep(160);
     rows = await fromYahoo(yTicker);
