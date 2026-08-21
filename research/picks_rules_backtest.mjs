@@ -57,7 +57,11 @@ const seriesFn = LONG ? returnsSeriesLong : returnsSeries;
 const ENTRY = Number(arg("--entry", "80")) / 100;   // percentil de calidad para poder ENTRAR
 const EXIT = Number(arg("--exit", "50")) / 100;     // por debajo de esto, empieza la cuenta de salida
 const TOP_N = Number(arg("--top", "40"));           // tope de posiciones (decidido en §6)
-const COMPRAS_POR_FECHA = 2;                        // §4
+// ⚠️ POR FECHA DE DECISIÓN, y hay DOS fechas al mes → el ritmo mensual es el DOBLE.
+// Esta confusión ya coló una vez: las variantes de la ablación estaban etiquetadas "al mes"
+// cuando el valor era por fecha, así que el "4 al mes" medido eran en realidad 8. Toda
+// etiqueta de cadencia dice ahora las dos cifras.
+const COMPRAS_POR_FECHA = 1;                        // §4 v1: "dos posiciones nuevas AL MES"
 const PERSISTENCIA_DIAS = 60;                       // §3
 const DIAS_180 = 180;                               // §5.3
 const CUARENTENA_MESES = 12;                        // §5
@@ -422,11 +426,15 @@ if (!process.argv.includes("--no-ablacion")) {
     "sin la regla de 180 días":      { dias180: 0 },
     "sin cuarentena de 12 meses":    { cuarentenaMeses: 0 },
     "sin persistencia de 60 días":   { persistencia: 0 },
-    "4 compras al mes (no 2)":       { comprasPorFecha: 4 },
-    "sin 180d + 4 al mes":           { dias180: 0, comprasPorFecha: 4 },
-    // El diseño que sale de todo lo anterior, medido COMO CONJUNTO. Las mejoras no tienen
-    // por qué sumarse: hay que medir la combinación, no asumirla.
-    "RECONSTRUIDO p70/4mes/sin180d": { entry: 0.70, dias180: 0, comprasPorFecha: 4 },
+    "2/fecha = 4 al mes":            { comprasPorFecha: 2 },
+    "4/fecha = 8 al mes":            { comprasPorFecha: 4 },
+    "sin 180d + 4 al mes":           { dias180: 0, comprasPorFecha: 2 },
+    "sin 180d + 8 al mes":           { dias180: 0, comprasPorFecha: 4 },
+    // Los dos candidatos a v2, medidos COMO CONJUNTO: las mejoras no tienen por qué
+    // sumarse. Se separan por cadencia porque es lo único que los distingue, y porque
+    // 4 y 8 compras al mes son productos distintos para quien las ejecuta a mano.
+    "v2 · p70 · 4 al mes · sin180d": { entry: 0.70, dias180: 0, comprasPorFecha: 2 },
+    "v2 · p70 · 8 al mes · sin180d": { entry: 0.70, dias180: 0, comprasPorFecha: 4 },
   };
   const ablacion = {};
   for (const [nombre, opts] of Object.entries(VARIANTES)) {
