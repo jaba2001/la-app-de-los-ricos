@@ -175,6 +175,42 @@ for (const [nombre, claves] of Object.entries(SEÑALES)) {
   console.log(`  ${nombre.padEnd(24)}${(mean(ics) >= 0 ? "+" : "") + mean(ics).toFixed(4)}${("+" + c.total.toFixed(0) + "%").padStart(9)}${(c.cagr.toFixed(1) + "%").padStart(8)}${c.sharpe.toFixed(2).padStart(8)}${(c.maxDD.toFixed(1) + "%").padStart(9)}${(((c.total - ew.total) >= 0 ? "+" : "") + (c.total - ew.total).toFixed(0) + "pp").padStart(9)}`);
 }
 
+// ── BARRIDO DEL TAMAÑO DE CARTERA ────────────────────────────────────────────────
+// El nº de posiciones es un PARÁMETRO LIBRE, y se fijó en 25 sin justificarlo. Con 25 de
+// ~499 se está en el top 5%: unos pocos nombres mueven todo el resultado. Si la señal es
+// real debe seguir funcionando —con menos margen— al diversificar; si sólo funciona muy
+// concentrada, lo que se está midiendo es ruido con suerte.
+//
+// Referencia del sector: Evans & Archer (1968) y Statman (1987) sitúan en 20-40 nombres la
+// diversificación del riesgo idiosincrático; los ETF de factor calidad usan 100+.
+console.log(`
+  ── ¿DEPENDE EL RESULTADO DEL Nº DE POSICIONES? ──`);
+console.log(`  ${"N".padStart(4)}${"% univ.".padStart(9)}${"total".padStart(9)}${"CAGR".padStart(8)}${"Sharpe".padStart(8)}${"maxDD".padStart(9)}${"vs EW".padStart(9)}`);
+const nMedio = Math.round(mean(fechasOk.map((d) => porFecha.get(d).length)));
+const barridoN = {};
+for (const N of [10, 15, 20, 25, 30, 40, 50, 75, 100, 150]) {
+  if (N > nMedio * 0.6) break;
+  const rets = []; let prev = new Set();
+  for (const d of fechasOk) {
+    const rows = porFecha.get(d);
+    const m = compuesto(rows, SEÑALES["Calidad"]);
+    const orden = [...m.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0]).slice(0, N);
+    const byT = new Map(rows.map((r) => [r.t, r]));
+    const r = mean(orden.map((t) => byT.get(t)?.fwd3).filter((x) => x != null)) ?? 0;
+    const set = new Set(orden); let nuevos = 0; for (const t of set) if (!prev.has(t)) nuevos++;
+    rets.push(r - (set.size ? nuevos / set.size : 0) * 2 * COST_BPS / 100); prev = set;
+  }
+  const c = curvaDe(rets);
+  barridoN[N] = { total: fx(c.total, 1), cagr: fx(c.cagr, 2), sharpe: fx(c.sharpe, 2), maxDD: fx(c.maxDD, 1), vsEW: fx(c.total - ew.total, 1) };
+  console.log(`  ${String(N).padStart(4)}${((N / nMedio * 100).toFixed(1) + "%").padStart(9)}${("+" + c.total.toFixed(0) + "%").padStart(9)}${(c.cagr.toFixed(1) + "%").padStart(8)}${c.sharpe.toFixed(2).padStart(8)}${(c.maxDD.toFixed(1) + "%").padStart(9)}${(((c.total - ew.total) >= 0 ? "+" : "") + (c.total - ew.total).toFixed(0) + "pp").padStart(9)}`);
+}
+const conN = Object.entries(barridoN);
+const positivos = conN.filter(([, v]) => v.vsEW > 0).length;
+console.log(`  → bate al universo EW en ${positivos}/${conN.length} tamaños de cartera.`);
+console.log(`     ${positivos === conN.length ? "El resultado NO depende de acertar el número de posiciones: buena señal."
+  : positivos >= conN.length * 0.7 ? "Aguanta en la mayoría de tamaños, pero se degrada: leerlo con cautela."
+  : "⚠ SÓLO funciona en unos pocos tamaños — eso es ruido concentrado, no una señal."}`);
+
 // ── criterios, evaluados sin margen de interpretación ────────────────────────────
 const b = resultados["Calidad + baja vol"];
 const c1 = b.sharpe > ew.sharpe;
@@ -192,6 +228,7 @@ writeFileSync(join(OUT, LONG ? "quality_lowvol_lab_oos.json" : "quality_lowvol_l
   quarters: fechasOk.length, topN: TOP_N, universeEW: { total: fx(ew.total, 1), cagr: fx(ew.cagr, 2), sharpe: fx(ew.sharpe, 2), maxDD: fx(ew.maxDD, 1) },
   benchmarks: { spy: spy ? { total: fx(spy.total,1), sharpe: fx(spy.sharpe,2), maxDD: fx(spy.maxDD,1) } : null,
                 rsp: rsp ? { total: fx(rsp.total,1), sharpe: fx(rsp.sharpe,2), maxDD: fx(rsp.maxDD,1) } : null },
+  sizeSweep: barridoN, avgUniverseSize: nMedio,
   results: resultados, criteria: { sharpeAboveEW: c1, drawdownBelowEW: c2, returnNotFarBelow: c3, passed: pasa },
 }, null, 2));
 console.log(`  → escrito research/out/${LONG ? "quality_lowvol_lab_oos.json" : "quality_lowvol_lab.json"}\n`);
