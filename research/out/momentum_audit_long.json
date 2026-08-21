@@ -1,0 +1,378 @@
+{
+  "generatedAt": "2026-08-18T11:40:10.650Z",
+  "mode": "historia larga",
+  "window": {
+    "start": "2010-07-01",
+    "end": "2026-06-01"
+  },
+  "universe": 367,
+  "months": 192,
+  "nameMonths": 65481,
+  "A1_significance": {
+    "mom12_1": {
+      "ic": 0.0005,
+      "se": 0.0148,
+      "t": 0.03,
+      "p": 0.977,
+      "n": 192
+    },
+    "mom12_1_ra": {
+      "ic": 0.0004,
+      "se": 0.0152,
+      "t": 0.03,
+      "p": 0.979,
+      "n": 192
+    },
+    "mom6_1_ra": {
+      "ic": -0.0069,
+      "se": 0.0141,
+      "t": -0.49,
+      "p": 0.638,
+      "n": 192
+    },
+    "rs_ibd": {
+      "ic": -0.0029,
+      "se": 0.0156,
+      "t": -0.19,
+      "p": 0.861,
+      "n": 192
+    },
+    "rs_spy": {
+      "ic": 0.0005,
+      "se": 0.0148,
+      "t": 0.03,
+      "p": 0.977,
+      "n": 192
+    },
+    "dist52w": {
+      "ic": -0.0138,
+      "se": 0.0168,
+      "t": -0.82,
+      "p": 0.419,
+      "n": 192
+    },
+    "resid_mom": {
+      "ic": -0.0032,
+      "se": 0.005,
+      "t": -0.63,
+      "p": 0.539,
+      "n": 192
+    },
+    "fip_neg": {
+      "ic": 0.011,
+      "se": 0.0102,
+      "t": 1.07,
+      "p": 0.287,
+      "n": 192
+    },
+    "rev1m_neg": {
+      "ic": 0.0111,
+      "se": 0.0128,
+      "t": 0.86,
+      "p": 0.395,
+      "n": 192
+    },
+    "COMPOSITE": {
+      "ic": -0.0026,
+      "se": 0.0157,
+      "t": -0.17,
+      "p": 0.877,
+      "n": 192
+    }
+  },
+  "A2_regime": {
+    "inSample": {
+      "low": {
+        "composite": 0.0385,
+        "compositeT": 1.77,
+        "compositeP": 0.077,
+        "mom12_1": 0.0402,
+        "mom12_1T": 1.91,
+        "mom12_1P": 0.056,
+        "months": 65
+      },
+      "mid": {
+        "composite": -0.0109,
+        "compositeT": -0.4,
+        "compositeP": 0.699,
+        "mom12_1": -0.0122,
+        "mom12_1T": -0.47,
+        "mom12_1P": 0.653,
+        "months": 63
+      },
+      "high": {
+        "composite": -0.0363,
+        "compositeT": -1.15,
+        "compositeP": 0.252,
+        "mom12_1": -0.0274,
+        "mom12_1T": -0.95,
+        "mom12_1P": 0.35,
+        "months": 64
+      },
+      "lowMinusHigh": {
+        "diff": 0.0748,
+        "t": 1.95,
+        "nLow": 65,
+        "nHigh": 64
+      }
+    },
+    "pit": {
+      "low": {
+        "composite": 0.0231,
+        "compositeT": 1.15,
+        "compositeP": 0.251,
+        "mom12_1": 0.0202,
+        "mom12_1T": 1.03,
+        "mom12_1P": 0.309,
+        "months": 87
+      },
+      "mid": {
+        "composite": -0.0298,
+        "compositeT": -0.87,
+        "compositeP": 0.388,
+        "mom12_1": -0.0208,
+        "mom12_1T": -0.67,
+        "mom12_1P": 0.515,
+        "months": 42
+      },
+      "high": {
+        "composite": -0.0386,
+        "compositeT": -0.89,
+        "compositeP": 0.381,
+        "mom12_1": -0.0333,
+        "mom12_1T": -0.79,
+        "mom12_1P": 0.441,
+        "months": 39
+      },
+      "lowMinusHigh": {
+        "diff": 0.0616,
+        "t": 1.29,
+        "nLow": 87,
+        "nHigh": 39
+      }
+    },
+    "tercileCuts": {
+      "inSampleLow": 0.2231,
+      "inSampleHigh": 0.3071
+    },
+    "pitRolling36": {
+      "low": 0.028,
+      "lowT": 1.34,
+      "nLow": 65,
+      "high": -0.051,
+      "highT": -1.19,
+      "nHigh": 41,
+      "mom12Low": 0.0289,
+      "diff": 0.0789,
+      "diffT": 1.66
+    },
+    "absolute": {
+      "low": 0.052,
+      "lowT": 2.13,
+      "nLow": 52,
+      "high": -0.0332,
+      "highT": -0.65,
+      "nHigh": 28,
+      "mom12Low": 0.0508,
+      "diff": 0.0852,
+      "diffT": 1.5
+    },
+    "allSpecifications": [
+      {
+        "nombre": "in-sample (look-ahead)",
+        "diff": 0.0748,
+        "t": 1.95,
+        "pit": false
+      },
+      {
+        "nombre": "PIT expandiente",
+        "diff": 0.0616,
+        "t": 1.29,
+        "pit": true
+      },
+      {
+        "nombre": "PIT móvil 36m",
+        "diff": 0.0789,
+        "t": 1.66,
+        "pit": true
+      },
+      {
+        "nombre": "absoluto 0.20/0.40 (el de producción)",
+        "diff": 0.0852,
+        "t": 1.5,
+        "pit": true
+      }
+    ]
+  },
+  "A3_portfolios": {
+    "spy": {
+      "total": 863.9,
+      "cagr": 15.21,
+      "sharpe": 1.04,
+      "maxDD": -23.9
+    },
+    "noGate": {
+      "total": 727.8,
+      "sharpe": 0.95,
+      "maxDD": -25.2
+    },
+    "gateInSample": {
+      "total": 928.5,
+      "sharpe": 1,
+      "maxDD": -23.1
+    },
+    "gatePIT": {
+      "total": 865.8,
+      "sharpe": 0.97,
+      "maxDD": -23.1
+    }
+  },
+  "A3_benchmarks": {
+    "rsp": {
+      "total": 636.6,
+      "cagr": 13.29,
+      "sharpe": 0.86,
+      "maxDD": -30.3
+    },
+    "universeEW": {
+      "total": 908.1,
+      "cagr": 15.54,
+      "sharpe": 0.99,
+      "maxDD": -30.6
+    },
+    "bottomDecile": {
+      "total": 587.4,
+      "cagr": 12.8,
+      "sharpe": 0.62,
+      "maxDD": -49.3
+    },
+    "topBeatsUniverseEW": false,
+    "topBeatsRSP": true,
+    "topBeatsSPY": false,
+    "topMinusBottomPP": 140.5
+  },
+  "A4_latency": {
+    "compositeNoLag": -0.0026,
+    "compositeLag1d": -0.0001,
+    "mom12NoLag": 0.0005,
+    "mom12Lag1d": 0.0048,
+    "crossCheckMismatches": 0,
+    "crossCheckMaxDiffPP": 0
+  },
+  "A5_coverage": {
+    "meanPct": 70.8,
+    "minPct": 66.6,
+    "maxPct": 75.8,
+    "first": {
+      "d": "2010-07-01",
+      "miembros": 446,
+      "conPanel": 297,
+      "pct": 66.59192825112108
+    },
+    "last": {
+      "d": "2026-06-01",
+      "miembros": 503,
+      "conPanel": 340,
+      "pct": 67.59443339960238
+    }
+  },
+  "A6_nulls": {
+    "mom12_1": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "mom12_1_ra": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "mom6_1_ra": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "rs_ibd": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "rs_spy": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "dist52w": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "resid_mom": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "fip_neg": {
+      "nulls": 0,
+      "pct": 0
+    },
+    "rev1m_neg": {
+      "nulls": 0,
+      "pct": 0
+    }
+  },
+  "A7_overlap": {
+    "composite": {
+      "overlapped": -0.0052,
+      "overlappedT": -0.37,
+      "independent": -0.0103,
+      "independentT": -0.47,
+      "nIndependent": 64
+    },
+    "mom12_1": {
+      "overlapped": -0.0029,
+      "independent": -0.0102,
+      "independentT": -0.45
+    }
+  },
+  "A8_power": {
+    "sigmaMonthlyIC_composite": 0.2171,
+    "sigmaMonthlyIC_mom12": 0.2051,
+    "monthsObserved": 192,
+    "mdeAt80Power": 0.0439,
+    "monthsNeeded": {
+      "ic002": 925,
+      "ic003": 411,
+      "ic005": 148
+    },
+    "underpowered": true
+  },
+  "A9_heterogeneity": {
+    "compuesto": {
+      "sdObserved": 0.2171,
+      "sdSampling": 0.0543,
+      "varianceRatio": 15.97,
+      "chi2": 3050.7,
+      "df": 191,
+      "pValue": 0
+    },
+    "12-1m": {
+      "sdObserved": 0.2051,
+      "sdSampling": 0.0543,
+      "varianceRatio": 14.25,
+      "chi2": 2722,
+      "df": 191,
+      "pValue": 0
+    },
+    "regimesExist": true,
+    "interpretacion": "Condición NECESARIA para el gate (hay variación temporal real del IC, p<0.00001), NO suficiente (que sea predecible ex-ante por la correlación es A2/A2b, y ahí ninguna especificación alcanza el 5%)."
+  },
+  "A10_multipleComparisons": {
+    "contrasts": 24,
+    "familywiseErrorIfIndependent": 0.708,
+    "bonferroniAlpha": 0.00208,
+    "bonferroniT": 3.02,
+    "anyResultPasses": false
+  },
+  "conclusions": {
+    "compositeIndistinguishableFromZero": true,
+    "regimeSignConsistentSpecs": "4/4",
+    "regimeSignConsistentPITSpecs": "3/3",
+    "anySpecSignificantAt5pct": false,
+    "underpowered": true,
+    "lectura": "La ventana 2019-2026 (84 meses) NO tiene potencia para aceptar ni rechazar un IC de 0.02-0.05: el efecto mínimo detectable es 0.0665. Por tanto: (1) NO construir el compuesto se sostiene por PARSIMONIA — no hay evidencia que justifique la complejidad —, no porque esté demostrado que no funcione; (2) el gate NO puede apoyarse en un p-valor de este run, pero su patrón direccional es consistente en las 4 especificaciones y coincide con la teoría (Daniel-Moskowitz) y con el hallazgo previo del repo. Es una decisión de prior + consistencia, y hay que presentarla como tal, no como 'está medido'."
+  }
+}

@@ -36,3 +36,13 @@ research/out/*
 !research/out/backtest_summary.json
 !research/out/trials_ledger.json
 !research/out/factor_lab.json
+# Evidencia de Scora Picks: los números de SCORA_PICKS_REGLAS.md §3 y §6 salen de aquí.
+# El documento es un PRE-REGISTRO — si la evidencia que lo respalda no está versionada,
+# nadie puede comprobar mañana que los números publicados son los que se midieron.
+!research/out/quality_lowvol_lab.json
+!research/out/quality_lowvol_lab_oos.json
+# Evidencia de decisiones que ya viven en el código o en un plan:
+!research/out/score_v2_validate.json
+!research/out/momentum_lab.json
+!research/out/momentum_audit.json
+!research/out/momentum_audit_long.json
