@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-08-21T12:36:54.802Z",
+  "window": "2011-2018",
+  "quarters": 32,
+  "topN": 40,
+  "H1_saturacion": {
+    "pctEnTope": 30.8,
+    "pctEnTopeNoFinancieras": 35.8,
+    "pctEnTopeFinancieras": 3.9,
+    "valoresDistintos": 30.5,
+    "mayorGrupoEmpatadoPct": 30.8,
+    "topeSatura": true
+  },
+  "H2_escala": {
+    "universeEW": {
+      "total": 156.4,
+      "sharpe": 0.96
+    },
+    "señales": {
+      "health · BANDAS (la app)": {
+        "ic": 0.0378,
+        "total": 178.3,
+        "sharpe": 0.93,
+        "vsEW": 21.9,
+        "empatesEnElCorte": 97.5
+      },
+      "health · PERCENTIL (mismo set)": {
+        "ic": 0.0144,
+        "total": 159.2,
+        "sharpe": 0.93,
+        "vsEW": 2.8,
+        "empatesEnElCorte": 1.1
+      },
+      "Calidad §3 · PERCENTIL (5 mét.)": {
+        "ic": 0.0101,
+        "total": 189.2,
+        "sharpe": 1.03,
+        "vsEW": 32.9,
+        "empatesEnElCorte": 1
+      },
+      "SCORE v1 · BANDAS (la app)": {
+        "ic": 0.0252,
+        "total": 194.4,
+        "sharpe": 1.07,
+        "vsEW": 38,
+        "empatesEnElCorte": 6
+      }
+    },
+    "cambiarEscalaMejora": false
+  },
+  "H3_monotonia": {
+    "mediaUniverso": 3.11,
+    "v1": {
+      "deciles": [
+        2.47,
+        3.23,
+        3.33,
+        2.66,
+        3.18,
+        2.68,
+        3.6,
+        2.95,
+        3.13,
+        3.89
+      ],
+      "monotonia": 0.39,
+      "d10MenosMedia": 0.78
+    },
+    "health": {
+      "deciles": [
+        2.51,
+        2.97,
+        2.81,
+        3.43,
+        3.01,
+        3.19,
+        3.41,
+        3.17,
+        3.73,
+        2.85
+      ],
+      "monotonia": 0.48,
+      "d10MenosMedia": -0.26
+    }
+  }
+}

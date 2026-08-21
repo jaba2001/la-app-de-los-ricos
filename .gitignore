@@ -53,3 +53,5 @@ research/out/*
 !research/out/picks_rules_backtest_oos.json
 !research/out/pillar_dilution_lab.json
 !research/out/pillar_dilution_lab_oos.json
+!research/out/health_scale_lab.json
+!research/out/health_scale_lab_oos.json
