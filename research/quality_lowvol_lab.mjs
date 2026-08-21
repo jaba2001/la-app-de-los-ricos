@@ -32,7 +32,7 @@ import { fileURLToPath } from "url";
 import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
 import { collectRows } from "./factorDistCore.mjs";
 import { returnsSeries, fwdReturn } from "./prices.mjs";
-import { returnsSeriesLong } from "./pricesLong.mjs";
+import { returnsSeriesLong, rawPriceAsOfLong, momentumLong } from "./pricesLong.mjs";
 import { calcScores } from "../lib/scoring.ts";
 import { addMonths, monthStarts, mean, std, fx, spearman, loadPanel, idxOnOrBefore, pct } from "./momentumSignals.mjs";
 
@@ -41,6 +41,7 @@ if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : d; };
 const LONG = process.argv.includes("--long");
 const seriesFn = LONG ? returnsSeriesLong : returnsSeries;
+const PX = LONG ? { rawPriceAsOf: rawPriceAsOfLong, momentum: momentumLong } : null;
 const CAP = Number(arg("--cap", "400"));
 const COST_BPS = 10;
 const TOP_N = Number(arg("--top", "25"));   // nº de posiciones, como una cartera real
@@ -81,7 +82,14 @@ for (const fecha of fechas) {
   }
   // Sin exigir precio: la señal de calidad sale de los estados financieros, y exigirlo
   // limitaba el estudio a 2018+ (donde arranca la caché de precios) sin avisar.
-  const filas = await collectRows(miembros, fecha, sectorCache, false);
+  // ⚠️ LA FUENTE DE PRECIOS TIENE QUE COINCIDIR CON LA VENTANA. `collectRows` usa por
+  // defecto `prices.mjs`, cuya caché arranca en 2018-06: en la ventana 2011-2018 devolvía
+  // precio null para TODOS los nombres, así que `calcScores` calculaba el score de
+  // producción con los pilares de VALUE y MOMENTUM a cero. El "score v1 no replica
+  // (−16 pp en 2011-2018)" que se publicó salía de ahí — no del score, sino de medirlo
+  // sin la mitad de sus ingredientes. Se confirmó al inyectar precios largos en
+  // `pillar_dilution_lab`: el mismo score pasa de −16 pp a +38 pp.
+  const filas = await collectRows(miembros, fecha, sectorCache, false, PX);
   const bucket = [];
   for (const f of filas) {
     if (!panels.has(f.ticker)) panels.set(f.ticker, await loadPanel(f.ticker, seriesFn));

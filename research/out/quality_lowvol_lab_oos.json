@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-21T00:19:01.491Z",
+  "generatedAt": "2026-08-21T12:15:26.838Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
@@ -120,12 +120,12 @@
       "vsEW": 21.3
     },
     "Score v1 (actual)": {
-      "ic": 0.0173,
-      "total": 140.9,
-      "cagr": 11.62,
-      "sharpe": 0.79,
-      "maxDD": -18.3,
-      "vsEW": -15.7
+      "ic": 0.025,
+      "total": 193.5,
+      "cagr": 14.41,
+      "sharpe": 1.07,
+      "maxDD": -14.7,
+      "vsEW": 36.9
     }
   },
   "criteria": {

@@ -46,3 +46,10 @@ research/out/*
 !research/out/momentum_lab.json
 !research/out/momentum_audit.json
 !research/out/momentum_audit_long.json
+# Evidencia del backtest de las REGLAS (§6bis) y de la refutación de la dilución.
+# Los paneles de señal (`picks_signal_panel_*`) NO: son 0,6-0,9 MB regenerables y no
+# sostienen ninguna afirmación por sí solos.
+!research/out/picks_rules_backtest.json
+!research/out/picks_rules_backtest_oos.json
+!research/out/pillar_dilution_lab.json
+!research/out/pillar_dilution_lab_oos.json

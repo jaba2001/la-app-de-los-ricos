@@ -1,0 +1,138 @@
+{
+  "generatedAt": "2026-08-21T12:13:28.754Z",
+  "window": "2011-2018",
+  "quarters": 32,
+  "topN": 40,
+  "nombresMedios": 316,
+  "universeEW": {
+    "total": 156.4,
+    "sharpe": 0.96,
+    "maxDD": -18.1
+  },
+  "señales": {
+    "health (pilar solo)": {
+      "ic": 0.0378,
+      "t": 1.52,
+      "total": 178.3,
+      "sharpe": 0.93,
+      "maxDD": -17.7,
+      "vsEW": 21.9
+    },
+    "value (pilar solo)": {
+      "ic": 0.0439,
+      "t": 2.49,
+      "total": 248.2,
+      "sharpe": 1.3,
+      "maxDD": -14,
+      "vsEW": 91.8
+    },
+    "momentum (pilar solo)": {
+      "ic": -0.0092,
+      "t": -0.32,
+      "total": 139.8,
+      "sharpe": 0.93,
+      "maxDD": -13.9,
+      "vsEW": -16.6
+    },
+    "growth (pilar solo)": {
+      "ic": -0.0216,
+      "t": -1.14,
+      "total": 85.3,
+      "sharpe": 0.57,
+      "maxDD": -21.9,
+      "vsEW": -71.1
+    },
+    "health + value": {
+      "ic": 0.0552,
+      "t": 2.52,
+      "total": 222.2,
+      "sharpe": 1.09,
+      "maxDD": -16,
+      "vsEW": 65.8
+    },
+    "health + momentum": {
+      "ic": 0.0156,
+      "t": 0.58,
+      "total": 148,
+      "sharpe": 0.89,
+      "maxDD": -16.4,
+      "vsEW": -8.4
+    },
+    "health + growth": {
+      "ic": 0.0109,
+      "t": 0.44,
+      "total": 153.1,
+      "sharpe": 0.82,
+      "maxDD": -18.3,
+      "vsEW": -3.3
+    },
+    "los 4 pilares (percentil)": {
+      "ic": 0.0207,
+      "t": 0.85,
+      "total": 203.8,
+      "sharpe": 1.1,
+      "maxDD": -14.2,
+      "vsEW": 47.4
+    },
+    "SCORE v1 (total, producción)": {
+      "ic": 0.0252,
+      "t": 1.04,
+      "total": 194.4,
+      "sharpe": 1.07,
+      "maxDD": -14.7,
+      "vsEW": 38
+    },
+    "Calidad §3 (5 métricas)": {
+      "ic": 0.0101,
+      "t": 0.45,
+      "total": 189.2,
+      "sharpe": 1.03,
+      "maxDD": -16.6,
+      "vsEW": 32.9
+    }
+  },
+  "pareados": {
+    "health − SCORE v1": {
+      "dif": 0.0127,
+      "t": 0.99,
+      "gana": 21,
+      "n": 32,
+      "mde": 0.0358
+    },
+    "health − (health+value)": {
+      "dif": -0.0173,
+      "t": -1.36,
+      "gana": 14,
+      "n": 32,
+      "mde": 0.0356
+    },
+    "health − (health+momentum)": {
+      "dif": 0.0222,
+      "t": 1.12,
+      "gana": 17,
+      "n": 32,
+      "mde": 0.0555
+    },
+    "health − (health+growth)": {
+      "dif": 0.027,
+      "t": 2.52,
+      "gana": 22,
+      "n": 32,
+      "mde": 0.03
+    },
+    "Calidad §3 − SCORE v1": {
+      "dif": -0.015,
+      "t": -0.9,
+      "gana": 15,
+      "n": 32,
+      "mde": 0.0469
+    }
+  },
+  "ventana": {
+    "healthBateTotal": false,
+    "pilaresQueEmpeoran": [
+      "momentum",
+      "growth"
+    ]
+  }
+}

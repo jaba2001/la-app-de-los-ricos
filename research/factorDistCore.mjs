@@ -34,17 +34,25 @@ export function quantile(sorted, p) {
  * caché de precios, que arranca en 2018-06 y estaba dejando cualquier análisis anterior
  * en cero filas sin decir por qué.
  */
-export async function collectRows(tickers, asOf, sectorCache = new Map(), requirePrice = true) {
+/**
+ * `px` permite inyectar OTRA fuente de precios. Por defecto usa `prices.mjs`, cuya caché
+ * arranca en 2018-06: cualquier estudio anterior a esa fecha salía con los pilares de
+ * VALORACIÓN y MOMENTUM en null sin avisar de por qué. Pasándole las funciones de
+ * `pricesLong.mjs` se pueden estudiar los cuatro pilares desde 2009.
+ */
+export async function collectRows(tickers, asOf, sectorCache = new Map(), requirePrice = true, px = null) {
+  const precioDe = px?.rawPriceAsOf ?? rawPriceAsOf;
+  const momentumDe = px?.momentum ?? momentum;
   const filas = [];
   for (const t of tickers) {
     try {
       const cik = await tickerToCik(t);
       if (!cik) continue;
       const f = await fundamentalsAsOf(cik, asOf);
-      const raw = await rawPriceAsOf(t, asOf);
+      const raw = await precioDe(t, asOf);
       if (!f || f.revTTM == null || (requirePrice && raw == null)) continue;
       if (!sectorCache.has(t)) sectorCache.set(t, (await sicSector(cik)) || null);
-      filas.push({ ticker: t, sector: sectorCache.get(t), m: metricsOf(f, raw, await momentum(t, asOf)) });
+      filas.push({ ticker: t, sector: sectorCache.get(t), m: metricsOf(f, raw, await momentumDe(t, asOf)) });
     } catch { /* saltar */ }
   }
   return filas;
