@@ -1,0 +1,39 @@
+name: Scora Picks — decisión quincenal
+
+# Aplica §3-§5 de SCORA_PICKS_REGLAS.md el día 1 y el día 15 de cada mes.
+#
+# POR QUÉ CORRE TODOS LOS DÍAS LABORABLES Y NO SÓLO EL 1 Y EL 15: las fechas de decisión son
+# "el día 1 o el 15, o el hábil SIGUIENTE". Si el 1 cae en sábado, la fecha real es el lunes
+# 3 — y un cron programado sólo para el día 1 no habría disparado nunca ese mes. El script
+# consulta el calendario real de cotización del SPY y sale en dos segundos si hoy no toca.
+#
+# POR QUÉ A LAS 21:30 UTC (17:30 ET): DESPUÉS DEL CIERRE de EE. UU. El precio de ejecución
+# que se registra es el cierre del día de la decisión; con el mercado abierto, la barra de
+# hoy aún no existe y se registraría el cierre de AYER sin que nada fallara. El script
+# aborta si detecta esa situación, así que como mucho se perdería una fecha — pero el
+# horario correcto evita llegar ahí.
+on:
+  schedule:
+    - cron: "30 21 * * 1-5" # días laborables, 21:30 UTC — tras el cierre de Nueva York
+  workflow_dispatch: {} # relanzable a mano; el script es idempotente por fecha
+
+# Una decisión cada vez. Dos ejecuciones simultáneas podrían leer el mismo estado y comprar
+# dos veces; el guardián de idempotencia protege, pero no hay razón para acercarse al borde.
+concurrency:
+  group: scora-picks
+  cancel-in-progress: false
+
+jobs:
+  decidir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45 # el día que toca, refresca precios de ~500 nombres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Aplicar las reglas → sl_picks_run / sl_picks_position
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # opcional — cobertura de deslistados
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/cron-picks.mjs

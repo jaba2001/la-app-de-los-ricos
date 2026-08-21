@@ -99,6 +99,17 @@ if (KEY) {
   // Sólo hacen falta los paneles recientes: los de la ventana de persistencia y los que
   // alimentan el contador de salida. Se piden de sobra y se filtran abajo.
   runs = await sb(`sl_picks_run?${v}&decision_date=lt.${HOY}&select=decision_date,signal&order=decision_date.desc&limit=12`);
+  // IDEMPOTENCIA. El workflow corre todos los días laborables y se puede relanzar a mano;
+  // un reintento no puede volver a decidir. Sin esto, una segunda ejecución el mismo día
+  // podría comprar nombres DISTINTOS (el estado ya habría cambiado) y duplicar posiciones.
+  // La fila de `sl_picks_run` es la marca de "esta fecha ya está decidida".
+  const yaHecho = await sb(`sl_picks_run?${v}&decision_date=eq.${HOY}&select=decision_date,bought_count,sold_count`);
+  if (yaHecho.length && !DRY) {
+    console.log(`  la decisión del ${HOY} ya está registrada (${yaHecho[0].bought_count} compras · ${yaHecho[0].sold_count} ventas).`);
+    console.log(`  → nada que hacer. Una fecha de decisión se decide UNA vez.
+`);
+    process.exit(0);
+  }
 } else {
   console.log(`  ⚠ SUPABASE_SERVICE_KEY no definida — se asume cartera vacía (sólo tiene sentido con --dry).`);
 }
@@ -169,12 +180,26 @@ if (history.length < 3 && d.buys.length === 0) {
 // El precio CRUDO, no el ajustado: es el que se habría pagado. El ajustado cambia hacia
 // atrás cada vez que hay un dividendo o un split, y un registro de operación no puede
 // cambiar después.
+//
+// ⚠️ ESTE CRON TIENE QUE CORRER DESPUÉS DEL CIERRE DE EE. UU. `rawPriceAsOf` coge la última
+// barra disponible: con el mercado abierto, la barra de hoy aún no existe y registraría EL
+// PRECIO DE AYER como precio de ejecución, sin fallar. Se comprueba justo debajo.
 const precio = {};
 for (const t of [...d.buys.map((b) => b.ticker), ...d.sells.map((s) => s.ticker)]) {
   try { precio[t] = await rawPriceAsOf(t, HOY); } catch { precio[t] = null; }
 }
 const sinPrecio = Object.entries(precio).filter(([, p]) => p == null).map(([t]) => t);
 if (sinPrecio.length) console.log(`\n  ⚠ sin precio para: ${sinPrecio.join(", ")} — se registran con precio nulo, no se omiten.`);
+
+// Si la barra de hoy no existe todavía, los precios serían los de la sesión anterior. Es
+// preferible no decidir a decidir registrando un precio falso.
+if ((d.buys.length || d.sells.length) && spy.dates.at(-1) !== HOY && !FORCE) {
+  console.error(`
+  ✖ la última barra de mercado es ${spy.dates.at(-1)}, no ${HOY}: el cierre de hoy aún no está publicado.`);
+  console.error(`    Registrar ahora pondría el precio de la sesión anterior como precio de ejecución. Se aborta.`);
+  console.error(`    Este cron debe ejecutarse DESPUÉS del cierre de EE. UU.`);
+  process.exit(1);
+}
 
 // ── 6 · Escribir ────────────────────────────────────────────────────────────────────────
 const runRow = {
