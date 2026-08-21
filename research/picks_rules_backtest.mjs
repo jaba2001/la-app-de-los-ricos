@@ -41,10 +41,10 @@ import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
-import { collectRows } from "./factorDistCore.mjs";
+import { señalAt } from "./picksSignal.mjs";
 import { returnsSeries } from "./prices.mjs";
 import { returnsSeriesLong } from "./pricesLong.mjs";
-import { addMonths, mean, std, fx, loadPanel, idxOnOrBefore, pct } from "./momentumSignals.mjs";
+import { addMonths, mean, std, fx, loadPanel, idxOnOrBefore } from "./momentumSignals.mjs";
 // El motor de reglas, COMPARTIDO con producción. Import de VALOR ⇒ necesita la extensión.
 import { decide, emptyState } from "../lib/picks.ts";
 
@@ -109,8 +109,6 @@ console.log(`  ${fechasDecision.length} fechas de decisión (2/mes) · entrada p
 // ── Panel de señal: percentil de calidad de cada nombre en cada fecha de decisión ────────
 // Se cachea en disco porque construirlo cuesta ~500 lecturas de EDGAR por fecha y el
 // simulador se ejecuta muchas veces (barrido de umbrales) sobre exactamente los mismos datos.
-const CALIDAD = ["gprof", "roic", "opm", "icov", "lev"];
-
 async function construirPanel() {
   const table = await loadSP500Historical();
   const sectorCache = new Map();
@@ -120,22 +118,9 @@ async function construirPanel() {
     // Miembros del índice EN ESA FECHA. ⚠️ Nunca truncar: `membersAsOf` devuelve los
     // tickers en orden alfabético y un slice(0,N) borraría de la S a la Z (ver §3).
     const miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
-    // requirePrice=false: la calidad sale entera de los estados financieros. Exigir precio
-    // limitaría el estudio a 2018+ sin avisar.
-    const filas = await collectRows(miembros, fecha, sectorCache, false);
-    const rows = filas.map((f) => ({
-      t: f.ticker,
-      gprof: f.m.grossProfitability, roic: f.m.roic, opm: f.m.operatingMargin,
-      icov: f.m.interestCoverage, lev: f.m.netDebtEbitda != null ? -f.m.netDebtEbitda : null,
-    }));
-    // Percentil transversal medio de las cinco métricas (mayor = mejor en todas).
-    const maps = CALIDAD.map((k) => pct(rows, k));
-    const sig = {};
-    for (const r of rows) {
-      let s = 0, c = 0;
-      for (const m of maps) { const p = m.get(r.t); if (p != null) { s += p; c++; } }
-      if (c >= 3) sig[r.t] = +(s / c).toFixed(4);   // al menos 3 de 5 métricas
-    }
+    // La definición de la señal NO vive aquí: `picksSignal.mjs` es la misma función que
+    // ejecutará el cron de producción.
+    const sig = await señalAt(miembros, fecha, sectorCache);
     panel[fecha] = sig;
     process.stdout.write(`  construyendo panel  ${fecha}  ${String(Object.keys(sig).length).padStart(3)} nombres   (${++n}/${fechasDecision.length})\r`);
   }

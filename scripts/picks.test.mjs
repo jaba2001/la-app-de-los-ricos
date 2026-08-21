@@ -10,6 +10,7 @@ import {
   PICKS_RULES_VERSION, ENTRY_PCTL, EXIT_PCTL, TARGET_POSITIONS, BUYS_PER_DATE,
   PERSISTENCE_DAYS, QUARANTINE_MONTHS, EXIT_CONSECUTIVE,
 } from "../lib/picks.ts";
+import { percentilesDe, metricasDe, METRICAS_CALIDAD, MIN_METRICAS } from "../research/picksSignal.mjs";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -166,6 +167,62 @@ const FECHAS_60D = ["2026-01-02", "2026-01-15", "2026-02-02", "2026-02-16"];   /
   const copia = JSON.parse(JSON.stringify(state));
   decide({ date: "2026-02-16", signal: { P: 0.10 }, history: [], state });
   eq(state, copia, "decide() no muta su entrada");
+}
+
+// ── La señal (research/picksSignal.mjs) ─────────────────────────────────────────────────
+// Sólo la parte PURA: convertir métricas crudas en percentiles. La parte que habla con
+// EDGAR se valida por paridad contra el panel del backtest, no aquí.
+eq(METRICAS_CALIDAD, ["gprof", "roic", "opm", "icov", "lev"], "las cinco métricas de calidad de §3");
+eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
+
+{
+  // Diez nombres, la métrica `gprof` creciente y el resto constante: el orden del percentil
+  // tiene que seguir a `gprof`, y el mejor debe quedar en 1 y el peor en 0.
+  const rows = Array.from({ length: 10 }, (_, i) => ({
+    t: `T${i}`, gprof: i, roic: 5, opm: 5, icov: 5, lev: -1,
+  }));
+  const p = percentilesDe(rows);
+  eq(Object.keys(p).length, 10, "todos los nombres con las 5 métricas obtienen señal");
+  ok(p.T9 > p.T0, "más rentabilidad bruta ⇒ mejor percentil");
+  ok(p.T9 <= 1 && p.T0 >= 0, "el percentil vive en [0,1]");
+  // Con cuatro métricas empatadas, cada una aporta 0,5 de percentil medio: el rango se
+  // comprime pero el ORDEN se conserva, que es lo único que usa el motor.
+  const orden = Object.entries(p).sort((a, b) => b[1] - a[1]).map((e) => e[0]);
+  eq(orden[0], "T9", "el mejor por gprof queda primero");
+  eq(orden.at(-1), "T0", "el peor queda último");
+}
+
+{
+  // La deuda va al revés: `lev` es −netDebtEbitda, así que MENOS deuda debe puntuar mejor.
+  const fila = (t, netDebtEbitda) => metricasDe({ ticker: t, m: { grossProfitability: 30, roic: 10, operatingMargin: 0.2, interestCoverage: 8, netDebtEbitda } });
+  const rows = [fila("SANA", 0.5), fila("REGULAR", 3), fila("CARGADA", 6)];
+  eq(rows[0].lev > rows[2].lev, true, "menos deuda ⇒ `lev` mayor");
+  // Con 3 nombres `pct` no calcula (exige 8), así que se rellena hasta el mínimo.
+  const muchos = [...rows, ...Array.from({ length: 7 }, (_, i) => fila(`X${i}`, 2 + i * 0.3))];
+  const p = percentilesDe(muchos);
+  ok(p.SANA > p.CARGADA, "la menos endeudada saca mejor señal que la más endeudada");
+}
+
+{
+  // Un nombre al que le faltan 3 de 5 métricas no debe tener señal: con dos métricas, el
+  // percentil medio lo decide qué datos FALTAN, no qué negocio es.
+  const rows = Array.from({ length: 10 }, (_, i) => ({ t: `T${i}`, gprof: i, roic: i, opm: i, icov: i, lev: -i }));
+  rows.push({ t: "COJO", gprof: 100, roic: 100, opm: null, icov: null, lev: null });
+  const p = percentilesDe(rows);
+  ok(p.COJO === undefined, "con sólo 2 de 5 métricas no hay señal");
+  rows.push({ t: "JUSTO", gprof: 100, roic: 100, opm: 100, icov: null, lev: null });
+  ok(percentilesDe(rows).JUSTO !== undefined, "con 3 de 5 sí hay señal");
+}
+
+{
+  // El percentil es TRANSVERSAL: los mismos números absolutos dan señal distinta según
+  // contra quién se comparen. Es la propiedad que hace que no envejezca como una banda fija.
+  const base = (t, g) => ({ t, gprof: g, roic: 10, opm: 0.2, icov: 8, lev: -1 });
+  const flojos = Array.from({ length: 9 }, (_, i) => base(`F${i}`, i));
+  const fuertes = Array.from({ length: 9 }, (_, i) => base(`F${i}`, 100 + i));
+  const entreFlojos = percentilesDe([...flojos, base("YO", 50)]).YO;
+  const entreFuertes = percentilesDe([...fuertes, base("YO", 50)]).YO;
+  ok(entreFlojos > entreFuertes, "la misma empresa puntúa peor rodeada de mejores");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);
