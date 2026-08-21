@@ -45,6 +45,8 @@ import { collectRows } from "./factorDistCore.mjs";
 import { returnsSeries } from "./prices.mjs";
 import { returnsSeriesLong } from "./pricesLong.mjs";
 import { addMonths, mean, std, fx, loadPanel, idxOnOrBefore, pct } from "./momentumSignals.mjs";
+// El motor de reglas, COMPARTIDO con producción. Import de VALOR ⇒ necesita la extensión.
+import { decide, emptyState } from "../lib/picks.ts";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -153,67 +155,63 @@ const fechasOk = fechasDecision.filter((f) => Object.keys(PANEL[f] ?? {}).length
 if (fechasOk.length < (SMOKE ? 6 : 24)) { console.error(`  ✖ sólo ${fechasOk.length} fechas con datos suficientes`); process.exit(1); }
 
 // ── SIMULACIÓN DE LAS REGLAS ────────────────────────────────────────────────────────────
-/** Devuelve el libro de operaciones: cada posición con su fecha de entrada, salida y motivo. */
+// ⚠️ LA LÓGICA NO VIVE AQUÍ. Vive en `lib/picks.ts`, que es lo que ejecuta también el cron
+// de producción. Si el backtest tuviera su propia copia, el track record publicado dejaría
+// de ser el de lo que se midió — que es exactamente el fallo que ya costó meses de deriva
+// silenciosa con los pesos del ensemble.
+//
+// Lo único que este fichero añade es la REGLA DE LOS 180 DÍAS, que la v2 eliminó pero que
+// hay que poder seguir midiendo para justificar por qué se eliminó. Se aplica como un
+// descalificador externo (el motor ya sabe vender descalificados y poner la cuarentena) y
+// luego se reetiqueta el motivo en el libro, para que la tabla de ablación siga siendo
+// legible. La regla NO está dentro del motor: producción no puede aplicarla ni por error.
 function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERSISTENCIA_DIAS,
                    dias180 = DIAS_180, cuarentenaMeses = CUARENTENA_MESES, comprasPorFecha = COMPRAS_POR_FECHA } = {}) {
-  const cartera = new Map();      // ticker → { desde, ultimaSobreEntrada }
-  const cuarentena = new Map();   // ticker → fecha hasta la que no puede reentrar
-  const bajoSalida = new Map();   // ticker → evaluaciones consecutivas por debajo del umbral de salida
-  const libro = [];               // { t, desde, hasta, motivo }
-  const huecos = [];              // fechas en las que NO se compró nada, y por qué
+  const overrides = { entryPctl: entry, exitPctl: exit, targetPositions: topN,
+                      buysPerDate: comprasPorFecha, persistenceDays: persistencia,
+                      quarantineMonths: cuarentenaMeses };
+  let state = emptyState();
+  const ultimaSobreEntrada = new Map();   // sólo para la regla de 180 días
+  const libro = [];
+  const huecos = [];
 
   for (let k = 0; k < fechasOk.length; k++) {
     const fecha = fechasOk[k];
     const sig = PANEL[fecha];
 
-    // ── VENTAS (§5). Se evalúan antes que las compras: una plaza que se libera hoy se
-    //    puede ocupar hoy, que es lo que haría un gestor real.
-    for (const [t, pos] of [...cartera]) {
-      const p = sig[t];
-      let motivo = null;
-      if (p == null) motivo = "fuera del universo";                       // §5.4
-      else {
-        if (p >= entry) pos.ultimaSobreEntrada = fecha;
-        if (p < exit) {
-          bajoSalida.set(t, (bajoSalida.get(t) ?? 0) + 1);
-          if (bajoSalida.get(t) >= 2) motivo = "señal bajo umbral 2 evaluaciones";  // §5.1
-        } else bajoSalida.set(t, 0);
-        if (!motivo && dias180 > 0 && dias(pos.ultimaSobreEntrada, fecha) > dias180) motivo = "180 días sin recuperar";  // §5.3
-      }
-      if (motivo) {
-        libro.push({ t, desde: pos.desde, hasta: fecha, motivo });
-        cartera.delete(t); bajoSalida.delete(t);
-        if (cuarentenaMeses > 0) cuarentena.set(t, addMonths(fecha, cuarentenaMeses));  // §5 cuarentena
+    // Fechas de decisión anteriores que caen dentro de la ventana de persistencia.
+    const history = [];
+    for (let j = k - 1; j >= 0 && dias(fechasOk[j], fecha) <= persistencia; j--) {
+      history.unshift({ date: fechasOk[j], signal: PANEL[fechasOk[j]] });
+    }
+
+    // Regla de 180 días (sólo backtest histórico).
+    const porLos180 = [];
+    if (dias180 > 0) {
+      for (const h of state.holdings) {
+        const p = sig[h.ticker];
+        if (p != null && p >= entry) ultimaSobreEntrada.set(h.ticker, fecha);
+        const ultima = ultimaSobreEntrada.get(h.ticker) ?? h.since;
+        if (p != null && dias(ultima, fecha) > dias180) porLos180.push(h.ticker);
       }
     }
 
-    // ── COMPRAS (§4): hasta 2, las de mayor señal entre las elegibles.
-    const libres = topN - cartera.size;
-    if (libres > 0) {
-      // Persistencia (§3): tiene que haber estado sobre el umbral en TODAS las fechas de
-      // decisión de los últimos 60 días naturales. Sin esto se compra el pico de un día.
-      const previas = [];
-      for (let j = k; j >= 0 && dias(fechasOk[j], fecha) <= persistencia; j--) previas.push(fechasOk[j]);
-      const candidatos = [];
-      for (const [t, p] of Object.entries(sig)) {
-        if (p < entry || cartera.has(t)) continue;
-        if (cuarentena.has(t) && fecha < cuarentena.get(t)) continue;
-        if (persistencia > 0) {
-          if (previas.length < 3) continue;                               // sin histórico suficiente, no se compra
-          let sostenido = true;
-          for (const f of previas) { const q = PANEL[f]?.[t]; if (q == null || q < entry) { sostenido = false; break; } }
-          if (!sostenido) continue;
-        }
-        candidatos.push([t, p]);
-      }
-      candidatos.sort((a, b) => b[1] - a[1]);
-      const compras = candidatos.slice(0, Math.min(comprasPorFecha, libres));
-      for (const [t] of compras) cartera.set(t, { desde: fecha, ultimaSobreEntrada: fecha });
-      if (!compras.length) huecos.push({ fecha, candidatos: candidatos.length, libres });
+    const d = decide({ date: fecha, signal: sig, history, state, disqualified: porLos180, overrides });
+
+    for (const v of d.sells) {
+      const motivo = porLos180.includes(v.ticker) ? "180 días sin recuperar"
+        : v.reason === "senal_bajo_umbral" ? "señal bajo umbral 2 evaluaciones"
+        : "fuera del universo";
+      libro.push({ t: v.ticker, desde: v.since, hasta: fecha, motivo });
+      ultimaSobreEntrada.delete(v.ticker);
     }
+    for (const b of d.buys) ultimaSobreEntrada.set(b.ticker, fecha);
+    if (!d.buys.length && state.holdings.length < topN) {
+      huecos.push({ fecha, candidatos: d.eligibleNotBought.length, libres: topN - state.holdings.length });
+    }
+    state = d.nextState;
   }
-  // Las posiciones vivas al final se cierran en la última fecha para poder valorar.
-  for (const [t, pos] of cartera) libro.push({ t, desde: pos.desde, hasta: fechasOk.at(-1), motivo: "abierta al cierre" });
+  for (const h of state.holdings) libro.push({ t: h.ticker, desde: h.since, hasta: fechasOk.at(-1), motivo: "abierta al cierre" });
   return { libro, huecos };
 }
 

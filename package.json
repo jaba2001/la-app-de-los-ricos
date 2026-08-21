@@ -9,11 +9,12 @@
     "lint": "next lint",
     "test": "node --experimental-strip-types --no-warnings scripts/golden.test.mjs",
     "test:theory": "node --experimental-strip-types --no-warnings scripts/theory.test.mjs",
+    "test:picks": "node --experimental-strip-types --no-warnings scripts/picks.test.mjs",
     "test:smoke": "node scripts/smoke-proxy.mjs",
     "test:css": "node scripts/css-lint.mjs",
     "test:p2": "node --experimental-strip-types --no-warnings scripts/p2.test.mjs",
     "test:retrieval": "node --experimental-strip-types --no-warnings scripts/retrieval.test.mjs",
-    "test:all": "npm run test && npm run test:p2 && npm run test:percentile && npm run test:roadmap && npm run test:theory && npm run test:retrieval && npm run test:css && npm run test:smoke",
+    "test:all": "npm run test && npm run test:p2 && npm run test:percentile && npm run test:roadmap && npm run test:theory && npm run test:picks && npm run test:retrieval && npm run test:css && npm run test:smoke",
     "test:percentile": "node --experimental-strip-types --no-warnings scripts/percentile.test.mjs",
     "test:roadmap": "node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs"
   },
