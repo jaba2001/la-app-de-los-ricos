@@ -25,6 +25,10 @@ export interface PickPosition {
 
 export interface PickRun {
   decision_date: string;
+  /** Fecha de la FOTO de miembros del índice usada, que no es `decision_date`: la fuente
+   *  gratuita del universo dejó de actualizarse el 2025-08-23. Se publica para que ese
+   *  desfase sea visible. Null en filas escritas antes de que la columna existiera. */
+  universe_asof: string | null;
   universe_size: number;
   eligible_count: number;
   bought_count: number;
@@ -67,8 +71,22 @@ export async function fetchClosedPositions(): Promise<PickPosition[]> {
 /** El historial de decisiones, incluidas las fechas en que no se compró nada. */
 export async function fetchRuns(limit = 60): Promise<PickRun[]> {
   return (await restGet<PickRun[]>(
-    `sl_picks_run?${V}&select=decision_date,universe_size,eligible_count,bought_count,sold_count,positions_after&order=decision_date.desc&limit=${limit}`,
+    `sl_picks_run?${V}&select=decision_date,universe_asof,universe_size,eligible_count,bought_count,sold_count,positions_after&order=decision_date.desc&limit=${limit}`,
   )) ?? [];
+}
+
+/**
+ * Las fotos de miembros del índice distintas usadas en un conjunto de decisiones, de más
+ * reciente a más antigua. Casi siempre será una sola: la fuente gratuita del universo está
+ * congelada. Se publica precisamente por eso — un universo fijo es defendible en un sistema
+ * de reglas preregistrado, pero sólo si se dice cuál es.
+ *
+ * Puro: se testea sin red.
+ */
+export function universeSnapshots(runs: PickRun[]): string[] {
+  const vistos = new Set<string>();
+  for (const r of runs) if (r.universe_asof) vistos.add(r.universe_asof);
+  return [...vistos].sort().reverse();
 }
 
 /** Retorno de una posición cerrada, en %. Null si falta algún precio. */

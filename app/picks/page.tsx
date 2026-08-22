@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   fetchOpenPositions, fetchClosedPositions, fetchRuns,
-  positionReturn, CLOSE_REASON_LABEL, type PickPosition,
+  positionReturn, universeSnapshots, CLOSE_REASON_LABEL, type PickPosition,
 } from "@/lib/picksData";
 import {
   PICKS_RULES_VERSION, TARGET_POSITIONS, BUYS_PER_DATE,
@@ -57,6 +57,7 @@ export default async function PicksPage() {
     : null;
   const sinCompra = runs.filter((r) => r.bought_count === 0).length;
   const arrancado = runs.length > 0;
+  const fotos = universeSnapshots(runs);
 
   return (
     <main className="container" style={{ paddingBottom: "var(--sr-sp-6)" }}>
@@ -184,6 +185,17 @@ export default async function PicksPage() {
                 </tbody>
               </table>
             </div>
+            {fotos.length > 0 && (
+              <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
+                <strong>El universo es una foto fija, y conviene saberlo:</strong> la lista de miembros del
+                S&amp;P 500 que usa el sistema es la del{" "}
+                {fotos.length === 1 ? fotos[0] : fotos.join(", ")}, porque la fuente pública y gratuita de la
+                que sale dejó de actualizarse ese día. Las altas y bajas del índice posteriores no se ven: una
+                empresa que entró después no puede ser comprada. Los sustitutos gratuitos que se revisaron
+                traen tickers equivocados, así que se prefiere un universo fijo y declarado a uno que envejece
+                en silencio. Se registra en cada decisión.
+              </p>
+            )}
           </section>
         </>
       )}
@@ -197,6 +209,15 @@ export default async function PicksPage() {
           <li><strong>Cuándo se vende:</strong> si la señal cae bajo el percentil {(EXIT_PCTL * 100).toFixed(0)} en dos evaluaciones seguidas, si un pilar entra en el decil inferior de su sector, o si deja de cumplir el universo. <strong>No hay stop-loss por precio</strong>: un stop es una regla sobre el precio, no sobre el negocio.</li>
           <li><strong>Pesos:</strong> equiponderado, tope de {TARGET_POSITIONS} posiciones, y un valor vendido no puede volver en {QUARANTINE_MONTHS} meses.</li>
         </ul>
+        <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.7 }}>
+          <strong>Esta cartera no tiene bancos, y no es una opinión sobre la banca.</strong> Las cinco métricas
+          de calidad —margen operativo, cobertura de intereses, deuda neta sobre EBITDA— no significan nada en
+          el balance de un banco, donde los intereses son el negocio y no un gasto. Medido: de los 18 mayores
+          bancos del índice, <strong>ninguno</strong> llega a tener nota. Tampoco hay REITs, por el mismo tipo
+          de razón. Es un sesgo sectorial permanente que va incluido en el precio — y conviene saber que en
+          las dos ventanas del backtest los bancos rindieron por debajo del índice, así que no tenerlos ayudó.
+          Cuánto de la ventaja histórica es eso y cuánto es selección <strong>todavía no está medido</strong>.
+        </p>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.7 }}>
           Se mide contra tres referencias, y la tercera es la que de verdad dice si seleccionar aporta algo: el
           S&amp;P 500, su versión equiponderada, y el universo elegible equiponderado. Si a 24 meses queda por

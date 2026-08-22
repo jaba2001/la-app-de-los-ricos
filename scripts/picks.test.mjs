@@ -6,11 +6,14 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/picks.test.mjs
 import {
-  decide, emptyState, addMonths, daysBetween,
+  decide, emptyState, addMonths, daysBetween, cotizaEn,
   PICKS_RULES_VERSION, ENTRY_PCTL, EXIT_PCTL, TARGET_POSITIONS, BUYS_PER_DATE,
-  PERSISTENCE_DAYS, QUARANTINE_MONTHS, EXIT_CONSECUTIVE,
+  PERSISTENCE_DAYS, QUARANTINE_MONTHS, EXIT_CONSECUTIVE, MAX_PRICE_LAG_DAYS,
 } from "../lib/picks.ts";
 import { percentilesDe, metricasDe, METRICAS_CALIDAD, MIN_METRICAS } from "../research/picksSignal.mjs";
+import { parseSP500Csv, snapshotDate, membersAsOf } from "../research/universe.mjs";
+import { cubreLaCache } from "../research/prices.mjs";
+import { universeSnapshots } from "../lib/picksData.ts";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -223,6 +226,83 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   const entreFlojos = percentilesDe([...flojos, base("YO", 50)]).YO;
   const entreFuertes = percentilesDe([...fuertes, base("YO", 50)]).YO;
   ok(entreFlojos > entreFuertes, "la misma empresa puntúa peor rodeada de mejores");
+}
+
+// ── El universo: de dónde sale y qué foto se usó ────────────────────────────────────────
+// Estas piezas existen porque el cron cayó a `CURATED` si GitHub parpadeaba, y porque la
+// fuente del universo lleva congelada desde 2025-08-23 sin que nada lo dijera.
+{
+  const csv = [
+    "date,tickers",
+    '2025-08-21,"AAA,BBB,CCC"',
+    '2025-08-23,"AAA,BBB,DDD"',
+    '2025-08-22,"AAA,CCC"',
+  ].join("\n");
+  const t = parseSP500Csv(csv);
+  eq(t.map((r) => r.date), ["2025-08-21", "2025-08-22", "2025-08-23"], "parseSP500Csv ordena por fecha");
+  eq(t[2].tickers, ["AAA", "BBB", "DDD"], "parseSP500Csv separa los tickers de la fecha");
+  eq(snapshotDate(t), "2025-08-23", "snapshotDate es la foto más reciente, no la de hoy");
+  eq(snapshotDate([]), null, "snapshotDate de una tabla vacía es null");
+  eq(snapshotDate(null), null, "snapshotDate tolera null");
+
+  // El punto entero de guardar `universe_asof`: pedir miembros de una fecha MUY posterior
+  // devuelve la última foto disponible sin avisar. Es correcto y es exactamente por lo que
+  // hay que publicar de cuándo es esa foto.
+  eq(membersAsOf(t, "2026-09-01"), ["AAA", "BBB", "DDD"], "membersAsOf de una fecha futura devuelve la última foto");
+
+  // Una línea rota no puede colarse como fecha válida ni vaciar el universo.
+  eq(parseSP500Csv("date,tickers\nbasura,\n2025-01-02,\"AAA\"").length, 1, "parseSP500Csv descarta líneas sin fecha válida");
+  eq(parseSP500Csv('date,tickers\n2025-01-02,""').length, 0, "parseSP500Csv descarta fotos sin ningún ticker");
+}
+
+{
+  const runs = [
+    { decision_date: "2026-09-15", universe_asof: "2025-08-23" },
+    { decision_date: "2026-09-01", universe_asof: "2025-08-23" },
+    { decision_date: "2026-08-15", universe_asof: null },
+  ];
+  eq(universeSnapshots(runs), ["2025-08-23"], "universeSnapshots deduplica e ignora las filas antiguas sin foto");
+  eq(universeSnapshots([]), [], "universeSnapshots sin decisiones no inventa nada");
+  eq(
+    universeSnapshots([{ universe_asof: "2025-08-23" }, { universe_asof: "2026-01-10" }]),
+    ["2026-01-10", "2025-08-23"],
+    "universeSnapshots ordena de más reciente a más antigua",
+  );
+}
+
+// ── §2: "sin cotización suspendida" ─────────────────────────────────────────────────────
+// El caso que lo obligó: BNY Mellon cotiza hoy como `BNY`, la foto de miembros congelada
+// dice `BK`, y `tickerToCik("BK")` resuelve — así que la señal de BK sale perfecta con un
+// precio de 14,79 $ que es de otro instrumento.
+{
+  eq(MAX_PRICE_LAG_DAYS, 10, "el desfase máximo de precio son 10 días naturales");
+  ok(cotizaEn("2026-08-17", "2026-08-17"), "una serie que llega al día de la decisión cotiza");
+  ok(cotizaEn("2026-08-07", "2026-08-17"), "diez días de desfase todavía cotiza");
+  ok(!cotizaEn("2026-08-06", "2026-08-17"), "once días ya no");
+  ok(!cotizaEn(null, "2026-08-17"), "sin serie no cotiza");
+  ok(!cotizaEn(undefined, "2026-08-17"), "sin serie (undefined) no cotiza");
+  ok(!cotizaEn("2026-06-10", "2026-08-17"), "el caso BK: última barra de junio, decisión de agosto");
+  // Point-in-time: la comparación es contra la fecha de DECISIÓN, no contra hoy. Un valor
+  // que se deslistó en 2020 seguía cotizando cuando se decidió en 2019.
+  ok(cotizaEn("2020-05-01", "2019-06-03"), "una serie posterior a la decisión no invalida la decisión");
+}
+
+// ── La caché de precios no puede encogerse ──────────────────────────────────────────────
+// Existe porque un refresco del 2026-08-21 dejó `EA` en 6 barras y `BK` en 5 (a 14,79 $, que
+// no es el precio de Bank of New York), borrando años de historia irrecuperable. Y el fallo
+// era mudo: `loadPanel` exige 300 barras, así que el nombre se cae de todos los paneles sin
+// que nada falle.
+{
+  const serie = (ini, fin, n = 100) => Array.from({ length: n }, (_, i) => ({ date: i === 0 ? ini : i === n - 1 ? fin : `2020-01-${String((i % 28) + 1).padStart(2, "0")}`, raw: 1, adj: 1 }));
+  const previa = serie("2018-06-01", "2026-08-20");
+
+  ok(cubreLaCache(serie("2018-06-01", "2026-08-21"), previa), "una descarga que llega más lejos SÍ reemplaza");
+  ok(cubreLaCache(serie("2018-05-01", "2026-08-20"), previa), "una que empieza antes y llega igual SÍ reemplaza");
+  ok(!cubreLaCache(serie("2026-07-17", "2026-08-10", 6), previa), "una de 6 barras recientes NO reemplaza (el caso EA)");
+  ok(!cubreLaCache(serie("2018-06-01", "2023-01-05"), previa), "una que se queda corta por el final NO reemplaza (deslistado)");
+  ok(!cubreLaCache([], previa), "una descarga vacía NO reemplaza");
+  ok(cubreLaCache(serie("2020-01-01", "2020-06-01", 5), null), "sin caché previa, se escribe lo que haya");
+  ok(cubreLaCache(serie("2020-01-01", "2020-06-01", 5), []), "una caché vacía no es historia que perder");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);

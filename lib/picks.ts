@@ -47,6 +47,30 @@ export const PERSISTENCE_DAYS = 60;
  *  mantiene porque evita el efecto sierra de comprar y vender el mismo nombre. */
 export const QUARANTINE_MONTHS = 12;
 
+/** §2 — desfase máximo, en días naturales, entre la última barra de precio de un valor y la
+ *  fecha de decisión para considerarlo COTIZANDO. Diez cubre un puente largo sin dejar pasar
+ *  un ticker muerto. */
+export const MAX_PRICE_LAG_DAYS = 10;
+
+/**
+ * §2 · "sin cotización suspendida", que hasta el 2026-08-21 estaba escrito y no implementado.
+ *
+ * La señal sale de EDGAR y EDGAR no sabe de tickers: un valor puede tener fundamentales
+ * impecables y no tener precio, o —peor— tener el precio de OTRA empresa. El caso real:
+ * BNY Mellon cotiza hoy como `BNY`, pero la foto de miembros congelada dice `BK`. El CIK de
+ * `BK` sí resuelve —por el override manual de `edgar.mjs`, no porque la SEC conserve el
+ * ticker viejo—, así que su percentil de calidad se calcula perfectamente, mientras su
+ * "precio" son 14,79 $ de otro instrumento. Sin este filtro, un `BK` en el top 40 se habría
+ * registrado como compra a 14,79 $ y nada habría fallado.
+ *
+ * Es point-in-time: compara con la fecha de DECISIÓN, no con hoy. Un valor deslistado en 2020
+ * sigue siendo elegible para una decisión de 2019, que es lo correcto.
+ */
+export function cotizaEn(lastBar: string | null | undefined, date: string): boolean {
+  if (!lastBar) return false;
+  return daysBetween(lastBar, date) <= MAX_PRICE_LAG_DAYS;
+}
+
 export type SellReason =
   | "senal_bajo_umbral"        // §5.1
   | "descalificador"           // §5.2 — NO cubierto por el backtest

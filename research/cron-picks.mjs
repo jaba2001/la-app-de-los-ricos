@@ -25,12 +25,14 @@
 //
 // Env: SUPABASE_URL (opcional), SUPABASE_SERVICE_KEY (obligatoria para escribir)
 // ─────────────────────────────────────────────────────────────────────────────
-import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
+// CURATED NO se importa a propósito: es el universo de laboratorio y no puede acabar
+// decidiendo en producción ni por accidente. Ver el guardián de §3.
+import { loadSP500Historical, membersAsOf, snapshotDate } from "./universe.mjs";
 import { señalAt } from "./picksSignal.mjs";
-import { rawPriceAsOf } from "./prices.mjs";
+import { rawPriceAsOf, lastBarDate } from "./prices.mjs";
 import { loadPanel } from "./momentumSignals.mjs";
 import {
-  decide, emptyState, addMonths, daysBetween,
+  decide, emptyState, addMonths, daysBetween, cotizaEn,
   PICKS_RULES_VERSION, ENTRY_PCTL, EXIT_PCTL, EXIT_CONSECUTIVE,
   TARGET_POSITIONS, BUYS_PER_DATE, PERSISTENCE_DAYS, QUARANTINE_MONTHS,
 } from "../lib/picks.ts";
@@ -145,12 +147,69 @@ console.log(`  estado: ${state.holdings.length} posiciones abiertas · ${Object.
 
 // ── 3 · La señal de hoy ─────────────────────────────────────────────────────────────────
 const table = await loadSP500Historical();
+// ⚠️ SIN TABLA NO SE DECIDE. Antes se caía a `CURATED`, y eso es inaceptable en producción:
+// son 43 megacaps supervivientes elegidas a mano, así que el sistema habría publicado como
+// "el mejor del S&P 500" el mejor de una lista que no es el S&P 500. Lo tapaba, por pura
+// casualidad, el guardián de cobertura de abajo —CURATED tiene 43 nombres y el umbral son
+// 50—, y una protección que depende de la longitud de una constante de laboratorio no es una
+// protección. Se aborta aquí, nombrando la causa real.
+if (!table) {
+  console.error(`  ✖ no se pudo cargar la tabla histórica de miembros del S&P 500 (red + caché local).`);
+  console.error(`    Sin universo no hay decisión. Se aborta SIN escribir fila: es preferible una fecha`);
+  console.error(`    ausente y visible a una decisión tomada sobre el universo equivocado.`);
+  process.exit(1);
+}
 // ⚠️ Nunca truncar: `membersAsOf` devuelve los tickers en orden alfabético.
-const miembros = table ? [...new Set(membersAsOf(table, HOY) || [])] : CURATED;
+const miembros = [...new Set(membersAsOf(table, HOY) || [])];
+// La foto de miembros no es de hoy: la fuente (hanshof/sp500_constituents, gratuita) dejó de
+// actualizarse el 2025-08-23. Se DECLARA en cada decisión y se guarda en la fila, porque el
+// universo sobre el que se eligió es parte de la decisión — no un detalle de infraestructura.
+const universeAsOf = snapshotDate(table);
+const universeLagDays = daysBetween(universeAsOf, HOY);
+console.log(`  universo: foto del ${universeAsOf} (${universeLagDays} días de antigüedad) · ${miembros.length} miembros`);
+if (universeLagDays > 45) {
+  console.log(`  ⚠ la foto de miembros tiene más de 45 días: las altas y bajas del índice desde entonces`);
+  console.log(`    NO se están viendo. Queda registrada en universe_asof y publicada en /picks.`);
+}
 process.stdout.write(`  calculando señal sobre ${miembros.length} miembros del índice…\r`);
-const signal = await señalAt(miembros, HOY);
+const señalCruda = await señalAt(miembros, HOY);
+
+// ── 3bis · Sólo entra lo que se puede COMPRAR hoy ───────────────────────────────────────
+// §2 exige "sin cotización suspendida", y esto es lo que significa en código. La señal sale
+// de EDGAR y EDGAR no sabe de tickers: un valor puede tener fundamentales impecables y no
+// tener precio, o —peor— tener el precio de OTRA empresa.
+//
+// El caso que obligó a escribir esto es real y está vivo: BNY Mellon cotiza hoy como `BNY`,
+// pero la foto de miembros congelada en 2025-08-23 todavía dice `BK`. `tickerToCik("BK")`
+// resuelve al CIK correcto, así que la señal de BK se calcula PERFECTAMENTE; su precio, en
+// cambio, es el de otro instrumento a 14,79 $. Sin este filtro, un BK en el top 40 se habría
+// registrado como una compra a 14,79 $ en un track record público, y nada habría fallado.
+//
+// `hasPriceAt` no vale aquí: usa `idxOnOrBefore`, así que una serie muerta en 2019 devuelve
+// `true` en 2026 con el precio de 2019. La pregunta correcta es si la serie LLEGA A HOY.
+const signal = {}, sinCotizar = [];
+for (const [t, v] of Object.entries(señalCruda)) {
+  let ultima = null;
+  try { ultima = await lastBarDate(t); } catch { /* se trata como sin precio */ }
+  if (cotizaEn(ultima, HOY)) signal[t] = v;
+  else sinCotizar.push({ t, ultima });
+}
 const universeSize = Object.keys(signal).length;
-console.log(`  señal: ${universeSize} nombres con datos suficientes (de ${miembros.length} miembros)          `);
+console.log(`  señal: ${universeSize} nombres con datos suficientes Y precio de hoy (de ${miembros.length} miembros)          `);
+if (sinCotizar.length) {
+  console.log(`  ⚠ ${sinCotizar.length} con fundamentales pero SIN cotización vigente — excluidos de §2:`);
+  console.log(`    ${sinCotizar.slice(0, 12).map((x) => `${x.t}(${x.ultima ?? "sin serie"})`).join(" · ")}${sinCotizar.length > 12 ? " …" : ""}`);
+}
+// Que unos pocos nombres pierdan la cotización es normal (cambios de ticker, OPAs). Que la
+// pierda un tercio del universo no es un evento de mercado: es la fuente de precios caída. La
+// diferencia importa porque el primer caso debe seguir adelante y el segundo NO.
+const excluidos = sinCotizar.length / Math.max(1, sinCotizar.length + universeSize);
+if (excluidos > 0.20) {
+  console.error(`\n  ✖ el ${(excluidos * 100).toFixed(0)}% del universo se ha quedado sin precio vigente.`);
+  console.error(`    Eso no es rotación del índice, es la fuente de precios fallando. Se aborta en vez de`);
+  console.error(`    decidir sobre los que sí tienen precio: sería seleccionar por quién respondió al servidor.`);
+  process.exit(1);
+}
 if (universeSize < 50) { console.error(`  ✖ cobertura insuficiente (${universeSize} nombres). No se decide a ciegas.`); process.exit(1); }
 
 // ── 4 · Decidir ─────────────────────────────────────────────────────────────────────────
@@ -204,6 +263,7 @@ if ((d.buys.length || d.sells.length) && spy.dates.at(-1) !== HOY && !FORCE) {
 // ── 6 · Escribir ────────────────────────────────────────────────────────────────────────
 const runRow = {
   decision_date: HOY, rules_version: PICKS_RULES_VERSION,
+  universe_asof: universeAsOf,
   universe_size: universeSize, eligible_count: d.buys.length + d.eligibleNotBought.length,
   bought_count: d.buys.length, sold_count: d.sells.length,
   positions_after: d.nextState.holdings.length,
@@ -213,7 +273,7 @@ const runRow = {
 
 if (DRY || !KEY) {
   console.log(`\n  ${DRY ? "DRY RUN" : "SIN SUPABASE_SERVICE_KEY"} — no se escribe nada.`);
-  console.log(`  La fila de sl_picks_run que se habría escrito: universo ${runRow.universe_size} · elegibles ${runRow.eligible_count} · compras ${runRow.bought_count} · ventas ${runRow.sold_count} · cartera ${runRow.positions_after}\n`);
+  console.log(`  La fila de sl_picks_run que se habría escrito: universo ${runRow.universe_size} (foto del ${runRow.universe_asof}) · elegibles ${runRow.eligible_count} · compras ${runRow.bought_count} · ventas ${runRow.sold_count} · cartera ${runRow.positions_after}\n`);
   process.exit(0);
 }
 
