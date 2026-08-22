@@ -61,6 +61,13 @@ const MANUAL_CIK = {
   HES: "0000004447", // HESS CORP
   AEP: "0000004904", // AMERICAN ELECTRIC POWER CO INC
   XOM: "0000034088", // EXXON MOBIL CORP — no la holding nueva
+  // Clase de acción escrita con PUNTO en el CSV de miembros del índice y con GUION en la
+  // SEC. No es un cambio de ticker ni una empresa distinta: es otra convención de vendor
+  // para la misma acción. Sin esta línea, Berkshire Hathaway era INVISIBLE para el sistema
+  // —sin CIK, luego sin fundamentales, luego sin señal— y no aparecía en ningún aviso,
+  // porque los avisos sólo ven a los que llegan a tener señal. Es el único caso de los 503:
+  // el otro ticker con sufijo, `BF-B`, ya viene con guion en el CSV y resuelve solo.
+  "BRK.B": "0001067983", // BERKSHIRE HATHAWAY INC (en la SEC: "BRK-B")
 };
 
 export async function tickerToCik(ticker) {

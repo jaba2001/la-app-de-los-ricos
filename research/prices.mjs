@@ -61,7 +61,50 @@ async function fromTiingo(ticker) {
 
 // Canonical symbol → Yahoo symbol. We use FMP's crypto format (BTCUSD) as the ONE
 // canonical ticker across the app, backtest and paper fund; Yahoo needs the hyphen form.
-const YAHOO_ALIAS = { BTCUSD: "BTC-USD", ETHUSD: "ETH-USD" };
+//
+// ── CAMBIOS DE TICKER ───────────────────────────────────────────────────────────────────
+// Una empresa puede cambiar de ticker sin dejar de ser la misma empresa, y entonces el
+// universo point-in-time —congelado en 2025-08-23— sigue nombrándola con el ticker viejo
+// mientras el precio vive bajo el nuevo. Sin esta tabla, miembros grandes y sanos del S&P 500
+// quedaban con la señal calculada por un lado y el precio de otro instrumento por el otro.
+//
+// ⚠️ REGLA PARA AÑADIR UN CAMBIO DE TICKER AQUÍ, y no es opcional: `tickerToCik` tiene que
+// devolver EL MISMO CIK para los dos. Es la única prueba de que se trata del mismo
+// registrante y no de un ticker REASIGNADO a otra compañía — el error simétrico, y mucho
+// peor, porque empalma los precios de una empresa ajena sin que nada falle. Verificado así
+// el 2026-08-22 para `BK` y `MMC`.
+//
+// Ojo, porque es contraintuitivo: que el ticker VIEJO resuelva a CIK no significa que la SEC
+// lo conserve. `company_tickers.json` sólo trae tickers VIGENTES —comprobado: 10.403 entradas
+// con `BNY`, `MRSH` y `BRK-B`, sin `BK`, `MMC` ni `BRK.B`—. Si `tickerToCik("BK")` responde es
+// porque `MANUAL_CIK` de `edgar.mjs` lo lleva a mano. Las dos tablas van juntas: una entrada
+// aquí sin su pareja allí (o al revés) deja el nombre medio roto, que es lo que pasaba.
+export const YAHOO_ALIAS = {
+  BTCUSD: "BTC-USD",
+  ETHUSD: "ETH-USD",
+  BK: "BNY",     // Bank of New York Mellon · CIK 0001390777 en los dos tickers
+  MMC: "MRSH",   // Marsh & McLennan        · CIK 0000062709 en los dos tickers
+  // Y un caso distinto: no es un cambio de ticker sino la MISMA acción escrita de otra
+  // forma. El CSV de miembros del índice usa punto para la clase; Yahoo y la SEC, guion.
+  "BRK.B": "BRK-B", // Berkshire Hathaway clase B · CIK 0001067983
+};
+
+/**
+ * ¿La serie recién descargada puede REEMPLAZAR a la que ya estaba en disco?
+ *
+ * Sólo si la abarca por los dos extremos. Cualquier otra cosa —una respuesta más corta, una
+ * que empieza más tarde— significa que la fuente ya no tiene la historia o que el ticker es
+ * de otra empresa, y en los dos casos escribirla destruye datos que no se pueden recuperar.
+ *
+ * Pura a propósito: es la regla que impide una pérdida silenciosa de datos, así que tiene
+ * que poder testearse sin red ni disco.
+ */
+export function cubreLaCache(nuevas, previa) {
+  if (!previa?.length) return true;              // no había nada que perder
+  if (!nuevas?.length) return false;
+  return nuevas[0].date <= previa[0].date
+    && nuevas[nuevas.length - 1].date >= previa[previa.length - 1].date;
+}
 
 async function series(ticker) {
   if (mem.has(ticker)) return mem.get(ticker);
@@ -74,12 +117,46 @@ async function series(ticker) {
   // avisar. `PX_REFRESH=1` fuerza la recarga; lo usa `cron-picks.mjs`, que necesita el
   // precio de hoy y el calendario de mercado real.
   const refrescar = process.env.PX_REFRESH === "1";
-  if (!refrescar && existsSync(path)) { try { const c = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(c) && c.length && c[0].raw != null) rows = c; } catch { rows = null; } }
+  const enDisco = () => { try { const c = JSON.parse(readFileSync(path, "utf8")); return Array.isArray(c) && c.length && c[0].raw != null ? c : null; } catch { return null; } };
+  if (!refrescar && existsSync(path)) rows = enDisco();
   if (!rows) {
     await sleep(160);
     rows = await fromYahoo(yTicker);
-    if (!rows.length) rows = await fromTiingo(yTicker); // delisted / Yahoo-miss
-    if (rows.length) writeFileSync(path, JSON.stringify(rows));
+    const previa = enDisco();
+    // Tiingo se consultaba SÓLO cuando Yahoo devolvía cero barras, y ese "cero" era el
+    // supuesto equivocado: Yahoo también devuelve series TRUNCADAS —26 barras de `EA` desde
+    // 2026-07-17, cinco de `BK` a 14,79 $— cuando una empresa sale de bolsa o el ticker
+    // cambia de manos. Al no estar vacías, la respuesta corta ganaba y la fuente que sí tiene
+    // la historia no llegaba a preguntarse. Se le pregunta también cuando la respuesta no
+    // cubre lo que ya había, que es justo el caso en que hace falta.
+    if (!rows.length || !cubreLaCache(rows, previa)) {
+      const alt = await fromTiingo(yTicker);           // cubre deslistados
+      if (alt.length > rows.length) rows = alt;
+    }
+    if (rows.length) {
+      // ⚠️ UN REFRESCO PUEDE ALARGAR UNA SERIE; NUNCA ACORTARLA.
+      //
+      // Antes se escribía cualquier respuesta no vacía, y eso destruyó datos de verdad: un
+      // refresco del 2026-08-21 dejó `EA` en 6 barras y `BK` en 5 —a 14,79 $, que no es el
+      // precio de Bank of New York sino el de OTRO instrumento con ese ticker— borrando años
+      // de historia buena. El daño es silencioso por partida doble: `loadPanel` exige 300
+      // barras, así que el nombre desaparece de todos los paneles sin que nada falle, y en CI
+      // (donde no hay caché) desaparece del universo directamente.
+      //
+      // Un ticker puede dejar de cotizar o ser REASIGNADO a otra empresa. En los dos casos la
+      // respuesta nueva no cubre la historia guardada, y en los dos casos lo correcto es
+      // quedarse con lo que ya había: perder cobertura reciente es un problema menor que
+      // empalmar los precios de otra compañía o quedarse sin serie.
+      if (cubreLaCache(rows, previa)) writeFileSync(path, JSON.stringify(rows));
+      else {
+        console.warn(`  ⚠ precios ${ticker}: la descarga (${rows.length} barras, ${rows[0].date}→${rows[rows.length - 1].date}) NO cubre la caché (${previa.length}, ${previa[0].date}→${previa[previa.length - 1].date}). Se conserva la caché.`);
+        rows = previa;
+      }
+    } else if (previa) {
+      // El refresco no trajo nada. Sin esto el nombre se caía del panel durante toda la
+      // ejecución por un fallo de red pasajero, en silencio.
+      rows = previa;
+    }
   }
   rows = rows ?? [];
   mem.set(ticker, rows);
@@ -102,6 +179,18 @@ export async function momentum(ticker, date) {
   return { m1: pct(21), m3: pct(63), m6: pct(126) };
 }
 export async function hasPriceAt(ticker, date) { return idxOnOrBefore(await series(ticker), date) >= 0; }
+
+/**
+ * Última fecha con barra, o null si no hay serie.
+ *
+ * `hasPriceAt` NO sirve para saber si un nombre se puede comprar HOY: usa `idxOnOrBefore`, así
+ * que una serie que terminó en 2019 sigue devolviendo `true` en 2026 — con el precio de 2019.
+ * Un proceso en vivo necesita saber si la serie llega hasta hoy, y ésta es esa pregunta.
+ */
+export async function lastBarDate(ticker) {
+  const r = await series(ticker);
+  return r.length ? r[r.length - 1].date : null;
+}
 
 // Is the (adjusted) price on `date` above its trailing n-day simple moving average?
 // Returns null when there isn't enough history. Used by the breadth aggregator.

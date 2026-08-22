@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { YAHOO_ALIAS, cubreLaCache } from "./prices.mjs";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache", "px_long");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
@@ -42,8 +43,29 @@ async function fromYahoo(ticker) {
   return [];
 }
 
+// Tiingo, igual que en `prices.mjs` pero con la ventana larga de este módulo. Existe por lo
+// que se cuenta abajo: sin él, un nombre cuya historia Yahoo ya no sirve desaparece de la
+// ventana 2011-2018 sin que nada falle.
+async function fromTiingo(ticker) {
+  const TOK = process.env.TIINGO_TOKEN || "";
+  if (!TOK) return [];
+  try {
+    const hoy = new Date().toISOString().slice(0, 10);
+    const r = await fetch(`https://api.tiingo.com/tiingo/daily/${encodeURIComponent(ticker)}/prices?startDate=${FROM}&endDate=${hoy}&format=json&token=${TOK}`, { headers: { "Content-Type": "application/json" } });
+    if (!r.ok) return [];
+    const j = await r.json();
+    return Array.isArray(j)
+      ? j.filter((x) => x?.date && x.close != null).map((x) => ({ date: x.date.slice(0, 10), raw: x.close, adj: x.adjClose ?? x.close })).sort((a, b) => a.date.localeCompare(b.date))
+      : [];
+  } catch { return []; }
+}
+
 async function seriesLong(ticker) {
   if (mem.has(ticker)) return mem.get(ticker);
+  // El mismo mapa que `prices.mjs`, IMPORTADO y no copiado: dos tablas de alias que se
+  // separan producirían dos historias distintas para la misma empresa según qué ventana se
+  // mire, y eso es exactamente el fallo que este repo ya cometió con los pesos del ensemble.
+  const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
   const path = join(DIR, ticker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
   let rows = null;
   // `c[0].raw != null` invalida las cachés escritas antes de guardar el cierre crudo: sin
@@ -52,8 +74,24 @@ async function seriesLong(ticker) {
   if (existsSync(path)) { try { const c = JSON.parse(readFileSync(path, "utf8")); if (Array.isArray(c) && c.length && c[0].raw != null) rows = c; } catch { rows = null; } }
   if (!rows) {
     await sleep(120);
-    rows = await fromYahoo(ticker);
-    if (rows.length) writeFileSync(path, JSON.stringify(rows));
+    rows = await fromYahoo(yTicker);
+    const previa = (() => { try { const c = JSON.parse(readFileSync(path, "utf8")); return Array.isArray(c) && c.length && c[0].raw != null ? c : null; } catch { return null; } })();
+    // ⚠️ ESTE MÓDULO YA HIZO DAÑO POR NO TENER ESTA COMPROBACIÓN. El 2026-08-21 a las 08:10
+    // guardó `EA` con SEIS barras de 2026 —Yahoo ya no sirve su historia tras salir de
+    // bolsa—, y a las 08:54 el backtest de 2011-2018 corrió con ese muñón: `loadPanel` exige
+    // 300 barras, devolvió null, y `valorar` **se saltó las dos posiciones de EA enteras**
+    // (`retorno: null` en el libro). Los números publicados de esa ventana —incluido el
+    // +166% de la v2— se calcularon con dos posiciones de 64 desaparecidas y sin un solo
+    // aviso. La misma regla que `prices.mjs`: un refresco alarga, nunca acorta.
+    if (!rows.length || !cubreLaCache(rows, previa)) {
+      const alt = await fromTiingo(yTicker);
+      if (alt.length > rows.length) rows = alt;
+    }
+    if (rows.length && cubreLaCache(rows, previa)) writeFileSync(path, JSON.stringify(rows));
+    else if (previa) {
+      if (rows.length) console.warn(`  ⚠ px_long ${ticker}: la descarga (${rows.length} barras, ${rows[0].date}→${rows[rows.length - 1].date}) NO cubre la caché (${previa.length}). Se conserva la caché.`);
+      rows = previa;
+    }
   }
   rows = rows ?? [];
   mem.set(ticker, rows);
