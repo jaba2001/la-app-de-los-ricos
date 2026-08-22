@@ -40,7 +40,9 @@
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { loadSP500Historical, membersAsOf, CURATED } from "./universe.mjs";
+// CURATED no se importa: el backtest que respalda un producto no puede caer en silencio a
+// un universo de laboratorio. Ver el guardián de `construirPanel`.
+import { loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { señalAt } from "./picksSignal.mjs";
 import { returnsSeries } from "./prices.mjs";
 import { returnsSeriesLong } from "./pricesLong.mjs";
@@ -111,13 +113,24 @@ console.log(`  ${fechasDecision.length} fechas de decisión (2/mes) · entrada p
 // simulador se ejecuta muchas veces (barrido de umbrales) sobre exactamente los mismos datos.
 async function construirPanel() {
   const table = await loadSP500Historical();
+  // ⚠️ NI UNA FECHA CON EL UNIVERSO EQUIVOCADO. Aquí había un `table ? … : CURATED`, y en un
+  // bucle que tarda media hora eso es peor que en el cron: un parpadeo de red a mitad de
+  // construcción habría dejado unas fechas con 500 miembros y otras con 43 megacaps
+  // supervivientes, TODO ELLO ESCRITO AL PANEL CACHEADO y reutilizado en cada ejecución
+  // posterior sin volver a preguntar. Un backtest con el universo cambiando a mitad de
+  // película no da un número peor: da un número que no significa nada, y no lo parece.
+  if (!table) {
+    console.error(`\n  ✖ no se pudo cargar la tabla histórica de miembros (red + caché local).`);
+    console.error(`    Se aborta sin escribir panel: media hora perdida es más barata que un panel mestizo.\n`);
+    process.exit(1);
+  }
   const sectorCache = new Map();
   const panel = {};
   let n = 0;
   for (const fecha of fechasDecision) {
     // Miembros del índice EN ESA FECHA. ⚠️ Nunca truncar: `membersAsOf` devuelve los
     // tickers en orden alfabético y un slice(0,N) borraría de la S a la Z (ver §3).
-    const miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
+    const miembros = [...new Set(membersAsOf(table, fecha) || [])];
     // La definición de la señal NO vive aquí: `picksSignal.mjs` es la misma función que
     // ejecutará el cron de producción.
     const sig = await señalAt(miembros, fecha, sectorCache);
