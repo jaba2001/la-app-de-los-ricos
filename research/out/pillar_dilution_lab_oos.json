@@ -1,131 +1,131 @@
 {
-  "generatedAt": "2026-08-21T12:13:28.754Z",
+  "generatedAt": "2026-08-22T16:24:29.159Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
-  "nombresMedios": 316,
+  "nombresMedios": 320,
   "universeEW": {
-    "total": 156.4,
+    "total": 156.6,
     "sharpe": 0.96,
-    "maxDD": -18.1
+    "maxDD": -18.2
   },
   "señales": {
     "health (pilar solo)": {
-      "ic": 0.0378,
-      "t": 1.52,
-      "total": 178.3,
-      "sharpe": 0.93,
+      "ic": 0.0392,
+      "t": 1.58,
+      "total": 181.9,
+      "sharpe": 0.94,
       "maxDD": -17.7,
-      "vsEW": 21.9
+      "vsEW": 25.3
     },
     "value (pilar solo)": {
-      "ic": 0.0439,
-      "t": 2.49,
+      "ic": 0.0434,
+      "t": 2.45,
       "total": 248.2,
       "sharpe": 1.3,
       "maxDD": -14,
-      "vsEW": 91.8
+      "vsEW": 91.6
     },
     "momentum (pilar solo)": {
-      "ic": -0.0092,
-      "t": -0.32,
-      "total": 139.8,
-      "sharpe": 0.93,
-      "maxDD": -13.9,
-      "vsEW": -16.6
+      "ic": -0.008,
+      "t": -0.28,
+      "total": 138,
+      "sharpe": 0.92,
+      "maxDD": -14.9,
+      "vsEW": -18.5
     },
     "growth (pilar solo)": {
-      "ic": -0.0216,
-      "t": -1.14,
-      "total": 85.3,
+      "ic": -0.0222,
+      "t": -1.16,
+      "total": 83.6,
       "sharpe": 0.57,
       "maxDD": -21.9,
-      "vsEW": -71.1
+      "vsEW": -73
     },
     "health + value": {
-      "ic": 0.0552,
-      "t": 2.52,
+      "ic": 0.0555,
+      "t": 2.54,
       "total": 222.2,
       "sharpe": 1.09,
       "maxDD": -16,
-      "vsEW": 65.8
+      "vsEW": 65.6
     },
     "health + momentum": {
-      "ic": 0.0156,
-      "t": 0.58,
-      "total": 148,
-      "sharpe": 0.89,
-      "maxDD": -16.4,
-      "vsEW": -8.4
+      "ic": 0.0173,
+      "t": 0.65,
+      "total": 151.6,
+      "sharpe": 0.91,
+      "maxDD": -16.3,
+      "vsEW": -5
     },
     "health + growth": {
-      "ic": 0.0109,
-      "t": 0.44,
-      "total": 153.1,
-      "sharpe": 0.82,
-      "maxDD": -18.3,
-      "vsEW": -3.3
+      "ic": 0.0113,
+      "t": 0.46,
+      "total": 154,
+      "sharpe": 0.84,
+      "maxDD": -17.9,
+      "vsEW": -2.5
     },
     "los 4 pilares (percentil)": {
-      "ic": 0.0207,
-      "t": 0.85,
-      "total": 203.8,
-      "sharpe": 1.1,
-      "maxDD": -14.2,
-      "vsEW": 47.4
+      "ic": 0.021,
+      "t": 0.87,
+      "total": 208.9,
+      "sharpe": 1.12,
+      "maxDD": -14.1,
+      "vsEW": 52.3
     },
     "SCORE v1 (total, producción)": {
-      "ic": 0.0252,
-      "t": 1.04,
-      "total": 194.4,
-      "sharpe": 1.07,
+      "ic": 0.0259,
+      "t": 1.07,
+      "total": 197.5,
+      "sharpe": 1.08,
       "maxDD": -14.7,
-      "vsEW": 38
+      "vsEW": 40.9
     },
     "Calidad §3 (5 métricas)": {
-      "ic": 0.0101,
-      "t": 0.45,
-      "total": 189.2,
-      "sharpe": 1.03,
-      "maxDD": -16.6,
-      "vsEW": 32.9
+      "ic": 0.0107,
+      "t": 0.47,
+      "total": 187.4,
+      "sharpe": 1.02,
+      "maxDD": -17,
+      "vsEW": 30.8
     }
   },
   "pareados": {
     "health − SCORE v1": {
-      "dif": 0.0127,
-      "t": 0.99,
-      "gana": 21,
+      "dif": 0.0133,
+      "t": 1.05,
+      "gana": 20,
+      "n": 32,
+      "mde": 0.0354
+    },
+    "health − (health+value)": {
+      "dif": -0.0164,
+      "t": -1.28,
+      "gana": 13,
       "n": 32,
       "mde": 0.0358
     },
-    "health − (health+value)": {
-      "dif": -0.0173,
-      "t": -1.36,
-      "gana": 14,
-      "n": 32,
-      "mde": 0.0356
-    },
     "health − (health+momentum)": {
-      "dif": 0.0222,
-      "t": 1.12,
-      "gana": 17,
+      "dif": 0.0219,
+      "t": 1.11,
+      "gana": 16,
       "n": 32,
-      "mde": 0.0555
+      "mde": 0.0552
     },
     "health − (health+growth)": {
-      "dif": 0.027,
-      "t": 2.52,
-      "gana": 22,
+      "dif": 0.0278,
+      "t": 2.57,
+      "gana": 23,
       "n": 32,
-      "mde": 0.03
+      "mde": 0.0304
     },
     "Calidad §3 − SCORE v1": {
-      "dif": -0.015,
-      "t": -0.9,
+      "dif": -0.0152,
+      "t": -0.92,
       "gana": 15,
       "n": 32,
-      "mde": 0.0469
+      "mde": 0.046
     }
   },
   "ventana": {

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-08-21T12:15:26.838Z",
+  "generatedAt": "2026-08-22T16:27:05.814Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
   "universeEW": {
-    "total": 156.6,
-    "cagr": 12.5,
+    "total": 156.8,
+    "cagr": 12.51,
     "sharpe": 0.96,
-    "maxDD": -18.1
+    "maxDD": -18.2
   },
   "benchmarks": {
     "spy": {
@@ -23,109 +23,109 @@
   },
   "sizeSweep": {
     "10": {
-      "total": 137.5,
-      "cagr": 11.42,
-      "sharpe": 0.75,
+      "total": 140.5,
+      "cagr": 11.59,
+      "sharpe": 0.77,
       "maxDD": -19.4,
-      "vsEW": -19.2
+      "vsEW": -16.3
     },
     "15": {
-      "total": 176.7,
-      "cagr": 13.57,
-      "sharpe": 0.91,
+      "total": 179.3,
+      "cagr": 13.7,
+      "sharpe": 0.93,
       "maxDD": -19.7,
-      "vsEW": 20.1
+      "vsEW": 22.4
     },
     "20": {
-      "total": 199.7,
-      "cagr": 14.71,
+      "total": 200.1,
+      "cagr": 14.73,
       "sharpe": 0.98,
       "maxDD": -18.3,
-      "vsEW": 43.1
+      "vsEW": 43.3
     },
     "25": {
-      "total": 170.7,
-      "cagr": 13.26,
-      "sharpe": 0.9,
+      "total": 178.8,
+      "cagr": 13.67,
+      "sharpe": 0.93,
       "maxDD": -18.7,
-      "vsEW": 14.1
+      "vsEW": 22
     },
     "30": {
-      "total": 185.1,
-      "cagr": 13.99,
-      "sharpe": 0.99,
+      "total": 179.1,
+      "cagr": 13.69,
+      "sharpe": 0.98,
       "maxDD": -17.8,
-      "vsEW": 28.5
+      "vsEW": 22.3
     },
     "40": {
-      "total": 187.3,
-      "cagr": 14.1,
+      "total": 187,
+      "cagr": 14.09,
       "sharpe": 1.02,
-      "maxDD": -16.6,
-      "vsEW": 30.7
+      "maxDD": -17,
+      "vsEW": 30.2
     },
     "50": {
-      "total": 184.2,
-      "cagr": 13.95,
-      "sharpe": 1.01,
-      "maxDD": -15.7,
-      "vsEW": 27.6
+      "total": 186.4,
+      "cagr": 14.06,
+      "sharpe": 1.02,
+      "maxDD": -16,
+      "vsEW": 29.5
     },
     "75": {
-      "total": 160.3,
-      "cagr": 12.7,
-      "sharpe": 0.98,
+      "total": 163.8,
+      "cagr": 12.89,
+      "sharpe": 0.99,
       "maxDD": -15.8,
-      "vsEW": 3.7
+      "vsEW": 7
     },
     "100": {
-      "total": 170.7,
-      "cagr": 13.26,
-      "sharpe": 1.03,
+      "total": 174.9,
+      "cagr": 13.47,
+      "sharpe": 1.05,
       "maxDD": -15.6,
-      "vsEW": 14.1
+      "vsEW": 18.1
     },
     "150": {
       "total": 165.8,
       "cagr": 13,
       "sharpe": 1.04,
       "maxDD": -15.6,
-      "vsEW": 9.2
+      "vsEW": 9
     }
   },
-  "avgUniverseSize": 315,
+  "avgUniverseSize": 319,
   "results": {
     "Calidad": {
-      "ic": 0.0101,
-      "total": 187.3,
-      "cagr": 14.1,
+      "ic": 0.0106,
+      "total": 187,
+      "cagr": 14.09,
       "sharpe": 1.02,
-      "maxDD": -16.6,
-      "vsEW": 30.7
+      "maxDD": -17,
+      "vsEW": 30.2
     },
     "Baja volatilidad": {
-      "ic": 0.0111,
+      "ic": 0.0093,
       "total": 177.6,
       "cagr": 13.61,
       "sharpe": 1.58,
       "maxDD": -2.7,
-      "vsEW": 21
+      "vsEW": 20.8
     },
     "Calidad + baja vol": {
-      "ic": 0.0136,
-      "total": 178,
-      "cagr": 13.63,
+      "ic": 0.0124,
+      "total": 178.1,
+      "cagr": 13.64,
       "sharpe": 1.43,
       "maxDD": -7.6,
       "vsEW": 21.3
     },
     "Score v1 (actual)": {
-      "ic": 0.025,
-      "total": 193.5,
-      "cagr": 14.41,
-      "sharpe": 1.07,
+      "ic": 0.0257,
+      "total": 196.6,
+      "cagr": 14.56,
+      "sharpe": 1.08,
       "maxDD": -14.7,
-      "vsEW": 36.9
+      "vsEW": 39.8
     }
   },
   "criteria": {
