@@ -131,13 +131,25 @@ export async function sicSector(cik) {
  */
 const TAXONOMIAS = ["us-gaap", "ifrs-full"];
 
-function facts(fj, tag, taxonomy = null) {
+/**
+ * ⚠️ HAY QUE MIRAR LA MONEDA, no sólo si el tag existe.
+ *
+ * Toyota publica en `us-gaap` Y en `ifrs-full`. Buscando sólo por nombre, `Assets` aparecía en
+ * la primera —sin un solo importe en yenes, que es su moneda— y nunca se llegaba a la
+ * segunda, donde sí estaba el dato. Resultado: Toyota se quedaba sin activo ni patrimonio y
+ * caía a 2 de 5 métricas, por debajo del mínimo para tener señal. Otro fallo mudo.
+ */
+function facts(fj, tag, taxonomy = null, unidad = null) {
   if (taxonomy) return fj?.facts?.[taxonomy]?.[tag]?.units ?? null;
+  let primera = null;
   for (const tax of TAXONOMIAS) {
     const u = fj?.facts?.[tax]?.[tag]?.units;
-    if (u) return u;
+    if (!u) continue;
+    if (!unidad) return u;
+    if (Array.isArray(u[unidad]) && u[unidad].length) return u;   // ésta sí tiene la moneda
+    primera ??= u;
   }
-  return null;
+  return primera;
 }
 
 /**
@@ -273,7 +285,7 @@ function instant(units, asOf, unit = "USD") {
 function hechosFlujo(fj, tags, asOf, cur) {
   const porClave = new Map();
   for (const t of tags) {
-    const arr = facts(fj, t)?.[cur];
+    const arr = facts(fj, t, null, cur)?.[cur];
     if (!Array.isArray(arr)) continue;
     for (const x of arr) {
       if (!x.start || x.filed > asOf || x.end > asOf) continue;
@@ -418,12 +430,12 @@ function menosDias(fecha, dias) {
   return d.toISOString().slice(0, 10);
 }
 function instTag(fj, tags, asOf, taxonomy = null, unit = "USD") {
-  for (const t of tags) { const v = instant(facts(fj, t, taxonomy), asOf, unit); if (v != null) return v; }
+  for (const t of tags) { const v = instant(facts(fj, t, taxonomy, unit), asOf, unit); if (v != null) return v; }
   return null;
 }
 /** Igual que `instTag` pero devuelve también el cierre, para el mapa de periodos. */
 function instTagFull(fj, tags, asOf, taxonomy = null, unit = "USD") {
-  for (const t of tags) { const v = instantFull(facts(fj, t, taxonomy), asOf, unit); if (v != null) return v; }
+  for (const t of tags) { const v = instantFull(facts(fj, t, taxonomy, unit), asOf, unit); if (v != null) return v; }
   return null;
 }
 
@@ -548,6 +560,11 @@ const IFRS = {
   INV: ["Inventories"],
   NCI: ["NoncontrollingInterests"],
   EQUITY: ["EquityAttributableToOwnersOfParent", "Equity"],
+  CASH: ["CashAndCashEquivalents"],
+  CURA: ["CurrentAssets"], CURL: ["CurrentLiabilities"],
+  LTD: ["NoncurrentPortionOfNoncurrentBorrowings", "Borrowings"],
+  LTDC: ["CurrentBorrowingsAndCurrentPortionOfNoncurrentBorrowings"],
+  LIAB: ["Liabilities"], GP: ["GrossProfit"],
 };
 
 // ── Fase F1/F2 (2026-08-22) — lo que piden la capa de integridad contable y los modelos
@@ -660,7 +677,7 @@ export async function ttmAlineado(cik, asOf, grupos) {
     const tags = usaIFRS && spec.ifrs ? [...spec.tags, ...spec.ifrs] : spec.tags;
     const mapa = new Map();
     for (const t of tags) {
-      const q = quarters(facts(fj, t), asOf, cur);
+      const q = quarters(facts(fj, t, null, cur), asOf, cur);
       for (let i = 0; i + 4 <= q.length; i++) {
         const s = q.slice(i, i + 4);
         // Los cuatro tienen que ser consecutivos de verdad: cuatro trimestres con un hueco en
@@ -733,10 +750,37 @@ export async function fundamentalsAsOf(cik, asOf) {
   };
   const I = (tags) => IF_(tags)?.val ?? null;
 
+  /**
+   * El mismo instante UN AÑO ANTES, tal y como se conoce HOY.
+   *
+   * Beneish y Piotroski comparan cada magnitud contra su valor del ejercicio anterior. Se
+   * podría sacar volviendo a llamar a `fundamentalsAsOf` con la fecha de hace un año, que es
+   * lo que hacía `backtest.mjs`, pero eso mete un retraso de más: usa la foto que se conocía
+   * entonces en vez de la comparativa que la propia empresa publica hoy. Cogiendo el instante
+   * anterior dentro de las presentaciones ya disponibles se compara lo mismo que compara el
+   * 10-K, y sigue sin haber look-ahead porque todo cumple `filed <= asOf`.
+   */
+  const IPREV = (tags) => {
+    const actual = IF_(tags);
+    if (!actual) return null;
+    const techo = menosDias(actual.end, 300);         // el cierre de hace ~un año o antes
+    for (const t of tags) {
+      const u = facts(fj, t, null, cur)?.[cur];
+      if (!Array.isArray(u)) continue;
+      const filas = u.filter((x) => !x.start && x.filed <= asOf && x.end <= techo);
+      if (!filas.length) continue;
+      filas.sort((a, b) => b.end.localeCompare(a.end) || b.filed.localeCompare(a.filed));
+      // Sólo vale si de verdad es de hace un año, no de hace cinco.
+      if (dias(filas[0].end, actual.end) > 450) continue;
+      return filas[0].val;
+    }
+    return null;
+  };
+
   const rev = F(T(REV, "REV"), 0) ?? F(REV2, 0);
   const revP = F(T(REV, "REV"), 4) ?? F(REV2, 4);
   const ni = F(T(NI, "NI")), niP = F(T(NI, "NI"), 4);
-  let gp = F(GP);
+  let gp = F(T(GP, "GP"));
   const cost = F(T(COST, "COST"));
   // El margen bruto derivado sólo lleva fecha si los dos sumandos son del MISMO cierre. Si no,
   // el valor se sigue calculando —era el comportamiento previo y hay ratios que dependen de
@@ -749,13 +793,13 @@ export async function fundamentalsAsOf(cik, asOf) {
   const ocf = F(T(OCF, "OCF")), capex = F(T(CAPEX, "CAPEX"));
 
   const equityI = IF_(T(EQUITY, "EQUITY")), equity = equityI?.val ?? null;
-  const ltd = I(["LongTermDebtNoncurrent", "LongTermDebt"]);
-  const ltdC = I(["LongTermDebtCurrent", "DebtCurrent"]);
+  const ltd = I(T(["LongTermDebtNoncurrent", "LongTermDebt"], "LTD"));
+  const ltdC = I(T(["LongTermDebtCurrent", "DebtCurrent"], "LTDC"));
   const cfi = F(T(ICF, "ICF")), cff = F(T(FCF_, "FCF_")), fx = F(FX);
   const dcashCon = F(DCASH_CON_FX), dcashSin = F(DCASH_SIN_FX);
   const dcash = dcashCon ?? dcashSin;
   const div = F(T(DIV, "DIV")), buyb = F(BUYB);
-  const assetsI = IF_(["Assets"]), liabI = IF_(LIAB), nciI = IF_(T(NCI, "NCI")), tempI = IF_(TEMPEQ);
+  const assetsI = IF_(["Assets"]), liabI = IF_(T(LIAB, "LIAB")), nciI = IF_(T(NCI, "NCI")), tempI = IF_(TEMPEQ);
 
   return {
     revTTM: rev?.val ?? null, revPrevTTM: revP?.val ?? null,
@@ -764,8 +808,8 @@ export async function fundamentalsAsOf(cik, asOf) {
     daTTM: da?.val ?? null, interestTTM: intp?.val != null ? Math.abs(intp.val) : null,
     ocfTTM: ocf?.val ?? null, capexTTM: capex?.val != null ? Math.abs(capex.val) : null,
     assets: assetsI?.val ?? null, equity,
-    curA: I(["AssetsCurrent"]), curL: I(["LiabilitiesCurrent"]),
-    cash: I(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"]),
+    curA: I(T(["AssetsCurrent"], "CURA")), curL: I(T(["LiabilitiesCurrent"], "CURL")),
+    cash: I(T(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"], "CASH")),
     debt: (ltd ?? 0) + (ltdC ?? 0),
     // Fase 7 additions for the quality/credit rankers (Altman Z, DuPont 5-factor).
     retainedEarnings: I(["RetainedEarningsAccumulatedDeficit"]),
@@ -796,6 +840,31 @@ export async function fundamentalsAsOf(cik, asOf) {
     claimsTTM: F(CLAIMS)?.val ?? null,
     acqCostTTM: F(ACQC)?.val ?? null,
     sgaTTM: F(T(SGA, "SGA"))?.val ?? null, rndTTM: F(RND)?.val ?? null, sbcTTM: F(SBC)?.val ?? null,
+
+    // ── Fase F3 · el ejercicio ANTERIOR, para Beneish y Piotroski ────────────────────────
+    // Los flujos vienen de `skip = 4` (mismo criterio, una ventana atrás) y los instantes del
+    // cierre de hace ~un año. Ambos con `filed <= asOf`: no hay look-ahead por ningún lado.
+    prev: {
+      revTTM: revP?.val ?? null,
+      niTTM: niP?.val ?? null,
+      gpTTM: (() => { const g2 = F(GP, 4); const c2 = F(T(COST, "COST"), 4);
+                      return g2?.val ?? (revP && c2 ? revP.val - c2.val : null); })(),
+      costTTM: F(T(COST, "COST"), 4)?.val ?? null,
+      ocfTTM: F(T(OCF, "OCF"), 4)?.val ?? null,
+      sgaTTM: F(T(SGA, "SGA"), 4)?.val ?? null,
+      daTTM: F(T(DA, "DA"), 4)?.val ?? null,
+      assets: IPREV(["Assets"]),
+      equity: IPREV(T(EQUITY, "EQUITY")),
+      curA: IPREV(["AssetsCurrent"]), curL: IPREV(["LiabilitiesCurrent"]),
+      receivables: IPREV(T(RECV, "RECV")), ppe: IPREV(T(PPE, "PPE")),
+      inventory: IPREV(T(INV, "INV")),
+      debt: (() => { const a = IPREV(["LongTermDebtNoncurrent", "LongTermDebt"]);
+                     const b = IPREV(["LongTermDebtCurrent", "DebtCurrent"]);
+                     return a == null && b == null ? null : (a ?? 0) + (b ?? 0); })(),
+      // Para la prueba de dilución de Piotroski basta con las acciones que se conocían hace
+      // un año: `sharesAsOf` ya es point-in-time, así que retrasar su fecha de corte basta.
+      shares: sharesAsOf(fj, menosDias(asOf, 365)),
+    },
 
     // ── Procedencia: sin esto, un dato anual y uno trimestral son indistinguibles ────────
     currency: cur,
