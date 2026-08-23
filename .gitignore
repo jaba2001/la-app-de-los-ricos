@@ -55,3 +55,5 @@ research/out/*
 !research/out/pillar_dilution_lab_oos.json
 !research/out/health_scale_lab.json
 !research/out/health_scale_lab_oos.json
+!research/out/articulacion_lab.json
+!research/out/desfase_periodos.json

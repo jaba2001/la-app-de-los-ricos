@@ -14,6 +14,7 @@ import { percentilesDe, metricasDe, METRICAS_CALIDAD, MIN_METRICAS } from "../re
 import { parseSP500Csv, snapshotDate, membersAsOf } from "../research/universe.mjs";
 import { cubreLaCache } from "../research/prices.mjs";
 import { universeSnapshots } from "../lib/picksData.ts";
+import { articular, articularFundamentales, TOLERANCIA } from "../lib/articulacion.ts";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -303,6 +304,81 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   ok(!cubreLaCache([], previa), "una descarga vacía NO reemplaza");
   ok(cubreLaCache(serie("2020-01-01", "2020-06-01", 5), null), "sin caché previa, se escribe lo que haya");
   ok(cubreLaCache(serie("2020-01-01", "2020-06-01", 5), []), "una caché vacía no es historia que perder");
+}
+
+
+// ── ARTICULACIÓN CONTABLE (`lib/articulacion.ts`) ───────────────────────────────────────
+// La partida doble usada como test de datos. Estos tests fijan sobre todo UNA distinción,
+// que es la que hace útil o inútil a un control de integridad: **no comprobable ≠ erróneo**.
+// Confundirlas ya produjo tres tandas de falsas alarmas seguidas —minoritarios, efecto del
+// tipo de cambio y patrimonio temporal—, todas por comprobaciones mal planteadas y no por
+// datos malos.
+{
+  const base = { assets: 1000, liabilities: 600, equity: 400 };
+  const c = (r, id) => r.comprobaciones.find((x) => x.id === id);
+
+  // A1 · balance
+  eq(c(articular(base), "balance").ok, true, "balance: A = P + PN cuadra");
+  eq(c(articular({ assets: 1000, liabilities: 600, equity: 300 }), "balance").ok, false, "balance: un hueco del 10 % falla");
+  eq(c(articular({ assets: 1000, liabilities: 600 }), "balance").ok, null, "balance: sin patrimonio NO es un fallo, es no comprobable");
+  ok(c(articular({ assets: 1000, liabilities: 600 }), "balance").motivo.length > 0, "lo no comprobable siempre dice por qué");
+
+  // Los tres sumandos que se olvidaron una vez cada uno.
+  eq(c(articular({ assets: 1000, liabilities: 600, equity: 300, minorityInterest: 100 }), "balance").ok, true,
+     "balance: los minoritarios cuentan (DaVita, Vornado…)");
+  eq(c(articular({ assets: 1000, liabilities: 600, equity: 300, temporaryEquity: 100 }), "balance").ok, true,
+     "balance: el patrimonio temporal cuenta (S&P Global, T. Rowe…)");
+  eq(c(articular({ assets: 1000, liabilities: 500, equity: 300, minorityInterest: 100, temporaryEquity: 100 }), "balance").ok, true,
+     "balance: minoritarios y mezzanine SUMAN, no son alternativos");
+
+  // A2 · caja — el efecto del tipo de cambio es el cuarto sumando, no un ajuste opcional.
+  eq(c(articular({ deltaCash: 100, ocf: 200, cfi: -150, cff: 50 }), "caja").ok, true, "caja: los tres flujos cuadran");
+  eq(c(articular({ deltaCash: 90, ocf: 200, cfi: -150, cff: 50, fxCash: -10 }), "caja").ok, true,
+     "caja: con divisa, el efecto del tipo de cambio cierra la identidad");
+  eq(c(articular({ deltaCash: 90, ocf: 200, cfi: -150, cff: 50 }), "caja").ok, false,
+     "caja: sin ese término, una multinacional descuadra estando bien");
+
+  // A4 · margen bruto
+  eq(c(articular({ revenue: 1000, cost: 600, grossProfit: 400 }), "margen").ok, true, "margen: ingresos − coste = bruto");
+  eq(c(articular({ revenue: 1000, cost: 600, grossProfit: 300 }), "margen").ok, false, "margen: un 25 % de desvío falla");
+
+  // A3 · patrimonio: es el ruidoso a propósito (OCI, pagos en acciones, conversiones).
+  eq(c(articular({ equityFin: 1100, equityPrev: 1000, netIncome: 200, dividends: 100 }), "patrimonio").ok, true,
+     "patrimonio: PN + resultado − dividendos");
+  ok(TOLERANCIA.patrimonio > TOLERANCIA.balance, "el patrimonio tolera más que el balance: no es una identidad exacta");
+  eq(TOLERANCIA.balance, 0.01, "el balance es exacto y se le exige el 1 %");
+
+  // El balance manda sobre las demás: es la única identidad que no admite ruido.
+  eq(articular(base).confianza, "alta", "todo lo comprobable cuadra → confianza alta");
+  eq(articular({ ...base, revenue: 1000, cost: 600, grossProfit: 300 }).confianza, "media", "falla una → media");
+  eq(articular({ assets: 1000, liabilities: 100, equity: 100 }).confianza, "baja", "si falla el BALANCE, baja aunque sea el único fallo");
+  eq(articular({}).confianza, "alta", "sin nada que comprobar no se inventa un fallo");
+  eq(articular({}).comprobables, 0, "sin datos, cero comprobables");
+
+  // ── Y lo más importante: periodos desalineados = NO COMPROBABLE, nunca un fallo ────────
+  // `flowTTM` elige la ventana más reciente de cada tag por separado, así que el activo puede
+  // ser de junio y el pasivo de marzo. Restarlos y llamarlo descuadre hacía "fallar" el
+  // margen bruto en el 36 % de los nombres, todas alarmas falsas.
+  const alineado = articularFundamentales({
+    assets: 1000, liabilities: 600, equity: 400, revTTM: 1000, costTTM: 600, gpTTM: 400,
+    periodos: { assets: "2026-06-30", liabilities: "2026-06-30", equity: "2026-06-30",
+                rev: "2026-06-30", cost: "2026-06-30", gp: "2026-06-30" },
+  });
+  eq(c(alineado, "balance").ok, true, "mismo cierre → el balance se comprueba");
+  eq(c(alineado, "margen").ok, true, "mismo cierre → el margen se comprueba");
+
+  const desalineado = articularFundamentales({
+    assets: 1000, liabilities: 600, equity: 400, revTTM: 1000, costTTM: 600, gpTTM: 400,
+    periodos: { assets: "2026-06-30", liabilities: "2026-03-31", equity: "2026-06-30",
+                rev: "2026-06-30", cost: "2011-02-28", gp: "2026-06-30" },
+  });
+  eq(c(desalineado, "balance").ok, null, "cierres distintos → balance NO comprobable (no fallo)");
+  eq(c(desalineado, "margen").ok, null, "coste de 2011 con ingresos de 2026 → margen NO comprobable");
+  eq(desalineado.confianza, "alta", "lo no comprobable no degrada la confianza: no es un defecto");
+
+  // Sin mapa de periodos no se puede afirmar alineación, así que no se comprueba nada.
+  eq(c(articularFundamentales({ assets: 1000, liabilities: 600, equity: 400 }), "balance").ok, null,
+     "sin mapa de periodos no se da por buena la alineación");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);

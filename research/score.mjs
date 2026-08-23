@@ -8,7 +8,7 @@ import { altmanZ, accrualsRatio, dupont, piotroskiF } from "../lib/quality.ts";
  *  fundamentals bundle ~1yr earlier (for Piotroski). Returns scalars where HIGHER = better, so a
  *  positive IC in the backtest means the signal predicts higher forward returns. */
 export function computeQualitySignals({ f, fPrev, rawPrice, sector }) {
-  const mcap = f.shares && rawPrice ? rawPrice * f.shares : null;
+  const mcap = f.precioComparable !== false && f.shares && rawPrice ? rawPrice * f.shares : null;  // ver buildInputs: sin cruce de moneda/ADR
   const totLiab = f.assets != null && f.equity != null ? f.assets - f.equity : null;
   const serviceOrFinancial = /financial|real estate/i.test(sector || "");
   const az = altmanZ({
@@ -45,9 +45,12 @@ export function computeQualitySignals({ f, fPrev, rawPrice, sector }) {
   };
 }
 
-/** Assemble ScoreInputs from a fundamentalsAsOf() bundle + raw price + momentum + sector. */
+/** Assemble ScoreInputs from a fundamentalsAsOf() bundle + raw price + momentum + sector.
+ *  Igual que `metricsOf`: si el precio y los estados financieros no son comparables —otra
+ *  moneda, o un ADR que no equivale a una acción ordinaria— la capitalización no se calcula,
+ *  y con ella caen los ratios de valoración. Ver la cabecera de `fundamentalMetrics.mjs`. */
 export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
-  const mcap = f.shares && rawPrice ? rawPrice * f.shares : null;
+  const mcap = f.precioComparable !== false && f.shares && rawPrice ? rawPrice * f.shares : null;
   const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
   const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
   const ev = mcap != null ? mcap + (f.debt ?? 0) - (f.cash ?? 0) : null;

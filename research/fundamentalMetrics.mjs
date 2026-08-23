@@ -24,9 +24,30 @@ export const SECTOR_ALIASES = {
   "Materials": ["Basic Materials"], "Basic Materials": ["Materials"],
 };
 
-/** Métricas de un nombre, en las unidades de ScoreInputs. null donde no se pueda calcular. */
+/**
+ * Métricas de un nombre, en las unidades de ScoreInputs. null donde no se pueda calcular.
+ *
+ * ⚠️ EL CRUCE PRECIO ↔ ESTADOS FINANCIEROS SE NIEGA CUANDO NO SON COMPARABLES.
+ * `f.precioComparable` (de `edgar.mjs`) es falso para una extranjera: o presenta en otra
+ * moneda —ASML en euros, Toyota en yenes, Alibaba en yuanes— o su ADR no equivale a una
+ * acción ordinaria. En cualquiera de los dos casos la capitalización sale mal, y con ella
+ * TODO lo que la usa: PER, P/B, EV/EBITDA, P/FCF y la rentabilidad del flujo de caja.
+ *
+ * No es un riesgo teórico: una capitalización en dólares dividida entre un beneficio en euros
+ * da un PER perfectamente creíble. Por eso aquí se devuelve `null`, que es un hueco visible,
+ * en lugar de un número que nadie va a cuestionar. Es exactamente lo que avisa la cabecera de
+ * este fichero: una unidad equivocada no rompe, miente.
+ *
+ * Lo que SÍ sobrevive es todo lo adimensional —márgenes, ROIC, ROE, apalancamiento, cobertura
+ * de intereses, crecimiento—, porque son cocientes entre magnitudes de la misma moneda. Y esa
+ * es justo la materia prima de la señal de calidad de Scora Picks: una extranjera puede
+ * puntuar sin que haga falta un solo tipo de cambio.
+ */
 export function metricsOf(f, raw, mom) {
-  const mcap = f.shares > 0 && raw > 0 ? raw * f.shares : null;
+  // `precioComparable` puede no venir (paquetes viejos en caché o tests): se asume true, que
+  // es como se comportaba antes de la fase multi-mercado.
+  const cruzable = f.precioComparable !== false;
+  const mcap = cruzable && f.shares > 0 && raw > 0 ? raw * f.shares : null;
   const ev = mcap != null ? mcap + (f.debt ?? 0) - (f.cash ?? 0) : null;
   const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
   const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
