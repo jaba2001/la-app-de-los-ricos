@@ -237,43 +237,151 @@ function instant(units, asOf, unit = "USD") {
   return instantFull(units, asOf, unit)?.val ?? null;
 }
 
-// Try every tag, keep the window whose latest quarter is the MOST RECENT (tags change
-// over time — banks especially — and stale tags must never beat current data).
-//
-// `cur` es la moneda de presentación. `skip` salta N trimestres hacia atrás (skip=4 → el TTM
-// del ejercicio anterior, que es lo que piden Piotroski y Beneish).
-//
-// LA VÍA ANUAL se decide POR EMPRESA, no por tag, y `permitirAnual` llega ya resuelto desde
-// `fundamentalsAsOf`: sólo vale para quien no publica NINGÚN trimestre de ingresos, es decir,
-// un presentador 20-F. Esa distinción no es cosmética. El primer intento la aplicaba por tag,
-// y entonces bastaba con que UNA magnitud suelta careciera de trimestres para que un filer
-// estadounidense cambiara: medido, Aflac pasó de no tener EBITDA a tenerlo, y con él el
-// EV/EBITDA y la deuda neta. Más cobertura, sí — pero moviendo cifras ya publicadas de
-// empresas que nadie había tocado. Eso es una regresión aunque el número nuevo sea mejor.
-function flowTTM(fj, tags, asOf, skip = 0, cur = "USD", permitirAnual = false, minEnd = null) {
-  let best = null;
+/**
+ * TTM — DOCE MESES DE VERDAD, no cuatro trimestres cualesquiera.
+ *
+ * ⚠️ ESTA FUNCIÓN SE REESCRIBIÓ EL 2026-08-23 PORQUE LA ANTERIOR NO CALCULABA UN TTM.
+ *
+ * Sumaba `q.slice(skip, skip+4)` sobre los trimestres DISCRETOS ordenados por cierre, sin
+ * comprobar que fueran consecutivos. Y no lo son casi nunca, por dos motivos estructurales
+ * de cómo se presenta a la SEC:
+ *
+ *   · No existe el 10-Q del CUARTO trimestre fiscal: esa cifra va en el 10-K, y el trimestre
+ *     suelto hay que derivarlo (ejercicio − nueve meses). Así que en ingresos y resultado
+ *     falta un trimestre de cada cuatro, y la "ventana" saltaba al año anterior. Medido:
+ *     Apple y Microsoft cubrían 454 días en vez de 365.
+ *   · El estado de FLUJOS se presenta ACUMULADO. Los únicos periodos discretos de 80-100
+ *     días son los primeros trimestres. Resultado: el "flujo de explotación TTM" de Apple
+ *     sumaba el primer trimestre de 2026, 2025, 2024 y 2023 — **1.189 días** y 157,8 B,
+ *     cuando lo real ronda 110-120 B. El de JPMorgan salía en −729 B.
+ *
+ * Afectaba a `operatingMargin`, `roic` y `grossProfitability`, que son TRES DE LAS CINCO
+ * métricas de la señal de Scora Picks, además de a todos los ratios de valoración.
+ *
+ * LA FORMA CORRECTA, que es la que usa cualquiera que lea XBRL en serio:
+ *
+ *     TTM = acumulado del ejercicio en curso
+ *         + ejercicio anterior completo
+ *         − acumulado del ejercicio anterior hasta el mismo punto
+ *
+ * Sólo necesita periodos ACUMULADOS, que siempre están (son los que se presentan). Si no hay
+ * acumulado posterior al último ejercicio cerrado, se usa el ejercicio completo tal cual —que
+ * es lo correcto para un 20-F, que sólo presenta una vez al año.
+ */
+
+/** Todos los periodos de flujo visibles en `asOf`, deduplicados por (inicio, cierre). */
+function hechosFlujo(fj, tags, asOf, cur) {
+  const porClave = new Map();
   for (const t of tags) {
-    const q = quarters(facts(fj, t), asOf, cur);
-    if (q.length >= skip + 4) {
-      const s = q.slice(skip, skip + 4);
-      if (minEnd && s[0].end < minEnd) continue;         // ventana rancia: ver ANTIGUEDAD_MAX_DIAS
-      const cand = { val: s.reduce((a, x) => a + x.val, 0), latestFiled: s[0].filed, latestEnd: s[0].end, periodicidad: "trimestral" };
-      if (!best || cand.latestEnd > best.latestEnd) best = cand;
+    const arr = facts(fj, t)?.[cur];
+    if (!Array.isArray(arr)) continue;
+    for (const x of arr) {
+      if (!x.start || x.filed > asOf || x.end > asOf) continue;
+      const k = `${x.start}|${x.end}`;
+      const prev = porClave.get(k);
+      if (!prev || x.filed > prev.filed) porClave.set(k, x);
     }
   }
-  if (best || !permitirAnual) return best;
-  const saltoAnual = skip / 4;                       // skip=4 (un año atrás) → el 2º ejercicio
-  if (!Number.isInteger(saltoAnual)) return null;
-  for (const t of tags) {
-    const a = anuales(facts(fj, t), asOf, cur);
-    if (a.length >= saltoAnual + 1) {
-      const x = a[saltoAnual];
-      if (minEnd && x.end < minEnd) continue;
-      const cand = { val: x.val, latestFiled: x.filed, latestEnd: x.end, periodicidad: "anual" };
-      if (!best || cand.latestEnd > best.latestEnd) best = cand;
-    }
+  return [...porClave.values()];
+}
+
+const DIA = 86400000;
+const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / DIA);
+const diaSiguiente = (f) => new Date(new Date(f + "T00:00:00Z").getTime() + DIA).toISOString().slice(0, 10);
+/** Dos fechas "iguales" con holgura: los cierres fiscales de 52/53 semanas se mueven días. */
+const cerca = (a, b, tol = 7) => a != null && b != null && Math.abs(dias(a, b)) <= tol;
+
+/**
+ * Devuelve los TTM sucesivos (el actual y los anteriores) a partir de periodos acumulados.
+ * `n` es cuántos se piden hacia atrás: `skip=4` del código antiguo equivale al índice 1.
+ */
+function ttmSerie(hechos, n = 2) {
+  const anuales = hechos.filter((x) => { const d = dias(x.start, x.end); return d >= 330 && d <= 400; })
+    .sort((a, b) => b.end.localeCompare(a.end));
+  if (!anuales.length) return [];
+
+  // Longitud del acumulado en curso: define en qué punto del ejercicio estamos, y hay que
+  // usar la MISMA para el año anterior o la resta no compara lo mismo.
+  const fy0 = anuales[0];
+  const inicioSig = diaSiguiente(fy0.end);
+  const enCurso = hechos
+    .filter((x) => cerca(x.start, inicioSig) && x.end > fy0.end)
+    .sort((a, b) => b.end.localeCompare(a.end))[0] ?? null;
+  const L = enCurso ? dias(enCurso.start, enCurso.end) : null;
+
+  const out = [];
+  for (let k = 0; k < n; k++) {
+    const fy = anuales[k];
+    if (!fy) break;
+    if (L == null) { out.push({ val: fy.val, end: fy.end, filed: fy.filed, periodicidad: "anual" }); continue; }
+    const iniSig = diaSiguiente(fy.end);
+    const acum = hechos.find((x) => cerca(x.start, iniSig) && Math.abs(dias(x.start, x.end) - L) <= 10);
+    const acumPrev = hechos.find((x) => cerca(x.start, fy.start) && Math.abs(dias(x.start, x.end) - L) <= 10);
+    if (!acum || !acumPrev) { out.push({ val: fy.val, end: fy.end, filed: fy.filed, periodicidad: "anual" }); continue; }
+    out.push({
+      val: acum.val + fy.val - acumPrev.val,
+      end: acum.end,
+      filed: [acum.filed, fy.filed].sort().pop(),
+      periodicidad: "ttm",
+    });
   }
-  return best;
+  return out;
+}
+
+/**
+ * SEGUNDA VÍA: cuatro trimestres discretos REALMENTE CONSECUTIVOS.
+ *
+ * Hace falta porque no todo el mundo etiqueta el ejercicio completo. Medido a 2019-03-01:
+ * Kroger, Constellation Brands y Western Digital no publican ningún periodo anual en sus
+ * tags de ingresos —sólo acumulados y trimestres—, así que la vía de acumulados no les sirve.
+ *
+ * La diferencia con lo que hacía el código antiguo es la comprobación de CONTINUIDAD: cada
+ * trimestre tiene que empezar donde acaba el anterior. Sin ella se sumaban cuatro trimestres
+ * cualesquiera, y como no existe el 10-Q del cuarto trimestre fiscal, la ventana saltaba al
+ * año anterior y cubría 454 días en vez de 365.
+ */
+function ttmDeTrimestres(hechos, n = 2) {
+  const q = hechos.filter((x) => { const d = dias(x.start, x.end); return d >= 80 && d <= 100; })
+    .sort((a, b) => b.end.localeCompare(a.end));
+  const ventanas = [];
+  for (let i = 0; i + 4 <= q.length; i++) {
+    const s = q.slice(i, i + 4);
+    let contiguo = true;
+    for (let j = 0; j < 3; j++) if (!cerca(s[j].start, diaSiguiente(s[j + 1].end), 5)) { contiguo = false; break; }
+    if (!contiguo) continue;
+    ventanas.push({
+      val: s.reduce((a, x) => a + x.val, 0),
+      end: s[0].end,
+      filed: s.map((x) => x.filed).sort().pop(),
+      periodicidad: "trimestral",
+    });
+    if (ventanas.length >= n * 4) break;      // margen de sobra para elegir el de hace un año
+  }
+  if (!ventanas.length) return [];
+  const out = [ventanas[0]];
+  for (let k = 1; k < n; k++) {
+    // El de hace k años: la ventana cuyo cierre esté ~365·k días antes que la primera.
+    const objetivo = -365 * k;
+    const cand = ventanas.slice(1).filter((v) => Math.abs(dias(ventanas[0].end, v.end) - objetivo) <= 20);
+    if (!cand.length) break;
+    out.push(cand[0]);
+  }
+  return out;
+}
+
+function flowTTM(fj, tags, asOf, skip = 0, cur = "USD", permitirAnual = true, minEnd = null) {
+  const idx = skip / 4;
+  if (!Number.isInteger(idx)) return null;
+  const hechos = hechosFlujo(fj, tags, asOf, cur);
+  // Primero la vía de acumulados (la correcta y la que más cubre); si la empresa no publica
+  // ejercicios completos, la de cuatro trimestres contiguos. Nunca una ventana descosida.
+  let serie = ttmSerie(hechos, idx + 1);
+  let r = serie[idx];
+  if (!r) { serie = ttmDeTrimestres(hechos, idx + 1); r = serie[idx]; }
+  if (!r) return null;
+  if (!permitirAnual && r.periodicidad === "anual") return null;
+  if (minEnd && r.end < minEnd) return null;
+  return { val: r.val, latestFiled: r.filed, latestEnd: r.end, periodicidad: r.periodicidad };
 }
 
 /**
@@ -370,7 +478,14 @@ function sharesAsOf(fj, asOf) {
 // aceptaba, el hueco no se veía —se usaban ingresos de 2017 con activos de 2025—.
 const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "SalesRevenueNet", "RevenuesNetOfInterestExpense", "InterestAndDividendIncomeOperating",
              "RevenueFromContractWithCustomerIncludingAssessedTax",  // 15 de los 18 recuperados
-             "RegulatedAndUnregulatedOperatingRevenue"];             // eléctricas: DUK, NEE, DTE, XEL
+             "RegulatedAndUnregulatedOperatingRevenue",              // eléctricas: DUK, NEE, DTE, XEL
+             // ── Era anterior a ASC 606 (2018). Imprescindibles: la ventana 2011-2018 del
+             // backtest corre ENTERA en esa era, y sin estos tags empresas como Kroger o
+             // Constellation Brands no tienen ni un ejercicio anual con el que formar un TTM.
+             // Como `hechosFlujo` mezcla los periodos de TODOS los tags en un solo conjunto,
+             // el cambio de etiqueta de 2018 se salva solo: el acumulado nuevo y el ejercicio
+             // viejo conviven sin que haya que decidir cuál "gana".
+             "SalesRevenueGoodsNet", "SalesRevenueServicesNet", "RealEstateRevenueNet"];
 
 /**
  * SEGUNDO RECURSO para los ingresos: sólo se consulta si `REV` no ha dado NADA.
@@ -383,7 +498,12 @@ const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", 
  * con un número creíble. Consultándolo sólo cuando no hay otra cosa, ese riesgo desaparece.
  */
 const REV2 = ["OperatingLeaseLeaseIncome"];
-const NI = ["NetIncomeLoss"];
+// `ProfitLoss` NO es sólo IFRS: en US GAAP es el resultado INCLUYENDO minoritarios, y hay
+// bancos grandes que sólo etiquetan ese. PNC dejó `NetIncomeLoss` en 2014 y Truist en 2009;
+// los dos siguen publicando `ProfitLoss` cada trimestre. Sin esta línea se quedaban sin
+// resultado —y antes del guardián de antigüedad era peor: puntuaban con el beneficio de 2014—.
+// El orden es el desempate: primero lo atribuible a la matriz, que es la medida estándar.
+const NI = ["NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"];
 const GP = ["GrossProfit"];
 const COST = ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold"];
 const OI = ["OperatingIncomeLoss"];
@@ -436,8 +556,14 @@ const IFRS = {
 // sólo existe donde están todas: Beneish sale en el 37,5 % del índice y en el 8 % de la banca.
 const ICF = ["NetCashProvidedByUsedInInvestingActivities", "NetCashProvidedByUsedInInvestingActivitiesContinuingOperations"];
 const FCF_ = ["NetCashProvidedByUsedInFinancingActivities", "NetCashProvidedByUsedInFinancingActivitiesContinuingOperations"];
-const DCASH = ["CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
-               "CashAndCashEquivalentsPeriodIncreaseDecrease"];
+// DOS TAGS QUE NO SIGNIFICAN LO MISMO, y mezclarlos rompe la identidad de la caja: uno
+// INCLUYE el efecto del tipo de cambio sobre los saldos y el otro lo EXCLUYE. Si se suma el
+// efecto al que ya lo lleva, se corrige dos veces. Se extraen por separado para que
+// `lib/articulacion.ts` compare cada uno contra el lado que le corresponde.
+const DCASH_CON_FX = ["CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect"];
+const DCASH_SIN_FX = ["CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseExcludingExchangeRateEffect",
+                      "CashAndCashEquivalentsPeriodIncreaseDecrease",
+                      "IncreaseDecreaseInCashAndCashEquivalents"];
 // El CUARTO sumando del estado de flujos, y sin él la identidad de la caja NO cierra. Los tres
 // flujos (explotación, inversión, financiación) están en la moneda funcional; el saldo de caja
 // incluye además lo que el tipo de cambio hace con los saldos en divisa, que no es un flujo de
@@ -456,6 +582,29 @@ const RECV = ["AccountsReceivableNetCurrent", "ReceivablesNetCurrent", "Accounts
 const PPE = ["PropertyPlantAndEquipmentNet"];
 const INV = ["InventoryNet"];
 const GW = ["Goodwill"];
+// ── Fase F4 (2026-08-23) — el juego de métricas propio de BANCA y SEGUROS ────────────────
+// Un banco no presenta balance clasificado: no tiene activo corriente ni coste de ventas
+// porque su negocio no funciona así. Aplicarle el modelo industrial no es difícil, es
+// incorrecto — de ahí que 0 de 18 bancos lleguen a puntuar hoy (§2ter). Estos son los tags
+// con los que SÍ se les juzga. Cobertura medida (`research/banca_cobertura.mjs`, 2026-08-01):
+// en banca comercial, margen de intereses, comisiones, gastos de explotación y depósitos
+// están al 100 %; la calidad crediticia se queda en el 40 % y la solvencia regulatoria en el
+// 30 %, así que ESAS DOS NO SE CONSTRUYEN. En seguros, primas y siniestralidad ~80 %.
+const NII    = ["InterestIncomeExpenseNet", "InterestIncomeExpenseAfterProvisionForLoanLoss"];
+const INTINC = ["InterestAndDividendIncomeOperating", "InterestIncomeOperating"];
+const NONINT_INC = ["NoninterestIncome", "FeesAndCommissions"];
+const NONINT_EXP = ["NoninterestExpense"];
+const DEPOS  = ["Deposits", "InterestBearingDepositLiabilities"];
+const LOANS  = ["FinancingReceivableExcludingAccruedInterestBeforeAllowanceForCreditLoss",
+                "LoansAndLeasesReceivableNetReportedAmount",
+                "FinancingReceivableBeforeAllowanceForCreditLossNoncurrent"];
+const ALLOW  = ["FinancingReceivableAllowanceForCreditLosses",
+                "FinancingReceivableAllowanceForCreditLossExcludingAccruedInterest",
+                "LoansAndLeasesReceivableAllowance"];
+const PREMS  = ["PremiumsEarnedNet", "PremiumsEarnedNetPropertyAndCasualty", "PremiumsWritten"];
+const CLAIMS = ["PolicyholderBenefitsAndClaimsIncurredNet", "IncurredClaimsPropertyCasualtyAndLiability"];
+const ACQC   = ["DeferredPolicyAcquisitionCostAmortizationExpense"];
+
 const LIAB = ["Liabilities"];
 
 /**
@@ -478,6 +627,63 @@ const TEMPEQ = ["TemporaryEquityCarryingAmountIncludingPortionAttributableToNonc
                 "RedeemableNoncontrollingInterestEquityFairValue"];
 const NCI = ["MinorityInterest", "StockholdersEquityAttributableToNoncontrollingInterest"];
 const EQUITY = ["StockholdersEquity", "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest"];
+
+/**
+ * TTM DE VARIAS MAGNITUDES SOBRE UN CIERRE COMÚN.
+ *
+ * `fundamentalsAsOf` elige para cada tag su ventana más reciente, que es lo correcto para no
+ * perder un dato bueno por culpa de otro que va retrasado. Pero hay cuentas que RESTAN dos
+ * magnitudes, y ahí eso deja de valer: los devengos de Sloan son (resultado − flujo de
+ * explotación), y medido el 2026-08-22 esas dos sólo comparten cierre en el 47 % de los
+ * nombres, con una mediana de desfase de 91 días — justo un trimestre.
+ *
+ * La causa no es un fallo: el estado de flujos se presenta ACUMULADO en el ejercicio, así que
+ * los trimestres sueltos de caja aparecen con menos frecuencia que los de resultado. Restar
+ * un resultado de doce meses cerrados en junio de un flujo de doce meses cerrados en marzo no
+ * da un devengo: da un devengo más un trimestre de deriva.
+ *
+ * Esta función busca el cierre MÁS RECIENTE en el que TODAS las magnitudes pedidas tienen sus
+ * cuatro trimestres, y las devuelve ahí. Prefiere perder frescura antes que comparar dos
+ * fotos distintas. Si no hay ningún cierre común, devuelve null: no hay dato, y decirlo es
+ * mejor que inventar uno creíble.
+ */
+export async function ttmAlineado(cik, asOf, grupos) {
+  const fj = await companyFacts(cik);
+  if (!fj) return null;
+  const cur = reportingCurrency(fj) ?? "USD";
+  const usaIFRS = !!fj?.facts?.["ifrs-full"];
+
+  // Para cada grupo, el conjunto de cierres en los que tiene cuatro trimestres consecutivos
+  // disponibles, con el valor ya sumado.
+  const porGrupo = {};
+  for (const [nombre, spec] of Object.entries(grupos)) {
+    const tags = usaIFRS && spec.ifrs ? [...spec.tags, ...spec.ifrs] : spec.tags;
+    const mapa = new Map();
+    for (const t of tags) {
+      const q = quarters(facts(fj, t), asOf, cur);
+      for (let i = 0; i + 4 <= q.length; i++) {
+        const s = q.slice(i, i + 4);
+        // Los cuatro tienen que ser consecutivos de verdad: cuatro trimestres con un hueco en
+        // medio suman trece o quince meses y se parecen mucho a un TTM sin serlo.
+        const span = (new Date(s[0].end) - new Date(s[3].start)) / 86400000;
+        if (span < 330 || span > 400) continue;
+        if (!mapa.has(s[0].end)) mapa.set(s[0].end, s.reduce((a, x) => a + x.val, 0));
+      }
+    }
+    porGrupo[nombre] = mapa;
+  }
+
+  const nombres = Object.keys(grupos);
+  if (!nombres.length) return null;
+  const comunes = [...porGrupo[nombres[0]].keys()]
+    .filter((e) => nombres.every((n) => porGrupo[n].has(e)))
+    .sort();
+  const end = comunes[comunes.length - 1];
+  if (!end) return null;
+  const out = { end, currency: cur };
+  for (const n of nombres) out[n] = porGrupo[n].get(end);
+  return out;
+}
 
 /** Full point-in-time fundamentals for `cik` as known on `asOf` (YYYY-MM-DD). */
 export async function fundamentalsAsOf(cik, asOf) {
@@ -545,7 +751,9 @@ export async function fundamentalsAsOf(cik, asOf) {
   const equityI = IF_(T(EQUITY, "EQUITY")), equity = equityI?.val ?? null;
   const ltd = I(["LongTermDebtNoncurrent", "LongTermDebt"]);
   const ltdC = I(["LongTermDebtCurrent", "DebtCurrent"]);
-  const cfi = F(T(ICF, "ICF")), cff = F(T(FCF_, "FCF_")), dcash = F(T(DCASH, "DCASH")), fx = F(FX);
+  const cfi = F(T(ICF, "ICF")), cff = F(T(FCF_, "FCF_")), fx = F(FX);
+  const dcashCon = F(DCASH_CON_FX), dcashSin = F(DCASH_SIN_FX);
+  const dcash = dcashCon ?? dcashSin;
   const div = F(T(DIV, "DIV")), buyb = F(BUYB);
   const assetsI = IF_(["Assets"]), liabI = IF_(LIAB), nciI = IF_(T(NCI, "NCI")), tempI = IF_(TEMPEQ);
 
@@ -570,12 +778,23 @@ export async function fundamentalsAsOf(cik, asOf) {
     temporaryEquity: tempI?.val ?? null,
     costTTM: cost?.val ?? null,
     cfiTTM: cfi?.val ?? null, cffTTM: cff?.val ?? null, deltaCashTTM: dcash?.val ?? null,
+    deltaCashConFxTTM: dcashCon?.val ?? null, deltaCashSinFxTTM: dcashSin?.val ?? null,
     fxCashTTM: fx?.val ?? null,
     dividendsTTM: div?.val != null ? Math.abs(div.val) : null,
     buybacksTTM: buyb?.val != null ? Math.abs(buyb.val) : null,
 
     // ── Fase F2 · entradas de los modelos forenses ──────────────────────────────────────
     receivables: I(T(RECV, "RECV")), ppe: I(T(PPE, "PPE")), inventory: I(T(INV, "INV")), goodwill: I(GW),
+
+    // ── Fase F4 · banca y seguros ────────────────────────────────────────────────────────
+    niiTTM: F(NII)?.val ?? null,
+    intIncTTM: F(INTINC)?.val ?? null,
+    nonIntIncTTM: F(NONINT_INC)?.val ?? null,
+    nonIntExpTTM: F(NONINT_EXP)?.val ?? null,
+    deposits: I(DEPOS), loans: I(LOANS), loanAllowance: I(ALLOW),
+    premiumsTTM: F(PREMS)?.val ?? null,
+    claimsTTM: F(CLAIMS)?.val ?? null,
+    acqCostTTM: F(ACQC)?.val ?? null,
     sgaTTM: F(T(SGA, "SGA"))?.val ?? null, rndTTM: F(RND)?.val ?? null, sbcTTM: F(SBC)?.val ?? null,
 
     // ── Procedencia: sin esto, un dato anual y uno trimestral son indistinguibles ────────

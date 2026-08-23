@@ -333,10 +333,10 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
 
   // A2 · caja — el efecto del tipo de cambio es el cuarto sumando, no un ajuste opcional.
   eq(c(articular({ deltaCash: 100, ocf: 200, cfi: -150, cff: 50 }), "caja").ok, true, "caja: los tres flujos cuadran");
-  eq(c(articular({ deltaCash: 90, ocf: 200, cfi: -150, cff: 50, fxCash: -10 }), "caja").ok, true,
+  eq(c(articular({ deltaCashConFx: 90, ocf: 200, cfi: -150, cff: 50, fxCash: -10, assets: 200 }), "caja").ok, true,
      "caja: con divisa, el efecto del tipo de cambio cierra la identidad");
-  eq(c(articular({ deltaCash: 90, ocf: 200, cfi: -150, cff: 50 }), "caja").ok, false,
-     "caja: sin ese término, una multinacional descuadra estando bien");
+  eq(c(articular({ deltaCashSinFx: 90, ocf: 200, cfi: -150, cff: 50, assets: 200 }), "caja").ok, false,
+     "caja: 10 de descuadre sobre 200 de activo (5 %) sí es un fallo");
 
   // A4 · margen bruto
   eq(c(articular({ revenue: 1000, cost: 600, grossProfit: 400 }), "margen").ok, true, "margen: ingresos − coste = bruto");
@@ -375,6 +375,30 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   eq(c(desalineado, "balance").ok, null, "cierres distintos → balance NO comprobable (no fallo)");
   eq(c(desalineado, "margen").ok, null, "coste de 2011 con ingresos de 2026 → margen NO comprobable");
   eq(desalineado.confianza, "alta", "lo no comprobable no degrada la confianza: no es un defecto");
+
+  // ── La escala del desvío: la caja se mide contra el ACTIVO, no contra sí misma ─────────
+  // La variación de caja en doce meses ronda cero, así que un desvío relativo sobre esa base
+  // convierte el ruido en catástrofe. Medido: los peores "fallos" eran EXPD, PWR, TPR y LW,
+  // todos con los dos lados por debajo de 0,01 B. Escalado sobre el activo, 88,9 % → 99,2 %.
+  {
+    const ruido = { deltaCashConFx: -2e6, ocf: 500e6, cfi: -400e6, cff: -102e6, fxCash: 0, assets: 50e9 };
+    eq(c(articular(ruido), "caja").ok, true, "caja: 2 M de diferencia sobre 50.000 M de activo es ruido, no un fallo");
+    const deVerdad = { deltaCashConFx: -0.1e9, ocf: 1e9, cfi: -3e9, cff: -2.86e9, fxCash: 0, assets: 40e9 };
+    eq(c(articular(deVerdad), "caja").ok, false, "caja: 4,76 B sobre 40 B de activo SÍ es un descuadre (el caso JCI)");
+  }
+
+  // Las dos convenciones de variación de caja no son intercambiables.
+  {
+    // El activo hace de escala: se elige pequeño a propósito para que 10 de descuadre sea
+    // un 5 % y por tanto detectable. Con un activo grande, 10 es ruido — y ESE es el punto.
+    const flujos = { ocf: 200, cfi: -150, cff: 50, fxCash: -10, assets: 200 };
+    eq(c(articular({ ...flujos, deltaCashConFx: 90 }), "caja").ok, true,
+       "caja: la variación que INCLUYE el tipo de cambio se compara con los flujos + ese efecto");
+    eq(c(articular({ ...flujos, deltaCashSinFx: 100 }), "caja").ok, true,
+       "caja: la que lo EXCLUYE se compara con los flujos a secas");
+    eq(c(articular({ ...flujos, deltaCashConFx: 100 }), "caja").ok, false,
+       "caja: aplicar el efecto dos veces se detecta");
+  }
 
   // Sin mapa de periodos no se puede afirmar alineación, así que no se comprueba nada.
   eq(c(articularFundamentales({ assets: 1000, liabilities: 600, equity: 400 }), "balance").ok, null,

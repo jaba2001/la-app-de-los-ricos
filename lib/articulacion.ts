@@ -38,7 +38,13 @@ const num = (x: number | null | undefined): x is number => x != null && isFinite
  */
 export const TOLERANCIA = {
   balance: 0.01,
-  caja: 0.05,
+  /** ⚠️ La caja se mide CONTRA EL ACTIVO, no contra sí misma. La variación de caja en doce
+   *  meses suele rondar cero —una empresa acaba el año con un saldo parecido al de partida—,
+   *  así que una desviación relativa sobre esa base convierte diez millones de ruido en un
+   *  "178 % de desvío". Medido: los peores fallos de esta comprobación eran EXPD, PWR, TPR y
+   *  LW, todos con los dos lados por debajo de 0,01 B. Escalado sobre el activo, un 1 % es un
+   *  descuadre de verdad y el ruido desaparece. */
+  caja: 0.01,
   patrimonio: 0.25,
   margen: 0.01,
 } as const;
@@ -78,6 +84,10 @@ export interface ArticulacionInputs {
   cfi?: number | null;
   cff?: number | null;
   fxCash?: number | null;
+  /** Variación de caja según la convención que INCLUYE el efecto del tipo de cambio. */
+  deltaCashConFx?: number | null;
+  /** …y según la que lo excluye. Se compara cada una contra su lado. */
+  deltaCashSinFx?: number | null;
   // A3 · patrimonio.
   // `equityFin` es el patrimonio de cierre para ESTA identidad y va aparte de `equity` a
   // propósito: las dos comprobaciones exigen alineaciones distintas (el balance pide que
@@ -88,6 +98,9 @@ export interface ArticulacionInputs {
   netIncome?: number | null;
   dividends?: number | null;
   buybacks?: number | null;
+  /** Magnitud contra la que escalar el desvío de caja cuando no se pasa el activo (p. ej.
+   *  cuando el balance no está alineado y `assets` viene a null). */
+  escalaCaja?: number | null;
   // A4 · margen bruto
   revenue?: number | null;
   cost?: number | null;
@@ -111,12 +124,14 @@ function comparar(
   der: number | null | undefined,
   tol: number,
   faltan: string,
+  /** Magnitud estable contra la que medir el desvío (p. ej. el activo). Si no se pasa, se
+   *  mide contra el mayor de los dos lados — que sólo vale cuando ninguno puede ser ~0. */
+  escala?: number | null,
 ): Comprobacion {
   if (!num(izq) || !num(der)) {
     return { id, ok: null, izq: num(izq) ? izq : null, der: num(der) ? der : null, desvio: null, motivo: faltan };
   }
-  // Un denominador cero no admite desviación relativa; se compara en absoluto contra el otro lado.
-  const base = Math.max(Math.abs(izq), Math.abs(der));
+  const base = num(escala) && Math.abs(escala) > 0 ? Math.abs(escala) : Math.max(Math.abs(izq), Math.abs(der));
   if (base === 0) return { id, ok: true, izq, der, desvio: 0, motivo: "ambos lados son cero" };
   const desvio = Math.abs(izq - der) / base;
   const ok = desvio <= tol;
@@ -156,9 +171,16 @@ export function articular(inp: ArticulacionInputs): ArticulacionResult {
         + (num(inp.temporaryEquity) ? inp.temporaryEquity : 0)
       : null;
 
-  const flujoNeto = num(inp.ocf) && num(inp.cfi) && num(inp.cff)
-    ? inp.ocf + inp.cfi + inp.cff + (num(inp.fxCash) ? inp.fxCash : 0)
-    : null;
+  // La variación de caja se compara contra el lado que le corresponde: hay dos convenciones
+  // de presentación y el mismo número no vale para las dos. Si la empresa publica la que
+  // INCLUYE el efecto del tipo de cambio, ese efecto va sumado; si publica la que lo excluye,
+  // no. Mezclarlas corrige dos veces y hace "fallar" a multinacionales que están bien.
+  const sumaFlujos = num(inp.ocf) && num(inp.cfi) && num(inp.cff) ? inp.ocf + inp.cfi + inp.cff : null;
+  const fx = num(inp.fxCash) ? inp.fxCash : 0;
+  const conFx = num(inp.deltaCashConFx) ? inp.deltaCashConFx : null;
+  const sinFx = num(inp.deltaCashSinFx) ? inp.deltaCashSinFx : null;
+  const deltaCajaObs = conFx ?? sinFx ?? (num(inp.deltaCash) ? inp.deltaCash : null);
+  const flujoNeto = sumaFlujos == null ? null : (conFx != null ? sumaFlujos + fx : sumaFlujos);
 
   const netoEsperado =
     num(inp.equityPrev) && num(inp.netIncome)
@@ -170,8 +192,8 @@ export function articular(inp: ArticulacionInputs): ArticulacionResult {
   const comprobaciones: Comprobacion[] = [
     comparar("balance", inp.assets, pasivoMasNeto, TOLERANCIA.balance,
       "falta activo, pasivo o patrimonio al mismo cierre"),
-    comparar("caja", inp.deltaCash, flujoNeto, TOLERANCIA.caja,
-      "falta la variación de caja o alguno de los tres flujos"),
+    comparar("caja", deltaCajaObs, flujoNeto, TOLERANCIA.caja,
+      "falta la variación de caja o alguno de los tres flujos", inp.assets ?? inp.escalaCaja),
     comparar("patrimonio", inp.equityFin ?? inp.equity, netoEsperado, TOLERANCIA.patrimonio,
       "falta el patrimonio del ejercicio anterior o el resultado"),
     comparar("margen", inp.grossProfit, brutoEsperado, TOLERANCIA.margen,
@@ -237,6 +259,10 @@ export function articularFundamentales(f: Record<string, unknown>, fPrev?: Recor
     cfi: si(okCaja, n("cfiTTM")),
     cff: si(okCaja, n("cffTTM")),
     fxCash: si(okCaja, n("fxCashTTM")),
+    deltaCashConFx: si(okCaja, n("deltaCashConFxTTM")),
+    deltaCashSinFx: si(okCaja, n("deltaCashSinFxTTM")),
+    // La escala NO se alinea: sólo sirve para dar tamaño al desvío, no entra en la identidad.
+    escalaCaja: n("assets"),
     equityFin: si(okNeto, n("equity")),
     equityPrev: fPrev ? n("equity", fPrev) : null,
     netIncome: si(okNeto, n("niTTM")),
