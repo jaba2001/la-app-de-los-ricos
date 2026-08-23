@@ -217,6 +217,13 @@ export default async function PicksPage() {
           de razón. Es un sesgo sectorial permanente que va incluido en el precio — y conviene saber que en
           las dos ventanas del backtest los bancos rindieron por debajo del índice, así que no tenerlos ayudó.
           Cuánto de la ventaja histórica es eso y cuánto es selección <strong>todavía no está medido</strong>.
+          {" "}Desde el 23-08-2026 sí existe un juego de métricas propio de banca —margen de intereses,
+          eficiencia, peso de las comisiones, depósitos sobre activo—, y se ha comprobado que los datos
+          públicos lo sostienen para los 20 bancos comerciales del índice. Lo que <em>no</em> sostienen es la
+          calidad crediticia (40 %) ni la solvencia regulatoria (30 %), así que esas dos no se calculan:
+          ordenar por una métrica que sólo existe para el 40 % es ordenar la disponibilidad del dato.
+          Nada de eso entra todavía en esta cartera: meter bancos cambia la estrategia, no arregla un fallo,
+          y eso exige abrir una versión de reglas nueva y validarla antes.
         </p>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.7 }}>
           Se mide contra tres referencias, y la tercera es la que de verdad dice si seleccionar aporta algo: el

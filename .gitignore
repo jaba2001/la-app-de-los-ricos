@@ -57,3 +57,7 @@ research/out/*
 !research/out/health_scale_lab_oos.json
 !research/out/articulacion_lab.json
 !research/out/desfase_periodos.json
+!research/out/banca_cobertura.json
+!research/out/lideres_lab.json
+!research/out/forense_lab.json
+!research/out/forense_lab_oos.json

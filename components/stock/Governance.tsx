@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import { computeGovernance, jensenFcfTest, shareholderYield } from "@/lib/governance";
 import { accrualsRatio } from "@/lib/quality";
+import Articulacion from "./Articulacion";
 import { waccBridge } from "@/lib/valuation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 
@@ -183,6 +184,7 @@ export default function Governance({ ticker, data, rf }: Props) {
           medirse en el harness — pero medirse, no suponerse. Hasta que pasen el gate fuera de muestra son contexto.
         </div>
       </div>
+      <Articulacion data={data} />
     </div>
   );
 }
