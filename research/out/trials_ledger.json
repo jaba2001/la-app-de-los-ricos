@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-08-18T17:37:07.046Z",
-  "totalTrials": 204,
-  "artifacts": 27,
+  "generatedAt": "2026-08-24T15:33:09.763Z",
+  "totalTrials": 309,
+  "artifacts": 36,
   "isLowerBound": true,
   "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
-  "sharpeSamples": 127,
-  "sharpeMeanMonthly": 0.19944,
-  "sharpeStdDevMonthly": 0.11428,
+  "sharpeSamples": 137,
+  "sharpeMeanMonthly": 0.20431,
+  "sharpeStdDevMonthly": 0.11412,
   "entries": [
     {
       "file": "signals_ic.json",
@@ -15,6 +15,38 @@
       "trials": 27,
       "sharpesFound": 0,
       "generatedAt": "2026-08-18T17:35:33.320Z"
+    },
+    {
+      "file": "picks_rules_backtest_oos.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
+      "trials": 25,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T14:34:07.932Z"
+    },
+    {
+      "file": "picks_rules_backtest.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
+      "trials": 25,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T14:29:41.381Z"
+    },
+    {
+      "file": "quality_lowvol_lab_oos.json",
+      "lab": "quality_lowvol_lab",
+      "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
+      "trials": 14,
+      "sharpesFound": 4,
+      "generatedAt": "2026-08-24T14:14:16.826Z"
+    },
+    {
+      "file": "quality_lowvol_lab.json",
+      "lab": "quality_lowvol_lab",
+      "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
+      "trials": 14,
+      "sharpesFound": 4,
+      "generatedAt": "2026-08-24T14:13:15.218Z"
     },
     {
       "file": "beat_index_lab_2018-07-01.json",
@@ -47,6 +79,22 @@
       "trials": 10,
       "sharpesFound": 10,
       "generatedAt": "2026-07-10T22:55:36.708Z"
+    },
+    {
+      "file": "pillar_dilution_lab_oos.json",
+      "lab": "pillar_dilution_lab",
+      "note": "Pilares del score solos y en pares",
+      "trials": 10,
+      "sharpesFound": 1,
+      "generatedAt": "2026-08-24T14:17:08.592Z"
+    },
+    {
+      "file": "pillar_dilution_lab.json",
+      "lab": "pillar_dilution_lab",
+      "note": "Pilares del score solos y en pares",
+      "trials": 10,
+      "sharpesFound": 1,
+      "generatedAt": "2026-08-24T14:16:04.505Z"
     },
     {
       "file": "regime_sector_lab.json",
@@ -201,6 +249,22 @@
       "generatedAt": "2026-08-18T17:36:09.852Z"
     },
     {
+      "file": "forense_lab_oos.json",
+      "lab": "forense_lab",
+      "note": "Veto forense: devengos, Beneish y Piotroski",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T14:48:45.245Z"
+    },
+    {
+      "file": "forense_lab.json",
+      "lab": "forense_lab",
+      "note": "Veto forense: devengos, Beneish y Piotroski",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T14:44:08.838Z"
+    },
+    {
       "file": "momentum_lab_smoke.json",
       "lab": "momentum_lab",
       "note": "Señales de momentum (sesión 2026-08-17)",
@@ -214,7 +278,15 @@
       "note": "Barrido de N de la cartera de selección",
       "trials": 3,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-18T11:56:18.553Z"
+      "generatedAt": "2026-08-18T17:37:37.622Z"
+    },
+    {
+      "file": "lideres_lab.json",
+      "lab": "lideres_lab",
+      "note": "¿Repiten los mejores del año al siguiente?",
+      "trials": 1,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-23T17:54:53.635Z"
     },
     {
       "file": "factor_dist.json",
@@ -222,8 +294,21 @@
       "note": "Distribuciones de factores",
       "trials": 0,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-18T12:10:06.036Z"
+      "generatedAt": "2026-08-20T17:14:26.653Z"
     }
   ],
-  "uncounted": []
+  "uncounted": [
+    {
+      "file": "factor_dist_history.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "health_scale_lab.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "health_scale_lab_oos.json",
+      "reason": "forma no reconocida"
+    }
+  ]
 }

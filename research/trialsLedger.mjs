@@ -49,6 +49,21 @@ const LABS = [
   ["factor_dist", "Distribuciones de factores"],
   ["factor_lab", "Hipótesis de fricción: ¿la IC es mayor donde el arbitraje es caro?"],
   ["signals_ic", "IC por factor y régimen"],
+  // ── Añadidos el 24-08-2026. Todo el trabajo de Scora Picks se había quedado FUERA del
+  // recuento, y no es poco: la ablación de reglas son 10 variantes por ventana, el barrido de
+  // calidad son 4 señales × 10 tamaños × 2 ventanas, y el veto forense otras tantas. Cada
+  // ensayo no contado BAJA artificialmente el listón de significancia de todo lo demás, así
+  // que omitirlos hacía el Sharpe deflactado más permisivo justo donde más se ha buscado.
+  ["quality_lowvol_lab", "Señales de Picks: calidad, baja volatilidad y sus combinaciones"],
+  ["pillar_dilution_lab", "Pilares del score solos y en pares"],
+  ["health_scale_lab", "Escala y juego de métricas del pilar health"],
+  ["picks_rules_backtest", "Ablación de las reglas de Scora Picks"],
+  ["forense_lab", "Veto forense: devengos, Beneish y Piotroski"],
+  ["lideres_lab", "¿Repiten los mejores del año al siguiente?"],
+  // NO se cuentan `articulacion_lab`, `sanidad_metricas`, `desfase_periodos`,
+  // `banca_cobertura` ni `forense_solapamiento`: no contrastan ninguna hipótesis sobre el
+  // mercado. Son control de calidad del dato, y meterlos inflaría M sin motivo — que sería el
+  // error simétrico al de omitir los de arriba.
 ];
 
 /** Cuenta las variantes evaluadas en un artefacto. null = forma desconocida (se reporta). */
@@ -58,7 +73,27 @@ export function countTrials(json) {
   if (json.significance && Number.isFinite(json.significance.trials)) return json.significance.trials;
   const bag = json.results ?? json.report;
   if (Array.isArray(bag)) return bag.length;
-  if (bag && typeof bag === "object") return Object.keys(bag).length;
+  if (bag && typeof bag === "object") {
+    // `quality_lowvol_lab` evalúa además cada señal en 10 tamaños de cartera, y cada tamaño
+    // ES un ensayo: fue exactamente así como se descubrió que `TOP_N = 25` era el pico de la
+    // ventana mirada. Contar sólo las señales escondería el barrido que hace peligrosa la
+    // elección del parámetro.
+    const barrido = json.sizeSweep && typeof json.sizeSweep === "object" ? Object.keys(json.sizeSweep).length : 0;
+    return Object.keys(bag).length + barrido;
+  }
+  // picks_rules_backtest: cada variante de la ablación es un ensayo, y el barrido de umbrales
+  // otro por punto. Se habían quedado sin contar los dos.
+  if (json.ablacionReglas && typeof json.ablacionReglas === "object") {
+    const abl = Object.keys(json.ablacionReglas).length;
+    const sweep = json.barridoUmbrales && typeof json.barridoUmbrales === "object" ? Object.keys(json.barridoUmbrales).length : 0;
+    return abl + sweep;
+  }
+  // pillar_dilution_lab: cada pilar y cada par evaluado.
+  if (json["señales"] && typeof json["señales"] === "object") return Object.keys(json["señales"]).length;
+  // forense_lab: tres hipótesis, cada una con su configuración de veto.
+  if (json.HF1 && json.HF3) return 3;
+  // lideres_lab: una hipótesis (¿repiten los líderes?), medida sobre N años.
+  if (json.pruebaDeSignos) return 1;
   // regime_sector_lab: dos barridos independientes en el mismo fichero.
   if (json.regimeSectorExcess && json.regimeFactorExcess) {
     return Object.keys(json.regimeSectorExcess).length + Object.keys(json.regimeFactorExcess).length;
