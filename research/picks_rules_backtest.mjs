@@ -44,6 +44,7 @@ import { fileURLToPath } from "url";
 // un universo de laboratorio. Ver el guardián de `construirPanel`.
 import { loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { señalAt } from "./picksSignal.mjs";
+import { tickerToCik, sicSector } from "./edgar.mjs";
 import { returnsSeries } from "./prices.mjs";
 import { returnsSeriesLong } from "./pricesLong.mjs";
 import { addMonths, mean, std, fx, loadPanel, idxOnOrBefore } from "./momentumSignals.mjs";
@@ -310,7 +311,16 @@ async function refDe(ticker, eje) {
  *  Aquí cada día promedia SÓLO los nombres que estaban en el panel en la última fecha de
  *  decisión anterior o igual a ese día.
  */
-async function universoEW(eje) {
+/**
+ * `excluir` permite construir la MISMA referencia dejando fuera un conjunto de nombres.
+ *
+ * Existe para separar dos cosas que el resultado mezcla: **elegir bien** y **no tener bancos**.
+ * §2ter dejó medido que la señal no puntúa a ni uno de los 18 mayores bancos del índice, y que
+ * los bancos rindieron por debajo del SPY en las dos ventanas — así que parte de la ventaja
+ * podría ser simplemente no haberlos tenido. Comparando contra el universo elegible **sin
+ * financieros en ninguna de las dos partes**, lo que sobre es selección.
+ */
+async function universoEW(eje, excluir = null) {
   const porDia = eje.map(() => []);
   const idx = new Map(eje.map((d, i) => [d, i]));
   // Para cada día de mercado, qué fecha de decisión estaba vigente.
@@ -345,6 +355,24 @@ const { eje, soloPicks, conCaja, vivas } = await valorar(libro);
 const cPicks = curva(soloPicks);
 const cCaja = curva(conCaja);
 const ew = await universoEW(eje);
+
+// ── SESGO SECTORIAL (§11, medición pendiente desde el 2026-08-21) ─────────────────────────
+// Se marca como financiero a quien lo sea según el SIC de la SEC, y se rehace la referencia
+// equiponderada SIN ellos. Es la comparación que separa "elegimos bien" de "no tenemos bancos".
+const financieros = new Set();
+{
+  const vistos = new Set();
+  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) vistos.add(t);
+  for (const t of vistos) {
+    try {
+      const cik = await tickerToCik(t);
+      if (!cik) continue;
+      const sec = await sicSector(cik);
+      if (sec === "Financial Services" || sec === "Real Estate") financieros.add(t);
+    } catch { /* sin sector: se queda dentro, que es lo conservador */ }
+  }
+}
+const ewSinFin = await universoEW(eje, financieros);
 const spy = await refDe("SPY", eje);
 const rsp = await refDe("RSP", eje);
 
@@ -355,9 +383,16 @@ console.log(`  ${"".padEnd(34)}${"total".padStart(9)}${"CAGR".padStart(8)}${"Sha
 if (spy) fila("① SPY (comprar y mantener)", spy, null);
 if (rsp) fila("② RSP (equiponderado)", rsp, null);
 fila("③ universo elegible EW", ew, null);
+fila("③b universo elegible EW SIN financieros", ewSinFin, null);
 console.log(`  ${"-".repeat(77)}`);
 fila("Reglas · SÓLO PICKS (sin caja)", cPicks, ew.total);
 fila("Reglas · CON CAJA (suscriptor)", cCaja, ew.total);
+console.log(`  ${"-".repeat(77)}`);
+console.log(`  SESGO SECTORIAL — ¿cuánto de la ventaja es "no tener bancos"?`);
+console.log(`    financieros dentro del universo elegible: ${financieros.size} de ${new Set(fechasOk.flatMap((f) => Object.keys(PANEL[f]))).size} nombres`);
+console.log(`    vs universo EW  (con financieros)  ${((cCaja.total - ew.total >= 0 ? "+" : "") + (cCaja.total - ew.total).toFixed(0) + "pp")}`);
+console.log(`    vs universo EW  (SIN financieros)  ${((cCaja.total - ewSinFin.total >= 0 ? "+" : "") + (cCaja.total - ewSinFin.total).toFixed(0) + "pp")}`);
+console.log(`    → la diferencia entre las dos, ${((ewSinFin.total - ew.total >= 0 ? "+" : "") + (ewSinFin.total - ew.total).toFixed(0) + "pp")}, es lo que aportaban los financieros a la referencia.`);
 
 // ── Lo que sólo se ve simulando las reglas ──────────────────────────────────────────────
 const mesesRampa = vivas.findIndex((v) => v >= TOP_N);
@@ -466,7 +501,10 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
   span: { from: eje[0], to: eje.at(-1), decisiones: fechasOk.length, diasMercado: eje.length },
   benchmarks: { spy: spy && { total: fx(spy.total, 1), cagr: fx(spy.cagr, 2), sharpe: fx(spy.sharpe, 2), maxDD: fx(spy.maxDD, 1) },
                 rsp: rsp && { total: fx(rsp.total, 1), sharpe: fx(rsp.sharpe, 2), maxDD: fx(rsp.maxDD, 1) },
-                universoEW: { total: fx(ew.total, 1), cagr: fx(ew.cagr, 2), sharpe: fx(ew.sharpe, 2), maxDD: fx(ew.maxDD, 1) } },
+                universoEW: { total: fx(ew.total, 1), cagr: fx(ew.cagr, 2), sharpe: fx(ew.sharpe, 2), maxDD: fx(ew.maxDD, 1) },
+                universoEWSinFinancieros: { total: fx(ewSinFin.total, 1), cagr: fx(ewSinFin.cagr, 2), sharpe: fx(ewSinFin.sharpe, 2), maxDD: fx(ewSinFin.maxDD, 1),
+                  financierosExcluidos: financieros.size,
+                  nota: "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)." } },
   carteras: { soloPicks: { total: fx(cPicks.total, 1), cagr: fx(cPicks.cagr, 2), sharpe: fx(cPicks.sharpe, 2), maxDD: fx(cPicks.maxDD, 1) },
               conCaja: { total: fx(cCaja.total, 1), cagr: fx(cCaja.cagr, 2), sharpe: fx(cCaja.sharpe, 2), maxDD: fx(cCaja.maxDD, 1) } },
   mecanica: { posiciones: libro.length, mesesHastaLlenar: mesesRampa < 0 ? null : +(mesesRampa / 21).toFixed(1),

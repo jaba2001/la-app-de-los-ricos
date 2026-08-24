@@ -74,7 +74,7 @@ export async function loadSP500Historical() {
         // respaldo justo para el día en que hace falta.
         if (byDate.length) {
           try { if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true }); writeFileSync(CACHE_CSV, text); } catch { /* la caché es un extra, no un requisito */ }
-          return byDate;
+          return await conFotoDeHoy(byDate);
         }
       }
     } catch { /* reintento */ }
@@ -85,15 +85,118 @@ export async function loadSP500Historical() {
       const byDate = parseSP500Csv(readFileSync(CACHE_CSV, "utf8"));
       if (byDate.length) {
         console.warn(`  ⚠ universo: GitHub no responde; se usa la copia local (${byDate.at(-1).date}).`);
-        return byDate;
+        return await conFotoDeHoy(byDate);
       }
     }
   } catch { /* cae a null */ }
   return null;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LA FOTO DE HOY — porque la histórica lleva parada desde el 2025-08-23
+//
+// `sp500_historical_components.csv` es point-in-time y sirve para el backtest, pero su última
+// fila es del 2025-08-23 y aguas arriba no se actualiza. Para el cron eso es un problema que
+// CRECE SOLO: cada alta y cada baja del índice desde entonces es invisible, y a los 366 días
+// medidos son 28 nombres de 503 (un 5,6 %).
+//
+// Esta segunda fuente sí está mantenida (`datasets/s-and-p-500-companies`, actualizada cada
+// pocos días) y trae además el CIK de cada miembro.
+//
+// ⚠️ CORRIGE UNA AFIRMACIÓN FALSA que estuvo en `SCORA_PICKS_REGLAS.md` §2: allí se decía que
+// los sustitutos gratuitos traen "tickers equivocados" y se citaban `FISV`, `MRSH`, `Q` y
+// `ECHO`. **No lo son.** Comprobado contra data.sec.gov el 2026-08-24, la SEC asocia esos
+// tickers exactos a esos CIK: `Q` es Qnity Electronics (escisión de DuPont), `ECHO` es
+// EchoStar, `MRSH` es Marsh & McLennan y `FISV` es Fiserv. Son tickers ACTUALES que no se
+// reconocieron. La que trae los viejos es la foto congelada — de hecho `MANUAL_CIK` ya tenía
+// que mapear `BK`→BNY y `MMC`→MRSH justamente por eso.
+// ─────────────────────────────────────────────────────────────────────────────
+const SP500_HOY_URL = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv";
+const CACHE_HOY = join(CACHE_DIR, "sp500_actual.csv");
+
+/** Parsea el CSV de miembros actuales. Puro: se testea sin red. Devuelve [{ticker, cik}]. */
+export function parseSP500Actual(text) {
+  const lineas = text.trim().split(String.fromCharCode(10)).slice(1);
+  const out = [];
+  for (const ln of lineas) {
+    // CSV con comillas: la sede lleva comas dentro.
+    const campos = []; let cur = "", dentro = false;
+    for (const ch of ln) {
+      if (ch === '"') dentro = !dentro;
+      else if (ch === "," && !dentro) { campos.push(cur); cur = ""; }
+      else cur += ch;
+    }
+    campos.push(cur);
+    const ticker = (campos[0] || "").trim().toUpperCase();
+    const cik = (campos[6] || "").trim();
+    if (!/^[A-Z][A-Z0-9.-]{0,6}$/.test(ticker)) continue;
+    out.push({ ticker, cik: /^[0-9]+$/.test(cik) ? cik.padStart(10, "0") : null });
+  }
+  return out;
+}
+
+/**
+ * Descarga la foto de HOY. Devuelve null si no hay red y no hay copia local: quien la llame
+ * decide si eso es aceptable — para el cron NO lo es, y por eso `loadSP500Historical` sólo la
+ * añade cuando existe de verdad.
+ */
+export async function loadSP500Actual() {
+  for (let a = 0; a < 3; a++) {
+    try {
+      const r = await fetch(SP500_HOY_URL);
+      if (r.ok) {
+        const text = await r.text();
+        const filas = parseSP500Actual(text);
+        // 400 es un suelo deliberado: el índice tiene ~503 y una respuesta mucho menor es un
+        // error de la fuente, no un índice que ha encogido. Cachear eso envenenaría el respaldo.
+        if (filas.length >= 400) {
+          try { writeFileSync(CACHE_HOY, text); } catch { /* la caché es un extra */ }
+          return filas;
+        }
+      }
+    } catch { /* reintento */ }
+    await sleep(600 * (a + 1));
+  }
+  try {
+    if (existsSync(CACHE_HOY)) {
+      const filas = parseSP500Actual(readFileSync(CACHE_HOY, "utf8"));
+      if (filas.length >= 400) return filas;
+    }
+  } catch { /* cae a null */ }
+  return null;
+}
+
+/** ticker → CIK de los miembros ACTUALES, según la fuente mantenida. Es un mapa independiente
+ *  de `company_tickers.json` de la SEC, así que sirve de segunda opinión. */
+export async function cikDeMiembrosActuales() {
+  const filas = await loadSP500Actual();
+  if (!filas) return null;
+  const m = new Map();
+  for (const f of filas) if (f.cik) m.set(f.ticker, f.cik);
+  return m;
+}
+
 /** Fecha de la foto de miembros más reciente de la tabla. Es la que hay que PUBLICAR: dice
  *  sobre qué universo se decidió, que no es lo mismo que la fecha de la decisión. */
+/**
+ * Añade la foto de HOY como una instantánea más, si es posterior a la última histórica.
+ *
+ * No reescribe la historia: la tabla point-in-time del backtest sigue intacta y las fechas
+ * anteriores resuelven exactamente igual que antes. Lo único que cambia es que una decisión
+ * de HOY ve el índice de hoy en vez del de hace un año.
+ *
+ * Si la fuente mantenida no responde se devuelve la tabla tal cual y el aviso de antigüedad
+ * del cron se encarga del resto: mejor un universo viejo y declarado que ninguno.
+ */
+async function conFotoDeHoy(byDate) {
+  const ultima = byDate[byDate.length - 1]?.date ?? "0000-00-00";
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (hoy <= ultima) return byDate;
+  const filas = await loadSP500Actual();
+  if (!filas) return byDate;
+  return [...byDate, { date: hoy, tickers: filas.map((f) => f.ticker) }];
+}
+
 export function snapshotDate(table) {
   return table?.length ? table[table.length - 1].date : null;
 }

@@ -214,7 +214,7 @@ function periodos(units, asOf, unit, minDias, maxDias) {
   const arr = units?.[unit];
   if (!Array.isArray(arr)) return [];
   const q = arr.filter((x) => {
-    if (!x.start || x.filed > asOf) return false;
+    if (!x.start || x.filed > asOf || !esEstadoFinanciero(x)) return false;
     const days = (new Date(x.end) - new Date(x.start)) / 86400000;
     return days >= minDias && days <= maxDias;
   });
@@ -239,7 +239,7 @@ function anuales(units, asOf, unit = "USD") {
 function instantFull(units, asOf, unit = "USD") {
   const arr = units?.[unit];
   if (!Array.isArray(arr)) return null;
-  const rows = arr.filter((x) => !x.start && x.filed <= asOf && x.end <= asOf);
+  const rows = arr.filter((x) => !x.start && x.filed <= asOf && x.end <= asOf && esEstadoFinanciero(x));
   if (!rows.length) return null;
   rows.sort((a, b) => b.end.localeCompare(a.end) || b.filed.localeCompare(a.filed));
   return { val: rows[0].val, end: rows[0].end, filed: rows[0].filed };
@@ -281,6 +281,26 @@ function instant(units, asOf, unit = "USD") {
  * es lo correcto para un 20-F, que sólo presenta una vez al año.
  */
 
+/**
+ * SÓLO ESTADOS FINANCIEROS. Un `DEF 14A` no es un balance.
+ *
+ * `companyfacts` mezcla los hechos de TODOS los documentos que la empresa presenta, y algunos
+ * etiquetan el mismo concepto y el mismo periodo con otra escala. Encontrado el 2026-08-24:
+ *
+ *   FedEx · NetIncomeLoss · 2025-06-01 → 2026-05-31
+ *     · del 10-K  (presentado 2026-07-20):  4.433.000.000
+ *     · del DEF 14A (presentado 2026-08-17):        4.433   ← en MILLONES
+ *
+ * El informe de retribuciones se presenta DESPUÉS del 10-K, así que la regla de «gana el más
+ * reciente» se quedaba con el de 4.433 dólares. FedEx salía con un resultado de cuatro mil
+ * dólares sobre 94.720 millones de ingresos, y un PER de cinco cifras. Medtronic, igual.
+ *
+ * No se puede arreglar mirando la magnitud —eso sería adivinar—: se arregla no leyendo cifras
+ * de documentos que no son estados financieros.
+ */
+const FORMULARIOS_CONTABLES = /^(10-K|10-Q|20-F|40-F|6-K)/;
+const esEstadoFinanciero = (x) => !x.form || FORMULARIOS_CONTABLES.test(x.form);
+
 /** Todos los periodos de flujo visibles en `asOf`, deduplicados por (inicio, cierre). */
 function hechosFlujo(fj, tags, asOf, cur) {
   const porClave = new Map();
@@ -289,6 +309,7 @@ function hechosFlujo(fj, tags, asOf, cur) {
     if (!Array.isArray(arr)) continue;
     for (const x of arr) {
       if (!x.start || x.filed > asOf || x.end > asOf) continue;
+      if (!esEstadoFinanciero(x)) continue;
       const k = `${x.start}|${x.end}`;
       const prev = porClave.get(k);
       if (!prev || x.filed > prev.filed) porClave.set(k, x);

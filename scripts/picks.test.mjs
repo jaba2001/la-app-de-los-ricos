@@ -11,7 +11,7 @@ import {
   PERSISTENCE_DAYS, QUARANTINE_MONTHS, EXIT_CONSECUTIVE, MAX_PRICE_LAG_DAYS,
 } from "../lib/picks.ts";
 import { percentilesDe, metricasDe, METRICAS_CALIDAD, MIN_METRICAS } from "../research/picksSignal.mjs";
-import { parseSP500Csv, snapshotDate, membersAsOf } from "../research/universe.mjs";
+import { parseSP500Csv, snapshotDate, membersAsOf, parseSP500Actual } from "../research/universe.mjs";
 import { cubreLaCache } from "../research/prices.mjs";
 import { universeSnapshots } from "../lib/picksData.ts";
 import { articular, articularFundamentales, TOLERANCIA } from "../lib/articulacion.ts";
@@ -537,6 +537,33 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   ok(!marcas.has("PARCIAL"), "un Piotroski sobre 6 pruebas NO se compara con un umbral de 9");
   eq(cobertura.beneish, 3, "la cobertura de Beneish se cuenta y se publica");
   eq(cobertura.piotroski, 3, "y la de Piotroski también: un veto parcial es un sesgo si no se dice");
+}
+
+// ── LA FOTO DE HOY (`parseSP500Actual`) ─────────────────────────────────────────────────
+// La tabla histórica lleva parada desde el 2025-08-23 y aguas arriba no se actualiza. Para el
+// cron eso es un problema que crece solo: a los 366 días medidos, 28 nombres de 503 estaban
+// mal. La segunda fuente sí está mantenida y trae el CIK de cada miembro.
+{
+  const csv = [
+    "Symbol,Security,GICS Sector,GICS Sub-Industry,Headquarters Location,Date added,CIK,Founded",
+    'MMM,3M,Industrials,Industrial Conglomerates,"Saint Paul, Minnesota",1957-03-04,66740,1902',
+    'Q,Qnity Electronics,Information Technology,Semiconductors,"Wilmington, Delaware",2025-11-03,2058873,2025',
+    "BF.B,Brown-Forman,Consumer Staples,Distillers,Louisville,1982-10-31,14693,1870",
+    "MALO,,,,,,,",                       // sin CIK: entra igual, el CIK es opcional
+    ",,,,,,,",                            // fila vacía: se descarta
+  ].join("\n");
+  const filas = parseSP500Actual(csv);
+  eq(filas.length, 4, "se parsean las filas con ticker válido y se descarta la vacía");
+  eq(filas[0], { ticker: "MMM", cik: "0000066740" }, "el CIK se normaliza a diez dígitos");
+  eq(filas[1].ticker, "Q", "un ticker de UNA letra es válido — `Q` es Qnity Electronics, no un error");
+  eq(filas[2].ticker, "BF.B", "la clase con punto se conserva tal cual la publica la fuente");
+  eq(filas[3].cik, null, "sin CIK numérico se devuelve null, no una cadena rara");
+
+  // La sede lleva comas dentro de comillas: si el parser no las respeta, el CIK sale de otra
+  // columna — y un CIK equivocado ingiere los estados financieros de OTRA empresa sin fallar.
+  ok(filas[0].cik === "0000066740", "las comas dentro de comillas no desplazan las columnas");
+
+  eq(parseSP500Actual("Symbol,Security\n").length, 0, "un CSV sin filas no inventa miembros");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T14:34:07.932Z",
+  "generatedAt": "2026-08-24T15:56:44.606Z",
   "window": "2011-2018",
   "rules": {
     "entry": 0.8,
@@ -34,6 +34,14 @@
       "cagr": 13.56,
       "sharpe": 0.95,
       "maxDD": -20.2
+    },
+    "universoEWSinFinancieros": {
+      "total": 174.8,
+      "cagr": 13.56,
+      "sharpe": 0.95,
+      "maxDD": -20.2,
+      "financierosExcluidos": 18,
+      "nota": "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)."
     }
   },
   "carteras": {
