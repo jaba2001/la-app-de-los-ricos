@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T14:13:15.218Z",
+  "generatedAt": "2026-08-24T16:20:42.956Z",
   "window": "2019-2026",
   "quarters": 28,
   "topN": 40,
@@ -30,11 +30,11 @@
       "vsEW": -3.1
     },
     "15": {
-      "total": 172.1,
-      "cagr": 15.37,
-      "sharpe": 0.78,
+      "total": 176.4,
+      "cagr": 15.63,
+      "sharpe": 0.79,
       "maxDD": -31.2,
-      "vsEW": 41.5
+      "vsEW": 45.8
     },
     "20": {
       "total": 181.8,
@@ -62,46 +62,46 @@
       "cagr": 14.66,
       "sharpe": 0.77,
       "maxDD": -29.8,
-      "vsEW": 29.9
+      "vsEW": 30
     },
     "50": {
       "total": 175.6,
       "cagr": 15.58,
       "sharpe": 0.81,
       "maxDD": -26.9,
-      "vsEW": 44.9
+      "vsEW": 45
     },
     "75": {
-      "total": 161.1,
-      "cagr": 14.7,
+      "total": 162.7,
+      "cagr": 14.8,
       "sharpe": 0.78,
       "maxDD": -26.4,
-      "vsEW": 30.5
+      "vsEW": 32.1
     },
     "100": {
-      "total": 134.2,
-      "cagr": 12.93,
+      "total": 134.5,
+      "cagr": 12.95,
       "sharpe": 0.71,
-      "maxDD": -28.3,
-      "vsEW": 3.6
+      "maxDD": -28.2,
+      "vsEW": 3.9
     },
     "150": {
-      "total": 121.9,
-      "cagr": 12.06,
+      "total": 122.7,
+      "cagr": 12.12,
       "sharpe": 0.68,
       "maxDD": -26.6,
-      "vsEW": -8.7
+      "vsEW": -7.9
     }
   },
   "avgUniverseSize": 466,
   "results": {
     "Calidad": {
-      "ic": 0.0156,
+      "ic": 0.0159,
       "total": 160.6,
       "cagr": 14.66,
       "sharpe": 0.77,
       "maxDD": -29.8,
-      "vsEW": 29.9
+      "vsEW": 30
     },
     "Baja volatilidad": {
       "ic": -0.0534,
@@ -112,7 +112,7 @@
       "vsEW": -67.9
     },
     "Calidad + baja vol": {
-      "ic": -0.0382,
+      "ic": -0.0381,
       "total": 75.3,
       "cagr": 8.35,
       "sharpe": 0.57,
@@ -120,12 +120,12 @@
       "vsEW": -55.3
     },
     "Score v1 (actual)": {
-      "ic": -0.0066,
-      "total": 142.5,
-      "cagr": 13.49,
-      "sharpe": 0.72,
+      "ic": -0.0063,
+      "total": 138.8,
+      "cagr": 13.24,
+      "sharpe": 0.71,
       "maxDD": -29.1,
-      "vsEW": 11.9
+      "vsEW": 8.2
     }
   },
   "criteria": {

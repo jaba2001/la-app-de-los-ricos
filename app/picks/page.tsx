@@ -197,13 +197,15 @@ export default async function PicksPage() {
             </div>
             {fotos.length > 0 && (
               <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
-                <strong>El universo es una foto fija, y conviene saberlo:</strong> la lista de miembros del
-                S&amp;P 500 que usa el sistema es la del{" "}
-                {fotos.length === 1 ? fotos[0] : fotos.join(", ")}, porque la fuente pública y gratuita de la
-                que sale dejó de actualizarse ese día. Las altas y bajas del índice posteriores no se ven: una
-                empresa que entró después no puede ser comprada. Los sustitutos gratuitos que se revisaron
-                traen tickers equivocados, así que se prefiere un universo fijo y declarado a uno que envejece
-                en silencio. Se registra en cada decisión.
+                <strong>Sobre qué universo se decidió:</strong> la lista de miembros del S&amp;P 500 usada en
+                cada decisión fue la del{" "}
+                {fotos.length === 1 ? fotos[0] : fotos.join(", ")}, y queda registrada con la decisión para
+                que se pueda comprobar después. <strong>Hasta el 24 de agosto de 2026 esa foto llevaba 366
+                días parada</strong>, porque la fuente histórica dejó de actualizarse y aquí se dijo —
+                equivocadamente — que no había sustituto: los candidatos que se revisaron parecían traer
+                tickers erróneos y resultó que eran los tickers <em>actuales</em>, comprobados uno a uno contra
+                los registros de la SEC. Corregido: ahora la foto es del día. Las decisiones tomadas antes de
+                esa fecha se tomaron sobre el índice de agosto de 2025 y no se reescriben.
               </p>
             )}
           </section>
