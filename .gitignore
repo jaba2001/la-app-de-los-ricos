@@ -62,3 +62,5 @@ research/out/*
 !research/out/forense_lab.json
 !research/out/forense_lab_oos.json
 !research/out/forense_veredicto.json
+!research/out/sanidad_metricas.json
+!research/out/forense_solapamiento.json
