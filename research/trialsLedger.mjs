@@ -60,6 +60,7 @@ const LABS = [
   ["picks_rules_backtest", "Ablación de las reglas de Scora Picks"],
   ["forense_lab", "Veto forense: devengos, Beneish y Piotroski"],
   ["lideres_lab", "¿Repiten los mejores del año al siguiente?"],
+  ["bab_lab", "Betting-against-beta en forma long-only top-N"],
   // NO se cuentan `articulacion_lab`, `sanidad_metricas`, `desfase_periodos`,
   // `banca_cobertura` ni `forense_solapamiento`: no contrastan ninguna hipótesis sobre el
   // mercado. Son control de calidad del dato, y meterlos inflaría M sin motivo — que sería el
@@ -92,6 +93,9 @@ export function countTrials(json) {
   if (json["señales"] && typeof json["señales"] === "object") return Object.keys(json["señales"]).length;
   // forense_lab: tres hipótesis, cada una con su configuración de veto.
   if (json.HF1 && json.HF3) return 3;
+  // bab_lab: tres hipótesis. Si la puerta previa lo retiró, NO cuenta como ensayo — no se
+  // llegó a contrastar nada contra los retornos.
+  if (json.puerta) return json.retirada ? 0 : 3;
   // lideres_lab: una hipótesis (¿repiten los líderes?), medida sobre N años.
   if (json.pruebaDeSignos) return 1;
   // regime_sector_lab: dos barridos independientes en el mismo fichero.

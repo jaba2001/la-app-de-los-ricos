@@ -136,6 +136,12 @@ const PUERTA = 0.85;
 const mismaSenal = rhoMedio != null && Math.abs(rhoMedio) > PUERTA;
 console.log(`\n  ${mismaSenal ? `✖ PUERTA CERRADA: |${rhoMedio.toFixed(3)}| > ${PUERTA}. Beta y volatilidad ordenan el universo igual.\n    La hipótesis se RETIRA sin contrastarse y NO cuenta como ensayo.`
   : `✓ puerta abierta: |${rhoMedio?.toFixed(3)}| ≤ ${PUERTA}. Beta y volatilidad NO son la misma señal.`}`);
+// Pasar por poco no es pasar limpio, y conviene que lo diga el propio laboratorio.
+if (!mismaSenal && rhoMedio != null && Math.abs(rhoMedio) > 0.7) {
+  console.log(`  ⚠ pero pasa por poco: comparten el ${(rhoMedio ** 2 * 100).toFixed(0)} % de su varianza de rangos.`);
+  console.log(`    Lo que se mida aquí va a parecerse a lo que ya midió quality_lowvol_lab, y los dos`);
+  console.log(`    resultados hay que leerlos juntos, no como hallazgos independientes.`);
+}
 
 const salida = {
   generatedAt: new Date().toISOString(), window: VENTANA, topN: TOP_N, fechas: fechas.length,
@@ -180,11 +186,19 @@ const utiles = Object.keys(fwd).filter((f) => Object.keys(fwd[f]).length >= 40);
 console.log(`  ${utiles.length} fechas con rentabilidad futura utilizable\n`);
 if (utiles.length < 12) { console.error("  ✖ muy pocas fechas"); process.exit(1); }
 
-const ENTRADA = 0.70;
-/** Universo elegible en una fecha: con señal de calidad por encima del umbral Y con beta. */
+/**
+ * UNIVERSO ELEGIBLE = los nombres CON SEÑAL, sin filtro de percentil.
+ *
+ * Es la definición que usa el resto del repositorio: `universoEW` en `picks_rules_backtest.mjs`
+ * mete a todos los que aparecen en el panel, no sólo a los que superan p70. Aquí se había
+ * colado el filtro de entrada por descuido, y el efecto fue silencioso y grande: en 2011-2018
+ * sólo hay entre 26 y 57 nombres por encima de p70, así que "elegir 40 de 45" no es
+ * seleccionar — y con el mínimo de 60 fechas útiles la ventana entera salía con CERO
+ * observaciones, reportadas como «dentro del ruido» en vez de como el fallo que eran.
+ */
 const elegibles = (f) => {
   const sig = senal.panel[f] ?? {}, bs = panelBeta[f] ?? {};
-  return Object.keys(sig).filter((t) => sig[t] >= ENTRADA && bs[t] != null && fwd[f]?.[t] != null);
+  return Object.keys(sig).filter((t) => bs[t] != null && fwd[f]?.[t] != null);
 };
 /** Todos los que tienen beta y retorno, sin filtro de calidad (la referencia EW). */
 const conBeta = (f) => Object.keys(panelBeta[f] ?? {}).filter((t) => fwd[f]?.[t] != null);
@@ -238,12 +252,20 @@ console.log("  ══ HB3 · ¿es beta bajo sólo un proxy de sector? ═══�
   console.log(`  MDE (antes de mirar): ${mdeB != null ? mdeB.toFixed(1) + " pp" : "—"}   ·   fechas: ${brutos.length}`);
   console.log(`  beta bajo, BRUTO             vs universo EW: ${mB?.toFixed(2)} pp  ±${seB?.toFixed(2)}`);
   console.log(`  beta bajo, NEUTRAL POR SECTOR vs universo EW: ${mN?.toFixed(2)} pp  ±${seN?.toFixed(2)}`);
-  const sobrevive = mN != null && mB != null && (mB <= 0 || mN / mB >= 0.5);
-  console.log(`\n  ${sobrevive ? "✓ HB3 pasa: la ventaja NO es sólo sector" : "✖ HB3 FALLA: al neutralizar por sector se evapora — es una apuesta sectorial"}`);
+  // TRES desenlaces, no dos. Decir «pasa» cuando el efecto bruto es NEGATIVO sería engañoso:
+  // no hay ventaja que pueda ser un proxy de sector, así que el falsador se queda sin objeto.
+  // Un criterio que sólo sabe aprobar o suspender convierte «no hay nada» en «está limpio».
+  const hayVentaja = mB != null && mB > 0;
+  const sobrevive = hayVentaja && mN != null && mN / mB >= 0.5;
+  const veredictoHB3 = !hayVentaja ? "vacío" : sobrevive ? "pasa" : "falla";
+  console.log(`\n  ${veredictoHB3 === "vacío"
+    ? `○ HB3 NO SE PUEDE EVALUAR: el efecto bruto es NEGATIVO (${mB.toFixed(2)} pp). No hay ventaja\n    que pueda ser un proxy de sector — hay una desventaja. El falsador queda sin objeto.`
+    : sobrevive ? "✓ HB3 pasa: la ventaja NO es sólo sector"
+    : "✖ HB3 FALLA: al neutralizar por sector se evapora — es una apuesta sectorial"}`);
   const top5 = [...sectoresTop.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
   const tot = [...sectoresTop.values()].reduce((s, x) => s + x, 0);
   console.log(`\n  sectores del top 40 por beta bajo: ${top5.map(([s, n]) => `${s} ${Math.round(100 * n / tot)}%`).join(" · ")}`);
-  salida.HB3 = { bruto: mB, seBruto: seB, neutral: mN, seNeutral: seN, mde: mdeB, fechas: brutos.length, pasa: sobrevive,
+  salida.HB3 = { bruto: mB, seBruto: seB, neutral: mN, seNeutral: seN, mde: mdeB, fechas: brutos.length, veredicto: veredictoHB3, pasa: sobrevive,
                  sectoresTop: Object.fromEntries(top5.map(([s, n]) => [s, +(100 * n / tot).toFixed(1)])) };
 }
 
@@ -253,12 +275,15 @@ console.log("\n  ══ HB1 · ¿bate el beta bajo al universo elegible? ══�
   const dif = [];
   for (const f of utiles) {
     const uni = elegibles(f);
-    if (uni.length < 60) continue;
+    if (uni.length < 2 * TOP_N) continue;   // menos del doble de la cartera no es selección
     const bs = panelBeta[f];
     const ew = media(uni.map((t) => fwd[f][t]));
     const c = cartera(f, uni, (t) => -bs[t]);
     if (c) dif.push(c.ret - ew);
   }
+  // Sin observaciones no hay resultado, y decir «dentro del ruido» sobre una muestra vacía es
+  // indistinguible de decirlo sobre una de verdad. Misma lección que en `lideres_lab`.
+  if (dif.length < 12) { console.error(`  ✖ sólo ${dif.length} fechas utilizables: HB1 NO se evalúa.`); process.exit(1); }
   const m = media(dif), se = neweyWest(dif), mde = se != null ? 2.8 * se : null;
   console.log(`  MDE (antes de mirar): ${mde != null ? mde.toFixed(1) + " pp" : "—"}   ·   fechas: ${dif.length}`);
   console.log(`  top 40 por beta bajo vs universo elegible EW: ${m?.toFixed(2)} pp  ±${se?.toFixed(2)}  t = ${m != null && se ? (m / se).toFixed(2) : "—"}`);
@@ -273,7 +298,7 @@ console.log("\n  ══ HB2 · calidad + beta bajo, ¿bate a cada una por separa
   const vsCal = [], vsBeta = [], vsEW = [];
   for (const f of utiles) {
     const uni = elegibles(f);
-    if (uni.length < 60) continue;
+    if (uni.length < 2 * TOP_N) continue;   // menos del doble de la cartera no es selección
     const bs = panelBeta[f], sig = senal.panel[f];
     const ew = media(uni.map((t) => fwd[f][t]));
     // Percentil dentro del universo elegible para poder sumar las dos ordenaciones.
@@ -288,6 +313,7 @@ console.log("\n  ══ HB2 · calidad + beta bajo, ¿bate a cada una por separa
     vsBeta.push(combo.ret - soloBeta.ret);
     vsEW.push(combo.ret - ew);
   }
+  if (vsCal.length < 12) { console.error(`  ✖ sólo ${vsCal.length} fechas utilizables: HB2 NO se evalúa.`); process.exit(1); }
   const f2 = (a) => ({ m: media(a), se: neweyWest(a) });
   const c1 = f2(vsCal), c2 = f2(vsBeta), c3 = f2(vsEW);
   console.log(`  fechas: ${vsCal.length}`);

@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-08-24T15:33:09.763Z",
-  "totalTrials": 309,
-  "artifacts": 36,
+  "generatedAt": "2026-08-24T20:18:37.348Z",
+  "totalTrials": 315,
+  "artifacts": 38,
   "isLowerBound": true,
   "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
   "sharpeSamples": 137,
-  "sharpeMeanMonthly": 0.20431,
-  "sharpeStdDevMonthly": 0.11412,
+  "sharpeMeanMonthly": 0.20422,
+  "sharpeStdDevMonthly": 0.11409,
   "entries": [
     {
       "file": "signals_ic.json",
@@ -22,7 +22,7 @@
       "note": "Ablación de las reglas de Scora Picks",
       "trials": 25,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T14:34:07.932Z"
+      "generatedAt": "2026-08-24T16:59:01.237Z"
     },
     {
       "file": "picks_rules_backtest.json",
@@ -30,7 +30,7 @@
       "note": "Ablación de las reglas de Scora Picks",
       "trials": 25,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T14:29:41.381Z"
+      "generatedAt": "2026-08-24T16:54:47.585Z"
     },
     {
       "file": "quality_lowvol_lab_oos.json",
@@ -38,7 +38,7 @@
       "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
       "trials": 14,
       "sharpesFound": 4,
-      "generatedAt": "2026-08-24T14:14:16.826Z"
+      "generatedAt": "2026-08-24T16:22:39.003Z"
     },
     {
       "file": "quality_lowvol_lab.json",
@@ -46,7 +46,7 @@
       "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
       "trials": 14,
       "sharpesFound": 4,
-      "generatedAt": "2026-08-24T14:13:15.218Z"
+      "generatedAt": "2026-08-24T16:20:42.956Z"
     },
     {
       "file": "beat_index_lab_2018-07-01.json",
@@ -86,7 +86,7 @@
       "note": "Pilares del score solos y en pares",
       "trials": 10,
       "sharpesFound": 1,
-      "generatedAt": "2026-08-24T14:17:08.592Z"
+      "generatedAt": "2026-08-24T16:27:49.188Z"
     },
     {
       "file": "pillar_dilution_lab.json",
@@ -94,7 +94,7 @@
       "note": "Pilares del score solos y en pares",
       "trials": 10,
       "sharpesFound": 1,
-      "generatedAt": "2026-08-24T14:16:04.505Z"
+      "generatedAt": "2026-08-24T16:25:59.006Z"
     },
     {
       "file": "regime_sector_lab.json",
@@ -241,6 +241,22 @@
       "generatedAt": "2026-08-18T02:56:18.874Z"
     },
     {
+      "file": "bab_lab_oos.json",
+      "lab": "bab_lab",
+      "note": "Betting-against-beta en forma long-only top-N",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T20:16:27.441Z"
+    },
+    {
+      "file": "bab_lab.json",
+      "lab": "bab_lab",
+      "note": "Betting-against-beta en forma long-only top-N",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T20:16:50.823Z"
+    },
+    {
       "file": "factor_lab.json",
       "lab": "factor_lab",
       "note": "Hipótesis de fricción: ¿la IC es mayor donde el arbitraje es caro?",
@@ -254,7 +270,7 @@
       "note": "Veto forense: devengos, Beneish y Piotroski",
       "trials": 3,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T14:48:45.245Z"
+      "generatedAt": "2026-08-24T17:11:48.059Z"
     },
     {
       "file": "forense_lab.json",
@@ -262,7 +278,7 @@
       "note": "Veto forense: devengos, Beneish y Piotroski",
       "trials": 3,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T14:44:08.838Z"
+      "generatedAt": "2026-08-24T17:07:43.186Z"
     },
     {
       "file": "momentum_lab_smoke.json",
