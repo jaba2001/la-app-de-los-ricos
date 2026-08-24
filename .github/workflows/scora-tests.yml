@@ -3,11 +3,19 @@ name: Scora — tests (golden + red-team + build)
 # Continuous verification of the guarantees that must never silently regress:
 #  1. the pure calculation core (golden.test.mjs) — the math behind every score,
 #  2. the AI grounding gate (redteam_grounding.mjs) — "the AI can't hallucinate figures",
-#  3. type safety, the CSS system, and that the app actually builds.
+#  3. the Scora Picks rules engine and the accounting-integrity layer,
+#  4. type safety, the CSS system, and that the app actually builds.
 #
-# (1) and (2) protect the moat and need no dependencies. (3) was previously verified by
-# hand on every batch ("tsc --noEmit EXIT 0" in the roadmap notes) — that's discipline,
-# not a guarantee, so it runs here now. All headless, deterministic, no secrets.
+# ⚠️ TODOS los pasos van DESPUÉS de `npm ci`, y esto se corrigió el 2026-08-24.
+#
+# El golden test y el red-team estaban antes, con el comentario «no necesitan dependencias».
+# Dejó de ser cierto en algún momento: `lib/horizon.ts` ganó un store compartido con
+# `useSyncExternalStore`, y el golden lo importa por sus exports NO-React. El import de
+# `react` se ejecuta igual, así que el paso moría con ERR_MODULE_NOT_FOUND en 11 segundos.
+#
+# **El CI llevaba al menos doce ejecuciones seguidas en rojo por esto**, o sea que las
+# garantías que este fichero dice proteger no se estaban comprobando. Un CI en rojo permanente
+# es un CI que nadie lee — y entonces da igual lo que verifique.
 on:
   push:
     branches: [main]
@@ -30,14 +38,13 @@ jobs:
           node-version: "22"
           cache: npm
 
-      # Steps 1-2 run without node_modules — they only need the type-stripping loader.
+      - name: Install dependencies
+        run: npm ci
+
       - name: Golden tests (calculation core)
         run: node --experimental-strip-types --no-warnings scripts/golden.test.mjs
       - name: Red-team the grounding gate
         run: node --experimental-strip-types --no-warnings research/redteam_grounding.mjs
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: P2 maths self-tests
         run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
