@@ -61,3 +61,4 @@ research/out/*
 !research/out/lideres_lab.json
 !research/out/forense_lab.json
 !research/out/forense_lab_oos.json
+!research/out/forense_veredicto.json

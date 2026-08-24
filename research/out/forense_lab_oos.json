@@ -1,0 +1,375 @@
+{
+ "ventana": "2011-2018",
+ "fechas": 168,
+ "horizonteMeses": 12,
+ "entrada": 0.7,
+ "HF3": {
+  "tasaTop": 0.13102595797280595,
+  "tasaResto": 0.07575334821428571,
+  "diferencia": 0.05527260975852023,
+  "se": 0.020752694264725813,
+  "mde": 0.05810754394123227,
+  "pasa": true,
+  "nTop": 809,
+  "nResto": 7168,
+  "ganadoresVetados": [
+   {
+    "fecha": "2012-11-01",
+    "t": "TRIP",
+    "ret": 183.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-10-01",
+    "t": "TRIP",
+    "ret": 145.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-03-15",
+    "t": "NVDA",
+    "ret": 143.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-04-17",
+    "t": "NVDA",
+    "ret": 140.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-11-15",
+    "t": "TRIP",
+    "ret": 139.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-10-15",
+    "t": "TRIP",
+    "ret": 134.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-12-03",
+    "t": "TRIP",
+    "ret": 127.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-03-01",
+    "t": "NVDA",
+    "ret": 126.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2013-03-01",
+    "t": "TRIP",
+    "ret": 119.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-09-04",
+    "t": "TRIP",
+    "ret": 115.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-05-01",
+    "t": "NVDA",
+    "ret": 113.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-04-03",
+    "t": "NVDA",
+    "ret": 108.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-08-15",
+    "t": "TRIP",
+    "ret": 107.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-08-01",
+    "t": "TRIP",
+    "ret": 107.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2013-02-15",
+    "t": "TRIP",
+    "ret": 105.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-09-17",
+    "t": "TRIP",
+    "ret": 103.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2013-03-15",
+    "t": "TRIP",
+    "ret": 96.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-07-17",
+    "t": "CPRI",
+    "ret": 96.1,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-06-15",
+    "t": "CPRI",
+    "ret": 94.7,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2013-01-15",
+    "t": "TRIP",
+    "ret": 91,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-12-17",
+    "t": "TRIP",
+    "ret": 86.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-05-15",
+    "t": "NVDA",
+    "ret": 83.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2013-01-02",
+    "t": "TRIP",
+    "ret": 82.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-07-03",
+    "t": "CPRI",
+    "ret": 81.7,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-06-01",
+    "t": "CPRI",
+    "ret": 80.9,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-05-01",
+    "t": "CPRI",
+    "ret": 80.8,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-04-17",
+    "t": "CPRI",
+    "ret": 79.1,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-06-01",
+    "t": "NVDA",
+    "ret": 79,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-08-01",
+    "t": "CPRI",
+    "ret": 78.9,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-05-15",
+    "t": "CPRI",
+    "ret": 76.7,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2011-03-01",
+    "t": "MA",
+    "ret": 75.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-06-15",
+    "t": "NVDA",
+    "ret": 74.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-10-15",
+    "t": "STX",
+    "ret": 72.5,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2011-03-15",
+    "t": "MA",
+    "ret": 71.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2016-05-16",
+    "t": "SWKS",
+    "ret": 71.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-03-01",
+    "t": "CPRI",
+    "ret": 71.4,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2017-07-03",
+    "t": "NVDA",
+    "ret": 70.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-02-15",
+    "t": "CPRI",
+    "ret": 70.1,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2014-05-15",
+    "t": "UAA",
+    "ret": 68,
+    "motivos": [
+     "devengos",
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2013-02-01",
+    "t": "TRIP",
+    "ret": 66.7,
+    "motivos": [
+     "devengos"
+    ]
+   }
+  ]
+ },
+ "HF1": {
+  "spread": -4.386082690809106,
+  "se": 2.0069617016531693,
+  "mde": 5.619492764628874,
+  "t": -2.1854341750498842,
+  "fechas": 168,
+  "nObs": 7908,
+  "significativo": false,
+  "signo": "−"
+ },
+ "HF2": {
+  "marcadosEnTop40": 553,
+  "deTop40": 6720,
+  "pct": 8.2,
+  "nota": "sin potencia: comprobación, no evidencia"
+ },
+ "cobertura": {
+  "accruals": 7908,
+  "beneish": 2474,
+  "piotroski": 3440,
+  "total": 7977
+ },
+ "veredicto": {
+  "construir": false,
+  "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
+  "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
+ },
+ "generatedAt": "2026-08-24T13:25:49.612Z",
+ "parametros": {
+  "BENEISH_UMBRAL": -1.78,
+  "PIOTROSKI_MIN": 3,
+  "ACCRUALS_PCTL": 0.9,
+  "ENTRADA": 0.7,
+  "HORIZONTE_MESES": 12
+ },
+ "orden": "HF3 se ejecuta primero y manda: si el veto castiga a los ganadores, HF1 y HF2 son irrelevantes."
+}
