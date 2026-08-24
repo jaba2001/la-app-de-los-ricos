@@ -15,6 +15,8 @@ import { parseSP500Csv, snapshotDate, membersAsOf } from "../research/universe.m
 import { cubreLaCache } from "../research/prices.mjs";
 import { universeSnapshots } from "../lib/picksData.ts";
 import { articular, articularFundamentales, TOLERANCIA } from "../lib/articulacion.ts";
+import { ttmSerie, ttmDeTrimestres } from "../research/edgar.mjs";
+import { devengos, vetados } from "../research/forenseSignal.mjs";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -403,6 +405,138 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   // Sin mapa de periodos no se puede afirmar alineación, así que no se comprueba nada.
   eq(c(articularFundamentales({ assets: 1000, liabilities: 600, equity: 400 }), "balance").ok, null,
      "sin mapa de periodos no se da por buena la alineación");
+}
+
+// ── EL TTM: DOCE MESES DE VERDAD (`research/edgar.mjs`) ─────────────────────────────────
+// Fijan el arreglo del 2026-08-23, que es el mayor de la sesión: `flowTTM` sumaba cuatro
+// trimestres discretos SIN comprobar que fueran consecutivos, y casi nunca lo son. El "flujo
+// de explotación a doce meses" de Apple sumaba el primer trimestre de 2026, 2025, 2024 y
+// 2023 —1.189 días— y el de JPMorgan salía en −729 B. Afectaba a tres de las cinco métricas
+// de la señal.
+{
+  // Un presentador de calendario natural: ejercicio 2025 completo + acumulados de 2026.
+  const anual = (ini, fin, val) => ({ start: ini, end: fin, val, filed: fin });
+  const hechos = [
+    anual("2025-01-01", "2025-12-31", 1000),   // ejercicio anterior completo
+    anual("2024-01-01", "2024-12-31", 900),    // el de antes
+    anual("2026-01-01", "2026-03-31", 300),    // acumulado en curso (3 meses)
+    anual("2025-01-01", "2025-03-31", 250),    // el mismo tramo del año pasado
+    anual("2024-01-01", "2024-03-31", 200),    // y del anterior
+  ];
+  const serie = ttmSerie(hechos, 2);
+  // TTM = acumulado en curso + ejercicio anterior − acumulado del año pasado
+  eq(serie[0].val, 300 + 1000 - 250, "TTM = acumulado + ejercicio anterior − acumulado del año pasado");
+  eq(serie[0].end, "2026-03-31", "el TTM cierra donde cierra el acumulado en curso");
+  eq(serie[0].periodicidad, "ttm", "se etiqueta como TTM, no como anual");
+  // El de hace un año usa el MISMO tramo, o compararía cosas distintas.
+  eq(serie[1].val, 250 + 900 - 200, "el TTM del año anterior usa el mismo tramo del ejercicio");
+
+  // Sin acumulado posterior al último ejercicio (un 20-F, o justo tras el cierre) se usa el
+  // ejercicio tal cual. Es el caso de Microsoft en junio: TTM = ejercicio, y hay que decirlo.
+  const soloAnuales = [anual("2025-01-01", "2025-12-31", 1000), anual("2024-01-01", "2024-12-31", 900)];
+  const s2 = ttmSerie(soloAnuales, 2);
+  eq(s2[0].val, 1000, "sin acumulado en curso, el TTM es el ejercicio completo");
+  eq(s2[0].periodicidad, "anual", "y se etiqueta ANUAL: un dato anual y uno TTM no son lo mismo");
+  eq(s2[1].val, 900, "el anterior es el ejercicio de antes");
+
+  eq(ttmSerie([], 2).length, 0, "sin ejercicios no hay TTM (no se inventa uno)");
+}
+
+// ── La vía de cuatro trimestres: CONTIGÜIDAD OBLIGATORIA ────────────────────────────────
+{
+  const q = (ini, fin, val) => ({ start: ini, end: fin, val, filed: fin });
+  // Cuatro trimestres encadenados de verdad.
+  const seguidos = [
+    q("2026-01-01", "2026-03-31", 40), q("2025-10-01", "2025-12-31", 30),
+    q("2025-07-01", "2025-09-30", 20), q("2025-04-01", "2025-06-30", 10),
+  ];
+  eq(ttmDeTrimestres(seguidos, 1)[0].val, 100, "cuatro trimestres contiguos suman el TTM");
+  eq(ttmDeTrimestres(seguidos, 1)[0].end, "2026-03-31", "cierra en el más reciente");
+
+  // Y el caso que rompía todo: falta el CUARTO trimestre fiscal (no existe su 10-Q), así que
+  // la "ventana" saltaba al año anterior y cubría 15 meses. Ahora se rechaza.
+  const conHueco = [
+    q("2026-01-01", "2026-03-31", 40), q("2025-10-01", "2025-12-31", 30),
+    q("2025-07-01", "2025-09-30", 20), q("2025-01-01", "2025-03-31", 10),   // salta un trimestre
+  ];
+  eq(ttmDeTrimestres(conHueco, 1).length, 0, "con un hueco NO se suma: no serían doce meses (el caso Apple)");
+
+  // Y el caso del flujo de caja: cuatro primeros trimestres de cuatro años distintos.
+  const cuatroPrimeros = [
+    q("2026-01-01", "2026-03-31", 40), q("2025-01-01", "2025-03-31", 30),
+    q("2024-01-01", "2024-03-31", 20), q("2023-01-01", "2023-03-31", 10),
+  ];
+  eq(ttmDeTrimestres(cuatroPrimeros, 1).length, 0, "cuatro primeros trimestres de años distintos NO son un TTM (el caso JPMorgan)");
+
+  eq(ttmDeTrimestres(seguidos.slice(0, 3), 1).length, 0, "con menos de cuatro no hay ventana");
+}
+
+// ── SEÑAL FORENSE (`research/forenseSignal.mjs`) ────────────────────────────────────────
+// El veto NO está en producción (medido y descartado el 24-08-2026: HF1 cambia de signo entre
+// ventanas). Estos tests fijan el COMPORTAMIENTO del cálculo igualmente, porque los modelos
+// se siguen publicando como capa explicativa y porque si algún día se reabre la hipótesis
+// tiene que hacerse sobre el mismo código que se midió.
+{
+  // Los devengos EXIGEN que resultado y flujo sean del mismo cierre. Hoy coinciden en el
+  // 100 % de los nombres, pero la garantía tiene que estar en el código y no en la memoria
+  // de que un día se arregló.
+  const base = { niTTM: 100, ocfTTM: 60, assets: 1000,
+                 periodos: { ni: "2026-06-30", ocf: "2026-06-30" } };
+  eq(devengos(base), 0.04, "devengos = (resultado − flujo) / activo");
+  eq(devengos({ ...base, periodos: { ni: "2026-06-30", ocf: "2026-03-31" } }), null,
+     "cierres distintos → NO se calcula (sería un devengo más un trimestre de deriva)");
+  eq(devengos({ ...base, periodos: { ni: "2026-06-30", ocf: null } }), null, "sin cierre no se calcula");
+  eq(devengos({ ...base, assets: 0 }), null, "sin activo positivo no hay ratio");
+  eq(devengos({}), null, "sin mapa de periodos no se calcula");
+
+  // Un beneficio con MÁS caja detrás que resultado da devengos negativos: eso es bueno.
+  ok(devengos({ ...base, ocfTTM: 140 }) < 0, "más caja que beneficio → devengos negativos (mejor calidad)");
+}
+
+{
+  // El veto de devengos es SECTOR-RELATIVO: el circulante de una tecnológica y el de una
+  // distribuidora no se parecen, y un umbral común marcaría sectores enteros.
+  const filas = [];
+  for (let i = 0; i < 20; i++) filas.push({ t: `T${i}`, accruals: i / 100, beneish: null, piotroski: null });
+  for (let i = 0; i < 20; i++) filas.push({ t: `D${i}`, accruals: 1 + i / 100, beneish: null, piotroski: null });
+  const sectorDe = (t) => (t.startsWith("T") ? "Technology" : "Consumer Defensive");
+
+  const { marcas, cobertura } = vetados(filas, { sectorDe });
+  eq(cobertura.accruals, 40, "cobertura de devengos: los 40");
+  eq(cobertura.total, 40, "total de la cohorte");
+  // Con percentil 90 y 20 nombres por sector, se marca a los peores de CADA sector.
+  const marcadosT = [...marcas.keys()].filter((t) => t.startsWith("T")).length;
+  const marcadosD = [...marcas.keys()].filter((t) => t.startsWith("D")).length;
+  ok(marcadosT > 0 && marcadosD > 0, "se marca dentro de CADA sector, no sólo en el peor");
+  ok(marcadosT === marcadosD, "y en la misma proporción: el umbral es relativo al sector");
+  // Sin el corte sectorial, los 20 de "D" (todos con devengos altos) se llevarían el veto entero.
+  const { marcas: sinSector } = vetados(filas, { sectorDe: () => "ALL" });
+  ok([...sinSector.keys()].every((t) => t.startsWith("D")),
+     "con un umbral común se marca a un sector entero — que es justo lo que hay que evitar");
+}
+
+{
+  // Un sector con menos de 8 nombres no admite percentil: sería una anécdota.
+  const pocos = [{ t: "A", accruals: 0.5 }, { t: "B", accruals: 0.01 }, { t: "C", accruals: 0.02 }];
+  const { marcas } = vetados(pocos, { sectorDe: () => "Raro" });
+  eq(marcas.size, 0, "con menos de 8 nombres no se calcula percentil sectorial");
+}
+
+{
+  // Beneish y Piotroski: umbrales absolutos del artículo original, y la cobertura se declara.
+  const filas = [
+    { t: "LIMPIA", accruals: null, beneish: -3.0, piotroski: 8, piotroskiMax: 9 },
+    { t: "SOSPECHA", accruals: null, beneish: -1.0, piotroski: 8, piotroskiMax: 9 },
+    { t: "DEBIL", accruals: null, beneish: -3.0, piotroski: 2, piotroskiMax: 9 },
+    { t: "PARCIAL", accruals: null, beneish: null, piotroski: 2, piotroskiMax: 6 },
+  ];
+  const { marcas, cobertura } = vetados(filas, {});
+  ok(!marcas.has("LIMPIA"), "M por debajo de −1,78 y F alto: no se marca");
+  eq(marcas.get("SOSPECHA"), ["beneish"], "M > −1,78 marca por Beneish");
+  eq(marcas.get("DEBIL"), ["piotroski"], "F ≤ 3 sobre 9 marca por Piotroski");
+  ok(!marcas.has("PARCIAL"), "un Piotroski sobre 6 pruebas NO se compara con un umbral de 9");
+  eq(cobertura.beneish, 3, "la cobertura de Beneish se cuenta y se publica");
+  eq(cobertura.piotroski, 3, "y la de Piotroski también: un veto parcial es un sesgo si no se dice");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);

@@ -307,7 +307,7 @@ const cerca = (a, b, tol = 7) => a != null && b != null && Math.abs(dias(a, b)) 
  * Devuelve los TTM sucesivos (el actual y los anteriores) a partir de periodos acumulados.
  * `n` es cuántos se piden hacia atrás: `skip=4` del código antiguo equivale al índice 1.
  */
-function ttmSerie(hechos, n = 2) {
+export function ttmSerie(hechos, n = 2) {
   const anuales = hechos.filter((x) => { const d = dias(x.start, x.end); return d >= 330 && d <= 400; })
     .sort((a, b) => b.end.localeCompare(a.end));
   if (!anuales.length) return [];
@@ -352,7 +352,7 @@ function ttmSerie(hechos, n = 2) {
  * cualesquiera, y como no existe el 10-Q del cuarto trimestre fiscal, la ventana saltaba al
  * año anterior y cubría 454 días en vez de 365.
  */
-function ttmDeTrimestres(hechos, n = 2) {
+export function ttmDeTrimestres(hechos, n = 2) {
   const q = hechos.filter((x) => { const d = dias(x.start, x.end); return d >= 80 && d <= 100; })
     .sort((a, b) => b.end.localeCompare(a.end));
   const ventanas = [];
