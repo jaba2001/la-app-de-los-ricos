@@ -4,14 +4,14 @@
  "horizonteMeses": 12,
  "entrada": 0.7,
  "HF3": {
-  "tasaTop": 0.13280212483399734,
-  "tasaResto": 0.07387548406315163,
-  "diferencia": 0.05892664077084571,
-  "se": 0.022923605128202584,
-  "mde": 0.06418609435896723,
+  "tasaTop": 0.12916111850865514,
+  "tasaResto": 0.07352062163777645,
+  "diferencia": 0.055640496870878686,
+  "se": 0.022957646013106826,
+  "mde": 0.06428140883669911,
   "pasa": true,
-  "nTop": 753,
-  "nResto": 6714,
+  "nTop": 751,
+  "nResto": 6692,
   "ganadoresVetados": [
    {
     "fecha": "2012-11-01",
@@ -340,33 +340,33 @@
   ]
  },
  "HF1": {
-  "spread": 0.03047992824339918,
-  "se": 2.2658317795061675,
-  "mde": 6.344328982617268,
-  "t": 0.013451981969306744,
+  "spread": -0.15232474934978657,
+  "se": 2.2272268205287347,
+  "mde": 6.236235097480456,
+  "t": -0.06839211343262529,
   "fechas": 168,
-  "nObs": 7405,
+  "nObs": 7381,
   "significativo": false,
-  "signo": "+"
+  "signo": "−"
  },
  "HF2": {
-  "marcadosEnTop40": 530,
+  "marcadosEnTop40": 525,
   "deTop40": 6720,
-  "pct": 7.9,
+  "pct": 7.8,
   "nota": "sin potencia: comprobación, no evidencia"
  },
  "cobertura": {
-  "accruals": 7405,
-  "beneish": 3134,
-  "piotroski": 4558,
-  "total": 7467
+  "accruals": 7381,
+  "beneish": 3126,
+  "piotroski": 4549,
+  "total": 7443
  },
  "veredicto": {
   "construir": false,
   "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
   "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
  },
- "generatedAt": "2026-08-24T14:48:45.245Z",
+ "generatedAt": "2026-08-24T17:11:48.059Z",
  "parametros": {
   "BENEISH_UMBRAL": -1.78,
   "PIOTROSKI_MIN": 3,

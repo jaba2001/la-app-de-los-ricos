@@ -1,38 +1,38 @@
 {
- "generatedAt": "2026-08-24T14:48:47.411Z",
+ "generatedAt": "2026-08-24T17:11:48.613Z",
  "ventanas": {
   "reciente": "2019-2026",
   "antigua": "2011-2018"
  },
  "HF1": {
   "spread": {
-   "reciente": -0.368635854480488,
-   "antigua": 0.03047992824339918
+   "reciente": -0.23255080903243822,
+   "antigua": -0.15232474934978657
   },
   "t": {
-   "reciente": -0.12389407508888609,
-   "antigua": 0.013451981969306744
+   "reciente": -0.07993427918826246,
+   "antigua": -0.06839211343262529
   },
   "mde": {
-   "reciente": 8.331152170148918,
-   "antigua": 6.344328982617268
+   "reciente": 8.145970313402671,
+   "antigua": 6.236235097480456
   },
-  "mismoSigno": false,
+  "mismoSigno": true,
   "ambosSuperanMDE": false,
   "pasa": false
  },
  "HF3": {
   "diferenciaPp": {
-   "reciente": 2.956169035086653,
-   "antigua": 5.892664077084571
+   "reciente": 2.955002903889048,
+   "antigua": 5.564049687087868
   },
   "mdePp": {
-   "reciente": 7.330497278998377,
-   "antigua": 6.418609435896723
+   "reciente": 7.339973711916802,
+   "antigua": 6.428140883669911
   },
   "ratioVetoGanadores": {
-   "reciente": 1.2922349736626009,
-   "antigua": 1.7976481172085848
+   "reciente": 1.2920860232300146,
+   "antigua": 1.7568012297965856
   },
   "limpio": false,
   "falla": false
@@ -41,24 +41,24 @@
   "nota": "sin potencia — 49 y 54 posiciones en quince años; se reporta como comprobación, no como evidencia",
   "marcadosEnTop40Pct": {
    "reciente": 12.1,
-   "antigua": 7.9
+   "antigua": 7.8
   }
  },
  "cobertura": {
   "reciente": {
-   "accruals": 10749,
-   "beneish": 5198,
-   "piotroski": 7506,
-   "total": 10749
+   "accruals": 10738,
+   "beneish": 5188,
+   "piotroski": 7495,
+   "total": 10738
   },
   "antigua": {
-   "accruals": 7405,
-   "beneish": 3134,
-   "piotroski": 4558,
-   "total": 7467
+   "accruals": 7381,
+   "beneish": 3126,
+   "piotroski": 4549,
+   "total": 7443
   }
  },
  "construir": false,
- "motivo": "HF1 cambia de SIGNO entre ventanas (criterio preespecificado incumplido) y HF3 apunta a los ganadores en las dos",
+ "motivo": "HF3 apunta en la dirección temida",
  "consecuencia": "El veto NO se enchufa a PicksInput.disqualified. Los modelos forenses se calculan y publican como capa explicativa."
 }

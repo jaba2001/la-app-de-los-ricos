@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T15:56:02.290Z",
+  "generatedAt": "2026-08-24T16:54:47.585Z",
   "window": "2019-2026",
   "rules": {
     "entry": 0.8,
@@ -52,7 +52,7 @@
       "maxDD": -32.3
     },
     "conCaja": {
-      "total": 142,
+      "total": 142.1,
       "cagr": 12.49,
       "sharpe": 0.76,
       "maxDD": -28.3
@@ -747,11 +747,11 @@
     },
     {
       "t": "CTAS",
-      "desde": "2026-02-17",
+      "desde": "2026-03-16",
       "hasta": "2026-07-15",
       "motivo": "abierta al cierre",
-      "dias": 148,
-      "retorno": -1
+      "dias": 121,
+      "retorno": 0.1
     },
     {
       "t": "MKTX",
@@ -807,10 +807,10 @@
       "entry": 70,
       "exit": 40,
       "soloPicks": 203.9,
-      "conCaja": 146.1,
+      "conCaja": 145.8,
       "sharpe": 0.73,
-      "maxDD": -33.3,
-      "vsEW": -27.4,
+      "maxDD": -33.5,
+      "vsEW": -27.7,
       "posiciones": 67,
       "pctInvertido": 87
     },
@@ -818,10 +818,10 @@
       "entry": 70,
       "exit": 50,
       "soloPicks": 209.3,
-      "conCaja": 148.9,
+      "conCaja": 148.7,
       "sharpe": 0.74,
-      "maxDD": -32.1,
-      "vsEW": -24.6,
+      "maxDD": -32.3,
+      "vsEW": -24.8,
       "posiciones": 68,
       "pctInvertido": 87
     },
@@ -829,10 +829,10 @@
       "entry": 70,
       "exit": 60,
       "soloPicks": 208.7,
-      "conCaja": 138.1,
+      "conCaja": 138,
       "sharpe": 0.71,
-      "maxDD": -32.4,
-      "vsEW": -35.4,
+      "maxDD": -32.5,
+      "vsEW": -35.5,
       "posiciones": 69,
       "pctInvertido": 87
     },
@@ -854,7 +854,7 @@
       "conCaja": 164.7,
       "sharpe": 0.77,
       "maxDD": -34.5,
-      "vsEW": -8.8,
+      "vsEW": -8.7,
       "posiciones": 83,
       "pctInvertido": 87
     },
@@ -865,7 +865,7 @@
       "conCaja": 160.6,
       "sharpe": 0.76,
       "maxDD": -34.4,
-      "vsEW": -12.9,
+      "vsEW": -12.8,
       "posiciones": 85,
       "pctInvertido": 87
     },
@@ -876,7 +876,7 @@
       "conCaja": 139.9,
       "sharpe": 0.75,
       "maxDD": -29.5,
-      "vsEW": -33.6,
+      "vsEW": -33.5,
       "posiciones": 91,
       "pctInvertido": 73
     },
@@ -884,10 +884,10 @@
       "entry": 80,
       "exit": 50,
       "soloPicks": 212.7,
-      "conCaja": 142,
+      "conCaja": 142.1,
       "sharpe": 0.76,
       "maxDD": -28.3,
-      "vsEW": -31.5,
+      "vsEW": -31.4,
       "posiciones": 91,
       "pctInvertido": 73
     },
@@ -895,10 +895,10 @@
       "entry": 80,
       "exit": 60,
       "soloPicks": 213.1,
-      "conCaja": 142.7,
+      "conCaja": 142.8,
       "sharpe": 0.77,
       "maxDD": -28,
-      "vsEW": -30.8,
+      "vsEW": -30.7,
       "posiciones": 91,
       "pctInvertido": 73
     },
@@ -931,7 +931,7 @@
       "conCaja": 85.7,
       "sharpe": 0.79,
       "maxDD": -17.9,
-      "vsEW": -87.8,
+      "vsEW": -87.7,
       "posiciones": 56,
       "pctInvertido": 42
     },
@@ -972,10 +972,10 @@
   "ablacionReglas": {
     "reglas completas (§2-§6)": {
       "soloPicks": 212.7,
-      "conCaja": 142,
+      "conCaja": 142.1,
       "sharpe": 0.76,
       "maxDD": -28.3,
-      "vsEW": -31.5,
+      "vsEW": -31.4,
       "posiciones": 91,
       "pctInvertido": 73
     },
@@ -984,18 +984,18 @@
       "conCaja": 234.8,
       "sharpe": 0.85,
       "maxDD": -34.6,
-      "vsEW": 61.3,
+      "vsEW": 61.4,
       "posiciones": 56,
       "pctInvertido": 85
     },
     "sin cuarentena de 12 meses": {
-      "soloPicks": 228.8,
-      "conCaja": 159.1,
+      "soloPicks": 228.7,
+      "conCaja": 159.2,
       "sharpe": 0.8,
       "maxDD": -29.1,
-      "vsEW": -14.4,
+      "vsEW": -14.3,
       "posiciones": 93,
-      "pctInvertido": 75
+      "pctInvertido": 74
     },
     "sin persistencia de 60 días": {
       "soloPicks": 260.3,
@@ -1007,20 +1007,20 @@
       "pctInvertido": 77
     },
     "2/fecha = 4 al mes": {
-      "soloPicks": 208.5,
+      "soloPicks": 208.4,
       "conCaja": 154.2,
       "sharpe": 0.76,
       "maxDD": -28.9,
-      "vsEW": -19.3,
+      "vsEW": -19.2,
       "posiciones": 98,
       "pctInvertido": 76
     },
     "4/fecha = 8 al mes": {
       "soloPicks": 208.7,
-      "conCaja": 157.2,
+      "conCaja": 157.3,
       "sharpe": 0.76,
       "maxDD": -29.3,
-      "vsEW": -16.3,
+      "vsEW": -16.2,
       "posiciones": 101,
       "pctInvertido": 78
     },
@@ -1029,7 +1029,7 @@
       "conCaja": 283.7,
       "sharpe": 0.89,
       "maxDD": -35.4,
-      "vsEW": 110.1,
+      "vsEW": 110.2,
       "posiciones": 57,
       "pctInvertido": 90
     },
@@ -1043,11 +1043,11 @@
       "pctInvertido": 92
     },
     "v2 · p70 · 4 al mes · sin180d": {
-      "soloPicks": 212.5,
-      "conCaja": 292.5,
+      "soloPicks": 211.9,
+      "conCaja": 291.8,
       "sharpe": 0.87,
       "maxDD": -35.4,
-      "vsEW": 119,
+      "vsEW": 118.3,
       "posiciones": 59,
       "pctInvertido": 93
     },
@@ -1056,7 +1056,7 @@
       "conCaja": 316.9,
       "sharpe": 0.88,
       "maxDD": -36.3,
-      "vsEW": 143.3,
+      "vsEW": 143.4,
       "posiciones": 63,
       "pctInvertido": 96
     }
@@ -1065,6 +1065,6 @@
     "H1_reglasNoDestruyenSeñal": true,
     "H1_refTrimestral": 160.6,
     "H2_bateUniversoEW": false,
-    "H3_precioDeLaRampaPp": 70.6
+    "H3_precioDeLaRampaPp": 70.5
   }
 }
