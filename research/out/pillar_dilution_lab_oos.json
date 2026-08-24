@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T13:51:14.016Z",
+  "generatedAt": "2026-08-24T14:17:08.592Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
@@ -11,20 +11,20 @@
   },
   "señales": {
     "health (pilar solo)": {
-      "ic": 0.0292,
-      "t": 1.39,
-      "total": 170.8,
-      "sharpe": 0.96,
-      "maxDD": -17.5,
-      "vsEW": 18.1
+      "ic": 0.0277,
+      "t": 1.38,
+      "total": 155.1,
+      "sharpe": 0.93,
+      "maxDD": -19.1,
+      "vsEW": 2.4
     },
     "value (pilar solo)": {
-      "ic": 0.047,
-      "t": 2.56,
-      "total": 250.9,
-      "sharpe": 1.2,
-      "maxDD": -16.6,
-      "vsEW": 98.1
+      "ic": 0.0475,
+      "t": 2.54,
+      "total": 228.9,
+      "sharpe": 1.14,
+      "maxDD": -17.2,
+      "vsEW": 76.1
     },
     "momentum (pilar solo)": {
       "ic": -0.009,
@@ -43,89 +43,89 @@
       "vsEW": -87.2
     },
     "health + value": {
-      "ic": 0.0468,
-      "t": 2.29,
-      "total": 198.4,
-      "sharpe": 1.01,
-      "maxDD": -16.8,
-      "vsEW": 45.6
+      "ic": 0.0456,
+      "t": 2.24,
+      "total": 206.7,
+      "sharpe": 1.05,
+      "maxDD": -17.1,
+      "vsEW": 54
     },
     "health + momentum": {
-      "ic": 0.0088,
-      "t": 0.36,
-      "total": 136.6,
-      "sharpe": 0.88,
-      "maxDD": -15.8,
-      "vsEW": -16.2
+      "ic": 0.0076,
+      "t": 0.32,
+      "total": 119.3,
+      "sharpe": 0.81,
+      "maxDD": -18,
+      "vsEW": -33.5
     },
     "health + growth": {
-      "ic": 0.0028,
-      "t": 0.13,
-      "total": 103,
-      "sharpe": 0.63,
-      "maxDD": -23.7,
-      "vsEW": -49.8
+      "ic": 0.0019,
+      "t": 0.09,
+      "total": 104.4,
+      "sharpe": 0.65,
+      "maxDD": -23.5,
+      "vsEW": -48.4
     },
     "los 4 pilares (percentil)": {
-      "ic": 0.0158,
-      "t": 0.75,
-      "total": 172.5,
-      "sharpe": 0.99,
-      "maxDD": -15.9,
-      "vsEW": 19.7
+      "ic": 0.0156,
+      "t": 0.76,
+      "total": 177,
+      "sharpe": 1.07,
+      "maxDD": -15.5,
+      "vsEW": 24.2
     },
     "SCORE v1 (total, producción)": {
-      "ic": 0.0205,
-      "t": 0.96,
-      "total": 186.1,
-      "sharpe": 1.03,
+      "ic": 0.021,
+      "t": 1.01,
+      "total": 179.6,
+      "sharpe": 1.05,
       "maxDD": -16.4,
-      "vsEW": 33.3
+      "vsEW": 26.8
     },
     "Calidad §3 (5 métricas)": {
-      "ic": -0.0018,
-      "t": -0.08,
-      "total": 158.8,
-      "sharpe": 0.96,
-      "maxDD": -15.7,
-      "vsEW": 6
+      "ic": -0.001,
+      "t": -0.05,
+      "total": 150.2,
+      "sharpe": 0.89,
+      "maxDD": -18.9,
+      "vsEW": -2.6
     }
   },
   "pareados": {
     "health − SCORE v1": {
-      "dif": 0.0087,
-      "t": 0.81,
+      "dif": 0.0066,
+      "t": 0.64,
       "gana": 18,
       "n": 32,
-      "mde": 0.0301
+      "mde": 0.0293
     },
     "health − (health+value)": {
-      "dif": -0.0176,
-      "t": -1.64,
-      "gana": 12,
+      "dif": -0.0179,
+      "t": -1.69,
+      "gana": 11,
       "n": 32,
-      "mde": 0.0301
+      "mde": 0.0297
     },
     "health − (health+momentum)": {
-      "dif": 0.0204,
-      "t": 1.05,
+      "dif": 0.02,
+      "t": 1.02,
       "gana": 17,
       "n": 32,
-      "mde": 0.0542
+      "mde": 0.0548
     },
     "health − (health+growth)": {
-      "dif": 0.0264,
-      "t": 2.26,
-      "gana": 22,
+      "dif": 0.0257,
+      "t": 2.07,
+      "gana": 21,
       "n": 32,
-      "mde": 0.0327
+      "mde": 0.0349
     },
     "Calidad §3 − SCORE v1": {
-      "dif": -0.0223,
-      "t": -1.25,
+      "dif": -0.0221,
+      "t": -1.36,
       "gana": 12,
       "n": 32,
-      "mde": 0.0499
+      "mde": 0.0455
     }
   },
   "ventana": {

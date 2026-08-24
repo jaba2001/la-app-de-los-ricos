@@ -4,14 +4,14 @@
  "horizonteMeses": 12,
  "entrada": 0.7,
  "HF3": {
-  "tasaTop": 0.13102595797280595,
-  "tasaResto": 0.07575334821428571,
-  "diferencia": 0.05527260975852023,
-  "se": 0.020752694264725813,
-  "mde": 0.05810754394123227,
+  "tasaTop": 0.13280212483399734,
+  "tasaResto": 0.07387548406315163,
+  "diferencia": 0.05892664077084571,
+  "se": 0.022923605128202584,
+  "mde": 0.06418609435896723,
   "pasa": true,
-  "nTop": 809,
-  "nResto": 7168,
+  "nTop": 753,
+  "nResto": 6714,
   "ganadoresVetados": [
    {
     "fecha": "2012-11-01",
@@ -78,14 +78,6 @@
     ]
    },
    {
-    "fecha": "2013-03-01",
-    "t": "TRIP",
-    "ret": 119.7,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
     "fecha": "2012-09-04",
     "t": "TRIP",
     "ret": 115.7,
@@ -126,14 +118,6 @@
     ]
    },
    {
-    "fecha": "2013-02-15",
-    "t": "TRIP",
-    "ret": 105.4,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
     "fecha": "2012-09-17",
     "t": "TRIP",
     "ret": 103.7,
@@ -142,35 +126,19 @@
     ]
    },
    {
-    "fecha": "2013-03-15",
-    "t": "TRIP",
-    "ret": 96.5,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2017-07-17",
-    "t": "CPRI",
-    "ret": 96.1,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2017-06-15",
-    "t": "CPRI",
-    "ret": 94.7,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
     "fecha": "2013-01-15",
     "t": "TRIP",
     "ret": 91,
     "motivos": [
      "devengos"
+    ]
+   },
+   {
+    "fecha": "2012-11-15",
+    "t": "HAL",
+    "ret": 87.3,
+    "motivos": [
+     "piotroski"
     ]
    },
    {
@@ -198,59 +166,11 @@
     ]
    },
    {
-    "fecha": "2017-07-03",
-    "t": "CPRI",
-    "ret": 81.7,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2017-06-01",
-    "t": "CPRI",
-    "ret": 80.9,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2017-05-01",
-    "t": "CPRI",
-    "ret": 80.8,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2017-04-17",
-    "t": "CPRI",
-    "ret": 79.1,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
     "fecha": "2017-06-01",
     "t": "NVDA",
     "ret": 79,
     "motivos": [
      "devengos"
-    ]
-   },
-   {
-    "fecha": "2017-08-01",
-    "t": "CPRI",
-    "ret": 78.9,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2017-05-15",
-    "t": "CPRI",
-    "ret": 76.7,
-    "motivos": [
-     "beneish"
     ]
    },
    {
@@ -286,35 +206,11 @@
     ]
    },
    {
-    "fecha": "2016-05-16",
-    "t": "SWKS",
-    "ret": 71.4,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2017-03-01",
-    "t": "CPRI",
-    "ret": 71.4,
-    "motivos": [
-     "beneish"
-    ]
-   },
-   {
     "fecha": "2017-07-03",
     "t": "NVDA",
     "ret": 70.5,
     "motivos": [
      "devengos"
-    ]
-   },
-   {
-    "fecha": "2017-02-15",
-    "t": "CPRI",
-    "ret": 70.1,
-    "motivos": [
-     "beneish"
     ]
    },
    {
@@ -327,9 +223,116 @@
     ]
    },
    {
+    "fecha": "2011-01-03",
+    "t": "MA",
+    "ret": 67.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
     "fecha": "2013-02-01",
     "t": "TRIP",
     "ret": 66.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2011-04-01",
+    "t": "MA",
+    "ret": 66.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-09-01",
+    "t": "NVDA",
+    "ret": 65.1,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2011-04-15",
+    "t": "MA",
+    "ret": 64.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2011-05-02",
+    "t": "MA",
+    "ret": 64.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-10-02",
+    "t": "NVDA",
+    "ret": 60.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2017-01-03",
+    "t": "SPGI",
+    "ret": 59.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2014-12-15",
+    "t": "VRSN",
+    "ret": 59.3,
+    "motivos": [
+     "devengos",
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2014-05-01",
+    "t": "UAA",
+    "ret": 58.5,
+    "motivos": [
+     "devengos",
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2011-06-15",
+    "t": "MA",
+    "ret": 58.1,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2014-10-15",
+    "t": "UAA",
+    "ret": 57.9,
+    "motivos": [
+     "devengos",
+     "piotroski"
+    ]
+   },
+   {
+    "fecha": "2014-11-17",
+    "t": "SBUX",
+    "ret": 57.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2013-07-01",
+    "t": "SPGI",
+    "ret": 57.5,
     "motivos": [
      "devengos"
     ]
@@ -337,33 +340,33 @@
   ]
  },
  "HF1": {
-  "spread": -4.386082690809106,
-  "se": 2.0069617016531693,
-  "mde": 5.619492764628874,
-  "t": -2.1854341750498842,
+  "spread": 0.03047992824339918,
+  "se": 2.2658317795061675,
+  "mde": 6.344328982617268,
+  "t": 0.013451981969306744,
   "fechas": 168,
-  "nObs": 7908,
+  "nObs": 7405,
   "significativo": false,
-  "signo": "−"
+  "signo": "+"
  },
  "HF2": {
-  "marcadosEnTop40": 553,
+  "marcadosEnTop40": 530,
   "deTop40": 6720,
-  "pct": 8.2,
+  "pct": 7.9,
   "nota": "sin potencia: comprobación, no evidencia"
  },
  "cobertura": {
-  "accruals": 7908,
-  "beneish": 2474,
-  "piotroski": 3440,
-  "total": 7977
+  "accruals": 7405,
+  "beneish": 3134,
+  "piotroski": 4558,
+  "total": 7467
  },
  "veredicto": {
   "construir": false,
   "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
   "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
  },
- "generatedAt": "2026-08-24T13:25:49.612Z",
+ "generatedAt": "2026-08-24T14:48:45.245Z",
  "parametros": {
   "BENEISH_UMBRAL": -1.78,
   "PIOTROSKI_MIN": 3,

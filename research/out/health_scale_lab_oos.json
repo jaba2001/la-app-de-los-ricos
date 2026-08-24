@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-08-24T14:03:31.109Z",
+  "generatedAt": "2026-08-24T14:20:21.055Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
   "H1_saturacion": {
-    "pctEnTope": 27.4,
-    "pctEnTopeNoFinancieras": 31.9,
+    "pctEnTope": 29,
+    "pctEnTopeNoFinancieras": 33.8,
     "pctEnTopeFinancieras": 1.9,
-    "valoresDistintos": 30.7,
-    "mayorGrupoEmpatadoPct": 27.4,
+    "valoresDistintos": 30.6,
+    "mayorGrupoEmpatadoPct": 29,
     "topeSatura": true
   },
   "H2_escala": {
@@ -18,32 +18,32 @@
     },
     "señales": {
       "health · BANDAS (la app)": {
-        "ic": 0.0252,
-        "total": 160.9,
-        "sharpe": 0.97,
-        "vsEW": 8.1,
-        "empatesEnElCorte": 94.8
+        "ic": 0.0277,
+        "total": 155.1,
+        "sharpe": 0.93,
+        "vsEW": 2.4,
+        "empatesEnElCorte": 100.8
       },
       "health · PERCENTIL (mismo set)": {
-        "ic": 0.0059,
-        "total": 134.7,
-        "sharpe": 0.83,
-        "vsEW": -18.1,
+        "ic": 0.0099,
+        "total": 125,
+        "sharpe": 0.79,
+        "vsEW": -27.8,
         "empatesEnElCorte": 1
       },
       "Calidad §3 · PERCENTIL (5 mét.)": {
-        "ic": 0.0006,
-        "total": 148.7,
+        "ic": -0.001,
+        "total": 150.2,
         "sharpe": 0.89,
-        "vsEW": -4,
+        "vsEW": -2.6,
         "empatesEnElCorte": 1.1
       },
       "SCORE v1 · BANDAS (la app)": {
-        "ic": 0.0182,
-        "total": 184.7,
-        "sharpe": 1.08,
-        "vsEW": 31.9,
-        "empatesEnElCorte": 5.8
+        "ic": 0.021,
+        "total": 179.6,
+        "sharpe": 1.05,
+        "vsEW": 26.8,
+        "empatesEnElCorte": 6.3
       }
     },
     "cambiarEscalaMejora": false
@@ -53,34 +53,34 @@
     "v1": {
       "deciles": [
         2.52,
-        3.42,
-        3.15,
-        2.64,
-        3.31,
-        2.83,
-        3.26,
-        2.76,
-        3.07,
-        3.63
+        3.22,
+        3.08,
+        2.51,
+        3.37,
+        3.29,
+        3.29,
+        3.01,
+        2.6,
+        3.71
       ],
-      "monotonia": 0.3,
-      "d10MenosMedia": 0.57
+      "monotonia": 0.39,
+      "d10MenosMedia": 0.65
     },
     "health": {
       "deciles": [
         2.47,
-        2.85,
-        2.58,
-        3.38,
-        3.43,
-        3.9,
-        3.13,
-        2.96,
-        2.9,
-        2.99
+        2.45,
+        3.23,
+        3.08,
+        3.45,
+        3.87,
+        3.23,
+        3.09,
+        3.07,
+        2.63
       ],
-      "monotonia": 0.39,
-      "d10MenosMedia": -0.07
+      "monotonia": 0.16,
+      "d10MenosMedia": -0.42
     }
   }
 }

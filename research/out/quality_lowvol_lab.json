@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T13:37:19.704Z",
+  "generatedAt": "2026-08-24T14:13:15.218Z",
   "window": "2019-2026",
   "quarters": 28,
   "topN": 40,
@@ -23,85 +23,85 @@
   },
   "sizeSweep": {
     "10": {
-      "total": 141.4,
-      "cagr": 13.42,
-      "sharpe": 0.66,
-      "maxDD": -28.8,
-      "vsEW": 10.8
+      "total": 127.5,
+      "cagr": 12.46,
+      "sharpe": 0.67,
+      "maxDD": -25.9,
+      "vsEW": -3.1
     },
     "15": {
-      "total": 134.3,
-      "cagr": 12.93,
-      "sharpe": 0.69,
-      "maxDD": -28.1,
-      "vsEW": 3.6
+      "total": 172.1,
+      "cagr": 15.37,
+      "sharpe": 0.78,
+      "maxDD": -31.2,
+      "vsEW": 41.5
     },
     "20": {
-      "total": 173.6,
-      "cagr": 15.46,
+      "total": 181.8,
+      "cagr": 15.95,
       "sharpe": 0.81,
-      "maxDD": -27.2,
-      "vsEW": 43
+      "maxDD": -30.4,
+      "vsEW": 51.2
     },
     "25": {
-      "total": 166.6,
-      "cagr": 15.04,
-      "sharpe": 0.77,
-      "maxDD": -31.5,
-      "vsEW": 36
+      "total": 179.2,
+      "cagr": 15.8,
+      "sharpe": 0.8,
+      "maxDD": -29.8,
+      "vsEW": 48.6
     },
     "30": {
-      "total": 178.1,
-      "cagr": 15.73,
-      "sharpe": 0.77,
-      "maxDD": -29.7,
-      "vsEW": 47.4
+      "total": 183.8,
+      "cagr": 16.07,
+      "sharpe": 0.83,
+      "maxDD": -29.5,
+      "vsEW": 53.2
     },
     "40": {
-      "total": 178.9,
-      "cagr": 15.78,
-      "sharpe": 0.82,
-      "maxDD": -28.3,
-      "vsEW": 48.3
+      "total": 160.6,
+      "cagr": 14.66,
+      "sharpe": 0.77,
+      "maxDD": -29.8,
+      "vsEW": 29.9
     },
     "50": {
-      "total": 168.4,
-      "cagr": 15.15,
+      "total": 175.6,
+      "cagr": 15.58,
       "sharpe": 0.81,
-      "maxDD": -28.2,
-      "vsEW": 37.8
+      "maxDD": -26.9,
+      "vsEW": 44.9
     },
     "75": {
-      "total": 172.9,
-      "cagr": 15.42,
-      "sharpe": 0.81,
-      "maxDD": -27.8,
-      "vsEW": 42.3
+      "total": 161.1,
+      "cagr": 14.7,
+      "sharpe": 0.78,
+      "maxDD": -26.4,
+      "vsEW": 30.5
     },
     "100": {
-      "total": 158.8,
-      "cagr": 14.55,
-      "sharpe": 0.78,
-      "maxDD": -26.9,
-      "vsEW": 28.2
-    },
-    "150": {
       "total": 134.2,
       "cagr": 12.93,
       "sharpe": 0.71,
-      "maxDD": -26.9,
+      "maxDD": -28.3,
       "vsEW": 3.6
+    },
+    "150": {
+      "total": 121.9,
+      "cagr": 12.06,
+      "sharpe": 0.68,
+      "maxDD": -26.6,
+      "vsEW": -8.7
     }
   },
   "avgUniverseSize": 466,
   "results": {
     "Calidad": {
-      "ic": 0.0173,
-      "total": 178.9,
-      "cagr": 15.78,
-      "sharpe": 0.82,
-      "maxDD": -28.3,
-      "vsEW": 48.3
+      "ic": 0.0156,
+      "total": 160.6,
+      "cagr": 14.66,
+      "sharpe": 0.77,
+      "maxDD": -29.8,
+      "vsEW": 29.9
     },
     "Baja volatilidad": {
       "ic": -0.0534,
@@ -112,20 +112,20 @@
       "vsEW": -67.9
     },
     "Calidad + baja vol": {
-      "ic": -0.0391,
-      "total": 74.6,
-      "cagr": 8.28,
-      "sharpe": 0.56,
-      "maxDD": -26,
-      "vsEW": -56
+      "ic": -0.0382,
+      "total": 75.3,
+      "cagr": 8.35,
+      "sharpe": 0.57,
+      "maxDD": -24,
+      "vsEW": -55.3
     },
     "Score v1 (actual)": {
-      "ic": -0.0059,
-      "total": 128.7,
-      "cagr": 12.54,
-      "sharpe": 0.64,
-      "maxDD": -33.4,
-      "vsEW": -2
+      "ic": -0.0066,
+      "total": 142.5,
+      "cagr": 13.49,
+      "sharpe": 0.72,
+      "maxDD": -29.1,
+      "vsEW": 11.9
     }
   },
   "criteria": {

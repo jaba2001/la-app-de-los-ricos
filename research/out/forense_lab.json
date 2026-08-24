@@ -4,15 +4,23 @@
  "horizonteMeses": 12,
  "entrada": 0.7,
  "HF3": {
-  "tasaTop": 0.1526508226691042,
-  "tasaResto": 0.09527191558441558,
-  "diferencia": 0.057378907084688624,
-  "se": 0.04429620505606996,
-  "mde": 0.12402937415699587,
+  "tasaTop": 0.13071895424836602,
+  "tasaResto": 0.10115726389749949,
+  "diferencia": 0.029561690350866532,
+  "se": 0.026180347424994206,
+  "mde": 0.07330497278998377,
   "pasa": true,
-  "nTop": 1094,
-  "nResto": 9856,
+  "nTop": 1071,
+  "nResto": 9678,
   "ganadoresVetados": [
+   {
+    "fecha": "2022-10-17",
+    "t": "NVDA",
+    "ret": 269.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
    {
     "fecha": "2022-09-01",
     "t": "NVDA",
@@ -46,6 +54,22 @@
     ]
    },
    {
+    "fecha": "2023-12-01",
+    "t": "NVDA",
+    "ret": 195.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-11-15",
+    "t": "NVDA",
+    "ret": 193.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
     "fecha": "2022-07-01",
     "t": "NVDA",
     "ret": 191.5,
@@ -62,17 +86,33 @@
     ]
    },
    {
-    "fecha": "2020-05-15",
-    "t": "ALGN",
-    "ret": 179.4,
+    "fecha": "2024-01-02",
+    "t": "NVDA",
+    "ret": 187.2,
     "motivos": [
      "devengos"
     ]
    },
    {
-    "fecha": "2025-05-01",
-    "t": "MPWR",
-    "ret": 165.2,
+    "fecha": "2020-05-15",
+    "t": "MGM",
+    "ret": 182.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-12-15",
+    "t": "NVDA",
+    "ret": 174.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-05-01",
+    "t": "MGM",
+    "ret": 171.4,
     "motivos": [
      "devengos"
     ]
@@ -81,6 +121,14 @@
     "fecha": "2019-06-03",
     "t": "NVDA",
     "ret": 162.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-07-01",
+    "t": "MGM",
+    "ret": 159.6,
     "motivos": [
      "devengos"
     ]
@@ -118,9 +166,9 @@
     ]
    },
    {
-    "fecha": "2025-04-15",
-    "t": "MPWR",
-    "ret": 150.5,
+    "fecha": "2020-09-15",
+    "t": "AMAT",
+    "ret": 149,
     "motivos": [
      "devengos"
     ]
@@ -134,41 +182,25 @@
     ]
    },
    {
-    "fecha": "2025-06-02",
-    "t": "MPWR",
-    "ret": 144.9,
+    "fecha": "2020-06-01",
+    "t": "MGM",
+    "ret": 143.9,
     "motivos": [
      "devengos"
     ]
    },
    {
-    "fecha": "2020-04-01",
-    "t": "LOW",
-    "ret": 141.9,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2020-03-16",
-    "t": "CDNS",
+    "fecha": "2024-01-16",
+    "t": "NVDA",
     "ret": 137,
     "motivos": [
      "devengos"
     ]
    },
    {
-    "fecha": "2020-06-01",
-    "t": "ALGN",
-    "ret": 136.9,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2023-05-15",
-    "t": "ANET",
-    "ret": 136.3,
+    "fecha": "2020-11-02",
+    "t": "AMAT",
+    "ret": 136,
     "motivos": [
      "devengos"
     ]
@@ -182,9 +214,9 @@
     ]
    },
    {
-    "fecha": "2020-06-15",
-    "t": "ALGN",
-    "ret": 131.9,
+    "fecha": "2022-08-15",
+    "t": "NVDA",
+    "ret": 131.1,
     "motivos": [
      "devengos"
     ]
@@ -198,9 +230,9 @@
     ]
    },
    {
-    "fecha": "2023-07-03",
-    "t": "ANET",
-    "ret": 128.5,
+    "fecha": "2020-04-01",
+    "t": "SNA",
+    "ret": 128.8,
     "motivos": [
      "devengos"
     ]
@@ -214,14 +246,6 @@
     ]
    },
    {
-    "fecha": "2020-07-01",
-    "t": "ALGN",
-    "ret": 126,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
     "fecha": "2021-01-04",
     "t": "NVDA",
     "ret": 123.6,
@@ -231,16 +255,24 @@
    },
    {
     "fecha": "2020-04-15",
-    "t": "LOW",
-    "ret": 120.5,
+    "t": "SNA",
+    "ret": 117.9,
     "motivos": [
      "devengos"
     ]
    },
    {
-    "fecha": "2025-05-15",
-    "t": "MPWR",
-    "ret": 119.9,
+    "fecha": "2020-09-01",
+    "t": "AMAT",
+    "ret": 117.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-06-15",
+    "t": "MGM",
+    "ret": 117.3,
     "motivos": [
      "devengos"
     ]
@@ -254,9 +286,17 @@
     ]
    },
    {
-    "fecha": "2023-01-17",
-    "t": "ANET",
-    "ret": 114.1,
+    "fecha": "2020-07-15",
+    "t": "MGM",
+    "ret": 115.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-10-01",
+    "t": "AMAT",
+    "ret": 114.7,
     "motivos": [
      "devengos"
     ]
@@ -264,14 +304,6 @@
    {
     "fecha": "2020-11-16",
     "t": "AMAT",
-    "ret": 113.7,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2025-06-16",
-    "t": "MPWR",
     "ret": 113.7,
     "motivos": [
      "devengos"
@@ -294,42 +326,9 @@
     ]
    },
    {
-    "fecha": "2022-10-17",
-    "t": "LRCX",
-    "ret": 108.8,
-    "motivos": [
-     "devengos",
-     "beneish"
-    ]
-   },
-   {
-    "fecha": "2020-03-02",
-    "t": "CDNS",
-    "ret": 107.9,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2023-03-01",
-    "t": "ANET",
-    "ret": 107.7,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2023-10-02",
-    "t": "ANET",
-    "ret": 107.5,
-    "motivos": [
-     "devengos"
-    ]
-   },
-   {
-    "fecha": "2023-10-16",
-    "t": "ANET",
-    "ret": 106.3,
+    "fecha": "2020-10-15",
+    "t": "AMAT",
+    "ret": 109,
     "motivos": [
      "devengos"
     ]
@@ -337,33 +336,33 @@
   ]
  },
  "HF1": {
-  "spread": 0.5534486006882533,
-  "se": 3.6941041502080867,
-  "mde": 10.343491620582641,
-  "t": 0.14981943610254678,
+  "spread": -0.368635854480488,
+  "se": 2.9754114893389,
+  "mde": 8.331152170148918,
+  "t": -0.12389407508888609,
   "fechas": 158,
-  "nObs": 10926,
+  "nObs": 10749,
   "significativo": false,
-  "signo": "+"
+  "signo": "−"
  },
  "HF2": {
-  "marcadosEnTop40": 742,
+  "marcadosEnTop40": 766,
   "deTop40": 6320,
-  "pct": 11.7,
+  "pct": 12.1,
   "nota": "sin potencia: comprobación, no evidencia"
  },
  "cobertura": {
-  "accruals": 10926,
-  "beneish": 3409,
-  "piotroski": 5373,
-  "total": 10950
+  "accruals": 10749,
+  "beneish": 5198,
+  "piotroski": 7506,
+  "total": 10749
  },
  "veredicto": {
   "construir": false,
   "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
   "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
  },
- "generatedAt": "2026-08-24T13:10:27.834Z",
+ "generatedAt": "2026-08-24T14:44:08.838Z",
  "parametros": {
   "BENEISH_UMBRAL": -1.78,
   "PIOTROSKI_MIN": 3,

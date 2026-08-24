@@ -1,21 +1,21 @@
 {
- "generatedAt": "2026-08-24T13:29:15.650Z",
+ "generatedAt": "2026-08-24T14:48:47.411Z",
  "ventanas": {
   "reciente": "2019-2026",
   "antigua": "2011-2018"
  },
  "HF1": {
   "spread": {
-   "reciente": 0.5534486006882533,
-   "antigua": -4.386082690809106
+   "reciente": -0.368635854480488,
+   "antigua": 0.03047992824339918
   },
   "t": {
-   "reciente": 0.14981943610254678,
-   "antigua": -2.1854341750498842
+   "reciente": -0.12389407508888609,
+   "antigua": 0.013451981969306744
   },
   "mde": {
-   "reciente": 10.343491620582641,
-   "antigua": 5.619492764628874
+   "reciente": 8.331152170148918,
+   "antigua": 6.344328982617268
   },
   "mismoSigno": false,
   "ambosSuperanMDE": false,
@@ -23,16 +23,16 @@
  },
  "HF3": {
   "diferenciaPp": {
-   "reciente": 5.737890708468862,
-   "antigua": 5.527260975852023
+   "reciente": 2.956169035086653,
+   "antigua": 5.892664077084571
   },
   "mdePp": {
-   "reciente": 12.402937415699586,
-   "antigua": 5.810754394123227
+   "reciente": 7.330497278998377,
+   "antigua": 6.418609435896723
   },
   "ratioVetoGanadores": {
-   "reciente": 1.6022646519986061,
-   "antigua": 1.7296391652837442
+   "reciente": 1.2922349736626009,
+   "antigua": 1.7976481172085848
   },
   "limpio": false,
   "falla": false
@@ -40,22 +40,22 @@
  "HF2": {
   "nota": "sin potencia — 49 y 54 posiciones en quince años; se reporta como comprobación, no como evidencia",
   "marcadosEnTop40Pct": {
-   "reciente": 11.7,
-   "antigua": 8.2
+   "reciente": 12.1,
+   "antigua": 7.9
   }
  },
  "cobertura": {
   "reciente": {
-   "accruals": 10926,
-   "beneish": 3409,
-   "piotroski": 5373,
-   "total": 10950
+   "accruals": 10749,
+   "beneish": 5198,
+   "piotroski": 7506,
+   "total": 10749
   },
   "antigua": {
-   "accruals": 7908,
-   "beneish": 2474,
-   "piotroski": 3440,
-   "total": 7977
+   "accruals": 7405,
+   "beneish": 3134,
+   "piotroski": 4558,
+   "total": 7467
   }
  },
  "construir": false,
