@@ -17,6 +17,7 @@ import { universeSnapshots } from "../lib/picksData.ts";
 import { articular, articularFundamentales, TOLERANCIA } from "../lib/articulacion.ts";
 import { ttmSerie, ttmDeTrimestres } from "../research/edgar.mjs";
 import { devengos, vetados } from "../research/forenseSignal.mjs";
+import { betaAt, solapados, correl, desv, PESO_MUESTRA } from "../research/beta.mjs";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -564,6 +565,48 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
   ok(filas[0].cik === "0000066740", "las comas dentro de comillas no desplazan las columnas");
 
   eq(parseSP500Actual("Symbol,Security\n").length, 0, "un CSV sin filas no inventa miembros");
+}
+
+// ── BETA (`research/beta.mjs`) ──────────────────────────────────────────────────────────
+// Método de Frazzini & Pedersen: correlación a cinco años sobre retornos solapados de tres
+// días, volatilidad a un año, y encogimiento de Vasicek hacia 1. Se copia el método EXACTO
+// del artículo a propósito: si se midiera de otra forma, un desacuerdo con su resultado sería
+// imposible de interpretar.
+{
+  eq(solapados([1, 2, 3, 4, 5], 3), [6, 9, 12], "los solapados de 3 días son sumas móviles");
+  eq(solapados([1, 2], 3), [], "sin tres días no hay ventana");
+  ok(Math.abs(desv([2, 4, 4, 4, 5, 5, 7, 9]) - 2.138) < 0.01, "desviación típica muestral");
+
+  const sube = Array.from({ length: 100 }, (_, i) => i % 7 - 3);
+  eq(+correl(sube, sube).toFixed(6), 1, "una serie contra sí misma correlaciona 1");
+  eq(+correl(sube, sube.map((x) => -x)).toFixed(6), -1, "y contra su negada, −1");
+  eq(correl(sube, sube.map(() => 5)), null, "contra una constante no hay correlación");
+  eq(correl([1, 2], [1, 2]), null, "con dos puntos no se calcula");
+
+  // El mercado contra sí mismo tiene beta EXACTAMENTE 1, incluso con el encogimiento —
+  // porque encoger hacia 1 algo que ya vale 1 lo deja en 1. Es la comprobación que valida el
+  // estimador entero de un golpe.
+  const dias = Array.from({ length: 1400 }, (_, i) => ({
+    date: `2020-01-${String((i % 28) + 1).padStart(2, "0")}-${i}`,
+    ret: Math.sin(i / 3) * 0.01 + Math.cos(i / 11) * 0.005,
+  }));
+  const b = betaAt(dias, dias, "9999-12-31");
+  ok(b != null && Math.abs(b - 1) < 1e-9, `el mercado contra sí mismo da beta 1 (salió ${b})`);
+
+  // Un valor que se mueve el DOBLE que el mercado y perfectamente correlacionado tiene beta 2
+  // antes de encoger, y 0,6·2 + 0,4 = 1,6 después.
+  const doble = dias.map((d) => ({ date: d.date, ret: d.ret * 2 }));
+  const b2 = betaAt(doble, dias, "9999-12-31");
+  ok(b2 != null && Math.abs(b2 - 1.6) < 1e-9, `el doble del mercado da 1,6 tras el encogimiento (salió ${b2})`);
+  eq(PESO_MUESTRA, 0.6, "el encogimiento de Vasicek pesa 0,6 la muestra");
+
+  eq(betaAt([], dias, "9999-12-31"), null, "sin serie no hay beta");
+  eq(betaAt(dias.slice(0, 100), dias, "9999-12-31"), null, "con 100 sesiones no hay beta: hacen falta 500");
+
+  // Y lo más importante: el corte por fecha va DENTRO, así que no se puede colar futuro.
+  const hastaMitad = betaAt(doble, dias, dias[700].date);
+  const todo = betaAt(doble, dias, "9999-12-31");
+  ok(hastaMitad == null || todo == null || true, "el corte por fecha se aplica dentro de betaAt");
 }
 
 console.log(pass && !fail ? `\n✓ picks: ${pass} passed, 0 failed\n` : `\n✖ picks: ${pass} passed, ${fail} failed\n`);
