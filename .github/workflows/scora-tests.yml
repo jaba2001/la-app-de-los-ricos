@@ -12,6 +12,12 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Semanal aunque nadie toque el código. Lo aprendido el 2026-08-24: las fuentes cambian
+  # solas. El CSV de miembros del índice dejó de actualizarse aguas arriba y nadie se enteró
+  # en 366 días; la SEC empezó a mezclar cifras de un `DEF 14A` con las del 10-K. Un CI que
+  # sólo corre en los commits no ve nada de eso, porque el commit que lo rompe no existe.
+  schedule:
+    - cron: "0 6 * * 1" # lunes 06:00 UTC
   workflow_dispatch: {}
 
 jobs:
@@ -46,6 +52,30 @@ jobs:
       # that caps the whole block instead of re-truncating each passage (the original bug).
       - name: Retrieval tests
         run: node --experimental-strip-types --no-warnings scripts/retrieval.test.mjs
+      # Las reglas de Scora Picks (§3-§5 de SCORA_PICKS_REGLAS.md) más la partida doble como
+      # test de datos, el cálculo del TTM y la señal forense. Un cambio de regla sin abrir una
+      # `rules_version` nueva tiene que gritar aquí: el track record de dos versiones no se
+      # mezcla jamás.
+      - name: Scora Picks — motor de reglas y capa contable
+        run: node --experimental-strip-types --no-warnings scripts/picks.test.mjs
+      - name: Percentiles sector-relativos
+        run: node --experimental-strip-types --no-warnings scripts/percentile.test.mjs
+      - name: Roadmap (F3+F4+F5)
+        run: node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs
+      # ── LA CAPA DE DATOS ──────────────────────────────────────────────────────────────
+      # Los cinco defectos encontrados el 2026-08-23/24 vivieron MESES sin que nada fallara:
+      # el TTM que no eran doce meses, magnitudes congeladas en 2009, la deuda ausente escrita
+      # como cero, los REIT puntuando con una rebanada de sus ingresos y un `DEF 14A` metiendo
+      # el resultado de FedEx en millones. Ninguno rompía — todos devolvían un número creíble.
+      #
+      # Dos partes. La primera pone SUELOS sobre los artefactos versionados: cobertura por
+      # métrica, tasas de las cuatro identidades contables y CERO desfases de más de tres años.
+      # Si un commit degrada la extracción, salta aquí antes de que nadie publique encima.
+      # La segunda es un humo contra la SEC de verdad con seis nombres, uno por defecto; si la
+      # SEC no responde, avisa y se salta en vez de romper el build.
+      - name: Guardián de la capa de datos
+        run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
+
       - name: Typecheck
         run: npx tsc --noEmit
       - name: CSS regression guard
