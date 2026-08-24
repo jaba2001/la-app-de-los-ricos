@@ -87,6 +87,14 @@ export default async function PicksPage() {
           ninguna regla —cambiarla ahora sería elegirla mirando el resultado—, pero la evidencia previa es más
           débil de lo que se publicó, y con más razón lo único que va a valer es lo que pase aquí en vivo.
         </p>
+        <p style={{ margin: "var(--sr-sp-2) 0 0", fontSize: "var(--sr-t-sm)", lineHeight: 1.7 }}>
+          <strong>Y lo más incómodo, que también va aquí:</strong> el criterio de cierre está publicado de
+          antemano —si a 24 meses queda por debajo de su referencia, se publica el resultado y se cierra—.
+          Aplicado a las dos ventanas históricas, <strong>ese criterio habría disparado en una de las dos</strong>.
+          No se relaja: relajar un criterio después de ver el resultado es lo que lo vacía de sentido. Pero
+          quien dedique tiempo o dinero a esto debería partir de que <strong>la probabilidad de que termine en
+          cierre es alta</strong>, y lo era antes de empezar.
+        </p>
       </div>
 
       {!arrancado ? (
