@@ -381,15 +381,47 @@ export function ttmDeTrimestres(hechos, n = 2) {
   return out;
 }
 
-function flowTTM(fj, tags, asOf, skip = 0, cur = "USD", permitirAnual = true, minEnd = null) {
+/**
+ * `preferirMayor` — SÓLO para los ingresos, y por un motivo concreto.
+ *
+ * Mezclar los periodos de todos los tags en un conjunto único es lo que salva los cambios de
+ * etiqueta (una empresa que pasó de `SalesRevenueGoodsNet` a `RevenueFromContractWithCustomer…`
+ * en 2018 tiene el ejercicio viejo en un tag y el acumulado nuevo en otro, y hacen falta los
+ * dos). Pero tiene un coste: cuando dos tags cubren el MISMO periodo con valores distintos, el
+ * que gana lo decide la fecha de presentación, o sea el azar.
+ *
+ * Y en los REIT eso no es un empate cualquiera: bajo ASC 842 el grueso de sus ingresos es renta
+ * de alquiler y el tag de ASC 606 recoge sólo la parte de servicios. Medido el 24-08-2026,
+ * Essex Property salía con **10 M de ingresos** cuando su cifra real es **1.890 M**, y con ella
+ * un margen bruto del 14.526 %. Camden, Extra Space, SBA, Healthpeak y American Tower, igual.
+ *
+ * La regla: entre candidatos IGUAL DE FRESCOS se coge el mayor. Un componente es por
+ * definición más pequeño que el total, así que el máximo no puede ser un componente. Se aplica
+ * únicamente a los ingresos: para el resultado o los flujos, "el mayor" no significa nada
+ * —una pérdida grande no es mejor que una pequeña— y ahí manda el orden de la lista.
+ */
+function flowTTM(fj, tags, asOf, skip = 0, cur = "USD", permitirAnual = true, minEnd = null, preferirMayor = false) {
   const idx = skip / 4;
   if (!Number.isInteger(idx)) return null;
-  const hechos = hechosFlujo(fj, tags, asOf, cur);
-  // Primero la vía de acumulados (la correcta y la que más cubre); si la empresa no publica
-  // ejercicios completos, la de cuatro trimestres contiguos. Nunca una ventana descosida.
-  let serie = ttmSerie(hechos, idx + 1);
-  let r = serie[idx];
-  if (!r) { serie = ttmDeTrimestres(hechos, idx + 1); r = serie[idx]; }
+  const calcular = (ts) => {
+    const hechos = hechosFlujo(fj, ts, asOf, cur);
+    // Primero la vía de acumulados (la correcta y la que más cubre); si la empresa no publica
+    // ejercicios completos, la de cuatro trimestres contiguos. Nunca una ventana descosida.
+    let serie = ttmSerie(hechos, idx + 1);
+    let x = serie[idx];
+    if (!x) { serie = ttmDeTrimestres(hechos, idx + 1); x = serie[idx]; }
+    return x ?? null;
+  };
+  let r = calcular(tags);
+  if (preferirMayor) {
+    // Se comparan el conjunto mezclado y cada tag por separado: lo primero cubre el cambio de
+    // etiqueta, lo segundo evita quedarse con una rebanada.
+    for (const t of tags) {
+      const c = calcular([t]);
+      if (!c) continue;
+      if (!r || c.end > r.end || (c.end === r.end && c.val > r.val)) r = c;
+    }
+  }
   if (!r) return null;
   if (!permitirAnual && r.periodicidad === "anual") return null;
   if (minEnd && r.end < minEnd) return null;
@@ -429,14 +461,29 @@ function menosDias(fecha, dias) {
   d.setUTCDate(d.getUTCDate() - dias);
   return d.toISOString().slice(0, 10);
 }
-function instTag(fj, tags, asOf, taxonomy = null, unit = "USD") {
-  for (const t of tags) { const v = instant(facts(fj, t, taxonomy, unit), asOf, unit); if (v != null) return v; }
+/**
+ * ⚠️ EL FILTRO DE ANTIGÜEDAD VA DENTRO DEL BUCLE, no después.
+ *
+ * Estaba fuera —se elegía el primer tag con valor y luego se descartaba si era rancio— y eso
+ * hacía que un tag abandonado ENTERRARA a los que venían detrás. CVS tiene
+ * `LongTermDebtNoncurrent` congelado en 2020 y `LongTermDebtAndCapitalLeaseObligations` al
+ * día: se cogía el de 2020, se rechazaba por viejo, y nunca se llegaba al bueno. La empresa
+ * acababa sin deuda. Air Products, Avery Dennison y Dominion, igual.
+ *
+ * Afectaba a TODOS los instantes —activo, patrimonio, caja, clientes—, no sólo a la deuda:
+ * cualquier lista cuyo primer tag hubiera envejecido perdía los demás.
+ */
+function instTagFull(fj, tags, asOf, taxonomy = null, unit = "USD", minEnd = null) {
+  for (const t of tags) {
+    const v = instantFull(facts(fj, t, taxonomy, unit), asOf, unit);
+    if (v == null) continue;
+    if (minEnd && v.end < minEnd) continue;      // rancio: se sigue buscando, no se abandona
+    return v;
+  }
   return null;
 }
-/** Igual que `instTag` pero devuelve también el cierre, para el mapa de periodos. */
-function instTagFull(fj, tags, asOf, taxonomy = null, unit = "USD") {
-  for (const t of tags) { const v = instantFull(facts(fj, t, taxonomy, unit), asOf, unit); if (v != null) return v; }
-  return null;
+function instTag(fj, tags, asOf, taxonomy = null, unit = "USD", minEnd = null) {
+  return instTagFull(fj, tags, asOf, taxonomy, unit, minEnd)?.val ?? null;
 }
 
 // Sum instant share CLASSES at the latest filing (Google/Meta report A+C separately),
@@ -742,12 +789,11 @@ export async function fundamentalsAsOf(cik, asOf) {
    * nunca a la vía anual: para la inmensa mayoría no cambia nada.
    */
   const F = (tags, skip = 0) => flowTTM(fj, tags, asOf, skip, cur, true, suelo(skip));
-  const IF_ = (tags) => {
-    const v = instTagFull(fj, tags, asOf, null, cur);
-    // Un instante de balance rancio es igual de tóxico que un flujo rancio: el activo de 2026
-    // contra el pasivo de 2013 no es un descuadre de la empresa, es un dato muerto.
-    return v && ancla && v.end < menosDias(ancla, ANTIGUEDAD_MAX_DIAS) ? null : v;
-  };
+  // Un instante de balance rancio es igual de tóxico que un flujo rancio: el activo de 2026
+  // contra el pasivo de 2013 no es un descuadre de la empresa, es un dato muerto. El suelo se
+  // PASA A LA BÚSQUEDA para que un tag envejecido no entierre a los siguientes.
+  const sueloInst = ancla ? menosDias(ancla, ANTIGUEDAD_MAX_DIAS) : null;
+  const IF_ = (tags) => instTagFull(fj, tags, asOf, null, cur, sueloInst);
   const I = (tags) => IF_(tags)?.val ?? null;
 
   /**
@@ -777,8 +823,17 @@ export async function fundamentalsAsOf(cik, asOf) {
     return null;
   };
 
-  const rev = F(T(REV, "REV"), 0) ?? F(REV2, 0);
-  const revP = F(T(REV, "REV"), 4) ?? F(REV2, 4);
+  // Los ingresos se piden con `preferirMayor`: ver el comentario de `flowTTM`.
+  const FR = (tags, skip) => flowTTM(fj, tags, asOf, skip, cur, true, suelo(skip), true);
+  // REV2 entra AQUÍ, junto a los demás, y no como segundo recurso. Se separó cuando el
+  // desempate lo decidía el azar: `OperatingLeaseLeaseIncome` son los ingresos de verdad de un
+  // REIT pero una partida menor en cualquier otra empresa, y bastaba con que fuera un trimestre
+  // más fresca para pasar a hacer de "ingresos". Con `preferirMayor` ese riesgo desaparece: en
+  // una empresa normal el alquiler nunca va a ser mayor que la cifra de negocio, y en un REIT
+  // sí lo es porque es la cifra de negocio. Camden Property salía con 10 M en vez de 1.570 M.
+  const TODOS_REV = [...T(REV, "REV"), ...REV2];
+  const rev = FR(TODOS_REV, 0);
+  const revP = FR(TODOS_REV, 4);
   const ni = F(T(NI, "NI")), niP = F(T(NI, "NI"), 4);
   let gp = F(T(GP, "GP"));
   const cost = F(T(COST, "COST"));
@@ -793,8 +848,32 @@ export async function fundamentalsAsOf(cik, asOf) {
   const ocf = F(T(OCF, "OCF")), capex = F(T(CAPEX, "CAPEX"));
 
   const equityI = IF_(T(EQUITY, "EQUITY")), equity = equityI?.val ?? null;
-  const ltd = I(T(["LongTermDebtNoncurrent", "LongTermDebt"], "LTD"));
-  const ltdC = I(T(["LongTermDebtCurrent", "DebtCurrent"], "LTDC"));
+  /**
+   * DEUDA — y la ausencia se dice, no se rellena con un cero.
+   *
+   * Estaba escrito `(largo ?? 0) + (corto ?? 0)`, así que **no encontrar el tag se convertía en
+   * "esta empresa no tiene deuda"**. Medido el 24-08-2026: 136 de 497 nombres del índice
+   * salían con deuda exactamente cero, y de los primeros 40 revisados, **34 sí tenían
+   * conceptos de deuda vivos** — entre ellos CVS (253 B de activo), Cigna (157 B) y Dominion
+   * (118 B). De ahí salían un `debtEquity` de 0, un `netDebtEbitda` NEGATIVO (o sea, caja neta)
+   * y un `roic` inflado por un capital invertido que sólo contaba el patrimonio.
+   *
+   * `netDebtEbitda` es UNA DE LAS CINCO MÉTRICAS de la señal de Scora Picks, y la mejor
+   * deuda posible puntúa alto. Un cuarto del universo estaba cobrando esa nota gratis.
+   *
+   * Se buscan más conceptos y, si no aparece ninguno, el resultado es `null`: sin dato no hay
+   * ratio, que es incómodo pero cierto. Las obligaciones por arrendamiento NO se cuentan: bajo
+   * ASC 842 están en balance, pero meterlas cambiaría la definición de la métrica a mitad de
+   * un track record.
+   */
+  const deudaTotal = I(["DebtLongtermAndShorttermCombinedAmount"]);
+  const ltd = I(T(["LongTermDebtNoncurrent", "LongTermDebt", "LongTermDebtAndCapitalLeaseObligations",
+                   "SeniorNotesNoncurrent", "SeniorNotes", "NotesPayableNoncurrent",
+                   "ConvertibleDebtNoncurrent", "UnsecuredDebt", "SecuredDebt"], "LTD"));
+  const ltdC = I(T(["LongTermDebtCurrent", "DebtCurrent", "LongTermDebtAndCapitalLeaseObligationsCurrent",
+                    "NotesPayableCurrent", "ShortTermBorrowings", "OtherShortTermBorrowings",
+                    "CommercialPaper"], "LTDC"));
+  const deuda = deudaTotal ?? (ltd == null && ltdC == null ? null : (ltd ?? 0) + (ltdC ?? 0));
   const cfi = F(T(ICF, "ICF")), cff = F(T(FCF_, "FCF_")), fx = F(FX);
   const dcashCon = F(DCASH_CON_FX), dcashSin = F(DCASH_SIN_FX);
   const dcash = dcashCon ?? dcashSin;
@@ -810,7 +889,7 @@ export async function fundamentalsAsOf(cik, asOf) {
     assets: assetsI?.val ?? null, equity,
     curA: I(T(["AssetsCurrent"], "CURA")), curL: I(T(["LiabilitiesCurrent"], "CURL")),
     cash: I(T(["CashAndCashEquivalentsAtCarryingValue", "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"], "CASH")),
-    debt: (ltd ?? 0) + (ltdC ?? 0),
+    debt: deuda,
     // Fase 7 additions for the quality/credit rankers (Altman Z, DuPont 5-factor).
     retainedEarnings: I(["RetainedEarningsAccumulatedDeficit"]),
     pretaxIncome: F(["IncomeLossFromContinuingOperationsBeforeIncomeTaxesExtraordinaryItemsNoncontrollingInterest", "IncomeLossFromContinuingOperationsBeforeIncomeTaxesMinorityInterestAndIncomeLossFromEquityMethodInvestments"])?.val ?? null,

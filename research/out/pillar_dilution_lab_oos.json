@@ -1,131 +1,131 @@
 {
-  "generatedAt": "2026-08-22T16:24:29.159Z",
+  "generatedAt": "2026-08-24T13:51:14.016Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
-  "nombresMedios": 320,
+  "nombresMedios": 349,
   "universeEW": {
-    "total": 156.6,
-    "sharpe": 0.96,
-    "maxDD": -18.2
+    "total": 152.8,
+    "sharpe": 0.95,
+    "maxDD": -17.9
   },
   "señales": {
     "health (pilar solo)": {
-      "ic": 0.0392,
-      "t": 1.58,
-      "total": 181.9,
-      "sharpe": 0.94,
-      "maxDD": -17.7,
-      "vsEW": 25.3
+      "ic": 0.0292,
+      "t": 1.39,
+      "total": 170.8,
+      "sharpe": 0.96,
+      "maxDD": -17.5,
+      "vsEW": 18.1
     },
     "value (pilar solo)": {
-      "ic": 0.0434,
-      "t": 2.45,
-      "total": 248.2,
-      "sharpe": 1.3,
-      "maxDD": -14,
-      "vsEW": 91.6
+      "ic": 0.047,
+      "t": 2.56,
+      "total": 250.9,
+      "sharpe": 1.2,
+      "maxDD": -16.6,
+      "vsEW": 98.1
     },
     "momentum (pilar solo)": {
-      "ic": -0.008,
-      "t": -0.28,
-      "total": 138,
-      "sharpe": 0.92,
-      "maxDD": -14.9,
-      "vsEW": -18.5
+      "ic": -0.009,
+      "t": -0.32,
+      "total": 127.7,
+      "sharpe": 0.88,
+      "maxDD": -14,
+      "vsEW": -25.1
     },
     "growth (pilar solo)": {
-      "ic": -0.0222,
-      "t": -1.16,
-      "total": 83.6,
-      "sharpe": 0.57,
-      "maxDD": -21.9,
-      "vsEW": -73
+      "ic": -0.0244,
+      "t": -1.28,
+      "total": 65.6,
+      "sharpe": 0.48,
+      "maxDD": -25.7,
+      "vsEW": -87.2
     },
     "health + value": {
-      "ic": 0.0555,
-      "t": 2.54,
-      "total": 222.2,
-      "sharpe": 1.09,
-      "maxDD": -16,
-      "vsEW": 65.6
+      "ic": 0.0468,
+      "t": 2.29,
+      "total": 198.4,
+      "sharpe": 1.01,
+      "maxDD": -16.8,
+      "vsEW": 45.6
     },
     "health + momentum": {
-      "ic": 0.0173,
-      "t": 0.65,
-      "total": 151.6,
-      "sharpe": 0.91,
-      "maxDD": -16.3,
-      "vsEW": -5
+      "ic": 0.0088,
+      "t": 0.36,
+      "total": 136.6,
+      "sharpe": 0.88,
+      "maxDD": -15.8,
+      "vsEW": -16.2
     },
     "health + growth": {
-      "ic": 0.0113,
-      "t": 0.46,
-      "total": 154,
-      "sharpe": 0.84,
-      "maxDD": -17.9,
-      "vsEW": -2.5
+      "ic": 0.0028,
+      "t": 0.13,
+      "total": 103,
+      "sharpe": 0.63,
+      "maxDD": -23.7,
+      "vsEW": -49.8
     },
     "los 4 pilares (percentil)": {
-      "ic": 0.021,
-      "t": 0.87,
-      "total": 208.9,
-      "sharpe": 1.12,
-      "maxDD": -14.1,
-      "vsEW": 52.3
+      "ic": 0.0158,
+      "t": 0.75,
+      "total": 172.5,
+      "sharpe": 0.99,
+      "maxDD": -15.9,
+      "vsEW": 19.7
     },
     "SCORE v1 (total, producción)": {
-      "ic": 0.0259,
-      "t": 1.07,
-      "total": 197.5,
-      "sharpe": 1.08,
-      "maxDD": -14.7,
-      "vsEW": 40.9
+      "ic": 0.0205,
+      "t": 0.96,
+      "total": 186.1,
+      "sharpe": 1.03,
+      "maxDD": -16.4,
+      "vsEW": 33.3
     },
     "Calidad §3 (5 métricas)": {
-      "ic": 0.0107,
-      "t": 0.47,
-      "total": 187.4,
-      "sharpe": 1.02,
-      "maxDD": -17,
-      "vsEW": 30.8
+      "ic": -0.0018,
+      "t": -0.08,
+      "total": 158.8,
+      "sharpe": 0.96,
+      "maxDD": -15.7,
+      "vsEW": 6
     }
   },
   "pareados": {
     "health − SCORE v1": {
-      "dif": 0.0133,
-      "t": 1.05,
-      "gana": 20,
+      "dif": 0.0087,
+      "t": 0.81,
+      "gana": 18,
       "n": 32,
-      "mde": 0.0354
+      "mde": 0.0301
     },
     "health − (health+value)": {
-      "dif": -0.0164,
-      "t": -1.28,
-      "gana": 13,
+      "dif": -0.0176,
+      "t": -1.64,
+      "gana": 12,
       "n": 32,
-      "mde": 0.0358
+      "mde": 0.0301
     },
     "health − (health+momentum)": {
-      "dif": 0.0219,
-      "t": 1.11,
-      "gana": 16,
+      "dif": 0.0204,
+      "t": 1.05,
+      "gana": 17,
       "n": 32,
-      "mde": 0.0552
+      "mde": 0.0542
     },
     "health − (health+growth)": {
-      "dif": 0.0278,
-      "t": 2.57,
-      "gana": 23,
+      "dif": 0.0264,
+      "t": 2.26,
+      "gana": 22,
       "n": 32,
-      "mde": 0.0304
+      "mde": 0.0327
     },
     "Calidad §3 − SCORE v1": {
-      "dif": -0.0152,
-      "t": -0.92,
-      "gana": 15,
+      "dif": -0.0223,
+      "t": -1.25,
+      "gana": 12,
       "n": 32,
-      "mde": 0.046
+      "mde": 0.0499
     }
   },
   "ventana": {

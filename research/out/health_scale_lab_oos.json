@@ -1,86 +1,86 @@
 {
-  "generatedAt": "2026-08-22T16:24:56.040Z",
+  "generatedAt": "2026-08-24T14:03:31.109Z",
   "window": "2011-2018",
   "quarters": 32,
   "topN": 40,
   "H1_saturacion": {
-    "pctEnTope": 30.6,
-    "pctEnTopeNoFinancieras": 35.7,
-    "pctEnTopeFinancieras": 3.8,
-    "valoresDistintos": 30.5,
-    "mayorGrupoEmpatadoPct": 30.6,
+    "pctEnTope": 27.4,
+    "pctEnTopeNoFinancieras": 31.9,
+    "pctEnTopeFinancieras": 1.9,
+    "valoresDistintos": 30.7,
+    "mayorGrupoEmpatadoPct": 27.4,
     "topeSatura": true
   },
   "H2_escala": {
     "universeEW": {
-      "total": 156.6,
-      "sharpe": 0.96
+      "total": 152.8,
+      "sharpe": 0.95
     },
     "señales": {
       "health · BANDAS (la app)": {
-        "ic": 0.0392,
-        "total": 181.9,
-        "sharpe": 0.94,
-        "vsEW": 25.3,
-        "empatesEnElCorte": 98.1
+        "ic": 0.0252,
+        "total": 160.9,
+        "sharpe": 0.97,
+        "vsEW": 8.1,
+        "empatesEnElCorte": 94.8
       },
       "health · PERCENTIL (mismo set)": {
-        "ic": 0.0161,
-        "total": 161.6,
-        "sharpe": 0.94,
-        "vsEW": 5,
-        "empatesEnElCorte": 1.1
-      },
-      "Calidad §3 · PERCENTIL (5 mét.)": {
-        "ic": 0.0107,
-        "total": 187.4,
-        "sharpe": 1.02,
-        "vsEW": 30.8,
+        "ic": 0.0059,
+        "total": 134.7,
+        "sharpe": 0.83,
+        "vsEW": -18.1,
         "empatesEnElCorte": 1
       },
+      "Calidad §3 · PERCENTIL (5 mét.)": {
+        "ic": 0.0006,
+        "total": 148.7,
+        "sharpe": 0.89,
+        "vsEW": -4,
+        "empatesEnElCorte": 1.1
+      },
       "SCORE v1 · BANDAS (la app)": {
-        "ic": 0.0259,
-        "total": 197.5,
+        "ic": 0.0182,
+        "total": 184.7,
         "sharpe": 1.08,
-        "vsEW": 40.9,
-        "empatesEnElCorte": 6
+        "vsEW": 31.9,
+        "empatesEnElCorte": 5.8
       }
     },
     "cambiarEscalaMejora": false
   },
   "H3_monotonia": {
-    "mediaUniverso": 3.11,
+    "mediaUniverso": 3.06,
     "v1": {
       "deciles": [
-        2.46,
-        3.23,
-        3.3,
-        2.76,
+        2.52,
+        3.42,
         3.15,
-        2.61,
-        3.65,
-        2.93,
-        3.17,
-        3.9
+        2.64,
+        3.31,
+        2.83,
+        3.26,
+        2.76,
+        3.07,
+        3.63
       ],
-      "monotonia": 0.42,
-      "d10MenosMedia": 0.78
+      "monotonia": 0.3,
+      "d10MenosMedia": 0.57
     },
     "health": {
       "deciles": [
-        2.61,
-        2.8,
-        2.81,
-        3.41,
-        3.03,
-        3.29,
-        3.31,
-        3.23,
-        3.82,
-        2.83
+        2.47,
+        2.85,
+        2.58,
+        3.38,
+        3.43,
+        3.9,
+        3.13,
+        2.96,
+        2.9,
+        2.99
       ],
-      "monotonia": 0.59,
-      "d10MenosMedia": -0.28
+      "monotonia": 0.39,
+      "d10MenosMedia": -0.07
     }
   }
 }

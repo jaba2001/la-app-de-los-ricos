@@ -48,10 +48,15 @@ export function metricsOf(f, raw, mom) {
   // es como se comportaba antes de la fase multi-mercado.
   const cruzable = f.precioComparable !== false;
   const mcap = cruzable && f.shares > 0 && raw > 0 ? raw * f.shares : null;
-  const ev = mcap != null ? mcap + (f.debt ?? 0) - (f.cash ?? 0) : null;
+  // ⚠️ `f.debt` puede ser NULL, y null NO es cero. Hasta el 24-08-2026 estos cuatro sitios
+  // hacían `?? 0`, así que una empresa sin tag de deuda salía con apalancamiento cero,
+  // `netDebtEbitda` negativo (caja neta) y un ROIC inflado. Eran 136 de 497 nombres, y
+  // `netDebtEbitda` es una de las cinco métricas de la señal: un cuarto del universo cobraba
+  // esa nota gratis. Sin dato de deuda no hay ratio de deuda.
+  const ev = mcap != null && f.debt != null ? mcap + f.debt - (f.cash ?? 0) : null;
   const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
   const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
-  const invested = (f.equity ?? 0) + (f.debt ?? 0);
+  const invested = f.equity != null && f.debt != null ? f.equity + f.debt : null;
   const pos = (x) => (x != null && isFinite(x) && x > 0 ? x : null);
 
   return {
@@ -64,7 +69,7 @@ export function metricsOf(f, raw, mom) {
     // Rentabilidad (porcentaje)
     roe: pos(f.equity) && f.niTTM != null ? (f.niTTM / f.equity) * 100 : null,
     roa: pos(f.assets) && f.niTTM != null ? (f.niTTM / f.assets) * 100 : null,
-    roic: invested > 0 && f.oiTTM != null ? ((f.oiTTM * 0.79) / invested) * 100 : null,
+    roic: invested != null && invested > 0 && f.oiTTM != null ? ((f.oiTTM * 0.79) / invested) * 100 : null,
     grossMargin: pos(f.revTTM) && f.gpTTM != null ? (f.gpTTM / f.revTTM) * 100 : null,
     netMargin: pos(f.revTTM) && f.niTTM != null ? (f.niTTM / f.revTTM) * 100 : null,
     grossProfitability: pos(f.assets) && f.gpTTM != null ? (f.gpTTM / f.assets) * 100 : null,
@@ -73,10 +78,10 @@ export function metricsOf(f, raw, mom) {
     capexToRevenue: pos(f.revTTM) && f.capexTTM != null ? f.capexTTM / f.revTTM : null,
     fcfYield: mcap != null && fcf != null ? fcf / mcap : null,
     // Solidez (ratios)
-    debtEquity: pos(f.equity) ? (f.debt ?? 0) / f.equity : null,
+    debtEquity: pos(f.equity) && f.debt != null ? f.debt / f.equity : null,
     currentRatio: pos(f.curL) && f.curA != null ? f.curA / f.curL : null,
     interestCoverage: pos(f.interestTTM) && f.oiTTM != null ? f.oiTTM / f.interestTTM : null,
-    netDebtEbitda: pos(ebitda) ? ((f.debt ?? 0) - (f.cash ?? 0)) / ebitda : null,
+    netDebtEbitda: pos(ebitda) && f.debt != null ? (f.debt - (f.cash ?? 0)) / ebitda : null,
     // Crecimiento (porcentaje)
     revenueGrowth: pos(f.revPrevTTM) && f.revTTM != null ? (f.revTTM / f.revPrevTTM - 1) * 100 : null,
     epsGrowth: pos(f.niPrevTTM) && f.niTTM != null ? (f.niTTM / f.niPrevTTM - 1) * 100 : null,

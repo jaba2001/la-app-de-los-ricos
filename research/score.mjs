@@ -53,8 +53,13 @@ export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
   const mcap = f.precioComparable !== false && f.shares && rawPrice ? rawPrice * f.shares : null;
   const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
   const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
-  const ev = mcap != null ? mcap + (f.debt ?? 0) - (f.cash ?? 0) : null;
-  const invested = (f.equity ?? 0) + (f.debt ?? 0);
+  // ⚠️ `f.debt` puede ser NULL, y null NO es cero. Hasta el 24-08-2026 estos cuatro sitios
+  // hacían `?? 0`, así que una empresa sin tag de deuda salía con apalancamiento cero,
+  // `netDebtEbitda` negativo (caja neta) y un ROIC inflado. Eran 136 de 497 nombres, y
+  // `netDebtEbitda` es una de las cinco métricas de la señal: un cuarto del universo cobraba
+  // esa nota gratis. Sin dato de deuda no hay ratio de deuda.
+  const ev = mcap != null && f.debt != null ? mcap + f.debt - (f.cash ?? 0) : null;
+  const invested = f.equity != null && f.debt != null ? f.equity + f.debt : null;
   const pos = (x) => (x != null && x > 0 ? x : null);
 
   return {
@@ -62,11 +67,11 @@ export function buildInputs(f, rawPrice, mom = {}, sector = "", regime = null) {
     pb:               mcap != null && pos(f.equity) ? mcap / f.equity : null,
     evEbitda:         ev != null && pos(ebitda) ? ev / ebitda : null,
     pfcf:             mcap != null && pos(fcf) ? mcap / fcf : null,
-    debtEquity:       pos(f.equity) ? (f.debt ?? 0) / f.equity : null,
+    debtEquity:       pos(f.equity) && f.debt != null ? f.debt / f.equity : null,
     currentRatio:     pos(f.curL) ? f.curA / f.curL : null,
     interestCoverage: pos(f.interestTTM) && f.oiTTM != null ? f.oiTTM / f.interestTTM : null,
-    netDebtEbitda:    pos(ebitda) ? ((f.debt ?? 0) - (f.cash ?? 0)) / ebitda : null,
-    roic:             pos(invested) && f.oiTTM != null ? (f.oiTTM * 0.79 / invested) * 100 : null,
+    netDebtEbitda:    pos(ebitda) && f.debt != null ? (f.debt - (f.cash ?? 0)) / ebitda : null,
+    roic:             invested != null && pos(invested) && f.oiTTM != null ? (f.oiTTM * 0.79 / invested) * 100 : null,
     roe:              pos(f.equity) && f.niTTM != null ? (f.niTTM / f.equity) * 100 : null,
     roa:              pos(f.assets) && f.niTTM != null ? (f.niTTM / f.assets) * 100 : null,
     grossProfitability: pos(f.assets) && f.gpTTM != null ? (f.gpTTM / f.assets) * 100 : null, // Novy-Marx quality
