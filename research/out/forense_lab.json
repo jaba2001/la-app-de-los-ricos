@@ -1,0 +1,375 @@
+{
+ "ventana": "2019-2026",
+ "fechas": 158,
+ "horizonteMeses": 12,
+ "entrada": 0.7,
+ "HF3": {
+  "tasaTop": 0.1526508226691042,
+  "tasaResto": 0.09527191558441558,
+  "diferencia": 0.057378907084688624,
+  "se": 0.04429620505606996,
+  "mde": 0.12402937415699587,
+  "pasa": true,
+  "nTop": 1094,
+  "nResto": 9856,
+  "ganadoresVetados": [
+   {
+    "fecha": "2022-09-01",
+    "t": "NVDA",
+    "ret": 248.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-10-03",
+    "t": "NVDA",
+    "ret": 248,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-09-15",
+    "t": "NVDA",
+    "ret": 239.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-11-01",
+    "t": "NVDA",
+    "ret": 212.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-07-01",
+    "t": "NVDA",
+    "ret": 191.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-07-15",
+    "t": "NVDA",
+    "ret": 188.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-05-15",
+    "t": "ALGN",
+    "ret": 179.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2025-05-01",
+    "t": "MPWR",
+    "ret": 165.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-06-03",
+    "t": "NVDA",
+    "ret": 162.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-06-15",
+    "t": "NVDA",
+    "ret": 158.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-08-01",
+    "t": "NVDA",
+    "ret": 158.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-06-17",
+    "t": "NVDA",
+    "ret": 155.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-08-01",
+    "t": "NVDA",
+    "ret": 152.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2025-04-15",
+    "t": "MPWR",
+    "ret": 150.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-07-15",
+    "t": "NVDA",
+    "ret": 145.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2025-06-02",
+    "t": "MPWR",
+    "ret": 144.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-04-01",
+    "t": "LOW",
+    "ret": 141.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-03-16",
+    "t": "CDNS",
+    "ret": 137,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-06-01",
+    "t": "ALGN",
+    "ret": 136.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-05-15",
+    "t": "ANET",
+    "ret": 136.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-12-01",
+    "t": "NVDA",
+    "ret": 135,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-06-15",
+    "t": "ALGN",
+    "ret": 131.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-07-01",
+    "t": "NVDA",
+    "ret": 130,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-07-03",
+    "t": "ANET",
+    "ret": 128.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-12-15",
+    "t": "NVDA",
+    "ret": 128.2,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-07-01",
+    "t": "ALGN",
+    "ret": 126,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2021-01-04",
+    "t": "NVDA",
+    "ret": 123.6,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-04-15",
+    "t": "LOW",
+    "ret": 120.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2025-05-15",
+    "t": "MPWR",
+    "ret": 119.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-06-01",
+    "t": "NVDA",
+    "ret": 117.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-01-17",
+    "t": "ANET",
+    "ret": 114.1,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-11-16",
+    "t": "AMAT",
+    "ret": 113.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2025-06-16",
+    "t": "MPWR",
+    "ret": 113.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-05-15",
+    "t": "NVDA",
+    "ret": 113.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2021-01-15",
+    "t": "NVDA",
+    "ret": 109.7,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2022-10-17",
+    "t": "LRCX",
+    "ret": 108.8,
+    "motivos": [
+     "devengos",
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-03-02",
+    "t": "CDNS",
+    "ret": 107.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-03-01",
+    "t": "ANET",
+    "ret": 107.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-10-02",
+    "t": "ANET",
+    "ret": 107.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-10-16",
+    "t": "ANET",
+    "ret": 106.3,
+    "motivos": [
+     "devengos"
+    ]
+   }
+  ]
+ },
+ "HF1": {
+  "spread": 0.5534486006882533,
+  "se": 3.6941041502080867,
+  "mde": 10.343491620582641,
+  "t": 0.14981943610254678,
+  "fechas": 158,
+  "nObs": 10926,
+  "significativo": false,
+  "signo": "+"
+ },
+ "HF2": {
+  "marcadosEnTop40": 742,
+  "deTop40": 6320,
+  "pct": 11.7,
+  "nota": "sin potencia: comprobación, no evidencia"
+ },
+ "cobertura": {
+  "accruals": 10926,
+  "beneish": 3409,
+  "piotroski": 5373,
+  "total": 10950
+ },
+ "veredicto": {
+  "construir": false,
+  "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
+  "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
+ },
+ "generatedAt": "2026-08-24T13:10:27.834Z",
+ "parametros": {
+  "BENEISH_UMBRAL": -1.78,
+  "PIOTROSKI_MIN": 3,
+  "ACCRUALS_PCTL": 0.9,
+  "ENTRADA": 0.7,
+  "HORIZONTE_MESES": 12
+ },
+ "orden": "HF3 se ejecuta primero y manda: si el veto castiga a los ganadores, HF1 y HF2 son irrelevantes."
+}

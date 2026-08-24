@@ -126,3 +126,17 @@ export async function momentumLong(ticker, date) {
   const pct = (n) => { const p = i - n >= 0 ? r[i - n].adj : null; return p && p > 0 ? ((cur - p) / p) * 100 : null; };
   return { m1: pct(21), m3: pct(63), m6: pct(126) };
 }
+
+/**
+ * Rentabilidad total entre dos fechas, EN PORCENTAJE — misma convención y mismo nombre de
+ * concepto que `fwdReturn` de `prices.mjs`, para que se puedan inyectar la una por la otra.
+ *
+ * No existía, y su ausencia ya causó dos veces el mismo fallo mudo: un laboratorio llamaba a
+ * `pxl.fwdReturn`, el `try/catch` se tragaba el TypeError y salían cero observaciones sin que
+ * nada avisara. Una función que falta no da un error: da un resultado vacío y creíble.
+ */
+export async function fwdReturnLong(ticker, from, to) {
+  const r = await seriesLong(ticker);
+  const a = idxOnOrBefore(r, from), b = idxOnOrBefore(r, to);
+  return a >= 0 && b >= 0 && r[a].adj > 0 ? (r[b].adj / r[a].adj - 1) * 100 : null;
+}

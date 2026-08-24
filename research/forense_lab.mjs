@@ -32,8 +32,8 @@ import { fileURLToPath } from "url";
 import { loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { devengos, beneish, piotroski, vetados, BENEISH_UMBRAL, PIOTROSKI_MIN, ACCRUALS_PCTL } from "./forenseSignal.mjs";
-import * as px from "./prices.mjs";
-import * as pxl from "./pricesLong.mjs";
+import { fwdReturn } from "./prices.mjs";
+import { fwdReturnLong } from "./pricesLong.mjs";
 
 const LONG = process.argv.includes("--long");
 const REBUILD = process.argv.includes("--rebuild");
@@ -45,7 +45,11 @@ const PANEL_FORENSE = join(OUT, `forense_panel_${VENTANA}.json`);
 
 // La caché de `prices.mjs` arranca en 2018-06: para la ventana antigua hay que usar la larga
 // o los retornos futuros salen todos a null sin decir por qué (`fuente-precios-por-ventana`).
-const precio = LONG ? pxl : px;
+// ⚠️ LAS DOS DEVUELVEN PORCENTAJE (+248 = +248 %), no fracción. La primera versión de este
+// laboratorio las trataba como fracción y multiplicaba por 100: el +248 % real de NVDA entre
+// septiembre de 2022 y septiembre de 2023 salía impreso como +24.834 %. No rompía nada — sólo
+// mentía, que es el modo de fallo que este repositorio persigue desde hace meses.
+const retornoFuturo = LONG ? fwdReturnLong : fwdReturn;
 
 if (!existsSync(PANEL_SENAL)) {
   console.error(`  ✖ falta ${PANEL_SENAL.split(/[\\/]/).pop()}. Constrúyelo antes con:`);
@@ -128,7 +132,8 @@ for (const f of fechas) {
   if (hasta > ultima) continue;        // sin doce meses por delante no hay observación
   fwd[f] = {};
   for (const t of Object.keys(senal.panel[f] ?? {})) {
-    try { const r = await precio.fwdReturn(t, f, hasta); if (r != null && isFinite(r)) fwd[f][t] = r; } catch { /* sin precio */ }
+    const r = await retornoFuturo(t, f, hasta);
+    if (r != null && isFinite(r)) fwd[f][t] = r;      // en PORCENTAJE
   }
 }
 const fechasConFwd = Object.keys(fwd).filter((f) => Object.keys(fwd[f]).length >= 30);
@@ -172,7 +177,7 @@ console.log("  ══ HF3 · ¿el veto se come a los ganadores? ═════�
     let vt = 0, vr = 0;
     for (const t of c.elegibles) {
       const vetado = c.marcas.has(t);
-      if (top.has(t)) { nTop++; if (vetado) { vetTop++; vt++; ganadoresVetados.push({ fecha: c.fecha, t, ret: +(fwd[c.fecha][t] * 100).toFixed(1), motivos: c.marcas.get(t) }); } }
+      if (top.has(t)) { nTop++; if (vetado) { vetTop++; vt++; ganadoresVetados.push({ fecha: c.fecha, t, ret: +fwd[c.fecha][t].toFixed(1), motivos: c.marcas.get(t) }); } }
       else { nResto++; if (vetado) { vetResto++; vr++; } }
     }
     porFecha.push((vt / Math.max(1, corte)) - (vr / Math.max(1, c.elegibles.length - corte)));
@@ -187,7 +192,15 @@ console.log("  ══ HF3 · ¿el veto se come a los ganadores? ═════�
   console.log(`  tasa de veto en el resto         : ${(tasaResto * 100).toFixed(1)} %   (${vetResto}/${nResto})`);
   console.log(`  diferencia                       : ${(dif * 100).toFixed(1)} pp   ±${se != null ? (se * 100).toFixed(1) : "—"} (Newey-West)`);
   const falla = mde != null && dif > mde;
-  console.log(`\n  ${falla ? "✖ HF3 FALLA" : "✓ HF3 pasa"}: el veto ${falla ? "SÍ" : "no"} castiga a los ganadores por encima del MDE.`);
+  // «Pasa» significa sólo que no supera el listón preespecificado. Si la estimación puntual
+  // apunta en la dirección temida hay que decirlo: un criterio que se supera por falta de
+  // potencia no es una absolución, y leerlo como tal sería justo la trampa que HF3 evita.
+  console.log(`\n  ${falla ? "✖ HF3 FALLA" : "✓ HF3 pasa el listón"}: el veto ${falla ? "SÍ" : "no"} castiga a los ganadores por encima del MDE.`);
+  if (!falla && dif > 0 && mde) {
+    console.log(`  ⚠ PERO la dirección es la temida: marca a los ganadores ${(tasaTop / Math.max(1e-9, tasaResto)).toFixed(1)}× más que al resto,`);
+    console.log(`    y la diferencia (${(dif * 100).toFixed(1)} pp) es el ${(dif / mde * 100).toFixed(0)} % del MDE. Pasa por falta de`);
+    console.log(`    potencia, no por estar limpio. Eso NO autoriza a construirlo.`);
+  }
   if (ganadoresVetados.length) {
     console.log(`\n  ganadores vetados (muestra de los mejores):`);
     for (const g of ganadoresVetados.sort((a, b) => b.ret - a.ret).slice(0, 10)) {
@@ -214,10 +227,10 @@ console.log("\n  ══ HF1 · ¿los peores devengos rinden menos dentro de la c
     nObs += conAcc.length;
   }
   const m = media(spreads), se = neweyWest(spreads), mde = se != null ? 2.8 * se : null;
-  console.log(`  MDE (antes de mirar): ${mde != null ? (mde * 100).toFixed(1) + " pp" : "—"}`);
+  console.log(`  MDE (antes de mirar): ${mde != null ? mde.toFixed(1) + " pp" : "—"}`);
   console.log(`  fechas con cohorte suficiente: ${spreads.length}   ·   observaciones nombre-fecha: ${nObs}`);
   console.log(`  quintil de MEJORES devengos − quintil de PEORES, a 12 meses:`);
-  console.log(`    ${m != null ? (m * 100).toFixed(2) + " pp" : "—"}   ±${se != null ? (se * 100).toFixed(2) : "—"}   t = ${m != null && se ? (m / se).toFixed(2) : "—"}`);
+  console.log(`    ${m != null ? m.toFixed(2) + " pp" : "—"}   ±${se != null ? se.toFixed(2) : "—"}   t = ${m != null && se ? (m / se).toFixed(2) : "—"}`);
   const significativo = m != null && mde != null && Math.abs(m) > mde;
   console.log(`\n  ${significativo ? (m > 0 ? "✓ los mejores devengos rinden MÁS" : "✖ los mejores devengos rinden MENOS (signo contrario)") : "○ dentro del ruido: no se puede afirmar nada"}`);
   resultados.HF1 = { spread: m, se, mde, t: m != null && se ? m / se : null, fechas: spreads.length, nObs, significativo, signo: m > 0 ? "+" : "−" };
@@ -251,6 +264,34 @@ console.log("\n  ══ HF2 · efecto sobre la cartera — SIN POTENCIA, es una 
     console.log(`    ${k.padEnd(11)} ${suma[k]}/${suma.total}  ${(100 * suma[k] / Math.max(1, suma.total)).toFixed(1)} %`);
   }
   resultados.cobertura = suma;
+}
+
+// ── VEREDICTO GLOBAL, escrito según las reglas de §3 y no según lo que apetezca ───────────
+{
+  const hf3 = resultados.HF3, hf1 = resultados.HF1;
+  const hf3Limpio = hf3.pasa && hf3.diferencia <= 0;
+  const hf1Apoya = hf1.significativo && hf1.spread > 0;
+  const construir = hf3Limpio && hf1Apoya;
+  console.log(`
+  ══ VEREDICTO ═══════════════════════════════════════════════════════════════
+`);
+  if (construir) {
+    console.log(`  ✓ El veto tiene apoyo: HF3 limpio y HF1 significativo en el signo correcto.`);
+  } else {
+    console.log(`  ✖ NO SE CONSTRUYE el veto forense.`);
+    if (!hf1Apoya) console.log(`    · HF1 no encuentra efecto: ${hf1.spread?.toFixed(2)} pp con un MDE de ${hf1.mde?.toFixed(1)} pp (t = ${hf1.t?.toFixed(2)}).`);
+    if (!hf3Limpio) console.log(`    · HF3 pasa el listón pero apunta en la dirección temida (+${(hf3.diferencia * 100).toFixed(1)} pp sobre los ganadores).`);
+    console.log(`
+    Es un resultado válido y barato: el plan preveía que la fase pudiera terminar`);
+    console.log(`    aquí, y terminar aquí cuesta mucho menos que construirlo mal.`);
+  }
+  resultados.veredicto = {
+    construir,
+    motivo: construir ? "HF3 limpio y HF1 significativo" :
+      (!hf1Apoya && !hf3Limpio) ? "HF1 sin efecto y HF3 apunta en la dirección temida" :
+      !hf1Apoya ? "HF1 sin efecto medible" : "HF3 apunta en la dirección temida",
+    nota: "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa.",
+  };
 }
 
 resultados.generatedAt = new Date().toISOString();
