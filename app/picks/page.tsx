@@ -77,6 +77,16 @@ export default async function PicksPage() {
           <strong>no es evidencia fuera de muestra</strong> — es la razón para probarlas en vivo, no la prueba de
           que funcionen. Este track record empieza de cero y sólo tendrá algo que decir a partir de 24 meses.
         </p>
+        <p style={{ margin: "var(--sr-sp-2) 0 0", fontSize: "var(--sr-t-sm)", lineHeight: 1.7 }}>
+          <strong>Y una corrección del 24 de agosto de 2026, que va aquí y no en una nota al pie.</strong> Al
+          auditar el motor de datos aparecieron tres defectos que afectaban a cuatro de las cinco métricas con
+          las que se elige. Corregidos y vuelto a medir, la señal <strong>ya no bate al universo elegible
+          equiponderado en las dos ventanas históricas</strong>: gana en una y pierde en la otra. Antes ganaba en
+          las dos, y esa diferencia era el defecto, no el mercado. Tampoco se puede seguir diciendo que la
+          cartera caiga menos que el índice: en la ventana reciente cae <strong>más</strong>. No se ha cambiado
+          ninguna regla —cambiarla ahora sería elegirla mirando el resultado—, pero la evidencia previa es más
+          débil de lo que se publicó, y con más razón lo único que va a valer es lo que pase aquí en vivo.
+        </p>
       </div>
 
       {!arrancado ? (
