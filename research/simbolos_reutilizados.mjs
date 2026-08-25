@@ -60,7 +60,7 @@
 // que quedaron sin comprobar, así que hay que correrlo varias veces —una por hora— hasta que
 // no queden «no comprobados». `--rehacer` lo fuerza todo de cero.
 // ─────────────────────────────────────────────────────────────────────────────
-import { writeFileSync, readFileSync, existsSync, mkdirSync, rmSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync, rmSync, renameSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { loadSP500Historical } from "./universe.mjs";
@@ -437,7 +437,28 @@ if (heredados.length) console.log(`  ↻ ${heredados.length} bloqueos heredados 
 
 // El fichero que consumen los módulos de precios. En `data/`, que se versiona por defecto:
 // si esto se perdiera, el bloqueo desaparecería en silencio y volverían los precios ajenos.
-writeFileSync(ruta, JSON.stringify({
+/**
+ * ESCRIBIR SIN DEJAR NUNCA UN FICHERO A MEDIAS.
+ *
+ * `writeFileSync` trunca y luego escribe, así que hay una ventana —corta, pero real— en la que
+ * el fichero existe VACÍO o cortado. Daría igual si esto fuera un artefacto de investigación,
+ * pero `data/simbolos_reutilizados.json` y `data/cik_historicos.json` los lee CÓDIGO DE
+ * PRODUCCIÓN en caliente: `simboloBloqueado` y `tickerToCik`. Y los dos leen dentro de un
+ * `try/catch` que ante un JSON roto se queda con `{}` y sigue — o sea que un cron que cayera
+ * en esa ventana no fallaría: se quedaría **sin lista de bloqueo**, serviría los precios del
+ * instrumento que heredó el símbolo y no lo diría. Exactamente el fallo que estos ficheros
+ * existen para impedir, reintroducido por la forma de escribirlos.
+ *
+ * Con temporal + `rename` el cambio es atómico dentro del mismo volumen: quien lea ve la
+ * versión vieja entera o la nueva entera, nunca media.
+ */
+function escribirAtomico(ruta, texto) {
+  const tmp = ruta + ".tmp";
+  writeFileSync(tmp, texto);
+  renameSync(tmp, ruta);
+}
+
+escribirAtomico(ruta, JSON.stringify({
   generatedAt: new Date().toISOString(),
   fuente: "research/simbolos_reutilizados.mjs",
   versionReglas: VERSION_REGLAS,

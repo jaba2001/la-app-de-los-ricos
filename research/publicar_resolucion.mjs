@@ -24,7 +24,7 @@
 //
 //   node research/publicar_resolucion.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { elegirVivo, convivieron } from "./alias_reglas.mjs";
@@ -96,7 +96,28 @@ if (revisionesDesfasadas.length) {
   console.warn(`     Manda la decisión revisada, pero conviene volver a mirarlas.
 `);
 }
-writeFileSync(join(DATA, "cik_historicos.json"), JSON.stringify({
+/**
+ * ESCRIBIR SIN DEJAR NUNCA UN FICHERO A MEDIAS.
+ *
+ * `writeFileSync` trunca y luego escribe, así que hay una ventana —corta, pero real— en la que
+ * el fichero existe VACÍO o cortado. Daría igual si esto fuera un artefacto de investigación,
+ * pero `data/simbolos_reutilizados.json` y `data/cik_historicos.json` los lee CÓDIGO DE
+ * PRODUCCIÓN en caliente: `simboloBloqueado` y `tickerToCik`. Y los dos leen dentro de un
+ * `try/catch` que ante un JSON roto se queda con `{}` y sigue — o sea que un cron que cayera
+ * en esa ventana no fallaría: se quedaría **sin lista de bloqueo**, serviría los precios del
+ * instrumento que heredó el símbolo y no lo diría. Exactamente el fallo que estos ficheros
+ * existen para impedir, reintroducido por la forma de escribirlos.
+ *
+ * Con temporal + `rename` el cambio es atómico dentro del mismo volumen: quien lea ve la
+ * versión vieja entera o la nueva entera, nunca media.
+ */
+function escribirAtomico(ruta, texto) {
+  const tmp = ruta + ".tmp";
+  writeFileSync(tmp, texto);
+  renameSync(tmp, ruta);
+}
+
+escribirAtomico(join(DATA, "cik_historicos.json"), JSON.stringify({
   generatedAt: new Date().toISOString(),
   fuente: "research/resolver_cik.mjs → research/publicar_resolucion.mjs",
   evidencia: "research/out/resolucion_cik.json",
@@ -202,7 +223,7 @@ for (const [muerto, cik] of Object.entries(mapa)) {
   detalleAlias.push({ de: muerto, a: vivo, cik, nombre: fila?.nombre ?? "", enElIndice: `${fila?.desde}→${fila?.hasta}` });
 }
 
-writeFileSync(join(DATA, "alias_ticker.json"), JSON.stringify({
+escribirAtomico(join(DATA, "alias_ticker.json"), JSON.stringify({
   generatedAt: new Date().toISOString(),
   fuente: "research/publicar_resolucion.mjs",
   criterio: "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",

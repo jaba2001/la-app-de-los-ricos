@@ -69,3 +69,7 @@ research/out/*
 !research/out/resolucion_cik.json
 !research/out/simbolos_reutilizados.json
 !research/out/float_publico.json
+
+# Temporales de las escrituras atómicas a research/data/ (temporal + rename). Si una
+# ejecución se corta puede quedar uno suelto; no debe entrar en git ni confundirse con el bueno.
+research/data/*.tmp
