@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T16:59:01.237Z",
+  "generatedAt": "2026-08-25T20:27:37.256Z",
   "window": "2011-2018",
   "rules": {
     "entry": 0.8,
@@ -17,6 +17,74 @@
     "decisiones": 192,
     "diasMercado": 2003
   },
+  "cobertura": {
+    "posicionesNoValoradas": {
+      "sinPanel": [
+        "APOL",
+        "ANSS"
+      ],
+      "sinRetornos": 2,
+      "total": 4,
+      "deCuantas": 89
+    },
+    "universoEWFuera": {
+      "sinPanel": [
+        "APOL",
+        "CBS",
+        "COG",
+        "DISCA",
+        "GENZ",
+        "IGT",
+        "JCP",
+        "NYX",
+        "SPLS",
+        "WIN",
+        "CEPH",
+        "FTR",
+        "LSI",
+        "BIG",
+        "MOLX",
+        "CVC",
+        "BBBY",
+        "ENDP",
+        "CPGX",
+        "ANSS",
+        "HFC",
+        "WRK"
+      ],
+      "empiezaTarde": 28,
+      "deCuantos": 430
+    },
+    "universoEWSinFinancierosFuera": {
+      "sinPanel": [
+        "APOL",
+        "CBS",
+        "COG",
+        "DISCA",
+        "GENZ",
+        "IGT",
+        "JCP",
+        "NYX",
+        "SPLS",
+        "WIN",
+        "CEPH",
+        "FTR",
+        "LSI",
+        "BIG",
+        "MOLX",
+        "CVC",
+        "BBBY",
+        "ENDP",
+        "CPGX",
+        "ANSS",
+        "HFC",
+        "WRK"
+      ],
+      "empiezaTarde": 28,
+      "deCuantos": 430
+    },
+    "nota": "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo."
+  },
   "benchmarks": {
     "spy": {
       "total": 134.9,
@@ -30,46 +98,46 @@
       "maxDD": -22.9
     },
     "universoEW": {
-      "total": 174.8,
-      "cagr": 13.56,
-      "sharpe": 0.95,
-      "maxDD": -20.2
+      "total": 158.3,
+      "cagr": 12.68,
+      "sharpe": 0.89,
+      "maxDD": -21.1
     },
     "universoEWSinFinancieros": {
-      "total": 174.8,
-      "cagr": 13.56,
-      "sharpe": 0.95,
-      "maxDD": -20.2,
-      "financierosExcluidos": 18,
+      "total": 158.3,
+      "cagr": 12.68,
+      "sharpe": 0.89,
+      "maxDD": -21.1,
+      "financierosExcluidos": 23,
       "nota": "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)."
     }
   },
   "carteras": {
     "soloPicks": {
-      "total": 206.4,
-      "cagr": 15.13,
-      "sharpe": 0.92,
-      "maxDD": -19.6
+      "total": 170.1,
+      "cagr": 13.32,
+      "sharpe": 0.83,
+      "maxDD": -18.8
     },
     "conCaja": {
-      "total": 76.4,
-      "cagr": 7.4,
-      "sharpe": 0.78,
-      "maxDD": -15.5
+      "total": 80.4,
+      "cagr": 7.7,
+      "sharpe": 0.74,
+      "maxDD": -15.6
     }
   },
   "mecanica": {
-    "posiciones": 74,
+    "posiciones": 89,
     "mesesHastaLlenar": null,
-    "posicionesMedias": 19.5,
-    "fechasSinCompra": 118,
-    "permanenciaMesesMedia": 23.1,
-    "aciertosPct": 80.9,
+    "posicionesMedias": 22.7,
+    "fechasSinCompra": 103,
+    "permanenciaMesesMedia": 23.4,
+    "aciertosPct": 73.7,
     "motivos": {
-      "fuera del universo": 6,
-      "180 días sin recuperar": 38,
-      "señal bajo umbral 2 evaluaciones": 3,
-      "abierta al cierre": 27
+      "180 días sin recuperar": 47,
+      "fuera del universo": 9,
+      "señal bajo umbral 2 evaluaciones": 5,
+      "abierta al cierre": 28
     }
   },
   "operaciones": [
@@ -114,60 +182,60 @@
       "retorno": 35.9
     },
     {
-      "t": "MCO",
-      "desde": "2011-04-15",
-      "hasta": "2017-08-15",
-      "motivo": "180 días sin recuperar",
-      "dias": 2314,
-      "retorno": 303.8
-    },
-    {
       "t": "INTC",
-      "desde": "2011-05-02",
+      "desde": "2011-04-15",
       "hasta": "2013-10-15",
       "motivo": "180 días sin recuperar",
-      "dias": 897,
-      "retorno": 11.7
+      "dias": 914,
+      "retorno": 29.6
     },
     {
       "t": "V",
-      "desde": "2011-05-16",
+      "desde": "2011-05-02",
       "hasta": "2012-12-03",
       "motivo": "fuera del universo",
-      "dias": 567,
-      "retorno": 88.5
+      "dias": 581,
+      "retorno": 90.4
+    },
+    {
+      "t": "SNI",
+      "desde": "2011-05-16",
+      "hasta": "2013-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 822,
+      "retorno": 49.7
+    },
+    {
+      "t": "MCO",
+      "desde": "2011-06-01",
+      "hasta": "2017-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 2267,
+      "retorno": 266.1
     },
     {
       "t": "BKNG",
-      "desde": "2011-06-01",
-      "hasta": "2015-11-02",
-      "motivo": "180 días sin recuperar",
-      "dias": 1615,
-      "retorno": 189.4
-    },
-    {
-      "t": "CL",
       "desde": "2011-06-15",
-      "hasta": "2014-09-02",
+      "hasta": "2016-08-15",
       "motivo": "180 días sin recuperar",
-      "dias": 1175,
-      "retorno": 62
+      "dias": 1888,
+      "retorno": 197
     },
     {
-      "t": "SPGI",
+      "t": "APOL",
       "desde": "2011-07-01",
-      "hasta": "2015-03-02",
-      "motivo": "señal bajo umbral 2 evaluaciones",
-      "dias": 1340,
-      "retorno": 174.6
+      "hasta": "2013-07-01",
+      "motivo": "fuera del universo",
+      "dias": null,
+      "retorno": null
     },
     {
       "t": "ADI",
       "desde": "2011-07-15",
-      "hasta": "2012-08-15",
+      "hasta": "2012-05-15",
       "motivo": "180 días sin recuperar",
-      "dias": 397,
-      "retorno": 16.6
+      "dias": 305,
+      "retorno": 5.6
     },
     {
       "t": "INTU",
@@ -178,28 +246,52 @@
       "retorno": 363.2
     },
     {
-      "t": "SBUX",
+      "t": "CL",
       "desde": "2011-08-15",
+      "hasta": "2014-09-02",
+      "motivo": "180 días sin recuperar",
+      "dias": 1114,
+      "retorno": 60.1
+    },
+    {
+      "t": "SPGI",
+      "desde": "2011-09-01",
+      "hasta": "2015-03-02",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 1278,
+      "retorno": 178.4
+    },
+    {
+      "t": "SBUX",
+      "desde": "2011-09-15",
       "hasta": "2013-12-16",
       "motivo": "señal bajo umbral 2 evaluaciones",
-      "dias": 854,
-      "retorno": 105.4
+      "dias": 823,
+      "retorno": 102
     },
     {
       "t": "ACN",
-      "desde": "2011-09-01",
+      "desde": "2011-10-03",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
-      "dias": 2664,
-      "retorno": 237.4
+      "dias": 2632,
+      "retorno": 245.7
     },
     {
-      "t": "RL",
-      "desde": "2011-10-03",
-      "hasta": "2012-10-15",
+      "t": "ATGE",
+      "desde": "2011-10-17",
+      "hasta": "2012-08-01",
       "motivo": "180 días sin recuperar",
-      "dias": 378,
-      "retorno": 28.2
+      "dias": 289,
+      "retorno": -53.3
+    },
+    {
+      "t": "LLTC",
+      "desde": "2011-11-01",
+      "hasta": "2012-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": null,
+      "retorno": null
     },
     {
       "t": "BIIB",
@@ -208,6 +300,22 @@
       "motivo": "abierta al cierre",
       "dias": 2540,
       "retorno": 175.9
+    },
+    {
+      "t": "SWN",
+      "desde": "2012-01-17",
+      "hasta": "2012-09-04",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 231,
+      "retorno": 7.2
+    },
+    {
+      "t": "SIAL",
+      "desde": "2012-04-02",
+      "hasta": "2012-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 196,
+      "retorno": -2.1
     },
     {
       "t": "TDC",
@@ -227,35 +335,35 @@
     },
     {
       "t": "HP",
-      "desde": "2012-05-15",
+      "desde": "2012-07-02",
       "hasta": "2016-05-16",
       "motivo": "180 días sin recuperar",
-      "dias": 1462,
-      "retorno": 52.2
-    },
-    {
-      "t": "CF",
-      "desde": "2012-07-02",
-      "hasta": "2013-11-01",
-      "motivo": "180 días sin recuperar",
-      "dias": 487,
-      "retorno": 12.2
+      "dias": 1414,
+      "retorno": 54.4
     },
     {
       "t": "BF-B",
-      "desde": "2012-07-16",
+      "desde": "2012-09-17",
       "hasta": "2013-09-03",
       "motivo": "180 días sin recuperar",
-      "dias": 414,
-      "retorno": 6.2
+      "dias": 351,
+      "retorno": 5.7
     },
     {
-      "t": "WU",
-      "desde": "2012-11-15",
-      "hasta": "2013-08-15",
-      "motivo": "fuera del universo",
-      "dias": 273,
-      "retorno": 47.2
+      "t": "CF",
+      "desde": "2012-10-01",
+      "hasta": "2013-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 396,
+      "retorno": -3.5
+    },
+    {
+      "t": "CERN",
+      "desde": "2012-10-15",
+      "hasta": "2014-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 730,
+      "retorno": 56.8
     },
     {
       "t": "ORCL",
@@ -266,12 +374,36 @@
       "retorno": 30.5
     },
     {
-      "t": "STX",
+      "t": "ALXN",
       "desde": "2012-12-17",
-      "hasta": "2013-10-15",
+      "hasta": "2015-08-17",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 973,
+      "retorno": 100.9
+    },
+    {
+      "t": "STX",
+      "desde": "2013-01-02",
+      "hasta": "2013-11-01",
       "motivo": "180 días sin recuperar",
-      "dias": 302,
-      "retorno": 70.7
+      "dias": 303,
+      "retorno": 56.9
+    },
+    {
+      "t": "WU",
+      "desde": "2013-01-15",
+      "hasta": "2013-08-15",
+      "motivo": "fuera del universo",
+      "dias": 212,
+      "retorno": 35.1
+    },
+    {
+      "t": "RL",
+      "desde": "2013-04-15",
+      "hasta": "2015-04-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 716,
+      "retorno": -20.4
     },
     {
       "t": "REGN",
@@ -280,6 +412,14 @@
       "motivo": "fuera del universo",
       "dias": 1414,
       "retorno": 95.7
+    },
+    {
+      "t": "GPS",
+      "desde": "2013-08-15",
+      "hasta": "2014-12-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 473,
+      "retorno": -7
     },
     {
       "t": "GWW",
@@ -291,19 +431,19 @@
     },
     {
       "t": "EL",
-      "desde": "2013-10-01",
-      "hasta": "2016-11-01",
+      "desde": "2013-10-15",
+      "hasta": "2017-02-15",
       "motivo": "180 días sin recuperar",
-      "dias": 1127,
-      "retorno": 26.9
+      "dias": 1219,
+      "retorno": 23.4
     },
     {
-      "t": "RL",
-      "desde": "2013-10-15",
-      "hasta": "2015-04-01",
+      "t": "SIAL",
+      "desde": "2013-11-01",
+      "hasta": "2014-09-02",
       "motivo": "180 días sin recuperar",
-      "dias": 533,
-      "retorno": -14.9
+      "dias": 305,
+      "retorno": 22.8
     },
     {
       "t": "AAPL",
@@ -320,6 +460,14 @@
       "motivo": "señal bajo umbral 2 evaluaciones",
       "dias": 74,
       "retorno": 3.9
+    },
+    {
+      "t": "UNP",
+      "desde": "2014-01-15",
+      "hasta": "2016-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 929,
+      "retorno": 15.6
     },
     {
       "t": "FAST",
@@ -346,20 +494,44 @@
       "retorno": 161.5
     },
     {
-      "t": "UNP",
-      "desde": "2014-09-15",
-      "hasta": "2016-08-01",
+      "t": "FB",
+      "desde": "2014-07-01",
+      "hasta": "2015-07-15",
       "motivo": "180 días sin recuperar",
-      "dias": 686,
-      "retorno": -9.5
+      "dias": 379,
+      "retorno": 31.9
+    },
+    {
+      "t": "SWN",
+      "desde": "2014-07-15",
+      "hasta": "2015-04-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 274,
+      "retorno": -37.1
+    },
+    {
+      "t": "SNI",
+      "desde": "2014-08-15",
+      "hasta": "2015-08-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 367,
+      "retorno": -25.9
     },
     {
       "t": "BF-B",
-      "desde": "2014-10-01",
-      "hasta": "2015-06-01",
+      "desde": "2014-09-15",
+      "hasta": "2017-12-01",
       "motivo": "180 días sin recuperar",
-      "dias": 243,
-      "retorno": 6.7
+      "dias": 1173,
+      "retorno": 39
+    },
+    {
+      "t": "LLTC",
+      "desde": "2014-10-15",
+      "hasta": "2015-11-16",
+      "motivo": "fuera del universo",
+      "dias": null,
+      "retorno": null
     },
     {
       "t": "SBUX",
@@ -371,11 +543,11 @@
     },
     {
       "t": "GILD",
-      "desde": "2015-04-15",
+      "desde": "2015-02-02",
       "hasta": "2018-08-15",
       "motivo": "180 días sin recuperar",
-      "dias": 1218,
-      "retorno": -22.2
+      "dias": 1290,
+      "retorno": -23.8
     },
     {
       "t": "HSY",
@@ -403,19 +575,27 @@
     },
     {
       "t": "MMM",
-      "desde": "2015-07-01",
+      "desde": "2015-06-15",
       "hasta": "2016-04-15",
       "motivo": "180 días sin recuperar",
-      "dias": 289,
-      "retorno": 10.7
+      "dias": 305,
+      "retorno": 10.5
     },
     {
-      "t": "EA",
-      "desde": "2015-10-15",
-      "hasta": "2016-08-01",
+      "t": "JNJ",
+      "desde": "2015-07-01",
+      "hasta": "2016-08-15",
+      "motivo": "fuera del universo",
+      "dias": 411,
+      "retorno": 27.9
+    },
+    {
+      "t": "CL",
+      "desde": "2015-09-15",
+      "hasta": "2016-08-15",
       "motivo": "180 días sin recuperar",
-      "dias": 291,
-      "retorno": 8
+      "dias": 335,
+      "retorno": 22.4
     },
     {
       "t": "HRB",
@@ -426,20 +606,20 @@
       "retorno": -12.3
     },
     {
-      "t": "CL",
+      "t": "LUV",
       "desde": "2015-12-15",
-      "hasta": "2016-08-15",
+      "hasta": "2018-06-01",
       "motivo": "180 días sin recuperar",
-      "dias": 244,
-      "retorno": 13.8
+      "dias": 899,
+      "retorno": 17.5
     },
     {
-      "t": "LUV",
+      "t": "ORLY",
       "desde": "2016-01-04",
-      "hasta": "2017-10-16",
+      "hasta": "2018-06-01",
       "motivo": "180 días sin recuperar",
-      "dias": 651,
-      "retorno": 42.5
+      "dias": 879,
+      "retorno": 10.7
     },
     {
       "t": "AAPL",
@@ -450,12 +630,12 @@
       "retorno": 23.1
     },
     {
-      "t": "JNJ",
+      "t": "CTSH",
       "desde": "2016-02-01",
-      "hasta": "2016-08-15",
-      "motivo": "fuera del universo",
-      "dias": 196,
-      "retorno": 18.9
+      "hasta": "2017-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 547,
+      "retorno": 11.8
     },
     {
       "t": "CPRI",
@@ -474,12 +654,12 @@
       "retorno": 5.3
     },
     {
-      "t": "ORLY",
+      "t": "SPGI",
       "desde": "2016-04-15",
-      "hasta": "2018-02-01",
-      "motivo": "180 días sin recuperar",
-      "dias": 657,
-      "retorno": -2.4
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 976,
+      "retorno": 71.9
     },
     {
       "t": "SHW",
@@ -490,12 +670,20 @@
       "retorno": 49.2
     },
     {
-      "t": "BF-B",
+      "t": "FL",
       "desde": "2016-06-01",
-      "hasta": "2017-12-01",
+      "hasta": "2018-09-17",
       "motivo": "180 días sin recuperar",
-      "dias": 548,
-      "retorno": 27.4
+      "dias": 838,
+      "retorno": -10.1
+    },
+    {
+      "t": "CERN",
+      "desde": "2016-06-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 915,
+      "retorno": -0.4
     },
     {
       "t": "ALK",
@@ -506,12 +694,20 @@
       "retorno": 30.9
     },
     {
-      "t": "CTSH",
+      "t": "FB",
+      "desde": "2016-08-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 854,
+      "retorno": 13.1
+    },
+    {
+      "t": "TSCO",
       "desde": "2016-10-03",
-      "hasta": "2017-05-01",
+      "hasta": "2017-11-01",
       "motivo": "180 días sin recuperar",
-      "dias": 210,
-      "retorno": 19.7
+      "dias": 394,
+      "retorno": -10.1
     },
     {
       "t": "PAYX",
@@ -520,14 +716,6 @@
       "motivo": "abierta al cierre",
       "dias": 762,
       "retorno": 24.4
-    },
-    {
-      "t": "SPGI",
-      "desde": "2017-01-03",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 713,
-      "retorno": 56.8
     },
     {
       "t": "NVDA",
@@ -546,20 +734,36 @@
       "retorno": -9.7
     },
     {
-      "t": "EA",
-      "desde": "2017-10-02",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 441,
-      "retorno": -32.8
+      "t": "ANSS",
+      "desde": "2017-09-01",
+      "hasta": "2018-05-15",
+      "motivo": "fuera del universo",
+      "dias": null,
+      "retorno": null
     },
     {
       "t": "MMM",
-      "desde": "2017-10-16",
+      "desde": "2017-09-15",
       "hasta": "2018-08-01",
       "motivo": "180 días sin recuperar",
-      "dias": 289,
-      "retorno": -3.6
+      "dias": 320,
+      "retorno": -1.2
+    },
+    {
+      "t": "AMAT",
+      "desde": "2017-10-16",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 427,
+      "retorno": -39.6
+    },
+    {
+      "t": "IDXX",
+      "desde": "2017-11-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 411,
+      "retorno": 15.4
     },
     {
       "t": "ADBE",
@@ -568,14 +772,6 @@
       "motivo": "abierta al cierre",
       "dias": 397,
       "retorno": 22.9
-    },
-    {
-      "t": "IDXX",
-      "desde": "2018-01-02",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 349,
-      "retorno": 16.5
     },
     {
       "t": "V",
@@ -594,28 +790,20 @@
       "retorno": -49.8
     },
     {
-      "t": "AMAT",
+      "t": "MU",
       "desde": "2018-05-15",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
       "dias": 216,
-      "retorno": -38.7
+      "retorno": -37.3
     },
     {
-      "t": "MU",
+      "t": "AOS",
       "desde": "2018-06-01",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
       "dias": 199,
-      "retorno": -42.3
-    },
-    {
-      "t": "CTSH",
-      "desde": "2018-06-15",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 185,
-      "retorno": -19.4
+      "retorno": -32.7
     },
     {
       "t": "LRCX",
@@ -626,20 +814,20 @@
       "retorno": -20.5
     },
     {
-      "t": "AOS",
+      "t": "BKNG",
       "desde": "2018-07-16",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
       "dias": 154,
-      "retorno": -28.1
+      "retorno": -13.9
     },
     {
-      "t": "BKNG",
+      "t": "CTSH",
       "desde": "2018-08-01",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
       "dias": 138,
-      "retorno": -14
+      "retorno": -20.8
     },
     {
       "t": "NKTR",
@@ -670,258 +858,258 @@
     {
       "entry": 70,
       "exit": 40,
-      "soloPicks": 189.7,
-      "conCaja": 137.8,
-      "sharpe": 0.87,
-      "maxDD": -16.5,
-      "vsEW": -36.9,
-      "posiciones": 93,
-      "pctInvertido": 88
-    },
-    {
-      "entry": 70,
-      "exit": 50,
-      "soloPicks": 189.6,
-      "conCaja": 137.8,
-      "sharpe": 0.87,
-      "maxDD": -16.3,
-      "vsEW": -37,
-      "posiciones": 94,
-      "pctInvertido": 88
-    },
-    {
-      "entry": 70,
-      "exit": 60,
-      "soloPicks": 181.7,
-      "conCaja": 132.9,
-      "sharpe": 0.86,
+      "soloPicks": 194.5,
+      "conCaja": 145.3,
+      "sharpe": 0.91,
       "maxDD": -16,
-      "vsEW": -41.8,
-      "posiciones": 98,
-      "pctInvertido": 88
+      "vsEW": -13.1,
+      "posiciones": 85,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 70,
+      "exit": 50,
+      "soloPicks": 199,
+      "conCaja": 148.3,
+      "sharpe": 0.93,
+      "maxDD": -16,
+      "vsEW": -10,
+      "posiciones": 86,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 70,
+      "exit": 60,
+      "soloPicks": 199.1,
+      "conCaja": 148.5,
+      "sharpe": 0.93,
+      "maxDD": -16,
+      "vsEW": -9.9,
+      "posiciones": 87,
+      "pctInvertido": 86
     },
     {
       "entry": 75,
       "exit": 40,
-      "soloPicks": 200.4,
-      "conCaja": 124.9,
-      "sharpe": 0.86,
+      "soloPicks": 167.2,
+      "conCaja": 123.1,
+      "sharpe": 0.81,
+      "maxDD": -17.3,
+      "vsEW": -35.2,
+      "posiciones": 109,
+      "pctInvertido": 85
+    },
+    {
+      "entry": 75,
+      "exit": 50,
+      "soloPicks": 174.8,
+      "conCaja": 126.8,
+      "sharpe": 0.83,
+      "maxDD": -16.6,
+      "vsEW": -31.5,
+      "posiciones": 111,
+      "pctInvertido": 85
+    },
+    {
+      "entry": 75,
+      "exit": 60,
+      "soloPicks": 171.9,
+      "conCaja": 124.3,
+      "sharpe": 0.82,
       "maxDD": -16.7,
-      "vsEW": -49.8,
-      "posiciones": 96,
-      "pctInvertido": 76
-    },
-    {
-      "entry": 75,
-      "exit": 50,
-      "soloPicks": 203.3,
-      "conCaja": 125.6,
-      "sharpe": 0.87,
-      "maxDD": -16.7,
-      "vsEW": -49.2,
-      "posiciones": 97,
-      "pctInvertido": 75
-    },
-    {
-      "entry": 75,
-      "exit": 60,
-      "soloPicks": 199.5,
-      "conCaja": 120,
-      "sharpe": 0.84,
-      "maxDD": -17.6,
-      "vsEW": -54.8,
-      "posiciones": 97,
-      "pctInvertido": 75
+      "vsEW": -34,
+      "posiciones": 112,
+      "pctInvertido": 85
     },
     {
       "entry": 80,
       "exit": 40,
-      "soloPicks": 206.3,
-      "conCaja": 76.3,
-      "sharpe": 0.78,
+      "soloPicks": 167.3,
+      "conCaja": 78.1,
+      "sharpe": 0.72,
       "maxDD": -15.5,
-      "vsEW": -98.4,
-      "posiciones": 74,
-      "pctInvertido": 49
+      "vsEW": -80.2,
+      "posiciones": 89,
+      "pctInvertido": 57
     },
     {
       "entry": 80,
       "exit": 50,
-      "soloPicks": 206.4,
-      "conCaja": 76.4,
-      "sharpe": 0.78,
-      "maxDD": -15.5,
-      "vsEW": -98.4,
-      "posiciones": 74,
-      "pctInvertido": 49
+      "soloPicks": 170.1,
+      "conCaja": 80.4,
+      "sharpe": 0.74,
+      "maxDD": -15.6,
+      "vsEW": -78,
+      "posiciones": 89,
+      "pctInvertido": 57
     },
     {
       "entry": 80,
       "exit": 60,
-      "soloPicks": 203.8,
-      "conCaja": 74.1,
-      "sharpe": 0.76,
-      "maxDD": -15.5,
-      "vsEW": -100.7,
-      "posiciones": 74,
-      "pctInvertido": 48
+      "soloPicks": 167.1,
+      "conCaja": 78,
+      "sharpe": 0.72,
+      "maxDD": -15.7,
+      "vsEW": -80.4,
+      "posiciones": 89,
+      "pctInvertido": 57
     },
     {
       "entry": 85,
       "exit": 40,
-      "soloPicks": 179.3,
-      "conCaja": 30.5,
-      "sharpe": 0.61,
-      "maxDD": -8.2,
-      "vsEW": -144.3,
-      "posiciones": 39,
-      "pctInvertido": 24
+      "soloPicks": 155.1,
+      "conCaja": 31.9,
+      "sharpe": 0.58,
+      "maxDD": -8.8,
+      "vsEW": -126.4,
+      "posiciones": 49,
+      "pctInvertido": 27
     },
     {
       "entry": 85,
       "exit": 50,
-      "soloPicks": 179.3,
-      "conCaja": 30.6,
-      "sharpe": 0.61,
-      "maxDD": -8.2,
-      "vsEW": -144.2,
-      "posiciones": 39,
-      "pctInvertido": 24
-    },
-    {
-      "entry": 85,
-      "exit": 60,
-      "soloPicks": 176.4,
-      "conCaja": 29.9,
+      "soloPicks": 155.5,
+      "conCaja": 32.6,
       "sharpe": 0.6,
-      "maxDD": -8.2,
-      "vsEW": -144.9,
-      "posiciones": 39,
-      "pctInvertido": 24
+      "maxDD": -8.7,
+      "vsEW": -125.8,
+      "posiciones": 49,
+      "pctInvertido": 27
+    },
+    {
+      "entry": 85,
+      "exit": 60,
+      "soloPicks": 152.9,
+      "conCaja": 31.8,
+      "sharpe": 0.59,
+      "maxDD": -8.8,
+      "vsEW": -126.5,
+      "posiciones": 49,
+      "pctInvertido": 27
     },
     {
       "entry": 90,
       "exit": 40,
-      "soloPicks": 109.8,
-      "conCaja": 8.6,
-      "sharpe": 0.38,
-      "maxDD": -5,
-      "vsEW": -166.1,
-      "posiciones": 20,
+      "soloPicks": 104.6,
+      "conCaja": 7.3,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -151,
+      "posiciones": 19,
       "pctInvertido": 11
     },
     {
       "entry": 90,
       "exit": 50,
-      "soloPicks": 111.8,
-      "conCaja": 8.6,
-      "sharpe": 0.38,
-      "maxDD": -5,
-      "vsEW": -166.1,
-      "posiciones": 20,
+      "soloPicks": 104.6,
+      "conCaja": 7.3,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -151,
+      "posiciones": 19,
       "pctInvertido": 11
     },
     {
       "entry": 90,
       "exit": 60,
-      "soloPicks": 111.8,
-      "conCaja": 8.6,
-      "sharpe": 0.38,
-      "maxDD": -5,
-      "vsEW": -166.1,
-      "posiciones": 20,
+      "soloPicks": 104.6,
+      "conCaja": 7.3,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -151,
+      "posiciones": 19,
       "pctInvertido": 11
     }
   ],
   "ablacionReglas": {
     "reglas completas (§2-§6)": {
-      "soloPicks": 206.4,
-      "conCaja": 76.4,
-      "sharpe": 0.78,
-      "maxDD": -15.5,
-      "vsEW": -98.4,
-      "posiciones": 74,
-      "pctInvertido": 49
+      "soloPicks": 170.1,
+      "conCaja": 80.4,
+      "sharpe": 0.74,
+      "maxDD": -15.6,
+      "vsEW": -78,
+      "posiciones": 89,
+      "pctInvertido": 57
     },
     "sin la regla de 180 días": {
-      "soloPicks": 224.7,
-      "conCaja": 113.1,
-      "sharpe": 0.83,
-      "maxDD": -18.8,
-      "vsEW": -61.7,
-      "posiciones": 59,
-      "pctInvertido": 69
+      "soloPicks": 204.5,
+      "conCaja": 117.8,
+      "sharpe": 0.82,
+      "maxDD": -19,
+      "vsEW": -40.5,
+      "posiciones": 68,
+      "pctInvertido": 78
     },
     "sin cuarentena de 12 meses": {
-      "soloPicks": 198.3,
-      "conCaja": 76.4,
-      "sharpe": 0.77,
-      "maxDD": -15.3,
-      "vsEW": -98.4,
-      "posiciones": 75,
-      "pctInvertido": 50
+      "soloPicks": 169.3,
+      "conCaja": 82,
+      "sharpe": 0.74,
+      "maxDD": -15.5,
+      "vsEW": -76.3,
+      "posiciones": 91,
+      "pctInvertido": 58
     },
     "sin persistencia de 60 días": {
-      "soloPicks": 215.5,
-      "conCaja": 75,
-      "sharpe": 0.73,
-      "maxDD": -15.6,
-      "vsEW": -99.8,
-      "posiciones": 77,
-      "pctInvertido": 52
+      "soloPicks": 183.8,
+      "conCaja": 84.9,
+      "sharpe": 0.74,
+      "maxDD": -16.2,
+      "vsEW": -73.5,
+      "posiciones": 93,
+      "pctInvertido": 60
     },
     "2/fecha = 4 al mes": {
-      "soloPicks": 213.1,
-      "conCaja": 79.2,
-      "sharpe": 0.79,
-      "maxDD": -15.4,
-      "vsEW": -95.6,
-      "posiciones": 76,
-      "pctInvertido": 50
+      "soloPicks": 169.4,
+      "conCaja": 84.6,
+      "sharpe": 0.75,
+      "maxDD": -15.6,
+      "vsEW": -73.8,
+      "posiciones": 92,
+      "pctInvertido": 59
     },
     "4/fecha = 8 al mes": {
-      "soloPicks": 202.8,
-      "conCaja": 78.7,
-      "sharpe": 0.78,
-      "maxDD": -15.3,
-      "vsEW": -96.1,
-      "posiciones": 76,
-      "pctInvertido": 50
+      "soloPicks": 163.4,
+      "conCaja": 87,
+      "sharpe": 0.75,
+      "maxDD": -15.5,
+      "vsEW": -71.4,
+      "posiciones": 94,
+      "pctInvertido": 60
     },
     "sin 180d + 4 al mes": {
-      "soloPicks": 224.9,
-      "conCaja": 116.5,
-      "sharpe": 0.84,
-      "maxDD": -18.8,
-      "vsEW": -58.3,
-      "posiciones": 60,
-      "pctInvertido": 70
+      "soloPicks": 202.6,
+      "conCaja": 126.8,
+      "sharpe": 0.83,
+      "maxDD": -19.2,
+      "vsEW": -31.5,
+      "posiciones": 69,
+      "pctInvertido": 81
     },
     "sin 180d + 8 al mes": {
-      "soloPicks": 215.9,
-      "conCaja": 115.9,
-      "sharpe": 0.83,
-      "maxDD": -18.9,
-      "vsEW": -58.9,
-      "posiciones": 60,
-      "pctInvertido": 70
+      "soloPicks": 192.9,
+      "conCaja": 126.7,
+      "sharpe": 0.82,
+      "maxDD": -19.9,
+      "vsEW": -31.7,
+      "posiciones": 69,
+      "pctInvertido": 84
     },
     "v2 · p70 · 4 al mes · sin180d": {
-      "soloPicks": 189.7,
-      "conCaja": 163.3,
-      "sharpe": 0.89,
-      "maxDD": -17.7,
-      "vsEW": -11.4,
-      "posiciones": 69,
-      "pctInvertido": 94
+      "soloPicks": 184.9,
+      "conCaja": 149.8,
+      "sharpe": 0.84,
+      "maxDD": -18.1,
+      "vsEW": -8.5,
+      "posiciones": 71,
+      "pctInvertido": 92
     },
     "v2 · p70 · 8 al mes · sin180d": {
-      "soloPicks": 164.1,
-      "conCaja": 156.4,
-      "sharpe": 0.84,
-      "maxDD": -19.2,
-      "vsEW": -18.3,
-      "posiciones": 71,
+      "soloPicks": 149.6,
+      "conCaja": 134.9,
+      "sharpe": 0.75,
+      "maxDD": -21.7,
+      "vsEW": -23.4,
+      "posiciones": 77,
       "pctInvertido": 96
     }
   },
@@ -929,6 +1117,6 @@
     "H1_reglasNoDestruyenSeñal": true,
     "H1_refTrimestral": 146.9,
     "H2_bateUniversoEW": false,
-    "H3_precioDeLaRampaPp": 130.1
+    "H3_precioDeLaRampaPp": 89.7
   }
 }
