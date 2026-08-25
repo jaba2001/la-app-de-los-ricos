@@ -127,13 +127,94 @@ export async function tickerToCikVivo(ticker) {
   return mem.get("__map")[t] ?? null;
 }
 
+/**
+ * EL CIK QUE LLEVABA LA HISTORIA ANTES DE UNA REORGANIZACION.
+ *
+ * Cuando una empresa se reorganiza bajo una holding nueva, la SEC le da un CIK NUEVO y el mapa
+ * vivo apunta el ticker ahi. El CIK nuevo solo tiene los ejercicios posteriores, asi que la
+ * empresa se queda sin fundamentales en toda su historia anterior — luego sin senal, luego
+ * invisible en el backtest. No falla nada: devuelve una respuesta plausible y vacia.
+ *
+ * Es el mismo fenomeno que ya obligo a fijar `XOM` a mano en `MANUAL_CIK`, pero alli se
+ * resolvio eligiendo UN CIK, y elegir pierde una mitad: la antigua pierde los trimestres
+ * nuevos, la nueva pierde los anos viejos. Aqui no hay que elegir, porque los hechos de XBRL
+ * van FECHADOS y `fundamentalsAsOf` ya selecciona por fecha: se unen los dos juegos y cada
+ * consulta encuentra el tramo que le toca.
+ *
+ * Medido el 2026-08-25:
+ *   BLK   nuevo 2012383 tiene Assets desde 2023-12-31; el viejo 1364742, desde 2008-12-31.
+ *   APA   nuevo 1841666 tiene Assets desde 2019-12-31; el viejo 6769,    desde 2008-12-31.
+ *
+ * ⚠️ SOLO REORGANIZACIONES. NUNCA UN SIMBOLO REASIGNADO.
+ *
+ * La diferencia no es tecnica, es de que se esta afirmando. `BLK` y `APA` son la MISMA empresa
+ * con otra envoltura juridica, asi que unir sus hechos reconstruye una serie que existio de
+ * verdad. `SNDK` no: el SanDisk que estuvo en el indice de 2010 a 2016 lo compro Western
+ * Digital, y el `SNDK` de hoy es un spin-off de 2025 que no es su continuacion. Unirlos
+ * FABRICARIA una continuidad que nunca hubo — y eso es peor que el hueco, porque un hueco se ve
+ * y se cuenta y una serie inventada no.
+ *
+ * Y la prueba de que son casos distintos esta en los propios datos, no en mi criterio: los
+ * hechos de SanDisk viejo (CIK 1000180) acaban el 2016-04-03, el mes de la compra, y los del
+ * nuevo empiezan el 2024-06-28. Ocho anos de vacio. Los de BlackRock viejo llegan a 2024-06-30
+ * y los del nuevo arrancan en 2023-12-31: se SOLAPAN, que es lo que hace una reorganizacion.
+ *
+ * Antes de anadir una entrada aqui, comprueba ese solape. Si hay hueco, no es una
+ * reorganizacion y no va en esta tabla.
+ */
+const CIK_PREDECESOR = {
+  "0002012383": "0001364742", // BlackRock, Inc. (holding de 2023) <- BLACKROCK FINANCE, INC.
+  "0001841666": "0000006769", // APA Corp (holding de 2021)        <- APACHE CORP
+  // "0002023554": NO. Sandisk Corp (spin-off de 2025) no continua a SANDISK CORP (1000180).
+};
+
+/**
+ * Une dos juegos de `companyfacts` conservando la estructura que espera todo lo de abajo.
+ *
+ * Manda el NUEVO en cualquier colision: durante el solape de una reorganizacion los dos
+ * declaran el mismo periodo, y el bueno es el de la entidad que informa hoy — su primer 10-K
+ * reexpresa la historia. El viejo solo aporta lo que el nuevo no tiene, que es el pasado.
+ */
+function fusionarFacts(nuevo, viejo) {
+  if (!viejo?.facts) return nuevo;
+  if (!nuevo?.facts) return nuevo;
+  const clave = (x) => `${x.start ?? ""}|${x.end ?? ""}|${x.fp ?? ""}|${x.form ?? ""}`;
+  const out = { ...nuevo, facts: { ...nuevo.facts } };
+  for (const tax of Object.keys(viejo.facts)) {
+    out.facts[tax] = { ...(out.facts[tax] ?? {}) };
+    for (const tag of Object.keys(viejo.facts[tax])) {
+      const vt = viejo.facts[tax][tag];
+      const nt = out.facts[tax][tag];
+      if (!nt) { out.facts[tax][tag] = vt; continue; }
+      const units = { ...nt.units };
+      for (const u of Object.keys(vt.units ?? {})) {
+        const yaEsta = new Set((units[u] ?? []).map(clave));
+        const anadidos = (vt.units[u] ?? []).filter((x) => !yaEsta.has(clave(x)));
+        units[u] = [...(units[u] ?? []), ...anadidos].sort((a, b) => String(a.end).localeCompare(String(b.end)));
+      }
+      out.facts[tax][tag] = { ...nt, units };
+    }
+  }
+  return out;
+}
+
 async function companyFacts(cik) {
   const key = `facts_${cik}`;
   if (mem.has(key)) return mem.get(key);
-  const j = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`, `CIK${cik}.json`);
+  let j = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`, `CIK${cik}.json`);
+  const previo = CIK_PREDECESOR[cik];
+  if (previo && j) {
+    // Si el predecesor no responde no se rompe nada: se sigue con lo que hay, que es el
+    // comportamiento de antes. Un fallo de red no debe cambiar una nota.
+    const viejo = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${previo}.json`, `CIK${previo}.json`);
+    if (viejo) j = fusionarFacts(j, viejo);
+  }
   mem.set(key, j);
   return j;
 }
+
+/** Para los tests: quien tiene predecesor declarado y cual. */
+export const PREDECESORES = CIK_PREDECESOR;
 
 /** SIC code → Scora sector (from submissions endpoint, cached). */
 export async function sicSector(cik) {

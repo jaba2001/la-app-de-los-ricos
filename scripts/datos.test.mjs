@@ -263,7 +263,34 @@ if (SIN_RED) {
   console.log("\n  B · humo contra la SEC — SALTADO (--sin-red)\n");
 } else {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
-  const { tickerToCik, fundamentalsAsOf } = await import("../research/edgar.mjs");
+  const { tickerToCik, fundamentalsAsOf, PREDECESORES } = await import("../research/edgar.mjs");
+
+  // ── LA FUSION CON EL CIK PREDECESOR ────────────────────────────────────────────────
+  //
+  // Cuando una empresa se reorganiza bajo una holding nueva, la SEC le da un CIK NUEVO que
+  // solo tiene los ejercicios posteriores. `BLK` apuntaba a un CIK cuyos hechos empiezan en
+  // 2023-12-31, asi que BlackRock —un top-25 del indice— estaba sin fundamentales en toda su
+  // historia anterior: sin senal, invisible, y sin que fallara nada.
+  //
+  // El arreglo une los hechos del CIK nuevo con los del predecesor y deja que
+  // `fundamentalsAsOf` elija por fecha, que es lo que ya hacia. Este test comprueba que la
+  // union SIRVE —no que exista la tabla— pidiendo un ejercicio que solo puede venir del CIK
+  // viejo: antes de la fusion, esta misma llamada devolvia null.
+  {
+    const cik = await tickerToCik("BLK");
+    const f = await fundamentalsAsOf(cik, "2021-06-30");
+    ok(f?.revTTM > 5e9, `BLK tiene fundamentales en 2021 gracias al CIK predecesor (revTTM ${f?.revTTM ? (f.revTTM / 1e9).toFixed(1) + " B" : "NULO"}) — sin la fusion, BlackRock es invisible antes de 2023`);
+
+    // ⚠️ Y LO QUE NO PUEDE ENTRAR NUNCA EN ESA TABLA.
+    //
+    // `SNDK` tiene la misma forma —ticker vivo, CIK nuevo sin historia— y el arreglo seria el
+    // mismo mecanicamente. Pero no es la misma empresa: el SanDisk del indice 2010-2016 lo
+    // compro Western Digital y el de hoy es un spin-off de 2025. Unirlos no reconstruiria una
+    // serie, la INVENTARIA. Y la prueba esta en los datos, no en el criterio de nadie: los
+    // hechos del viejo (CIK 1000180) acaban el 2016-04-03 y los del nuevo empiezan el
+    // 2024-06-28 — ocho anos de vacio. Los de una reorganizacion se SOLAPAN.
+    ok(!PREDECESORES["0002023554"], "SNDK NO tiene predecesor declarado: es una reasignacion de simbolo, no una reorganizacion, y unir sus hechos fabricaria una continuidad que nunca existio");
+  }
 
   // ── MIEMBROS ACTUALES QUE EL MAPA VIVO MANDA A UN CIK SIN HISTORIA ──────────────────
   //
