@@ -141,6 +141,31 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     }
   }
 
+  // ⚠️ UNA PROPUESTA DE LA MÁQUINA NO PUEDE FIGURAR COMO REVISIÓN HUMANA.
+  //
+  // `cik_revisados.json` se describe como el fichero de las decisiones humanas, pero
+  // `revisar_cik.mjs --proponer` escribe en él también. El 2026-08-25 eran 13 de 36, y
+  // `publicar_resolucion` las etiquetaba a todas `+revisado`: la salvaguarda que el código
+  // prometía cubría 23 de los 121 CIK publicados y no los 121, sin que nada lo dijera.
+  //
+  // Ahora se distingue `+revisado` de `+corroborado`, y esto lo comprueba. Importa que siga
+  // comprobándose porque hay tandas de --proponer programándose sin supervisión: sin este
+  // test, la próxima añadiría propuestas automáticas bajo la etiqueta de revisión humana.
+  const rev = dat("cik_revisados.json");
+  if (!rev?.decisiones) aviso("falta research/data/cik_revisados.json — no se puede comprobar la procedencia de las decisiones");
+  else if (hist) {
+    const esHumano = (d) => !/--proponer/.test(String(d?.propuestoPor ?? ""));
+    const publicados = new Set(Object.keys(hist.mapa ?? {}));
+    const auto = Object.entries(rev.decisiones).filter(([t, d]) => publicados.has(t) && !esHumano(d)).map(([t]) => t);
+    const ev = hist.porEvidencia ?? {};
+    const nCorroborado = Object.entries(ev).filter(([k]) => k.endsWith("+corroborado")).reduce((a, [, v]) => a + v, 0);
+    ok(nCorroborado === auto.length, `cik_historicos: las ${auto.length} decisiones escritas por --proponer figuran como «+corroborado», no como revisión humana (porEvidencia cuenta ${nCorroborado})`);
+    // Y ninguna decisión puede quedarse sin procedencia declarada: sin ese campo no se sabe
+    // quién decidió, y lo que no se sabe acaba contándose como lo más favorable.
+    const sinProc = Object.entries(rev.decisiones).filter(([, d]) => !d?.propuestoPor).map(([t]) => t);
+    ok(!sinProc.length, `cik_revisados: toda decisión declara quién la tomó${sinProc.length ? ` — sin procedencia: ${sinProc.slice(0, 5).join(", ")}` : ""}`);
+  }
+
   const bloq = dat("simbolos_reutilizados.json");
   if (!bloq) aviso("falta research/data/simbolos_reutilizados.json — regenéralo con research/simbolos_reutilizados.mjs");
   else {

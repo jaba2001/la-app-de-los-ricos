@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-25T19:54:38.958Z",
+ "generatedAt": "2026-08-25T20:43:58.613Z",
  "versionReglas": 3,
  "auditados": 287,
  "reutilizados": 27,
@@ -3654,9 +3654,9 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -3679,9 +3679,9 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,

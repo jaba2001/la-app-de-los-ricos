@@ -62,6 +62,24 @@ const revisados = (() => {
 //
 // Lo que sí se conserva es el rastro: la decisión guarda a qué candidato se enfrentaba, y si el
 // resolutor ha cambiado de opinión desde entonces se avisa en vez de callarlo.
+// ⚠️ Y «REVISADO» NO SIEMPRE QUIERE DECIR QUE LO MIRARA UNA PERSONA.
+//
+// `cik_revisados.json` se describe —aquí y en §10— como el fichero de las decisiones
+// humanas, y `publicar_resolucion` lo trataba entero como tal. Pero
+// `revisar_cik.mjs --proponer` ESCRIBE EN ESE MISMO FICHERO: de las 36 decisiones que
+// había el 2026-08-25, **13 las puso la máquina** y 23 una persona. La salvaguarda que este
+// código prometía cubría 23 de los 121 CIK publicados, no los 121.
+//
+// No se descartan, y el motivo está medido: esas 13 son una corroboración automática
+// INDEPENDIENTE —el proveedor de precios dice qué empresa llevaba el símbolo y el nombre casa
+// al ~100 %— y de hecho CORRIGIERON al resolutor (llevan `cikPropuestoEntonces`, y `TWC` es
+// una de ellas). Son Heinz, Airgas, Covidien, Express Scripts, Red Hat, St Jude, Safeway…
+// ninguna dudosa.
+//
+// Lo que sí se arregla es que la diferencia se VEA: la evidencia distingue `+revisado` de
+// `+corroborado` y el recuento final los separa, de modo que una tanda de `--proponer` no
+// pueda volver a colar propuestas automáticas bajo la etiqueta de revisión humana.
+const esHumano = (d) => !/--proponer/.test(String(d?.propuestoPor ?? ""));
 const entradas = [];
 const revisionesDesfasadas = [];
 for (const f of detalle) {
@@ -74,7 +92,7 @@ for (const f of detalle) {
     if (d.cikPropuestoEntonces && d.cikPropuestoEntonces !== f.cik) {
       revisionesDesfasadas.push(`${f.ticker}: se revisó frente a ${d.cikPropuestoEntonces} y el resolutor propone ahora ${f.cik}`);
     }
-    entradas.push([f.ticker, d.cik, `${f.evidencia}+revisado`]);
+    entradas.push([f.ticker, d.cik, `${f.evidencia}+${esHumano(d) ? "revisado" : "corroborado"}`]);
     continue;
   }
   if (!/^\d{10}$/.test(f.cik)) continue;
@@ -233,7 +251,10 @@ escribirAtomico(join(DATA, "alias_ticker.json"), JSON.stringify({
   detalle: detalleAlias.sort((a, b) => a.de.localeCompare(b.de)),
 }, null, 1));
 
+const nHumano = entradas.filter(([, , e]) => e.endsWith("+revisado")).length;
+const nAuto = entradas.filter(([, , e]) => e.endsWith("+corroborado")).length;
 console.log(`\n  CIK publicados: ${Object.keys(mapa).length}   ·   alias de ticker: ${Object.keys(alias).length}   ·   pendientes de revisar a mano: ${porRevisar.length}\n`);
+console.log(`  Con decisión sobre el resolutor: ${nHumano} revisados por una PERSONA · ${nAuto} corroborados por revisar_cik --proponer (máquina, NO revisión humana)`);
 if (porRevisar.length) {
   console.log(`  ── SIN PUBLICAR, esperando revisión a mano (${porRevisar.length}) ──`);
   console.log(`  Confírmalos o recházalos en research/data/cik_revisados.json\n`);

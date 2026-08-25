@@ -1,15 +1,16 @@
 {
- "generatedAt": "2026-08-25T05:10:40.372Z",
+ "generatedAt": "2026-08-25T21:52:47.744Z",
  "fuente": "research/resolver_cik.mjs → research/publicar_resolucion.mjs",
  "evidencia": "research/out/resolucion_cik.json",
  "criterio": "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) o la fuente de miembros actuales. Los niveles B y C sólo entran confirmados a mano en cik_revisados.json.",
  "entradas": 121,
  "porEvidencia": {
   "A": 83,
-  "C+revisado": 20,
+  "C+revisado": 8,
+  "C+corroborado": 12,
   "B+revisado": 15,
   "fuente": 2,
-  "A+revisado": 1
+  "A+corroborado": 1
  },
  "sinPublicar": [],
  "mapa": {

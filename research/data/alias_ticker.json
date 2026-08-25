@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-25T05:10:41.360Z",
+ "generatedAt": "2026-08-25T21:52:48.286Z",
  "fuente": "research/publicar_resolucion.mjs",
  "criterio": "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",
  "entradas": 21,
