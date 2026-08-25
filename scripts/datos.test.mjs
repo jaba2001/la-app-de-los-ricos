@@ -265,6 +265,45 @@ if (SIN_RED) {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
   const { tickerToCik, fundamentalsAsOf } = await import("../research/edgar.mjs");
 
+  // ── MIEMBROS ACTUALES QUE EL MAPA VIVO MANDA A UN CIK SIN HISTORIA ──────────────────
+  //
+  // El sesgo de supervivencia que cerró §10 entraba por los tickers MUERTOS. Existe la
+  // variante simétrica, hacia atrás, y aquello no la cubre: un ticker VIVO cuya empresa de hoy
+  // no es la que lo llevaba entonces. Ocurre de dos maneras:
+  //
+  //   · **Reorganización** — la empresa crea una holding nueva, con CIK nuevo. Es el caso de
+  //     `XOM`, que por esto está fijado a mano en `MANUAL_CIK`: el mapa devuelve el CIK de
+  //     «ExxonMobil Holdings Corp», que no ha presentado ningún 10-K. Respuesta plausible y
+  //     equivocada — no falla: deja a la empresa sin fundamentales y por tanto sin señal.
+  //   · **Reasignación** — la empresa murió y otra heredó el símbolo años después. `SNDK` fue
+  //     miembro de 2010 a 2016 (SanDisk, comprada por Western Digital) y hoy es el spin-off de
+  //     2025, con CIK nuevo. No es la misma empresa ni de lejos.
+  //
+  // El síntoma común es barato y no cuesta ni una petición extra: un CIK ALTO —asignado hace
+  // poco— en un ticker que consta en el índice desde hace años. Los tres conocidos van en la
+  // lista; este test existe para que el CUARTO no entre en silencio, que es como entraron
+  // estos. Fijarles el CIK correcto es decisión de producción, no de un test.
+  {
+    const { loadSP500Historical } = await import("../research/universe.mjs");
+    const tabla = await loadSP500Historical();
+    if (!tabla?.length) aviso("sin tabla de miembros: no se puede buscar tickers vivos con CIK sin historia");
+    else {
+      const fotos = tabla.filter((f) => f.date >= "2010-01-01");
+      const primera = new Map();
+      for (const f of fotos) for (const k of f.tickers) if (!primera.has(k)) primera.set(k, f.date);
+      const CONOCIDOS = new Set(["SNDK", "BLK", "APA"]);
+      const nuevos = [];
+      for (const t of fotos[fotos.length - 1].tickers) {
+        const cik = await tickerToCik(t).catch(() => null);
+        if (!cik) continue;
+        if (parseInt(cik, 10) > 1800000 && primera.get(t) < "2019-01-01" && !CONOCIDOS.has(t)) {
+          nuevos.push(`${t} (CIK ${cik}, en el índice desde ${primera.get(t)})`);
+        }
+      }
+      ok(!nuevos.length, `ningún miembro actual NUEVO con CIK reciente e historia antigua (conocidos, sin arreglar: ${[...CONOCIDOS].join(", ")})${nuevos.length ? ` — APARECIDO: ${nuevos.join(" · ")}` : ""}`);
+    }
+  }
+
   /** Cada caso reproduce UNO de los defectos encontrados. El comentario dice cuál. */
   const CASOS = [
     { t: "AAPL", cik: "0000320193", que: "TTM de doce meses seguidos (sumaba 4 trimestres sueltos)",
