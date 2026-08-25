@@ -564,4 +564,10 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
   criterios: { H1_reglasNoDestruyenSeñal: h1, H1_refTrimestral: refTrimestral == null ? null : fx(refTrimestral, 1),
                H2_bateUniversoEW: h2, H3_precioDeLaRampaPp: fx(cPicks.total - cCaja.total, 1) },
 }, null, 2));
-console.log(`\n  → escrito research/out/picks_rules_backtest${LONG ? "_oos" : ""}.json\n`);
+// El nombre que se imprime tiene que ser el que se ESCRIBE. Le faltaba el `_smoke`, asi que al
+// terminar una corrida de humo anunciaba «escrito research/out/picks_rules_backtest.json» — el
+// artefacto de VERDAD, el que sostiene las cifras publicadas del documento de reglas. No lo
+// pisa (la escritura si lleva el sufijo), pero invita a creer que si, y en las dos direcciones:
+// o corres un smoke para revisar algo y te quedas pensando que has machacado los numeros
+// buenos, o abres ese fichero convencido de que trae lo que acabas de correr.
+console.log(`\n  → escrito research/out/picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_smoke" : ""}.json\n`);
