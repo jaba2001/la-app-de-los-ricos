@@ -243,17 +243,30 @@ const curva = (rets, porAño = 252) => {
 };
 
 /** Convierte el libro de operaciones en dos curvas diarias: CON caja y SIN caja. */
-async function valorar(libro) {
+// `silencioso` para el barrido y la ablación: ahí `valorar` se llama decenas de veces y el
+// aviso de posiciones no valoradas se repetiría hasta enterrar el resultado. En la corrida
+// principal —la que produce los números que se publican— SÍ se dice.
+async function valorar(libro, { silencioso = false } = {}) {
   const eje = DIAS_MERCADO.filter((d) => d >= fechasOk[0] && d <= fechasOk.at(-1));
   const idx = new Map(eje.map((d, i) => [d, i]));
   // Para cada posición, su serie de retornos diarios colocada sobre el eje global.
   const activos = eje.map(() => []);            // día → [retornos de las posiciones vivas]
   const flujos = eje.map(() => ({ compras: [], ventas: [] }));
+  // ⚠️ ESTOS DOS `continue` YA HICIERON DAÑO, y en silencio. El 2026-08-21 `EA` se quedó con
+  // seis barras y `loadPanel` —que exige 300— devolvió null: las DOS posiciones de EA
+  // desaparecieron del libro con `retorno: null`, y los números publicados de 2011-2018
+  // salieron con 2 de 64 posiciones evaporadas sin un solo aviso.
+  //
+  // El riesgo dejó de ser teórico al resolver los CIK de las empresas muertas: ~150 nombres
+  // nuevos entran al universo, y son justo los de historia corta o interrumpida. Si una parte
+  // apreciable del libro se cae por aquí, el resultado NO es comparable con el anterior — así
+  // que ahora se cuenta y se dice, en vez de saltarse.
+  const saltadas = { sinPanel: [], sinRetornos: [] };
   for (const op of libro) {
     const p = await panelDe(op.t);
-    if (!p) continue;
+    if (!p) { saltadas.sinPanel.push(op.t); continue; }
     const rs = retornosEntre(p, op.desde, op.hasta);
-    if (!rs.length) continue;
+    if (!rs.length) { saltadas.sinRetornos.push(`${op.t} ${op.desde}→${op.hasta}`); continue; }
     op.retorno = (rs.reduce((s, x) => s * (1 + x.r), 1) - 1) * 100;
     op.dias = dias(op.desde, op.hasta);
     for (const x of rs) { const i = idx.get(x.d); if (i != null) activos[i].push({ t: op.t, r: x.r }); }
@@ -288,7 +301,15 @@ async function valorar(libro) {
 
   // Nº medio de posiciones vivas y rotación
   const vivas = activos.map((a) => a.length);
-  return { eje, soloPicks, conCaja, vivas };
+  const nSalt = saltadas.sinPanel.length + saltadas.sinRetornos.length;
+  if (nSalt && !silencioso) {
+    const pct = (100 * nSalt) / libro.length;
+    console.warn(`  ⚠ ${nSalt} de ${libro.length} posiciones (${pct.toFixed(1)} %) no se pudieron valorar y NO están en el resultado.`);
+    if (saltadas.sinPanel.length) console.warn(`     sin panel de precios: ${[...new Set(saltadas.sinPanel)].join(" ")}`);
+    if (saltadas.sinRetornos.length) console.warn(`     sin retornos en su periodo: ${saltadas.sinRetornos.slice(0, 12).join(" · ")}`);
+    if (pct > 5) console.warn(`     ⚠⚠ por encima del 5 %: este resultado no es comparable con uno calculado sobre el libro completo.`);
+  }
+  return { eje, soloPicks, conCaja, vivas, saltadas: { sinPanel: [...new Set(saltadas.sinPanel)], sinRetornos: saltadas.sinRetornos.length, total: nSalt, deCuantas: libro.length } };
 }
 
 /** Referencia: comprar y mantener un ETF durante toda la ventana. */
@@ -332,12 +353,18 @@ async function universoEW(eje, excluir = null) {
   const miembros = new Set();
   for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) miembros.add(t);
   let n = 0;
+  // Esta referencia es CONTRA LO QUE SE MIDE TODO, así que un nombre que desaparezca de ella en
+  // silencio desplaza el listón sin que nada avise. Los dos descartes de abajo se cuentan:
+  //   · `sinPanel`  — no hay precios (o están bloqueados por símbolo reutilizado).
+  //   · `empiezaTarde` — la serie arranca DESPUÉS del inicio de la ventana, y entonces el
+  //     nombre se cae entero en vez de aportar desde que existe.
+  const fuera = { sinPanel: [], empiezaTarde: [] };
   for (const t of miembros) {
     const p = await panelDe(t);
     process.stdout.write(`  universo EW  ${++n}/${miembros.size}\r`);
-    if (!p) continue;
+    if (!p) { fuera.sinPanel.push(t); continue; }
     const a = idxOnOrBefore(p.dates, eje[0]);
-    if (a < 0) continue;
+    if (a < 0) { fuera.empiezaTarde.push(`${t} (${p.dates[0]})`); continue; }
     for (let i = a + 1; i < p.dates.length && p.dates[i] <= eje.at(-1); i++) {
       const j = idx.get(p.dates[i]);
       if (j == null) continue;
@@ -346,12 +373,19 @@ async function universoEW(eje, excluir = null) {
     }
   }
   process.stdout.write("                              \r");
-  return curva(porDia.map((a) => (a.length ? mean(a) : 0)));
+  const nFuera = fuera.sinPanel.length + fuera.empiezaTarde.length;
+  if (nFuera) {
+    const pct = (100 * nFuera) / miembros.size;
+    console.warn(`  ⚠ universo EW${excluir ? " (sin financieros)" : ""}: ${nFuera} de ${miembros.size} nombres (${pct.toFixed(1)} %) NO entran en la referencia.`);
+    if (fuera.sinPanel.length) console.warn(`     sin precios: ${fuera.sinPanel.slice(0, 20).join(" ")}${fuera.sinPanel.length > 20 ? ` … (+${fuera.sinPanel.length - 20})` : ""}`);
+    if (fuera.empiezaTarde.length) console.warn(`     su serie empieza después del inicio de la ventana: ${fuera.empiezaTarde.slice(0, 10).join(" · ")}`);
+  }
+  return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, deCuantos: miembros.size } };
 }
 
 // ── EJECUCIÓN ───────────────────────────────────────────────────────────────────────────
 const { libro, huecos } = simular();
-const { eje, soloPicks, conCaja, vivas } = await valorar(libro);
+const { eje, soloPicks, conCaja, vivas, saltadas } = await valorar(libro);
 const cPicks = curva(soloPicks);
 const cCaja = curva(conCaja);
 const ew = await universoEW(eje);
@@ -429,7 +463,7 @@ if (!process.argv.includes("--no-sweep")) {
   for (const e of [70, 75, 80, 85, 90]) {
     for (const x of [40, 50, 60]) {
       const sim = simular({ entry: e / 100, exit: x / 100 });
-      const v = await valorar(sim.libro);
+      const v = await valorar(sim.libro, { silencioso: true });
       const c = curva(v.conCaja), cp = curva(v.soloPicks);
       const invertido = mean(v.vivas) / TOP_N * 100;   // % del cupo de posiciones realmente ocupado
       barrido.push({ entry: e, exit: x, soloPicks: fx(cp.total, 1), conCaja: fx(c.total, 1), sharpe: fx(c.sharpe, 2), maxDD: fx(c.maxDD, 1), vsEW: fx(c.total - ew.total, 1), posiciones: sim.libro.length, pctInvertido: fx(invertido, 0) });
@@ -470,7 +504,7 @@ if (!process.argv.includes("--no-ablacion")) {
   const ablacion = {};
   for (const [nombre, opts] of Object.entries(VARIANTES)) {
     const sim = simular(opts);
-    const v = await valorar(sim.libro);
+    const v = await valorar(sim.libro, { silencioso: true });
     const c = curva(v.conCaja), cp = curva(v.soloPicks);
     ablacion[nombre] = { soloPicks: fx(cp.total, 1), conCaja: fx(c.total, 1), sharpe: fx(c.sharpe, 2), maxDD: fx(c.maxDD, 1), vsEW: fx(c.total - ew.total, 1), posiciones: sim.libro.length, pctInvertido: fx(mean(v.vivas) / TOP_N * 100, 0) };
     console.log(`  ${nombre.padEnd(32)}${((cp.total >= 0 ? "+" : "") + cp.total.toFixed(0) + "%").padStart(9)}${((c.total >= 0 ? "+" : "") + c.total.toFixed(0) + "%").padStart(9)}${c.sharpe.toFixed(2).padStart(8)}${(c.maxDD.toFixed(1) + "%").padStart(9)}${(((c.total - ew.total) >= 0 ? "+" : "") + (c.total - ew.total).toFixed(0) + "pp").padStart(9)}${String(sim.libro.length).padStart(8)}${(fx(mean(v.vivas) / TOP_N * 100, 0) + "%").padStart(9)}`);
@@ -499,6 +533,15 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
   generatedAt: new Date().toISOString(), window: VENTANA,
   rules: { entry: ENTRY, exit: EXIT, topN: TOP_N, comprasPorFecha: COMPRAS_POR_FECHA, persistenciaDias: PERSISTENCIA_DIAS, dias180: DIAS_180, cuarentenaMeses: CUARENTENA_MESES, costBps: COST_BPS },
   span: { from: eje[0], to: eje.at(-1), decisiones: fechasOk.length, diasMercado: eje.length },
+  // Lo que NO entró en el cálculo, que es tan parte del resultado como lo que sí. Sin esto,
+  // una caída silenciosa de posiciones o de nombres de la referencia desplaza los números sin
+  // dejar rastro — que es exactamente lo que pasó con `EA` el 2026-08-21.
+  cobertura: {
+    posicionesNoValoradas: saltadas,
+    universoEWFuera: ew.fuera,
+    universoEWSinFinancierosFuera: ewSinFin.fuera,
+    nota: "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo.",
+  },
   benchmarks: { spy: spy && { total: fx(spy.total, 1), cagr: fx(spy.cagr, 2), sharpe: fx(spy.sharpe, 2), maxDD: fx(spy.maxDD, 1) },
                 rsp: rsp && { total: fx(rsp.total, 1), sharpe: fx(rsp.sharpe, 2), maxDD: fx(rsp.maxDD, 1) },
                 universoEW: { total: fx(ew.total, 1), cagr: fx(ew.cagr, 2), sharpe: fx(ew.sharpe, 2), maxDD: fx(ew.maxDD, 1) },

@@ -92,6 +92,140 @@ console.log("\n  A · artefactos versionados (sin red)\n");
   }
 }
 
+// ── El sesgo de supervivencia, sus dos mitades ───────────────────────────────────────────
+//
+// Las dos son silenciosas: si estos ficheros desaparecen, nada falla — sencillamente vuelven
+// los números viejos, que eran los sesgados. Por eso se comprueban aquí y no en ningún sitio
+// donde un fallo se pueda confundir con un aviso.
+{
+  const dat = (f) => { const p = join(RAIZ, "research", "data", f); return existsSync(p) ? JSON.parse(readFileSync(p, "utf8")) : null; };
+
+  const hist = dat("cik_historicos.json");
+  if (!hist) fail++, console.error("  ✖ falta research/data/cik_historicos.json — sin él, las empresas que salieron del índice vuelven a ser invisibles y el backtest recupera el sesgo sin avisar. Regenéralo con research/resolver_cik.mjs");
+  else {
+    // El suelo detecta que el fichero se ha vaciado o truncado, NO fija un objetivo de
+    // cobertura: subirlo hasta rozar la cifra real haría que el guardián fallara cada vez que
+    // una revisión legítima retira un CIK dudoso, que es justo lo que debe poder pasar.
+    const n = Object.keys(hist.mapa ?? {}).length;
+    ok(n >= 80, `cik_historicos: ${n} tickers muertos resueltos (suelo 80; el hueco medido eran 175)`);
+    const malos = Object.entries(hist.mapa ?? {}).filter(([, c]) => !/^\d{10}$/.test(c));
+    ok(!malos.length, `cik_historicos: todos los CIK con 10 dígitos${malos.length ? ` — mal: ${malos.slice(0, 4).map(([t]) => t).join(", ")}` : ""}`);
+    // ⚠️ QUE DOS TICKERS COMPARTAN CIK NO ES UN ERROR AQUÍ, y la primera versión de esta
+    // comprobación lo daba por tal. Este mapa da FUNDAMENTALES, y una empresa que cambia de
+    // nombre —`CBS`→`VIAC`, `COG`→`CTRA`, `SYMC`→`NLOK`— o que tiene dos clases de acción
+    // —`DISCA` y `DISCK`— presenta unos únicos estados financieros. Lo que sí sería un error es
+    // compartir PRECIOS, y eso lo impide la regla de alias, que exige correspondencia uno a uno.
+    // Aquí sólo se vigila que ningún CIK acapare muchos tickers, que es la firma de un fallo
+    // sistemático de asignación.
+    const porCik = {};
+    for (const [t, c] of Object.entries(hist.mapa ?? {})) (porCik[c] = porCik[c] ?? []).push(t);
+    const acaparadores = Object.entries(porCik).filter(([, ts]) => ts.length > 3);
+    ok(!acaparadores.length, `cik_historicos: ningún CIK acapara más de 3 tickers${acaparadores.length ? ` — ${acaparadores.map(([c, ts]) => `${c}: ${ts.join(",")}`).join(" · ")}` : ""}`);
+    const compartidos = Object.entries(porCik).filter(([, ts]) => ts.length > 1);
+    if (compartidos.length) aviso(`cik_historicos: ${compartidos.length} CIK con más de un ticker (renombres o clases): ${compartidos.map(([, ts]) => ts.join("=")).join(" ")}`);
+  }
+
+  const bloq = dat("simbolos_reutilizados.json");
+  if (!bloq) aviso("falta research/data/simbolos_reutilizados.json — regenéralo con research/simbolos_reutilizados.mjs");
+  else ok(Object.keys(bloq.bloqueados ?? {}).length > 0, "simbolos_reutilizados: la lista de bloqueo no está vacía (hay símbolos reutilizados de verdad)");
+
+  // Un alias de ticker manda los precios de un símbolo a otro. Si el CIK de los dos no
+  // coincide, no es un cambio de nombre: es un símbolo reasignado a OTRA empresa, y el alias
+  // estaría empalmando los precios de un tercero sin que nada falle. Es la regla que
+  // `prices.mjs` exige a mano desde el 2026-08-22; aquí se comprueba para los generados.
+  const ali = dat("alias_ticker.json");
+  if (!ali) aviso("falta research/data/alias_ticker.json — regenéralo con research/publicar_resolucion.mjs");
+  else if (hist) {
+    const malos = (ali.detalle ?? []).filter((d) => hist.mapa?.[d.de] !== d.cik);
+    ok(!malos.length, `alias_ticker: todo alias empareja dos símbolos del MISMO CIK${malos.length ? ` — mal: ${malos.slice(0, 4).map((d) => `${d.de}→${d.a}`).join(", ")}` : ""}`);
+    ok(Object.keys(ali.alias ?? {}).length === (ali.detalle ?? []).length, "alias_ticker: el mapa y su detalle tienen el mismo número de entradas");
+    // Y nadie puede estar a la vez aliaseado y bloqueado: si tiene alias, sus precios vienen
+    // del símbolo vivo y el bloqueo lo dejaría sin precios por un motivo que ya no aplica.
+    const ambos = Object.keys(ali.alias ?? {}).filter((t) => bloq?.bloqueados?.[t]);
+    ok(!ambos.length, `alias_ticker: ninguno está a la vez con alias y bloqueado${ambos.length ? ` — ${ambos.join(", ")}` : ""}`);
+  }
+}
+
+// ── Las tres trampas de la prueba de portada, como funciones puras ───────────────────────
+//
+// Cada `ok` de aquí abajo es un defecto que YA existió y que devolvía un CIK creíble y falso.
+// Son puras y sin red: si alguien relaja el detector, salta en el acto.
+{
+  const { simboloEnPortada, ficheroLlevaTicker, tokenDelNombre } = await import("../research/portada.mjs");
+
+  // 1 · La biografía de un consejero NO prueba nada. Con la regla antigua —«cerca de NYSE»—
+  //     una SPAC quedó verificada como dueña del ticker ANTM por esta misma frase.
+  const bio = "Prior to Surgery Partners Mr. Kretschmer, served as senior vice president, treasurer, and CIO for Anthem, Inc. (NYSE: ANTM). During his over 25-year career at Anthem, Inc.,";
+  ok(!simboloEnPortada(bio, "ANTM", "SCP & CO Healthcare Acquisition Co").hay,
+    "portada: «Anthem, Inc. (NYSE: ANTM)» en la biografía de un consejero de OTRA empresa no vale como prueba");
+
+  // 2 · La tabla de registro de la §12(b) sí.
+  const tabla = "Securities registered pursuant to Section 12(b) of the Act: Title of each class Trading symbol(s) Name of each exchange on which registered Common Stock, Par Value $0.01 ANTM New York Stock Exchange";
+  ok(simboloEnPortada(tabla, "ANTM", "Elevance Health, Inc.").hay,
+    "portada: el símbolo en la tabla de la §12(b) sí vale");
+
+  // 3 · Un ticker AL FINAL DE UNA FRASE. Excluir el punto del límite de palabra —necesario
+  //     para no partir `BF.B`— hacía que «under the symbol “CELG.”» no casara nunca, y Celgene
+  //     quedó «sin resolver» teniendo su símbolo escrito en el documento.
+  const item5 = "Market for Registrant's Common Equity Our common stock is traded on The Nasdaq Global Select Market under the symbol “CELG.” As of February 2019,";
+  ok(simboloEnPortada(item5, "CELG", "CELGENE CORP /DE/").hay,
+    "portada: «under the symbol “CELG.”» con el punto pegado sí casa");
+
+  // 4 · Y el emisor que se cita a sí mismo, que es lo que cubre el tramo anterior a 2019.
+  ok(simboloEnPortada("Celgene Corporation (NASDAQ: CELG) announced today", "CELG", "CELGENE CORP /DE/").hay,
+    "portada: el emisor citándose a sí mismo con su símbolo sí vale");
+
+  // 4bis · Pero citar a OTRA empresa, no. Con la regla antigua —el nombre del emisor «en los
+  //        160 caracteres previos»— bastaba una frase así para que **Solo Cup** quedara
+  //        verificada como dueña del ticker de H.J. Heinz. Fue la única entrada que ese patrón
+  //        produjo en toda la resolución, y era falsa.
+  ok(!simboloEnPortada("Solo Cup sells its products to customers including H.J. Heinz Company (NYSE: HNZ) and others", "HNZ", "Solo Cup CO").hay,
+    "portada: Solo Cup citando a «H.J. Heinz Company (NYSE: HNZ)» no la hace dueña de HNZ");
+
+  ok(ficheroLlevaTicker("antm-20211231.htm", "ANTM", "Elevance Health, Inc.") && !ficheroLlevaTicker("celgenecorp10-ka.htm", "CELG", "CELGENE CORP /DE/"),
+    "portada: el nombre del fichero cuenta cuando el emisor lo bautizó con su ticker, y no cuando no");
+
+  // 5 · El nombre del fichero puede ser la abreviatura del NOMBRE y no del ticker, y así entró
+  //     LSI Industries —que cotiza como `LYTS`— como dueña del ticker `LSI`.
+  ok(!ficheroLlevaTicker("lsi_10q-123112.htm", "LSI", "LSI INDUSTRIES INC"),
+    "portada: «lsi_…» de LSI Industries —que cotiza como LYTS— no prueba que LSI sea su ticker");
+  ok(ficheroLlevaTicker("x-20250331.htm", "X", "UNITED STATES STEEL CORP"),
+    "portada: un ticker de una letra con la convención de la SEC sí cuenta");
+  // El freno del nombre NO alcanza para todo, y conviene que quede escrito: «Wendy's Co» no
+  // empieza por TWC, así que esta función no puede rechazar `twc_wr10qq3-12.htm`. A Wendy's lo
+  // caza la regla de conflicto de `resolver_cik.mjs` —su CIK es el de `WEN`, que estaba en el
+  // índice a la vez que `TWC`—, no el nombre del fichero. Y las iniciales tampoco servirían de
+  // regla general: «TOTAL SYSTEM SERVICES INC» da «TSS», que sí es su ticker de verdad.
+  ok(ficheroLlevaTicker("twc_wr10qq3-12.htm", "TWC", "Wendy's Co"),
+    "portada: el freno del nombre no alcanza a «twc_…» de Wendy's — eso lo resuelve la regla de conflicto, no ésta");
+  ok(tokenDelNombre("CELGENE CORP /DE/") === "CELGENE" && tokenDelNombre("The Company Inc") === null,
+    "portada: la palabra distintiva del nombre salta los sufijos societarios");
+}
+
+// ── Un CIK identifica una EMPRESA, no una ACCIÓN ─────────────────────────────────────────
+//
+// Los dos casos de abajo produjeron alias equivocados que nada habría delatado: a la clase B de
+// Brown-Forman se le habrían dado los precios de la clase A, y a Symantec/NortonLifeLock se les
+// habría negado el suyo por confundir un warrant con una clase.
+{
+  // ⚠️ De `alias_reglas.mjs`, NO de `publicar_resolucion.mjs`: aquél es un script con
+  // efectos, e importarlo desde aquí lo EJECUTABA — reescribía los mapas y llamaba a la SEC
+  // en medio de un test. Por eso las reglas puras viven en su propio módulo.
+  const { elegirVivo, convivieron } = await import("../research/alias_reglas.mjs");
+  ok(elegirVivo("BF.B", new Set(["BF-A", "BF-B"])) === "BF-B",
+    "alias: BF.B va a su propia clase (BF-B), no a la primera alfabética");
+  ok(elegirVivo("NLOK", new Set(["GEN", "GENVR"])) === "GEN",
+    "alias: GENVR es un derecho —extensión de GEN— y no compite como acción ordinaria");
+  ok(elegirVivo("ESV", new Set(["VAL", "VAL-WT"])) === "VAL",
+    "alias: VAL-WT es un warrant y no compite como acción ordinaria");
+  ok(elegirVivo("XYZ", new Set(["AAA", "BBB"])) === null,
+    "alias: con dos ordinarias distintas y ninguna coincidencia de clase, no se inventa");
+  ok(convivieron({ desde: "2010-03-01", hasta: "2022-04-04" }, { desde: "2014-08-07", hasta: "2022-04-04" }),
+    "alias: DISCA y DISCK convivieron en el índice — son clases, no una cadena de renombres");
+  ok(!convivieron({ desde: "2010-01-06", hasta: "2019-10-18" }, { desde: "2019-11-05", hasta: "2022-11-01" }),
+    "alias: SYMC y NLOK se suceden — la misma empresa con dos nombres, y los dos alias valen");
+}
+
 // ══ B · HUMO CONTRA LA SEC ════════════════════════════════════════════════════════════════
 if (SIN_RED) {
   console.log("\n  B · humo contra la SEC — SALTADO (--sin-red)\n");

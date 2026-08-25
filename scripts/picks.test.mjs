@@ -11,7 +11,7 @@ import {
   PERSISTENCE_DAYS, QUARANTINE_MONTHS, EXIT_CONSECUTIVE, MAX_PRICE_LAG_DAYS,
 } from "../lib/picks.ts";
 import { percentilesDe, metricasDe, METRICAS_CALIDAD, MIN_METRICAS } from "../research/picksSignal.mjs";
-import { parseSP500Csv, snapshotDate, membersAsOf, parseSP500Actual } from "../research/universe.mjs";
+import { parseSP500Csv, snapshotDate, membersAsOf, parseSP500Actual, normalizaTicker } from "../research/universe.mjs";
 import { cubreLaCache } from "../research/prices.mjs";
 import { universeSnapshots } from "../lib/picksData.ts";
 import { articular, articularFundamentales, TOLERANCIA } from "../lib/articulacion.ts";
@@ -256,6 +256,16 @@ eq(MIN_METRICAS, 3, "hacen falta al menos 3 de 5 métricas");
 
   // Una línea rota no puede colarse como fecha válida ni vaciar el universo.
   eq(parseSP500Csv("date,tickers\nbasura,\n2025-01-02,\"AAA\"").length, 1, "parseSP500Csv descarta líneas sin fecha válida");
+
+  // La fuente es de mantenimiento comunitario y se le cuela texto: el 2023-12-31 escribió
+  // «RVTY (Previously PKI)» en vez de «RVTY», y ese día Revvity desaparecía del índice —ni como
+  // RVTY ni como PKI— además de ensuciar la lista de tickers sin CIK, que es de donde sale el
+  // trabajo de cerrar el sesgo de supervivencia.
+  eq(normalizaTicker("RVTY (Previously PKI)"), "RVTY", "normalizaTicker rescata el símbolo de cabeza de una aclaración entre paréntesis");
+  eq(normalizaTicker("BF.B"), "BF.B", "normalizaTicker respeta las clases con punto");
+  eq(normalizaTicker("Some Company Inc"), null, "normalizaTicker NO adivina: sin símbolo reconocible, descarta");
+  eq(parseSP500Csv("date,tickers\n2025-01-02,\"AAA,RVTY (Previously PKI),BBB\"")[0].tickers,
+     ["AAA", "RVTY", "BBB"], "parseSP500Csv normaliza los símbolos con texto pegado");
   eq(parseSP500Csv('date,tickers\n2025-01-02,""').length, 0, "parseSP500Csv descarta fotos sin ningún ticker");
 }
 

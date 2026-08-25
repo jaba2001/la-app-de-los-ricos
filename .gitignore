@@ -66,3 +66,6 @@ research/out/*
 !research/out/forense_solapamiento.json
 !research/out/bab_lab.json
 !research/out/bab_lab_oos.json
+!research/out/resolucion_cik.json
+!research/out/simbolos_reutilizados.json
+!research/out/float_publico.json

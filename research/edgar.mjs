@@ -70,6 +70,30 @@ const MANUAL_CIK = {
   "BRK.B": "0001067983", // BERKSHIRE HATHAWAY INC (en la SEC: "BRK-B")
 };
 
+/**
+ * CIK de tickers MUERTOS, resueltos y verificados por `research/resolver_cik.mjs`.
+ *
+ * `company_tickers.json` sólo contiene tickers VIVOS. Por eso una empresa que salió del índice
+ * era invisible **en todas las fechas**, incluidas aquellas en que estaba dentro y era
+ * excelente: sin CIK no hay fundamentales, sin fundamentales no hay señal, y sin señal no
+ * aparece en ningún aviso — porque los avisos sólo ven a los que llegan a tener señal. Ése es
+ * el sesgo de supervivencia de este repositorio, y no entraba por los precios sino por aquí.
+ *
+ * Cada entrada de ese fichero está verificada exigiendo que el propio emisor declare el símbolo
+ * en un documento suyo. Lo que no se pudo verificar NO está.
+ */
+function cikHistoricos() {
+  if (!mem.has("__hist")) {
+    let m = {};
+    try {
+      const ruta = join(dirname(fileURLToPath(import.meta.url)), "data", "cik_historicos.json");
+      if (existsSync(ruta)) m = JSON.parse(readFileSync(ruta, "utf8"))?.mapa ?? {};
+    } catch { m = {}; } // si el fichero no está o está roto, se sigue sin él
+    mem.set("__hist", m);
+  }
+  return mem.get("__hist");
+}
+
 export async function tickerToCik(ticker) {
   const t = ticker.toUpperCase();
   if (MANUAL_CIK[t]) return MANUAL_CIK[t];
@@ -79,6 +103,27 @@ export async function tickerToCik(ticker) {
     if (j) for (const k in j) m[j[k].ticker.toUpperCase()] = String(j[k].cik_str).padStart(10, "0");
     mem.set("__map", m);
   }
+  // ⚠️ EL ORDEN IMPORTA, y es el revés del de `MANUAL_CIK`. Los históricos van DESPUÉS del mapa
+  // vivo, nunca antes: un ticker que quedó libre puede haber sido reasignado a otra empresa
+  // —`Q` es hoy Qnity Electronics y `ECHO` es EchoStar, ninguna de las dos la que llevó ese
+  // símbolo antes—. Consultarlos primero taparía a la empresa VIVA con la difunta. Como
+  // relleno sólo actúan donde la SEC no tiene nada, que es exactamente donde hacen falta.
+  return mem.get("__map")[t] ?? cikHistoricos()[t] ?? null;
+}
+
+/**
+ * Igual que `tickerToCik` pero SIN el relleno histórico: sólo lo que la SEC reconoce hoy.
+ *
+ * Existe para romper una pescadilla que se muerde la cola. `resolver_cik.mjs` decide qué
+ * tickers faltan preguntando por cada uno; si preguntara con el relleno puesto, en la segunda
+ * ejecución vería que ya no falta ninguno y reescribiría `resolucion_cik.json` **vacío**,
+ * borrando su propio trabajo. Con esto la lista de pendientes es siempre la misma —los muertos
+ * de verdad— y el fichero se regenera entero y se puede comparar con el anterior.
+ */
+export async function tickerToCikVivo(ticker) {
+  const t = ticker.toUpperCase();
+  if (MANUAL_CIK[t]) return MANUAL_CIK[t];
+  await tickerToCik(t); // asegura el mapa en memoria
   return mem.get("__map")[t] ?? null;
 }
 

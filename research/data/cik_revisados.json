@@ -1,0 +1,262 @@
+{
+ "_comentario": [
+  "DECISIONES sobre los CIK que `resolver_cik.mjs` no pudo verificar solo.",
+  "",
+  "El resolutor acepta por su cuenta el nivel A: que el propio emisor declare el símbolo en un",
+  "documento suyo DENTRO del periodo en que el ticker estuvo en el índice. Los niveles B (lo",
+  "declara en otro momento) y C (sólo el nombre del fichero) producen CIK equivocados y",
+  "creíbles, y no hay regla automática que los separe de los buenos:",
+  "",
+  "  · TWC → CIK 30697 es WENDY'S, porque «The Wendy's Company» bautiza sus ficheros `twc_…`.",
+  "    Y la regla de conflicto no lo ve: Wendy's cotiza como WEN y nunca estuvo en el S&P 500.",
+  "  · LSI → Life Storage declara `LSI` en 2017-2022, pero el LSI del índice en 2010-2014 era",
+  "    LSI Corporation, la de semiconductores que compró Avago.",
+  "",
+  "Las entradas se llenan de dos formas, y las dos dejan su evidencia escrita:",
+  "  · `research/revisar_cik.mjs --proponer` cuando DOS fuentes independientes coinciden — el",
+  "    nombre que el proveedor de precios asocia al símbolo casa con los `formerNames` del CIK",
+  "    y su última cotización cuadra con la salida del índice.",
+  "  · A mano, cuando no cuadran. Es el caso de APOL: Apollo salió del índice en 2013 y siguió",
+  "    cotizando hasta 2017, así que la fecha no cuadra aunque el nombre case al 100 %.",
+  "",
+  "FORMATO — una entrada por ticker:",
+  "  \"TWC\": { \"cik\": \"0001377013\", \"motivo\": \"cómo se comprobó\", \"revisadoEl\": \"2026-08-24\" }",
+  "  \"XYZ\": { \"cik\": null, \"motivo\": \"por qué se rechaza\", \"revisadoEl\": \"2026-08-24\" }",
+  "",
+  "`cik: null` significa RECHAZADO: no se publica, y queda constancia de que se miró.",
+  "La decisión MANDA sobre la del resolutor —corregirlo es su razón de ser—, y `--proponer`",
+  "nunca pisa una entrada existente. `cikPropuestoEntonces` guarda contra qué candidato se",
+  "decidió: si el resolutor cambia de opinión, el publicador avisa en vez de callarlo."
+ ],
+ "decisiones": {
+  "HNZ": {
+   "cik": "0000046640",
+   "motivo": "identidad corroborada: el proveedor de precios dice que HNZ era «H.J. Heinz Company» hasta 2013-10-17 (133 días tras salir del índice), coincide al 100 % con «Kraft Heinz Foods Co» / «HEINZ H J CO», y ese CIK presentó 13 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001294608",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "ARG": {
+   "cik": "0000804212",
+   "motivo": "identidad corroborada: el proveedor de precios dice que ARG era «Airgas Inc» hasta 2016-05-31 (11 días tras salir del índice), coincide al 100 % con «AIRGAS INC», y ese CIK presentó 26 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0000804212",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "COV": {
+   "cik": "0001385187",
+   "motivo": "identidad corroborada: el proveedor de precios dice que COV era «Covidien plc» hasta 2015-02-03 (19 días tras salir del índice), coincide al 100 % con «Covidien plc» / «Covidien Ltd.», y ese CIK presentó 16 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001385187",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "CPGX": {
+   "cik": "0001629995",
+   "motivo": "identidad corroborada: el proveedor de precios dice que CPGX era «Columbia Pipeline Group Inc» hasta 2016-07-01 (4 días tras salir del índice), coincide al 100 % con «Columbia Pipeline Group, Inc.», y ese CIK presentó 5 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001629995",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "ESRX": {
+   "cik": "0001532063",
+   "motivo": "identidad corroborada: el proveedor de precios dice que ESRX era «Express Scripts Holding Company» hasta 2018-12-20 (1 días tras salir del índice), coincide al 100 % con «Express Scripts Holding Co.» / «Aristotle Holding, Inc.», y ese CIK presentó 27 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001532063",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "EVHC": {
+   "cik": "0001678531",
+   "motivo": "identidad corroborada: el proveedor de precios dice que EVHC era «Envision Healthcare Holdings Inc» hasta 2018-12-14 (65 días tras salir del índice), coincide al 100 % con «Envision Healthcare Corp» / «New Amethyst Corp.», y ese CIK presentó 8 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001678531",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "MOLX": {
+   "cik": "0000067472",
+   "motivo": "identidad corroborada: el proveedor de precios dice que MOLX era «Molex Inc» hasta , coincide al 100 % con «MOLEX INC», y ese CIK presentó 16 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0000067472",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "RAI": {
+   "cik": "0001275283",
+   "motivo": "identidad corroborada: el proveedor de precios dice que RAI era «Reynolds American Inc» hasta 2017-08-17 (28 días tras salir del índice), coincide al 100 % con «REYNOLDS AMERICAN INC», y ese CIK presentó 31 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001275283",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "RHT": {
+   "cik": "0001087423",
+   "motivo": "identidad corroborada: el proveedor de precios dice que RHT era «Red Hat Inc» hasta 2019-07-08 (7 días tras salir del índice), coincide al 100 % con «RED HAT INC», y ese CIK presentó 41 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001087423",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "SNI": {
+   "cik": "0001430602",
+   "motivo": "identidad corroborada: el proveedor de precios dice que SNI era «Scripps Networks Interactive Inc» hasta 2018-03-16 (16 días tras salir del índice), coincide al 100 % con «Scripps Networks Interactive, Inc.», y ese CIK presentó 33 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0001430602",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "STJ": {
+   "cik": "0000203077",
+   "motivo": "identidad corroborada: el proveedor de precios dice que STJ era «St Jude Medical Inc» hasta 2017-01-18 (15 días tras salir del índice), coincide al 100 % con «ST JUDE MEDICAL, LLC» / «ST JUDE MEDICAL INC», y ese CIK presentó 29 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0000203077",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "SWY": {
+   "cik": "0000086144",
+   "motivo": "identidad corroborada: el proveedor de precios dice que SWY era «Safeway Inc» hasta 2015-02-09 (25 días tras salir del índice), coincide al 100 % con «SAFEWAY INC», y ese CIK presentó 24 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0000086144",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "TWC": {
+   "cik": "0001377013",
+   "motivo": "identidad corroborada: el proveedor de precios dice que TWC era «Time Warner Cable Inc» hasta 2016-05-26 (9 días tras salir del índice), coincide al 100 % con «SPECTRUM MANAGEMENT HOLDING COMPANY, LLC» / «TIME WARNER CABLE INC.», y ese CIK presentó 28 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": "0000030697",
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "APOL": {
+   "cik": "0000929887",
+   "motivo": "se llamaba «APOLLO GROUP INC» durante el periodo en el índice; el proveedor de precios dice que APOL era «Apollo Education Group Inc»; 17 informes periódicos dentro del periodo. salió del índice en 2013 y siguió cotizando hasta 2017, así que la fecha final no cuadra aunque la identidad sí",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "ATGE": {
+   "cik": "0000730464",
+   "motivo": "se llamaba «DEVRY INC» durante el periodo en el índice; flotante público 3.97 mil M$; 11 informes periódicos dentro del periodo. la tabla de miembros lleva el ticker MODERNO retroproyectado: en 2010-2012 la empresa cotizaba como DV",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "BIG": {
+   "cik": "0000768835",
+   "motivo": "se llamaba «BIG LOTS INC» durante el periodo en el índice; flotante público 2.71 mil M$; 12 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "CBS": {
+   "cik": "0000813828",
+   "motivo": "se llamaba «CBS CORP» durante el periodo en el índice; flotante público 32.76 mil M$; 40 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "CVC": {
+   "cik": "0001053112",
+   "motivo": "se llamaba «CABLEVISION SYSTEMS CORP /NY» durante el periodo en el índice; el proveedor de precios dice que CVC era «Cablevision Systems Corp»; flotante público 8.03 mil M$; 24 informes periódicos dentro del periodo. la filial CSC Holdings tiene el mismo documento y el mismo nombre hasta 1998, pero NO declara flotante",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "DNR": {
+   "cik": "0000945764",
+   "motivo": "se llamaba «DENBURY RESOURCES INC» durante el periodo en el índice; el proveedor de precios dice que DNR era «Denbury Resources Inc»; flotante público 6.99 mil M$; 22 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "ENDP": {
+   "cik": "0001593034",
+   "motivo": "se llamaba «Endo International plc» durante el periodo en el índice; flotante público 16.57 mil M$; 10 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "FII": {
+   "cik": "0001056288",
+   "motivo": "se llamaba «FEDERATED INVESTORS INC /PA/» durante el periodo en el índice; flotante público 2.2 mil M$; 12 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "FL": {
+   "cik": "0000850209",
+   "motivo": "se llamaba «FOOT LOCKER INC» durante el periodo en el índice; el proveedor de precios dice que FL era «Foot Locker Inc»; flotante público 6.03 mil M$; 13 informes periódicos dentro del periodo. salió del índice en 2019 y sigue cotizando",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "IGT": {
+   "cik": "0000353944",
+   "motivo": "se llamaba «INTERNATIONAL GAME TECHNOLOGY» durante el periodo en el índice; flotante público 5.5 mil M$; 21 informes periódicos dentro del periodo. NO es la sociedad de la fusión GTECH/IGT (CIK 1619762), que se llamaba Georgia Worldwide hasta 2014",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "JCP": {
+   "cik": "0001166126",
+   "motivo": "se llamaba «J C PENNEY CO INC» durante el periodo en el índice; flotante público 5.62 mil M$; 15 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "LSI": {
+   "cik": "0000703360",
+   "motivo": "se llamaba «LSI CORP» durante el periodo en el índice; flotante público 4.1 mil M$; 19 informes periódicos dentro del periodo. el proveedor dice «Life Storage Inc» porque HEREDÓ el símbolo en 2016; la LSI del índice en 2010-2014 era LSI Corporation, comprada por Avago",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "ODP": {
+   "cik": "0000800240",
+   "motivo": "se llamaba «OFFICE DEPOT INC» durante el periodo en el índice; el proveedor de precios dice que ODP era «ODP Corporation (The)»; flotante público 1.25 mil M$; 4 informes periódicos dentro del periodo. ticker moderno retroproyectado: en 2010 cotizaba como ODP siendo Office Depot",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "PDCO": {
+   "cik": "0000891024",
+   "motivo": "se llamaba «PATTERSON COMPANIES, INC.» durante el periodo en el índice; el proveedor de precios dice que PDCO era «Patterson Companies Inc»; flotante público 4.69 mil M$; 34 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "QEP": {
+   "cik": "0001108827",
+   "motivo": "se llamaba «QEP RESOURCES, INC.» durante el periodo en el índice; el proveedor de precios dice que QEP era «QEP Resources Inc»; 21 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "RDC": {
+   "cik": "0000085408",
+   "motivo": "se llamaba «ROWAN COMPANIES INC» durante el periodo en el índice; el proveedor de precios dice que RDC era «Rowan Companies PLC»; flotante público 4.9 mil M$; 20 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "RRD": {
+   "cik": "0000029669",
+   "motivo": "se llamaba «RR Donnelley & Sons Co» durante el periodo en el índice; el proveedor de precios dice que RRD era «R.R. Donnelley & Sons Company»; flotante público 3.66 mil M$; 13 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "SIAL": {
+   "cik": "0000090185",
+   "motivo": "se llamaba «SIGMA ALDRICH CORP» durante el periodo en el índice; el proveedor de precios dice que SIAL era «SigmaAldrich Corp»; flotante público 10.49 mil M$; 25 informes periódicos dentro del periodo. el proveedor deja de cotizarlo el 2015-11-18, un día después de salir del índice",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "SRCL": {
+   "cik": "0000861878",
+   "motivo": "se llamaba «STERICYCLE INC» durante el periodo en el índice; el proveedor de precios dice que SRCL era «Stericycle Inc»; flotante público 11.36 mil M$; 40 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "SWN": {
+   "cik": "0000007332",
+   "motivo": "se llamaba «SOUTHWESTERN ENERGY CO» durante el periodo en el índice; el proveedor de precios dice que SWN era «Southwestern Energy Company»; flotante público 15.88 mil M$; 34 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "TSS": {
+   "cik": "0000721683",
+   "motivo": "se llamaba «TOTAL SYSTEM SERVICES INC» durante el periodo en el índice; flotante público 10.57 mil M$; 50 informes periódicos dentro del periodo. el proveedor devuelve un ETF de GraniteShares: el símbolo se reutilizó tras la compra por Global Payments",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "WPX": {
+   "cik": "0001518832",
+   "motivo": "se llamaba «WPX ENERGY, INC.» durante el periodo en el índice; el proveedor de precios dice que WPX era «WPX Energy Inc»; flotante público 3.78 mil M$; 10 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "X": {
+   "cik": "0001163302",
+   "motivo": "se llamaba «UNITED STATES STEEL CORP» durante el periodo en el índice; el proveedor de precios dice que X era «United States Steel Corp»; flotante público 6.6 mil M$; 18 informes periódicos dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  }
+ }
+}

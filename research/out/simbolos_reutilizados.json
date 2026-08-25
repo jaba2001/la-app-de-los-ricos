@@ -1,0 +1,5948 @@
+{
+ "generatedAt": "2026-08-25T05:33:23.998Z",
+ "auditados": 287,
+ "reutilizados": 5,
+ "sinDatos": 0,
+ "noComprobados": 158,
+ "detalle": [
+  {
+   "ticker": "AAL",
+   "desde": "2015-03-23",
+   "hasta": "2024-09-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "American Airlines Group Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "AAP",
+   "desde": "2015-07-09",
+   "hasta": "2023-08-28",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-20",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Advance Auto Parts, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ABC",
+   "desde": "2010-01-06",
+   "hasta": "2023-09-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Cencora, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ABMD",
+   "desde": "2018-05-31",
+   "hasta": "2022-12-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-11-03",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ACS",
+   "desde": "2010-01-06",
+   "hasta": "2010-02-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ADS",
+   "desde": "2013-12-23",
+   "hasta": "2020-05-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-28",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Bread Financial Holdings, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "AET",
+   "desde": "2010-01-06",
+   "hasta": "2018-11-28",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-10-30",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "AIV",
+   "desde": "2010-01-06",
+   "hasta": "2020-11-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Apartment Investment and Management Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ALK",
+   "desde": "2016-05-13",
+   "hasta": "2023-12-16",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Alaska Air Group, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ALXN",
+   "desde": "2012-05-25",
+   "hasta": "2021-06-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2021-04-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "AMG",
+   "desde": "2014-07-01",
+   "hasta": "2019-12-10",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Affiliated Managers Group, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "AMTM",
+   "desde": "2024-10-01",
+   "hasta": "2024-12-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-11",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Amentum Holdings, Inc.",
+    "desde": "2024-09-24",
+    "hasta": "2026-08-24",
+    "barras": 480,
+    "juicio": "ok",
+    "motivo": "480 barras, 2024-09-24→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "AN",
+   "desde": "2010-01-06",
+   "hasta": "2017-08-07",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "AutoNation, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ANDV",
+   "desde": "2010-01-06",
+   "hasta": "2018-09-24",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ANF",
+   "desde": "2010-01-06",
+   "hasta": "2013-12-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Abercrombie & Fitch Co.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ANSS",
+   "desde": "2017-06-19",
+   "hasta": "2025-07-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-04-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ANTM",
+   "desde": "2010-01-06",
+   "hasta": "2022-06-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-15",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Elevance Health, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "APC",
+   "desde": "2010-01-06",
+   "hasta": "2019-08-08",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "ARKO Petroleum Corp.",
+    "desde": "2026-02-12",
+    "hasta": "2026-08-24",
+    "barras": 133,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2026-02-12→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2019-08-08)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "APOL",
+   "desde": "2010-01-06",
+   "hasta": "2013-06-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2017-01-09",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ARG",
+   "desde": "2010-01-06",
+   "hasta": "2016-05-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2016-05-10",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ATGE",
+   "desde": "2010-01-06",
+   "hasta": "2012-09-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Covista Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ATI",
+   "desde": "2010-01-06",
+   "hasta": "2015-07-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "ATI Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ATVI",
+   "desde": "2015-08-31",
+   "hasta": "2023-10-12",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2023-07-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "AVB",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "AvalonBay Communities Inc",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "AVP",
+   "desde": "2010-01-06",
+   "hasta": "2015-03-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "AYE",
+   "desde": "2010-01-06",
+   "hasta": "2011-02-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "AYI",
+   "desde": "2016-05-03",
+   "hasta": "2018-06-15",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-25",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Acuity Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BBBY",
+   "desde": "2010-01-06",
+   "hasta": "2017-07-25",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Bed Bath & Beyond, Inc.",
+    "desde": "2026-07-17",
+    "hasta": "2026-08-24",
+    "barras": 27,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2026-07-17→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2017-07-25)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BBT",
+   "desde": "2010-01-06",
+   "hasta": "2019-12-05",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Beacon Financial Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BBWI",
+   "desde": "2021-08-03",
+   "hasta": "2024-09-30",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-05-27",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Bath & Body Works, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BCR",
+   "desde": "2010-01-06",
+   "hasta": "2017-12-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BDK",
+   "desde": "2010-01-06",
+   "hasta": "2010-03-11",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BF-B",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-06-12",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Brown-Forman Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BHF",
+   "desde": "2017-08-07",
+   "hasta": "2019-02-27",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Brighthouse Financial, Inc.",
+    "desde": "2017-07-17",
+    "hasta": "2026-08-24",
+    "barras": 2289,
+    "juicio": "ok",
+    "motivo": "2289 barras, 2017-07-17→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BIG",
+   "desde": "2010-01-06",
+   "hasta": "2013-02-06",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2024-09-12",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BIO",
+   "desde": "2020-06-22",
+   "hasta": "2024-09-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Bio-Rad Laboratories, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BJS",
+   "desde": "2010-01-06",
+   "hasta": "2010-04-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BK",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Bank of New York Mellon Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BLL",
+   "desde": "2010-01-06",
+   "hasta": "2022-04-11",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Ball Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BMS",
+   "desde": "2010-01-06",
+   "hasta": "2014-12-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2019-04-26",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BNI",
+   "desde": "2010-01-06",
+   "hasta": "2010-02-10",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BRCM",
+   "desde": "2010-01-06",
+   "hasta": "2016-01-26",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BRK-B",
+   "desde": "2010-02-16",
+   "hasta": "2023-09-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-10",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Berkshire Hathaway Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BTUUQ",
+   "desde": "2010-01-06",
+   "hasta": "2014-09-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "BWA",
+   "desde": "2011-12-19",
+   "hasta": "2025-03-24",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "BorgWarner Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "BXLT",
+   "desde": "2015-07-01",
+   "hasta": "2016-06-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CA",
+   "desde": "2010-01-06",
+   "hasta": "2018-10-31",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CAG",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-15",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Conagra Brands, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CAM",
+   "desde": "2010-01-06",
+   "hasta": "2016-03-31",
+   "veredicto": "reutilizado",
+   "motivo": "el proveedor devuelve un ETF («AB California Intermediate Municipal ETF»), no una acción",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "tipo": "ETF",
+    "nombre": "AB California Intermediate Municipal ETF",
+    "desde": "2025-10-06",
+    "hasta": "2026-08-24",
+    "barras": 222,
+    "juicio": "reutilizado",
+    "motivo": "el proveedor devuelve un ETF («AB California Intermediate Municipal ETF»), no una acción"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CBE",
+   "desde": "2011-11-23",
+   "hasta": "2012-11-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CBS",
+   "desde": "2010-01-06",
+   "hasta": "2019-11-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-07-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CDAY",
+   "desde": "2021-09-20",
+   "hasta": "2024-02-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-10-29",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CE",
+   "desde": "2018-12-24",
+   "hasta": "2025-03-24",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Celanese Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CELG",
+   "desde": "2010-01-06",
+   "hasta": "2019-11-05",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2019-10-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CEPH",
+   "desde": "2010-01-06",
+   "hasta": "2011-10-11",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2011-08-03",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CERN",
+   "desde": "2010-04-30",
+   "hasta": "2022-05-10",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-05-03",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CFN",
+   "desde": "2010-01-06",
+   "hasta": "2015-03-13",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CLF",
+   "desde": "2010-01-06",
+   "hasta": "2014-04-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Cleveland-Cliffs Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CMA",
+   "desde": "2010-01-06",
+   "hasta": "2024-06-22",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-10-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CMCSK",
+   "desde": "2015-09-21",
+   "hasta": "2015-12-09",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CNX",
+   "desde": "2010-01-06",
+   "hasta": "2016-03-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "CNX Resources Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "COG",
+   "desde": "2010-01-06",
+   "hasta": "2021-09-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-05-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "COL",
+   "desde": "2010-01-06",
+   "hasta": "2018-11-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-11-27",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "COTY",
+   "desde": "2016-10-03",
+   "hasta": "2020-09-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-20",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Coty Inc.",
+    "desde": "2013-06-13",
+    "hasta": "2026-08-24",
+    "barras": 3319,
+    "juicio": "ok",
+    "motivo": "3319 barras, 2013-06-13→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "COV",
+   "desde": "2011-03-01",
+   "hasta": "2015-01-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-01-23",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CPB",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-06-08",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Campbell's Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CPGX",
+   "desde": "2015-07-02",
+   "hasta": "2016-06-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2017-02-17",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CPRI",
+   "desde": "2016-01-04",
+   "hasta": "2020-04-06",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Capri Holdings Limited",
+    "desde": "2011-12-15",
+    "hasta": "2026-08-24",
+    "barras": 3692,
+    "juicio": "ok",
+    "motivo": "3692 barras, 2011-12-15→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CSRA",
+   "desde": "2015-11-30",
+   "hasta": "2018-04-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Cohen & Steers Real Assets Active ETF",
+    "desde": "2026-08-12",
+    "hasta": "2026-08-24",
+    "barras": 9,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2026-08-12→2026-08-24) no solapa con el periodo en el índice (2015-11-30→2018-04-02)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CTL",
+   "desde": "2010-01-06",
+   "hasta": "2020-06-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Lumen Technologies, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "CTLT",
+   "desde": "2020-09-21",
+   "hasta": "2024-12-18",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2024-11-05",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CTRA",
+   "desde": "2021-10-04",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-05-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CTXS",
+   "desde": "2010-01-06",
+   "hasta": "2022-09-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-07-26",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CVC",
+   "desde": "2010-12-20",
+   "hasta": "2016-06-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2016-05-05",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CXO",
+   "desde": "2016-02-22",
+   "hasta": "2021-01-07",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-10-27",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "CZR",
+   "desde": "2021-03-22",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-28",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Caesars Entertainment, Inc.",
+    "desde": "2014-09-22",
+    "hasta": "2026-08-24",
+    "barras": 2998,
+    "juicio": "ok",
+    "motivo": "2998 barras, 2014-09-22→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "DAY",
+   "desde": "2024-02-02",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DF",
+   "desde": "2010-01-06",
+   "hasta": "2013-05-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DFS",
+   "desde": "2010-01-06",
+   "hasta": "2025-05-16",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-04-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DISCA",
+   "desde": "2010-03-01",
+   "hasta": "2022-04-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DISCK",
+   "desde": "2014-08-07",
+   "hasta": "2022-04-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DISH",
+   "desde": "2017-03-13",
+   "hasta": "2023-06-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-11-14",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DNR",
+   "desde": "2010-01-06",
+   "hasta": "2015-03-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2023-11-21",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DRE",
+   "desde": "2017-07-26",
+   "hasta": "2022-09-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-08-08",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DWDP",
+   "desde": "2017-09-01",
+   "hasta": "2019-06-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "DXC",
+   "desde": "2010-01-06",
+   "hasta": "2023-10-05",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "DXC Technology Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "EA",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Electronic Arts Inc",
+    "desde": "2026-07-17",
+    "hasta": "2026-08-24",
+    "barras": 27,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2026-07-17→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2025-08-23)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "EKDKQ",
+   "desde": "2010-01-06",
+   "hasta": "2010-12-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "EMN",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Eastman Chemical Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ENDP",
+   "desde": "2015-01-27",
+   "hasta": "2017-03-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2024-03-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ENPH",
+   "desde": "2021-01-07",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-28",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Enphase Energy, Inc.",
+    "desde": "2012-03-30",
+    "hasta": "2026-08-24",
+    "barras": 3620,
+    "juicio": "ok",
+    "motivo": "3620 barras, 2012-03-30→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "EP",
+   "desde": "2010-01-06",
+   "hasta": "2012-05-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-14",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Empire Petroleum Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "EPAM",
+   "desde": "2021-12-14",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "EPAM Systems, Inc.",
+    "desde": "2012-02-08",
+    "hasta": "2026-08-24",
+    "barras": 3656,
+    "juicio": "ok",
+    "motivo": "3656 barras, 2012-02-08→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "EQR",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Equity Residential",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ESRX",
+   "desde": "2010-01-06",
+   "hasta": "2018-12-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-10-31",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ESV",
+   "desde": "2012-07-31",
+   "hasta": "2016-03-29",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Valaris Limited",
+    "desde": "2021-05-03",
+    "hasta": "2026-08-24",
+    "barras": 1334,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2021-05-03→2026-08-24) no solapa con el periodo en el índice (2012-07-31→2016-03-29)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ETFC",
+   "desde": "2010-01-06",
+   "hasta": "2020-09-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-08-05",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ETSY",
+   "desde": "2020-09-21",
+   "hasta": "2024-09-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Etsy, Inc.",
+    "desde": "2015-04-16",
+    "hasta": "2026-08-24",
+    "barras": 2856,
+    "juicio": "ok",
+    "motivo": "2856 barras, 2015-04-16→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "EVHC",
+   "desde": "2016-12-02",
+   "hasta": "2018-10-10",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-08-07",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FB",
+   "desde": "2013-12-23",
+   "hasta": "2022-06-08",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Meta Platforms, Inc.",
+    "desde": "2012-05-18",
+    "hasta": "2026-08-24",
+    "barras": 3586,
+    "juicio": "ok",
+    "motivo": "3586 barras, 2012-05-18→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FBHS",
+   "desde": "2016-06-24",
+   "hasta": "2022-11-08",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Fortune Brands Innovations, Inc.",
+    "desde": "2011-09-16",
+    "hasta": "2026-08-24",
+    "barras": 3755,
+    "juicio": "ok",
+    "motivo": "3755 barras, 2011-09-16→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FCPT",
+   "desde": "2015-11-10",
+   "hasta": "2015-11-10",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Four Corners Property Trust, Inc.",
+    "desde": "2015-11-10",
+    "hasta": "2026-08-24",
+    "barras": 2711,
+    "juicio": "ok",
+    "motivo": "2711 barras, 2015-11-10→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FDO",
+   "desde": "2010-01-06",
+   "hasta": "2015-07-06",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-07-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FHN",
+   "desde": "2010-01-06",
+   "hasta": "2013-06-19",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "First Horizon Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FI",
+   "desde": "2023-06-08",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FII",
+   "desde": "2010-01-06",
+   "hasta": "2012-12-28",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Federated Hermes, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FL",
+   "desde": "2016-04-04",
+   "hasta": "2019-08-08",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-09-02",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FLIR",
+   "desde": "2010-01-06",
+   "hasta": "2021-04-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2021-05-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FLR",
+   "desde": "2010-01-06",
+   "hasta": "2019-06-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Fluor Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FLS",
+   "desde": "2010-01-06",
+   "hasta": "2021-02-12",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Flowserve Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FLT",
+   "desde": "2018-06-20",
+   "hasta": "2024-03-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-10",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Corpay, Inc.",
+    "desde": "2010-12-15",
+    "hasta": "2026-08-24",
+    "barras": 3945,
+    "juicio": "ok",
+    "motivo": "3945 barras, 2010-12-15→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FMC",
+   "desde": "2010-01-06",
+   "hasta": "2025-03-24",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "FMC Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FRC",
+   "desde": "2019-01-02",
+   "hasta": "2023-03-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FRX",
+   "desde": "2010-01-06",
+   "hasta": "2014-06-24",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "FTI",
+   "desde": "2010-01-06",
+   "hasta": "2021-01-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "TechnipFMC plc",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "FTR",
+   "desde": "2010-01-06",
+   "hasta": "2017-03-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-10-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "GENZ",
+   "desde": "2010-01-06",
+   "hasta": "2011-04-01",
+   "veredicto": "reutilizado",
+   "motivo": "el proveedor devuelve un ETF («VanEck Digital Native Economy ETF»), no una acción",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2011-03-24",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "ETF",
+    "nombre": "VanEck Digital Native Economy ETF",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "reutilizado",
+    "motivo": "el proveedor devuelve un ETF («VanEck Digital Native Economy ETF»), no una acción"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "GGP",
+   "desde": "2013-12-10",
+   "hasta": "2018-08-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "GHC",
+   "desde": "2010-01-06",
+   "hasta": "2014-09-19",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Graham Holdings Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "GMCR",
+   "desde": "2014-03-24",
+   "hasta": "2016-02-26",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2016-02-01",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "GME",
+   "desde": "2010-01-06",
+   "hasta": "2016-04-20",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-11",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "GameStop Corp.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "GNW",
+   "desde": "2010-01-06",
+   "hasta": "2015-11-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Genworth Financial, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "GPS",
+   "desde": "2010-01-06",
+   "hasta": "2022-01-20",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-05-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Gap, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "GR",
+   "desde": "2010-01-06",
+   "hasta": "2012-07-26",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "GT",
+   "desde": "2010-01-06",
+   "hasta": "2019-02-15",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Goodyear Tire & Rubber Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "HBI",
+   "desde": "2015-03-23",
+   "hasta": "2021-12-14",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-11-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HCBK",
+   "desde": "2010-01-06",
+   "hasta": "2015-10-28",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HES",
+   "desde": "2010-01-06",
+   "hasta": "2025-07-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-05-08",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HFC",
+   "desde": "2018-06-18",
+   "hasta": "2021-05-14",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-04-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HNZ",
+   "desde": "2010-01-06",
+   "hasta": "2013-06-06",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2014-03-07",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HOG",
+   "desde": "2010-01-06",
+   "hasta": "2020-05-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Harley-Davidson, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "HOLX",
+   "desde": "2016-03-30",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-01-29",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HP",
+   "desde": "2010-03-01",
+   "hasta": "2020-05-12",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Helmerich & Payne, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "HRB",
+   "desde": "2010-01-06",
+   "hasta": "2020-09-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-14",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "H&R Block, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "HRS",
+   "desde": "2010-01-06",
+   "hasta": "2019-04-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "HSP",
+   "desde": "2010-01-06",
+   "hasta": "2015-09-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-07-29",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "IGT",
+   "desde": "2010-01-06",
+   "hasta": "2014-06-19",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-02-09",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ILMN",
+   "desde": "2015-11-19",
+   "hasta": "2024-06-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Illumina, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "INFO",
+   "desde": "2017-06-02",
+   "hasta": "2022-02-17",
+   "veredicto": "reutilizado",
+   "motivo": "el proveedor devuelve un ETF («Harbor PanAgora Dynamic Large Cap Core ETF»), no una acción",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "tipo": "ETF",
+    "nombre": "Harbor PanAgora Dynamic Large Cap Core ETF",
+    "desde": "2024-10-10",
+    "hasta": "2026-08-24",
+    "barras": 468,
+    "juicio": "reutilizado",
+    "motivo": "el proveedor devuelve un ETF («Harbor PanAgora Dynamic Large Cap Core ETF»), no una acción"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "IPG",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-11-10",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "IPGP",
+   "desde": "2018-03-07",
+   "hasta": "2022-06-09",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "IPG Photonics Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "ITT",
+   "desde": "2010-01-06",
+   "hasta": "2011-10-31",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "ITT Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "JCP",
+   "desde": "2010-01-06",
+   "hasta": "2013-11-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2020-12-10",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "JEC",
+   "desde": "2010-01-06",
+   "hasta": "2019-12-09",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Jacobs Solutions Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "JEF",
+   "desde": "2010-01-06",
+   "hasta": "2019-09-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-09",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Jefferies Financial Group Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "JNPR",
+   "desde": "2010-01-06",
+   "hasta": "2025-07-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-05-09",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "JNS",
+   "desde": "2010-01-06",
+   "hasta": "2011-11-18",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "JOY",
+   "desde": "2011-02-28",
+   "hasta": "2015-10-05",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "JWN",
+   "desde": "2010-01-06",
+   "hasta": "2020-05-22",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-03-21",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "K",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-10-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "KMX",
+   "desde": "2010-06-28",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-06-24",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "CarMax, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "KORS",
+   "desde": "2013-11-13",
+   "hasta": "2018-09-18",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "KRFT",
+   "desde": "2012-10-02",
+   "hasta": "2015-07-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "KSS",
+   "desde": "2010-01-06",
+   "hasta": "2020-09-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Kohl's Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "KSU",
+   "desde": "2013-05-24",
+   "hasta": "2021-10-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2023-02-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LB",
+   "desde": "2010-01-06",
+   "hasta": "2021-07-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "LandBridge Company LLC",
+    "desde": "2024-06-28",
+    "hasta": "2026-08-24",
+    "barras": 540,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2024-06-28→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LEG",
+   "desde": "2010-01-06",
+   "hasta": "2021-12-14",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Leggett & Platt, Incorporated",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "LKQ",
+   "desde": "2016-05-23",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "LKQ Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "LLTC",
+   "desde": "2010-01-06",
+   "hasta": "2017-03-10",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2017-01-31",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LM",
+   "desde": "2010-01-06",
+   "hasta": "2016-11-29",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LNC",
+   "desde": "2010-01-06",
+   "hasta": "2023-09-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Lincoln National Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "LO",
+   "desde": "2010-01-06",
+   "hasta": "2015-06-11",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LSI",
+   "desde": "2010-01-06",
+   "hasta": "2014-05-06",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2014-05-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LUMN",
+   "desde": "2020-09-18",
+   "hasta": "2023-03-15",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Lumen Technologies, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "LVLT",
+   "desde": "2014-11-05",
+   "hasta": "2017-10-10",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-02-20",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "LW",
+   "desde": "2018-12-03",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-24",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Lamb Weston Holdings, Inc.",
+    "desde": "2016-11-10",
+    "hasta": "2026-08-24",
+    "barras": 2458,
+    "juicio": "ok",
+    "motivo": "2458 barras, 2016-11-10→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "LXK",
+   "desde": "2010-01-06",
+   "hasta": "2012-09-25",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "M",
+   "desde": "2010-01-06",
+   "hasta": "2020-04-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Macy's, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MAC",
+   "desde": "2013-05-09",
+   "hasta": "2019-12-10",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Macerich Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MAT",
+   "desde": "2010-01-06",
+   "hasta": "2019-06-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Mattel, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MDP",
+   "desde": "2010-01-06",
+   "hasta": "2010-12-31",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2021-11-12",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MEE",
+   "desde": "2010-01-06",
+   "hasta": "2011-05-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MHK",
+   "desde": "2013-12-23",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Mohawk Industries, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MHS",
+   "desde": "2010-01-06",
+   "hasta": "2012-03-22",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MJN",
+   "desde": "2010-01-06",
+   "hasta": "2017-06-07",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MKTX",
+   "desde": "2019-07-01",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "MarketAxess Holdings Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MMC",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-21",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Marsh & McLennan Companies, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MMI",
+   "desde": "2011-01-04",
+   "hasta": "2012-05-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Marcus & Millichap, Inc.",
+    "desde": "2013-10-31",
+    "hasta": "2026-08-24",
+    "barras": 3221,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2013-10-31→2026-08-24) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MOH",
+   "desde": "2022-03-02",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Molina Healthcare, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MOLX",
+   "desde": "2010-01-06",
+   "hasta": "2013-12-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2013-10-24",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MRO",
+   "desde": "2010-01-06",
+   "hasta": "2024-11-22",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2024-11-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MTCH",
+   "desde": "2021-09-20",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Match Group, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MUR",
+   "desde": "2010-01-06",
+   "hasta": "2017-07-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Murphy Oil Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "MWV",
+   "desde": "2010-01-06",
+   "hasta": "2015-07-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MWW",
+   "desde": "2010-01-06",
+   "hasta": "2011-12-14",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MXIM",
+   "desde": "2018-12-03",
+   "hasta": "2021-08-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2021-09-07",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "MYL",
+   "desde": "2010-01-06",
+   "hasta": "2020-10-12",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-11-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "NAVI",
+   "desde": "2014-05-01",
+   "hasta": "2018-06-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Navient Corporation",
+    "desde": "2014-04-17",
+    "hasta": "2026-08-24",
+    "barras": 3106,
+    "juicio": "ok",
+    "motivo": "3106 barras, 2014-04-17→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NBL",
+   "desde": "2010-01-06",
+   "hasta": "2020-10-07",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-08-03",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "NBR",
+   "desde": "2010-01-06",
+   "hasta": "2015-03-19",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Nabors Industries Ltd.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NFX",
+   "desde": "2010-12-20",
+   "hasta": "2019-01-18",
+   "veredicto": "reutilizado",
+   "motivo": "el proveedor devuelve un ETF («Corgi NFLX 2x Daily ETF»), no una acción",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-10-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "ETF",
+    "nombre": "Corgi NFLX 2x Daily ETF",
+    "desde": "2026-07-07",
+    "hasta": "2026-08-24",
+    "barras": 35,
+    "juicio": "reutilizado",
+    "motivo": "el proveedor devuelve un ETF («Corgi NFLX 2x Daily ETF»), no una acción"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "NKTR",
+   "desde": "2018-03-19",
+   "hasta": "2019-09-26",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-14",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Nektar Therapeutics",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NLOK",
+   "desde": "2019-11-05",
+   "hasta": "2022-11-01",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Gen Digital Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NLSN",
+   "desde": "2013-07-09",
+   "hasta": "2022-10-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-10-27",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "NOV",
+   "desde": "2010-01-06",
+   "hasta": "2021-08-30",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "NOV Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NOVL",
+   "desde": "2010-01-06",
+   "hasta": "2011-04-25",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "NWL",
+   "desde": "2010-01-06",
+   "hasta": "2023-09-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Newell Brands Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NYT",
+   "desde": "2010-01-06",
+   "hasta": "2010-12-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The New York Times Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "NYX",
+   "desde": "2010-01-06",
+   "hasta": "2013-11-07",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2013-11-05",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ODP",
+   "desde": "2010-01-06",
+   "hasta": "2010-12-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-11-05",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "OGN",
+   "desde": "2021-06-04",
+   "hasta": "2023-10-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-31",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Organon & Co.",
+    "desde": "2021-05-14",
+    "hasta": "2026-08-24",
+    "barras": 1325,
+    "juicio": "ok",
+    "motivo": "1325 barras, 2021-05-14→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "OI",
+   "desde": "2010-01-06",
+   "hasta": "2016-11-29",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "O-I Glass, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PARA",
+   "desde": "2022-02-17",
+   "hasta": "2025-08-08",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-08-14",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Banzai International, Inc.",
+    "desde": "2021-02-12",
+    "hasta": "2026-08-24",
+    "barras": 1388,
+    "juicio": "ok",
+    "motivo": "1388 barras, 2021-02-12→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PAYC",
+   "desde": "2020-01-28",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Paycom Software, Inc.",
+    "desde": "2014-04-15",
+    "hasta": "2026-08-24",
+    "barras": 3108,
+    "juicio": "ok",
+    "motivo": "3108 barras, 2014-04-15→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PBCT",
+   "desde": "2010-01-06",
+   "hasta": "2022-03-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-03-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "PBG",
+   "desde": "2010-01-06",
+   "hasta": "2010-02-26",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "PBI",
+   "desde": "2010-01-06",
+   "hasta": "2017-02-28",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Pitney Bowes Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PDCO",
+   "desde": "2010-01-06",
+   "hasta": "2018-03-16",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-02-26",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "PEAK",
+   "desde": "2019-11-05",
+   "hasta": "2024-03-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Healthpeak Properties, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PENN",
+   "desde": "2021-03-22",
+   "hasta": "2022-06-28",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "PENN Entertainment, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PETM",
+   "desde": "2012-10-05",
+   "hasta": "2015-03-11",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2014-11-26",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "PKI",
+   "desde": "2010-01-06",
+   "hasta": "2023-05-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-11",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Revvity, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "POOL",
+   "desde": "2020-10-07",
+   "hasta": "2025-08-23",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Pool Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PRGO",
+   "desde": "2011-12-19",
+   "hasta": "2021-08-30",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Perrigo Company plc",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PVH",
+   "desde": "2013-02-14",
+   "hasta": "2022-06-28",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-06-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "PVH Corp.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "PXD",
+   "desde": "2010-01-06",
+   "hasta": "2024-05-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2024-05-02",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "QEP",
+   "desde": "2010-07-01",
+   "hasta": "2015-06-30",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2021-02-24",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "QLGC",
+   "desde": "2010-01-06",
+   "hasta": "2011-01-12",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2016-08-08",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "QRVO",
+   "desde": "2015-06-12",
+   "hasta": "2024-12-25",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-28",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Qorvo, Inc.",
+    "desde": "2015-01-02",
+    "hasta": "2026-08-24",
+    "barras": 2927,
+    "juicio": "ok",
+    "motivo": "2927 barras, 2015-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "R",
+   "desde": "2010-01-06",
+   "hasta": "2017-06-16",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Ryder System, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "RAI",
+   "desde": "2010-01-06",
+   "hasta": "2017-07-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2017-08-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "RDC",
+   "desde": "2010-01-06",
+   "hasta": "2014-08-13",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2019-02-27",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "RE",
+   "desde": "2017-06-19",
+   "hasta": "2023-07-10",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-03",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Everest Group, Ltd.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "RHI",
+   "desde": "2010-01-06",
+   "hasta": "2024-06-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Robert Half Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "RHT",
+   "desde": "2010-01-06",
+   "hasta": "2019-07-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2019-06-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "RRC",
+   "desde": "2010-01-06",
+   "hasta": "2018-06-15",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-21",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Range Resources Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "RRD",
+   "desde": "2010-01-06",
+   "hasta": "2012-12-07",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2022-02-24",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "RTN",
+   "desde": "2010-01-06",
+   "hasta": "2020-04-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-04-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "RX",
+   "desde": "2010-01-06",
+   "hasta": "2010-02-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SBNY",
+   "desde": "2021-12-20",
+   "hasta": "2023-01-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Signature Bank",
+    "desde": "2024-08-15",
+    "hasta": "2026-08-24",
+    "barras": 507,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2024-08-15→2026-08-24) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SCG",
+   "desde": "2010-01-06",
+   "hasta": "2018-12-24",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SEDG",
+   "desde": "2021-12-20",
+   "hasta": "2023-12-16",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "SolarEdge Technologies, Inc.",
+    "desde": "2015-03-26",
+    "hasta": "2026-08-24",
+    "barras": 2870,
+    "juicio": "ok",
+    "motivo": "2870 barras, 2015-03-26→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "SEE",
+   "desde": "2010-01-06",
+   "hasta": "2023-12-16",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-03-02",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SIAL",
+   "desde": "2010-01-06",
+   "hasta": "2015-11-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-11-03",
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SIVB",
+   "desde": "2018-03-19",
+   "hasta": "2023-01-04",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2023-02-24",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SLG",
+   "desde": "2015-03-23",
+   "hasta": "2021-02-12",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "SL Green Realty Corp.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "SLM",
+   "desde": "2010-01-06",
+   "hasta": "2014-04-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "SLM Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "SNI",
+   "desde": "2010-01-06",
+   "hasta": "2018-02-28",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2018-03-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SPLS",
+   "desde": "2010-01-06",
+   "hasta": "2017-09-12",
+   "veredicto": "reutilizado",
+   "motivo": "el proveedor devuelve un ETF («PIMCO US Stocks PLUS Active Bond Exchange Traded Fund»), no una acción",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2017-08-24",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "ETF",
+    "nombre": "PIMCO US Stocks PLUS Active Bond Exchange Traded Fund",
+    "desde": "2026-01-16",
+    "hasta": "2026-08-24",
+    "barras": 151,
+    "juicio": "reutilizado",
+    "motivo": "el proveedor devuelve un ETF («PIMCO US Stocks PLUS Active Bond Exchange Traded Fund»), no una acción"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SRCL",
+   "desde": "2010-01-06",
+   "hasta": "2018-11-29",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2024-11-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "STI",
+   "desde": "2010-01-06",
+   "hasta": "2019-12-05",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Solidion Technology, Inc.",
+    "desde": "2022-05-02",
+    "hasta": "2026-08-24",
+    "barras": 1082,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2022-05-02→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "STJ",
+   "desde": "2010-01-06",
+   "hasta": "2017-01-03",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2016-11-07",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SVU",
+   "desde": "2010-01-06",
+   "hasta": "2012-04-30",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2018-10-15",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SWN",
+   "desde": "2010-01-06",
+   "hasta": "2017-03-30",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2024-08-01",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SWY",
+   "desde": "2010-01-06",
+   "hasta": "2015-01-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2015-03-04",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "SYMC",
+   "desde": "2010-01-06",
+   "hasta": "2019-10-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Gen Digital Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "TDC",
+   "desde": "2010-01-06",
+   "hasta": "2017-06-16",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-05",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Teradata Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "TE",
+   "desde": "2010-01-06",
+   "hasta": "2016-06-27",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-12",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "T1 Energy Inc.",
+    "desde": "2020-01-10",
+    "hasta": "2026-08-24",
+    "barras": 1663,
+    "juicio": "reutilizado",
+    "motivo": "la serie (2020-01-10→2026-08-24) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TFX",
+   "desde": "2019-01-18",
+   "hasta": "2025-03-24",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Teleflex Incorporated",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "TGNA",
+   "desde": "2010-01-06",
+   "hasta": "2017-05-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-03-02",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "THC",
+   "desde": "2010-01-06",
+   "hasta": "2016-04-15",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Tenet Healthcare Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "TIE",
+   "desde": "2010-01-06",
+   "hasta": "2012-12-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TIF",
+   "desde": "2010-01-06",
+   "hasta": "2020-12-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2020-11-24",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TLAB",
+   "desde": "2010-01-06",
+   "hasta": "2011-12-20",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TMK",
+   "desde": "2010-01-06",
+   "hasta": "2019-07-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TRIP",
+   "desde": "2011-12-21",
+   "hasta": "2019-12-10",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Tripadvisor, Inc.",
+    "desde": "2011-12-07",
+    "hasta": "2026-08-24",
+    "barras": 3698,
+    "juicio": "ok",
+    "motivo": "3698 barras, 2011-12-07→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "TSS",
+   "desde": "2010-01-06",
+   "hasta": "2019-08-09",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2019-07-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TWC",
+   "desde": "2010-01-06",
+   "hasta": "2016-05-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2016-04-28",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TWTR",
+   "desde": "2018-06-07",
+   "hasta": "2022-10-12",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-07-26",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "TWX",
+   "desde": "2010-01-06",
+   "hasta": "2018-06-14",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "UA",
+   "desde": "2016-04-08",
+   "hasta": "2022-06-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Under Armour, Inc.",
+    "desde": "2016-03-23",
+    "hasta": "2026-08-24",
+    "barras": 2620,
+    "juicio": "ok",
+    "motivo": "2620 barras, 2016-03-23→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "UAA",
+   "desde": "2014-05-01",
+   "hasta": "2022-06-21",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-07",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Under Armour, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "UNM",
+   "desde": "2010-01-06",
+   "hasta": "2021-08-30",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Unum Group",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "UTX",
+   "desde": "2010-01-06",
+   "hasta": "2020-03-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-23",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "RTX Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "VAR",
+   "desde": "2010-01-06",
+   "hasta": "2021-03-22",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "VFC",
+   "desde": "2010-01-06",
+   "hasta": "2024-04-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-29",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "V.F. Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "VIAB",
+   "desde": "2010-01-06",
+   "hasta": "2019-11-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2019-11-14",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "VIAC",
+   "desde": "2019-12-05",
+   "hasta": "2022-02-15",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-07-31",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "VIAV",
+   "desde": "2010-01-06",
+   "hasta": "2013-12-18",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-13",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Viavi Solutions Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "VNO",
+   "desde": "2010-01-06",
+   "hasta": "2022-12-22",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-03",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Vornado Realty Trust",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "VNT",
+   "desde": "2020-10-12",
+   "hasta": "2021-02-12",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Vontier Corporation",
+    "desde": "2020-09-24",
+    "hasta": "2026-08-24",
+    "barras": 1485,
+    "juicio": "ok",
+    "motivo": "1485 barras, 2020-09-24→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "WBA",
+   "desde": "2010-01-06",
+   "hasta": "2025-08-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2025-06-26",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WCG",
+   "desde": "2018-09-17",
+   "hasta": "2019-12-23",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2019-10-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WFM",
+   "desde": "2010-01-06",
+   "hasta": "2017-08-17",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WHR",
+   "desde": "2010-01-06",
+   "hasta": "2024-03-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-04",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Whirlpool Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "WIN",
+   "desde": "2010-01-06",
+   "hasta": "2015-03-31",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2020-07-30",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WLTW",
+   "desde": "2016-01-05",
+   "hasta": "2021-12-20",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Willis Towers Watson Public Limited Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "WPX",
+   "desde": "2012-01-03",
+   "hasta": "2014-03-12",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2020-11-03",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WRK",
+   "desde": "2015-07-02",
+   "hasta": "2024-07-08",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2024-05-03",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "WU",
+   "desde": "2010-01-06",
+   "hasta": "2021-12-14",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-07-30",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "The Western Union Company",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "X",
+   "desde": "2010-01-06",
+   "hasta": "2014-07-01",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2025-05-02",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "XEC",
+   "desde": "2014-06-20",
+   "hasta": "2020-01-28",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": true,
+   "ultimoInforme": "2021-08-06",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "XLNX",
+   "desde": "2010-01-06",
+   "hasta": "2022-02-02",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": "2022-01-27",
+   "yahoo": {
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "XRAY",
+   "desde": "2010-01-06",
+   "hasta": "2024-04-03",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "DENTSPLY SIRONA Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "XRX",
+   "desde": "2010-01-06",
+   "hasta": "2021-02-12",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Xerox Holdings Corporation",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  },
+  {
+   "ticker": "XTO",
+   "desde": "2010-01-06",
+   "hasta": "2010-06-21",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "fuenteBuena": null,
+   "seguiaPresentando": false,
+   "ultimoInforme": null,
+   "yahoo": {
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
+   },
+   "tiingo": {
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
+   }
+  },
+  {
+   "ticker": "ZION",
+   "desde": "2010-01-06",
+   "hasta": "2024-03-17",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
+   "ultimoInforme": "2026-08-06",
+   "yahoo": {
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Zions Bancorporation, National Association",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-24",
+    "barras": 4437,
+    "juicio": "ok",
+    "motivo": "4437 barras, 2009-01-02→2026-08-24"
+   },
+   "tiingo": null
+  }
+ ]
+}

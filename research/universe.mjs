@@ -31,12 +31,31 @@ const CACHE_DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache");
 const CACHE_CSV = join(CACHE_DIR, "sp500_historical_components.csv");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+/**
+ * Un símbolo, o null si la celda no contiene ninguno reconocible.
+ *
+ * La fuente es de mantenimiento comunitario y se le cuela texto: el 2023-12-31 escribió
+ * **`RVTY (Previously PKI)`** en lugar de `RVTY`. Con la celda tal cual, ese día Revvity no
+ * existe —ni como `RVTY` ni como `PKI`— y además contamina la lista de «tickers sin CIK», que
+ * es de donde sale el trabajo de resolver el sesgo de supervivencia.
+ *
+ * Se queda con el símbolo de cabeza y **sólo** si lo que sigue es una aclaración entre
+ * paréntesis: se corrige una errata evidente, no se adivina. Cualquier otra cosa se descarta.
+ */
+export function normalizaTicker(celda) {
+  const t = String(celda ?? "").trim();
+  if (/^[A-Z][A-Z0-9.-]{0,6}$/.test(t)) return t;
+  const m = t.match(/^([A-Z][A-Z0-9.-]{0,6})\s*\(/);
+  return m ? m[1] : null;
+}
+
 /** date,"TICKER1,TICKER2,…" → [{date, tickers}] ordenado. Puro: se testea sin red. */
 export function parseSP500Csv(text) {
   return text.trim().split("\n").slice(1).map((ln) => {
     const c = ln.indexOf(",");
     const date = ln.slice(0, c).replace(/"/g, "").trim();
-    const tickers = ln.slice(c + 1).replace(/"/g, "").split(",").map((t) => t.trim()).filter(Boolean);
+    const tickers = ln.slice(c + 1).replace(/"/g, "").split(",")
+      .map((t) => normalizaTicker(t)).filter(Boolean);
     return { date, tickers };
   }).filter((r) => /^\d{4}-\d{2}-\d{2}$/.test(r.date) && r.tickers.length)
     .sort((a, b) => a.date.localeCompare(b.date));

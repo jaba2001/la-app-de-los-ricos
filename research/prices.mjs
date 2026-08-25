@@ -79,7 +79,7 @@ async function fromTiingo(ticker) {
 // con `BNY`, `MRSH` y `BRK-B`, sin `BK`, `MMC` ni `BRK.B`—. Si `tickerToCik("BK")` responde es
 // porque `MANUAL_CIK` de `edgar.mjs` lo lleva a mano. Las dos tablas van juntas: una entrada
 // aquí sin su pareja allí (o al revés) deja el nombre medio roto, que es lo que pasaba.
-export const YAHOO_ALIAS = {
+const ALIAS_A_MANO = {
   BTCUSD: "BTC-USD",
   ETHUSD: "ETH-USD",
   BK: "BNY",     // Bank of New York Mellon · CIK 0001390777 en los dos tickers
@@ -88,6 +88,30 @@ export const YAHOO_ALIAS = {
   // forma. El CSV de miembros del índice usa punto para la clase; Yahoo y la SEC, guion.
   "BRK.B": "BRK-B", // Berkshire Hathaway clase B · CIK 0001067983
 };
+
+/**
+ * Y los MISMOS cambios de ticker, pero de las empresas que ya salieron del índice, generados
+ * por `research/publicar_resolucion.mjs` con exactamente la prueba que pide la regla de
+ * arriba: los dos símbolos resuelven al mismo CIK en la SEC.
+ *
+ * Es lo que rescata a las renombradas. `FB` no devuelve nada de Meta —hoy ese símbolo es un
+ * ETF de ProShares que cotiza desde junio de 2025—, pero `META` devuelve la serie entera
+ * desde 2012, porque los proveedores guardan toda la historia bajo el nombre vigente. Sin el
+ * alias, Meta quedaría bloqueada por símbolo reutilizado y el backtest perdería uno de los
+ * mayores miembros del índice por un simple cambio de nombre.
+ *
+ * Los de arriba MANDAN sobre éstos: están puestos a mano, verificados uno a uno, y algunos
+ * (`BTCUSD`, `BRK.B`) no son cambios de ticker sino convenciones de formato.
+ */
+function aliasGenerados() {
+  try {
+    const ruta = join(dirname(fileURLToPath(import.meta.url)), "data", "alias_ticker.json");
+    if (existsSync(ruta)) return JSON.parse(readFileSync(ruta, "utf8"))?.alias ?? {};
+  } catch { /* sin fichero, sólo los de a mano */ }
+  return {};
+}
+
+export const YAHOO_ALIAS = { ...aliasGenerados(), ...ALIAS_A_MANO };
 
 /**
  * ¿La serie recién descargada puede REEMPLAZAR a la que ya estaba en disco?
@@ -106,10 +130,56 @@ export function cubreLaCache(nuevas, previa) {
     && nuevas[nuevas.length - 1].date >= previa[previa.length - 1].date;
 }
 
+/**
+ * SÍMBOLOS QUE OTRO INSTRUMENTO HEREDÓ, y por qué esto tiene que estar ANTES de la caché.
+ *
+ * Cuando una empresa desaparece su símbolo queda libre, y los proveedores indexan por símbolo:
+ * piden `GENZ` y devuelven **200 con 4.437 barras continuas de 2009 a 2026**… del *VanEck
+ * Digital Native Economy ETF*. Genzyme se vendió a 74 $/acción en abril de 2011 y esa serie
+ * marca 32,99 $ ese día. No hay error, no hay hueco, no hay nada que se note: hay precios de
+ * otra cosa. Ni Yahoo ni Tiingo distinguen el caso — lo comprobé en los dos.
+ *
+ * Y no se puede arreglar truncando en la fecha de salida, porque la serie **entera** es del
+ * instrumento nuevo, también el tramo antiguo. La única respuesta correcta es no dar precios:
+ * el nombre se queda fuera, contado y a la vista, en lugar de entrar con los de otro.
+ *
+ * La lista la produce `research/simbolos_reutilizados.mjs` comparando cada serie con el periodo
+ * en que el ticker estuvo en el índice. Si el fichero falta, no se bloquea nada — el arreglo
+ * degrada al comportamiento anterior en vez de dejar el sistema sin precios.
+ */
+const AVISADOS = new Set();
+export function simboloBloqueado(ticker) {
+  if (!mem.has("__bloq")) {
+    let m = {};
+    try {
+      const ruta = join(dirname(fileURLToPath(import.meta.url)), "data", "simbolos_reutilizados.json");
+      if (existsSync(ruta)) m = JSON.parse(readFileSync(ruta, "utf8"))?.bloqueados ?? {};
+    } catch { m = {}; }
+    mem.set("__bloq", m);
+  }
+  const motivo = mem.get("__bloq")[ticker.toUpperCase()];
+  if (motivo && !AVISADOS.has(ticker)) {
+    AVISADOS.add(ticker);
+    console.warn(`  ⚠ ${ticker}: sin precios a propósito — ${motivo}`);
+  }
+  return motivo ?? null;
+}
+
 async function series(ticker) {
   if (mem.has(ticker)) return mem.get(ticker);
+  // Antes que la caché y antes que la red: si el símbolo lo heredó otro instrumento, no hay
+  // respuesta buena que buscar, y una caché escrita en una ejecución anterior podría tener ya
+  // la serie ajena guardada.
+  if (simboloBloqueado(ticker)) { mem.set(ticker, []); return []; }
   const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
-  const path = join(DIR, ticker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
+  // ⚠️ LA CACHÉ SE INDEXA POR EL SÍMBOLO DEL QUE SE DESCARGA, no por el que se pide.
+  //
+  // Con el alias `FB → META`, guardar bajo `FB` deja en disco un fichero que la siguiente
+  // ejecución lee ANTES de aplicar el alias — y si ese `FB.json` se escribió cuando `FB` era
+  // ya el ETF de ProShares, Meta recibe los precios del ETF sin que nada falle. Indexar por
+  // el destino hace que `FB` y `META` compartan la misma serie, que es lo correcto porque son
+  // la misma acción, y de paso invalida sola cualquier caché escrita bajo el símbolo viejo.
+  const path = join(DIR, yTicker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
   let rows = null;
   // ⚠️ Esta caché NO CADUCA: una vez escrito el fichero, se reutiliza para siempre. Es lo
   // correcto para un backtest (que quiere datos estables y reproducibles) y VENENO para un

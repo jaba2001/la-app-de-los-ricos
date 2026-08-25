@@ -7,13 +7,17 @@
 // Este módulo escribe en `.cache/px_long/` — directorio propio, cero efectos colaterales
 // sobre nada de lo que ya funciona.
 //
-// Solo Yahoo (gratis, sin token) y solo lo que el audit necesita: log-retornos totales.
-// No cubre deslistados: eso está declarado como salvedad en el informe, no disimulado.
+// Empezó siendo solo-Yahoo y solo para log-retornos totales. Ya no: lleva respaldo de Tiingo,
+// que SÍ cubre los deslistados —`XLNX` hasta el 2022-02-14, `CELG` hasta el 2019-11-22, ambos
+// el día exacto de la operación—, mientras Yahoo responde 404 a todos ellos. La salvedad de
+// «no cubre deslistados» que estuvo escrita aquí dejó de ser cierta y se corrigió el
+// 2026-08-24, al medirlo. Lo que sigue sin cubrirse es otra cosa: los símbolos que heredó
+// otro instrumento, y ésos se bloquean explícitamente (ver `simboloBloqueado`).
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { YAHOO_ALIAS, cubreLaCache } from "./prices.mjs";
+import { YAHOO_ALIAS, cubreLaCache, simboloBloqueado } from "./prices.mjs";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache", "px_long");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
@@ -62,11 +66,22 @@ async function fromTiingo(ticker) {
 
 async function seriesLong(ticker) {
   if (mem.has(ticker)) return mem.get(ticker);
+  // Mismo bloqueo que en `prices.mjs`, y por el mismo motivo: `GENZ` devuelve aquí 4.436
+  // barras de un ETF de VanEck que nada tienen que ver con Genzyme. Esta ventana es la que
+  // más lo sufre, porque es la que llega a 2009 y por tanto la que más empresas muertas mira.
+  if (simboloBloqueado(ticker)) { mem.set(ticker, []); return []; }
   // El mismo mapa que `prices.mjs`, IMPORTADO y no copiado: dos tablas de alias que se
   // separan producirían dos historias distintas para la misma empresa según qué ventana se
   // mire, y eso es exactamente el fallo que este repo ya cometió con los pesos del ensemble.
   const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
-  const path = join(DIR, ticker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
+  // ⚠️ LA CACHÉ SE INDEXA POR EL SÍMBOLO DEL QUE SE DESCARGA, no por el que se pide.
+  //
+  // Con el alias `FB → META`, guardar bajo `FB` deja en disco un fichero que la siguiente
+  // ejecución lee ANTES de aplicar el alias — y si ese `FB.json` se escribió cuando `FB` era
+  // ya el ETF de ProShares, Meta recibe los precios del ETF sin que nada falle. Indexar por
+  // el destino hace que `FB` y `META` compartan la misma serie, que es lo correcto porque son
+  // la misma acción, y de paso invalida sola cualquier caché escrita bajo el símbolo viejo.
+  const path = join(DIR, yTicker.replace(/[^A-Za-z0-9_.-]/g, "") + ".json");
   let rows = null;
   // `c[0].raw != null` invalida las cachés escritas antes de guardar el cierre crudo: sin
   // él no se pueden calcular múltiplos de valoración (un PER contra el cierre AJUSTADO por

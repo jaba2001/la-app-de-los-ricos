@@ -1,0 +1,192 @@
+{
+ "generatedAt": "2026-08-25T05:10:41.360Z",
+ "fuente": "research/publicar_resolucion.mjs",
+ "criterio": "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",
+ "entradas": 21,
+ "descartados": [
+  {
+   "de": "DISCA",
+   "cik": "0001437107",
+   "nombre": "Warner Bros. Discovery, Inc.",
+   "motivo": "convivió en el índice con «DISCK» y los dos apuntan a «WBD»: eran clases distintas de la misma empresa y hoy son una sola"
+  },
+  {
+   "de": "DISCK",
+   "cik": "0001437107",
+   "nombre": "Warner Bros. Discovery, Inc.",
+   "motivo": "convivió en el índice con «DISCA» y los dos apuntan a «WBD»: eran clases distintas de la misma empresa y hoy son una sola"
+  }
+ ],
+ "alias": {
+  "ABC": "COR",
+  "ADS": "BFH",
+  "ANTM": "ELV",
+  "ATGE": "CVSA",
+  "BF.B": "BF-B",
+  "BLL": "BALL",
+  "CTL": "LUMN",
+  "ESV": "VAL",
+  "FB": "META",
+  "FBHS": "FBIN",
+  "FII": "FHI",
+  "FLT": "CPAY",
+  "GPS": "GAP",
+  "JEC": "J",
+  "NLOK": "GEN",
+  "PEAK": "DOC",
+  "PKI": "RVTY",
+  "RE": "EG",
+  "SYMC": "GEN",
+  "UTX": "RTX",
+  "WLTW": "WTW"
+ },
+ "detalle": [
+  {
+   "de": "ABC",
+   "a": "COR",
+   "cik": "0001140859",
+   "nombre": "Cencora, Inc.",
+   "enElIndice": "2010-01-06→2023-09-01"
+  },
+  {
+   "de": "ADS",
+   "a": "BFH",
+   "cik": "0001101215",
+   "nombre": "BREAD FINANCIAL HOLDINGS, INC.",
+   "enElIndice": "2013-12-23→2020-05-22"
+  },
+  {
+   "de": "ANTM",
+   "a": "ELV",
+   "cik": "0001156039",
+   "nombre": "Elevance Health, Inc.",
+   "enElIndice": "2010-01-06→2022-06-21"
+  },
+  {
+   "de": "ATGE",
+   "a": "CVSA",
+   "cik": "0000730464",
+   "nombre": "Covista Inc.",
+   "enElIndice": "2010-01-06→2012-09-25"
+  },
+  {
+   "de": "BF.B",
+   "a": "BF-B",
+   "cik": "0000014693",
+   "nombre": "BROWN FORMAN CORP",
+   "enElIndice": "2023-05-09→2026-08-24"
+  },
+  {
+   "de": "BLL",
+   "a": "BALL",
+   "cik": "0000009389",
+   "nombre": "BALL Corp",
+   "enElIndice": "2010-01-06→2022-04-11"
+  },
+  {
+   "de": "CTL",
+   "a": "LUMN",
+   "cik": "0000018926",
+   "nombre": "Lumen Technologies, Inc.",
+   "enElIndice": "2010-01-06→2020-06-22"
+  },
+  {
+   "de": "ESV",
+   "a": "VAL",
+   "cik": "0000314808",
+   "nombre": "Valaris Ltd",
+   "enElIndice": "2012-07-31→2016-03-29"
+  },
+  {
+   "de": "FB",
+   "a": "META",
+   "cik": "0001326801",
+   "nombre": "Meta Platforms, Inc.",
+   "enElIndice": "2013-12-23→2022-06-08"
+  },
+  {
+   "de": "FBHS",
+   "a": "FBIN",
+   "cik": "0001519751",
+   "nombre": "Fortune Brands Innovations, Inc.",
+   "enElIndice": "2016-06-24→2022-11-08"
+  },
+  {
+   "de": "FII",
+   "a": "FHI",
+   "cik": "0001056288",
+   "nombre": "FEDERATED HERMES, INC.",
+   "enElIndice": "2010-01-06→2012-12-28"
+  },
+  {
+   "de": "FLT",
+   "a": "CPAY",
+   "cik": "0001175454",
+   "nombre": "CORPAY, INC.",
+   "enElIndice": "2018-06-20→2024-03-25"
+  },
+  {
+   "de": "GPS",
+   "a": "GAP",
+   "cik": "0000039911",
+   "nombre": "GAP INC",
+   "enElIndice": "2010-01-06→2022-01-20"
+  },
+  {
+   "de": "JEC",
+   "a": "J",
+   "cik": "0000052988",
+   "nombre": "JACOBS SOLUTIONS INC.",
+   "enElIndice": "2010-01-06→2019-12-09"
+  },
+  {
+   "de": "NLOK",
+   "a": "GEN",
+   "cik": "0000849399",
+   "nombre": "Gen Digital Inc.",
+   "enElIndice": "2019-11-05→2022-11-01"
+  },
+  {
+   "de": "PEAK",
+   "a": "DOC",
+   "cik": "0000765880",
+   "nombre": "HEALTHPEAK PROPERTIES, INC.",
+   "enElIndice": "2019-11-05→2024-03-03"
+  },
+  {
+   "de": "PKI",
+   "a": "RVTY",
+   "cik": "0000031791",
+   "nombre": "REVVITY, INC.",
+   "enElIndice": "2010-01-06→2023-05-17"
+  },
+  {
+   "de": "RE",
+   "a": "EG",
+   "cik": "0001095073",
+   "nombre": "EVEREST GROUP, LTD.",
+   "enElIndice": "2017-06-19→2023-07-10"
+  },
+  {
+   "de": "SYMC",
+   "a": "GEN",
+   "cik": "0000849399",
+   "nombre": "Gen Digital Inc.",
+   "enElIndice": "2010-01-06→2019-10-18"
+  },
+  {
+   "de": "UTX",
+   "a": "RTX",
+   "cik": "0000101829",
+   "nombre": "RTX Corp",
+   "enElIndice": "2010-01-06→2020-03-03"
+  },
+  {
+   "de": "WLTW",
+   "a": "WTW",
+   "cik": "0001140536",
+   "nombre": "WILLIS TOWERS WATSON PLC",
+   "enElIndice": "2016-01-05→2021-12-20"
+  }
+ ]
+}
