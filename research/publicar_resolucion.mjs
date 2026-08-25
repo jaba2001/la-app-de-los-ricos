@@ -103,7 +103,11 @@ for (const [t, d] of Object.entries(revisados)) {
   if (!d?.cik || !/^\d{10}$/.test(d.cik)) continue;
   if (entradas.some(([x]) => x === t)) continue;
   if (detalle.some((f) => f.ticker === t)) continue;
-  entradas.push([t, d.cik, "revisado"]);
+  // ⚠️ AQUÍ TAMBIÉN, y no darse cuenta costó que 22 propuestas automáticas entraran
+  // etiquetadas como revisión humana el mismo día que se arregló la otra vía. Son dos caminos
+  // distintos hacia el mismo mapa —uno para lo que el resolutor sí miró y otro para lo que no—
+  // y arreglar sólo el primero deja el agujero entero abierto por el segundo.
+  entradas.push([t, d.cik, esHumano(d) ? "revisado" : "corroborado"]);
 }
 const mapa = Object.fromEntries(entradas.map(([t, c]) => [t, c]).sort((a, b) => a[0].localeCompare(b[0])));
 const porRevisar = detalle.filter((f) => f.estado === "revisar" && !mapa[f.ticker]);
@@ -193,7 +197,14 @@ const detalleAlias = [];
 const alias_descartados = [];
 // Quién reclama a quién, guardando el periodo de cada uno para poder distinguir clases
 // simultáneas de renombres sucesivos.
-const periodo = new Map(detalle.map((f) => [f.ticker, { desde: f.desde, hasta: f.hasta }]));
+// ⚠️ EL PERIODO SALE DE TODO LO QUE SE CONOCE, no sólo de lo que el resolutor resolvió.
+//
+// `noResueltos` también trae `desde` y `hasta` — que el resolutor no encontrara el CIK no
+// significa que no supiera cuándo estuvo el ticker en el índice. Construir el mapa sólo desde
+// `detalle` dejaba sin periodo justo a los que entran por revisión, y sin periodo la regla de
+// convivencia no puede comprobar nada: falla en cerrado y les niega el alias. Pasó de verdad
+// con 22 tickers el 2026-08-25, y el síntoma fue un test en rojo, no un error.
+const periodo = new Map([...detalle, ...(res.noResueltos ?? [])].map((f) => [f.ticker, { desde: f.desde, hasta: f.hasta }]));
 const reclamantes = new Map();
 for (const [muerto, cik] of Object.entries(mapa)) {
   const vivosDelCik = tickersDeCik.get(cik);
@@ -251,8 +262,9 @@ escribirAtomico(join(DATA, "alias_ticker.json"), JSON.stringify({
   detalle: detalleAlias.sort((a, b) => a.de.localeCompare(b.de)),
 }, null, 1));
 
-const nHumano = entradas.filter(([, , e]) => e.endsWith("+revisado")).length;
-const nAuto = entradas.filter(([, , e]) => e.endsWith("+corroborado")).length;
+const marca = (e, m) => e === m || e.endsWith("+" + m);   // «revisado» y «A+revisado» son la misma via
+const nHumano = entradas.filter(([, , e]) => marca(e, "revisado")).length;
+const nAuto = entradas.filter(([, , e]) => marca(e, "corroborado")).length;
 console.log(`\n  CIK publicados: ${Object.keys(mapa).length}   ·   alias de ticker: ${Object.keys(alias).length}   ·   pendientes de revisar a mano: ${porRevisar.length}\n`);
 console.log(`  Con decisión sobre el resolutor: ${nHumano} revisados por una PERSONA · ${nAuto} corroborados por revisar_cik --proponer (máquina, NO revisión humana)`);
 if (porRevisar.length) {

@@ -135,7 +135,7 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     const ev = leer("resolucion_cik.json");
     if (!ev) aviso("falta research/out/resolucion_cik.json — sin él no se puede comprobar que todo publicado tenga periodo");
     else {
-      const conPeriodo = new Set((ev.detalle ?? []).map((f) => f.ticker));
+      const conPeriodo = new Set([...(ev.detalle ?? []), ...(ev.noResueltos ?? [])].map((f) => f.ticker));
       const sinPeriodo = Object.keys(hist.mapa ?? {}).filter((t) => !conPeriodo.has(t));
       ok(!sinPeriodo.length, `cik_historicos: todo ticker publicado tiene periodo conocido en la evidencia${sinPeriodo.length ? ` — sin periodo (no se les dará alias): ${sinPeriodo.slice(0, 6).join(", ")}` : ""}`);
     }
@@ -158,7 +158,7 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     const publicados = new Set(Object.keys(hist.mapa ?? {}));
     const auto = Object.entries(rev.decisiones).filter(([t, d]) => publicados.has(t) && !esHumano(d)).map(([t]) => t);
     const ev = hist.porEvidencia ?? {};
-    const nCorroborado = Object.entries(ev).filter(([k]) => k.endsWith("+corroborado")).reduce((a, [, v]) => a + v, 0);
+    const nCorroborado = Object.entries(ev).filter(([k]) => k === "corroborado" || k.endsWith("+corroborado")).reduce((a, [, v]) => a + v, 0);
     ok(nCorroborado === auto.length, `cik_historicos: las ${auto.length} decisiones escritas por --proponer figuran como «+corroborado», no como revisión humana (porEvidencia cuenta ${nCorroborado})`);
     // Y ninguna decisión puede quedarse sin procedencia declarada: sin ese campo no se sabe
     // quién decidió, y lo que no se sabe acaba contándose como lo más favorable.
