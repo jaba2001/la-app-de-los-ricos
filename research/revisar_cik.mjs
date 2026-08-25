@@ -25,7 +25,7 @@
 //   node research/revisar_cik.mjs --pendientes --proponer
 //   node research/revisar_cik.mjs --sin-resolver --proponer   (los que no resolvió en absoluto)
 // ─────────────────────────────────────────────────────────────────────────────
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, existsSync, renameSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { loadSP500Historical } from "./universe.mjs";
@@ -306,7 +306,15 @@ if (PROPONER) {
     previo.decisiones[t] = d;
     nuevas++;
   }
-  writeFileSync(ruta, JSON.stringify(previo, null, 1));
+  // Temporal + rename, por lo mismo que en `simbolos_reutilizados.mjs`: este fichero lo LEE
+  // `publicar_resolucion.mjs` dentro de un try/catch que ante un JSON a medias se queda con
+  // `{}` y sigue. Sin las 36 decisiones revisadas, publicaría 35 CIK menos y no lo diría —
+  // el conjunto publicado encogería en silencio y el sesgo volvería en parte. La ventana es
+  // estrecha, pero deja de ser teórica en cuanto hay dos procesos trabajando el repo a la vez,
+  // que es exactamente la situación del 2026-08-25.
+  const tmp = ruta + ".tmp";
+  writeFileSync(tmp, JSON.stringify(previo, null, 1));
+  renameSync(tmp, ruta);
   console.log(`\n  → ${nuevas} decisiones nuevas en research/data/cik_revisados.json (las existentes no se tocan)`);
 } else {
   console.log(`\n  (sin --proponer no se escribe nada)`);

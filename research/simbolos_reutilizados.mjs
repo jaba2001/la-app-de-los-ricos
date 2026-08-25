@@ -319,7 +319,21 @@ if (!REHACER && !SOLO) {
         console.log(`  ⚠ la evidencia anterior se hizo con las reglas v${prev.versionReglas ?? 0} y ahora van por la v${VERSION_REGLAS}: NO se hereda nada, se audita todo de nuevo.`);
       } else {
         for (const f of prev.detalle ?? []) {
-          if (f.veredicto === "ok" || f.veredicto === "reutilizado") previoDetalle.set(f.ticker, f);
+          // ⚠️ «SIN DATOS» TAMBIÉN SE HEREDA, y dejarlo fuera hacía que la cuenta fuera HACIA ATRÁS.
+          //
+          // Los tres son respuestas REALES: el proveedor contestó. «No comprobado» es la única
+          // que no lo es —cuota o red—, y por eso es la única que se vuelve a preguntar. Cuando
+          // «sin datos» quedaba fuera de la herencia, cada pasada los repreguntaba, y como son
+          // justo los que Yahoo no sirve, acababan en Tiingo: se comían ~16 de las 50 peticiones
+          // por hora sin aportar nada. Y peor — si la cuota ya estaba seca cuando les tocaba el
+          // turno, salían «no comprobado», así que el total de pendientes SUBÍA de una pasada a
+          // la siguiente. Medido: la tanda anterior dejó 66 pendientes y 16 «sin datos», y la
+          // siguiente marcó 82. Oscilando así, la puerta del rebuild podía no abrirse nunca.
+          //
+          // Y heredarlos es seguro por una razón distinta de la de los otros dos: un nombre sin
+          // serie no puede contaminar nada, porque no hay precios que servir. Si algún día hace
+          // falta volver a preguntarlos —el proveedor pudo añadir historia—, está `--rehacer`.
+          if (f.veredicto === "ok" || f.veredicto === "reutilizado" || f.veredicto === "sin datos") previoDetalle.set(f.ticker, f);
         }
       }
     }
