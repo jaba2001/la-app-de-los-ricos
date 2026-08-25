@@ -123,6 +123,22 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     ok(!acaparadores.length, `cik_historicos: ningún CIK acapara más de 3 tickers${acaparadores.length ? ` — ${acaparadores.map(([c, ts]) => `${c}: ${ts.join(",")}`).join(" · ")}` : ""}`);
     const compartidos = Object.entries(porCik).filter(([, ts]) => ts.length > 1);
     if (compartidos.length) aviso(`cik_historicos: ${compartidos.length} CIK con más de un ticker (renombres o clases): ${compartidos.map(([, ts]) => ts.join("=")).join(" ")}`);
+
+    // TODO PUBLICADO TIENE QUE TENER PERIODO CONOCIDO EN LA EVIDENCIA, y no es burocracia.
+    // La regla que impide que dos CLASES de la misma empresa entren como dos posiciones con
+    // serie idéntica —el doble conteo disfrazado de `DISCA`/`DISCK`— necesita saber CUÁNDO
+    // estuvo cada ticker en el índice, y ese dato sale de `resolucion_cik.json.detalle`. Un
+    // ticker publicado que no esté ahí (lo estaría si una revisión a mano rescatara uno de los
+    // `noResueltos`) deja esa comprobación sin datos. `publicar_resolucion.mjs` falla en
+    // cerrado y le niega el alias, así que el daño está contenido; este test dice POR QUÉ un
+    // alias esperado no apareció, que si no es de las cosas que se buscan durante horas.
+    const ev = leer("resolucion_cik.json");
+    if (!ev) aviso("falta research/out/resolucion_cik.json — sin él no se puede comprobar que todo publicado tenga periodo");
+    else {
+      const conPeriodo = new Set((ev.detalle ?? []).map((f) => f.ticker));
+      const sinPeriodo = Object.keys(hist.mapa ?? {}).filter((t) => !conPeriodo.has(t));
+      ok(!sinPeriodo.length, `cik_historicos: todo ticker publicado tiene periodo conocido en la evidencia${sinPeriodo.length ? ` — sin periodo (no se les dará alias): ${sinPeriodo.slice(0, 6).join(", ")}` : ""}`);
+    }
   }
 
   const bloq = dat("simbolos_reutilizados.json");

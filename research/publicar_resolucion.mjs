@@ -164,10 +164,21 @@ for (const [muerto, cik] of Object.entries(mapa)) {
   if (!reclamantes.has(vivo)) reclamantes.set(vivo, []);
   reclamantes.get(vivo).push(muerto);
 }
-/** ¿Convivió este ticker en el índice con otro que reclama el mismo símbolo vivo? */
+/**
+ * ¿Convivió este ticker en el índice con otro que reclama el mismo símbolo vivo?
+ *
+ * Devuelve el rival, null si no hay ninguno, o `"?"` si NO SE PUEDE SABER — que no es lo
+ * mismo y aquí falla en cerrado. `periodo` se construye desde `detalle`, o sea desde lo que
+ * el resolutor llegó a resolver; una decisión revisada a mano que rescatara un ticker de
+ * `noResueltos` estaría en `mapa` y NO en `periodo`, y la versión anterior devolvía null
+ * —«no hay conflicto»— concediéndole el alias sin haber comprobado nada. Hoy no ocurre (los
+ * 121 publicados salen todos de `detalle`), pero el día que ocurra el fallo sería exactamente
+ * el que este fichero existe para evitar: dos clases de la misma empresa entrando como dos
+ * posiciones con serie idéntica, que es doble conteo disfrazado.
+ */
 function conviveConOtroReclamante(muerto, vivo) {
   const a = periodo.get(muerto);
-  if (!a) return null;
+  if (!a) return "?";
   for (const otro of reclamantes.get(vivo) ?? []) {
     if (otro === muerto) continue;
     const b = periodo.get(otro);
@@ -185,6 +196,7 @@ for (const [muerto, cik] of Object.entries(mapa)) {
   if (!vivo) { anotar(`el CIK tiene ${vivosDelCik.size} tickers vivos (${[...vivosDelCik].sort().join(", ")}) y ninguno es claramente la acción ordinaria`); continue; }
   if (vivo === muerto) continue;
   const rival = conviveConOtroReclamante(muerto, vivo);
+  if (rival === "?") { anotar(`no consta su periodo en el índice, así que no se puede comprobar si convivió con otro reclamante de «${vivo}»: sin esa comprobación no se concede el alias`); continue; }
   if (rival) { anotar(`convivió en el índice con «${rival}» y los dos apuntan a «${vivo}»: eran clases distintas de la misma empresa y hoy son una sola`); continue; }
   alias[muerto] = vivo;
   detalleAlias.push({ de: muerto, a: vivo, cik, nombre: fila?.nombre ?? "", enElIndice: `${fila?.desde}→${fila?.hasta}` });
