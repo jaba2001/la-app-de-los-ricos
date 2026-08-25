@@ -283,6 +283,23 @@ if (SIN_RED) {
   // poco— en un ticker que consta en el índice desde hace años. Los tres conocidos van en la
   // lista; este test existe para que el CUARTO no entre en silencio, que es como entraron
   // estos. Fijarles el CIK correcto es decisión de producción, no de un test.
+  //
+  // ⚠️ Y SI ALGUIEN VIENE A ARREGLARLO: LAS DOS CLASES PIDEN TRATAMIENTOS OPUESTOS.
+  //
+  // El arreglo natural es un mapa con TRAMOS POR FECHA —antes del corte la CIK antigua,
+  // después la nueva—, que hoy no existe: `mapa` es {ticker: "CIK"} plano y `tickerToCik`
+  // no recibe fecha (28 llamadas en 26 ficheros, varias en crons de producción).
+  //
+  //   · En BLK y APA empalmar es CORRECTO. Es la misma empresa con holding nueva, la serie de
+  //     fundamentales es económicamente continua, y el empalme reconstruye una historia que
+  //     existió de verdad.
+  //   · En SNDK empalmar es FALSIFICAR. El SanDisk de 2010-2016 lo absorbió Western Digital;
+  //     el de 2025 es un spin-off distinto. Unirlos fabrica una continuidad que nunca hubo, y
+  //     eso es PEOR que el hueco: un hueco se ve y se cuenta, una serie inventada no.
+  //
+  // O sea que el tramo por fecha resuelve los tres mecánicamente y sólo dos de ellos
+  // semánticamente. Si se implementa, SNDK necesita quedar marcado como «dos empresas que
+  // comparten símbolo», no como una con historia larga.
   {
     const { loadSP500Historical } = await import("../research/universe.mjs");
     const tabla = await loadSP500Historical();
