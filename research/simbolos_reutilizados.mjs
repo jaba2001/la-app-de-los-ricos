@@ -89,12 +89,30 @@ const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
  *
  *   1 · primera versión (salir del índice = morir; sin distinguir cuota de «sin datos»)
  *   2 · vida por informes de EDGAR, 429 distinguido, prueba directa vs circunstancial
+ *   3 · «no se pudo saber si siguió viva» deja de contar como «murió» (ver `ultimoInforme`)
  */
-const VERSION_REGLAS = 2;
+const VERSION_REGLAS = 3;
 
 /** Cuánto puede sobrevivir la serie a la salida del índice antes de ser sospechosa. */
 const GRACIA_DIAS = 400; // 12 meses de retorno futuro + holgura para el cierre de la operación
-/** Un miembro del índice es una acción ordinaria. Si el proveedor dice otra cosa, es otra cosa. */
+/**
+ * Un miembro del índice es una acción ordinaria. Si el proveedor dice otra cosa, es otra cosa.
+ *
+ * ⚠️ PERO EL PROVEEDOR CAMBIA DE OPINIÓN. El 2026-08-25, con media hora de diferencia, Yahoo
+ * devolvió para `GENZ` primero `instrumentType: "ETF"` y luego `"EQUITY"` — con el mismo
+ * `longName`, «VanEck Digital Native Economy ETF», en las dos. O sea que la prueba MÁS FUERTE,
+ * la única que bloquea ella sola, no es estable en el tiempo.
+ *
+ * No se compensa mirando el nombre: «Trust» y «Fund» salen en nombres de empresas de verdad
+ * (Northern Trust es un miembro del índice), y un falso positivo aquí borra una empresa buena.
+ * Lo que compensa es que el bloqueo sea PEGAJOSO dentro de una misma versión de reglas: una vez
+ * identificado, se hereda mientras nadie traiga un «ok» de verdad. Y que un símbolo que pierde
+ * esta prueba casi siempre conserva la de la cola — `GENZ` la tiene: Genzyme dejó de presentar
+ * informes el 2011-03-24, justo al salir del índice.
+ *
+ * Si un día la lista de bloqueos ENCOGE sin que nadie haya tocado nada, mira aquí antes que a
+ * ningún otro sitio: lo más probable es que Yahoo haya vuelto a cambiar de etiqueta.
+ */
 const NO_ES_ACCION = /^(ETF|MUTUALFUND|INDEX|CURRENCY|CRYPTOCURRENCY|FUTURE)$/i;
 
 async function deYahoo(t) {
@@ -198,23 +216,37 @@ function guardarEnCache(ticker, serie) {
  * defunción marcó a **Comerica (`CMA`)** como símbolo suplantado cuando lo único que ocurrió
  * es que salió del S&P 500 en 2024 y siguió cotizando.
  *
- * Devuelve la fecha del último informe periódico, o null si no se puede saber.
+ * ⚠️ DEVUELVE TRES ESTADOS, NO DOS, y colapsarlos bloqueó a Avon por error.
+ *
+ * La primera versión devolvía «la fecha, o null si no se puede saber», y quien llamaba hacía
+ * `informe != null && …` — con lo que **«no he podido mirar» acababa valiendo «murió»**. Y no
+ * se puede mirar precisamente en los tickers cuyo CIK no se ha resuelto, que son los que más
+ * necesitan el beneficio de la duda: `AVP` no está entre los 121, así que `tickerToCik`
+ * devolvía null, nadie llegó a preguntarle a EDGAR, y la auditoría lo bloqueó afirmando que
+ * «dejó de presentar informes al salir del índice». **Avon presentó informes hasta 2023-05-15**,
+ * ocho años después de salir, y siguió cotizando hasta que Natura la compró: su serie larga era
+ * legítima. Es el defecto nº 7 de §10.3 —confundir «no he podido mirar» con «no hay nada»—
+ * reaparecido en la prueba de vida en vez de en la de precios, y aquí era peor, porque el motivo
+ * que se escribía en el fichero AFIRMABA un hecho de EDGAR que nadie había observado.
+ *
+ * Devuelve `{ conocido: false }` cuando no se pudo averiguar, y `{ conocido: true, ultimo }`
+ * cuando sí — con `ultimo` en null si de verdad no hay ningún informe periódico.
  */
 async function ultimoInforme(ticker) {
   let cik = null;
-  try { cik = await tickerToCik(ticker); } catch { return null; }
-  if (!cik) return null;
+  try { cik = await tickerToCik(ticker); } catch { return { conocido: false }; }
+  if (!cik) return { conocido: false };
   try {
     const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: { "User-Agent": "Scora Research contact@scora.app" } });
-    if (!r.ok) return null;
+    if (!r.ok) return { conocido: false };
     const f = (await r.json())?.filings?.recent ?? {};
     let max = null;
     for (let i = 0; i < (f.filingDate?.length ?? 0); i++) {
       if (!/^(10-K|10-Q|20-F|40-F)/.test(f.form[i] ?? "")) continue;
       if (!max || f.filingDate[i] > max) max = f.filingDate[i];
     }
-    return max;
-  } catch { return null; }
+    return { conocido: true, ultimo: max };
+  } catch { return { conocido: false }; }
 }
 
 /**
@@ -235,7 +267,13 @@ function juzgar(s, desde, hasta, vivoHoy) {
   // PRUEBAS CIRCUNSTANCIALES: dicen que ESTA respuesta no sirve, no que no exista una buena.
   if (s.hasta < desde || s.desde > hasta) return { veredicto: "reutilizado", prueba: "solape", motivo: `la serie (${s.desde}→${s.hasta}) no solapa con el periodo en el índice (${desde}→${hasta})` };
   const cola = dias(hasta, s.hasta);
-  if (!vivoHoy && cola > GRACIA_DIAS) return { veredicto: "reutilizado", prueba: "cola", motivo: `dejó de presentar informes al salir del índice y la serie sigue ${cola} días más (tope ${GRACIA_DIAS})` };
+  if (cola > GRACIA_DIAS) {
+    // `vivoHoy` es TRI-ESTADO: true (siguió presentando), false (dejó de presentar, y consta en
+    // EDGAR), null (no se pudo saber). Sólo el false autoriza a bloquear. El null es la duda, y
+    // la duda no borra un nombre del backtest: lo deja pendiente de que alguien pueda mirarlo.
+    if (vivoHoy === false) return { veredicto: "reutilizado", prueba: "cola", motivo: `dejó de presentar informes al salir del índice y la serie sigue ${cola} días más (tope ${GRACIA_DIAS})` };
+    if (vivoHoy == null) return { veredicto: "no comprobado", prueba: "cola", motivo: `la serie sigue ${cola} días tras salir del índice (tope ${GRACIA_DIAS}), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó` };
+  }
   return { veredicto: "ok", prueba: null, motivo: `${s.barras} barras, ${s.desde}→${s.hasta}` };
 }
 
@@ -308,7 +346,8 @@ for (const t of auditar) {
   // ¿Siguió presentando informes tras salir del índice? Si sí, la empresa seguía siendo
   // pública y su serie puede llegar hasta hoy sin que eso tenga nada de sospechoso.
   const informe = await ultimoInforme(t);
-  const vivo = informe != null && dias(hasta, informe) > GRACIA_DIAS;
+  // null = «no se ha podido saber». NO es lo mismo que false, y colapsarlos bloqueó a Avon.
+  const vivo = !informe.conocido ? null : (informe.ultimo != null && dias(hasta, informe.ultimo) > GRACIA_DIAS);
   await sleep(260);
   const sy = await deYahoo(y);
   const jy = juzgar(sy, desde, hasta, vivo);
@@ -368,9 +407,26 @@ if (SOLO) { console.log(`\n  (--solo: prueba de depuración, no se escribe nada)
 // quedaría desbloqueado sin que nadie lo decidiera, y volverían sus precios ajenos. Así que:
 // un bloqueo se hereda mientras no haya una respuesta REAL que lo levante — y cuando la hay
 // («ok»), se levanta solo.
+//
+// ⚠️ PERO NO A TRAVÉS DE UN CAMBIO DE REGLAS, y esto costó un bloqueo falso. La herencia de
+// bloqueos es deliberadamente distinta de la de veredictos: aquélla mira la versión y ésta no
+// miraba nada, así que un símbolo bloqueado por una regla que después resultó EQUIVOCADA se
+// arrastraba para siempre — cada pasada lo veía «no comprobado» por cuota y lo heredaba otra
+// vez, sin que ninguna respuesta real pudiera levantarlo. Le pasó a `AVP`: bloqueado por la
+// regla de la cola cuando nadie había podido comprobar si Avon seguía presentando informes
+// (presentó hasta 2023-05-15). Ahora un cambio de versión también corta esta herencia.
+//
+// Lo que protege al backtest mientras tanto NO es un bloqueo viejo, sino la puerta de §10.7:
+// no se rebuildea con ningún ticker publicado en «no comprobado».
 const ruta = join(DATA, "simbolos_reutilizados.json");
 let previos = {};
-try { if (existsSync(ruta)) previos = JSON.parse(readFileSync(ruta, "utf8"))?.bloqueados ?? {}; } catch { previos = {}; }
+try {
+  if (existsSync(ruta)) {
+    const prev = JSON.parse(readFileSync(ruta, "utf8"));
+    if ((prev?.versionReglas ?? 0) === VERSION_REGLAS) previos = prev?.bloqueados ?? {};
+    else console.log(`  ⚠ los bloqueos anteriores se hicieron con las reglas v${prev?.versionReglas ?? 0} y ahora van por la v${VERSION_REGLAS}: NO se heredan, hay que volver a ganárselos.`);
+  }
+} catch { previos = {}; }
 const bloqueados = Object.fromEntries(malos.map((f) => [f.ticker, f.motivo]));
 const heredados = [];
 for (const f of noComp) {
@@ -391,7 +447,15 @@ writeFileSync(ruta, JSON.stringify({
   criterio: `la serie debe solapar con el periodo en el índice y no puede seguir más de ${GRACIA_DIAS} días tras salir de él; un ETF o un fondo nunca es un miembro del índice. Las pruebas circunstanciales (solape, cola) sólo bloquean si se pudo consultar a los dos proveedores; la identificación directa del instrumento bloquea sola.`,
   bloqueados,
 }, null, 1));
-writeFileSync(join(OUT, "simbolos_reutilizados.json"), JSON.stringify({ generatedAt: new Date().toISOString(), auditados: filas.length, reutilizados: malos.length, sinDatos: sinDatos.length, noComprobados: noComp.length, detalle: filas }, null, 1));
+// ⚠️ `versionReglas` AQUÍ TAMBIÉN, y no es un duplicado del de arriba: éste es el fichero que
+// se RELEE para heredar (más arriba, en el bloque incremental), así que es el ÚNICO sitio donde
+// el sello sirve de algo. Sin él, `prev.versionReglas ?? 0` valía 0, nunca coincidía con la
+// versión actual, y la herencia no ocurría jamás: cada pasada volvía a empezar por `AAL` y se
+// paraba donde se hubiera parado la anterior. Es decir, exactamente lo que el comentario del
+// bloque incremental dice que NO puede pasar — la auditoría no habría terminado nunca.
+// Encontrado corriéndola, no leyéndola: el aviso "la evidencia anterior se hizo con las reglas
+// v0" salió en una pasada en la que la evidencia anterior la había escrito esta misma versión.
+writeFileSync(join(OUT, "simbolos_reutilizados.json"), JSON.stringify({ generatedAt: new Date().toISOString(), versionReglas: VERSION_REGLAS, auditados: filas.length, reutilizados: malos.length, sinDatos: sinDatos.length, noComprobados: noComp.length, detalle: filas }, null, 1));
 
 // Y se tira lo que ya se había guardado de ellos. El bloqueo actúa antes de leer la caché, así
 // que estos ficheros son inertes — pero dejar en disco 310 KB de un ETF bajo el nombre `GENZ`

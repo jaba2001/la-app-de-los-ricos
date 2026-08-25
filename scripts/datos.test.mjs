@@ -127,7 +127,23 @@ console.log("\n  A · artefactos versionados (sin red)\n");
 
   const bloq = dat("simbolos_reutilizados.json");
   if (!bloq) aviso("falta research/data/simbolos_reutilizados.json — regenéralo con research/simbolos_reutilizados.mjs");
-  else ok(Object.keys(bloq.bloqueados ?? {}).length > 0, "simbolos_reutilizados: la lista de bloqueo no está vacía (hay símbolos reutilizados de verdad)");
+  else {
+    ok(Object.keys(bloq.bloqueados ?? {}).length > 0, "simbolos_reutilizados: la lista de bloqueo no está vacía (hay símbolos reutilizados de verdad)");
+
+    // ⚠️ EL SELLO DE VERSIÓN TIENE QUE ESTAR EN LOS DOS FICHEROS, Y VALER LO MISMO.
+    //
+    // La auditoría es incremental porque no puede no serlo: Tiingo da ~50 peticiones por hora y
+    // hay ~290 nombres que mirar, así que cada pasada hereda del fichero de EVIDENCIA lo que ya
+    // tenía veredicto firme. Para no heredar a través de un cambio de reglas compara la versión
+    // guardada con la actual — pero leía el sello de `out/` y `out/` se escribía SIN sello.
+    // `prev.versionReglas ?? 0` valía siempre 0, nunca coincidía, y no se heredaba nunca nada:
+    // cada pasada reempezaba por `AAL` y moría de cuota en el mismo sitio. La auditoría no
+    // habría terminado jamás. El fallo se ve corriéndola, no leyéndola — por eso hay test.
+    const ev = leer("simbolos_reutilizados.json");
+    if (!ev) aviso("falta research/out/simbolos_reutilizados.json — es la evidencia de la que hereda la auditoría incremental");
+    else ok(ev.versionReglas != null && ev.versionReglas === bloq.versionReglas,
+      `simbolos_reutilizados: la evidencia lleva el mismo sello de reglas que el mapa (out=${ev.versionReglas ?? "SIN SELLO"}, data=${bloq.versionReglas}) — si no, la auditoría no hereda nada y no termina nunca`);
+  }
 
   // Un alias de ticker manda los precios de un símbolo a otro. Si el CIK de los dos no
   // coincide, no es un cambio de nombre: es un símbolo reasignado a OTRA empresa, y el alias
