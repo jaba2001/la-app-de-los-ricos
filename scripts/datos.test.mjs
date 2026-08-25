@@ -166,6 +166,30 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     ok(!sinProc.length, `cik_revisados: toda decisión declara quién la tomó${sinProc.length ? ` — sin procedencia: ${sinProc.slice(0, 5).join(", ")}` : ""}`);
   }
 
+  // ── SUELOS DE COBERTURA (fase 0 del roadmap) ────────────────────────────────
+  //
+  // SON SUELOS, NO OBJETIVOS, y la diferencia importa: van holgadamente por debajo de lo
+  // medido para detectar que la extracción se ha ROTO — un tag que cambia de nombre, un
+  // endpoint que empieza a devolver otra cosa — sin fallar cada vez que una empresa deja de
+  // publicar una magnitud, que es un hecho del mundo y no un defecto del código.
+  //
+  // El artefacto lo escribe `research/cobertura_metricas.mjs`. Si no está, se avisa y no se
+  // falla: es una medición que cuesta 500 consultas y no tiene sentido exigirla en cada test.
+  const cob = leer("cobertura_metricas.json");
+  if (!cob) aviso("falta research/out/cobertura_metricas.json — regenéralo con research/cobertura_metricas.mjs");
+  else {
+    ok(cob.conSenal >= 320, `cobertura: ${cob.conSenal} nombres con señal a ${cob.asOf} (suelo 320; medido 358 el 2026-08-25)`);
+    ok((cob.campos?.oiTTM?.pct ?? 0) >= 70, `cobertura: oiTTM al ${cob.campos?.oiTTM?.pct} % (suelo 70; medido 77,6)`);
+    ok((cob.campos?.revTTM?.pct ?? 0) >= 95, `cobertura: revTTM al ${cob.campos?.revTTM?.pct} % (suelo 95; medido 99,6)`);
+    ok((cob.campos?.assets?.pct ?? 0) >= 95, `cobertura: assets al ${cob.campos?.assets?.pct} % (suelo 95; medido 100)`);
+    // Y el mapa de dependencias del informe tiene que cubrir las cinco métricas: si alguien
+    // añade una a la señal y no la declara ahí, el informe seguiría explicando por qué faltan
+    // notas — con una explicación plausible que ya no incluye la nueva.
+    const declaradas = Object.keys(cob.dependeDe ?? {}).sort().join(",");
+    const enSenal = Object.keys(cob.metricas ?? {}).sort().join(",");
+    ok(declaradas === enSenal, `cobertura: el mapa de dependencias cubre exactamente las métricas de la señal (${declaradas} vs ${enSenal})`);
+  }
+
   const bloq = dat("simbolos_reutilizados.json");
   if (!bloq) aviso("falta research/data/simbolos_reutilizados.json — regenéralo con research/simbolos_reutilizados.mjs");
   else {
@@ -315,6 +339,32 @@ if (SIN_RED) {
     // hechos del viejo (CIK 1000180) acaban el 2016-04-03 y los del nuevo empiezan el
     // 2024-06-28 — ocho anos de vacio. Los de una reorganizacion se SOLAPAN.
     ok(!PREDECESORES["0002023554"], "SNDK NO tiene predecesor declarado: es una reasignacion de simbolo, no una reorganizacion, y unir sus hechos fabricaria una continuidad que nunca existio");
+  // ── TODO MIEMBRO ACTUAL TIENE QUE RESOLVER A UN CIK ─────────────────────────
+  //
+  // Sin CIK no hay fundamentales, luego no hay señal, luego el nombre no sale en ningún
+  // aviso: desaparece del sistema entero sin que falle nada. El 2026-08-25 le pasaba a
+  // `EA`, `FI` y `DAY` — tres miembros del índice, uno de ellos Electronic Arts.
+  //
+  // La causa es que `company_tickers.json` NO es una foto completa de lo vivo, aunque se
+  // use como si lo fuera: para `EA` el volcado masivo no la trae y en cambio el endpoint
+  // de submissions declara `tickers: ["EA"]`. Los huecos se tapan en `MANUAL_CIK`, y este
+  // test existe para que el siguiente se vea el día que aparezca y no meses después.
+  {
+    const { loadSP500Historical: cargar, membersAsOf } = await import("../research/universe.mjs");
+    const t0 = await cargar();
+    if (!t0?.length) aviso("sin tabla de miembros: no se puede comprobar que todos resuelvan a CIK");
+    else {
+      const hoy = t0[t0.length - 1].date;
+      const miembros = membersAsOf(t0, hoy);
+      const sinCik = [];
+      for (const t of miembros) {
+        const c = await tickerToCik(t).catch(() => null);
+        if (!c) sinCik.push(t);
+      }
+      ok(!sinCik.length, `los ${miembros.length} miembros actuales resuelven a un CIK${sinCik.length ? ` — SIN CIK: ${sinCik.join(", ")} (añádelos a MANUAL_CIK en research/edgar.mjs)` : ""}`);
+    }
+  }
+
   }
 
   // ── MIEMBROS ACTUALES QUE EL MAPA VIVO MANDA A UN CIK SIN HISTORIA ──────────────────

@@ -257,6 +257,160 @@
    "motivo": "se llamaba «UNITED STATES STEEL CORP» durante el periodo en el índice; el proveedor de precios dice que X era «United States Steel Corp»; flotante público 6.6 mil M$; 18 informes periódicos dentro del periodo",
    "revisadoEl": "2026-08-25",
    "propuestoPor": "revisión a mano sobre la evidencia de research/revisar_cik.mjs"
+  },
+  "ANDV": {
+   "cik": "0000050104",
+   "motivo": "identidad corroborada: el proveedor de precios dice que ANDV era «Andeavor Corp» hasta 2018-09-28 (4 días tras salir del índice), coincide al 100 % con «ANDEAVOR LLC» / «ANDEAVOR», y ese CIK presentó 37 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "AYE": {
+   "cik": "0000003673",
+   "motivo": "identidad corroborada: el proveedor de precios dice que AYE era «ALLEGHENY ENERGY INC» hasta 2011-11-30 (280 días tras salir del índice), coincide al 100 % con «ALLEGHENY ENERGY, INC» / «ALLEGHENY ENERGY INC», y ese CIK presentó 5 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "BJS": {
+   "cik": "0000864328",
+   "motivo": "identidad corroborada: el proveedor de precios dice que BJS era «BJ SERVICES CO» hasta 2011-05-09 (383 días tras salir del índice), coincide al 100 % con «BJ SERVICES CO LLC» / «BJ SERVICES CO», y ese CIK presentó 1 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "BRCM": {
+   "cik": "0001054374",
+   "motivo": "identidad corroborada: el proveedor de precios dice que BRCM era «Broadcom Corp» hasta 2016-02-09 (14 días tras salir del índice), coincide al 100 % con «BROADCOM CORP», y ese CIK presentó 24 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "BXLT": {
+   "cik": "0001620546",
+   "motivo": "identidad corroborada: el proveedor de precios dice que BXLT era «Baxalta Inc» hasta 2016-06-16 (15 días tras salir del índice), coincide al 100 % con «Baxalta Inc», y ese CIK presentó 4 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "CBE": {
+   "cik": "0001141982",
+   "motivo": "identidad corroborada: el proveedor de precios dice que CBE era «Cooper Industries Plc» hasta , coincide al 100 % con «Cooper Industries plc» / «COOPER INDUSTRIES LTD», y ese CIK presentó 4 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "CFN": {
+   "cik": "0001457543",
+   "motivo": "identidad corroborada: el proveedor de precios dice que CFN era «CareFusion Corp» hasta 2015-03-17 (4 días tras salir del índice), coincide al 100 % con «CAREFUSION Corp», y ese CIK presentó 22 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "CMCSK": {
+   "cik": "0001166691",
+   "motivo": "identidad corroborada: el proveedor de precios dice que CMCSK era «Comcast Corp» hasta 2015-12-21 (12 días tras salir del índice), coincide al 100 % con «COMCAST CORP» / «AT&T COMCAST CORP», y ese CIK presentó 1 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "FRX": {
+   "cik": "0000038074",
+   "motivo": "identidad corroborada: el proveedor de precios dice que FRX era «Forest Laboratories Inc» hasta 2014-07-01 (7 días tras salir del índice), coincide al 100 % con «Forest Laboratories, LLC» / «Tango Merger Sub 2 LLC», y ese CIK presentó 19 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "GGP": {
+   "cik": "0001496048",
+   "motivo": "identidad corroborada: el proveedor de precios dice que GGP era «General Growth Properties Inc» hasta 2018-08-28 (8 días tras salir del índice), coincide al 100 % con «Brookfield Property REIT Inc.» / «GGP Inc.», y ese CIK presentó 19 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "GR": {
+   "cik": "0000042542",
+   "motivo": "identidad corroborada: el proveedor de precios dice que GR era «GOODRICH CORP» hasta , coincide al 100 % con «GOODRICH CORP» / «GOODRICH B F CO», y ese CIK presentó 11 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "HCBK": {
+   "cik": "0000921847",
+   "motivo": "identidad corroborada: el proveedor de precios dice que HCBK era «Hudson City Bancorp Inc» hasta 2015-10-30 (2 días tras salir del índice), coincide al 100 % con «HUDSON CITY BANCORP INC», y ese CIK presentó 28 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "KRFT": {
+   "cik": "0001545158",
+   "motivo": "identidad corroborada: el proveedor de precios dice que KRFT era «Kraft Foods Group Inc» hasta 2015-07-10 (8 días tras salir del índice), coincide al 100 % con «Kraft Foods Group, Inc.», y ese CIK presentó 12 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "MEE": {
+   "cik": "0000037748",
+   "motivo": "identidad corroborada: el proveedor de precios dice que MEE era «MASSEY ENERGY CO» hasta , coincide al 100 % con «Alpha Appalachia Holdings, Inc.» / «MASSEY ENERGY CO», y ese CIK presentó 8 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "MHS": {
+   "cik": "0001170650",
+   "motivo": "identidad corroborada: el proveedor de precios dice que MHS era «MEDCO HEALTH SOLUTIONS INC» hasta 2013-04-10 (384 días tras salir del índice), coincide al 100 % con «MEDCO HEALTH SOLUTIONS INC» / «MERCK MEDCO MANAGED CARE LLC», y ese CIK presentó 9 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "MJN": {
+   "cik": "0001452575",
+   "motivo": "identidad corroborada: el proveedor de precios dice que MJN era «Mead Johnson Nutrition CO» hasta 2017-07-14 (37 días tras salir del índice), coincide al 100 % con «Mead Johnson Nutrition Co», y ese CIK presentó 31 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "NOVL": {
+   "cik": "0000758004",
+   "motivo": "identidad corroborada: el proveedor de precios dice que NOVL era «NOVELL INC» hasta , coincide al 100 % con «NOVELL INC», y ese CIK presentó 6 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "PBG": {
+   "cik": "0001076405",
+   "motivo": "identidad corroborada: el proveedor de precios dice que PBG era «PEPSI BOTTLING GROUP INC» hasta 2011-03-07 (374 días tras salir del índice), coincide al 100 % con «PEPSI BOTTLING GROUP INC», y ese CIK presentó 1 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "TIE": {
+   "cik": "0001011657",
+   "motivo": "identidad corroborada: el proveedor de precios dice que TIE era «Titanium Metals Corp» hasta 2013-01-07 (17 días tras salir del índice), coincide al 100 % con «TITANIUM METALS CORP», y ese CIK presentó 14 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "TWX": {
+   "cik": "0001105705",
+   "motivo": "identidad corroborada: el proveedor de precios dice que TWX era «Time Warner Inc» hasta 2018-06-15 (1 días tras salir del índice), coincide al 100 % con «WARNER MEDIA, LLC» / «TIME WARNER LLC», y ese CIK presentó 35 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "VAR": {
+   "cik": "0000203527",
+   "motivo": "identidad corroborada: el proveedor de precios dice que VAR era «Varian Medical Systems Inc» hasta 2021-04-16 (25 días tras salir del índice), coincide al 100 % con «VARIAN MEDICAL SYSTEMS INC» / «VARIAN ASSOCIATES INC /DE/», y ese CIK presentó 49 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "WFM": {
+   "cik": "0000865436",
+   "motivo": "identidad corroborada: el proveedor de precios dice que WFM era «Whole Foods Market Inc» hasta 2017-08-29 (12 días tras salir del índice), coincide al 100 % con «WHOLE FOODS MARKET INC», y ese CIK presentó 33 informes dentro del periodo",
+   "revisadoEl": "2026-08-25",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
   }
  }
 }

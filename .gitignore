@@ -49,6 +49,10 @@ research/out/*
 # Evidencia del backtest de las REGLAS (§6bis) y de la refutación de la dilución.
 # Los paneles de señal (`picks_signal_panel_*`) NO: son 0,6-0,9 MB regenerables y no
 # sostienen ninguna afirmación por sí solos.
+# El informe de cobertura: es lo unico que hace juzgable un arreglo de extraccion, y
+# los suelos de datos.test.mjs lo leen. Si se pierde, los guardianes se quedan sin nada
+# que vigilar y no lo dicen.
+!research/out/cobertura_metricas.json
 !research/out/picks_rules_backtest.json
 !research/out/picks_rules_backtest_oos.json
 !research/out/pillar_dilution_lab.json

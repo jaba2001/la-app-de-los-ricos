@@ -65,9 +65,24 @@ const MANUAL_CIK = {
   // SEC. No es un cambio de ticker ni una empresa distinta: es otra convención de vendor
   // para la misma acción. Sin esta línea, Berkshire Hathaway era INVISIBLE para el sistema
   // —sin CIK, luego sin fundamentales, luego sin señal— y no aparecía en ningún aviso,
-  // porque los avisos sólo ven a los que llegan a tener señal. Es el único caso de los 503:
-  // el otro ticker con sufijo, `BF-B`, ya viene con guion en el CSV y resuelve solo.
+  // porque los avisos sólo ven a los que llegan a tener señal. El otro ticker con sufijo,
+  // `BF.B`, tampoco está en el volcado: resuelve, pero por el mapa de históricos, no solo.
   "BRK.B": "0001067983", // BERKSHIRE HATHAWAY INC (en la SEC: "BRK-B")
+  // `BF.B`, tampoco está en el volcado: resuelve, pero por el mapa de históricos, no solo.
+
+  // ⚠️ MIEMBROS ACTUALES QUE EL VOLCADO MASIVO DE LA SEC NO TRAE. Encontrados el
+  // 2026-08-25 por `research/cobertura_metricas.mjs`, que fue lo primero que dijo
+  // «tres miembros sin CIK» — y sin CIK no hay fundamentales, luego no hay señal, luego no
+  // aparecen en ningún aviso. Tres nombres del índice, invisibles, sin que fallara nada.
+  //
+  // Lo llamativo es que `company_tickers.json` y el endpoint de submissions NO DICEN LO
+  // MISMO: para `EA`, submissions declara `tickers: ["EA"]` y presenta 10-Q hasta el
+  // 2026-08-03, mientras el volcado masivo no la lista en absoluto. O sea que el volcado no
+  // es una foto completa de lo vivo, y tratarlo como si lo fuera es la causa de esta familia
+  // entera de agujeros — la misma de `K`, `DFS`, `HES` y `XOM` de aquí arriba.
+  EA:  "0000712515", // ELECTRONIC ARTS INC. — la SEC declara "EA" en submissions y aun así no está en el volcado
+  FI:  "0000798354", // FISERV INC — el volcado sigue diciendo "FISV", el nombre que dejó de usar en 2023
+  DAY: "0001725057", // Dayforce, Inc. — antes Ceridian (`CDAY`); el volcado no la trae con ninguno de los dos
 };
 
 /**
