@@ -314,6 +314,33 @@ if (SIN_RED) {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
   const { tickerToCik, fundamentalsAsOf, PREDECESORES } = await import("../research/edgar.mjs");
 
+  // ── LAS SERIES CORTADAS TIENEN QUE ESTAR CORTADAS DE VERDAD ───────────────────
+  //
+  // Cuando una empresa desaparece, el proveedor a veces no deja de servir su símbolo: repite
+  // el último cierre indefinidamente. `ANSS` sale a 374,30 el día que Synopsys cerró la
+  // compra y sigue a 374,30 hasta hoy; `SIVB` a 0,006 durante 133 barras. Eso NO es una serie
+  // ajena: es la buena más un muñón — y el muñón es PEOR que una serie ajena, porque
+  // volatilidad cero y retorno cero convierten a la empresa en un activo sin riesgo.
+  //
+  // Y no sólo ensucia el backtest: el cron en vivo pregunta si la serie LLEGA A HOY para
+  // decidir si un nombre se puede comprar. Con el muñón, la respuesta era que sí.
+  {
+    const { truncarEn, lastBarDate } = await import("../research/prices.mjs");
+    const ruta = join(RAIZ, "research", "data", "simbolos_reutilizados.json");
+    const bl = existsSync(ruta) ? JSON.parse(readFileSync(ruta, "utf8")) : null;
+    const cortes = Object.entries(bl?.truncados ?? {});
+    if (!cortes.length) aviso("no hay ninguna serie cortada: o no las hay, o la auditoría no ha corrido con reglas v4+");
+    else {
+      const malos = [];
+      for (const [t, fecha] of cortes) {
+        const ult = await lastBarDate(t).catch(() => null);
+        if (truncarEn(t) !== fecha) malos.push(t + ": el mapa dice " + fecha + " y truncarEn dice " + truncarEn(t));
+        else if (ult && ult > fecha) malos.push(t + ": cortada en " + fecha + " pero la última barra es " + ult);
+      }
+      ok(!malos.length, `las ${cortes.length} series cortadas no sirven ni una barra después de su fecha${malos.length ? " — " + malos.join(" · ") : ""}`);
+    }
+  }
+
   // ── `OilAndGasRevenue`: la línea de ingresos de las petroleras antes de ASC 606 ────
   //
   // Va la última de la lista ${REV} a propósito, para que sólo actúe donde no hay nada mejor.
