@@ -313,6 +313,30 @@ if (SIN_RED) {
 } else {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
   const { tickerToCik, fundamentalsAsOf, PREDECESORES } = await import("../research/edgar.mjs");
+  // ── LA RECONSTRUCCIÓN DEL RESULTADO DE EXPLOTACIÓN ─────────────────────────
+  //
+  // `OperatingIncomeLoss` falta en el 22 % del índice y de él cuelgan cuatro de las cinco
+  // métricas. Cuando falta se reconstruye DENTRO de la sección de explotación —bruto menos
+  // gastos, o ingresos menos coste menos gastos— y la procedencia queda escrita.
+  //
+  // Lo que este test protege no es tanto que funcione como que NO se degrade a la vía
+  // fácil: lo que estas empresas sí etiquetan es `...BeforeIncomeTaxes...`, que es resultado
+  // ANTES DE IMPUESTOS. Se midió y se rechazó — 36 pp de dispersión entre sectores —, pero es
+  // justo lo que añadiría alguien que viera «falta cobertura» sin leer por qué no está.
+  {
+    const cik = await tickerToCik("GPC");
+    const f = await fundamentalsAsOf(cik, "2026-06-30");
+    ok(f?.oiFuente === "bruto-menos-opex", `GPC reconstruye su resultado de explotación desde el margen bruto (fuente: ${f?.oiFuente ?? "NINGUNA"})`);
+    // Y el resultado tiene que ser un margen de empresa, no un número cualquiera: un
+    // distribuidor de recambios ronda el 4 %. Si sale 40 % o negativo, la resta está mal.
+    const opm = f?.oiTTM != null && f?.revTTM > 0 ? (f.oiTTM / f.revTTM) * 100 : null;
+    ok(opm != null && opm > 1 && opm < 15, `GPC: el margen reconstruido es creíble (${opm?.toFixed(1)} %, se espera 1-15 %)`);
+
+    // AAPL no debe cambiar de vía: tiene el tag y la reconstrucción no puede pisarlo.
+    const fa = await fundamentalsAsOf(await tickerToCik("AAPL"), "2026-06-30");
+    ok(fa?.oiFuente === "tag", `AAPL sigue usando el tag propio, no la reconstrucción (fuente: ${fa?.oiFuente})`);
+  }
+
 
   // ── LA FUSION CON EL CIK PREDECESOR ────────────────────────────────────────────────
   //

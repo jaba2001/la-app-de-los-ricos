@@ -728,6 +728,15 @@ const NI = ["NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockh
 const GP = ["GrossProfit"];
 const COST = ["CostOfRevenue", "CostOfGoodsAndServicesSold", "CostOfGoodsSold"];
 const OI = ["OperatingIncomeLoss"];
+/**
+ * Gastos de explotación, SÓLO para reconstruir el OI cuando la empresa no lo etiqueta.
+ *
+ * ⚠️ `CostsAndExpenses` NO vale aquí aunque lo parezca: son los costes TOTALES, coste de
+ * ventas incluido, así que restarlo del margen bruto lo descuenta dos veces. Medido: producía
+ * desvíos de −2.368 % en Centene y −665 % en Darden. Un tag que suena parecido y significa
+ * otra cosa es exactamente la forma de error que este fichero lleva toda la vida cazando.
+ */
+const OPEX = ["OperatingExpenses"];
 const DA = ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"];
 const INT = ["InterestExpense", "InterestExpenseDebt", "InterestAndDebtExpense"];
 const OCF = ["NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"];
@@ -1006,7 +1015,48 @@ export async function fundamentalsAsOf(cik, asOf) {
   if (gp == null && rev != null && cost != null) {
     gp = { val: rev.val - cost.val, latestEnd: rev.latestEnd === cost.latestEnd ? rev.latestEnd : null };
   }
-  const oi = F(T(OI, "OI")), da = F(T(DA, "DA")), intp = F(T(INT, "INT"));
+  /**
+   * RESULTADO DE EXPLOTACIÓN, Y DE DÓNDE SALE.
+   *
+   * `OperatingIncomeLoss` falta en el 22 % del índice —JNJ, XOM, IBM, CVX, PFE…— y de él
+   * cuelgan CUATRO de las cinco métricas de la señal: `roic`, `opm`, `icov` y, vía EBITDA,
+   * `lev`. Un solo campo ausente deja al nombre en 1 de 5 y por debajo del mínimo.
+   *
+   * ⚠️ LO QUE ESAS EMPRESAS SÍ ETIQUETAN NO SIRVE, y por poco no lo uso. Publican
+   * `IncomeLossFromContinuingOperationsBeforeIncomeTaxes…`, que es resultado ANTES DE
+   * IMPUESTOS: usarlo convertiría `opm` en margen pretax y dejaría `icov` incoherente, porque
+   * los intereses ya están restados del numerador. La reconstrucción aritméticamente correcta
+   * —pretax + intereses— se midió sobre las 406 empresas que publican las dos cosas y **se
+   * rechazó**: desvío mediano del 7,6 % y, lo que la mata, **36 pp de dispersión entre
+   * sectores** (3,8 % en consumo defensivo contra 39,9 % en telecos, 14,4 % en utilities).
+   * Un sesgo que depende del sector no se puede corregir: cambiaría un hueco conocido por una
+   * cobertura sesgada, que es peor. Ver `research/ebit_reconstruccion.mjs`.
+   *
+   * Lo que sí se acepta se queda DENTRO de la sección de explotación, donde la aritmética es
+   * la de la propia cuenta de resultados: 96 % de acierto dentro del ±5 % por la vía del
+   * bruto y 91 % por la de ingresos. Rescata poco —14 y 22 nombres de los 145 que no llegan,
+   * porque los demás tampoco etiquetan los gastos de explotación— pero lo que rescata, lo
+   * rescata bien. Los 122 restantes, casi la mitad financieras, no se arreglan por aquí.
+   *
+   * Y se exige que los sumandos sean del MISMO cierre, cosa que la derivación de `gp` de
+   * arriba no exige: un margen bruto descuadrado estropea una métrica, y un OI descuadrado
+   * estropea cuatro.
+   */
+  let oi = F(T(OI, "OI"));
+  let oiFuente = oi != null ? "tag" : null;
+  if (oi == null) {
+    const opex = F(T(OPEX, "OPEX"));
+    if (opex != null) {
+      if (gp != null && gp.latestEnd != null && gp.latestEnd === opex.latestEnd) {
+        oi = { val: gp.val - opex.val, latestEnd: gp.latestEnd };
+        oiFuente = "bruto-menos-opex";
+      } else if (rev != null && cost != null && rev.latestEnd === cost.latestEnd && cost.latestEnd === opex.latestEnd && rev.latestEnd != null) {
+        oi = { val: rev.val - cost.val - opex.val, latestEnd: rev.latestEnd };
+        oiFuente = "ingresos-menos-coste-menos-opex";
+      }
+    }
+  }
+  const da = F(T(DA, "DA")), intp = F(T(INT, "INT"));
   const ocf = F(T(OCF, "OCF")), capex = F(T(CAPEX, "CAPEX"));
 
   const equityI = IF_(T(EQUITY, "EQUITY")), equity = equityI?.val ?? null;
@@ -1045,7 +1095,7 @@ export async function fundamentalsAsOf(cik, asOf) {
   return {
     revTTM: rev?.val ?? null, revPrevTTM: revP?.val ?? null,
     niTTM: ni?.val ?? null, niPrevTTM: niP?.val ?? null,
-    gpTTM: gp?.val ?? null, oiTTM: oi?.val ?? null,
+    gpTTM: gp?.val ?? null, oiTTM: oi?.val ?? null, oiFuente,
     daTTM: da?.val ?? null, interestTTM: intp?.val != null ? Math.abs(intp.val) : null,
     ocfTTM: ocf?.val ?? null, capexTTM: capex?.val != null ? Math.abs(capex.val) : null,
     assets: assetsI?.val ?? null, equity,

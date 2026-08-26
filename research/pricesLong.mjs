@@ -17,7 +17,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { YAHOO_ALIAS, cubreLaCache, simboloBloqueado } from "./prices.mjs";
+import { YAHOO_ALIAS, cubreLaCache, simboloBloqueado, truncarEn } from "./prices.mjs";
 
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache", "px_long");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
@@ -109,6 +109,11 @@ async function seriesLong(ticker) {
     }
   }
   rows = rows ?? [];
+  // El mismo corte que en `prices.mjs`, y IMPORTADO de allí en vez de copiado: dos tablas
+  // que se separan dan dos historias distintas de la misma empresa según qué ventana se mire.
+  // Esta ventana lo necesita más, porque es la que llega a 2009 y la que más muertas mira.
+  const hastaT = truncarEn(ticker);
+  if (hastaT) rows = rows.filter((r) => r.date <= hastaT);
   mem.set(ticker, rows);
   return rows;
 }

@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-25T22:14:07.740Z",
+ "generatedAt": "2026-08-26T00:57:36.272Z",
  "fuente": "research/cobertura_metricas.mjs",
  "asOf": "2026-06-30",
  "minMetricas": 3,
@@ -51,8 +51,8 @@
    ]
   },
   "oiTTM": {
-   "n": 391,
-   "pct": 77.7,
+   "n": 392,
+   "pct": 77.9,
    "usadoPor": [
     "roic",
     "opm",
@@ -74,31 +74,31 @@
    "pct": 60
   },
   "roic": {
-   "n": 362,
-   "pct": 72
+   "n": 363,
+   "pct": 72.2
   },
   "opm": {
-   "n": 390,
-   "pct": 77.5
+   "n": 391,
+   "pct": 77.7
   },
   "icov": {
    "n": 150,
    "pct": 29.8
   },
   "lev": {
-   "n": 309,
-   "pct": 61.4
+   "n": 310,
+   "pct": 61.6
   }
  },
- "conSenal": 358,
- "bajoMinimo": 145,
- "pctBajoMinimo": 28.8,
+ "conSenal": 359,
+ "bajoMinimo": 144,
+ "pctBajoMinimo": 28.6,
  "culpables": {
   "daTTM": 29,
   "debt": 35,
   "gpTTM": 86,
-  "oiTTM": 112,
-  "interestTTM": 89,
+  "oiTTM": 111,
+  "interestTTM": 88,
   "revTTM": 1
  },
  "porSector": {
@@ -190,7 +190,6 @@
    "ETN",
    "FI",
    "GE",
-   "GPC",
    "GRMN",
    "INCY",
    "IP",

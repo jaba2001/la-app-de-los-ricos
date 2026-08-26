@@ -148,6 +148,7 @@ export function cubreLaCache(nuevas, previa) {
  * degrada al comportamiento anterior en vez de dejar el sistema sin precios.
  */
 const AVISADOS = new Set();
+const TRUNCADOS_AVISADOS = new Set();
 export function simboloBloqueado(ticker) {
   if (!mem.has("__bloq")) {
     let m = {};
@@ -163,6 +164,39 @@ export function simboloBloqueado(ticker) {
     console.warn(`  ⚠ ${ticker}: sin precios a propósito — ${motivo}`);
   }
   return motivo ?? null;
+}
+
+/**
+ * HASTA QUÉ FECHA VALE LA SERIE DE ESTE SÍMBOLO. Null = entera.
+ *
+ * ⚠️ BLOQUEAR NO ES LA ÚNICA RESPUESTA, y tratarlo como si lo fuera tira datos buenos.
+ *
+ * Hay TRES formas de que la serie de una empresa muerta siga después de su muerte, y sólo
+ * una se arregla bloqueando:
+ *
+  *   · **Otro instrumento heredó el símbolo.** `GENZ` devuelve un ETF con 4.437 barras
+ *     continuas, y el tramo antiguo TAMPOCO es de Genzyme. No hay nada que salvar: se bloquea.
+  *   · **El proveedor congela el último cierre.** `ANSS` tiene su historia real hasta el
+ *     2025-07-17 a 374,30 $ —el día que Synopsys cerró la compra—, luego 204 días de hueco, y
+ *     luego 374,30 $ repetido hasta hoy. Y el muñón es PEOR que una serie ajena: volatilidad
+ *     cero y retorno cero convierten a Ansys en un activo sin riesgo en cualquier ventana que
+  *     lo toque. `SIVB` igual, con 133 barras finales a 0,006 $. Aquí bloquear tiraría ocho
+ *     años reales de un miembro del índice: lo correcto es CORTAR donde acaba lo real.
+ *   · **La empresa siguió cotizando.** BorgWarner salió del índice y sigue viva: no se toca.
+ *
+ * La lista la produce `research/simbolos_reutilizados.mjs`, que distingue los tres casos por
+ * la forma de la serie y no por cuánto dura la cola.
+ */
+export function truncarEn(ticker) {
+  if (!mem.has("__trunc")) {
+    let m = {};
+    try {
+      const ruta = join(dirname(fileURLToPath(import.meta.url)), "data", "simbolos_reutilizados.json");
+      if (existsSync(ruta)) m = JSON.parse(readFileSync(ruta, "utf8"))?.truncados ?? {};
+    } catch { m = {}; }
+    mem.set("__trunc", m);
+  }
+  return mem.get("__trunc")[ticker.toUpperCase()] ?? null;
 }
 
 async function series(ticker) {
@@ -229,6 +263,17 @@ async function series(ticker) {
     }
   }
   rows = rows ?? [];
+  // Y si la serie sólo vale hasta cierta fecha, se corta AQUÍ y no en cada consumidor: es el
+  // único punto por el que pasan todas las lecturas, así que cortar aquí es cortar en todas.
+  const hasta = truncarEn(ticker);
+  if (hasta) {
+    const antes = rows.length;
+    rows = rows.filter((r) => r.date <= hasta);
+    if (antes !== rows.length && !TRUNCADOS_AVISADOS.has(ticker)) {
+      TRUNCADOS_AVISADOS.add(ticker);
+      console.warn(`  ✂ ${ticker}: serie cortada en ${hasta} (${antes - rows.length} barras descartadas) — lo que sigue es el último cierre congelado, no cotización`);
+    }
+  }
   mem.set(ticker, rows);
   return rows;
 }

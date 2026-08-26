@@ -53,6 +53,8 @@ research/out/*
 # los suelos de datos.test.mjs lo leen. Si se pierde, los guardianes se quedan sin nada
 # que vigilar y no lo dicen.
 !research/out/cobertura_metricas.json
+# La medicion que RECHAZO la via pretax: si se pierde, el proximo la reintentara.
+!research/out/ebit_reconstruccion.json
 !research/out/picks_rules_backtest.json
 !research/out/picks_rules_backtest_oos.json
 !research/out/pillar_dilution_lab.json

@@ -67,7 +67,9 @@ const tabla = await loadSP500Historical();
 if (!tabla?.length) morir("no se puede cargar la tabla de miembros: sin ella no se sabe quién está exento por seguir en el índice.");
 const vivos = new Set(tabla[tabla.length - 1].tickers);
 
-const FIRME = new Set(["ok", "reutilizado", "sin datos"]);
+// «truncar» es firme: la auditoria MIRO la serie y decidio que lo real acaba en tal fecha.
+// Es una respuesta, no una duda — y la mas util de las cuatro, porque conserva los anos buenos.
+const FIRME = new Set(["ok", "reutilizado", "sin datos", "truncar"]);
 const veredicto = new Map(evid.detalle.map((f) => [f.ticker, f.veredicto]));
 const publicados = Object.keys(hist.mapa);
 const exentos = publicados.filter((t) => vivos.has(t));

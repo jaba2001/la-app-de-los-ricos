@@ -90,8 +90,9 @@ const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
  *   1 · primera versión (salir del índice = morir; sin distinguir cuota de «sin datos»)
  *   2 · vida por informes de EDGAR, 429 distinguido, prueba directa vs circunstancial
  *   3 · «no se pudo saber si siguió viva» deja de contar como «murió» (ver `ultimoInforme`)
+ *   4 · la cola congelada se TRUNCA en vez de bloquearse (ver `colaCongelada`)
  */
-const VERSION_REGLAS = 3;
+const VERSION_REGLAS = 4;
 
 /** Cuánto puede sobrevivir la serie a la salida del índice antes de ser sospechosa. */
 const GRACIA_DIAS = 400; // 12 meses de retorno futuro + holgura para el cierre de la operación
@@ -126,6 +127,10 @@ async function deYahoo(t) {
       const res = (await r.json())?.chart?.result?.[0];
       const ts = res?.timestamp ?? [];
       if (!ts.length) return { estado: r.status };
+      // Los cierres, sólo para poder mirar la FORMA de la cola. Si no se piden aquí, la
+      // detección de muñón congelado sólo funcionaría cuando decide Tiingo — y entonces
+      // dependería de qué proveedor contestó primero, que no es un criterio.
+      const cierres = (res?.indicators?.quote?.[0]?.close ?? []).map((c, i) => ({ date: new Date(ts[i] * 1000).toISOString().slice(0, 10), raw: c })).filter((x) => x.raw != null);
       return {
         estado: 200,
         tipo: res?.meta?.instrumentType ?? "",
@@ -133,6 +138,7 @@ async function deYahoo(t) {
         desde: new Date(ts[0] * 1000).toISOString().slice(0, 10),
         hasta: new Date(ts[ts.length - 1] * 1000).toISOString().slice(0, 10),
         barras: ts.length,
+        ...formaDeLaCola(cierres),
       };
     } catch { await sleep(600); }
   }
@@ -169,7 +175,7 @@ async function deTiingo(t) {
         .map((x) => ({ date: x.date.slice(0, 10), raw: x.close, adj: x.adjClose ?? x.close }))
         .sort((a, b) => a.date.localeCompare(b.date));
       if (!serie.length) return { estado: 200, barras: 0 };
-      return { estado: 200, desde: serie[0].date, hasta: serie[serie.length - 1].date, barras: serie.length, serie };
+      return { estado: 200, desde: serie[0].date, hasta: serie[serie.length - 1].date, barras: serie.length, serie, ...formaDeLaCola(serie) };
     } catch { await sleep(1500); }
   }
   return { estado: "cuota" };
@@ -204,6 +210,41 @@ function guardarEnCache(ticker, serie) {
     } catch { /* si no se puede escribir, el backtest lo volverá a pedir y ya está */ }
   }
   return n;
+}
+
+/**
+ * ¿ES LA COLA COTIZACIÓN DE VERDAD, O EL ÚLTIMO CIERRE REPETIDO?
+ *
+ * ⚠️ NO TODA SERIE QUE SIGUE DESPUÉS DE LA MUERTE ES DE OTRO INSTRUMENTO, y tratarlas igual
+ * tira años de datos buenos. Medido el 2026-08-25 sobre los tres bloqueos por cola:
+ *
+ *   · `LSI` — 3.660 barras CONTINUAS hasta 2023, hueco máximo de 5 días. Es Life Storage,
+ *     que heredó el símbolo. No hay nada que salvar: se bloquea.
+ *   · `ANSS` — historia real hasta el 2025-07-17 a 374,30 $ (el día que Synopsys cerró la
+ *     compra), después 204 días de hueco, y después 374,30 $ repetido hasta hoy.
+ *   · `SIVB` — igual, con 133 barras finales idénticas a 0,006 $.
+ *
+ * Los dos últimos NO son series ajenas: son la serie buena más un muñón que el proveedor
+ * fabrica repitiendo el último cierre. Y el muñón es PEOR que una serie ajena — volatilidad
+ * cero y retorno cero convierten a la empresa en un activo sin riesgo en cualquier ventana que
+ * lo toque, que es un sesgo que además apunta siempre en la misma dirección.
+ *
+ * Bloquearlos costaría ocho años reales de Ansys y cinco de Silicon Valley Bank, los dos
+ * miembros del índice en la ventana reciente. Lo correcto es cortar donde acaba lo real.
+ *
+ * El umbral de repeticiones es deliberadamente alto: una acción de verdad puede cerrar dos o
+ * tres días seguidos al mismo precio, sobre todo si es barata. Diez no.
+ */
+const REPES_MINIMAS = 10;
+function formaDeLaCola(serie) {
+  if (!serie?.length) return {};
+  let repes = 1;
+  for (let i = serie.length - 1; i > 0; i--) {
+    if (serie[i].raw === serie[i - 1].raw) repes++; else break;
+  }
+  // La última barra ANTES de que empiece la repetición: ahí acaba lo que se puede creer.
+  const ultimaReal = serie[Math.max(0, serie.length - repes)].date;
+  return { colaRepes: repes, ultimaReal };
 }
 
 /**
@@ -271,6 +312,11 @@ function juzgar(s, desde, hasta, vivoHoy) {
     // `vivoHoy` es TRI-ESTADO: true (siguió presentando), false (dejó de presentar, y consta en
     // EDGAR), null (no se pudo saber). Sólo el false autoriza a bloquear. El null es la duda, y
     // la duda no borra un nombre del backtest: lo deja pendiente de que alguien pueda mirarlo.
+    // Antes de decidir que la serie es de OTRO, mirar si simplemente está congelada: si lo
+    // está, lo de antes del muñón es bueno y bloquear lo tiraría.
+    if (s.colaRepes >= REPES_MINIMAS && s.ultimaReal) {
+      return { veredicto: "truncar", prueba: "cola-congelada", truncarEn: s.ultimaReal, motivo: `la serie repite el último cierre ${s.colaRepes} veces: lo real acaba el ${s.ultimaReal} y lo que sigue es un muñón del proveedor, no cotización` };
+    }
     if (vivoHoy === false) return { veredicto: "reutilizado", prueba: "cola", motivo: `dejó de presentar informes al salir del índice y la serie sigue ${cola} días más (tope ${GRACIA_DIAS})` };
     if (vivoHoy == null) return { veredicto: "no comprobado", prueba: "cola", motivo: `la serie sigue ${cola} días tras salir del índice (tope ${GRACIA_DIAS}), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó` };
   }
@@ -333,7 +379,7 @@ if (!REHACER && !SOLO) {
           // Y heredarlos es seguro por una razón distinta de la de los otros dos: un nombre sin
           // serie no puede contaminar nada, porque no hay precios que servir. Si algún día hace
           // falta volver a preguntarlos —el proveedor pudo añadir historia—, está `--rehacer`.
-          if (f.veredicto === "ok" || f.veredicto === "reutilizado" || f.veredicto === "sin datos") previoDetalle.set(f.ticker, f);
+          if (["ok", "reutilizado", "sin datos", "truncar"].includes(f.veredicto)) previoDetalle.set(f.ticker, f);
         }
       }
     }
@@ -378,10 +424,17 @@ for (const t of auditar) {
   // ahí habría borrado del backtest un nombre con historia perfecta. Sólo la identificación
   // POSITIVA del instrumento («esto es un ETF») bloquea por su cuenta.
   const directa = [jy, jt].find((j) => j?.prueba === "tipo");
+  // ⚠️ EL ORDEN DECIDE SI SE SALVA O SE TIRA LA HISTORIA BUENA. Si un proveedor dice «esta
+  // serie está congelada desde tal fecha» y el otro dice «esta serie es de otro instrumento»,
+  // gana el primero: cortar conserva los años reales y bloquear los tira. Sólo la
+  // identificación POSITIVA del instrumento manda sobre el corte, porque ésa sí prueba que ni
+  // siquiera el tramo antiguo es de la empresa que buscamos.
+  const trunca = [jt, jy].find((j) => j?.veredicto === "truncar");
   const incompleto = jy.veredicto === "no comprobado" || jt?.veredicto === "no comprobado";
   const decide = bueno ? { veredicto: "ok", motivo: `vía ${bueno}` }
     : directa ? directa
     : incompleto ? { veredicto: "no comprobado", motivo: (jy.veredicto === "no comprobado" ? jy : jt).motivo }
+    : trunca ? trunca
     : jt?.veredicto === "reutilizado" ? jt
     : jy.veredicto === "reutilizado" ? jy
     : (jt ?? jy);
@@ -390,7 +443,7 @@ for (const t of auditar) {
   if (guardadas) enCache += guardadas;
   const { serie: _sinSerie, ...tiingoResumen } = st ?? {};
   filas.push({
-    ticker: t, desde, hasta, veredicto: decide.veredicto, motivo: decide.motivo,
+    ticker: t, desde, hasta, veredicto: decide.veredicto, motivo: decide.motivo, truncarEn: decide.truncarEn ?? null,
     fuenteBuena: bueno, seguiaPresentando: vivo, ultimoInforme: informe,
     yahoo: { ...sy, juicio: jy.veredicto, motivo: jy.motivo },
     tiingo: st ? { ...tiingoResumen, juicio: jt.veredicto, motivo: jt.motivo } : null,
@@ -400,10 +453,14 @@ for (const t of auditar) {
 console.log("\n");
 
 const malos = filas.filter((f) => f.veredicto === "reutilizado");
+const truncar = filas.filter((f) => f.veredicto === "truncar" && f.truncarEn);
 const sinDatos = filas.filter((f) => f.veredicto === "sin datos");
 const noComp = filas.filter((f) => f.veredicto === "no comprobado");
-const buenos = filas.length - malos.length - sinDatos.length - noComp.length;
-console.log(`  ok: ${buenos}   ·   REUTILIZADOS: ${malos.length}   ·   sin datos: ${sinDatos.length}   ·   NO COMPROBADOS: ${noComp.length}\n`);
+// Los truncados NO son «ok»: son otra respuesta, y contarlos con los buenos ocultaba que dos
+// nombres del índice llevan la serie cortada. Se dicen aparte.
+const buenos = filas.length - malos.length - sinDatos.length - noComp.length - truncar.length;
+console.log(`  ok: ${buenos}   ·   CORTADAS: ${truncar.length}   ·   REUTILIZADAS: ${malos.length}   ·   sin datos: ${sinDatos.length}   ·   NO COMPROBADAS: ${noComp.length}
+`);
 if (noComp.length) {
   console.log(`  ⚠ ${noComp.length} sin comprobar — el proveedor no contestó (cuota o red), que NO es lo mismo que «no hay datos».`);
   console.log(`     No se bloquea ninguno. Vuelve a correrlo cuando se recupere la cuota para cerrarlos:`);
@@ -447,6 +504,10 @@ for (const f of noComp) {
   if (previos[f.ticker] && !bloqueados[f.ticker]) { bloqueados[f.ticker] = previos[f.ticker]; heredados.push(f.ticker); }
 }
 if (enCache) console.log(`  💾 ${enCache} ficheros de caché de precios escritos de paso — el backtest no tendrá que volver a gastar cuota en ellos`);
+if (truncar.length) {
+  console.log("  ✂ " + truncar.length + " series CORTADAS en vez de bloqueadas (el proveedor repite el ultimo cierre; lo anterior es bueno):");
+  for (const f of truncar) console.log("      " + f.ticker.padEnd(7) + " real hasta " + f.truncarEn + "  — " + String(f.motivo).slice(0, 80));
+}
 if (heredados.length) console.log(`  ↻ ${heredados.length} bloqueos heredados de la pasada anterior por no haberse podido comprobar: ${heredados.join(" ")}`);
 
 // El fichero que consumen los módulos de precios. En `data/`, que se versiona por defecto:
@@ -479,6 +540,8 @@ escribirAtomico(ruta, JSON.stringify({
   evidencia: "research/out/simbolos_reutilizados.json",
   noComprobados: noComp.map((f) => f.ticker),
   heredados,
+  truncados: Object.fromEntries(truncar.map((f) => [f.ticker, f.truncarEn])),
+  motivoTruncado: Object.fromEntries(truncar.map((f) => [f.ticker, f.motivo])),
   criterio: `la serie debe solapar con el periodo en el índice y no puede seguir más de ${GRACIA_DIAS} días tras salir de él; un ETF o un fondo nunca es un miembro del índice. Las pruebas circunstanciales (solape, cola) sólo bloquean si se pudo consultar a los dos proveedores; la identificación directa del instrumento bloquea sola.`,
   bloqueados,
 }, null, 1));
