@@ -313,6 +313,19 @@ if (SIN_RED) {
 } else {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
   const { tickerToCik, fundamentalsAsOf, PREDECESORES } = await import("../research/edgar.mjs");
+
+  // ── `OilAndGasRevenue`: la línea de ingresos de las petroleras antes de ASC 606 ────
+  //
+  // Va la última de la lista ${REV} a propósito, para que sólo actúe donde no hay nada mejor.
+  // Sin ella, Apache no tenía NI UN ingreso en 2012-2016 — y esa es la ventana del backtest
+  // antiguo. Medido: 13 valores rescatados y CERO desplazados.
+  {
+    const a = await fundamentalsAsOf(await tickerToCik("APA"), "2012-06-30");
+    ok(a?.revTTM > 5e9, `APA tiene ingresos en 2012 vía OilAndGasRevenue (${a?.revTTM ? (a.revTTM / 1e9).toFixed(1) + " B" : "NULO"})`);
+    const q = await fundamentalsAsOf(await tickerToCik("PXD"), "2014-06-30");
+    ok(q?.revTTM > 1e9, `PXD tiene ingresos en 2014 vía OilAndGasRevenue (${q?.revTTM ? (q.revTTM / 1e9).toFixed(1) + " B" : "NULO"})`);
+  }
+
   // ── LA RECONSTRUCCIÓN DEL RESULTADO DE EXPLOTACIÓN ─────────────────────────
   //
   // `OperatingIncomeLoss` falta en el 22 % del índice y de él cuelgan cuatro de las cinco

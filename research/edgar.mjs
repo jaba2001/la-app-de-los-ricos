@@ -706,7 +706,22 @@ const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", 
              // Como `hechosFlujo` mezcla los periodos de TODOS los tags en un solo conjunto,
              // el cambio de etiqueta de 2018 se salva solo: el acumulado nuevo y el ejercicio
              // viejo conviven sin que haya que decidir cuál "gana".
-             "SalesRevenueGoodsNet", "SalesRevenueServicesNet", "RealEstateRevenueNet"];
+             "SalesRevenueGoodsNet", "SalesRevenueServicesNet", "RealEstateRevenueNet",
+             // ── AL FINAL DE LA LISTA, y el sitio es la mitad de la decisión ────────────────
+             //
+             // `OilAndGasRevenue` es la línea de ingresos de las petroleras antes de ASC 606:
+             // `CXO` desde 2008, `QEP` desde 2009, `FANG` desde 2010, y `PXD`, `MRO` y `APA`
+             // con historia que los tags estándar no alcanzan. Justo la ventana 2011-2018.
+             //
+             // ⚠️ Pero NO rescata a nadie de quedarse sin ingresos, y conviene decirlo porque
+             // yo mismo llegué a llamarlo «probablemente la vía más rentable que queda».
+             // Medido sobre 28 energéticas: CERO dependen sólo de este tag — todas tienen
+             // alguno estándar. Lo único que hace es PROFUNDIZAR la historia de ~6 nombres en
+             // la ventana antigua. Es una mejora pequeña y acotada, no un arreglo.
+             //
+             // Va el último a propósito: así sólo actúa donde no hay nada mejor y no puede
+             // desplazar a un tag estándar en las fechas que ya cubría.
+             "OilAndGasRevenue"];
 
 /**
  * SEGUNDO RECURSO para los ingresos: sólo se consulta si `REV` no ha dado NADA.
