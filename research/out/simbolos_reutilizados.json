@@ -1,10 +1,10 @@
 {
- "generatedAt": "2026-08-26T00:53:48.140Z",
+ "generatedAt": "2026-08-28T13:02:46.904Z",
  "versionReglas": 4,
  "auditados": 287,
- "reutilizados": 17,
- "sinDatos": 14,
- "noComprobados": 81,
+ "reutilizados": 26,
+ "sinDatos": 22,
+ "noComprobados": 8,
  "detalle": [
   {
    "ticker": "AAL",
@@ -453,24 +453,28 @@
    "ticker": "ANTM",
    "desde": "2010-01-06",
    "hasta": "2022-06-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (red)",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
    "truncarEn": null,
-   "fuenteBuena": null,
-   "seguiaPresentando": null,
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": true,
    "ultimoInforme": {
-    "conocido": false
+    "conocido": true,
+    "ultimo": "2026-07-15"
    },
    "yahoo": {
-    "estado": "red",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (red)"
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "Elevance Health, Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-25",
+    "barras": 4438,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-25",
+    "juicio": "ok",
+    "motivo": "4438 barras, 2009-01-02→2026-08-25"
    },
-   "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
-   }
+   "tiingo": null
   },
   {
    "ticker": "APC",
@@ -3789,7 +3793,7 @@
    "desde": "2010-01-06",
    "hasta": "2019-04-02",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2702 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "la serie sigue 2704 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -3804,12 +3808,12 @@
    "tiingo": {
     "estado": 200,
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-27",
+    "barras": 4440,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 2702 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "la serie sigue 2704 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
    }
   },
   {
@@ -4131,9 +4135,9 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -4159,9 +4163,9 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -4207,10 +4211,10 @@
    "ticker": "K",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4222,9 +4226,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2025-12-11",
+    "barras": 4263,
+    "colaRepes": 2,
+    "ultimaReal": "2025-12-10",
+    "juicio": "ok",
+    "motivo": "4263 barras, 2009-01-02→2025-12-11"
    }
   },
   {
@@ -4259,7 +4268,7 @@
    "desde": "2013-11-13",
    "hasta": "2018-09-18",
    "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "motivo": "la serie sigue 2900 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4272,19 +4281,24 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
+    "estado": 200,
+    "desde": "2011-12-15",
+    "hasta": "2026-08-27",
+    "barras": 3695,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-27",
     "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "motivo": "la serie sigue 2900 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
    }
   },
   {
    "ticker": "KRFT",
    "desde": "2012-10-02",
    "hasta": "2015-07-02",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4296,9 +4310,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2012-09-17",
+    "hasta": "2015-07-10",
+    "barras": 707,
+    "colaRepes": 6,
+    "ultimaReal": "2015-07-02",
+    "juicio": "ok",
+    "motivo": "707 barras, 2012-09-17→2015-07-10"
    }
   },
   {
@@ -4332,10 +4351,10 @@
    "ticker": "KSU",
    "desde": "2013-05-24",
    "hasta": "2021-10-04",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -4347,17 +4366,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2021-12-13",
+    "barras": 3260,
+    "colaRepes": 1,
+    "ultimaReal": "2021-12-13",
+    "juicio": "ok",
+    "motivo": "3260 barras, 2009-01-02→2021-12-13"
    }
   },
   {
    "ticker": "LB",
    "desde": "2010-01-06",
    "hasta": "2021-07-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4378,9 +4402,14 @@
     "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2024-06-28",
+    "hasta": "2026-08-25",
+    "barras": 541,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-25",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
    }
   },
   {
@@ -4441,10 +4470,10 @@
    "ticker": "LLTC",
    "desde": "2010-01-06",
    "hasta": "2017-03-10",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4456,9 +4485,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2016-01-04",
+    "hasta": "2017-03-20",
+    "barras": 304,
+    "colaRepes": 7,
+    "ultimaReal": "2017-03-10",
+    "juicio": "ok",
+    "motivo": "304 barras, 2016-01-04→2017-03-20"
    }
   },
   {
@@ -4466,7 +4500,7 @@
    "desde": "2010-01-06",
    "hasta": "2016-11-29",
    "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4479,9 +4513,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2020-07-31",
+    "barras": 2915,
+    "colaRepes": 5,
+    "ultimaReal": "2020-07-27",
     "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
    }
   },
   {
@@ -4515,10 +4554,10 @@
    "ticker": "LO",
    "desde": "2010-01-06",
    "hasta": "2015-06-11",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -4529,17 +4568,22 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2015-06-22",
+    "barras": 1628,
+    "colaRepes": 8,
+    "ultimaReal": "2015-06-11",
+    "juicio": "ok",
+    "motivo": "1628 barras, 2009-01-02→2015-06-22"
    }
   },
   {
    "ticker": "LSI",
    "desde": "2010-01-06",
    "hasta": "2014-05-06",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "dejó de presentar informes al salir del índice y la serie sigue 3361 días más (tope 400)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -4553,9 +4597,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2023-07-19",
+    "barras": 3660,
+    "colaRepes": 1,
+    "ultimaReal": "2023-07-19",
+    "juicio": "reutilizado",
+    "motivo": "dejó de presentar informes al salir del índice y la serie sigue 3361 días más (tope 400)"
    }
   },
   {
@@ -4589,10 +4638,10 @@
    "ticker": "LVLT",
    "desde": "2014-11-05",
    "hasta": "2017-10-10",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -4604,9 +4653,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2017-11-01",
+    "barras": 2225,
+    "colaRepes": 2,
+    "ultimaReal": "2017-10-31",
+    "juicio": "ok",
+    "motivo": "2225 barras, 2009-01-02→2017-11-01"
    }
   },
   {
@@ -4640,8 +4694,8 @@
    "ticker": "LXK",
    "desde": "2010-01-06",
    "hasta": "2012-09-25",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2016-01-04→2016-11-29) no solapa con el periodo en el índice (2010-01-06→2012-09-25)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4654,9 +4708,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2016-01-04",
+    "hasta": "2016-11-29",
+    "barras": 227,
+    "colaRepes": 2,
+    "ultimaReal": "2016-11-28",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2016-01-04→2016-11-29) no solapa con el periodo en el índice (2010-01-06→2012-09-25)"
    }
   },
   {
@@ -4744,8 +4803,8 @@
    "ticker": "MDP",
    "desde": "2010-01-06",
    "hasta": "2010-12-31",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4759,17 +4818,18 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
    "ticker": "MEE",
    "desde": "2010-01-06",
    "hasta": "2011-05-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -4783,9 +4843,10 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
@@ -4819,71 +4880,86 @@
    "ticker": "MHS",
    "desde": "2010-01-06",
    "hasta": "2012-03-22",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (red)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
     "ultimo": "2012-04-02"
    },
    "yahoo": {
-    "estado": "red",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (red)"
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2013-04-10",
+    "barras": 1074,
+    "colaRepes": 9,
+    "ultimaReal": "2013-03-28",
+    "juicio": "ok",
+    "motivo": "1074 barras, 2009-01-02→2013-04-10"
    }
   },
   {
    "ticker": "MJN",
    "desde": "2010-01-06",
    "hasta": "2017-06-07",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (red)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
-   "seguiaPresentando": null,
+   "fuenteBuena": "tiingo",
+   "seguiaPresentando": false,
    "ultimoInforme": {
-    "conocido": false
+    "conocido": true,
+    "ultimo": "2017-04-27"
    },
    "yahoo": {
-    "estado": "red",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (red)"
+    "estado": 200,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-02-11",
+    "hasta": "2017-07-14",
+    "barras": 2119,
+    "colaRepes": 20,
+    "ultimaReal": "2017-06-14",
+    "juicio": "ok",
+    "motivo": "2119 barras, 2009-02-11→2017-07-14"
    }
   },
   {
    "ticker": "MKTX",
    "desde": "2019-07-01",
    "hasta": "2025-08-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (red)",
+   "veredicto": "ok",
+   "motivo": "vía yahoo",
    "truncarEn": null,
-   "fuenteBuena": null,
-   "seguiaPresentando": null,
+   "fuenteBuena": "yahoo",
+   "seguiaPresentando": false,
    "ultimoInforme": {
-    "conocido": false
+    "conocido": true,
+    "ultimo": "2026-08-07"
    },
    "yahoo": {
-    "estado": "red",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (red)"
+    "estado": 200,
+    "tipo": "EQUITY",
+    "nombre": "MarketAxess Holdings Inc.",
+    "desde": "2009-01-02",
+    "hasta": "2026-08-25",
+    "barras": 4438,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-25",
+    "juicio": "ok",
+    "motivo": "4438 barras, 2009-01-02→2026-08-25"
    },
-   "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
-   }
+   "tiingo": null
   },
   {
    "ticker": "MMC",
@@ -4916,8 +4992,8 @@
    "ticker": "MMI",
    "desde": "2011-01-04",
    "hasta": "2012-05-15",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4938,9 +5014,14 @@
     "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2013-10-31",
+    "hasta": "2026-08-25",
+    "barras": 3222,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-25",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
    }
   },
   {
@@ -4974,8 +5055,8 @@
    "ticker": "MOLX",
    "desde": "2010-01-06",
    "hasta": "2013-12-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -4989,19 +5070,20 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
    "ticker": "MRO",
    "desde": "2010-01-06",
    "hasta": "2024-11-22",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5013,9 +5095,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2024-11-22",
+    "barras": 4001,
+    "colaRepes": 2,
+    "ultimaReal": "2024-11-21",
+    "juicio": "ok",
+    "motivo": "4001 barras, 2009-01-02→2024-11-22"
    }
   },
   {
@@ -5076,10 +5163,10 @@
    "ticker": "MWV",
    "desde": "2010-01-06",
    "hasta": "2015-07-01",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -5090,9 +5177,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2015-07-01",
+    "barras": 1635,
+    "colaRepes": 1,
+    "ultimaReal": "2015-07-01",
+    "juicio": "ok",
+    "motivo": "1635 barras, 2009-01-02→2015-07-01"
    }
   },
   {
@@ -5100,7 +5192,7 @@
    "desde": "2010-01-06",
    "hasta": "2011-12-14",
    "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -5113,19 +5205,24 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2016-11-09",
+    "barras": 1979,
+    "colaRepes": 8,
+    "ultimaReal": "2016-10-31",
     "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
    }
   },
   {
    "ticker": "MXIM",
    "desde": "2018-12-03",
    "hasta": "2021-08-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5137,19 +5234,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2021-09-01",
+    "barras": 3189,
+    "colaRepes": 6,
+    "ultimaReal": "2021-08-25",
+    "juicio": "ok",
+    "motivo": "3189 barras, 2009-01-02→2021-09-01"
    }
   },
   {
    "ticker": "MYL",
    "desde": "2010-01-06",
    "hasta": "2020-10-12",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5161,9 +5263,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2020-11-19",
+    "barras": 2991,
+    "colaRepes": 2,
+    "ultimaReal": "2020-11-16",
+    "juicio": "ok",
+    "motivo": "2991 barras, 2009-01-02→2020-11-19"
    }
   },
   {
@@ -5197,10 +5304,10 @@
    "ticker": "NBL",
    "desde": "2010-01-06",
    "hasta": "2020-10-07",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5212,9 +5319,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2020-10-06",
+    "barras": 2961,
+    "colaRepes": 3,
+    "ultimaReal": "2020-10-02",
+    "juicio": "ok",
+    "motivo": "2961 barras, 2009-01-02→2020-10-06"
    }
   },
   {
@@ -5333,10 +5445,10 @@
    "ticker": "NLSN",
    "desde": "2013-07-09",
    "hasta": "2022-10-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5348,9 +5460,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2011-01-27",
+    "hasta": "2022-10-11",
+    "barras": 2947,
+    "colaRepes": 1,
+    "ultimaReal": "2022-10-11",
+    "juicio": "ok",
+    "motivo": "2947 barras, 2011-01-27→2022-10-11"
    }
   },
   {
@@ -5384,8 +5501,8 @@
    "ticker": "NOVL",
    "desde": "2010-01-06",
    "hasta": "2011-04-25",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -5399,9 +5516,10 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
@@ -5462,8 +5580,8 @@
    "ticker": "NYX",
    "desde": "2010-01-06",
    "hasta": "2013-11-07",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -5477,18 +5595,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
    "ticker": "ODP",
    "desde": "2010-01-06",
    "hasta": "2010-12-17",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
-   "truncarEn": null,
+   "veredicto": "truncar",
+   "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-12-09 y lo que sigue es un muñón del proveedor, no cotización",
+   "truncarEn": "2025-12-09",
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -5501,9 +5620,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2026-08-25",
+    "barras": 4397,
+    "colaRepes": 137,
+    "ultimaReal": "2025-12-09",
+    "juicio": "truncar",
+    "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-12-09 y lo que sigue es un muñón del proveedor, no cotización"
    }
   },
   {
@@ -5618,10 +5742,10 @@
    "ticker": "PBCT",
    "desde": "2010-01-06",
    "hasta": "2022-03-02",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5633,19 +5757,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2022-04-04",
+    "barras": 3337,
+    "colaRepes": 2,
+    "ultimaReal": "2022-04-01",
+    "juicio": "ok",
+    "motivo": "3337 barras, 2009-01-02→2022-04-04"
    }
   },
   {
    "ticker": "PBG",
    "desde": "2010-01-06",
    "hasta": "2010-02-26",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5657,9 +5786,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2011-03-07",
+    "barras": 548,
+    "colaRepes": 259,
+    "ultimaReal": "2010-02-26",
+    "juicio": "ok",
+    "motivo": "548 barras, 2009-01-02→2011-03-07"
    }
   },
   {
@@ -5693,10 +5827,10 @@
    "ticker": "PDCO",
    "desde": "2010-01-06",
    "hasta": "2018-03-16",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -5708,9 +5842,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2025-04-17",
+    "barras": 4099,
+    "colaRepes": 2,
+    "ultimaReal": "2025-04-16",
+    "juicio": "ok",
+    "motivo": "4099 barras, 2009-01-02→2025-04-17"
    }
   },
   {
@@ -5771,10 +5910,10 @@
    "ticker": "PETM",
    "desde": "2012-10-05",
    "hasta": "2015-03-11",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5786,9 +5925,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2015-03-11",
+    "barras": 1557,
+    "colaRepes": 1,
+    "ultimaReal": "2015-03-11",
+    "juicio": "ok",
+    "motivo": "1557 barras, 2009-01-02→2015-03-11"
    }
   },
   {
@@ -5903,10 +6047,10 @@
    "ticker": "PXD",
    "desde": "2010-01-06",
    "hasta": "2024-05-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5918,19 +6062,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2024-05-03",
+    "barras": 3860,
+    "colaRepes": 2,
+    "ultimaReal": "2024-05-02",
+    "juicio": "ok",
+    "motivo": "3860 barras, 2009-01-02→2024-05-03"
    }
   },
   {
    "ticker": "QEP",
    "desde": "2010-07-01",
    "hasta": "2015-06-30",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -5942,17 +6091,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2010-06-16",
+    "hasta": "2021-03-18",
+    "barras": 2708,
+    "colaRepes": 3,
+    "ultimaReal": "2021-03-16",
+    "juicio": "ok",
+    "motivo": "2708 barras, 2010-06-16→2021-03-18"
    }
   },
   {
    "ticker": "QLGC",
    "desde": "2010-01-06",
    "hasta": "2011-01-12",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2016-01-04→2016-08-24) no solapa con el periodo en el índice (2010-01-06→2011-01-12)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -5966,9 +6120,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2016-01-04",
+    "hasta": "2016-08-24",
+    "barras": 163,
+    "colaRepes": 8,
+    "ultimaReal": "2016-08-15",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2016-01-04→2016-08-24) no solapa con el periodo en el índice (2010-01-06→2011-01-12)"
    }
   },
   {
@@ -6029,10 +6188,10 @@
    "ticker": "RAI",
    "desde": "2010-01-06",
    "hasta": "2017-07-20",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6044,19 +6203,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2017-08-17",
+    "barras": 2172,
+    "colaRepes": 19,
+    "ultimaReal": "2017-07-24",
+    "juicio": "ok",
+    "motivo": "2172 barras, 2009-01-02→2017-08-17"
    }
   },
   {
    "ticker": "RDC",
    "desde": "2010-01-06",
    "hasta": "2014-08-13",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6068,9 +6232,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-04-11",
+    "barras": 2586,
+    "colaRepes": 2,
+    "ultimaReal": "2019-04-10",
+    "juicio": "ok",
+    "motivo": "2586 barras, 2009-01-02→2019-04-11"
    }
   },
   {
@@ -6131,10 +6300,10 @@
    "ticker": "RHT",
    "desde": "2010-01-06",
    "hasta": "2019-07-01",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6146,9 +6315,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-07-08",
+    "barras": 2645,
+    "colaRepes": 2,
+    "ultimaReal": "2019-07-05",
+    "juicio": "ok",
+    "motivo": "2645 barras, 2009-01-02→2019-07-08"
    }
   },
   {
@@ -6182,10 +6356,10 @@
    "ticker": "RRD",
    "desde": "2010-01-06",
    "hasta": "2012-12-07",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6197,19 +6371,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2022-02-25",
+    "barras": 3311,
+    "colaRepes": 2,
+    "ultimaReal": "2022-02-24",
+    "juicio": "ok",
+    "motivo": "3311 barras, 2009-01-02→2022-02-25"
    }
   },
   {
    "ticker": "RTN",
    "desde": "2010-01-06",
    "hasta": "2020-04-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6221,17 +6400,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2020-04-03",
+    "barras": 2833,
+    "colaRepes": 2,
+    "ultimaReal": "2020-04-02",
+    "juicio": "ok",
+    "motivo": "2833 barras, 2009-01-02→2020-04-03"
    }
   },
   {
    "ticker": "RX",
    "desde": "2010-01-06",
    "hasta": "2010-02-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6244,9 +6428,10 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
@@ -6254,7 +6439,7 @@
    "desde": "2021-12-20",
    "hasta": "2023-01-04",
    "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "motivo": "la serie sigue 1331 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6266,27 +6451,32 @@
     "tipo": "EQUITY",
     "nombre": "Signature Bank",
     "desde": "2024-08-15",
-    "hasta": "2026-08-25",
-    "barras": 508,
+    "hasta": "2026-08-27",
+    "barras": 510,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-24",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2024-08-15→2026-08-25) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
+    "motivo": "la serie (2024-08-15→2026-08-27) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
    },
    "tiingo": {
-    "estado": "cuota",
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2026-08-27",
+    "barras": 4440,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-27",
     "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "motivo": "la serie sigue 1331 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
    }
   },
   {
    "ticker": "SCG",
    "desde": "2010-01-06",
    "hasta": "2018-12-24",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -6297,9 +6487,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2018-12-31",
+    "barras": 2516,
+    "colaRepes": 1,
+    "ultimaReal": "2018-12-31",
+    "juicio": "ok",
+    "motivo": "2516 barras, 2009-01-02→2018-12-31"
    }
   },
   {
@@ -6333,10 +6528,10 @@
    "ticker": "SEE",
    "desde": "2010-01-06",
    "hasta": "2023-12-16",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6348,19 +6543,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2026-04-09",
+    "barras": 4343,
+    "colaRepes": 2,
+    "ultimaReal": "2026-04-08",
+    "juicio": "ok",
+    "motivo": "4343 barras, 2009-01-02→2026-04-09"
    }
   },
   {
    "ticker": "SIAL",
    "desde": "2010-01-06",
    "hasta": "2015-11-17",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6372,18 +6572,23 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2015-11-18",
+    "barras": 1733,
+    "colaRepes": 2,
+    "ultimaReal": "2015-11-17",
+    "juicio": "ok",
+    "motivo": "1733 barras, 2009-01-02→2015-11-18"
    }
   },
   {
    "ticker": "SIVB",
    "desde": "2018-03-19",
    "hasta": "2023-01-04",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
-   "truncarEn": null,
+   "veredicto": "truncar",
+   "motivo": "la serie repite el último cierre 134 veces: lo real acaba el 2024-11-06 y lo que sigue es un muñón del proveedor, no cotización",
+   "truncarEn": "2024-11-06",
    "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
@@ -6396,9 +6601,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2026-08-25",
+    "barras": 4122,
+    "colaRepes": 134,
+    "ultimaReal": "2024-11-06",
+    "juicio": "truncar",
+    "motivo": "la serie repite el último cierre 134 veces: lo real acaba el 2024-11-06 y lo que sigue es un muñón del proveedor, no cotización"
    }
   },
   {
@@ -6459,10 +6669,10 @@
    "ticker": "SNI",
    "desde": "2010-01-06",
    "hasta": "2018-02-28",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6474,9 +6684,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2018-03-16",
+    "barras": 2317,
+    "colaRepes": 9,
+    "ultimaReal": "2018-03-06",
+    "juicio": "ok",
+    "motivo": "2317 barras, 2009-01-02→2018-03-16"
    }
   },
   {
@@ -6514,10 +6729,10 @@
    "ticker": "SRCL",
    "desde": "2010-01-06",
    "hasta": "2018-11-29",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6529,17 +6744,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2024-11-04",
+    "barras": 3987,
+    "colaRepes": 2,
+    "ultimaReal": "2024-11-01",
+    "juicio": "ok",
+    "motivo": "3987 barras, 2009-01-02→2024-11-04"
    }
   },
   {
    "ticker": "STI",
    "desde": "2010-01-06",
    "hasta": "2019-12-05",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2024-02-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -6552,27 +6772,32 @@
     "tipo": "EQUITY",
     "nombre": "Solidion Technology, Inc.",
     "desde": "2022-05-02",
-    "hasta": "2026-08-25",
-    "barras": 1083,
+    "hasta": "2026-08-27",
+    "barras": 1085,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2022-05-02→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
+    "motivo": "la serie (2022-05-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2024-02-02",
+    "hasta": "2026-08-27",
+    "barras": 644,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-27",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2024-02-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
    }
   },
   {
    "ticker": "STJ",
    "desde": "2010-01-06",
    "hasta": "2017-01-03",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6584,18 +6809,23 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2017-01-18",
+    "barras": 2025,
+    "colaRepes": 10,
+    "ultimaReal": "2017-01-04",
+    "juicio": "ok",
+    "motivo": "2025 barras, 2009-01-02→2017-01-18"
    }
   },
   {
    "ticker": "SVU",
    "desde": "2010-01-06",
    "hasta": "2012-04-30",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
-   "truncarEn": null,
+   "veredicto": "truncar",
+   "motivo": "la serie repite el último cierre 38 veces: lo real acaba el 2018-10-18 y lo que sigue es un muñón del proveedor, no cotización",
+   "truncarEn": "2018-10-18",
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -6608,19 +6838,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2018-12-14",
+    "barras": 2504,
+    "colaRepes": 38,
+    "ultimaReal": "2018-10-18",
+    "juicio": "truncar",
+    "motivo": "la serie repite el último cierre 38 veces: lo real acaba el 2018-10-18 y lo que sigue es un muñón del proveedor, no cotización"
    }
   },
   {
    "ticker": "SWN",
    "desde": "2010-01-06",
    "hasta": "2017-03-30",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6632,19 +6867,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2024-10-01",
+    "barras": 3963,
+    "colaRepes": 2,
+    "ultimaReal": "2024-09-30",
+    "juicio": "ok",
+    "motivo": "3963 barras, 2009-01-02→2024-10-01"
    }
   },
   {
    "ticker": "SWY",
    "desde": "2010-01-06",
    "hasta": "2015-01-15",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6656,9 +6896,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2015-02-09",
+    "barras": 1536,
+    "colaRepes": 8,
+    "ultimaReal": "2015-01-29",
+    "juicio": "ok",
+    "motivo": "1536 barras, 2009-01-02→2015-02-09"
    }
   },
   {
@@ -6719,8 +6964,8 @@
    "ticker": "TE",
    "desde": "2010-01-06",
    "hasta": "2016-06-27",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2021-07-08→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -6733,17 +6978,22 @@
     "tipo": "EQUITY",
     "nombre": "T1 Energy Inc.",
     "desde": "2020-01-10",
-    "hasta": "2026-08-25",
-    "barras": 1664,
+    "hasta": "2026-08-27",
+    "barras": 1666,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2020-01-10→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
+    "motivo": "la serie (2020-01-10→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2021-07-08",
+    "hasta": "2026-08-27",
+    "barras": 1291,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-27",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2021-07-08→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
    }
   },
   {
@@ -6777,10 +7027,10 @@
    "ticker": "TGNA",
    "desde": "2010-01-06",
    "hasta": "2017-05-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6792,9 +7042,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2026-03-20",
+    "barras": 4330,
+    "colaRepes": 2,
+    "ultimaReal": "2026-03-19",
+    "juicio": "ok",
+    "motivo": "4330 barras, 2009-01-02→2026-03-20"
    }
   },
   {
@@ -6828,10 +7083,10 @@
    "ticker": "TIE",
    "desde": "2010-01-06",
    "hasta": "2012-12-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6843,19 +7098,24 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2013-01-07",
+    "barras": 1010,
+    "colaRepes": 4,
+    "ultimaReal": "2013-01-02",
+    "juicio": "ok",
+    "motivo": "1010 barras, 2009-01-02→2013-01-07"
    }
   },
   {
    "ticker": "TIF",
    "desde": "2010-01-06",
    "hasta": "2020-12-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6867,17 +7127,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2021-01-08",
+    "barras": 3026,
+    "colaRepes": 3,
+    "ultimaReal": "2021-01-06",
+    "juicio": "ok",
+    "motivo": "3026 barras, 2009-01-02→2021-01-08"
    }
   },
   {
    "ticker": "TLAB",
    "desde": "2010-01-06",
    "hasta": "2011-12-20",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6890,17 +7155,18 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
    "ticker": "TMK",
    "desde": "2010-01-06",
    "hasta": "2019-07-15",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6913,9 +7179,10 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "barras": 0,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    }
   },
   {
@@ -6949,10 +7216,10 @@
    "ticker": "TSS",
    "desde": "2010-01-06",
    "hasta": "2019-08-09",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6964,19 +7231,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-09-17",
+    "barras": 2695,
+    "colaRepes": 1,
+    "ultimaReal": "2019-09-17",
+    "juicio": "ok",
+    "motivo": "2695 barras, 2009-01-02→2019-09-17"
    }
   },
   {
    "ticker": "TWC",
    "desde": "2010-01-06",
    "hasta": "2016-05-17",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6988,19 +7260,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2016-05-26",
+    "barras": 1863,
+    "colaRepes": 8,
+    "ultimaReal": "2016-05-17",
+    "juicio": "ok",
+    "motivo": "1863 barras, 2009-01-02→2016-05-26"
    }
   },
   {
    "ticker": "TWTR",
    "desde": "2018-06-07",
    "hasta": "2022-10-12",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7012,19 +7289,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2013-11-07",
+    "hasta": "2022-10-28",
+    "barras": 2260,
+    "colaRepes": 2,
+    "ultimaReal": "2022-10-27",
+    "juicio": "ok",
+    "motivo": "2260 barras, 2013-11-07→2022-10-28"
    }
   },
   {
    "ticker": "TWX",
    "desde": "2010-01-06",
    "hasta": "2018-06-14",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7036,9 +7318,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2018-06-15",
+    "barras": 2380,
+    "colaRepes": 2,
+    "ultimaReal": "2018-06-14",
+    "juicio": "ok",
+    "motivo": "2380 barras, 2009-01-02→2018-06-15"
    }
   },
   {
@@ -7153,10 +7440,10 @@
    "ticker": "VAR",
    "desde": "2010-01-06",
    "hasta": "2021-03-22",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7168,9 +7455,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2021-04-16",
+    "barras": 3093,
+    "colaRepes": 3,
+    "ultimaReal": "2021-04-14",
+    "juicio": "ok",
+    "motivo": "3093 barras, 2009-01-02→2021-04-16"
    }
   },
   {
@@ -7204,10 +7496,10 @@
    "ticker": "VIAB",
    "desde": "2010-01-06",
    "hasta": "2019-11-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7219,17 +7511,22 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-12-04",
+    "barras": 2750,
+    "colaRepes": 1,
+    "ultimaReal": "2019-12-04",
+    "juicio": "ok",
+    "motivo": "2750 barras, 2009-01-02→2019-12-04"
    }
   },
   {
    "ticker": "VIAC",
    "desde": "2019-12-05",
    "hasta": "2022-02-15",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2009-01-02→2019-12-04) no solapa con el periodo en el índice (2019-12-05→2022-02-15)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -7243,9 +7540,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-12-04",
+    "barras": 2750,
+    "colaRepes": 1,
+    "ultimaReal": "2019-12-04",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2009-01-02→2019-12-04) no solapa con el periodo en el índice (2019-12-05→2022-02-15)"
    }
   },
   {
@@ -7333,10 +7635,10 @@
    "ticker": "WBA",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7348,19 +7650,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2025-08-28",
+    "barras": 4190,
+    "colaRepes": 2,
+    "ultimaReal": "2025-08-27",
+    "juicio": "ok",
+    "motivo": "4190 barras, 2009-01-02→2025-08-28"
    }
   },
   {
    "ticker": "WCG",
    "desde": "2018-09-17",
    "hasta": "2019-12-23",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7372,19 +7679,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2020-01-23",
+    "barras": 2783,
+    "colaRepes": 1,
+    "ultimaReal": "2020-01-23",
+    "juicio": "ok",
+    "motivo": "2783 barras, 2009-01-02→2020-01-23"
    }
   },
   {
    "ticker": "WFM",
    "desde": "2010-01-06",
    "hasta": "2017-08-17",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7396,9 +7708,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2017-08-29",
+    "barras": 2180,
+    "colaRepes": 3,
+    "ultimaReal": "2017-08-25",
+    "juicio": "ok",
+    "motivo": "2180 barras, 2009-01-02→2017-08-29"
    }
   },
   {
@@ -7432,8 +7749,8 @@
    "ticker": "WIN",
    "desde": "2010-01-06",
    "hasta": "2015-03-31",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2023-12-01→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2015-03-31)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -7447,9 +7764,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2023-12-01",
+    "hasta": "2026-08-27",
+    "barras": 686,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-27",
+    "juicio": "reutilizado",
+    "motivo": "la serie (2023-12-01→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2015-03-31)"
    }
   },
   {
@@ -7483,10 +7805,10 @@
    "ticker": "WPX",
    "desde": "2012-01-03",
    "hasta": "2014-03-12",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7498,19 +7820,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2011-12-12",
+    "hasta": "2021-01-14",
+    "barras": 2288,
+    "colaRepes": 7,
+    "ultimaReal": "2021-01-06",
+    "juicio": "ok",
+    "motivo": "2288 barras, 2011-12-12→2021-01-14"
    }
   },
   {
    "ticker": "WRK",
    "desde": "2015-07-02",
    "hasta": "2024-07-08",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7522,9 +7849,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2024-07-05",
+    "hasta": "2024-07-05",
+    "barras": 1,
+    "colaRepes": 1,
+    "ultimaReal": "2024-07-05",
+    "juicio": "ok",
+    "motivo": "1 barras, 2024-07-05→2024-07-05"
    }
   },
   {
@@ -7558,10 +7890,10 @@
    "ticker": "X",
    "desde": "2010-01-06",
    "hasta": "2014-07-01",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7573,19 +7905,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2025-06-18",
+    "barras": 4141,
+    "colaRepes": 2,
+    "ultimaReal": "2025-06-17",
+    "juicio": "ok",
+    "motivo": "4141 barras, 2009-01-02→2025-06-18"
    }
   },
   {
    "ticker": "XEC",
    "desde": "2014-06-20",
    "hasta": "2020-01-28",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7597,19 +7934,24 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2021-10-04",
+    "barras": 3211,
+    "colaRepes": 3,
+    "ultimaReal": "2021-09-30",
+    "juicio": "ok",
+    "motivo": "3211 barras, 2009-01-02→2021-10-04"
    }
   },
   {
    "ticker": "XLNX",
    "desde": "2010-01-06",
    "hasta": "2022-02-02",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
+   "veredicto": "ok",
+   "motivo": "vía tiingo",
    "truncarEn": null,
-   "fuenteBuena": null,
+   "fuenteBuena": "tiingo",
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7621,9 +7963,14 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2022-02-14",
+    "barras": 3303,
+    "colaRepes": 2,
+    "ultimaReal": "2022-02-11",
+    "juicio": "ok",
+    "motivo": "3303 barras, 2009-01-02→2022-02-14"
    }
   },
   {
@@ -7684,9 +8031,9 @@
    "ticker": "XTO",
    "desde": "2010-01-06",
    "hasta": "2010-06-21",
-   "veredicto": "no comprobado",
-   "motivo": "el proveedor no contestó (cuota)",
-   "truncarEn": null,
+   "veredicto": "truncar",
+   "motivo": "la serie repite el último cierre 660 veces: lo real acaba el 2010-06-25 y lo que sigue es un muñón del proveedor, no cotización",
+   "truncarEn": "2010-06-25",
    "fuenteBuena": null,
    "seguiaPresentando": null,
    "ultimoInforme": {
@@ -7698,9 +8045,14 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": "cuota",
-    "juicio": "no comprobado",
-    "motivo": "el proveedor no contestó (cuota)"
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2013-02-07",
+    "barras": 1032,
+    "colaRepes": 660,
+    "ultimaReal": "2010-06-25",
+    "juicio": "truncar",
+    "motivo": "la serie repite el último cierre 660 veces: lo real acaba el 2010-06-25 y lo que sigue es un muñón del proveedor, no cotización"
    }
   },
   {

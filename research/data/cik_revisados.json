@@ -411,6 +411,13 @@
    "revisadoEl": "2026-08-25",
    "cikPropuestoEntonces": null,
    "propuestoPor": "research/revisar_cik.mjs --proponer"
+  },
+  "MWV": {
+   "cik": "0001159297",
+   "motivo": "identidad corroborada: el proveedor de precios dice que MWV era «MeadWestvaco Corp» hasta 2015-07-01 (0 días tras salir del índice), coincide al 100 % con «MEADWESTVACO Corp» / «MW HOLDING CORP», y ese CIK presentó 23 informes dentro del periodo",
+   "revisadoEl": "2026-08-26",
+   "cikPropuestoEntonces": null,
+   "propuestoPor": "research/revisar_cik.mjs --proponer"
   }
  }
 }
