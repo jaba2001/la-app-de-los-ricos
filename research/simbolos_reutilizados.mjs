@@ -91,8 +91,31 @@ const dias = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000);
  *   2 · vida por informes de EDGAR, 429 distinguido, prueba directa vs circunstancial
  *   3 · «no se pudo saber si siguió viva» deja de contar como «murió» (ver `ultimoInforme`)
  *   4 · la cola congelada se TRUNCA en vez de bloquearse (ver `colaCongelada`)
+ *   5 · un muñón de pocas barras deja de acusarse de «reutilizado» (ver `MIN_BARRAS_SOLAPE`)
  */
-const VERSION_REGLAS = 4;
+const VERSION_REGLAS = 5;
+
+/**
+ * MÍNIMO DE BARRAS PARA PODER ACUSAR A UN SÍMBOLO DE ESTAR REUTILIZADO.
+ *
+ * ⚠️ «NO SOLAPA» NO PRUEBA REUTILIZACIÓN CUANDO LA RESPUESTA ES UN MUÑÓN.
+ *
+ * El 2026-08-28 la auditoría bloqueó `EQR` —Equity Residential, un REIT de 15 años en el
+ * índice— con el motivo «la serie no solapa con el periodo en el índice». Y la propia evidencia
+ * lo desmentía: Yahoo devolvía 28 barras pero llamando al instrumento «Equity Residential», y
+ * EDGAR decía que la empresa había presentado un 10-Q **el mes anterior**.
+ *
+ * Lo que pasaba de verdad es que los dos proveedores han perdido su historia: Tiingo devuelve
+ * CERO barras y Yahoo sólo seis semanas, incluso pidiendo `range=max`. Es una caída de datos
+ * aguas arriba, no un símbolo heredado. Y es el mismo defecto que `prices.mjs` ya documenta
+ * para `EA` («Yahoo también devuelve series TRUNCADAS»), aquí en la capa de auditoría.
+ *
+ * Se sigue sin servir precios —un muñón no vale para nada y además no debe entrar en la
+ * caché—, pero el veredicto pasa a decir la verdad: no hay historia, en vez de acusar de una
+ * reutilización que nadie ha probado. El umbral son tres meses de sesión: por debajo de eso,
+ * una serie no es la historia de ningún instrumento.
+ */
+const MIN_BARRAS_SOLAPE = 60;
 
 /** Cuánto puede sobrevivir la serie a la salida del índice antes de ser sospechosa. */
 const GRACIA_DIAS = 400; // 12 meses de retorno futuro + holgura para el cierre de la operación
@@ -306,6 +329,12 @@ function juzgar(s, desde, hasta, vivoHoy) {
   // S&P 500. Vale por sí sola, aunque el otro proveedor no se haya podido consultar.
   if (s.tipo && NO_ES_ACCION.test(s.tipo)) return { veredicto: "reutilizado", prueba: "tipo", motivo: `el proveedor devuelve un ${s.tipo}${s.nombre ? ` («${s.nombre}»)` : ""}, no una acción` };
   // PRUEBAS CIRCUNSTANCIALES: dicen que ESTA respuesta no sirve, no que no exista una buena.
+  // Antes del solape: si lo que hay es un muñón, no se puede acusar a nadie. Se bloquea igual
+  // —no hay precios utilizables y no interesa cachearlos— pero por lo que es, no por lo que no
+  // se ha probado.
+  if (s.barras != null && s.barras < MIN_BARRAS_SOLAPE) {
+    return { veredicto: "sin historia", prueba: "muñón", motivo: `el proveedor sólo devuelve ${s.barras} barras (${s.desde}→${s.hasta}): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo` };
+  }
   if (s.hasta < desde || s.desde > hasta) return { veredicto: "reutilizado", prueba: "solape", motivo: `la serie (${s.desde}→${s.hasta}) no solapa con el periodo en el índice (${desde}→${hasta})` };
   const cola = dias(hasta, s.hasta);
   if (cola > GRACIA_DIAS) {
@@ -379,7 +408,7 @@ if (!REHACER && !SOLO) {
           // Y heredarlos es seguro por una razón distinta de la de los otros dos: un nombre sin
           // serie no puede contaminar nada, porque no hay precios que servir. Si algún día hace
           // falta volver a preguntarlos —el proveedor pudo añadir historia—, está `--rehacer`.
-          if (["ok", "reutilizado", "sin datos", "truncar"].includes(f.veredicto)) previoDetalle.set(f.ticker, f);
+          if (["ok", "reutilizado", "sin datos", "truncar", "sin historia"].includes(f.veredicto)) previoDetalle.set(f.ticker, f);
         }
       }
     }
@@ -454,12 +483,15 @@ console.log("\n");
 
 const malos = filas.filter((f) => f.veredicto === "reutilizado");
 const truncar = filas.filter((f) => f.veredicto === "truncar" && f.truncarEn);
+// Bloquean igual que las reutilizadas —no hay precios que servir— pero NO son lo mismo y el
+// recuento no debe mezclarlas: una acusa a otro instrumento, la otra dice que no hay datos.
+const sinHistoria = filas.filter((f) => f.veredicto === "sin historia");
 const sinDatos = filas.filter((f) => f.veredicto === "sin datos");
 const noComp = filas.filter((f) => f.veredicto === "no comprobado");
 // Los truncados NO son «ok»: son otra respuesta, y contarlos con los buenos ocultaba que dos
 // nombres del índice llevan la serie cortada. Se dicen aparte.
-const buenos = filas.length - malos.length - sinDatos.length - noComp.length - truncar.length;
-console.log(`  ok: ${buenos}   ·   CORTADAS: ${truncar.length}   ·   REUTILIZADAS: ${malos.length}   ·   sin datos: ${sinDatos.length}   ·   NO COMPROBADAS: ${noComp.length}
+const buenos = filas.length - malos.length - sinDatos.length - noComp.length - truncar.length - sinHistoria.length;
+console.log(`  ok: ${buenos}   ·   CORTADAS: ${truncar.length}   ·   REUTILIZADAS: ${malos.length}   ·   sin historia: ${sinHistoria.length}   ·   sin datos: ${sinDatos.length}   ·   NO COMPROBADAS: ${noComp.length}
 `);
 if (noComp.length) {
   console.log(`  ⚠ ${noComp.length} sin comprobar — el proveedor no contestó (cuota o red), que NO es lo mismo que «no hay datos».`);
@@ -498,7 +530,7 @@ try {
     else console.log(`  ⚠ los bloqueos anteriores se hicieron con las reglas v${prev?.versionReglas ?? 0} y ahora van por la v${VERSION_REGLAS}: NO se heredan, hay que volver a ganárselos.`);
   }
 } catch { previos = {}; }
-const bloqueados = Object.fromEntries(malos.map((f) => [f.ticker, f.motivo]));
+const bloqueados = Object.fromEntries([...malos, ...sinHistoria].map((f) => [f.ticker, f.motivo]));
 const heredados = [];
 for (const f of noComp) {
   if (previos[f.ticker] && !bloqueados[f.ticker]) { bloqueados[f.ticker] = previos[f.ticker]; heredados.push(f.ticker); }

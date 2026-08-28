@@ -69,7 +69,9 @@ const vivos = new Set(tabla[tabla.length - 1].tickers);
 
 // «truncar» es firme: la auditoria MIRO la serie y decidio que lo real acaba en tal fecha.
 // Es una respuesta, no una duda — y la mas util de las cuatro, porque conserva los anos buenos.
-const FIRME = new Set(["ok", "reutilizado", "sin datos", "truncar"]);
+// «sin historia» también es firme: la auditoría miró y el proveedor no tiene serie utilizable.
+// Bloquea igual que «reutilizado» pero sin acusar a nadie de haber heredado el símbolo.
+const FIRME = new Set(["ok", "reutilizado", "sin datos", "truncar", "sin historia"]);
 const veredicto = new Map(evid.detalle.map((f) => [f.ticker, f.veredicto]));
 const publicados = Object.keys(hist.mapa);
 const exentos = publicados.filter((t) => vivos.has(t));
