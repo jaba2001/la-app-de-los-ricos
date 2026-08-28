@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-28T14:15:56.330Z",
+ "generatedAt": "2026-08-28T14:19:15.430Z",
  "versionReglas": 5,
  "auditados": 287,
  "reutilizados": 10,
@@ -694,7 +694,7 @@
    "desde": "2010-01-06",
    "hasta": "2015-03-19",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1751 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -707,14 +707,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-01-03",
-    "barras": 2770,
-    "colaRepes": 1,
-    "ultimaReal": "2020-01-03",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 1751 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
