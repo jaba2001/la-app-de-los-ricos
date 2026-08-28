@@ -153,6 +153,34 @@ if (!PANEL) PANEL = await construirPanel();
 const fechasOk = fechasDecision.filter((f) => Object.keys(PANEL[f] ?? {}).length >= 50);
 if (fechasOk.length < (SMOKE ? 6 : 24)) { console.error(`  ✖ sólo ${fechasOk.length} fechas con datos suficientes`); process.exit(1); }
 
+// ⚠️ CUÁNTAS FECHAS CORREN SOBRE UNA FOTO DE MIEMBROS VIEJA, y por qué hay que decirlo.
+//
+// `sp500_historical_components.csv` dejó de actualizarse aguas arriba el 2025-08-23. Para toda
+// fecha posterior, `membersAsOf` devuelve esa foto: las altas del índice desde entonces no
+// existen y las bajas siguen dentro. Es la eleccion correcta —usar la foto de HOY para fechas
+// pasadas sería mirar al futuro, que es peor— pero es una limitación real que hasta ahora sólo
+// constaba en un comentario de `universe.mjs`, lejos de los números que afecta.
+//
+// Medido el 2026-08-28: 23 de 185 fechas de la ventana reciente (12 %). Y CRECE SOLO: cada día
+// que la fuente siga congelada añade otra.
+const tablaMiembros = await loadSP500Historical();
+const membresiaCongelada = ((t) => {
+  let ultimaReal = null;
+  for (let i = 1; i < (t?.length ?? 0); i++) {
+    const d = (new Date(t[i].date) - new Date(t[i - 1].date)) / 86400000;
+    if (d > 60) ultimaReal = t[i - 1].date;
+  }
+  if (!ultimaReal) return { fechasAfectadas: 0, de: fechasOk.length };
+  const afectadas = fechasOk.filter((f) => f > ultimaReal);
+  return {
+    ultimaFotoReal: ultimaReal,
+    fechasAfectadas: afectadas.length,
+    de: fechasOk.length,
+    pct: fechasOk.length ? +((100 * afectadas.length) / fechasOk.length).toFixed(1) : 0,
+    nota: "Para estas fechas la membresía es la de ultimaFotoReal: las altas posteriores del índice no aparecen y las bajas siguen dentro.",
+  };
+})(tablaMiembros);
+
 // ── SIMULACIÓN DE LAS REGLAS ────────────────────────────────────────────────────────────
 // ⚠️ LA LÓGICA NO VIVE AQUÍ. Vive en `lib/picks.ts`, que es lo que ejecuta también el cron
 // de producción. Si el backtest tuviera su propia copia, el track record publicado dejaría
@@ -538,6 +566,7 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
   // dejar rastro — que es exactamente lo que pasó con `EA` el 2026-08-21.
   cobertura: {
     posicionesNoValoradas: saltadas,
+    membresiaCongelada,
     universoEWFuera: ew.fuera,
     universoEWSinFinancierosFuera: ewSinFin.fuera,
     nota: "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo.",
