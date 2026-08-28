@@ -1,0 +1,96 @@
+name: Scora — auditoría de símbolos reutilizados
+
+# Cierra la auditoría de símbolos reutilizados a base de tandas, y se apaga sola cuando acaba.
+#
+# POR QUÉ ES UN CRON Y NO UN COMANDO QUE SE LANZA UNA VEZ. Tiingo da ~50 peticiones por hora y
+# hay ~290 nombres que mirar, así que una auditoría completa necesita entre cuatro y seis pasadas
+# separadas por la ventana de cuota. Hacerlas a mano significa que alguien tiene que estar
+# delante durante cinco horas, y lo que pasa en la práctica es que se quedan a medias — con el
+# mapa de bloqueo incompleto, que es peor que no tenerlo porque parece completo.
+#
+# Y NO ES SÓLO PARA TERMINAR LA QUE HAY AHORA. La auditoría envejece sola: cada empresa que sale
+# del índice es un símbolo nuevo que otro instrumento puede heredar, y cada vez que se sube la
+# versión de las reglas hay que rehacerla entera. Con esto, ambas cosas se resuelven sin que
+# nadie se acuerde.
+#
+# SE APAGA SOLA: el primer paso es la puerta de §10.7. Si ya está abierta —todos los tickers
+# publicados con veredicto firme— el job termina sin gastar una sola petición. Así el cron puede
+# quedarse puesto para siempre sin coste cuando no hay nada que hacer.
+on:
+  schedule:
+    - cron: "23 * * * *" # cada hora, en el minuto 23 (fuera de las horas en punto, que están cargadas)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# Dos tandas a la vez se pisarían el fichero de evidencia y se repartirían la misma cuota, así
+# que la segunda espera en vez de correr en paralelo.
+concurrency:
+  group: auditoria-simbolos
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # DOS CONDICIONES, y con una sola no basta.
+      #
+      # La puerta dice si todos los tickers publicados tienen veredicto firme. Pero un mapa
+      # COMPLETO puede estar OBSOLETO: si alguien sube `VERSION_REGLAS` porque una regla
+      # resultó equivocada, los veredictos siguen ahí y siguen siendo firmes — sólo que se
+      # tomaron con la regla vieja. La puerta los daría por buenos y el cron no haría nada,
+      # que es exactamente cómo un arreglo de reglas se queda sin aplicar para siempre.
+      #
+      # Por eso se compara también la versión del mapa con la del código. La auditoría está al
+      # día cuando se cumplen LAS DOS cosas.
+      - name: ¿Queda algo por auditar?
+        id: puerta
+        run: |
+          node -e "
+            const fs = require('fs');
+            const mapa = JSON.parse(fs.readFileSync('research/data/simbolos_reutilizados.json', 'utf8')).versionReglas ?? 0;
+            // Sin expresion regular a proposito: el escapado de la barra invertida no sobrevive
+            // al paso por YAML y por la shell, y un patron roto casaria siempre con cero.
+            const src = fs.readFileSync('research/simbolos_reutilizados.mjs', 'utf8');
+            const codigo = Number.parseInt(src.split('const VERSION_REGLAS = ')[1] ?? '0', 10);
+            console.log('mapa v' + mapa + ' · código v' + codigo);
+            process.exit(mapa === codigo ? 0 : 1);
+          " && VERSION_OK=si || VERSION_OK=no
+          if node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs && [ "$VERSION_OK" = "si" ]; then
+            echo "queda=no" >> "$GITHUB_OUTPUT"
+            echo "Auditoría al día: puerta abierta y mapa en la versión de reglas del código."
+          else
+            echo "queda=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Una tanda
+        if: steps.puerta.outputs.queda == 'si'
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
+        run: node --experimental-strip-types --no-warnings research/simbolos_reutilizados.mjs
+
+      # El mapa de bloqueo lo lee `prices.mjs` en caliente, así que el commit ES el despliegue:
+      # sin este paso la tanda se calcularía y no la vería nadie, y la siguiente empezaría desde
+      # el mismo sitio para siempre.
+      - name: Publicar la tanda si ha avanzado
+        if: steps.puerta.outputs.queda == 'si'
+        run: |
+          if git diff --quiet research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json; then
+            echo "La tanda no ha avanzado (cuota agotada). Se reintenta a la hora siguiente."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json
+            git commit -m "chore(auditoría): tanda de símbolos reutilizados al $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
+
+      - name: Estado tras la tanda
+        if: always()
+        run: node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs || true

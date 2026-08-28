@@ -1,10 +1,10 @@
 {
- "generatedAt": "2026-08-28T13:02:46.904Z",
- "versionReglas": 4,
+ "generatedAt": "2026-08-28T14:15:56.330Z",
+ "versionReglas": 5,
  "auditados": 287,
- "reutilizados": 26,
- "sinDatos": 22,
- "noComprobados": 8,
+ "reutilizados": 10,
+ "sinDatos": 11,
+ "noComprobados": 101,
  "detalle": [
   {
    "ticker": "AAL",
@@ -24,12 +24,12 @@
     "tipo": "EQUITY",
     "nombre": "American Airlines Group Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -51,12 +51,12 @@
     "tipo": "EQUITY",
     "nombre": "Advance Auto Parts, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -78,12 +78,12 @@
     "tipo": "EQUITY",
     "nombre": "Cencora, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -162,12 +162,12 @@
     "tipo": "EQUITY",
     "nombre": "Bread Financial Holdings, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -218,12 +218,12 @@
     "tipo": "EQUITY",
     "nombre": "Apartment Investment and Management Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -245,12 +245,12 @@
     "tipo": "EQUITY",
     "nombre": "Alaska Air Group, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -301,12 +301,12 @@
     "tipo": "EQUITY",
     "nombre": "Affiliated Managers Group, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -328,12 +328,12 @@
     "tipo": "EQUITY",
     "nombre": "Amentum Holdings, Inc.",
     "desde": "2024-09-24",
-    "hasta": "2026-08-25",
-    "barras": 481,
+    "hasta": "2026-08-28",
+    "barras": 484,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "481 barras, 2024-09-24→2026-08-25"
+    "motivo": "484 barras, 2024-09-24→2026-08-28"
    },
    "tiingo": null
   },
@@ -355,12 +355,12 @@
     "tipo": "EQUITY",
     "nombre": "AutoNation, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -411,12 +411,12 @@
     "tipo": "EQUITY",
     "nombre": "Abercrombie & Fitch Co.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -425,7 +425,7 @@
    "desde": "2017-06-19",
    "hasta": "2025-07-17",
    "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-07-16 y lo que sigue es un muñón del proveedor, no cotización",
+   "motivo": "la serie repite el último cierre 139 veces: lo real acaba el 2025-07-16 y lo que sigue es un muñón del proveedor, no cotización",
    "truncarEn": "2025-07-16",
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -441,12 +441,12 @@
    "tiingo": {
     "estado": 200,
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4295,
-    "colaRepes": 137,
+    "hasta": "2026-08-27",
+    "barras": 4297,
+    "colaRepes": 139,
     "ultimaReal": "2025-07-16",
     "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-07-16 y lo que sigue es un muñón del proveedor, no cotización"
+    "motivo": "la serie repite el último cierre 139 veces: lo real acaba el 2025-07-16 y lo que sigue es un muñón del proveedor, no cotización"
    }
   },
   {
@@ -467,12 +467,12 @@
     "tipo": "EQUITY",
     "nombre": "Elevance Health, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -481,34 +481,35 @@
    "desde": "2010-01-06",
    "hasta": "2019-08-08",
    "veredicto": "reutilizado",
-   "motivo": "la serie (2026-02-12→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2019-08-08)",
+   "motivo": "la serie (2026-02-12→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-08-08)",
    "truncarEn": null,
    "fuenteBuena": null,
-   "seguiaPresentando": null,
+   "seguiaPresentando": true,
    "ultimoInforme": {
-    "conocido": false
+    "conocido": true,
+    "ultimo": "2026-08-06"
    },
    "yahoo": {
     "estado": 200,
     "tipo": "EQUITY",
     "nombre": "ARKO Petroleum Corp.",
     "desde": "2026-02-12",
-    "hasta": "2026-08-25",
-    "barras": 134,
+    "hasta": "2026-08-28",
+    "barras": 137,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2026-02-12→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2019-08-08)"
+    "motivo": "la serie (2026-02-12→2026-08-28) no solapa con el periodo en el índice (2010-01-06→2019-08-08)"
    },
    "tiingo": {
     "estado": 200,
     "desde": "2026-02-12",
-    "hasta": "2026-08-25",
-    "barras": 134,
+    "hasta": "2026-08-27",
+    "barras": 136,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2026-02-12→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2019-08-08)"
+    "motivo": "la serie (2026-02-12→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-08-08)"
    }
   },
   {
@@ -554,9 +555,9 @@
     "ultimo": "2016-05-10"
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -587,12 +588,12 @@
     "tipo": "EQUITY",
     "nombre": "Covista Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -614,12 +615,12 @@
     "tipo": "EQUITY",
     "nombre": "ATI Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -670,12 +671,12 @@
     "tipo": "EQUITY",
     "nombre": "AvalonBay Communities Inc",
     "desde": "2026-07-17",
-    "hasta": "2026-08-25",
-    "barras": 28,
+    "hasta": "2026-08-28",
+    "barras": 31,
     "colaRepes": 1,
     "ultimaReal": "2026-08-24",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2025-08-23)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 31 barras (2026-07-17→2026-08-28): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    },
    "tiingo": {
     "estado": 200,
@@ -763,12 +764,12 @@
     "tipo": "EQUITY",
     "nombre": "Acuity Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -776,8 +777,8 @@
    "ticker": "BBBY",
    "desde": "2010-01-06",
    "hasta": "2017-07-25",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2017-07-25)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -790,12 +791,12 @@
     "tipo": "EQUITY",
     "nombre": "Bed Bath & Beyond, Inc.",
     "desde": "2026-07-17",
-    "hasta": "2026-08-25",
-    "barras": 28,
+    "hasta": "2026-08-28",
+    "barras": 31,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-24",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2017-07-25)"
+    "ultimaReal": "2026-08-27",
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 31 barras (2026-07-17→2026-08-28): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    },
    "tiingo": {
     "estado": 200,
@@ -822,12 +823,12 @@
     "tipo": "EQUITY",
     "nombre": "Beacon Financial Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -842,19 +843,19 @@
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
-    "ultimo": "2026-05-27"
+    "ultimo": "2026-08-26"
    },
    "yahoo": {
     "estado": 200,
     "tipo": "EQUITY",
     "nombre": "Bath & Body Works, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -928,12 +929,12 @@
     "tipo": "EQUITY",
     "nombre": "Brown-Forman Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -955,12 +956,12 @@
     "tipo": "EQUITY",
     "nombre": "Brighthouse Financial, Inc.",
     "desde": "2017-07-17",
-    "hasta": "2026-08-25",
-    "barras": 2290,
+    "hasta": "2026-08-28",
+    "barras": 2293,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2290 barras, 2017-07-17→2026-08-25"
+    "motivo": "2293 barras, 2017-07-17→2026-08-28"
    },
    "tiingo": null
   },
@@ -1007,12 +1008,12 @@
     "tipo": "EQUITY",
     "nombre": "Bio-Rad Laboratories, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1063,12 +1064,12 @@
     "tipo": "EQUITY",
     "nombre": "The Bank of New York Mellon Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1090,12 +1091,12 @@
     "tipo": "EQUITY",
     "nombre": "Ball Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1103,10 +1104,10 @@
    "ticker": "BMS",
    "desde": "2010-01-06",
    "hasta": "2014-12-04",
-   "veredicto": "ok",
-   "motivo": "vía yahoo",
-   "truncarEn": null,
-   "fuenteBuena": "yahoo",
+   "veredicto": "truncar",
+   "motivo": "la serie repite el último cierre 13 veces: lo real acaba el 2019-06-10 y lo que sigue es un muñón del proveedor, no cotización",
+   "truncarEn": "2019-06-10",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -1114,17 +1115,19 @@
    },
    "yahoo": {
     "estado": 200,
-    "tipo": "EQUITY",
-    "nombre": "Bemis Company, Inc.",
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2019-06-10",
-    "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    },
-   "tiingo": null
+   "tiingo": {
+    "estado": 200,
+    "desde": "2009-01-02",
+    "hasta": "2019-06-28",
+    "barras": 2638,
+    "colaRepes": 13,
+    "ultimaReal": "2019-06-10",
+    "juicio": "truncar",
+    "motivo": "la serie repite el último cierre 13 veces: lo real acaba el 2019-06-10 y lo que sigue es un muñón del proveedor, no cotización"
+   }
   },
   {
    "ticker": "BNI",
@@ -1154,10 +1157,10 @@
    "ticker": "BRCM",
    "desde": "2010-01-06",
    "hasta": "2016-01-26",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "sin historia",
+   "motivo": "el proveedor sólo devuelve 26 barras (2016-01-04→2016-02-09): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -1175,8 +1178,8 @@
     "barras": 26,
     "colaRepes": 8,
     "ultimaReal": "2016-01-29",
-    "juicio": "ok",
-    "motivo": "26 barras, 2016-01-04→2016-02-09"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 26 barras (2016-01-04→2016-02-09): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    }
   },
   {
@@ -1197,12 +1200,12 @@
     "tipo": "EQUITY",
     "nombre": "Berkshire Hathaway Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 2,
-    "ultimaReal": "2026-08-24",
+    "hasta": "2026-08-28",
+    "barras": 4441,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1252,12 +1255,12 @@
     "tipo": "EQUITY",
     "nombre": "BorgWarner Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1295,7 +1298,7 @@
    "desde": "2010-01-06",
    "hasta": "2018-10-31",
    "veredicto": "reutilizado",
-   "motivo": "la serie (2023-12-14→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2018-10-31)",
+   "motivo": "la serie (2023-12-14→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2018-10-31)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -1310,12 +1313,12 @@
    "tiingo": {
     "estado": 200,
     "desde": "2023-12-14",
-    "hasta": "2026-08-25",
-    "barras": 675,
-    "colaRepes": 76,
+    "hasta": "2026-08-27",
+    "barras": 677,
+    "colaRepes": 78,
     "ultimaReal": "2026-05-07",
     "juicio": "reutilizado",
-    "motivo": "la serie (2023-12-14→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2018-10-31)"
+    "motivo": "la serie (2023-12-14→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2018-10-31)"
    }
   },
   {
@@ -1336,12 +1339,12 @@
     "tipo": "EQUITY",
     "nombre": "Conagra Brands, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1362,22 +1365,17 @@
     "tipo": "ETF",
     "nombre": "AB California Intermediate Municipal ETF",
     "desde": "2025-10-06",
-    "hasta": "2026-08-25",
-    "barras": 223,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "hasta": "2026-08-28",
+    "barras": 226,
+    "colaRepes": 2,
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
     "motivo": "el proveedor devuelve un ETF («AB California Intermediate Municipal ETF»), no una acción"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 2053,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 3799 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -1433,8 +1431,8 @@
    "ticker": "CDAY",
    "desde": "2021-09-20",
    "hasta": "2024-02-01",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2026-06-08→2026-06-10) no solapa con el periodo en el índice (2021-09-20→2024-02-01)",
+   "veredicto": "sin historia",
+   "motivo": "el proveedor sólo devuelve 3 barras (2026-06-08→2026-06-10): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -1454,8 +1452,8 @@
     "barras": 3,
     "colaRepes": 1,
     "ultimaReal": "2026-06-10",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-06-08→2026-06-10) no solapa con el periodo en el índice (2021-09-20→2024-02-01)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 3 barras (2026-06-08→2026-06-10): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    }
   },
   {
@@ -1476,12 +1474,12 @@
     "tipo": "EQUITY",
     "nombre": "Celanese Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1615,12 +1613,12 @@
     "tipo": "EQUITY",
     "nombre": "Cleveland-Cliffs Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1700,12 +1698,12 @@
     "tipo": "EQUITY",
     "nombre": "CNX Resources Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1748,16 +1746,9 @@
     "ultimo": "2018-11-27"
    },
    "yahoo": {
-    "estado": 200,
-    "tipo": "MUTUALFUND",
-    "nombre": "Rockwell Collins, Inc.",
-    "desde": "2012-08-02",
-    "hasta": "2026-08-25",
-    "barras": 3535,
-    "colaRepes": 2,
-    "ultimaReal": "2020-11-27",
-    "juicio": "reutilizado",
-    "motivo": "el proveedor devuelve un MUTUALFUND («Rockwell Collins, Inc.»), no una acción"
+    "estado": 404,
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -1788,12 +1779,12 @@
     "tipo": "EQUITY",
     "nombre": "Coty Inc.",
     "desde": "2013-06-13",
-    "hasta": "2026-08-25",
-    "barras": 3320,
+    "hasta": "2026-08-28",
+    "barras": 3323,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3320 barras, 2013-06-13→2026-08-25"
+    "motivo": "3323 barras, 2013-06-13→2026-08-28"
    },
    "tiingo": null
   },
@@ -1844,12 +1835,12 @@
     "tipo": "EQUITY",
     "nombre": "The Campbell's Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -1900,12 +1891,12 @@
     "tipo": "EQUITY",
     "nombre": "Capri Holdings Limited",
     "desde": "2011-12-15",
-    "hasta": "2026-08-25",
-    "barras": 3693,
+    "hasta": "2026-08-28",
+    "barras": 3696,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3693 barras, 2011-12-15→2026-08-25"
+    "motivo": "3696 barras, 2011-12-15→2026-08-28"
    },
    "tiingo": null
   },
@@ -1914,7 +1905,7 @@
    "desde": "2015-11-30",
    "hasta": "2018-04-02",
    "veredicto": "reutilizado",
-   "motivo": "la serie (2026-08-12→2026-08-25) no solapa con el periodo en el índice (2015-11-30→2018-04-02)",
+   "motivo": "el proveedor devuelve un ETF («Cohen & Steers Real Assets Active ETF»), no una acción",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -1923,25 +1914,20 @@
    },
    "yahoo": {
     "estado": 200,
-    "tipo": "EQUITY",
+    "tipo": "ETF",
     "nombre": "Cohen & Steers Real Assets Active ETF",
     "desde": "2026-08-12",
-    "hasta": "2026-08-25",
-    "barras": 10,
+    "hasta": "2026-08-28",
+    "barras": 13,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2026-08-12→2026-08-25) no solapa con el periodo en el índice (2015-11-30→2018-04-02)"
+    "motivo": "el proveedor devuelve un ETF («Cohen & Steers Real Assets Active ETF»), no una acción"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2026-08-12",
-    "hasta": "2026-08-25",
-    "barras": 10,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-08-12→2026-08-25) no solapa con el periodo en el índice (2015-11-30→2018-04-02)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -1962,12 +1948,12 @@
     "tipo": "EQUITY",
     "nombre": "Lumen Technologies, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -2134,12 +2120,12 @@
     "tipo": "EQUITY",
     "nombre": "Caesars Entertainment, Inc.",
     "desde": "2014-09-22",
-    "hasta": "2026-08-25",
-    "barras": 2999,
-    "colaRepes": 2,
-    "ultimaReal": "2026-08-24",
+    "hasta": "2026-08-28",
+    "barras": 3002,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2999 barras, 2014-09-22→2026-08-25"
+    "motivo": "3002 barras, 2014-09-22→2026-08-28"
    },
    "tiingo": null
   },
@@ -2176,8 +2162,8 @@
    "ticker": "DF",
    "desde": "2010-01-06",
    "hasta": "2013-05-17",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2026-06-04→2026-06-10) no solapa con el periodo en el índice (2010-01-06→2013-05-17)",
+   "veredicto": "sin historia",
+   "motivo": "el proveedor sólo devuelve 5 barras (2026-06-04→2026-06-10): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -2196,8 +2182,8 @@
     "barras": 5,
     "colaRepes": 1,
     "ultimaReal": "2026-06-10",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-06-04→2026-06-10) no solapa con el periodo en el índice (2010-01-06→2013-05-17)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 5 barras (2026-06-04→2026-06-10): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    }
   },
   {
@@ -2233,8 +2219,8 @@
    "ticker": "DISCA",
    "desde": "2010-03-01",
    "hasta": "2022-04-04",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2022-04-06→2022-09-16) no solapa con el periodo en el índice (2010-03-01→2022-04-04)",
+   "veredicto": "sin historia",
+   "motivo": "el proveedor sólo devuelve 29 barras (2022-04-06→2022-09-16): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -2254,8 +2240,8 @@
     "barras": 29,
     "colaRepes": 27,
     "ultimaReal": "2022-04-08",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2022-04-06→2022-09-16) no solapa con el periodo en el índice (2010-03-01→2022-04-04)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 29 barras (2022-04-06→2022-09-16): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    }
   },
   {
@@ -2420,12 +2406,12 @@
     "tipo": "EQUITY",
     "nombre": "DXC Technology Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -2447,12 +2433,12 @@
     "tipo": "EQUITY",
     "nombre": "Electronic Arts Inc",
     "desde": "2026-07-17",
-    "hasta": "2026-08-25",
-    "barras": 28,
+    "hasta": "2026-08-28",
+    "barras": 31,
     "colaRepes": 5,
     "ultimaReal": "2026-08-04",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2025-08-23)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 31 barras (2026-07-17→2026-08-28): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    },
    "tiingo": {
     "estado": 200,
@@ -2507,12 +2493,12 @@
     "tipo": "EQUITY",
     "nombre": "Eastman Chemical Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -2558,12 +2544,12 @@
     "tipo": "EQUITY",
     "nombre": "Enphase Energy, Inc.",
     "desde": "2012-03-30",
-    "hasta": "2026-08-25",
-    "barras": 3621,
+    "hasta": "2026-08-28",
+    "barras": 3624,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3621 barras, 2012-03-30→2026-08-25"
+    "motivo": "3624 barras, 2012-03-30→2026-08-28"
    },
    "tiingo": null
   },
@@ -2585,12 +2571,12 @@
     "tipo": "EQUITY",
     "nombre": "Empire Petroleum Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -2612,12 +2598,12 @@
     "tipo": "EQUITY",
     "nombre": "EPAM Systems, Inc.",
     "desde": "2012-02-08",
-    "hasta": "2026-08-25",
-    "barras": 3657,
+    "hasta": "2026-08-28",
+    "barras": 3660,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3657 barras, 2012-02-08→2026-08-25"
+    "motivo": "3660 barras, 2012-02-08→2026-08-28"
    },
    "tiingo": null
   },
@@ -2625,8 +2611,8 @@
    "ticker": "EQR",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2025-08-23)",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (200)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -2639,12 +2625,12 @@
     "tipo": "EQUITY",
     "nombre": "Equity Residential",
     "desde": "2026-07-17",
-    "hasta": "2026-08-25",
-    "barras": 28,
+    "hasta": "2026-08-28",
+    "barras": 31,
     "colaRepes": 5,
     "ultimaReal": "2026-08-17",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2026-07-17→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2025-08-23)"
+    "juicio": "sin historia",
+    "motivo": "el proveedor sólo devuelve 31 barras (2026-07-17→2026-08-28): no hay historia utilizable, y con tan poco no se puede afirmar que otro instrumento heredara el símbolo"
    },
    "tiingo": {
     "estado": 200,
@@ -2668,15 +2654,8 @@
    },
    "yahoo": {
     "estado": 200,
-    "tipo": "MUTUALFUND",
-    "nombre": "Express Scripts Holding Company",
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 2,
-    "ultimaReal": "2018-12-20",
-    "juicio": "reutilizado",
-    "motivo": "el proveedor devuelve un MUTUALFUND («Express Scripts Holding Company»), no una acción"
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
     "estado": 200,
@@ -2707,22 +2686,22 @@
     "tipo": "EQUITY",
     "nombre": "Valaris Limited",
     "desde": "2021-05-03",
-    "hasta": "2026-08-25",
-    "barras": 1335,
+    "hasta": "2026-08-28",
+    "barras": 1338,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2021-05-03→2026-08-25) no solapa con el periodo en el índice (2012-07-31→2016-03-29)"
+    "motivo": "la serie (2021-05-03→2026-08-28) no solapa con el periodo en el índice (2012-07-31→2016-03-29)"
    },
    "tiingo": {
     "estado": 200,
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 3481,
+    "hasta": "2026-08-27",
+    "barras": 3483,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "3481 barras, 2009-01-02→2026-08-25"
+    "motivo": "3483 barras, 2009-01-02→2026-08-27"
    }
   },
   {
@@ -2772,12 +2751,12 @@
     "tipo": "EQUITY",
     "nombre": "Etsy, Inc.",
     "desde": "2015-04-16",
-    "hasta": "2026-08-25",
-    "barras": 2857,
+    "hasta": "2026-08-28",
+    "barras": 2860,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2857 barras, 2015-04-16→2026-08-25"
+    "motivo": "2860 barras, 2015-04-16→2026-08-28"
    },
    "tiingo": null
   },
@@ -2796,15 +2775,8 @@
    },
    "yahoo": {
     "estado": 200,
-    "tipo": "MUTUALFUND",
-    "nombre": "Envision Healthcare Corporation",
-    "desde": "2013-08-14",
-    "hasta": "2026-08-25",
-    "barras": 3277,
-    "colaRepes": 1,
-    "ultimaReal": "2018-10-10",
-    "juicio": "reutilizado",
-    "motivo": "el proveedor devuelve un MUTUALFUND («Envision Healthcare Corporation»), no una acción"
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
     "estado": 200,
@@ -2835,12 +2807,12 @@
     "tipo": "EQUITY",
     "nombre": "Meta Platforms, Inc.",
     "desde": "2012-05-18",
-    "hasta": "2026-08-25",
-    "barras": 3587,
+    "hasta": "2026-08-28",
+    "barras": 3590,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3587 barras, 2012-05-18→2026-08-25"
+    "motivo": "3590 barras, 2012-05-18→2026-08-28"
    },
    "tiingo": null
   },
@@ -2862,12 +2834,12 @@
     "tipo": "EQUITY",
     "nombre": "Fortune Brands Innovations, Inc.",
     "desde": "2011-09-16",
-    "hasta": "2026-08-25",
-    "barras": 3756,
+    "hasta": "2026-08-28",
+    "barras": 3759,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3756 barras, 2011-09-16→2026-08-25"
+    "motivo": "3759 barras, 2011-09-16→2026-08-28"
    },
    "tiingo": null
   },
@@ -2889,12 +2861,12 @@
     "tipo": "EQUITY",
     "nombre": "Four Corners Property Trust, Inc.",
     "desde": "2015-11-10",
-    "hasta": "2026-08-25",
-    "barras": 2712,
+    "hasta": "2026-08-28",
+    "barras": 2715,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2712 barras, 2015-11-10→2026-08-25"
+    "motivo": "2715 barras, 2015-11-10→2026-08-28"
    },
    "tiingo": null
   },
@@ -2912,9 +2884,9 @@
     "ultimo": "2015-07-01"
    },
    "yahoo": {
-    "estado": 200,
+    "estado": 404,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
     "estado": 200,
@@ -2945,12 +2917,12 @@
     "tipo": "EQUITY",
     "nombre": "First Horizon Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -2958,10 +2930,10 @@
    "ticker": "FI",
    "desde": "2023-06-08",
    "hasta": "2025-08-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -2973,14 +2945,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3001,12 +2968,12 @@
     "tipo": "EQUITY",
     "nombre": "Federated Hermes, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3014,9 +2981,9 @@
    "ticker": "FL",
    "desde": "2016-04-04",
    "hasta": "2019-08-08",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-09-05 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2025-09-05",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -3029,24 +2996,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4331,
-    "colaRepes": 137,
-    "ultimaReal": "2025-09-05",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-09-05 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "FLIR",
    "desde": "2010-01-06",
    "hasta": "2021-04-20",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3058,14 +3020,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-05-14",
-    "barras": 3113,
-    "colaRepes": 2,
-    "ultimaReal": "2021-05-13",
-    "juicio": "ok",
-    "motivo": "3113 barras, 2009-01-02→2021-05-14"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3086,12 +3043,12 @@
     "tipo": "EQUITY",
     "nombre": "Fluor Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3113,12 +3070,12 @@
     "tipo": "EQUITY",
     "nombre": "Flowserve Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3140,12 +3097,12 @@
     "tipo": "EQUITY",
     "nombre": "Corpay, Inc.",
     "desde": "2010-12-15",
-    "hasta": "2026-08-25",
-    "barras": 3946,
+    "hasta": "2026-08-28",
+    "barras": 3949,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3946 barras, 2010-12-15→2026-08-25"
+    "motivo": "3949 barras, 2010-12-15→2026-08-28"
    },
    "tiingo": null
   },
@@ -3167,12 +3124,12 @@
     "tipo": "EQUITY",
     "nombre": "FMC Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3180,8 +3137,8 @@
    "ticker": "FRC",
    "desde": "2019-01-02",
    "hasta": "2023-03-20",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (404)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -3194,19 +3151,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 404,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "FRX",
    "desde": "2010-01-06",
    "hasta": "2014-06-24",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3218,14 +3175,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2014-07-01",
-    "barras": 1383,
-    "colaRepes": 2,
-    "ultimaReal": "2014-06-30",
-    "juicio": "ok",
-    "motivo": "1383 barras, 2009-01-02→2014-07-01"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3246,12 +3198,12 @@
     "tipo": "EQUITY",
     "nombre": "TechnipFMC plc",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3259,8 +3211,8 @@
    "ticker": "FTR",
    "desde": "2010-01-06",
    "hasta": "2017-03-17",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2020-04-23→2021-06-01) no solapa con el periodo en el índice (2010-01-06→2017-03-17)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -3274,22 +3226,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2020-04-23",
-    "hasta": "2021-06-01",
-    "barras": 279,
-    "colaRepes": 22,
-    "ultimaReal": "2021-04-30",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2020-04-23→2021-06-01) no solapa con el periodo en el índice (2010-01-06→2017-03-17)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "GENZ",
    "desde": "2010-01-06",
    "hasta": "2011-04-01",
-   "veredicto": "reutilizado",
-   "motivo": "dejó de presentar informes al salir del índice y la serie sigue 5625 días más (tope 400)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -3302,32 +3249,27 @@
     "tipo": "EQUITY",
     "nombre": "VanEck Digital Native Economy ETF",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "dejó de presentar informes al salir del índice y la serie sigue 5625 días más (tope 400)"
+    "motivo": "dejó de presentar informes al salir del índice y la serie sigue 5628 días más (tope 400)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "reutilizado",
-    "motivo": "dejó de presentar informes al salir del índice y la serie sigue 5625 días más (tope 400)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "GGP",
    "desde": "2013-12-10",
    "hasta": "2018-08-20",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -3339,14 +3281,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2018-08-28",
-    "barras": 2431,
-    "colaRepes": 2,
-    "ultimaReal": "2018-08-27",
-    "juicio": "ok",
-    "motivo": "2431 barras, 2009-01-02→2018-08-28"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3367,12 +3304,12 @@
     "tipo": "EQUITY",
     "nombre": "Graham Holdings Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3380,10 +3317,10 @@
    "ticker": "GMCR",
    "desde": "2014-03-24",
    "hasta": "2016-02-26",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3395,14 +3332,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-03-04",
-    "barras": 1805,
-    "colaRepes": 3,
-    "ultimaReal": "2016-03-02",
-    "juicio": "ok",
-    "motivo": "1805 barras, 2009-01-02→2016-03-04"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3423,12 +3355,12 @@
     "tipo": "EQUITY",
     "nombre": "GameStop Corp.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3450,12 +3382,12 @@
     "tipo": "EQUITY",
     "nombre": "Genworth Financial, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3477,12 +3409,12 @@
     "tipo": "EQUITY",
     "nombre": "The Gap, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3490,8 +3422,8 @@
    "ticker": "GR",
    "desde": "2010-01-06",
    "hasta": "2012-07-26",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -3505,10 +3437,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3529,12 +3460,12 @@
     "tipo": "EQUITY",
     "nombre": "The Goodyear Tire & Rubber Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3542,9 +3473,9 @@
    "ticker": "HBI",
    "desde": "2015-03-23",
    "hasta": "2021-12-14",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-11-28 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2025-11-28",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -3557,24 +3488,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4390,
-    "colaRepes": 137,
-    "ultimaReal": "2025-11-28",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-11-28 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "HCBK",
    "desde": "2010-01-06",
    "hasta": "2015-10-28",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3586,24 +3512,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-10-30",
-    "barras": 1720,
-    "colaRepes": 1,
-    "ultimaReal": "2015-10-30",
-    "juicio": "ok",
-    "motivo": "1720 barras, 2009-01-02→2015-10-30"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "HES",
    "desde": "2010-01-06",
    "hasta": "2025-07-21",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3615,22 +3536,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-07-18",
-    "barras": 4161,
-    "colaRepes": 2,
-    "ultimaReal": "2025-07-17",
-    "juicio": "ok",
-    "motivo": "4161 barras, 2009-01-02→2025-07-18"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "HFC",
    "desde": "2018-06-18",
    "hasta": "2021-05-14",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (404)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -3644,19 +3560,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 404,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "HNZ",
    "desde": "2010-01-06",
    "hasta": "2013-06-06",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3668,14 +3584,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2013-10-17",
-    "barras": 1207,
-    "colaRepes": 93,
-    "ultimaReal": "2013-06-07",
-    "juicio": "ok",
-    "motivo": "1207 barras, 2009-01-02→2013-10-17"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3696,12 +3607,12 @@
     "tipo": "EQUITY",
     "nombre": "Harley-Davidson, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3709,10 +3620,10 @@
    "ticker": "HOLX",
    "desde": "2016-03-30",
    "hasta": "2025-08-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3724,14 +3635,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-04-07",
-    "barras": 4341,
-    "colaRepes": 2,
-    "ultimaReal": "2026-04-06",
-    "juicio": "ok",
-    "motivo": "4341 barras, 2009-01-02→2026-04-07"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3752,12 +3658,12 @@
     "tipo": "EQUITY",
     "nombre": "Helmerich & Payne, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3779,12 +3685,12 @@
     "tipo": "EQUITY",
     "nombre": "H&R Block, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3793,7 +3699,7 @@
    "desde": "2010-01-06",
    "hasta": "2019-04-02",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2704 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -3806,24 +3712,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-27",
-    "barras": 4440,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 2704 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "HSP",
    "desde": "2010-01-06",
    "hasta": "2015-09-01",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3835,22 +3736,17 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-09-02",
-    "barras": 1679,
-    "colaRepes": 1,
-    "ultimaReal": "2015-09-02",
-    "juicio": "ok",
-    "motivo": "1679 barras, 2009-01-02→2015-09-02"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "IGT",
    "desde": "2010-01-06",
    "hasta": "2014-06-19",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -3864,10 +3760,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3888,12 +3783,12 @@
     "tipo": "EQUITY",
     "nombre": "Illumina, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -3914,32 +3809,27 @@
     "tipo": "ETF",
     "nombre": "Harbor PanAgora Dynamic Large Cap Core ETF",
     "desde": "2024-10-10",
-    "hasta": "2026-08-25",
-    "barras": 469,
+    "hasta": "2026-08-28",
+    "barras": 472,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
     "motivo": "el proveedor devuelve un ETF («Harbor PanAgora Dynamic Large Cap Core ETF»), no una acción"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2024-10-10",
-    "hasta": "2026-08-25",
-    "barras": 469,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2024-10-10→2026-08-25) no solapa con el periodo en el índice (2017-06-02→2022-02-17)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "IPG",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -3951,14 +3841,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-11-26",
-    "barras": 4253,
-    "colaRepes": 1,
-    "ultimaReal": "2025-11-26",
-    "juicio": "ok",
-    "motivo": "4253 barras, 2009-01-02→2025-11-26"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -3979,12 +3864,12 @@
     "tipo": "EQUITY",
     "nombre": "IPG Photonics Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4006,12 +3891,12 @@
     "tipo": "EQUITY",
     "nombre": "ITT Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4019,8 +3904,8 @@
    "ticker": "JCP",
    "desde": "2010-01-06",
    "hasta": "2013-11-27",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (404)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4034,9 +3919,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 404,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4057,12 +3942,12 @@
     "tipo": "EQUITY",
     "nombre": "Jacobs Solutions Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4084,12 +3969,12 @@
     "tipo": "EQUITY",
     "nombre": "Jefferies Financial Group Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4097,10 +3982,10 @@
    "ticker": "JNPR",
    "desde": "2010-01-06",
    "hasta": "2025-07-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4112,14 +3997,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-07-02",
-    "barras": 4150,
-    "colaRepes": 2,
-    "ultimaReal": "2025-07-01",
-    "juicio": "ok",
-    "motivo": "4150 barras, 2009-01-02→2025-07-02"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4127,7 +4007,7 @@
    "desde": "2010-01-06",
    "hasta": "2011-11-18",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2020 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4140,14 +4020,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-05-30",
-    "barras": 2116,
-    "colaRepes": 2,
-    "ultimaReal": "2017-05-26",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 2020 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4155,7 +4030,7 @@
    "desde": "2011-02-28",
    "hasta": "2015-10-05",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 556 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4168,24 +4043,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-04-13",
-    "barras": 2085,
-    "colaRepes": 7,
-    "ultimaReal": "2017-04-05",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 556 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "JWN",
    "desde": "2010-01-06",
    "hasta": "2020-05-22",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -4197,24 +4067,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-05-20",
-    "barras": 4121,
-    "colaRepes": 1,
-    "ultimaReal": "2025-05-20",
-    "juicio": "ok",
-    "motivo": "4121 barras, 2009-01-02→2025-05-20"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "K",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4226,14 +4091,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-12-11",
-    "barras": 4263,
-    "colaRepes": 2,
-    "ultimaReal": "2025-12-10",
-    "juicio": "ok",
-    "motivo": "4263 barras, 2009-01-02→2025-12-11"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4254,12 +4114,12 @@
     "tipo": "EQUITY",
     "nombre": "CarMax, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4268,7 +4128,7 @@
    "desde": "2013-11-13",
    "hasta": "2018-09-18",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2900 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4281,24 +4141,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2011-12-15",
-    "hasta": "2026-08-27",
-    "barras": 3695,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 2900 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "KRFT",
    "desde": "2012-10-02",
    "hasta": "2015-07-02",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4310,14 +4165,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2012-09-17",
-    "hasta": "2015-07-10",
-    "barras": 707,
-    "colaRepes": 6,
-    "ultimaReal": "2015-07-02",
-    "juicio": "ok",
-    "motivo": "707 barras, 2012-09-17→2015-07-10"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4338,12 +4188,12 @@
     "tipo": "EQUITY",
     "nombre": "Kohl's Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4351,10 +4201,10 @@
    "ticker": "KSU",
    "desde": "2013-05-24",
    "hasta": "2021-10-04",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -4366,22 +4216,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-12-13",
-    "barras": 3260,
-    "colaRepes": 1,
-    "ultimaReal": "2021-12-13",
-    "juicio": "ok",
-    "motivo": "3260 barras, 2009-01-02→2021-12-13"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "LB",
    "desde": "2010-01-06",
    "hasta": "2021-07-21",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4394,22 +4239,17 @@
     "tipo": "EQUITY",
     "nombre": "LandBridge Company LLC",
     "desde": "2024-06-28",
-    "hasta": "2026-08-25",
-    "barras": 541,
+    "hasta": "2026-08-28",
+    "barras": 544,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
+    "motivo": "la serie (2024-06-28→2026-08-28) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2024-06-28",
-    "hasta": "2026-08-25",
-    "barras": 541,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2024-06-28→2026-08-25) no solapa con el periodo en el índice (2010-01-06→2021-07-21)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4430,12 +4270,12 @@
     "tipo": "EQUITY",
     "nombre": "Leggett & Platt, Incorporated",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "hasta": "2026-08-28",
+    "barras": 4441,
+    "colaRepes": 2,
+    "ultimaReal": "2026-08-26",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4457,12 +4297,12 @@
     "tipo": "EQUITY",
     "nombre": "LKQ Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4470,10 +4310,10 @@
    "ticker": "LLTC",
    "desde": "2010-01-06",
    "hasta": "2017-03-10",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4485,14 +4325,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2016-01-04",
-    "hasta": "2017-03-20",
-    "barras": 304,
-    "colaRepes": 7,
-    "ultimaReal": "2017-03-10",
-    "juicio": "ok",
-    "motivo": "304 barras, 2016-01-04→2017-03-20"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4500,7 +4335,7 @@
    "desde": "2010-01-06",
    "hasta": "2016-11-29",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4513,14 +4348,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-07-31",
-    "barras": 2915,
-    "colaRepes": 5,
-    "ultimaReal": "2020-07-27",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4541,12 +4371,12 @@
     "tipo": "EQUITY",
     "nombre": "Lincoln National Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4554,10 +4384,10 @@
    "ticker": "LO",
    "desde": "2010-01-06",
    "hasta": "2015-06-11",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -4568,22 +4398,17 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-06-22",
-    "barras": 1628,
-    "colaRepes": 8,
-    "ultimaReal": "2015-06-11",
-    "juicio": "ok",
-    "motivo": "1628 barras, 2009-01-02→2015-06-22"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "LSI",
    "desde": "2010-01-06",
    "hasta": "2014-05-06",
-   "veredicto": "reutilizado",
-   "motivo": "dejó de presentar informes al salir del índice y la serie sigue 3361 días más (tope 400)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -4597,14 +4422,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2023-07-19",
-    "barras": 3660,
-    "colaRepes": 1,
-    "ultimaReal": "2023-07-19",
-    "juicio": "reutilizado",
-    "motivo": "dejó de presentar informes al salir del índice y la serie sigue 3361 días más (tope 400)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4625,12 +4445,12 @@
     "tipo": "EQUITY",
     "nombre": "Lumen Technologies, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "hasta": "2026-08-28",
+    "barras": 4441,
+    "colaRepes": 2,
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4638,10 +4458,10 @@
    "ticker": "LVLT",
    "desde": "2014-11-05",
    "hasta": "2017-10-10",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -4653,14 +4473,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-11-01",
-    "barras": 2225,
-    "colaRepes": 2,
-    "ultimaReal": "2017-10-31",
-    "juicio": "ok",
-    "motivo": "2225 barras, 2009-01-02→2017-11-01"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4681,12 +4496,12 @@
     "tipo": "EQUITY",
     "nombre": "Lamb Weston Holdings, Inc.",
     "desde": "2016-11-10",
-    "hasta": "2026-08-25",
-    "barras": 2459,
+    "hasta": "2026-08-28",
+    "barras": 2462,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2459 barras, 2016-11-10→2026-08-25"
+    "motivo": "2462 barras, 2016-11-10→2026-08-28"
    },
    "tiingo": null
   },
@@ -4694,8 +4509,8 @@
    "ticker": "LXK",
    "desde": "2010-01-06",
    "hasta": "2012-09-25",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2016-01-04→2016-11-29) no solapa con el periodo en el índice (2010-01-06→2012-09-25)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4708,14 +4523,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2016-01-04",
-    "hasta": "2016-11-29",
-    "barras": 227,
-    "colaRepes": 2,
-    "ultimaReal": "2016-11-28",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2016-01-04→2016-11-29) no solapa con el periodo en el índice (2010-01-06→2012-09-25)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4736,12 +4546,12 @@
     "tipo": "EQUITY",
     "nombre": "Macy's, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4763,12 +4573,12 @@
     "tipo": "EQUITY",
     "nombre": "The Macerich Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4790,12 +4600,12 @@
     "tipo": "EQUITY",
     "nombre": "Mattel, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4803,8 +4613,8 @@
    "ticker": "MDP",
    "desde": "2010-01-06",
    "hasta": "2010-12-31",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -4818,18 +4628,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "MEE",
    "desde": "2010-01-06",
    "hasta": "2011-05-23",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -4843,10 +4652,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4867,12 +4675,12 @@
     "tipo": "EQUITY",
     "nombre": "Mohawk Industries, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4880,10 +4688,10 @@
    "ticker": "MHS",
    "desde": "2010-01-06",
    "hasta": "2012-03-22",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4895,24 +4703,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2013-04-10",
-    "barras": 1074,
-    "colaRepes": 9,
-    "ultimaReal": "2013-03-28",
-    "juicio": "ok",
-    "motivo": "1074 barras, 2009-01-02→2013-04-10"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "MJN",
    "desde": "2010-01-06",
    "hasta": "2017-06-07",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -4924,14 +4727,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-02-11",
-    "hasta": "2017-07-14",
-    "barras": 2119,
-    "colaRepes": 20,
-    "ultimaReal": "2017-06-14",
-    "juicio": "ok",
-    "motivo": "2119 barras, 2009-02-11→2017-07-14"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -4952,12 +4750,12 @@
     "tipo": "EQUITY",
     "nombre": "MarketAxess Holdings Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4979,12 +4777,12 @@
     "tipo": "EQUITY",
     "nombre": "Marsh & McLennan Companies, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -4992,8 +4790,8 @@
    "ticker": "MMI",
    "desde": "2011-01-04",
    "hasta": "2012-05-15",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -5006,22 +4804,17 @@
     "tipo": "EQUITY",
     "nombre": "Marcus & Millichap, Inc.",
     "desde": "2013-10-31",
-    "hasta": "2026-08-25",
-    "barras": 3222,
+    "hasta": "2026-08-28",
+    "barras": 3225,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
+    "motivo": "la serie (2013-10-31→2026-08-28) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2013-10-31",
-    "hasta": "2026-08-25",
-    "barras": 3222,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2013-10-31→2026-08-25) no solapa con el periodo en el índice (2011-01-04→2012-05-15)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5042,12 +4835,12 @@
     "tipo": "EQUITY",
     "nombre": "Molina Healthcare, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5055,8 +4848,8 @@
    "ticker": "MOLX",
    "desde": "2010-01-06",
    "hasta": "2013-12-03",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -5070,20 +4863,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "MRO",
    "desde": "2010-01-06",
    "hasta": "2024-11-22",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5095,14 +4887,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2024-11-22",
-    "barras": 4001,
-    "colaRepes": 2,
-    "ultimaReal": "2024-11-21",
-    "juicio": "ok",
-    "motivo": "4001 barras, 2009-01-02→2024-11-22"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5123,12 +4910,12 @@
     "tipo": "EQUITY",
     "nombre": "Match Group, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5150,12 +4937,12 @@
     "tipo": "EQUITY",
     "nombre": "Murphy Oil Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5163,10 +4950,10 @@
    "ticker": "MWV",
    "desde": "2010-01-06",
    "hasta": "2015-07-01",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -5177,14 +4964,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-07-01",
-    "barras": 1635,
-    "colaRepes": 1,
-    "ultimaReal": "2015-07-01",
-    "juicio": "ok",
-    "motivo": "1635 barras, 2009-01-02→2015-07-01"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5192,7 +4974,7 @@
    "desde": "2010-01-06",
    "hasta": "2011-12-14",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -5205,24 +4987,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-11-09",
-    "barras": 1979,
-    "colaRepes": 8,
-    "ultimaReal": "2016-10-31",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "MXIM",
    "desde": "2018-12-03",
    "hasta": "2021-08-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5234,24 +5011,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-09-01",
-    "barras": 3189,
-    "colaRepes": 6,
-    "ultimaReal": "2021-08-25",
-    "juicio": "ok",
-    "motivo": "3189 barras, 2009-01-02→2021-09-01"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "MYL",
    "desde": "2010-01-06",
    "hasta": "2020-10-12",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5263,14 +5035,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-11-19",
-    "barras": 2991,
-    "colaRepes": 2,
-    "ultimaReal": "2020-11-16",
-    "juicio": "ok",
-    "motivo": "2991 barras, 2009-01-02→2020-11-19"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5291,12 +5058,12 @@
     "tipo": "EQUITY",
     "nombre": "Navient Corporation",
     "desde": "2014-04-17",
-    "hasta": "2026-08-25",
-    "barras": 3107,
+    "hasta": "2026-08-28",
+    "barras": 3110,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3107 barras, 2014-04-17→2026-08-25"
+    "motivo": "3110 barras, 2014-04-17→2026-08-28"
    },
    "tiingo": null
   },
@@ -5304,10 +5071,10 @@
    "ticker": "NBL",
    "desde": "2010-01-06",
    "hasta": "2020-10-07",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5319,14 +5086,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-10-06",
-    "barras": 2961,
-    "colaRepes": 3,
-    "ultimaReal": "2020-10-02",
-    "juicio": "ok",
-    "motivo": "2961 barras, 2009-01-02→2020-10-06"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5347,12 +5109,12 @@
     "tipo": "EQUITY",
     "nombre": "Nabors Industries Ltd.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5374,10 +5136,10 @@
     "tipo": "ETF",
     "nombre": "Corgi NFLX 2x Daily ETF",
     "desde": "2026-07-07",
-    "hasta": "2026-08-25",
-    "barras": 36,
+    "hasta": "2026-08-28",
+    "barras": 39,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-24",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
     "motivo": "el proveedor devuelve un ETF («Corgi NFLX 2x Daily ETF»), no una acción"
    },
@@ -5405,12 +5167,12 @@
     "tipo": "EQUITY",
     "nombre": "Nektar Therapeutics",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5432,12 +5194,12 @@
     "tipo": "EQUITY",
     "nombre": "Gen Digital Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5445,10 +5207,10 @@
    "ticker": "NLSN",
    "desde": "2013-07-09",
    "hasta": "2022-10-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5460,14 +5222,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2011-01-27",
-    "hasta": "2022-10-11",
-    "barras": 2947,
-    "colaRepes": 1,
-    "ultimaReal": "2022-10-11",
-    "juicio": "ok",
-    "motivo": "2947 barras, 2011-01-27→2022-10-11"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5488,12 +5245,12 @@
     "tipo": "EQUITY",
     "nombre": "NOV Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "hasta": "2026-08-28",
+    "barras": 4441,
+    "colaRepes": 2,
+    "ultimaReal": "2026-08-27",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5501,8 +5258,8 @@
    "ticker": "NOVL",
    "desde": "2010-01-06",
    "hasta": "2011-04-25",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -5516,10 +5273,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5540,12 +5296,12 @@
     "tipo": "EQUITY",
     "nombre": "Newell Brands Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5567,12 +5323,12 @@
     "tipo": "EQUITY",
     "nombre": "The New York Times Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5580,8 +5336,8 @@
    "ticker": "NYX",
    "desde": "2010-01-06",
    "hasta": "2013-11-07",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
@@ -5595,19 +5351,18 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "ODP",
    "desde": "2010-01-06",
    "hasta": "2010-12-17",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-12-09 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2025-12-09",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -5620,14 +5375,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4397,
-    "colaRepes": 137,
-    "ultimaReal": "2025-12-09",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 137 veces: lo real acaba el 2025-12-09 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5648,12 +5398,12 @@
     "tipo": "EQUITY",
     "nombre": "Organon & Co.",
     "desde": "2021-05-14",
-    "hasta": "2026-08-25",
-    "barras": 1326,
-    "colaRepes": 3,
-    "ultimaReal": "2026-08-21",
+    "hasta": "2026-08-28",
+    "barras": 1329,
+    "colaRepes": 1,
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "1326 barras, 2021-05-14→2026-08-25"
+    "motivo": "1329 barras, 2021-05-14→2026-08-28"
    },
    "tiingo": null
   },
@@ -5675,12 +5425,12 @@
     "tipo": "EQUITY",
     "nombre": "O-I Glass, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5702,12 +5452,12 @@
     "tipo": "EQUITY",
     "nombre": "Banzai International, Inc.",
     "desde": "2021-02-12",
-    "hasta": "2026-08-25",
-    "barras": 1389,
+    "hasta": "2026-08-28",
+    "barras": 1392,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "1389 barras, 2021-02-12→2026-08-25"
+    "motivo": "1392 barras, 2021-02-12→2026-08-28"
    },
    "tiingo": null
   },
@@ -5729,12 +5479,12 @@
     "tipo": "EQUITY",
     "nombre": "Paycom Software, Inc.",
     "desde": "2014-04-15",
-    "hasta": "2026-08-25",
-    "barras": 3109,
+    "hasta": "2026-08-28",
+    "barras": 3112,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3109 barras, 2014-04-15→2026-08-25"
+    "motivo": "3112 barras, 2014-04-15→2026-08-28"
    },
    "tiingo": null
   },
@@ -5742,10 +5492,10 @@
    "ticker": "PBCT",
    "desde": "2010-01-06",
    "hasta": "2022-03-02",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5757,24 +5507,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2022-04-04",
-    "barras": 3337,
-    "colaRepes": 2,
-    "ultimaReal": "2022-04-01",
-    "juicio": "ok",
-    "motivo": "3337 barras, 2009-01-02→2022-04-04"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "PBG",
    "desde": "2010-01-06",
    "hasta": "2010-02-26",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5786,14 +5531,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2011-03-07",
-    "barras": 548,
-    "colaRepes": 259,
-    "ultimaReal": "2010-02-26",
-    "juicio": "ok",
-    "motivo": "548 barras, 2009-01-02→2011-03-07"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5814,12 +5554,12 @@
     "tipo": "EQUITY",
     "nombre": "Pitney Bowes Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5827,10 +5567,10 @@
    "ticker": "PDCO",
    "desde": "2010-01-06",
    "hasta": "2018-03-16",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -5842,14 +5582,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-04-17",
-    "barras": 4099,
-    "colaRepes": 2,
-    "ultimaReal": "2025-04-16",
-    "juicio": "ok",
-    "motivo": "4099 barras, 2009-01-02→2025-04-17"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5870,12 +5605,12 @@
     "tipo": "EQUITY",
     "nombre": "Healthpeak Properties, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5897,12 +5632,12 @@
     "tipo": "EQUITY",
     "nombre": "PENN Entertainment, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5910,10 +5645,10 @@
    "ticker": "PETM",
    "desde": "2012-10-05",
    "hasta": "2015-03-11",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -5925,14 +5660,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-03-11",
-    "barras": 1557,
-    "colaRepes": 1,
-    "ultimaReal": "2015-03-11",
-    "juicio": "ok",
-    "motivo": "1557 barras, 2009-01-02→2015-03-11"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -5953,12 +5683,12 @@
     "tipo": "EQUITY",
     "nombre": "Revvity, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -5980,12 +5710,12 @@
     "tipo": "EQUITY",
     "nombre": "Pool Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6007,12 +5737,12 @@
     "tipo": "EQUITY",
     "nombre": "Perrigo Company plc",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6034,12 +5764,12 @@
     "tipo": "EQUITY",
     "nombre": "PVH Corp.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6047,10 +5777,10 @@
    "ticker": "PXD",
    "desde": "2010-01-06",
    "hasta": "2024-05-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6062,24 +5792,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2024-05-03",
-    "barras": 3860,
-    "colaRepes": 2,
-    "ultimaReal": "2024-05-02",
-    "juicio": "ok",
-    "motivo": "3860 barras, 2009-01-02→2024-05-03"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "QEP",
    "desde": "2010-07-01",
    "hasta": "2015-06-30",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6091,22 +5816,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2010-06-16",
-    "hasta": "2021-03-18",
-    "barras": 2708,
-    "colaRepes": 3,
-    "ultimaReal": "2021-03-16",
-    "juicio": "ok",
-    "motivo": "2708 barras, 2010-06-16→2021-03-18"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "QLGC",
    "desde": "2010-01-06",
    "hasta": "2011-01-12",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2016-01-04→2016-08-24) no solapa con el periodo en el índice (2010-01-06→2011-01-12)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -6120,14 +5840,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2016-01-04",
-    "hasta": "2016-08-24",
-    "barras": 163,
-    "colaRepes": 8,
-    "ultimaReal": "2016-08-15",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2016-01-04→2016-08-24) no solapa con el periodo en el índice (2010-01-06→2011-01-12)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6148,12 +5863,12 @@
     "tipo": "EQUITY",
     "nombre": "Qorvo, Inc.",
     "desde": "2015-01-02",
-    "hasta": "2026-08-25",
-    "barras": 2928,
+    "hasta": "2026-08-28",
+    "barras": 2931,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2928 barras, 2015-01-02→2026-08-25"
+    "motivo": "2931 barras, 2015-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6175,12 +5890,12 @@
     "tipo": "EQUITY",
     "nombre": "Ryder System, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6188,10 +5903,10 @@
    "ticker": "RAI",
    "desde": "2010-01-06",
    "hasta": "2017-07-20",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6203,24 +5918,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-08-17",
-    "barras": 2172,
-    "colaRepes": 19,
-    "ultimaReal": "2017-07-24",
-    "juicio": "ok",
-    "motivo": "2172 barras, 2009-01-02→2017-08-17"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "RDC",
    "desde": "2010-01-06",
    "hasta": "2014-08-13",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6232,14 +5942,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-04-11",
-    "barras": 2586,
-    "colaRepes": 2,
-    "ultimaReal": "2019-04-10",
-    "juicio": "ok",
-    "motivo": "2586 barras, 2009-01-02→2019-04-11"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6260,12 +5965,12 @@
     "tipo": "EQUITY",
     "nombre": "Everest Group, Ltd.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6287,12 +5992,12 @@
     "tipo": "EQUITY",
     "nombre": "Robert Half Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6300,10 +6005,10 @@
    "ticker": "RHT",
    "desde": "2010-01-06",
    "hasta": "2019-07-01",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6315,14 +6020,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-07-08",
-    "barras": 2645,
-    "colaRepes": 2,
-    "ultimaReal": "2019-07-05",
-    "juicio": "ok",
-    "motivo": "2645 barras, 2009-01-02→2019-07-08"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6343,12 +6043,12 @@
     "tipo": "EQUITY",
     "nombre": "Range Resources Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6356,10 +6056,10 @@
    "ticker": "RRD",
    "desde": "2010-01-06",
    "hasta": "2012-12-07",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6371,24 +6071,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2022-02-25",
-    "barras": 3311,
-    "colaRepes": 2,
-    "ultimaReal": "2022-02-24",
-    "juicio": "ok",
-    "motivo": "3311 barras, 2009-01-02→2022-02-25"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "RTN",
    "desde": "2010-01-06",
    "hasta": "2020-04-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6400,22 +6095,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-04-03",
-    "barras": 2833,
-    "colaRepes": 2,
-    "ultimaReal": "2020-04-02",
-    "juicio": "ok",
-    "motivo": "2833 barras, 2009-01-02→2020-04-03"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "RX",
    "desde": "2010-01-06",
    "hasta": "2010-02-23",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6428,10 +6118,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6439,7 +6128,7 @@
    "desde": "2021-12-20",
    "hasta": "2023-01-04",
    "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1331 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6451,32 +6140,27 @@
     "tipo": "EQUITY",
     "nombre": "Signature Bank",
     "desde": "2024-08-15",
-    "hasta": "2026-08-27",
-    "barras": 510,
+    "hasta": "2026-08-28",
+    "barras": 511,
     "colaRepes": 1,
     "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
-    "motivo": "la serie (2024-08-15→2026-08-27) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
+    "motivo": "la serie (2024-08-15→2026-08-28) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-27",
-    "barras": 4440,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
+    "estado": "cuota",
     "juicio": "no comprobado",
-    "motivo": "la serie sigue 1331 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SCG",
    "desde": "2010-01-06",
    "hasta": "2018-12-24",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": null,
    "ultimoInforme": {
     "conocido": false
@@ -6487,14 +6171,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2018-12-31",
-    "barras": 2516,
-    "colaRepes": 1,
-    "ultimaReal": "2018-12-31",
-    "juicio": "ok",
-    "motivo": "2516 barras, 2009-01-02→2018-12-31"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6515,12 +6194,12 @@
     "tipo": "EQUITY",
     "nombre": "SolarEdge Technologies, Inc.",
     "desde": "2015-03-26",
-    "hasta": "2026-08-25",
-    "barras": 2871,
+    "hasta": "2026-08-28",
+    "barras": 2874,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2871 barras, 2015-03-26→2026-08-25"
+    "motivo": "2874 barras, 2015-03-26→2026-08-28"
    },
    "tiingo": null
   },
@@ -6528,10 +6207,10 @@
    "ticker": "SEE",
    "desde": "2010-01-06",
    "hasta": "2023-12-16",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6543,24 +6222,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-04-09",
-    "barras": 4343,
-    "colaRepes": 2,
-    "ultimaReal": "2026-04-08",
-    "juicio": "ok",
-    "motivo": "4343 barras, 2009-01-02→2026-04-09"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SIAL",
    "desde": "2010-01-06",
    "hasta": "2015-11-17",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6572,23 +6246,18 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-11-18",
-    "barras": 1733,
-    "colaRepes": 2,
-    "ultimaReal": "2015-11-17",
-    "juicio": "ok",
-    "motivo": "1733 barras, 2009-01-02→2015-11-18"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SIVB",
    "desde": "2018-03-19",
    "hasta": "2023-01-04",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 134 veces: lo real acaba el 2024-11-06 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2024-11-06",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
@@ -6601,14 +6270,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4122,
-    "colaRepes": 134,
-    "ultimaReal": "2024-11-06",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 134 veces: lo real acaba el 2024-11-06 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6629,12 +6293,12 @@
     "tipo": "EQUITY",
     "nombre": "SL Green Realty Corp.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6656,12 +6320,12 @@
     "tipo": "EQUITY",
     "nombre": "SLM Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6669,10 +6333,10 @@
    "ticker": "SNI",
    "desde": "2010-01-06",
    "hasta": "2018-02-28",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6684,14 +6348,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2018-03-16",
-    "barras": 2317,
-    "colaRepes": 9,
-    "ultimaReal": "2018-03-06",
-    "juicio": "ok",
-    "motivo": "2317 barras, 2009-01-02→2018-03-16"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6712,10 +6371,10 @@
     "tipo": "ETF",
     "nombre": "PIMCO US Stocks PLUS Active Bond Exchange Traded Fund",
     "desde": "2026-01-16",
-    "hasta": "2026-08-25",
-    "barras": 152,
+    "hasta": "2026-08-28",
+    "barras": 155,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-27",
     "juicio": "reutilizado",
     "motivo": "el proveedor devuelve un ETF («PIMCO US Stocks PLUS Active Bond Exchange Traded Fund»), no una acción"
    },
@@ -6729,10 +6388,10 @@
    "ticker": "SRCL",
    "desde": "2010-01-06",
    "hasta": "2018-11-29",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6744,22 +6403,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2024-11-04",
-    "barras": 3987,
-    "colaRepes": 2,
-    "ultimaReal": "2024-11-01",
-    "juicio": "ok",
-    "motivo": "3987 barras, 2009-01-02→2024-11-04"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "STI",
    "desde": "2010-01-06",
    "hasta": "2019-12-05",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2024-02-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -6772,32 +6426,27 @@
     "tipo": "EQUITY",
     "nombre": "Solidion Technology, Inc.",
     "desde": "2022-05-02",
-    "hasta": "2026-08-27",
-    "barras": 1085,
+    "hasta": "2026-08-28",
+    "barras": 1086,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2022-05-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
+    "motivo": "la serie (2022-05-02→2026-08-28) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2024-02-02",
-    "hasta": "2026-08-27",
-    "barras": 644,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2024-02-02→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2019-12-05)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "STJ",
    "desde": "2010-01-06",
    "hasta": "2017-01-03",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6809,23 +6458,18 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-01-18",
-    "barras": 2025,
-    "colaRepes": 10,
-    "ultimaReal": "2017-01-04",
-    "juicio": "ok",
-    "motivo": "2025 barras, 2009-01-02→2017-01-18"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SVU",
    "desde": "2010-01-06",
    "hasta": "2012-04-30",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 38 veces: lo real acaba el 2018-10-18 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2018-10-18",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
@@ -6838,24 +6482,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2018-12-14",
-    "barras": 2504,
-    "colaRepes": 38,
-    "ultimaReal": "2018-10-18",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 38 veces: lo real acaba el 2018-10-18 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SWN",
    "desde": "2010-01-06",
    "hasta": "2017-03-30",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -6867,24 +6506,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2024-10-01",
-    "barras": 3963,
-    "colaRepes": 2,
-    "ultimaReal": "2024-09-30",
-    "juicio": "ok",
-    "motivo": "3963 barras, 2009-01-02→2024-10-01"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "SWY",
    "desde": "2010-01-06",
    "hasta": "2015-01-15",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -6896,14 +6530,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2015-02-09",
-    "barras": 1536,
-    "colaRepes": 8,
-    "ultimaReal": "2015-01-29",
-    "juicio": "ok",
-    "motivo": "1536 barras, 2009-01-02→2015-02-09"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -6924,12 +6553,12 @@
     "tipo": "EQUITY",
     "nombre": "Gen Digital Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6951,12 +6580,12 @@
     "tipo": "EQUITY",
     "nombre": "Teradata Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -6964,8 +6593,8 @@
    "ticker": "TE",
    "desde": "2010-01-06",
    "hasta": "2016-06-27",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2021-07-08→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -6978,22 +6607,17 @@
     "tipo": "EQUITY",
     "nombre": "T1 Energy Inc.",
     "desde": "2020-01-10",
-    "hasta": "2026-08-27",
-    "barras": 1666,
+    "hasta": "2026-08-28",
+    "barras": 1667,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
+    "ultimaReal": "2026-08-28",
     "juicio": "reutilizado",
-    "motivo": "la serie (2020-01-10→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
+    "motivo": "la serie (2020-01-10→2026-08-28) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2021-07-08",
-    "hasta": "2026-08-27",
-    "barras": 1291,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2021-07-08→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2016-06-27)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7014,12 +6638,12 @@
     "tipo": "EQUITY",
     "nombre": "Teleflex Incorporated",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7027,10 +6651,10 @@
    "ticker": "TGNA",
    "desde": "2010-01-06",
    "hasta": "2017-05-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7042,14 +6666,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-03-20",
-    "barras": 4330,
-    "colaRepes": 2,
-    "ultimaReal": "2026-03-19",
-    "juicio": "ok",
-    "motivo": "4330 barras, 2009-01-02→2026-03-20"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7070,12 +6689,12 @@
     "tipo": "EQUITY",
     "nombre": "Tenet Healthcare Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7083,10 +6702,10 @@
    "ticker": "TIE",
    "desde": "2010-01-06",
    "hasta": "2012-12-21",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7098,24 +6717,19 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2013-01-07",
-    "barras": 1010,
-    "colaRepes": 4,
-    "ultimaReal": "2013-01-02",
-    "juicio": "ok",
-    "motivo": "1010 barras, 2009-01-02→2013-01-07"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TIF",
    "desde": "2010-01-06",
    "hasta": "2020-12-21",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7127,22 +6741,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-01-08",
-    "barras": 3026,
-    "colaRepes": 3,
-    "ultimaReal": "2021-01-06",
-    "juicio": "ok",
-    "motivo": "3026 barras, 2009-01-02→2021-01-08"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TLAB",
    "desde": "2010-01-06",
    "hasta": "2011-12-20",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -7155,18 +6764,17 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TMK",
    "desde": "2010-01-06",
    "hasta": "2019-07-15",
-   "veredicto": "sin datos",
-   "motivo": "el proveedor no devuelve serie (200)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -7179,10 +6787,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "barras": 0,
-    "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (200)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7203,12 +6810,12 @@
     "tipo": "EQUITY",
     "nombre": "Tripadvisor, Inc.",
     "desde": "2011-12-07",
-    "hasta": "2026-08-25",
-    "barras": 3699,
+    "hasta": "2026-08-28",
+    "barras": 3702,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "3699 barras, 2011-12-07→2026-08-25"
+    "motivo": "3702 barras, 2011-12-07→2026-08-28"
    },
    "tiingo": null
   },
@@ -7216,10 +6823,10 @@
    "ticker": "TSS",
    "desde": "2010-01-06",
    "hasta": "2019-08-09",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7231,24 +6838,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-09-17",
-    "barras": 2695,
-    "colaRepes": 1,
-    "ultimaReal": "2019-09-17",
-    "juicio": "ok",
-    "motivo": "2695 barras, 2009-01-02→2019-09-17"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TWC",
    "desde": "2010-01-06",
    "hasta": "2016-05-17",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7260,24 +6862,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-05-26",
-    "barras": 1863,
-    "colaRepes": 8,
-    "ultimaReal": "2016-05-17",
-    "juicio": "ok",
-    "motivo": "1863 barras, 2009-01-02→2016-05-26"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TWTR",
    "desde": "2018-06-07",
    "hasta": "2022-10-12",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7289,24 +6886,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2013-11-07",
-    "hasta": "2022-10-28",
-    "barras": 2260,
-    "colaRepes": 2,
-    "ultimaReal": "2022-10-27",
-    "juicio": "ok",
-    "motivo": "2260 barras, 2013-11-07→2022-10-28"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "TWX",
    "desde": "2010-01-06",
    "hasta": "2018-06-14",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7318,14 +6910,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2018-06-15",
-    "barras": 2380,
-    "colaRepes": 2,
-    "ultimaReal": "2018-06-14",
-    "juicio": "ok",
-    "motivo": "2380 barras, 2009-01-02→2018-06-15"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7346,12 +6933,12 @@
     "tipo": "EQUITY",
     "nombre": "Under Armour, Inc.",
     "desde": "2016-03-23",
-    "hasta": "2026-08-25",
-    "barras": 2621,
+    "hasta": "2026-08-28",
+    "barras": 2624,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "2621 barras, 2016-03-23→2026-08-25"
+    "motivo": "2624 barras, 2016-03-23→2026-08-28"
    },
    "tiingo": null
   },
@@ -7373,12 +6960,12 @@
     "tipo": "EQUITY",
     "nombre": "Under Armour, Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7400,12 +6987,12 @@
     "tipo": "EQUITY",
     "nombre": "Unum Group",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7427,12 +7014,12 @@
     "tipo": "EQUITY",
     "nombre": "RTX Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7440,10 +7027,10 @@
    "ticker": "VAR",
    "desde": "2010-01-06",
    "hasta": "2021-03-22",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7455,14 +7042,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-04-16",
-    "barras": 3093,
-    "colaRepes": 3,
-    "ultimaReal": "2021-04-14",
-    "juicio": "ok",
-    "motivo": "3093 barras, 2009-01-02→2021-04-16"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7483,12 +7065,12 @@
     "tipo": "EQUITY",
     "nombre": "V.F. Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7496,10 +7078,10 @@
    "ticker": "VIAB",
    "desde": "2010-01-06",
    "hasta": "2019-11-21",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7511,22 +7093,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-12-04",
-    "barras": 2750,
-    "colaRepes": 1,
-    "ultimaReal": "2019-12-04",
-    "juicio": "ok",
-    "motivo": "2750 barras, 2009-01-02→2019-12-04"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "VIAC",
    "desde": "2019-12-05",
    "hasta": "2022-02-15",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2009-01-02→2019-12-04) no solapa con el periodo en el índice (2019-12-05→2022-02-15)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -7540,14 +7117,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-12-04",
-    "barras": 2750,
-    "colaRepes": 1,
-    "ultimaReal": "2019-12-04",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2009-01-02→2019-12-04) no solapa con el periodo en el índice (2019-12-05→2022-02-15)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7568,12 +7140,12 @@
     "tipo": "EQUITY",
     "nombre": "Viavi Solutions Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7595,12 +7167,12 @@
     "tipo": "EQUITY",
     "nombre": "Vornado Realty Trust",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7622,12 +7194,12 @@
     "tipo": "EQUITY",
     "nombre": "Vontier Corporation",
     "desde": "2020-09-24",
-    "hasta": "2026-08-25",
-    "barras": 1486,
+    "hasta": "2026-08-28",
+    "barras": 1489,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "1486 barras, 2020-09-24→2026-08-25"
+    "motivo": "1489 barras, 2020-09-24→2026-08-28"
    },
    "tiingo": null
   },
@@ -7635,10 +7207,10 @@
    "ticker": "WBA",
    "desde": "2010-01-06",
    "hasta": "2025-08-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7650,24 +7222,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-08-28",
-    "barras": 4190,
-    "colaRepes": 2,
-    "ultimaReal": "2025-08-27",
-    "juicio": "ok",
-    "motivo": "4190 barras, 2009-01-02→2025-08-28"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "WCG",
    "desde": "2018-09-17",
    "hasta": "2019-12-23",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7679,24 +7246,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-01-23",
-    "barras": 2783,
-    "colaRepes": 1,
-    "ultimaReal": "2020-01-23",
-    "juicio": "ok",
-    "motivo": "2783 barras, 2009-01-02→2020-01-23"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "WFM",
    "desde": "2010-01-06",
    "hasta": "2017-08-17",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7708,14 +7270,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-08-29",
-    "barras": 2180,
-    "colaRepes": 3,
-    "ultimaReal": "2017-08-25",
-    "juicio": "ok",
-    "motivo": "2180 barras, 2009-01-02→2017-08-29"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7736,12 +7293,12 @@
     "tipo": "EQUITY",
     "nombre": "Whirlpool Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7749,8 +7306,8 @@
    "ticker": "WIN",
    "desde": "2010-01-06",
    "hasta": "2015-03-31",
-   "veredicto": "reutilizado",
-   "motivo": "la serie (2023-12-01→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2015-03-31)",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": true,
@@ -7764,14 +7321,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2023-12-01",
-    "hasta": "2026-08-27",
-    "barras": 686,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-27",
-    "juicio": "reutilizado",
-    "motivo": "la serie (2023-12-01→2026-08-27) no solapa con el periodo en el índice (2010-01-06→2015-03-31)"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7792,12 +7344,12 @@
     "tipo": "EQUITY",
     "nombre": "Willis Towers Watson Public Limited Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7805,10 +7357,10 @@
    "ticker": "WPX",
    "desde": "2012-01-03",
    "hasta": "2014-03-12",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7820,24 +7372,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2011-12-12",
-    "hasta": "2021-01-14",
-    "barras": 2288,
-    "colaRepes": 7,
-    "ultimaReal": "2021-01-06",
-    "juicio": "ok",
-    "motivo": "2288 barras, 2011-12-12→2021-01-14"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "WRK",
    "desde": "2015-07-02",
    "hasta": "2024-07-08",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7849,14 +7396,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2024-07-05",
-    "hasta": "2024-07-05",
-    "barras": 1,
-    "colaRepes": 1,
-    "ultimaReal": "2024-07-05",
-    "juicio": "ok",
-    "motivo": "1 barras, 2024-07-05→2024-07-05"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7877,12 +7419,12 @@
     "tipo": "EQUITY",
     "nombre": "The Western Union Company",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -7890,10 +7432,10 @@
    "ticker": "X",
    "desde": "2010-01-06",
    "hasta": "2014-07-01",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7905,24 +7447,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2025-06-18",
-    "barras": 4141,
-    "colaRepes": 2,
-    "ultimaReal": "2025-06-17",
-    "juicio": "ok",
-    "motivo": "4141 barras, 2009-01-02→2025-06-18"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "XEC",
    "desde": "2014-06-20",
    "hasta": "2020-01-28",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": true,
    "ultimoInforme": {
     "conocido": true,
@@ -7934,24 +7471,19 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2021-10-04",
-    "barras": 3211,
-    "colaRepes": 3,
-    "ultimaReal": "2021-09-30",
-    "juicio": "ok",
-    "motivo": "3211 barras, 2009-01-02→2021-10-04"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
    "ticker": "XLNX",
    "desde": "2010-01-06",
    "hasta": "2022-02-02",
-   "veredicto": "ok",
-   "motivo": "vía tiingo",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
    "truncarEn": null,
-   "fuenteBuena": "tiingo",
+   "fuenteBuena": null,
    "seguiaPresentando": false,
    "ultimoInforme": {
     "conocido": true,
@@ -7963,14 +7495,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2022-02-14",
-    "barras": 3303,
-    "colaRepes": 2,
-    "ultimaReal": "2022-02-11",
-    "juicio": "ok",
-    "motivo": "3303 barras, 2009-01-02→2022-02-14"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -7991,12 +7518,12 @@
     "tipo": "EQUITY",
     "nombre": "DENTSPLY SIRONA Inc.",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -8018,12 +7545,12 @@
     "tipo": "EQUITY",
     "nombre": "Xerox Holdings Corporation",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   },
@@ -8031,9 +7558,9 @@
    "ticker": "XTO",
    "desde": "2010-01-06",
    "hasta": "2010-06-21",
-   "veredicto": "truncar",
-   "motivo": "la serie repite el último cierre 660 veces: lo real acaba el 2010-06-25 y lo que sigue es un muñón del proveedor, no cotización",
-   "truncarEn": "2010-06-25",
+   "veredicto": "no comprobado",
+   "motivo": "el proveedor no contestó (cuota)",
+   "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
    "ultimoInforme": {
@@ -8045,14 +7572,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2013-02-07",
-    "barras": 1032,
-    "colaRepes": 660,
-    "ultimaReal": "2010-06-25",
-    "juicio": "truncar",
-    "motivo": "la serie repite el último cierre 660 veces: lo real acaba el 2010-06-25 y lo que sigue es un muñón del proveedor, no cotización"
+    "estado": "cuota",
+    "juicio": "no comprobado",
+    "motivo": "el proveedor no contestó (cuota)"
    }
   },
   {
@@ -8073,12 +7595,12 @@
     "tipo": "EQUITY",
     "nombre": "Zions Bancorporation, National Association",
     "desde": "2009-01-02",
-    "hasta": "2026-08-25",
-    "barras": 4438,
+    "hasta": "2026-08-28",
+    "barras": 4441,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-25",
+    "ultimaReal": "2026-08-28",
     "juicio": "ok",
-    "motivo": "4438 barras, 2009-01-02→2026-08-25"
+    "motivo": "4441 barras, 2009-01-02→2026-08-28"
    },
    "tiingo": null
   }
