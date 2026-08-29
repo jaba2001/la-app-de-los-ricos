@@ -69,27 +69,49 @@ jobs:
             echo "queda=si" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Una tanda
+      # VARIAS TANDAS POR EJECUCIÓN, y no una, porque el cron NO es fiable.
+      #
+      # GitHub salta o retrasa los `schedule` cuando hay carga: con un cron horario puesto, el
+      # 2026-08-28 sólo hubo DOS ejecuciones en quince horas. Con una tanda por ejecución, cerrar
+      # una auditoría de ~290 nombres dependería de la suerte durante días.
+      #
+      # Un job puede correr hasta 6 h, así que aquí se encadenan hasta cinco tandas esperando la
+      # ventana de cuota entre ellas — que es la auditoría entera en UNA ejecución. Y se corta en
+      # cuanto la puerta abre, así que cuando no queda nada no cuesta nada.
+      - name: Tandas hasta cerrar (o hasta agotar el presupuesto de tiempo)
         if: steps.puerta.outputs.queda == 'si'
+        timeout-minutes: 330
         env:
           TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
-        run: node --experimental-strip-types --no-warnings research/simbolos_reutilizados.mjs
-
-      # El mapa de bloqueo lo lee `prices.mjs` en caliente, así que el commit ES el despliegue:
-      # sin este paso la tanda se calcularía y no la vería nadie, y la siguiente empezaría desde
-      # el mismo sitio para siempre.
-      - name: Publicar la tanda si ha avanzado
-        if: steps.puerta.outputs.queda == 'si'
         run: |
-          if git diff --quiet research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json; then
-            echo "La tanda no ha avanzado (cuota agotada). Se reintenta a la hora siguiente."
-          else
-            git config user.name  "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json
-            git commit -m "chore(auditoría): tanda de símbolos reutilizados al $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
-          fi
+          # ⚠️ EL COMMIT VA DENTRO DEL BUCLE, y no al final como paso aparte.
+          #
+          # Un job de cinco horas que publica sólo al terminar pierde las cinco si se corta —
+          # timeout, cancelación, runner reciclado. Publicando después de cada tanda, lo peor que
+          # puede pasar es perder la última.
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            echo "── tanda $i ──"
+            node --experimental-strip-types --no-warnings research/simbolos_reutilizados.mjs
+            if git diff --quiet research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json; then
+              echo "La tanda no ha avanzado (cuota agotada)."
+            else
+              git add research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json
+              git commit -m "chore(auditoría): tanda de símbolos reutilizados al $(date -u +%Y-%m-%dT%H:%MZ)"
+              # Un push por tanda: si el job muere, lo publicado ya está a salvo. Con rebase por
+              # si alguien commiteó mientras tanto — cinco horas dan para eso.
+              git pull --rebase --autostash origin main && git push
+            fi
+            if node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs; then
+              echo "Puerta abierta tras $i tandas: no hace falta seguir."
+              break
+            fi
+            if [ "$i" -lt 5 ]; then
+              echo "Esperando 62 min a que Tiingo recupere cuota…"
+              sleep 3720
+            fi
+          done
 
       - name: Estado tras la tanda
         if: always()
