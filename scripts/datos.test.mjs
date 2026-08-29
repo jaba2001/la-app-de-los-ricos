@@ -312,7 +312,35 @@ if (SIN_RED) {
   console.log("\n  B · humo contra la SEC — SALTADO (--sin-red)\n");
 } else {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
-  const { tickerToCik, fundamentalsAsOf, PREDECESORES } = await import("../research/edgar.mjs");
+  const { tickerToCik, fundamentalsAsOf, sicSector, PREDECESORES } = await import("../research/edgar.mjs");
+
+  // ── COBERTURA SECTORIAL ────────────────────────────────────────────
+  //
+  // El sector no entra en el score —los percentiles sectoriales se retiraron— pero sí decide
+  // el análisis de SESGO SECTORIAL del backtest, que es el que responde a «¿cuánto de la
+  // ventaja es no tener bancos?». Con un tercio del universo sin clasificar —que es como
+  // estaba— esa pregunta no se podía contestar.
+  //
+  // Suelo bajo a propósito: 38 nombres siguen sin sector A PROPÓSITO porque el SIC no los
+  // resuelve (ver el comentario de `sicSector`). Lo que este test detecta es que el mapa se
+  // ROMPA, no que deje de crecer.
+  {
+    const { loadSP500Historical: cargarT, membersAsOf: miembrosEn } = await import("../research/universe.mjs");
+    const tb = await cargarT();
+    if (!tb?.length) aviso("sin tabla de miembros: no se puede medir la cobertura sectorial");
+    else {
+      const hoy = tb[tb.length - 1].date;
+      const ms = miembrosEn(tb, hoy);
+      let con = 0, tot = 0;
+      for (const k of ms) {
+        const c = await tickerToCik(k).catch(() => null); if (!c) continue;
+        tot++;
+        if (await sicSector(c).catch(() => null)) con++;
+      }
+      const pct = tot ? (100 * con) / tot : 0;
+      ok(pct >= 85, `cobertura sectorial: ${con}/${tot} miembros con sector (${pct.toFixed(0)} %, suelo 85; medido 92)`);
+    }
+  }
 
   // ── LAS SERIES CORTADAS TIENEN QUE ESTAR CORTADAS DE VERDAD ───────────────────
   //

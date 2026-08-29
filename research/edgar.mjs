@@ -260,6 +260,48 @@ export async function sicSector(cik) {
   if (sic >= 4000 && sic <= 4799) return "Industrials";
   if (sic >= 3400 && sic <= 3569) return "Industrials";
   if (sic >= 4900 && sic <= 4999) return "Utilities";
+
+  // ── Rangos que faltaban, y eran 160 de 503 miembros (32 %) ──────────────────────────────
+  //
+  // El mapa original cubría poco más de la mitad del índice. Los que caían fuera salían con
+  // sector vacío, y eso no rompe nada —el score no usa el sector desde que los percentiles
+  // sectoriales se retiraron— pero sí deja ciego el análisis de SESGO SECTORIAL del backtest,
+  // que es justo el que responde a «¿cuánto de la ventaja es no tener bancos?». Con un tercio
+  // del universo sin clasificar, esa pregunta no se podía contestar.
+  //
+  // Añadidos por tamaño del hueco, y sólo donde el SIC no deja dudas:
+  if (sic >= 3841 && sic <= 3851) return "Healthcare";              // 19: instrumental médico y quirúrgico
+  if (sic === 6798) return "Real Estate";                           // 28: REITs
+  if (sic === 6792) return "Energy";                                // regalías de petróleo (TPL)
+  if (sic >= 7000 && sic <= 7099) return "Consumer Cyclical";       // 6: hoteles y casinos
+  if (sic >= 5000 && sic <= 5199) return "Industrials";             // 6: mayoristas
+  if (sic >= 2600 && sic <= 2699) return "Materials";               // 5: papel y envases
+  if (sic >= 1500 && sic <= 1599) return "Consumer Cyclical";       // 4: constructoras de vivienda
+  if (sic >= 3300 && sic <= 3399) return "Materials";               // 4: metalurgia primaria
+  if (sic >= 2200 && sic <= 2399) return "Consumer Cyclical";       // 4: textil y confección
+  if (sic >= 7800 && sic <= 7999) return "Communication Services";  // 4: cine y entretenimiento
+  if (sic >= 2700 && sic <= 2799) return "Communication Services";  // 2: edición y prensa
+  if (sic >= 1400 && sic <= 1499) return "Materials";               // 2: minería no metálica
+  if (sic >= 3000 && sic <= 3099) return "Consumer Cyclical";       // 2: caucho y plástico
+  if (sic >= 3900 && sic <= 3999) return "Consumer Cyclical";       // 2: manufactura diversa
+  if (sic >= 100 && sic <= 999) return "Consumer Defensive";        // agricultura
+  if (sic === 7311) return "Communication Services";                // publicidad (IPG, OMC)
+  if (sic === 7320) return "Financial Services";                    // calificación y crédito (MCO, SPGI, EFX)
+  if (sic === 7359 || sic === 7381) return "Industrials";           // alquiler de equipo, seguridad
+  if (sic === 7389) return "Technology";                            // 16: «servicios NEC», mayoría tecnológicas
+  if (sic === 3812) return "Industrials";                           // defensa y aeronáutica (LHX, NOC, TDY)
+
+  // ⚠️ Y AQUÍ SE PARA A PROPÓSITO. 3820-3829 son «instrumentos de medida», y el SIC no los
+  // resuelve: de los 16 miembros que caen ahí, seis son de salud (Thermo Fisher, Danaher,
+  // Agilent, Waters, Mettler, Revvity), cuatro de tecnología (Keysight, Teradyne, KLA,
+  // Trimble) y seis industriales (Roper, Rockwell, Ametek, Fortive, Trane, Veralto). Seis
+  // contra cuatro contra seis: no hay mayoría que valga.
+  //
+  // Mapearlos «por no dejarlos vacíos» pondría a Thermo Fisher entre las industriales, y para
+  // un análisis de sesgo sectorial eso es PEOR que no clasificarlos — un hueco se ve y se
+  // cuenta, una etiqueta equivocada no. Lo mismo con 3600-3669 (equipo eléctrico: GE y Emerson
+  // conviven con Qualcomm y Motorola). Si algún día hacen falta, la fuente correcta no es el
+  // SIC sino una tabla GICS.
   return "";
 }
 
