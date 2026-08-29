@@ -763,7 +763,11 @@ const REV = ["RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", 
              //
              // Va el último a propósito: así sólo actúa donde no hay nada mejor y no puede
              // desplazar a un tag estándar en las fechas que ya cubría.
-             "OilAndGasRevenue"];
+             "OilAndGasRevenue",
+             // Ingresos de gestoras y broker-dealers, tambien al final. BlackRock lo usa desde
+             // 2007 y es lo unico que cubre su historia anterior a 2016: su CIK predecesor tiene
+             // balance desde 2008 pero los tags estandar de ingresos no arrancan hasta 2016.
+             "RevenuesExcludingInterestAndDividends"];
 
 /**
  * SEGUNDO RECURSO para los ingresos: sólo se consulta si `REV` no ha dado NADA.

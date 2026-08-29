@@ -314,6 +314,23 @@ if (SIN_RED) {
   console.log("\n  B · humo contra la SEC (seis nombres, uno por defecto)\n");
   const { tickerToCik, fundamentalsAsOf, sicSector, PREDECESORES } = await import("../research/edgar.mjs");
 
+  // ── BLACKROCK ANTES DE 2019 ────────────────────────────────────────
+  //
+  // Un top-25 del índice que estuvo invisible en toda su historia anterior a 2019. La fusión
+  // con el CIK predecesor le devolvió el balance, pero no los ingresos: los tags estándar de
+  // `BlackRock Finance` no arrancan hasta 2016. Lo que cubre 2007-2022 es
+  // `RevenuesExcludingInterestAndDividends`, la línea propia de gestoras y broker-dealers.
+  //
+  // Va al final de `REV`, así que sólo actúa donde no hay nada mejor — medido: AAPL, JPM, GS y
+  // APA no se mueven ni un dígito.
+  {
+    const cik = await tickerToCik("BLK");
+    const f13 = await fundamentalsAsOf(cik, "2013-06-30");
+    ok(f13?.revTTM > 5e9 && f13.revTTM < 20e9, `BLK tiene ingresos en 2013 (${f13?.revTTM ? (f13.revTTM / 1e9).toFixed(1) + " B" : "NULO"}, se esperan ~9 B)`);
+    const f26 = await fundamentalsAsOf(cik, "2026-06-30");
+    ok(f26?.revTTM > 15e9, `BLK sigue teniendo los ingresos de hoy (${f26?.revTTM ? (f26.revTTM / 1e9).toFixed(1) + " B" : "NULO"})`);
+  }
+
   // ── COBERTURA SECTORIAL ────────────────────────────────────────────
   //
   // El sector no entra en el score —los percentiles sectoriales se retiraron— pero sí decide

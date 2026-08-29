@@ -130,6 +130,26 @@ export async function loadSP500Historical() {
 // reconocieron. La que trae los viejos es la foto congelada — de hecho `MANUAL_CIK` ya tenía
 // que mapear `BK`→BNY y `MMC`→MRSH justamente por eso.
 // ─────────────────────────────────────────────────────────────────────────────
+// ⚠️ ¿POR QUÉ NO SE RELLENA EL HUECO CON EL HISTORIAL DE ESTA SEGUNDA FUENTE?
+//
+// Es la pregunta obvia —el repo mantenido tiene 194 commits desde 2012, y cada uno es una foto
+// point-in-time— así que queda medido para no repetir la investigación (2026-08-29):
+//
+//   · El CSV histórico llega al 2025-08-23 y ahí se congela.
+//   · El mantenido tiene commits hasta el **2025-08-12** y luego SE PARA TAMBIÉN, hasta el
+//     2026-03-04. O sea que ninguna de las dos cubre 2025-08-24 → 2026-03-03: seis meses que
+//     no se pueden rellenar con nada de lo que hay.
+//   · Y lo que decide: **las dos fuentes usan CONVENCIONES DE TICKER DISTINTAS**. La congelada
+//     escribe `BF-B` y `BK`; la mantenida escribe `BF.B` y `BNY`. De las 28 diferencias
+//     entre ambas, unas son altas y bajas de verdad y otras son el MISMO nombre escrito de otra
+//     forma. Empalmarlas sin una capa de normalización haría que Brown-Forman apareciera como
+//     una baja y un alta el mismo día, y Bank of New York igual — sesgo inventado donde no lo
+//     había.
+//
+// Así que rellenar el hueco a medias, con dos convenciones mezcladas, sería PEOR que el hueco:
+// un hueco se declara y se cuenta (`cobertura.membresiaCongelada` del backtest lo publica), y
+// una baja falsa no. Si algún día hace falta cerrarlo de verdad, lo que falta no es más código
+// sino una fuente point-in-time continua, o una tabla de equivalencia entre las dos grafías.
 const SP500_HOY_URL = "https://raw.githubusercontent.com/datasets/s-and-p-500-companies/main/data/constituents.csv";
 const CACHE_HOY = join(CACHE_DIR, "sp500_actual.csv");
 
