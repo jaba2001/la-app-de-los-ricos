@@ -26,7 +26,38 @@ export const CURATED = [
   "XOM", "CVX", "COP", "BA", "CAT", "GE", "HON", "UPS",
 ];
 
-const SP500_URL = "https://raw.githubusercontent.com/hanshof/sp500_constituents/main/sp_500_historical_components.csv";
+// ⚠️ ESTA FUENTE SE CAMBIÓ EL 2026-08-29, y el motivo es el defecto más grave que ha aparecido
+// en todo el trabajo del sesgo de supervivencia: **la fuente anterior tenía sesgo de
+// supervivencia DENTRO**.
+//
+// `hanshof/sp500_constituents` acierta cuándo sale cada empresa —comprobadas seis fechas de
+// adquisición conocidas, todas exactas— pero OMITE EMPRESAS ENTERAS del pasado. El recuento lo
+// dice solo, porque el S&P 500 siempre ha tenido ~500 miembros:
+//
+//     año    hanshof   fja05680
+//     2010     446       498      ← faltan 52
+//     2012     455       497
+//     2014     463       498
+//     2016     479       505
+//     2018     495       506
+//     2024     503       503      ← el déficit se cierra hacia el presente
+//
+// Ese patrón —error que crece hacia atrás— es la firma de una reconstrucción que borra a las que
+// murieron. Y no es inferencia: el 2013-07-01, `hanshof` da 459 nombres y `fja` 497, con CERO
+// nombres que estén sólo en `hanshof`. Es un subconjunto estricto, y los 38 que faltan son
+// `AABA`, `ADT`, `AGN`, `ALTR`, `BEAM`, `BMC`, `DELL`, `DTV`, `EMC`… todas adquiridas.
+//
+// O sea que la ventana 2011-2018 del backtest corría sobre un universo al que le faltaba el
+// 8-10 % de sus miembros, **precisamente los que desaparecieron** — y el universo equiponderado
+// que sirve de referencia estaba sesgado al alza por lo mismo. El trabajo de §10 (resolver los
+// CIK de los tickers muertos) partía de una lista ya truncada.
+//
+// Y `hanshof` además se congeló aguas arriba el 2025-08-24. `fja05680/sp500` sigue mantenida
+// (último commit 2026-07-13), cubre 1996-01-02 → 2026-06-30 en 2.718 fechas y usa el MISMO
+// formato. La única diferencia de convención observada es `BF.B` frente a `BF-B`, y la nueva
+// usa la misma grafía que la foto de hoy — así que la tabla pasa a ser consistente consigo
+// misma, que antes no lo era.
+const SP500_URL = "https://raw.githubusercontent.com/fja05680/sp500/master/S%26P%20500%20Historical%20Components%20%26%20Changes%20(Updated).csv";
 const CACHE_DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache");
 const CACHE_CSV = join(CACHE_DIR, "sp500_historical_components.csv");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
