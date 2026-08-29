@@ -53,7 +53,9 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 // CURATED no se importa: el backtest que respalda un producto no puede caer en silencio a
 // un universo de laboratorio. Ver el guardián de `construirPanel`.
+import { getHeapStatistics } from "v8";
 import { loadSP500Historical, membersAsOf } from "./universe.mjs";
+import { huellaEntradas } from "./huella.mjs";
 import { señalAt } from "./picksSignal.mjs";
 import { tickerToCik, sicSector } from "./edgar.mjs";
 import { returnsSeries } from "./prices.mjs";
@@ -65,6 +67,36 @@ import { decide, emptyState } from "../lib/picks.ts";
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : d; };
+/**
+ * ⚠️ SE NIEGA A ARRANCAR SIN MEMORIA SUFICIENTE, y eso es el arreglo — no el comentario.
+ *
+ * El 2026-08-29 esta corrida abortó por falta de memoria DESPUÉS de construir las 192 fechas
+ * del panel: cinco horas de trabajo tiradas, el artefacto sin escribir, y los números
+ * publicados siguiendo siendo los del día anterior sin que nada lo dijera.
+ *
+ * Dejarlo documentado en la cabecera no sirve: quien lanza esto y se va no vuelve a leer la
+ * cabecera. Comprobarlo aquí convierte un fallo silencioso de la hora cinco en un error
+ * ruidoso del segundo cero, que es la diferencia entre perder una tarde y perder un minuto.
+ *
+ * El umbral no es un número inventado: la corrida que reventó tenía el límite por defecto y
+ * la que funcionó llevaba 8 GB. Se pide 6 para dejar margen sin exigir de más — y crece con el
+ * universo, así que si vuelve a reventar con 6, hay que subirlo aquí y en el mensaje.
+ */
+const HEAP_MINIMO_MB = 6000;
+{
+  const limite = getHeapStatistics().heap_size_limit / 1024 / 1024;
+  if (limite < HEAP_MINIMO_MB) {
+    console.error(`
+  ⛔ Memoria insuficiente: el límite del montón es ${Math.round(limite)} MB y hacen falta ${HEAP_MINIMO_MB}.`);
+    console.error(`     Esta corrida tarda horas y reventaría al final, después del trabajo caro, sin escribir`);
+    console.error(`     el artefacto — dejando publicados los números de la corrida anterior sin avisar.
+`);
+    console.error(`     node --max-old-space-size=8192 --experimental-strip-types --no-warnings ${process.argv[1].split(/[\/]/).pop()} ${process.argv.slice(2).join(" ")}
+`);
+    process.exit(1);
+  }
+}
+
 const LONG = process.argv.includes("--long");
 const REBUILD = process.argv.includes("--rebuild");
 const SMOKE = process.argv.includes("--smoke");
@@ -570,6 +602,11 @@ console.log(`  ℹ  H3 el precio de la rampa: ${(cPicks.total - cCaja.total).toF
 
 writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_smoke" : ""}.json`), JSON.stringify({
   generatedAt: new Date().toISOString(), window: VENTANA,
+  // ⚠️ DE QUÉ ENTRADAS SALIÓ ESTO. Sin la huella, un artefacto viejo es indistinguible de uno
+  // nuevo salvo mirando la fecha — y nadie la mira. El 2026-08-29 esta corrida abortó por
+  // memoria DESPUÉS del panel, no escribió, y los números publicados siguieron siendo los del
+  // día anterior sin que nada lo dijera. `research/frescura_artefactos.mjs` la comprueba.
+  huella: huellaEntradas(tablaMiembros?.length ? tablaMiembros[tablaMiembros.length - 1].date : null),
   rules: { entry: ENTRY, exit: EXIT, topN: TOP_N, comprasPorFecha: COMPRAS_POR_FECHA, persistenciaDias: PERSISTENCIA_DIAS, dias180: DIAS_180, cuarentenaMeses: CUARENTENA_MESES, costBps: COST_BPS },
   span: { from: eje[0], to: eje.at(-1), decisiones: fechasOk.length, diasMercado: eje.length },
   // Lo que NO entró en el cálculo, que es tan parte del resultado como lo que sí. Sin esto,

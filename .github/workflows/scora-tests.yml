@@ -83,6 +83,13 @@ jobs:
       - name: Guardián de la capa de datos
         run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
 
+      # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
+      # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
+      # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
+      # publicados siguieron siendo los del día anterior sin que nada lo dijera.
+      - name: Frescura de los artefactos publicados
+        run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
+
       - name: Typecheck
         run: npx tsc --noEmit
       - name: CSS regression guard
