@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T13:27:52.707Z",
+  "generatedAt": "2026-08-29T01:25:06.160Z",
   "window": "2011-2018",
   "rules": {
     "entry": 0.8,
@@ -20,12 +20,11 @@
   "cobertura": {
     "posicionesNoValoradas": {
       "sinPanel": [
-        "APOL",
-        "ANSS"
+        "APOL"
       ],
       "sinRetornos": 2,
-      "total": 4,
-      "deCuantas": 91
+      "total": 3,
+      "deCuantas": 92
     },
     "membresiaCongelada": {
       "ultimaFotoReal": "2025-08-23",
@@ -60,12 +59,11 @@
         "ENDP",
         "EQR",
         "CPGX",
-        "ANSS",
         "HFC",
         "WRK"
       ],
       "empiezaTarde": 30,
-      "deCuantos": 454
+      "deCuantos": 455
     },
     "universoEWSinFinancierosFuera": {
       "sinPanel": [
@@ -93,12 +91,11 @@
         "ENDP",
         "EQR",
         "CPGX",
-        "ANSS",
         "HFC",
         "WRK"
       ],
       "empiezaTarde": 30,
-      "deCuantos": 454
+      "deCuantos": 455
     },
     "nota": "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo."
   },
@@ -115,46 +112,46 @@
       "maxDD": -22.9
     },
     "universoEW": {
-      "total": 157.8,
-      "cagr": 12.65,
+      "total": 158,
+      "cagr": 12.67,
       "sharpe": 0.89,
-      "maxDD": -21
+      "maxDD": -21.1
     },
     "universoEWSinFinancieros": {
-      "total": 157.8,
-      "cagr": 12.65,
+      "total": 158,
+      "cagr": 12.67,
       "sharpe": 0.89,
-      "maxDD": -21,
-      "financierosExcluidos": 23,
+      "maxDD": -21.1,
+      "financierosExcluidos": 51,
       "nota": "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)."
     }
   },
   "carteras": {
     "soloPicks": {
-      "total": 162.4,
-      "cagr": 12.9,
-      "sharpe": 0.8,
-      "maxDD": -20
+      "total": 163.1,
+      "cagr": 12.94,
+      "sharpe": 0.81,
+      "maxDD": -19.9
     },
     "conCaja": {
-      "total": 77.9,
-      "cagr": 7.52,
+      "total": 78.6,
+      "cagr": 7.57,
       "sharpe": 0.73,
-      "maxDD": -16.7
+      "maxDD": -16.8
     }
   },
   "mecanica": {
-    "posiciones": 91,
+    "posiciones": 92,
     "mesesHastaLlenar": null,
-    "posicionesMedias": 22.7,
-    "fechasSinCompra": 101,
-    "permanenciaMesesMedia": 23.3,
-    "aciertosPct": 75.9,
+    "posicionesMedias": 22.8,
+    "fechasSinCompra": 100,
+    "permanenciaMesesMedia": 22.9,
+    "aciertosPct": 74.6,
     "motivos": {
       "180 días sin recuperar": 49,
       "fuera del universo": 9,
       "señal bajo umbral 2 evaluaciones": 4,
-      "abierta al cierre": 29
+      "abierta al cierre": 30
     }
   },
   "operaciones": [
@@ -215,20 +212,20 @@
       "retorno": 90.4
     },
     {
-      "t": "MCO",
-      "desde": "2011-05-16",
-      "hasta": "2017-08-15",
-      "motivo": "180 días sin recuperar",
-      "dias": 2283,
-      "retorno": 279.4
-    },
-    {
       "t": "SNI",
-      "desde": "2011-06-01",
+      "desde": "2011-05-16",
       "hasta": "2013-08-15",
       "motivo": "180 días sin recuperar",
-      "dias": 806,
-      "retorno": 55.3
+      "dias": 822,
+      "retorno": 49.7
+    },
+    {
+      "t": "MCO",
+      "desde": "2011-06-01",
+      "hasta": "2017-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 2267,
+      "retorno": 266.1
     },
     {
       "t": "BKNG",
@@ -305,7 +302,7 @@
     {
       "t": "LLTC",
       "desde": "2011-11-01",
-      "hasta": "2012-11-01",
+      "hasta": "2012-09-17",
       "motivo": "180 días sin recuperar",
       "dias": null,
       "retorno": null
@@ -375,14 +372,6 @@
       "retorno": 56.8
     },
     {
-      "t": "WU",
-      "desde": "2012-11-15",
-      "hasta": "2013-08-15",
-      "motivo": "fuera del universo",
-      "dias": 273,
-      "retorno": 47.2
-    },
-    {
       "t": "ORCL",
       "desde": "2012-12-03",
       "hasta": "2014-12-15",
@@ -405,6 +394,14 @@
       "motivo": "señal bajo umbral 2 evaluaciones",
       "dias": 957,
       "retorno": 91.1
+    },
+    {
+      "t": "WU",
+      "desde": "2013-01-15",
+      "hasta": "2013-08-15",
+      "motivo": "fuera del universo",
+      "dias": 212,
+      "retorno": 35.1
     },
     {
       "t": "RL",
@@ -607,36 +604,28 @@
       "retorno": -12.3
     },
     {
-      "t": "CL",
+      "t": "JNJ",
       "desde": "2015-11-16",
       "hasta": "2016-08-15",
-      "motivo": "180 días sin recuperar",
+      "motivo": "fuera del universo",
       "dias": 273,
-      "retorno": 15.9
+      "retorno": 23.5
     },
     {
-      "t": "JNJ",
-      "desde": "2015-12-01",
+      "t": "CL",
+      "desde": "2015-12-15",
       "hasta": "2016-08-15",
-      "motivo": "fuera del universo",
-      "dias": 258,
-      "retorno": 21.2
+      "motivo": "180 días sin recuperar",
+      "dias": 244,
+      "retorno": 13.8
     },
     {
       "t": "LUV",
-      "desde": "2015-12-15",
+      "desde": "2016-01-04",
       "hasta": "2018-05-15",
       "motivo": "180 días sin recuperar",
-      "dias": 882,
-      "retorno": 19.2
-    },
-    {
-      "t": "ORLY",
-      "desde": "2016-01-04",
-      "hasta": "2018-02-01",
-      "motivo": "180 días sin recuperar",
-      "dias": 759,
-      "retorno": 6.6
+      "dias": 862,
+      "retorno": 25.6
     },
     {
       "t": "AAPL",
@@ -647,12 +636,12 @@
       "retorno": 23.1
     },
     {
-      "t": "CTSH",
+      "t": "ORLY",
       "desde": "2016-02-01",
-      "hasta": "2017-08-01",
+      "hasta": "2018-02-01",
       "motivo": "180 días sin recuperar",
-      "dias": 547,
-      "retorno": 11.8
+      "dias": 731,
+      "retorno": -1.1
     },
     {
       "t": "CPRI",
@@ -687,20 +676,20 @@
       "retorno": 49.2
     },
     {
+      "t": "CTSH",
+      "desde": "2016-05-16",
+      "hasta": "2017-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 442,
+      "retorno": 12.7
+    },
+    {
       "t": "FL",
       "desde": "2016-06-01",
       "hasta": "2018-09-17",
       "motivo": "180 días sin recuperar",
       "dias": 838,
       "retorno": -10.1
-    },
-    {
-      "t": "CERN",
-      "desde": "2016-06-15",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 915,
-      "retorno": -0.4
     },
     {
       "t": "ALK",
@@ -711,12 +700,12 @@
       "retorno": 30.9
     },
     {
-      "t": "TSCO",
+      "t": "CERN",
       "desde": "2016-08-01",
-      "hasta": "2017-11-01",
-      "motivo": "180 días sin recuperar",
-      "dias": 457,
-      "retorno": -33.7
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 868,
+      "retorno": -12.7
     },
     {
       "t": "FB",
@@ -725,6 +714,14 @@
       "motivo": "abierta al cierre",
       "dias": 823,
       "retorno": 9.2
+    },
+    {
+      "t": "TSCO",
+      "desde": "2016-10-03",
+      "hasta": "2017-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 394,
+      "retorno": -10.1
     },
     {
       "t": "PAYX",
@@ -755,8 +752,8 @@
       "desde": "2017-09-01",
       "hasta": "2018-05-15",
       "motivo": "fuera del universo",
-      "dias": null,
-      "retorno": null
+      "dias": 256,
+      "retorno": 29.2
     },
     {
       "t": "EA",
@@ -783,12 +780,20 @@
       "retorno": 7.6
     },
     {
-      "t": "ADBE",
+      "t": "BLK",
       "desde": "2017-11-15",
       "hasta": "2018-12-17",
       "motivo": "abierta al cierre",
       "dias": 397,
-      "retorno": 22.9
+      "retorno": -17.2
+    },
+    {
+      "t": "ADBE",
+      "desde": "2017-12-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 381,
+      "retorno": 23.3
     },
     {
       "t": "IDXX",
@@ -855,14 +860,6 @@
       "retorno": -20.8
     },
     {
-      "t": "AOS",
-      "desde": "2018-08-15",
-      "hasta": "2018-12-17",
-      "motivo": "abierta al cierre",
-      "dias": 124,
-      "retorno": -26.5
-    },
-    {
       "t": "NKTR",
       "desde": "2018-10-01",
       "hasta": "2018-12-17",
@@ -879,6 +876,14 @@
       "retorno": -20.9
     },
     {
+      "t": "AOS",
+      "desde": "2018-11-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 46,
+      "retorno": -11.9
+    },
+    {
       "t": "CPRT",
       "desde": "2018-12-03",
       "hasta": "2018-12-17",
@@ -892,257 +897,257 @@
       "entry": 70,
       "exit": 40,
       "soloPicks": 185.7,
-      "conCaja": 140.4,
-      "sharpe": 0.9,
-      "maxDD": -16.7,
-      "vsEW": -17.3,
+      "conCaja": 140.9,
+      "sharpe": 0.89,
+      "maxDD": -17.6,
+      "vsEW": -17.2,
       "posiciones": 82,
-      "pctInvertido": 86
+      "pctInvertido": 87
     },
     {
       "entry": 70,
       "exit": 50,
-      "soloPicks": 189.1,
-      "conCaja": 140.6,
+      "soloPicks": 188.4,
+      "conCaja": 142.5,
       "sharpe": 0.9,
-      "maxDD": -17.3,
-      "vsEW": -17.2,
+      "maxDD": -18,
+      "vsEW": -15.5,
       "posiciones": 84,
       "pctInvertido": 86
     },
     {
       "entry": 70,
       "exit": 60,
-      "soloPicks": 182.2,
-      "conCaja": 138.2,
-      "sharpe": 0.88,
-      "maxDD": -16.9,
-      "vsEW": -19.6,
+      "soloPicks": 178,
+      "conCaja": 135.6,
+      "sharpe": 0.87,
+      "maxDD": -18.1,
+      "vsEW": -22.4,
       "posiciones": 86,
       "pctInvertido": 86
     },
     {
       "entry": 75,
       "exit": 40,
-      "soloPicks": 160.3,
-      "conCaja": 117.7,
-      "sharpe": 0.79,
-      "maxDD": -17.8,
-      "vsEW": -40,
+      "soloPicks": 163.3,
+      "conCaja": 121.8,
+      "sharpe": 0.81,
+      "maxDD": -18,
+      "vsEW": -36.2,
+      "posiciones": 101,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 75,
+      "exit": 50,
+      "soloPicks": 161.4,
+      "conCaja": 120.3,
+      "sharpe": 0.8,
+      "maxDD": -18,
+      "vsEW": -37.7,
       "posiciones": 104,
       "pctInvertido": 86
     },
     {
       "entry": 75,
-      "exit": 50,
-      "soloPicks": 163.2,
-      "conCaja": 118.5,
-      "sharpe": 0.8,
-      "maxDD": -17.5,
-      "vsEW": -39.2,
-      "posiciones": 106,
+      "exit": 60,
+      "soloPicks": 157.3,
+      "conCaja": 114.6,
+      "sharpe": 0.78,
+      "maxDD": -18,
+      "vsEW": -43.4,
+      "posiciones": 105,
       "pctInvertido": 86
     },
     {
-      "entry": 75,
-      "exit": 60,
-      "soloPicks": 160,
-      "conCaja": 113.4,
-      "sharpe": 0.77,
-      "maxDD": -18.1,
-      "vsEW": -44.4,
-      "posiciones": 108,
-      "pctInvertido": 85
-    },
-    {
       "entry": 80,
       "exit": 40,
-      "soloPicks": 162.2,
-      "conCaja": 78,
-      "sharpe": 0.72,
-      "maxDD": -16.8,
-      "vsEW": -79.8,
-      "posiciones": 90,
-      "pctInvertido": 57
-    },
-    {
-      "entry": 80,
-      "exit": 50,
       "soloPicks": 162.4,
-      "conCaja": 77.9,
+      "conCaja": 78.7,
       "sharpe": 0.73,
-      "maxDD": -16.7,
-      "vsEW": -79.9,
+      "maxDD": -16.9,
+      "vsEW": -79.3,
       "posiciones": 91,
+      "pctInvertido": 58
+    },
+    {
+      "entry": 80,
+      "exit": 50,
+      "soloPicks": 163.1,
+      "conCaja": 78.6,
+      "sharpe": 0.73,
+      "maxDD": -16.8,
+      "vsEW": -79.4,
+      "posiciones": 92,
       "pctInvertido": 57
     },
     {
       "entry": 80,
       "exit": 60,
-      "soloPicks": 158.8,
-      "conCaja": 75.2,
+      "soloPicks": 159.5,
+      "conCaja": 75.9,
       "sharpe": 0.71,
-      "maxDD": -16.7,
-      "vsEW": -82.6,
-      "posiciones": 91,
-      "pctInvertido": 56
+      "maxDD": -16.9,
+      "vsEW": -82.2,
+      "posiciones": 92,
+      "pctInvertido": 57
     },
     {
       "entry": 85,
       "exit": 40,
-      "soloPicks": 159.8,
-      "conCaja": 32.6,
+      "soloPicks": 168.6,
+      "conCaja": 32.4,
       "sharpe": 0.6,
-      "maxDD": -8.7,
-      "vsEW": -125.1,
-      "posiciones": 49,
+      "maxDD": -8.8,
+      "vsEW": -125.6,
+      "posiciones": 48,
       "pctInvertido": 27
     },
     {
       "entry": 85,
       "exit": 50,
-      "soloPicks": 160.2,
-      "conCaja": 33.3,
-      "sharpe": 0.62,
+      "soloPicks": 169.1,
+      "conCaja": 33.1,
+      "sharpe": 0.61,
       "maxDD": -8.7,
-      "vsEW": -124.5,
-      "posiciones": 49,
-      "pctInvertido": 27
+      "vsEW": -125,
+      "posiciones": 48,
+      "pctInvertido": 26
     },
     {
       "entry": 85,
       "exit": 60,
-      "soloPicks": 157.6,
-      "conCaja": 32.6,
+      "soloPicks": 166.4,
+      "conCaja": 32.3,
       "sharpe": 0.6,
       "maxDD": -8.7,
-      "vsEW": -125.2,
-      "posiciones": 49,
-      "pctInvertido": 27
+      "vsEW": -125.7,
+      "posiciones": 48,
+      "pctInvertido": 26
     },
     {
       "entry": 90,
       "exit": 40,
-      "soloPicks": 104.6,
-      "conCaja": 7.3,
-      "sharpe": 0.32,
+      "soloPicks": 95.6,
+      "conCaja": 6.3,
+      "sharpe": 0.28,
       "maxDD": -5.4,
-      "vsEW": -150.4,
+      "vsEW": -151.7,
       "posiciones": 19,
       "pctInvertido": 11
     },
     {
       "entry": 90,
       "exit": 50,
-      "soloPicks": 104.6,
-      "conCaja": 7.3,
-      "sharpe": 0.32,
+      "soloPicks": 95.6,
+      "conCaja": 6.3,
+      "sharpe": 0.28,
       "maxDD": -5.4,
-      "vsEW": -150.4,
+      "vsEW": -151.7,
       "posiciones": 19,
       "pctInvertido": 11
     },
     {
       "entry": 90,
       "exit": 60,
-      "soloPicks": 104.6,
-      "conCaja": 7.3,
-      "sharpe": 0.32,
+      "soloPicks": 95.6,
+      "conCaja": 6.3,
+      "sharpe": 0.28,
       "maxDD": -5.4,
-      "vsEW": -150.4,
+      "vsEW": -151.7,
       "posiciones": 19,
       "pctInvertido": 11
     }
   ],
   "ablacionReglas": {
     "reglas completas (§2-§6)": {
-      "soloPicks": 162.4,
-      "conCaja": 77.9,
+      "soloPicks": 163.1,
+      "conCaja": 78.6,
       "sharpe": 0.73,
-      "maxDD": -16.7,
-      "vsEW": -79.9,
-      "posiciones": 91,
+      "maxDD": -16.8,
+      "vsEW": -79.4,
+      "posiciones": 92,
       "pctInvertido": 57
     },
     "sin la regla de 180 días": {
-      "soloPicks": 205.4,
-      "conCaja": 125.8,
-      "sharpe": 0.85,
+      "soloPicks": 205.5,
+      "conCaja": 126.6,
+      "sharpe": 0.86,
       "maxDD": -19.2,
-      "vsEW": -32,
-      "posiciones": 67,
+      "vsEW": -31.4,
+      "posiciones": 66,
       "pctInvertido": 79
     },
     "sin cuarentena de 12 meses": {
-      "soloPicks": 168.1,
-      "conCaja": 82.5,
-      "sharpe": 0.75,
-      "maxDD": -17,
-      "vsEW": -75.3,
+      "soloPicks": 171.9,
+      "conCaja": 84.4,
+      "sharpe": 0.76,
+      "maxDD": -17.1,
+      "vsEW": -73.6,
       "posiciones": 93,
-      "pctInvertido": 58
+      "pctInvertido": 59
     },
     "sin persistencia de 60 días": {
-      "soloPicks": 174.2,
-      "conCaja": 82.1,
+      "soloPicks": 180.4,
+      "conCaja": 85.1,
+      "sharpe": 0.73,
+      "maxDD": -17.7,
+      "vsEW": -72.9,
+      "posiciones": 99,
+      "pctInvertido": 62
+    },
+    "2/fecha = 4 al mes": {
+      "soloPicks": 161.7,
+      "conCaja": 83.1,
+      "sharpe": 0.73,
+      "maxDD": -17.2,
+      "vsEW": -74.9,
+      "posiciones": 96,
+      "pctInvertido": 60
+    },
+    "4/fecha = 8 al mes": {
+      "soloPicks": 152,
+      "conCaja": 83.9,
       "sharpe": 0.72,
-      "maxDD": -17.1,
-      "vsEW": -75.7,
+      "maxDD": -17.2,
+      "vsEW": -74.2,
       "posiciones": 99,
       "pctInvertido": 61
     },
-    "2/fecha = 4 al mes": {
-      "soloPicks": 162.6,
-      "conCaja": 82.9,
-      "sharpe": 0.74,
-      "maxDD": -16.6,
-      "vsEW": -74.8,
-      "posiciones": 96,
-      "pctInvertido": 59
-    },
-    "4/fecha = 8 al mes": {
-      "soloPicks": 155.2,
-      "conCaja": 84.6,
-      "sharpe": 0.74,
-      "maxDD": -16.6,
-      "vsEW": -73.2,
-      "posiciones": 99,
-      "pctInvertido": 60
-    },
     "sin 180d + 4 al mes": {
-      "soloPicks": 193.3,
-      "conCaja": 127.4,
-      "sharpe": 0.83,
-      "maxDD": -19.9,
-      "vsEW": -30.4,
-      "posiciones": 70,
-      "pctInvertido": 83
+      "soloPicks": 193.5,
+      "conCaja": 129.5,
+      "sharpe": 0.84,
+      "maxDD": -19.8,
+      "vsEW": -28.6,
+      "posiciones": 69,
+      "pctInvertido": 82
     },
     "sin 180d + 8 al mes": {
-      "soloPicks": 185.6,
-      "conCaja": 128.6,
+      "soloPicks": 188.3,
+      "conCaja": 130.2,
       "sharpe": 0.82,
       "maxDD": -20.2,
-      "vsEW": -29.2,
-      "posiciones": 69,
-      "pctInvertido": 85
+      "vsEW": -27.8,
+      "posiciones": 68,
+      "pctInvertido": 86
     },
     "v2 · p70 · 4 al mes · sin180d": {
-      "soloPicks": 168.3,
-      "conCaja": 140.1,
+      "soloPicks": 170.7,
+      "conCaja": 142.2,
       "sharpe": 0.82,
       "maxDD": -19.4,
-      "vsEW": -17.7,
-      "posiciones": 72,
+      "vsEW": -15.8,
+      "posiciones": 71,
       "pctInvertido": 92
     },
     "v2 · p70 · 8 al mes · sin180d": {
-      "soloPicks": 150.4,
-      "conCaja": 134.4,
-      "sharpe": 0.75,
+      "soloPicks": 152.6,
+      "conCaja": 135.5,
+      "sharpe": 0.76,
       "maxDD": -21.5,
-      "vsEW": -23.4,
-      "posiciones": 73,
+      "vsEW": -22.5,
+      "posiciones": 72,
       "pctInvertido": 96
     }
   },

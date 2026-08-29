@@ -34,8 +34,19 @@
 // SIN LOOK-AHEAD: la señal de cada fecha usa `fundamentalsAsOf` (EDGAR a esa fecha) y la
 // membresía del índice a esa fecha. Los precios sólo se usan hacia adelante.
 //
-//   node --experimental-strip-types --no-warnings research/picks_rules_backtest.mjs [--long]
-//        [--entry 80] [--exit 50] [--top 40] [--rebuild]
+// ⚠️ CON `--max-old-space-size=8192`, y no es una precaución: la ventana antigua REVIENTA sin
+// él. El 2026-08-29 abortó con «JavaScript heap out of memory» DESPUÉS de construir las 192
+// fechas del panel — o sea tras la parte cara, en el análisis. Y aborta de la peor manera
+// posible para quien lo lanza y se va: el panel queda escrito, el artefacto NO, así que los
+// números publicados siguen siendo los de la corrida anterior y nada lo dice.
+//
+// El consumo crece con el universo, y el universo crece cada vez que se arregla la cobertura:
+// esa corrida fue la primera con BlackRock dentro. Si vuelve a reventar, súbelo más.
+//
+// Si el panel ya está en disco y sólo se quiere recalcular, se omite `--rebuild` y tarda
+// minutos en vez de horas.
+//
+//   node --max-old-space-size=8192 --experimental-strip-types --no-warnings //        research/picks_rules_backtest.mjs [--long] [--entry 80] [--exit 50] [--top 40] [--rebuild]
 // ─────────────────────────────────────────────────────────────────────────────
 import { writeFileSync, readFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
