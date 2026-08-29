@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-26T00:57:36.272Z",
+ "generatedAt": "2026-08-29T01:08:49.515Z",
  "fuente": "research/cobertura_metricas.mjs",
  "asOf": "2026-06-30",
  "minMetricas": 3,
@@ -155,14 +155,17 @@
   ],
   "Consumer Defensive": [
    "ADM",
-   "BG"
+   "BG",
+   "CTVA"
   ],
   "Technology": [
    "ADP",
    "ANET",
    "CDNS",
+   "DASH",
    "DDOG",
    "FFIV",
+   "FI",
    "IBM",
    "MPWR",
    "NOW",
@@ -175,58 +178,12 @@
    "PCG",
    "SRE"
   ],
-  "(sin sector)": [
-   "ALGN",
-   "ARE",
-   "AVY",
-   "BXP",
-   "CPT",
-   "CTVA",
-   "DASH",
-   "DECK",
-   "DHI",
-   "DOC",
-   "EMR",
-   "ETN",
-   "FI",
-   "GE",
-   "GRMN",
-   "INCY",
-   "IP",
-   "ISRG",
-   "JCI",
-   "KLAC",
-   "LEN",
-   "LKQ",
-   "MAA",
-   "MAR",
-   "MTD",
-   "NKE",
-   "NUE",
-   "NVR",
-   "NWS",
-   "NWSA",
-   "O",
-   "PHM",
-   "PSA",
-   "TMO",
-   "TPL",
-   "VICI",
-   "VTR",
-   "WELL"
-  ],
-  "Industrials": [
-   "BALL",
-   "BKR",
-   "DE",
-   "EXPD",
-   "SWK",
-   "UNP"
-  ],
   "Healthcare": [
+   "ALGN",
    "BIIB",
    "BMY",
    "HCA",
+   "ISRG",
    "JNJ",
    "LLY",
    "MRK",
@@ -234,13 +191,39 @@
    "VRTX",
    "ZTS"
   ],
+  "Real Estate": [
+   "ARE",
+   "BXP",
+   "CPT",
+   "DOC",
+   "INVH",
+   "MAA",
+   "O",
+   "PSA",
+   "VICI",
+   "VTR",
+   "WELL"
+  ],
   "Materials": [
+   "AVY",
    "CLX",
    "DD",
    "DOW",
    "EMN",
+   "IP",
    "NEM",
+   "NUE",
    "PPG"
+  ],
+  "Industrials": [
+   "BALL",
+   "BKR",
+   "DE",
+   "EXPD",
+   "GRMN",
+   "LKQ",
+   "SWK",
+   "UNP"
   ],
   "Energy": [
    "COP",
@@ -249,26 +232,43 @@
    "OXY",
    "PSX",
    "SLB",
+   "TPL",
    "XOM"
   ],
   "Consumer Cyclical": [
    "CPRT",
+   "DECK",
+   "DHI",
    "F",
    "GM",
    "KMX",
+   "LEN",
+   "MAR",
+   "NKE",
+   "NVR",
    "PCAR",
+   "PHM",
    "SHW",
    "TJX",
    "TXT",
    "WSM"
   ],
+  "(sin sector)": [
+   "EMR",
+   "ETN",
+   "GE",
+   "INCY",
+   "JCI",
+   "KLAC",
+   "MTD",
+   "TMO"
+  ],
   "Communication Services": [
    "FOX",
    "FOXA",
+   "NWS",
+   "NWSA",
    "PSKY"
-  ],
-  "Real Estate": [
-   "INVH"
   ]
  },
  "dependeDe": {
