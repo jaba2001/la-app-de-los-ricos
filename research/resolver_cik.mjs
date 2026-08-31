@@ -58,7 +58,7 @@
 //
 //   node --experimental-strip-types --no-warnings research/resolver_cik.mjs [--desde 2010-01-01]
 // ─────────────────────────────────────────────────────────────────────────────
-import { writeFileSync, existsSync, mkdirSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { loadSP500Historical, cikDeMiembrosActuales } from "./universe.mjs";
@@ -172,12 +172,83 @@ function chocaConOtro(cik, ticker) {
 }
 
 // ── Resolución ────────────────────────────────────────────────────────────────────────────
+/**
+ * ⚠️ INCREMENTAL, y no por comodidad: sin esto una corrida de dos horas que muera al 90 % lo
+ * pierde TODO.
+ *
+ * Este guion escribía su evidencia una sola vez, al final. El 2026-08-29 murió por el camino
+ * —el proceso de fondo no sobrevivió al cierre de la sesión— con 116 de 213 nombres ya
+ * interrogados a la SEC, y no quedó ni uno. Es el mismo defecto que el backtest tenía con la
+ * memoria: el trabajo caro hecho, el resultado sin escribir, y nada que lo diga.
+ *
+ * Ahora hereda lo ya resuelto y guarda cada pocos nombres. `--rehacer` fuerza empezar de cero.
+ */
+const REHACER = process.argv.includes("--rehacer");
+const yaResuelto = new Map();
+if (!REHACER && !solo) {
+  // ⚠️ EL CATCH NO SE TRAGA CUALQUIER COSA, y la primera versión de esto sí lo hacía.
+  //
+  // «No hay fichero previo» es normal y se sigue sin él. Un fallo de programación NO: la
+  // primera versión olvidó importar `readFileSync`, el `ReferenceError` cayó en un catch
+  // vacío, y la herencia simplemente no ocurrió — sin error, sin aviso, y con la corrida
+  // repitiendo dos horas de trabajo ya hecho. Es el mismo defecto que este repo lleva días
+  // cazando en otros sitios: el catch que convierte un error en un silencio.
+  const rutaPrev = join(OUT, "resolucion_cik.json");
+  if (existsSync(rutaPrev)) {
+    let prev = null;
+    try {
+      prev = JSON.parse(readFileSync(rutaPrev, "utf8"));
+    } catch (e) {
+      console.warn(`  ⚠ la evidencia previa existe pero no se puede leer (${e.message}): se resuelve todo de nuevo`);
+    }
+    if (prev) {
+      for (const f of prev.detalle ?? []) if (f.cik) yaResuelto.set(f.ticker, f);
+      // Los «sin resolver» también se heredan: son una respuesta —se buscó y no había— y volver
+      // a buscarlos cuesta lo mismo para llegar al mismo sitio.
+      for (const f of prev.noResueltos ?? []) yaResuelto.set(f.ticker, { ...f, __sinResolver: true });
+    }
+  }
+}
+
 const filas = [];
 const sinResolver = [];
 let n = 0;
 
+/**
+ * Guarda la evidencia. Se llama cada pocos nombres y al final, no sólo al final: heredar lo ya
+ * resuelto no sirve de nada si el fichero del que se hereda nunca llega a escribirse.
+ *
+ * Temporal + rename, como el resto de lo que escribe este repo: una corrida que muera a mitad
+ * de la escritura dejaría un JSON cortado, y quien lo lea se queda con `{}` sin enterarse.
+ */
+const guardar = () => {
+  const ver = filas.filter((f) => f.estado === "verificado");
+  const rev = filas.filter((f) => f.estado === "revisar");
+  const nivel = (x) => filas.filter((f) => f.evidencia === x);
+  const ruta = join(OUT, "resolucion_cik.json");
+  const tmp = ruta + ".tmp";
+  writeFileSync(tmp, JSON.stringify({
+    generatedAt: new Date().toISOString(), desde: DESDE,
+    pendientes: pendientes.length, verificados: ver.length, aRevisar: rev.length, sinResolver: sinResolver.length,
+    porEvidencia: { A: nivel("A").length, B: nivel("B").length, C: nivel("C").length, fuente: nivel("fuente").length },
+    mapa: Object.fromEntries(filas.map((f) => [f.ticker, f.cik]).sort((a, b) => a[0].localeCompare(b[0]))),
+    detalle: filas, noResueltos: sinResolver,
+    nota: "Sólo el nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) y la fuente de miembros actuales entran solos. Los niveles B y C quedan como `revisar`: producen CIK equivocados y creíbles —Wendy's como dueña de TWC, Life Storage como dueña del LSI de 2010-2014— y ninguna regla automática los distingue.",
+  }, null, 1));
+  renameSync(tmp, ruta);
+};
+
+if (yaResuelto.size) console.log(`  ${yaResuelto.size} ya resueltos en una corrida anterior: se heredan sin volver a preguntar (--rehacer para forzar)
+`);
+
 for (const ticker of pendientes) {
   n++;
+  const heredado = yaResuelto.get(ticker);
+  if (heredado) {
+    if (heredado.__sinResolver) { const { __sinResolver, ...f } = heredado; sinResolver.push(f); }
+    else filas.push(heredado);
+    continue;
+  }
   const desde = primera.get(ticker), hasta = ultima.get(ticker);
   const traza = (m) => process.stdout.write(`\r  ${String(n).padStart(3)}/${pendientes.length}  ${ticker.padEnd(8)} ${m.slice(0, 62).padEnd(63)}`);
 
@@ -290,6 +361,9 @@ for (const ticker of pendientes) {
   }
 
   if (elegido) { filas.push(elegido); traza(`✓${elegido.evidencia === "A" ? "" : elegido.evidencia} ${String(elegido.nombre).slice(0, 40)}`); }
+  // Cada quince nombres, por si esto muere: quince es poco trabajo que perder y pocas
+  // escrituras de más.
+  if (!solo && n % 15 === 0) guardar();
   else { sinResolver.push({ ticker, desde, hasta, motivo: "ningún candidato declara el símbolo en su portada", descartes: descartes.slice(0, 6) }); traza("✗ ningún candidato pasa la portada"); }
 }
 console.log("\n");
@@ -329,13 +403,5 @@ if (solo) {
 // Aquí sólo se escribe la EVIDENCIA. Convertirla en los ficheros que consume el código es un
 // paso aparte —`research/publicar_resolucion.mjs`— porque esto tarda dos horas y aquello dos
 // segundos: separarlos permite rehacer los mapas sin volver a interrogar a la SEC entera.
-const ruta = join(OUT, "resolucion_cik.json");
-writeFileSync(ruta, JSON.stringify({
-  generatedAt: new Date().toISOString(), desde: DESDE,
-  pendientes: pendientes.length, verificados: verificados.length, aRevisar: aRevisar.length, sinResolver: sinResolver.length,
-  porEvidencia: { A: porNivel("A").length, B: porNivel("B").length, C: porNivel("C").length, fuente: porNivel("fuente").length },
-  mapa: Object.fromEntries(filas.map((f) => [f.ticker, f.cik]).sort((a, b) => a[0].localeCompare(b[0]))),
-  detalle: filas, noResueltos: sinResolver,
-  nota: "Sólo el nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) y la fuente de miembros actuales entran solos. Los niveles B y C quedan como `revisar`: producen CIK equivocados y creíbles —Wendy's como dueña de TWC, Life Storage como dueña del LSI de 2010-2014— y ninguna regla automática los distingue.",
-}, null, 1));
+guardar();
 console.log(`\n  → ${ruta}\n`);
