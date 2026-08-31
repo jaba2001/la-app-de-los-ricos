@@ -121,9 +121,24 @@ const mapa = Object.fromEntries(entradas.map(([t, c]) => [t, c]).sort((a, b) => 
 //
 // El umbral no es cero porque una revisión legítima SÍ puede retirar un CIK dudoso, y eso debe
 // poder ocurrir sin pelearse con un guardián. Lo que no debe ocurrir es perder un tercio.
-const previoMapa = (() => {
-  try { return JSON.parse(readFileSync(join(DATA, "cik_historicos.json"), "utf8"))?.mapa ?? null; } catch { return null; }
-})();
+// ⚠️ Y este catch tampoco puede tragarse el error, o el guardián se desactiva solo. Si el
+// fichero NO EXISTE es la primera publicación y no hay nada que proteger; si existe y no se
+// puede leer, el guardián se quedaría mudo justo cuando algo va mal — que es el mismo defecto
+// que este guardián existe para evitar, un piso más abajo.
+const rutaPrevia = join(DATA, "cik_historicos.json");
+let previoMapa = null;
+if (existsSync(rutaPrevia)) {
+  try {
+    previoMapa = JSON.parse(readFileSync(rutaPrevia, "utf8"))?.mapa ?? null;
+  } catch (e) {
+    console.error(`
+  ⛔ ${rutaPrevia} existe pero no se puede leer (${e.message}).`);
+    console.error(`     Sin él no se puede comprobar si el mapa nuevo encoge, así que no se publica.`);
+    console.error(`     Bórralo a mano si de verdad quieres publicar sin esa comprobación.
+`);
+    process.exit(1);
+  }
+}
 if (previoMapa) {
   const antes = Object.keys(previoMapa).length, ahora = Object.keys(mapa).length;
   const perdidos = Object.keys(previoMapa).filter((t) => !mapa[t]);

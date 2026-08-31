@@ -21,17 +21,49 @@ const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabas
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 // 1) current risk-on from the live macro_state row (the same field the app reads).
+//
+// ⚠️ UN FALLO DE RED NO PUEDE VALER 50, y valía. Esto decide un CAMBIO DE RÉGIMEN —≥50 acciones,
+// <50 cesta defensiva— así que el `?? 50` de antes dejaba cualquier error justo en la frontera
+// y **del lado de acciones**. Si Supabase no respondía y el régimen real era 20, el fondo se
+// rebalanceaba entero a renta variable; y la fila que escribía decía `risk_on: 50`, afirmando
+// en la base de datos un dato que nadie había observado.
+//
+// Es el mismo defecto que ya bloqueó a Avon, acusó a Equity Residential y borró a Marathon Oil
+// del mapa de CIK: «no he podido mirar» valiendo como un hecho. Aquí era el más caro de los
+// cuatro, porque es la ruta que asigna el dinero.
+//
+// Devuelve el número, o `NO_SE_SABE`. Quien llama NO puede rellenarlo con un valor por defecto.
+const NO_SE_SABE = Symbol("risk-on: no se pudo leer");
 async function fetchRiskOn() {
-  if (!SB_KEY) return null;
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/macro_state?id=eq.1&select=risk_on`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
-    const j = await r.json();
-    const v = Array.isArray(j) ? Number(j[0]?.risk_on) : NaN;
-    return isNaN(v) ? null : v;
-  } catch { return null; }
+  if (!SB_KEY) return NO_SE_SABE;
+  for (let intento = 0; intento < 3; intento++) {
+    try {
+      const r = await fetch(`${SB_URL}/rest/v1/macro_state?id=eq.1&select=risk_on`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+      if (r.ok) {
+        const j = await r.json();
+        const v = Array.isArray(j) ? Number(j[0]?.risk_on) : NaN;
+        // Una fila que existe y trae un risk_on ilegible SÍ es una respuesta rara, pero no es
+        // «no he podido preguntar»: se distingue igualmente, porque tampoco se puede inventar.
+        return Number.isFinite(v) ? v : NO_SE_SABE;
+      }
+    } catch { /* se reintenta */ }
+    await new Promise((ok) => setTimeout(ok, 800 * (intento + 1)));
+  }
+  return NO_SE_SABE;
 }
 
-const riskOn = (process.env.RISK_ON != null ? Number(process.env.RISK_ON) : await fetchRiskOn()) ?? 50;
+const riskOnLeido = process.env.RISK_ON != null ? Number(process.env.RISK_ON) : await fetchRiskOn();
+if (riskOnLeido === NO_SE_SABE || !Number.isFinite(riskOnLeido)) {
+  console.error(`
+  ⛔ No se ha podido leer el risk-on, así que NO se rebalancea.`);
+  console.error(`     Este valor decide el régimen (>=50 acciones, <50 defensivo). Rellenarlo con`);
+  console.error(`     un 50 por defecto pondría la cartera en acciones por un fallo de red, y`);
+  console.error(`     dejaría escrito en la base un risk_on que nadie ha medido.`);
+  console.error(`     Si hace falta forzarlo, RISK_ON=<n> en el entorno.
+`);
+  process.exit(1);
+}
+const riskOn = riskOnLeido;
 console.log(`\n  PAPER FUND rebalance · ${today} · risk-on ${riskOn.toFixed(1)}`);
 
 // 2) GROWTH mandate: regime switch — equities when risk-on (≥50), defensive basket
