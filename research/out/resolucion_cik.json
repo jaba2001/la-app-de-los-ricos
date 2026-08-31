@@ -1,37 +1,46 @@
 {
- "generatedAt": "2026-08-24T23:55:47.117Z",
+ "generatedAt": "2026-08-31T21:53:34.442Z",
  "desde": "2010-01-01",
- "pendientes": 175,
- "verificados": 86,
- "aRevisar": 35,
- "sinResolver": 54,
+ "pendientes": 213,
+ "verificados": 102,
+ "aRevisar": 42,
+ "sinResolver": 69,
  "porEvidencia": {
-  "A": 84,
-  "B": 15,
-  "C": 20,
-  "fuente": 2
+  "A": 101,
+  "B": 16,
+  "C": 26,
+  "fuente": 1
  },
  "mapa": {
   "ABC": "0001140859",
   "ABMD": "0000815094",
   "ADS": "0001101215",
   "AET": "0001122304",
+  "AGN": "0001578845",
+  "AKS": "0000918160",
+  "ALTR": "0000768251",
   "ALXN": "0000899866",
   "ANSS": "0001013462",
   "ANTM": "0001156039",
   "APOL": "0000929887",
   "ARG": "0000804212",
+  "ARNC": "0001790982",
   "ATGE": "0000730464",
   "ATVI": "0000718877",
   "BF.B": "0000014693",
+  "BHGE": "0001701605",
   "BIG": "0000768835",
   "BLL": "0000009389",
+  "BMC": "0000835729",
   "BMS": "0000011199",
+  "BRCM": "0001054374",
   "CBS": "0000813828",
+  "CCE": "0001491675",
   "CDAY": "0001725057",
   "CELG": "0000816284",
   "CEPH": "0000873364",
   "CERN": "0000804753",
+  "CHK": "0000895126",
   "CMA": "0000028412",
   "COG": "0000858470",
   "COL": "0001137411",
@@ -46,8 +55,12 @@
   "DISCA": "0001437107",
   "DISCK": "0001437107",
   "DISH": "0001001082",
+  "DNB": "0001115222",
   "DNR": "0000945764",
+  "DO": "0000949039",
   "DRE": "0000783280",
+  "DTV": "0001465112",
+  "EMC": "0000790070",
   "ENDP": "0001593034",
   "ESRX": "0001532063",
   "ESV": "0000314808",
@@ -64,11 +77,12 @@
   "GENZ": "0000732485",
   "GMCR": "0000909954",
   "GPS": "0000039911",
+  "HAR": "0000800459",
   "HBI": "0001359841",
+  "HCP": "0000765880",
   "HFC": "0000048039",
-  "HNZ": "0001294608",
   "HOLX": "0000859737",
-  "HSP": "0001274057",
+  "HOT": "0000316206",
   "IGT": "0000353944",
   "IPG": "0000051644",
   "JCP": "0001166126",
@@ -76,11 +90,15 @@
   "JNPR": "0001043604",
   "JWN": "0000072333",
   "KSU": "0000054480",
+  "LLL": "0001039101",
   "LLTC": "0000791907",
   "LSI": "0000944314",
   "LVLT": "0000794323",
   "MDP": "0000065011",
+  "MFE": "0000890801",
+  "MNK": "0001567892",
   "MOLX": "0000067472",
+  "MON": "0001110783",
   "MRO": "0000101778",
   "MXIM": "0000743316",
   "MYL": "0001623613",
@@ -88,13 +106,16 @@
   "NFX": "0000912750",
   "NLOK": "0000849399",
   "NLSN": "0001492633",
+  "NSM": "0000070530",
   "NYX": "0001368007",
   "ODP": "0000800240",
   "PBCT": "0001378946",
+  "PCP": "0000079958",
   "PDCO": "0000891024",
-  "PEAK": "0000765880",
   "PETM": "0000863157",
   "PKI": "0000031791",
+  "PLL": "0000075829",
+  "PX": "0000884905",
   "PXD": "0001038357",
   "QEP": "0001108827",
   "QLGC": "0000918386",
@@ -102,10 +123,10 @@
   "RDC": "0000085408",
   "RE": "0001095073",
   "RHT": "0001087423",
-  "RRD": "0000029669",
   "RTN": "0001047122",
+  "SATS": "0001415404",
   "SEE": "0001012100",
-  "SIAL": "0000090185",
+  "SHLD": "0001310067",
   "SIVB": "0000719739",
   "SNI": "0001430602",
   "SPLS": "0000791519",
@@ -115,7 +136,9 @@
   "SWN": "0000007332",
   "SWY": "0000086144",
   "SYMC": "0000849399",
+  "TEG": "0000916863",
   "TGNA": "0000039899",
+  "TIE": "0001011657",
   "TIF": "0000098246",
   "TSS": "0000721683",
   "TWC": "0000030697",
@@ -123,7 +146,6 @@
   "UTX": "0000101829",
   "VIAB": "0001339947",
   "VIAC": "0000813828",
-  "VMRK": "0000906107",
   "WBA": "0001618921",
   "WCG": "0001279363",
   "WIN": "0001282266",
@@ -132,6 +154,7 @@
   "WRK": "0001732845",
   "X": "0001163302",
   "XEC": "0001168054",
+  "XL": "0000875159",
   "XLNX": "0000743988"
  },
  "detalle": [
@@ -142,7 +165,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2023-09-01",
+   "hasta": "2023-08-25",
    "tickersSEC": "COR",
    "nombresAntiguos": "AMERISOURCEBERGEN CORP · AMERISOURCE BERGEN CORP",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2022-11-22",
@@ -188,6 +211,45 @@
    "estado": "verificado"
   },
   {
+   "ticker": "AGN",
+   "cik": "0001578845",
+   "nombre": "Allergan plc",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2020-04-06",
+   "tickersSEC": "",
+   "nombresAntiguos": "Actavis plc · Actavis Ltd",
+   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2020-02-18",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "AKS",
+   "cik": "0000918160",
+   "nombre": "Cleveland-Cliffs Steel Holding Corp",
+   "via": "texto completo",
+   "evidencia": "B",
+   "desde": "2010-01-06",
+   "hasta": "2011-12-14",
+   "tickersSEC": "",
+   "nombresAntiguos": "AK STEEL HOLDING CORP",
+   "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2020-02-20",
+   "estado": "revisar"
+  },
+  {
+   "ticker": "ALTR",
+   "cik": "0000768251",
+   "nombre": "ALTERA CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2015-12-21",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-02-13",
+   "estado": "verificado"
+  },
+  {
    "ticker": "ALXN",
    "cik": "0000899866",
    "nombre": "ALEXION PHARMACEUTICALS, INC.",
@@ -207,7 +269,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2017-06-19",
-   "hasta": "2025-07-17",
+   "hasta": "2025-07-09",
    "tickersSEC": "",
    "nombresAntiguos": "",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2025-02-19",
@@ -253,6 +315,19 @@
    "estado": "revisar"
   },
   {
+   "ticker": "ARNC",
+   "cik": "0001790982",
+   "nombre": "Arconic Corp",
+   "via": "browse-edgar por símbolo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2020-04-03",
+   "tickersSEC": "",
+   "nombresAntiguos": "Arconic Rolled Products Corp",
+   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2020-03-30",
+   "estado": "verificado"
+  },
+  {
    "ticker": "ATGE",
    "cik": "0000730464",
    "nombre": "Covista Inc.",
@@ -272,7 +347,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2015-08-31",
-   "hasta": "2023-10-12",
+   "hasta": "2023-10-02",
    "tickersSEC": "",
    "nombresAntiguos": "ACTIVISION INC /NY",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-02-23",
@@ -284,11 +359,24 @@
    "nombre": "BROWN FORMAN CORP",
    "via": "fuente mantenida",
    "evidencia": "fuente",
-   "desde": "2023-05-09",
-   "hasta": "2026-08-24",
+   "desde": "2010-01-06",
+   "hasta": "2026-08-31",
    "tickersSEC": "BF-A,BF-B",
    "nombresAntiguos": "",
    "comprobacion": "la fuente de miembros actuales empareja ticker y CIK",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "BHGE",
+   "cik": "0001701605",
+   "nombre": "Baker Hughes Co",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2019-10-03",
+   "tickersSEC": "BKR",
+   "nombresAntiguos": "Baker Hughes a GE Co · Bear Newco, Inc.",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2019-02-19",
    "estado": "verificado"
   },
   {
@@ -318,6 +406,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "BMC",
+   "cik": "0000835729",
+   "nombre": "BMC SOFTWARE INC",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2013-09-09",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2013-05-09",
+   "estado": "verificado"
+  },
+  {
    "ticker": "BMS",
    "cik": "0000011199",
    "nombre": "Amcor Flexibles North America, Inc.",
@@ -328,6 +429,19 @@
    "tickersSEC": "",
    "nombresAntiguos": "BEMIS CO INC",
    "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2012-02-29",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "BRCM",
+   "cik": "0001054374",
+   "nombre": "BROADCOM CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2016-01-26",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-01-29",
    "estado": "verificado"
   },
   {
@@ -344,13 +458,26 @@
    "estado": "revisar"
   },
   {
+   "ticker": "CCE",
+   "cik": "0001491675",
+   "nombre": "COCA-COLA EUROPEAN PARTNERS US, LLC",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2016-05-24",
+   "tickersSEC": "",
+   "nombresAntiguos": "COCA-COLA ENTERPRISES, INC. · International CCE Inc.",
+   "comprobacion": "el emisor nombra su propio documento «cce-20131231_10k.htm» · 10-K de 2014-02-07",
+   "estado": "revisar"
+  },
+  {
    "ticker": "CDAY",
    "cik": "0001725057",
    "nombre": "Dayforce, Inc.",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2021-09-20",
-   "hasta": "2024-02-01",
+   "hasta": "2023-12-18",
    "tickersSEC": "",
    "nombresAntiguos": "Ceridian HCM Holding Inc.",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-03-01",
@@ -396,13 +523,26 @@
    "estado": "verificado"
   },
   {
+   "ticker": "CHK",
+   "cik": "0000895126",
+   "nombre": "EXPAND ENERGY Corp",
+   "via": "browse-edgar por símbolo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2018-03-16",
+   "tickersSEC": "EXE",
+   "nombresAntiguos": "CHESAPEAKE ENERGY CORP",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2018-02-22",
+   "estado": "verificado"
+  },
+  {
    "ticker": "CMA",
    "cik": "0000028412",
    "nombre": "COMERICA INC",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2024-06-22",
+   "hasta": "2024-05-08",
    "tickersSEC": "",
    "nombresAntiguos": "COMERICA INC /NEW/",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-28",
@@ -480,7 +620,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2020-09-21",
-   "hasta": "2024-12-18",
+   "hasta": "2024-11-26",
    "tickersSEC": "",
    "nombresAntiguos": "PTS Holdings Corp.",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-09-06",
@@ -493,10 +633,10 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2021-10-04",
-   "hasta": "2025-08-23",
+   "hasta": "2026-04-09",
    "tickersSEC": "",
    "nombresAntiguos": "CABOT OIL & GAS CORP",
-   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2025-02-25",
+   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2026-02-27",
    "estado": "verificado"
   },
   {
@@ -571,10 +711,23 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2017-03-13",
-   "hasta": "2023-06-19",
+   "hasta": "2023-06-07",
    "tickersSEC": "",
    "nombresAntiguos": "ECHOSTAR COMMUNICATIONS CORP",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-02-23",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "DNB",
+   "cik": "0001115222",
+   "nombre": "DUN & BRADSTREET CORP/NW",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2017-04-04",
+   "tickersSEC": "",
+   "nombresAntiguos": "NEW D&B CORP",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2017-02-23",
    "estado": "verificado"
   },
   {
@@ -591,16 +744,55 @@
    "estado": "revisar"
   },
   {
+   "ticker": "DO",
+   "cik": "0000949039",
+   "nombre": "DIAMOND OFFSHORE DRILLING, INC.",
+   "via": "browse-edgar por símbolo",
+   "evidencia": "B",
+   "desde": "2010-01-06",
+   "hasta": "2016-09-28",
+   "tickersSEC": "",
+   "nombresAntiguos": "DIAMOND OFFSHORE DRILLING INC",
+   "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-28",
+   "estado": "revisar"
+  },
+  {
    "ticker": "DRE",
    "cik": "0000783280",
    "nombre": "DUKE REALTY CORP",
-   "via": "browse-edgar por símbolo",
+   "via": "texto completo",
    "evidencia": "A",
    "desde": "2017-07-26",
    "hasta": "2022-09-19",
    "tickersSEC": "",
    "nombresAntiguos": "DUKE WEEKS REALTY CORP · DUKE REALTY INVESTMENTS INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2022-02-18",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "DTV",
+   "cik": "0001465112",
+   "nombre": "DIRECTV",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2015-07-23",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-02-25",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "EMC",
+   "cik": "0000790070",
+   "nombre": "EMC CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2016-09-06",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2016-02-25",
    "estado": "verificado"
   },
   {
@@ -753,7 +945,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2018-06-20",
-   "hasta": "2024-03-25",
+   "hasta": "2024-03-18",
    "tickersSEC": "CPAY",
    "nombresAntiguos": "FLEETCOR TECHNOLOGIES INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-29",
@@ -805,10 +997,23 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2022-01-20",
+   "hasta": "2022-01-10",
    "tickersSEC": "GAP",
    "nombresAntiguos": "",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2021-03-16",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "HAR",
+   "cik": "0000800459",
+   "nombre": "HARMAN INTERNATIONAL INDUSTRIES INC /DE/",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2017-03-10",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2016-08-11",
    "estado": "verificado"
   },
   {
@@ -825,6 +1030,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "HCP",
+   "cik": "0000765880",
+   "nombre": "HEALTHPEAK PROPERTIES, INC.",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2019-10-18",
+   "tickersSEC": "DOC",
+   "nombresAntiguos": "HCP, INC. · HEALTH CARE PROPERTY INVESTORS INC",
+   "comprobacion": "el emisor nombra su propio documento «hcp-10q6302019.htm» · 10-Q de 2019-08-01",
+   "estado": "revisar"
+  },
+  {
    "ticker": "HFC",
    "cik": "0000048039",
    "nombre": "HollyFrontier Corp",
@@ -838,43 +1056,30 @@
    "estado": "verificado"
   },
   {
-   "ticker": "HNZ",
-   "cik": "0001294608",
-   "nombre": "Solo Cup CO",
-   "via": "texto completo",
-   "evidencia": "A",
-   "desde": "2010-01-06",
-   "hasta": "2013-06-06",
-   "tickersSEC": "",
-   "nombresAntiguos": "",
-   "comprobacion": "el emisor se cita a sí mismo con su símbolo · 10-K de 2012-03-23",
-   "estado": "verificado"
-  },
-  {
    "ticker": "HOLX",
    "cik": "0000859737",
    "nombre": "HOLOGIC INC",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2016-03-30",
-   "hasta": "2025-08-23",
+   "hasta": "2026-03-23",
    "tickersSEC": "",
    "nombresAntiguos": "HOLOGIC INC",
-   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-11-27",
+   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2025-11-18",
    "estado": "verificado"
   },
   {
-   "ticker": "HSP",
-   "cik": "0001274057",
-   "nombre": "HOSPIRA INC",
+   "ticker": "HOT",
+   "cik": "0000316206",
+   "nombre": "STARWOOD HOTELS & RESORTS WORLDWIDE, LLC",
    "via": "texto completo",
-   "evidencia": "A",
+   "evidencia": "C",
    "desde": "2010-01-06",
-   "hasta": "2015-09-01",
+   "hasta": "2016-09-16",
    "tickersSEC": "",
-   "nombresAntiguos": "",
-   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-02-12",
-   "estado": "verificado"
+   "nombresAntiguos": "STARWOOD HOTEL & RESORTS WORLDWIDE, INC · STARWOOD HOTEL & RESORTS WORLDWIDE INC · STARWOOD LODGING CORP · HOTEL INVESTORS CORP",
+   "comprobacion": "el emisor nombra su propio documento «hot-10q_20160630.htm» · 10-Q de 2016-07-29",
+   "estado": "revisar"
   },
   {
    "ticker": "IGT",
@@ -896,7 +1101,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2025-08-23",
+   "hasta": "2025-11-11",
    "tickersSEC": "",
    "nombresAntiguos": "INTERPUBLIC GROUP OF COMPANIES INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2025-02-20",
@@ -935,7 +1140,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2025-07-03",
+   "hasta": "2025-05-19",
    "tickersSEC": "",
    "nombresAntiguos": "JUNIPER NETWORKS INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2025-02-21",
@@ -966,6 +1171,19 @@
    "nombresAntiguos": "KANSAS CITY SOUTHERN INDUSTRIES INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2021-01-29",
    "estado": "verificado"
+  },
+  {
+   "ticker": "LLL",
+   "cik": "0001039101",
+   "nombre": "L3 TECHNOLOGIES, INC.",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2019-06-07",
+   "tickersSEC": "",
+   "nombresAntiguos": "L 3 COMMUNICATIONS CORP",
+   "comprobacion": "el emisor nombra su propio documento «lll-032919x10q.htm» · 10-Q de 2019-05-01",
+   "estado": "revisar"
   },
   {
    "ticker": "LLTC",
@@ -1020,6 +1238,32 @@
    "estado": "verificado"
   },
   {
+   "ticker": "MFE",
+   "cik": "0000890801",
+   "nombre": "McAfee, Inc.",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2011-02-28",
+   "tickersSEC": "",
+   "nombresAntiguos": "NETWORKS ASSOCIATES INC/ · NETWORK ASSOCIATES INC · MCAFEE ASSOCIATES INC",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2011-02-28",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "MNK",
+   "cik": "0001567892",
+   "nombre": "Keenova Therapeutics plc",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2014-08-19",
+   "hasta": "2017-07-25",
+   "tickersSEC": "",
+   "nombresAntiguos": "Mallinckrodt plc",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2016-11-29",
+   "estado": "verificado"
+  },
+  {
    "ticker": "MOLX",
    "cik": "0000067472",
    "nombre": "MOLEX INC",
@@ -1033,13 +1277,26 @@
    "estado": "revisar"
   },
   {
+   "ticker": "MON",
+   "cik": "0001110783",
+   "nombre": "MONSANTO CO /NEW/",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2018-06-06",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor nombra su propio documento «mon-20180228xq2.htm» · 10-Q de 2018-04-05",
+   "estado": "revisar"
+  },
+  {
    "ticker": "MRO",
    "cik": "0000101778",
    "nombre": "MARATHON OIL CORP",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2024-11-22",
+   "hasta": "2024-10-01",
    "tickersSEC": "",
    "nombresAntiguos": "USX CORP",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-22",
@@ -1101,7 +1358,7 @@
    "ticker": "NLOK",
    "cik": "0000849399",
    "nombre": "Gen Digital Inc.",
-   "via": "browse-edgar por símbolo",
+   "via": "texto completo",
    "evidencia": "A",
    "desde": "2019-11-05",
    "hasta": "2022-11-01",
@@ -1124,6 +1381,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "NSM",
+   "cik": "0000070530",
+   "nombre": "NATIONAL SEMICONDUCTOR CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2011-09-21",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2011-07-27",
+   "estado": "verificado"
+  },
+  {
    "ticker": "NYX",
    "cik": "0001368007",
    "nombre": "NYSE Euronext",
@@ -1140,7 +1410,7 @@
    "ticker": "ODP",
    "cik": "0000800240",
    "nombre": "ODP Corp",
-   "via": "browse-edgar por símbolo",
+   "via": "texto completo",
    "evidencia": "B",
    "desde": "2010-01-06",
    "hasta": "2010-12-17",
@@ -1163,6 +1433,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "PCP",
+   "cik": "0000079958",
+   "nombre": "PRECISION CASTPARTS CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2016-01-26",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-05-28",
+   "estado": "verificado"
+  },
+  {
    "ticker": "PDCO",
    "cik": "0000891024",
    "nombre": "PATTERSON COMPANIES, INC.",
@@ -1174,19 +1457,6 @@
    "nombresAntiguos": "PATTERSON DENTAL CO",
    "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2024-06-18",
    "estado": "revisar"
-  },
-  {
-   "ticker": "PEAK",
-   "cik": "0000765880",
-   "nombre": "HEALTHPEAK PROPERTIES, INC.",
-   "via": "browse-edgar por símbolo",
-   "evidencia": "A",
-   "desde": "2019-11-05",
-   "hasta": "2024-03-03",
-   "tickersSEC": "DOC",
-   "nombresAntiguos": "HCP, INC. · HEALTH CARE PROPERTY INVESTORS INC",
-   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-09",
-   "estado": "verificado"
   },
   {
    "ticker": "PETM",
@@ -1208,11 +1478,37 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2023-05-17",
+   "hasta": "2023-05-04",
    "tickersSEC": "RVTY",
    "nombresAntiguos": "PERKINELMER INC · EG&G INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-03-01",
    "estado": "verificado"
+  },
+  {
+   "ticker": "PLL",
+   "cik": "0000075829",
+   "nombre": "PALL CORP",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2015-08-25",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor nombra su propio documento «pll-4302015xq3fy2015.htm» · 10-Q de 2015-05-21",
+   "estado": "revisar"
+  },
+  {
+   "ticker": "PX",
+   "cik": "0000884905",
+   "nombre": "LINDE INC",
+   "via": "texto completo",
+   "evidencia": "C",
+   "desde": "2010-01-06",
+   "hasta": "2018-10-25",
+   "tickersSEC": "",
+   "nombresAntiguos": "PRAXAIR INC",
+   "comprobacion": "el emisor nombra su propio documento «px-q2201810q.htm» · 10-Q de 2018-07-26",
+   "estado": "revisar"
   },
   {
    "ticker": "PXD",
@@ -1221,7 +1517,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2024-05-03",
+   "hasta": "2024-04-02",
    "tickersSEC": "",
    "nombresAntiguos": "",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-22",
@@ -1283,10 +1579,10 @@
    "ticker": "RE",
    "cik": "0001095073",
    "nombre": "EVEREST GROUP, LTD.",
-   "via": "browse-edgar por símbolo",
+   "via": "texto completo",
    "evidencia": "A",
    "desde": "2017-06-19",
-   "hasta": "2023-07-10",
+   "hasta": "2023-06-20",
    "tickersSEC": "EG",
    "nombresAntiguos": "EVEREST RE GROUP LTD · EVEREST REINSURANCE GROUP LTD",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-02-24",
@@ -1306,19 +1602,6 @@
    "estado": "revisar"
   },
   {
-   "ticker": "RRD",
-   "cik": "0000029669",
-   "nombre": "RR Donnelley & Sons Co",
-   "via": "texto completo",
-   "evidencia": "B",
-   "desde": "2010-01-06",
-   "hasta": "2012-12-07",
-   "tickersSEC": "",
-   "nombresAntiguos": "DONNELLEY R R & SONS CO",
-   "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2022-02-24",
-   "estado": "revisar"
-  },
-  {
    "ticker": "RTN",
    "cik": "0001047122",
    "nombre": "RAYTHEON CO/",
@@ -1332,30 +1615,43 @@
    "estado": "verificado"
   },
   {
+   "ticker": "SATS",
+   "cik": "0001415404",
+   "nombre": "EchoStar CORP",
+   "via": "browse-edgar por símbolo",
+   "evidencia": "A",
+   "desde": "2026-03-23",
+   "hasta": "2026-06-22",
+   "tickersSEC": "ECHO",
+   "nombresAntiguos": "EchoStar Holding CORP",
+   "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-Q de 2026-05-11",
+   "estado": "verificado"
+  },
+  {
    "ticker": "SEE",
    "cik": "0001012100",
    "nombre": "SEALED AIR CORP/DE",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2023-12-16",
+   "hasta": "2023-10-18",
    "tickersSEC": "",
    "nombresAntiguos": "WR GRACE & CO/DE · GRACE HOLDING INC · GRACE HOLDINGING INC",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-02-21",
    "estado": "verificado"
   },
   {
-   "ticker": "SIAL",
-   "cik": "0000090185",
-   "nombre": "SIGMA ALDRICH CORP",
+   "ticker": "SHLD",
+   "cik": "0001310067",
+   "nombre": "SEARS HOLDINGS CORP",
    "via": "texto completo",
-   "evidencia": "C",
+   "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2015-11-17",
+   "hasta": "2012-08-23",
    "tickersSEC": "",
    "nombresAntiguos": "",
-   "comprobacion": "el emisor nombra su propio documento «sial-20150930x10q.htm» · 10-Q de 2015-11-03",
-   "estado": "revisar"
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2012-03-14",
+   "estado": "verificado"
   },
   {
    "ticker": "SIVB",
@@ -1475,6 +1771,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "TEG",
+   "cik": "0000916863",
+   "nombre": "INTEGRYS HOLDING, INC.",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2015-06-24",
+   "tickersSEC": "",
+   "nombresAntiguos": "INTEGRYS ENERGY GROUP, INC. · WPS RESOURCES CORP",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2015-03-02",
+   "estado": "verificado"
+  },
+  {
    "ticker": "TGNA",
    "cik": "0000039899",
    "nombre": "TEGNA INC",
@@ -1485,6 +1794,19 @@
    "tickersSEC": "",
    "nombresAntiguos": "GANNETT CO INC /DE/",
    "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2017-02-28",
+   "estado": "verificado"
+  },
+  {
+   "ticker": "TIE",
+   "cik": "0001011657",
+   "nombre": "TITANIUM METALS CORP",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2012-12-21",
+   "tickersSEC": "",
+   "nombresAntiguos": "",
+   "comprobacion": "el emisor se cita a sí mismo con su símbolo · 10-K de 2012-02-29",
    "estado": "verificado"
   },
   {
@@ -1579,26 +1901,13 @@
    "estado": "verificado"
   },
   {
-   "ticker": "VMRK",
-   "cik": "0000906107",
-   "nombre": "VIVMARK RESIDENTIAL",
-   "via": "fuente mantenida",
-   "evidencia": "fuente",
-   "desde": "2026-08-24",
-   "hasta": "2026-08-24",
-   "tickersSEC": "VMRK",
-   "nombresAntiguos": "EQUITY RESIDENTIAL · EQUITY RESIDENTIAL PROPERTIES TRUST",
-   "comprobacion": "la fuente de miembros actuales empareja ticker y CIK",
-   "estado": "verificado"
-  },
-  {
    "ticker": "WBA",
    "cik": "0001618921",
    "nombre": "Walgreens Boots Alliance, Inc.",
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2010-01-06",
-   "hasta": "2025-08-23",
+   "hasta": "2025-08-08",
    "tickersSEC": "",
    "nombresAntiguos": "",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2024-10-15",
@@ -1663,7 +1972,7 @@
    "via": "browse-edgar por símbolo",
    "evidencia": "A",
    "desde": "2015-07-02",
-   "hasta": "2024-07-08",
+   "hasta": "2024-06-24",
    "tickersSEC": "",
    "nombresAntiguos": "Whiskey Holdco, Inc.",
    "comprobacion": "símbolo en la tabla de registro de la §12(b) · 10-K de 2023-11-17",
@@ -1696,6 +2005,19 @@
    "estado": "verificado"
   },
   {
+   "ticker": "XL",
+   "cik": "0000875159",
+   "nombre": "XL GROUP LTD",
+   "via": "texto completo",
+   "evidencia": "A",
+   "desde": "2010-01-06",
+   "hasta": "2018-09-11",
+   "tickersSEC": "",
+   "nombresAntiguos": "XL GROUP PLC · XL CAPITAL LTD · EXEL LTD",
+   "comprobacion": "el emisor declara su símbolo en el Item 5 · 10-K de 2018-02-23",
+   "estado": "verificado"
+  },
+  {
    "ticker": "XLNX",
    "cik": "0000743988",
    "nombre": "XILINX INC",
@@ -1710,6 +2032,12 @@
   }
  ],
  "noResueltos": [
+  {
+   "ticker": "AABA",
+   "desde": "2010-01-06",
+   "hasta": "2017-06-16",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
   {
    "ticker": "ACS",
    "desde": "2010-01-06",
@@ -1735,6 +2063,12 @@
    ]
   },
   {
+   "ticker": "ANRZQ",
+   "desde": "2011-06-02",
+   "hasta": "2012-10-01",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
    "ticker": "AVP",
    "desde": "2010-01-06",
    "hasta": "2015-03-19",
@@ -1753,10 +2087,11 @@
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
     "0000004904 es AEP, que estaba en el índice a la vez",
-    "0000003673 (ALLEGHENY ENERGY, INC): el símbolo no aparece en el documento",
-    "0000821127 (BOSTON PRIVATE FINANCIAL HOLDINGS INC): el símbolo no aparece en el documento",
-    "0000081027 (PUBLIC SERVICE CO OF OKLAHOMA): el símbolo aparece, pero no como símbolo del emisor",
-    "0000050172 (INDIANA MICHIGAN POWER CO): el símbolo aparece, pero no como símbolo del emisor"
+    "0000081027 (PUBLIC SERVICE CO OF OKLAHOMA) no declara flotante público: no pudo ser miembro del índice",
+    "0000050172 (INDIANA MICHIGAN POWER CO) no declara flotante público: no pudo ser miembro del índice",
+    "0000022198 (COLUMBUS SOUTHERN POWER CO /OH/) no declara flotante público: no pudo ser miembro del índice",
+    "0000092487 (SOUTHWESTERN ELECTRIC POWER CO) no declara flotante público: no pudo ser miembro del índice",
+    "0000006879 (APPALACHIAN POWER CO) no declara flotante público: no pudo ser miembro del índice"
    ]
   },
   {
@@ -1768,7 +2103,7 @@
     "0001333563 (FORCE MINERALS CORP): el símbolo aparece, pero no como símbolo del emisor",
     "0000884731 (ARIAD PHARMACEUTICALS INC): el símbolo no aparece en el documento",
     "0000949699 (PHARMACYCLICS INC): el símbolo aparece, pero no como símbolo del emisor",
-    "0001037760 (CEPHEID): el símbolo no aparece en el documento"
+    "0001094847 (ONCOVISTA INNOVATIVE THERAPIES, INC): el símbolo no aparece en el documento"
    ]
   },
   {
@@ -1790,12 +2125,6 @@
    "ticker": "BNI",
    "desde": "2010-01-06",
    "hasta": "2010-02-10",
-   "motivo": "ninguna de las tres vías devuelve candidato"
-  },
-  {
-   "ticker": "BRCM",
-   "desde": "2010-01-06",
-   "hasta": "2016-01-26",
    "motivo": "ninguna de las tres vías devuelve candidato"
   },
   {
@@ -1883,17 +2212,15 @@
    ]
   },
   {
-   "ticker": "DAY",
-   "desde": "2024-02-02",
-   "hasta": "2025-08-23",
+   "ticker": "CVH",
+   "desde": "2010-01-06",
+   "hasta": "2013-05-02",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
-    "0000040545 es GE, que estaba en el índice a la vez",
-    "0000886982 es GS, que estaba en el índice a la vez",
-    "0000070858 es BAC, que estaba en el índice a la vez",
-    "0000723612 (AVIS BUDGET GROUP, INC.): el símbolo no aparece en el documento",
-    "0000788611 (NextTrip, Inc.): el símbolo no aparece en el documento",
-    "0001418819 (Iridium Communications Inc.): el símbolo no aparece en el documento"
+    "0001054833 (COVENTRY HEALTH CARE INC): el símbolo aparece, pero no como símbolo del emisor",
+    "0001179929 (MOLINA HEALTHCARE, INC.): el símbolo aparece, pero no como símbolo del emisor",
+    "0001477294 (Sensata Technologies Holding plc): el símbolo aparece, pero no como símbolo del emisor",
+    "0001064863 (AMERIGROUP CORP): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -1902,10 +2229,11 @@
    "hasta": "2013-05-17",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0000781891 (LML PAYMENT SYSTEMS INC) no declara flotante público: no pudo ser miembro del índice",
     "0001407739 (DUPONT FABROS TECHNOLOGY, INC.): el símbolo aparece, pero no como símbolo del emisor",
-    "0000781891 (LML PAYMENT SYSTEMS INC): el símbolo no aparece en el documento",
     "0000095052 (ELIZABETH ARDEN INC): el símbolo aparece, pero no como símbolo del emisor",
-    "0000941548 (CAMERON INTERNATIONAL CORP): el símbolo no aparece en el documento"
+    "0000941548 (CAMERON INTERNATIONAL CORP): el símbolo no aparece en el documento",
+    "0000018169 (DOLE FOOD CO INC): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -1924,19 +2252,6 @@
    "desde": "2010-01-06",
    "hasta": "2010-12-17",
    "motivo": "ninguna de las tres vías devuelve candidato"
-  },
-  {
-   "ticker": "FI",
-   "desde": "2023-06-08",
-   "hasta": "2025-08-23",
-   "motivo": "ningún candidato declara el símbolo en su portada",
-   "descartes": [
-    "0001166691 es CMCSA, que estaba en el índice a la vez",
-    "0001434647 (ZEVRA THERAPEUTICS, INC.): el símbolo no aparece en el documento",
-    "0000056679 (KORN FERRY): el símbolo no aparece en el documento",
-    "0001632127 (Cable One, Inc.): el símbolo no aparece en el documento",
-    "0001078271 (EXTREME NETWORKS INC): el símbolo no aparece en el documento"
-   ]
   },
   {
    "ticker": "FRC",
@@ -1958,10 +2273,23 @@
    "hasta": "2014-06-24",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0000891178 (EPICOR SOFTWARE CORP) no declara flotante público: no pudo ser miembro del índice",
     "0000038074 (Forest Laboratories, LLC): el símbolo no aparece en el documento",
     "0000880562 (DAEGIS INC.): el símbolo no aparece en el documento",
-    "0000891178 (EPICOR SOFTWARE CORP): el símbolo no aparece en el documento",
-    "0000813762 (ICAHN ENTERPRISES L.P.): el símbolo no aparece en el documento"
+    "0000813762 (ICAHN ENTERPRISES L.P.): el símbolo no aparece en el documento",
+    "0000713425 (LOGILITY SUPPLY CHAIN SOLUTIONS, INC): el símbolo no aparece en el documento"
+   ]
+  },
+  {
+   "ticker": "GAS",
+   "desde": "2010-01-06",
+   "hasta": "2016-06-27",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001126956 (SPIRE INC): el símbolo aparece, pero no como símbolo del emisor",
+    "0001326364 (Sino Gas International Holdings, Inc.): el símbolo aparece, pero no como símbolo del emisor",
+    "0000057183 (SPIRE MISSOURI INC): el símbolo aparece, pero no como símbolo del emisor",
+    "0000068589 (QUESTAR GAS CO): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -1982,10 +2310,12 @@
    "hasta": "2012-07-26",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0001377720 (CYBERDEFENDER CORP) no declara flotante público: no pudo ser miembro del índice",
+    "0001013871 es NRG, que estaba en el índice a la vez",
     "0000042542 (GOODRICH CORP): el símbolo aparece, pero no como símbolo del emisor",
-    "0001377720 (CYBERDEFENDER CORP): el símbolo aparece, pero no como símbolo del emisor",
     "0000921768 (BBX CAPITAL CORP): el símbolo no aparece en el documento",
-    "0000315858 (Bluegreen Vacations Holding Corp): el símbolo no aparece en el documento"
+    "0000315858 (Bluegreen Vacations Holding Corp): el símbolo no aparece en el documento",
+    "0001425392 (GRANT HARTFORD CORP): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -1994,8 +2324,19 @@
    "hasta": "2015-10-28",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
-    "0000921847 (HUDSON CITY BANCORP INC): el símbolo aparece, pero no como símbolo del emisor",
-    "0000912615 (URBAN OUTFITTERS INC): el símbolo aparece, pero no como símbolo del emisor"
+    "0000912615 es URBN, que estaba en el índice a la vez",
+    "0000921847 (HUDSON CITY BANCORP INC): el símbolo aparece, pero no como símbolo del emisor"
+   ]
+  },
+  {
+   "ticker": "HNZ",
+   "desde": "2010-01-06",
+   "hasta": "2013-06-06",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0000046640 (Kraft Heinz Foods Co): el símbolo aparece, pero no como símbolo del emisor",
+    "0001294608 (Solo Cup CO): el símbolo aparece, pero no como símbolo del emisor",
+    "0001508128 (PASSPORT POTASH INC): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -2011,15 +2352,46 @@
    ]
   },
   {
+   "ticker": "HSH",
+   "desde": "2010-01-06",
+   "hasta": "2012-06-25",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001443799 (Euronav MI II Inc.): el símbolo aparece, pero no como símbolo del emisor",
+    "0001011064 (SUNRISE SENIOR LIVING INC): el símbolo aparece, pero no como símbolo del emisor",
+    "0001158463 (JETBLUE AIRWAYS CORP): el símbolo aparece, pero no como símbolo del emisor",
+    "0001018164 (WILLIS LEASE FINANCE CORP): el símbolo aparece, pero no como símbolo del emisor"
+   ]
+  },
+  {
+   "ticker": "HSP",
+   "desde": "2010-01-06",
+   "hasta": "2015-09-01",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
    "ticker": "INFO",
    "desde": "2017-06-02",
    "hasta": "2022-02-17",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
-    "0001121142 (Maxar Technologies Inc.): el símbolo no aparece en el documento",
-    "0001620305 (COMM 2014-CCRE20 Mortgage Trust): el símbolo no aparece en el documento",
-    "0001657045 (NEXT-ChemX Corporation.): el símbolo no aparece en el documento",
-    "0001610796 (JPMBB Commercial Mortgage Securities Trust 2014-C21): el símbolo no aparece en el documento"
+    "0001620305 (COMM 2014-CCRE20 Mortgage Trust) no declara flotante público: no pudo ser miembro del índice",
+    "0001610796 (JPMBB Commercial Mortgage Securities Trust 2014-C21) no declara flotante público: no pudo ser miembro del índice",
+    "0001607484 (J.P. Morgan Chase Commercial Mortgage Securities Trust 2014-C20) no declara flotante público: no pudo ser miembro del índice",
+    "0001637008 (JPMBB Commercial Mortgage Securities Trust 2015-C28) no declara flotante público: no pudo ser miembro del índice",
+    "0001643661 (Citigroup Commercial Mortgage Trust 2015-GC31) no declara flotante público: no pudo ser miembro del índice",
+    "0001121142 (Maxar Technologies Inc.): el símbolo no aparece en el documento"
+   ]
+  },
+  {
+   "ticker": "JAVA",
+   "desde": "2010-01-06",
+   "hasta": "2010-01-21",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001074828 (USBC, Inc.): el símbolo no aparece en el documento",
+    "0001075857 (VIEW SYSTEMS INC): el símbolo no aparece en el documento",
+    "0001405424 (VISION INDUSTRIES CORP): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
@@ -2054,9 +2426,9 @@
     "0001530721 es CPRI, que estaba en el índice a la vez",
     "0001063761 es SPG, que estaba en el índice a la vez",
     "0001116132 es TPR, que estaba en el índice a la vez",
+    "0000883569 es FOSL, que estaba en el índice a la vez",
     "0000078239 es PVH, que estaba en el índice a la vez",
-    "0001001250 es EL, que estaba en el índice a la vez",
-    "0001022344 (SIMON PROPERTY GROUP L P): el símbolo no aparece en el documento"
+    "0001001250 es EL, que estaba en el índice a la vez"
    ]
   },
   {
@@ -2111,10 +2483,11 @@
    "hasta": "2011-05-23",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0000909992 (BEARD CO /OK) no declara flotante público: no pudo ser miembro del índice",
     "0000037748 (Alpha Appalachia Holdings, Inc.): el símbolo no aparece en el documento",
-    "0000909992 (BEARD CO /OK): el símbolo no aparece en el documento",
     "0000728535 (HUNT J B TRANSPORT SERVICES INC): el símbolo no aparece en el documento",
-    "0001412659 (Regenicin, Inc.): el símbolo no aparece en el documento"
+    "0001412659 (Regenicin, Inc.): el símbolo no aparece en el documento",
+    "0001076541 (INNOCOM TECHNOLOGY HOLDINGS, INC.): el símbolo no aparece en el documento"
    ]
   },
   {
@@ -2127,6 +2500,18 @@
     "0001082754 (TEAM HEALTH HOLDINGS INC.): el símbolo aparece, pero no como símbolo del emisor",
     "0000704415 (TIVITY HEALTH, INC.): el símbolo aparece, pero no como símbolo del emisor",
     "0001108109 (COMMUNITY HEALTH SYSTEMS INC): el símbolo no aparece en el documento"
+   ]
+  },
+  {
+   "ticker": "MIL",
+   "desde": "2010-01-06",
+   "hasta": "2010-07-12",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001000230 (OPTICAL CABLE CORP): el símbolo no aparece en el documento",
+    "0001037049 (AURORA GOLD CORP): el símbolo no aparece en el documento",
+    "0001141103 (CROSS COUNTRY HEALTHCARE INC): el símbolo aparece, pero no como símbolo del emisor",
+    "0001135152 (FMC TECHNOLOGIES INC): el símbolo no aparece en el documento"
    ]
   },
   {
@@ -2174,6 +2559,15 @@
    ]
   },
   {
+   "ticker": "NVLS",
+   "desde": "2010-01-06",
+   "hasta": "2012-06-04",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0000836106 (NOVELLUS SYSTEMS INC): el símbolo aparece, pero no como símbolo del emisor"
+   ]
+  },
+  {
    "ticker": "PBG",
    "desde": "2010-01-06",
    "hasta": "2010-02-26",
@@ -2187,9 +2581,52 @@
    ]
   },
   {
-   "ticker": "RVTY (Previously PKI)",
-   "desde": "2023-12-31",
-   "hasta": "2023-12-31",
+   "ticker": "PCL",
+   "desde": "2010-01-06",
+   "hasta": "2016-02-16",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
+   "ticker": "PEAK",
+   "desde": "2019-11-05",
+   "hasta": "2024-02-01",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001452804 (Retrieve Medical Holdings, Inc.): el símbolo aparece, pero no como símbolo del emisor",
+    "0001803498 (Blackstone Private Credit Fund): el símbolo no aparece en el documento",
+    "0001594466 (Pioneer PE Holding LLC): el símbolo no aparece en el documento",
+    "0001698832 (WALL STREET ACQUISITIONS, Corp): el símbolo no aparece en el documento"
+   ]
+  },
+  {
+   "ticker": "PGN",
+   "desde": "2010-01-06",
+   "hasta": "2012-06-29",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
+   "ticker": "PTV",
+   "desde": "2010-01-06",
+   "hasta": "2010-11-08",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001136868 (Exousia Advanced Materials, Inc.) no declara flotante público: no pudo ser miembro del índice",
+    "0000802724 (INSITE VISION INC): el símbolo no aparece en el documento",
+    "0000055772 (KIMBALL INTERNATIONAL INC): el símbolo no aparece en el documento",
+    "0001472468 (XT Energy Group, Inc.): el símbolo no aparece en el documento",
+    "0001433669 (Adelphia Recovery Trust): el símbolo no aparece en el documento"
+   ]
+  },
+  {
+   "ticker": "RRD",
+   "desde": "2010-01-06",
+   "hasta": "2012-12-07",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
+   "ticker": "RSHCQ",
+   "desde": "2010-01-06",
+   "hasta": "2011-06-30",
    "motivo": "ninguna de las tres vías devuelve candidato"
   },
   {
@@ -2198,10 +2635,11 @@
    "hasta": "2010-02-23",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0001058083 (IMS HEALTH INC) no declara flotante público: no pudo ser miembro del índice",
     "0001274057 (HOSPIRA INC): el símbolo no aparece en el documento",
     "0001292900 (INTERLINE BRANDS, INC./DE): el símbolo no aparece en el documento",
     "0000785557 (DLH Holdings Corp.): el símbolo no aparece en el documento",
-    "0001058083 (IMS HEALTH INC): el símbolo aparece, pero no como símbolo del emisor"
+    "0001279363 (WELLCARE HEALTH PLANS, INC.): el símbolo no aparece en el documento"
    ]
   },
   {
@@ -2220,25 +2658,39 @@
    "hasta": "2018-12-24",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0000075527 (PACIFIC ENTERPRISES INC) no declara flotante público: no pudo ser miembro del índice",
     "0001032208 es SRE, que estaba en el índice a la vez",
+    "0000086521 (SAN DIEGO GAS & ELECTRIC CO) no declara flotante público: no pudo ser miembro del índice",
     "0000912242 es MAC, que estaba en el índice a la vez",
     "0001512074 (RMG Networks Holding Corp): el símbolo aparece, pero no como símbolo del emisor",
-    "0000075527 (PACIFIC ENTERPRISES INC): el símbolo no aparece en el documento",
-    "0000086521 (SAN DIEGO GAS & ELECTRIC CO): el símbolo no aparece en el documento",
     "0001082510 (UIL HOLDINGS CORP): el símbolo aparece, pero no como símbolo del emisor"
    ]
   },
   {
-   "ticker": "TIE",
+   "ticker": "SIAL",
    "desde": "2010-01-06",
-   "hasta": "2012-12-21",
+   "hasta": "2015-11-17",
+   "motivo": "ninguna de las tres vías devuelve candidato"
+  },
+  {
+   "ticker": "STR",
+   "desde": "2010-01-06",
+   "hasta": "2010-06-29",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
-    "0001371534 (Gold Dynamics Corp.): el símbolo no aparece en el documento",
-    "0001093903 (Ziyang Ceramics Corp): el símbolo no aparece en el documento",
-    "0000920371 (Simpson Manufacturing Co., Inc.): el símbolo no aparece en el documento",
-    "0001380528 (GC China Turbine Corp.): el símbolo no aparece en el documento"
+    "0001703785 (STR Sub Inc.) sin informes periódicos en el periodo",
+    "0000007323 (ENTERGY ARKANSAS, LLC) no declara flotante público: no pudo ser miembro del índice",
+    "0001223550 (BEKEM METALS INC) no declara flotante público: no pudo ser miembro del índice",
+    "0001048789 (FelCor Lodging LP) no declara flotante público: no pudo ser miembro del índice",
+    "0000751652 (DOMINION QUESTAR CORP): el símbolo aparece, pero no como símbolo del emisor",
+    "0001473597 (STR HOLDINGS, INC.): el símbolo aparece, pero no como símbolo del emisor"
    ]
+  },
+  {
+   "ticker": "SUNEQ",
+   "desde": "2010-01-06",
+   "hasta": "2011-12-14",
+   "motivo": "ninguna de las tres vías devuelve candidato"
   },
   {
    "ticker": "TLAB",
@@ -2253,7 +2705,15 @@
    "ticker": "TMK",
    "desde": "2010-01-06",
    "hasta": "2019-07-15",
-   "motivo": "ninguna de las tres vías devuelve candidato"
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001297996 es DLR, que estaba en el índice a la vez",
+    "0001045609 es PLD, que estaba en el índice a la vez",
+    "0000320335 (GLOBE LIFE INC.): el símbolo aparece, pero no como símbolo del emisor",
+    "0000923284 (IRC Retail Centers Inc): el símbolo aparece, pero no como símbolo del emisor",
+    "0001424640 (Arista Power, Inc.): el símbolo no aparece en el documento",
+    "0000076282 (PARK OHIO HOLDINGS CORP): el símbolo aparece, pero no como símbolo del emisor"
+   ]
   },
   {
    "ticker": "TWX",
@@ -2276,8 +2736,8 @@
    "descartes": [
     "0000853496 (INLAND LAND APPRECIATION FUND II LP): el símbolo no aparece en el documento",
     "0001066656 (Ceres Classic L.P.): el símbolo no aparece en el documento",
-    "0001428040 (Polaris Futures Fund L.P.): el símbolo no aparece en el documento",
-    "0000914747 (MORGAN STANLEY SMITH BARNEY CHARTER ASPECT L.P.): el símbolo no aparece en el documento"
+    "0001066658 (MORGAN STANLEY SMITH BARNEY CHARTER WNT L.P.): el símbolo no aparece en el documento",
+    "0001428040 (Polaris Futures Fund L.P.): el símbolo no aparece en el documento"
    ]
   },
   {
@@ -2293,17 +2753,32 @@
    ]
   },
   {
+   "ticker": "WYND",
+   "desde": "2010-01-06",
+   "hasta": "2018-05-24",
+   "motivo": "ningún candidato declara el símbolo en su portada",
+   "descartes": [
+    "0001407067 (Franklin Financial Network Inc.): el símbolo no aparece en el documento",
+    "0000937136 (HYPERDYNAMICS CORP): el símbolo no aparece en el documento",
+    "0000750556 (SUNTRUST BANKS INC): el símbolo no aparece en el documento",
+    "0001674168 (Hilton Grand Vacations Inc.): el símbolo no aparece en el documento"
+   ]
+  },
+  {
    "ticker": "XTO",
    "desde": "2010-01-06",
    "hasta": "2010-06-21",
    "motivo": "ningún candidato declara el símbolo en su portada",
    "descartes": [
+    "0000881787 (CROSS TIMBERS ROYALTY TRUST) no declara flotante público: no pudo ser miembro del índice",
+    "0000862022 (HUGOTON ROYALTY TRUST) no declara flotante público: no pudo ser miembro del índice",
+    "0000033213 es EQT, que estaba en el índice a la vez",
     "0000868809 (XTO ENERGY INC): el símbolo aparece, pero no como símbolo del emisor",
-    "0000881787 (CROSS TIMBERS ROYALTY TRUST): el símbolo aparece, pero no como símbolo del emisor",
-    "0000862022 (HUGOTON ROYALTY TRUST): el símbolo aparece, pero no como símbolo del emisor",
-    "0001012569 (Energy Transfer, LP): el símbolo no aparece en el documento"
+    "0001012569 (Energy Transfer, LP): el símbolo no aparece en el documento",
+    "0001084991 (NATURAL GAS SERVICES GROUP INC): el símbolo no aparece en el documento"
    ]
   }
  ],
+ "noComprobados": [],
  "nota": "Sólo el nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) y la fuente de miembros actuales entran solos. Los niveles B y C quedan como `revisar`: producen CIK equivocados y creíbles —Wendy's como dueña de TWC, Life Storage como dueña del LSI de 2010-2014— y ninguna regla automática los distingue."
 }

@@ -1,8 +1,8 @@
 {
- "generatedAt": "2026-08-25T22:19:23.624Z",
+ "generatedAt": "2026-08-31T21:53:56.636Z",
  "fuente": "research/publicar_resolucion.mjs",
  "criterio": "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",
- "entradas": 21,
+ "entradas": 23,
  "descartados": [
   {
    "de": "CMCSK",
@@ -29,7 +29,9 @@
   "ANTM": "ELV",
   "ATGE": "CVSA",
   "BF.B": "BF-B",
+  "BHGE": "BKR",
   "BLL": "BALL",
+  "CHK": "EXE",
   "CTL": "LUMN",
   "ESV": "VAL",
   "FB": "META",
@@ -39,9 +41,9 @@
   "GPS": "GAP",
   "JEC": "J",
   "NLOK": "GEN",
-  "PEAK": "DOC",
   "PKI": "RVTY",
   "RE": "EG",
+  "SATS": "ECHO",
   "SYMC": "GEN",
   "UTX": "RTX",
   "WLTW": "WTW"
@@ -52,7 +54,7 @@
    "a": "COR",
    "cik": "0001140859",
    "nombre": "Cencora, Inc.",
-   "enElIndice": "2010-01-06→2023-09-01"
+   "enElIndice": "2010-01-06→2023-08-25"
   },
   {
    "de": "ADS",
@@ -80,7 +82,14 @@
    "a": "BF-B",
    "cik": "0000014693",
    "nombre": "BROWN FORMAN CORP",
-   "enElIndice": "2023-05-09→2026-08-24"
+   "enElIndice": "2010-01-06→2026-08-31"
+  },
+  {
+   "de": "BHGE",
+   "a": "BKR",
+   "cik": "0001701605",
+   "nombre": "Baker Hughes Co",
+   "enElIndice": "2010-01-06→2019-10-03"
   },
   {
    "de": "BLL",
@@ -88,6 +97,13 @@
    "cik": "0000009389",
    "nombre": "BALL Corp",
    "enElIndice": "2010-01-06→2022-04-11"
+  },
+  {
+   "de": "CHK",
+   "a": "EXE",
+   "cik": "0000895126",
+   "nombre": "EXPAND ENERGY Corp",
+   "enElIndice": "2010-01-06→2018-03-16"
   },
   {
    "de": "CTL",
@@ -129,14 +145,14 @@
    "a": "CPAY",
    "cik": "0001175454",
    "nombre": "CORPAY, INC.",
-   "enElIndice": "2018-06-20→2024-03-25"
+   "enElIndice": "2018-06-20→2024-03-18"
   },
   {
    "de": "GPS",
    "a": "GAP",
    "cik": "0000039911",
    "nombre": "GAP INC",
-   "enElIndice": "2010-01-06→2022-01-20"
+   "enElIndice": "2010-01-06→2022-01-10"
   },
   {
    "de": "JEC",
@@ -153,25 +169,25 @@
    "enElIndice": "2019-11-05→2022-11-01"
   },
   {
-   "de": "PEAK",
-   "a": "DOC",
-   "cik": "0000765880",
-   "nombre": "HEALTHPEAK PROPERTIES, INC.",
-   "enElIndice": "2019-11-05→2024-03-03"
-  },
-  {
    "de": "PKI",
    "a": "RVTY",
    "cik": "0000031791",
    "nombre": "REVVITY, INC.",
-   "enElIndice": "2010-01-06→2023-05-17"
+   "enElIndice": "2010-01-06→2023-05-04"
   },
   {
    "de": "RE",
    "a": "EG",
    "cik": "0001095073",
    "nombre": "EVEREST GROUP, LTD.",
-   "enElIndice": "2017-06-19→2023-07-10"
+   "enElIndice": "2017-06-19→2023-06-20"
+  },
+  {
+   "de": "SATS",
+   "a": "ECHO",
+   "cik": "0001415404",
+   "nombre": "EchoStar CORP",
+   "enElIndice": "2026-03-23→2026-06-22"
   },
   {
    "de": "SYMC",
