@@ -243,6 +243,11 @@ if (yaResuelto.size) console.log(`  ${yaResuelto.size} ya resueltos en una corri
 
 for (const ticker of pendientes) {
   n++;
+  // ⚠️ EL PUNTO DE GUARDADO VA AQUÍ, al principio del cuerpo, y no al final. La primera versión
+  // lo puso tras el último `push` y no disparaba: hay caminos que salen antes por `continue`
+  // —«sin candidatos», heredados— así que el guardado dependía de qué ticker cayera en el
+  // múltiplo de quince. Aquí se ejecuta siempre, porque `n` acaba de incrementarse.
+  if (!solo && n % 15 === 0) guardar();
   const heredado = yaResuelto.get(ticker);
   if (heredado) {
     if (heredado.__sinResolver) { const { __sinResolver, ...f } = heredado; sinResolver.push(f); }
@@ -361,9 +366,6 @@ for (const ticker of pendientes) {
   }
 
   if (elegido) { filas.push(elegido); traza(`✓${elegido.evidencia === "A" ? "" : elegido.evidencia} ${String(elegido.nombre).slice(0, 40)}`); }
-  // Cada quince nombres, por si esto muere: quince es poco trabajo que perder y pocas
-  // escrituras de más.
-  if (!solo && n % 15 === 0) guardar();
   else { sinResolver.push({ ticker, desde, hasta, motivo: "ningún candidato declara el símbolo en su portada", descartes: descartes.slice(0, 6) }); traza("✗ ningún candidato pasa la portada"); }
 }
 console.log("\n");

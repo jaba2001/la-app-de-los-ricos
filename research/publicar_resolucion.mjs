@@ -110,6 +110,38 @@ for (const [t, d] of Object.entries(revisados)) {
   entradas.push([t, d.cik, esHumano(d) ? "revisado" : "corroborado"]);
 }
 const mapa = Object.fromEntries(entradas.map(([t, c]) => [t, c]).sort((a, b) => a[0].localeCompare(b[0])));
+
+// ⚠️ UN MAPA NUEVO NO PUEDE ENCOGER SIN QUE ALGUIEN LO DECIDA.
+//
+// El resolutor tarda dos horas y desde el 2026-08-29 guarda cada quince nombres, así que
+// mientras corre su evidencia está INCOMPLETA por definición. Publicar en ese momento no
+// falla: produce un mapa más pequeño, y los CIK que faltan dejan de existir para el sistema —
+// las empresas vuelven a ser invisibles y el sesgo de supervivencia regresa en silencio.
+// Medido en mitad de una corrida: habría borrado 81 de los 143 publicados.
+//
+// El umbral no es cero porque una revisión legítima SÍ puede retirar un CIK dudoso, y eso debe
+// poder ocurrir sin pelearse con un guardián. Lo que no debe ocurrir es perder un tercio.
+const previoMapa = (() => {
+  try { return JSON.parse(readFileSync(join(DATA, "cik_historicos.json"), "utf8"))?.mapa ?? null; } catch { return null; }
+})();
+if (previoMapa) {
+  const antes = Object.keys(previoMapa).length, ahora = Object.keys(mapa).length;
+  const perdidos = Object.keys(previoMapa).filter((t) => !mapa[t]);
+  if (ahora < antes * 0.9) {
+    console.error(`
+  ⛔ EL MAPA ENCOGERÍA de ${antes} a ${ahora} CIK (${perdidos.length} desaparecen).`);
+    console.error(`     Casi siempre esto significa que la evidencia está a medias — el resolutor guarda`);
+    console.error(`     cada quince nombres y tarda dos horas. Espera a que termine y vuelve a publicar.`);
+    console.error(`     Se pierden, entre otros: ${perdidos.slice(0, 12).join(", ")}`);
+    console.error(`     Si el encogimiento es intencionado, --permitir-encoger.
+`);
+    if (!process.argv.includes("--permitir-encoger")) process.exit(1);
+    console.error(`     (--permitir-encoger: se publica igualmente)
+`);
+  } else if (perdidos.length) {
+    console.warn(`  ⚠ ${perdidos.length} CIK dejan de publicarse: ${perdidos.slice(0, 8).join(", ")}`);
+  }
+}
 const porRevisar = detalle.filter((f) => f.estado === "revisar" && !mapa[f.ticker]);
 if (revisionesDesfasadas.length) {
   console.warn(`
