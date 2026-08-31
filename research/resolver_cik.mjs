@@ -63,7 +63,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { loadSP500Historical, cikDeMiembrosActuales } from "./universe.mjs";
 import { tickerToCikVivo } from "./edgar.mjs";
-import { submissions, periodicasTodas, enPeriodo, tickerEsDe } from "./portada.mjs";
+import { submissions, periodicasTodas, enPeriodo, tickerEsDe, NO_COMPROBADO } from "./portada.mjs";
 import { floatPublico } from "./float_publico.mjs";
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -212,6 +212,7 @@ if (!REHACER && !solo) {
 
 const filas = [];
 const sinResolver = [];
+const noComprobados = [];
 let n = 0;
 
 /**
@@ -232,7 +233,7 @@ const guardar = () => {
     pendientes: pendientes.length, verificados: ver.length, aRevisar: rev.length, sinResolver: sinResolver.length,
     porEvidencia: { A: nivel("A").length, B: nivel("B").length, C: nivel("C").length, fuente: nivel("fuente").length },
     mapa: Object.fromEntries(filas.map((f) => [f.ticker, f.cik]).sort((a, b) => a[0].localeCompare(b[0]))),
-    detalle: filas, noResueltos: sinResolver,
+    detalle: filas, noResueltos: sinResolver, noComprobados,
     nota: "Sólo el nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) y la fuente de miembros actuales entran solos. Los niveles B y C quedan como `revisar`: producen CIK equivocados y creíbles —Wendy's como dueña de TWC, Life Storage como dueña del LSI de 2010-2014— y ninguna regla automática los distingue.",
   }, null, 1));
   renameSync(tmp, ruta);
@@ -295,12 +296,18 @@ for (const ticker of pendientes) {
   // que se puede descartar con dos peticiones de JSON se descarta aquí.
   const vivos = [];
   const descartes = [];
+  let noComprobado = null;
   for (const c of cands.slice(0, 8)) {
     const choque = chocaConOtro(c.cik, ticker);
     if (choque) { descartes.push(`${c.cik} es ${choque}, que estaba en el índice a la vez`); continue; }
     await sleep(200);
     const s = await submissions(c.cik);
-    if (!s) { descartes.push(`${c.cik} sin submissions`); continue; }
+    // ⚠️ «No he podido preguntar» NO es «no existe», y tratarlos igual borró dieciséis empresas
+    // ya publicadas: se descartaba al candidato bueno por un 429 y el ticker acababa «sin
+    // resolver». Cuando no se puede comprobar, se abandona ESTE ticker entero —para que la
+    // siguiente corrida lo reintente— en vez de concluir sobre él con datos que faltan.
+    if (s === NO_COMPROBADO) { noComprobado = `no se pudo consultar a la SEC sobre el candidato ${c.cik} (límite de peticiones o red)`; break; }
+    if (!s) { descartes.push(`${c.cik} no existe en la SEC (404)`); continue; }
     const todas = await periodicasTodas(s);
     // Si no presentó NINGÚN informe periódico mientras el ticker estaba en el índice, no era
     // ese miembro del índice. Esto solo elimina a las SPAC y a las empresas recientes.
@@ -366,6 +373,10 @@ for (const ticker of pendientes) {
   }
 
   if (elegido) { filas.push(elegido); traza(`✓${elegido.evidencia === "A" ? "" : elegido.evidencia} ${String(elegido.nombre).slice(0, 40)}`); }
+  // ⚠️ «No se pudo comprobar» va APARTE de «no resuelto», y la diferencia decide si se
+  // reintenta. Un «sin resolver» se hereda en la siguiente corrida —es una respuesta— y un
+  // «no comprobado» NO, para que se vuelva a intentar cuando la SEC responda.
+  else if (noComprobado) { noComprobados.push({ ticker, desde, hasta, motivo: noComprobado }); traza("⏳ no comprobado (la SEC no contestó)"); }
   else { sinResolver.push({ ticker, desde, hasta, motivo: "ningún candidato declara el símbolo en su portada", descartes: descartes.slice(0, 6) }); traza("✗ ningún candidato pasa la portada"); }
 }
 console.log("\n");
@@ -374,7 +385,8 @@ console.log("\n");
 const porNivel = (x) => filas.filter((f) => f.evidencia === x);
 const verificados = filas.filter((f) => f.estado === "verificado");
 const aRevisar = filas.filter((f) => f.estado === "revisar");
-console.log(`  VERIFICADOS (entran solos): ${verificados.length}   ·   a revisar a mano: ${aRevisar.length}   ·   sin resolver: ${sinResolver.length}`);
+console.log(`  VERIFICADOS (entran solos): ${verificados.length}   ·   a revisar a mano: ${aRevisar.length}   ·   sin resolver: ${sinResolver.length}   ·   NO COMPROBADOS: ${noComprobados.length}`);
+if (noComprobados.length) console.log(`  ⏳ ${noComprobados.length} sin comprobar porque la SEC no contestó — NO se heredan: vuelve a correrlo y se reintentan.`);
 console.log(`     nivel A (símbolo en portada dentro del periodo): ${porNivel("A").length}`);
 console.log(`     nivel B (símbolo en portada, otro momento):      ${porNivel("B").length}`);
 console.log(`     nivel C (sólo el nombre del fichero — el más débil): ${porNivel("C").length}`);

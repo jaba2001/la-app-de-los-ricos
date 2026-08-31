@@ -306,11 +306,38 @@ export function mismoNombre(a, b) {
   return A.filter((w) => enB.has(w)).length / Math.max(A.length, B.length);
 }
 
+/**
+ * ⚠️ DEVUELVE TRES COSAS, NO DOS, y confundirlas borró dieciséis empresas del mapa.
+ *
+ * La primera versión devolvía `null` tanto para «esta empresa no existe» (404) como para
+ * «no he podido preguntar» (429, red, timeout). Quien llama anotaba «sin submissions» y
+ * descartaba al candidato — un hecho negativo que nadie había observado.
+ *
+ * El 2026-08-31 eso hizo que `MRO` quedara «sin resolver»: se descartó el CIK 0000101778 por
+ * «sin submissions» cuando ese CIK es MARATHON OIL CORP y tiene 1.001 formularios. Y con él
+ * cayeron quince más que ya estaban publicados: ABC, ABMD, ADS, AET, ALXN, ANSS, ANTM, MXIM,
+ * MYL, NBL, NFX, NLOK, NLSN, PEAK y SEE. Todos habían sido `verificado/A` en la corrida
+ * anterior; ninguna empresa había cambiado, sólo la suerte de las peticiones.
+ *
+ * Es el mismo defecto que `ultimoInforme` tenía en la auditoría de símbolos y que allí bloqueó
+ * a Avon: **«no he podido mirar» valiendo como «no hay»**.
+ *
+ * Devuelve el JSON, `null` si la SEC dice claramente que no existe (404), o `NO_COMPROBADO`
+ * si no se pudo averiguar. Quien llama TIENE que distinguir el tercero.
+ */
+export const NO_COMPROBADO = Symbol("submissions: no se pudo comprobar");
+
 export async function submissions(cik) {
-  try {
-    const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: UA });
-    return r.ok ? await r.json() : null;
-  } catch {
-    return null;
+  for (let intento = 0; intento < 4; intento++) {
+    try {
+      const r = await fetch(`https://data.sec.gov/submissions/CIK${cik}.json`, { headers: UA });
+      if (r.ok) return await r.json();
+      if (r.status === 404) return null;                 // la SEC dice que no existe: es una respuesta
+      // 429 y 5xx son «ahora no»: se espera y se reintenta, con esperas crecientes.
+      await new Promise((ok) => setTimeout(ok, 700 * (intento + 1)));
+    } catch {
+      await new Promise((ok) => setTimeout(ok, 700 * (intento + 1)));
+    }
   }
+  return NO_COMPROBADO;
 }
