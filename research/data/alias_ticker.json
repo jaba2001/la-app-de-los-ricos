@@ -1,9 +1,15 @@
 {
- "generatedAt": "2026-08-31T21:53:56.636Z",
+ "generatedAt": "2026-08-31T22:30:19.360Z",
  "fuente": "research/publicar_resolucion.mjs",
  "criterio": "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",
- "entradas": 23,
+ "entradas": 22,
  "descartados": [
+  {
+   "de": "CHK",
+   "cik": "0000895126",
+   "nombre": "EXPAND ENERGY Corp",
+   "motivo": "está bloqueado por la auditoría de símbolos (la serie (2021-02-10→2026-08-31) no solapa con el periodo en el índice (2010-01-), y el bloqueo se decide mirando la serie de precios, que es más evidencia que el CIK"
+  },
   {
    "de": "CMCSK",
    "cik": "0001166691",
@@ -14,7 +20,7 @@
    "de": "DISCA",
    "cik": "0001437107",
    "nombre": "Warner Bros. Discovery, Inc.",
-   "motivo": "convivió en el índice con «DISCK» y los dos apuntan a «WBD»: eran clases distintas de la misma empresa y hoy son una sola"
+   "motivo": "está bloqueado por la auditoría de símbolos (el proveedor sólo devuelve 29 barras (2022-04-06→2022-09-16): no hay historia ut), y el bloqueo se decide mirando la serie de precios, que es más evidencia que el CIK"
   },
   {
    "de": "DISCK",
@@ -31,7 +37,6 @@
   "BF.B": "BF-B",
   "BHGE": "BKR",
   "BLL": "BALL",
-  "CHK": "EXE",
   "CTL": "LUMN",
   "ESV": "VAL",
   "FB": "META",
@@ -97,13 +102,6 @@
    "cik": "0000009389",
    "nombre": "BALL Corp",
    "enElIndice": "2010-01-06→2022-04-11"
-  },
-  {
-   "de": "CHK",
-   "a": "EXE",
-   "cik": "0000895126",
-   "nombre": "EXPAND ENERGY Corp",
-   "enElIndice": "2010-01-06→2018-03-16"
   },
   {
    "de": "CTL",

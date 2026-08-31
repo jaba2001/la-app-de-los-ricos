@@ -69,11 +69,14 @@ async function seriesLong(ticker) {
   // Mismo bloqueo que en `prices.mjs`, y por el mismo motivo: `GENZ` devuelve aquí 4.436
   // barras de un ETF de VanEck que nada tienen que ver con Genzyme. Esta ventana es la que
   // más lo sufre, porque es la que llega a 2009 y por tanto la que más empresas muertas mira.
-  if (simboloBloqueado(ticker)) { mem.set(ticker, []); return []; }
   // El mismo mapa que `prices.mjs`, IMPORTADO y no copiado: dos tablas de alias que se
   // separan producirían dos historias distintas para la misma empresa según qué ventana se
   // mire, y eso es exactamente el fallo que este repo ya cometió con los pesos del ensemble.
   const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
+  // Y el mismo ORDEN que en `prices.mjs`: alias primero, bloqueo después, sobre el símbolo que
+  // de verdad se descarga. Al revés, un alias no llega a aplicarse nunca y una empresa viva se
+  // queda sin precios — le pasó a `CHK`, que hoy cotiza como `EXE` con el mismo CIK.
+  if (simboloBloqueado(yTicker)) { mem.set(ticker, []); return []; }
   // ⚠️ LA CACHÉ SE INDEXA POR EL SÍMBOLO DEL QUE SE DESCARGA, no por el que se pide.
   //
   // Con el alias `FB → META`, guardar bajo `FB` deja en disco un fichero que la siguiente

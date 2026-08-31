@@ -519,7 +519,28 @@ if (SIN_RED) {
       const fotos = tabla.filter((f) => f.date >= "2010-01-01");
       const primera = new Map();
       for (const f of fotos) for (const k of f.tickers) if (!primera.has(k)) primera.set(k, f.date);
-      const CONOCIDOS = new Set(["SNDK", "BLK", "APA"]);
+      // Los cinco conocidos, y los cinco son de las DOS clases que piden tratamientos opuestos:
+      //
+      //   · REORGANIZACIÓN (misma empresa, holding nueva) → se fusiona con el predecesor:
+      //     `BLK` y `APA`. Los hechos de las dos entidades SE SOLAPAN.
+      //   · REASIGNACIÓN (otra empresa heredó el símbolo) → NO se fusiona, porque empalmarlas
+      //     fabricaría una continuidad que nunca existió: `SNDK`, `CEG` y `Q`.
+      //
+      // `CEG` y `Q` los encontró este mismo test el 2026-09-01, al corregir la fuente de
+      // miembros — que es exactamente para lo que se escribió. Los dos tienen la firma del
+      // símbolo reasignado: dos periodos en el índice separados por un hueco enorme.
+      //
+      //   CEG  1996→2012-03-02 (Constellation Energy Group, comprada por Exelon)
+      //        2022-02→hoy     (Constellation Energy Corp, ex-«Constellation Newholdco»)
+      //   Q    2000→2011-03-23 (Qwest, comprada por CenturyLink)
+      //        2025-11→hoy     (Qnity Electronics, ex-«Novus SpinCo 1»)
+      //
+      // Ninguno contamina hoy: sus CIK actuales sólo tienen fundamentales recientes y sus
+      // series de precios empiezan tarde, así que en las fechas antiguas quedan fuera del panel
+      // en vez de entrar con datos ajenos. Pero son la variante que la auditoría de símbolos NO
+      // mira —sólo audita a los que SALIERON del índice, y éstos están dentro— así que si algún
+      // proveedor llegara a servir la historia vieja bajo el símbolo actual, nadie lo vería.
+      const CONOCIDOS = new Set(["SNDK", "BLK", "APA", "CEG", "Q"]);
       const nuevos = [];
       for (const t of fotos[fotos.length - 1].tickers) {
         const cik = await tickerToCik(t).catch(() => null);

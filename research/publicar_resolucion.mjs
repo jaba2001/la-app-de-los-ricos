@@ -239,6 +239,14 @@ for (const k in vivos) {
   tickersDeCik.get(cik).add(t);
 }
 
+// Los símbolos que la auditoría ha bloqueado: no se les da alias (ver abajo). Si el fichero no
+// está, no se bloquea nada y el comportamiento es el de antes — pero se dice.
+const bloqueados = (() => {
+  const r = join(DATA, "simbolos_reutilizados.json");
+  if (!existsSync(r)) { console.warn("  ⚠ falta data/simbolos_reutilizados.json: los alias se generan sin comprobar bloqueos"); return {}; }
+  try { return JSON.parse(readFileSync(r, "utf8"))?.bloqueados ?? {}; } catch { console.warn("  ⚠ data/simbolos_reutilizados.json ilegible: los alias se generan sin comprobar bloqueos"); return {}; }
+})();
+
 const alias = {};
 const detalleAlias = [];
 const alias_descartados = [];
@@ -292,6 +300,16 @@ for (const [muerto, cik] of Object.entries(mapa)) {
   const vivo = elegirVivo(muerto, vivosDelCik);
   if (!vivo) { anotar(`el CIK tiene ${vivosDelCik.size} tickers vivos (${[...vivosDelCik].sort().join(", ")}) y ninguno es claramente la acción ordinaria`); continue; }
   if (vivo === muerto) continue;
+  // ⚠️ UN SÍMBOLO BLOQUEADO NO RECIBE ALIAS, y darle uno crea una contradicción.
+  //
+  // El bloqueo lo decide la auditoría MIRANDO LA SERIE DE PRECIOS; este guion sólo mira CIK, así
+  // que cuando discrepan manda el que tiene la evidencia. `CHK` lo enseñó: Chesapeake quebró,
+  // sus acciones se cancelaron y hoy cotiza como `EXE` con el MISMO CIK — así que la regla del
+  // CIK autoriza el alias. Pero la serie de `EXE` empieza el 2021-02-10 y `CHK` estuvo en el
+  // índice de 2010 a 2018: **el alias no cubre ni un día del periodo para el que haría falta**.
+  // Lo único que aportaría es desactivar el bloqueo y servir la cotización de una acción distinta
+  // de la que estuvo en el índice.
+  if (bloqueados[muerto]) { anotar(`está bloqueado por la auditoría de símbolos (${String(bloqueados[muerto]).slice(0, 80)}), y el bloqueo se decide mirando la serie de precios, que es más evidencia que el CIK`); continue; }
   const rival = conviveConOtroReclamante(muerto, vivo);
   if (rival === "?") { anotar(`no consta su periodo en el índice, así que no se puede comprobar si convivió con otro reclamante de «${vivo}»: sin esa comprobación no se concede el alias`); continue; }
   if (rival) { anotar(`convivió en el índice con «${rival}» y los dos apuntan a «${vivo}»: eran clases distintas de la misma empresa y hoy son una sola`); continue; }

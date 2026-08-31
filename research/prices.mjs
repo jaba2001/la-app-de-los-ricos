@@ -204,8 +204,18 @@ async function series(ticker) {
   // Antes que la caché y antes que la red: si el símbolo lo heredó otro instrumento, no hay
   // respuesta buena que buscar, y una caché escrita en una ejecución anterior podría tener ya
   // la serie ajena guardada.
-  if (simboloBloqueado(ticker)) { mem.set(ticker, []); return []; }
+  // ⚠️ EL ALIAS SE RESUELVE ANTES QUE EL BLOQUEO, y el orden inverso dejaba sin precios a
+  // empresas vivas. El bloqueo dice «no busques bajo ESTE símbolo»; el alias dice «búscalo bajo
+  // AQUEL». Si se bloquea primero, el alias no llega a aplicarse nunca.
+  //
+  // `CHK` lo enseñó: Chesapeake quebró, volvió a cotizar en 2021 y hoy es `EXE` (Expand Energy),
+  // el MISMO CIK. La auditoría —que corrió antes de que existiera el alias— vio bajo `CHK` una
+  // serie que empieza en 2021 y no solapa con su periodo en el índice, y lo bloqueó. Con el
+  // bloqueo primero, Chesapeake se quedaba sin precios en toda su historia pese a que `EXE` los
+  // tiene enteros. Comprobando el bloqueo sobre el símbolo que DE VERDAD se descarga, el alias
+  // hace su trabajo y el bloqueo sigue protegiendo a los que no tienen a dónde ir (`GENZ`).
   const yTicker = YAHOO_ALIAS[ticker] ?? ticker;
+  if (simboloBloqueado(yTicker)) { mem.set(ticker, []); return []; }
   // ⚠️ LA CACHÉ SE INDEXA POR EL SÍMBOLO DEL QUE SE DESCARGA, no por el que se pide.
   //
   // Con el alias `FB → META`, guardar bajo `FB` deja en disco un fichero que la siguiente
