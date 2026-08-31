@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-31T22:24:35.297Z",
+  "generatedAt": "2026-08-31T22:32:52.287Z",
   "window": "2011-2018",
   "huella": {
-    "sha": "402590528ddb840b",
+    "sha": "a27ff2f5f239abe6",
     "ficheros": {
       "cik_historicos.json": "2e4c0463ad38",
-      "alias_ticker.json": "4ad3fe86a2b9",
+      "alias_ticker.json": "c52e4cce84ee",
       "simbolos_reutilizados.json": "514e53c645a3"
     },
     "versionReglas": 5,
