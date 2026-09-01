@@ -350,6 +350,31 @@ console.log("\n  A · artefactos versionados (sin red)\n");
 }
 
 
+// ── §11: la referencia SIN financieros tiene que ser otra referencia ──────────────────────
+//
+// `universoEW(eje, excluir)` aceptaba `excluir` y lo usaba en UN solo sitio: el texto del
+// aviso. Nunca filtraba. Asi que la referencia "sin financieros" era el mismo calculo que la
+// normal y daba los mismos cuatro numeros con 56 nombres supuestamente fuera — y el script
+// imprimia "la diferencia entre las dos, +0pp, es lo que aportaban los financieros".
+//
+// Eso no es un fallo que rompa: es una respuesta falsa a la pregunta de §11, que es la misma
+// que decide si merece la pena meter bancos en el universo elegible.
+{
+  for (const [f, nombre] of [["picks_rules_backtest.json", "2019-2026"], ["picks_rules_backtest_oos.json", "2011-2018"]]) {
+    const j = leer(f);
+    if (!j) { aviso(`falta ${f} — no se puede comprobar la referencia de §11`); continue; }
+    const con = j.benchmarks?.universoEW, sin = j.benchmarks?.universoEWSinFinancieros;
+    if (!con || !sin) { aviso(`${nombre}: el artefacto no trae las dos referencias de §11`); continue; }
+    const n = sin.financierosExcluidos ?? 0;
+    if (!n) { aviso(`${nombre}: no se excluyo ningun financiero, no hay nada que comparar`); continue; }
+    const campos = ["total", "cagr", "sharpe", "maxDD"];
+    const iguales = campos.every((k) => con[k] === sin[k]);
+    ok(!iguales,
+      `§11 ${nombre}: quitar ${n} financieros tiene que mover la referencia EW y da los cuatro numeros identicos (${sin.total} % · ${sin.cagr} · ${sin.sharpe} · ${sin.maxDD}) — es universoEW(excluir) sin filtrar`);
+  }
+}
+
+
 // ══ B · HUMO CONTRA LA SEC ════════════════════════════════════════════════════════════════
 if (SIN_RED) {
   console.log("\n  B · humo contra la SEC — SALTADO (--sin-red)\n");

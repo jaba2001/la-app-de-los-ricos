@@ -421,8 +421,24 @@ async function universoEW(eje, excluir = null) {
     while (k + 1 < fechasOk.length && fechasOk[k + 1] <= eje[i]) k++;
     decisionVigente.push(fechasOk[k]);
   }
-  const miembros = new Set();
-  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) miembros.add(t);
+  const todos = new Set();
+  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) todos.add(t);
+
+  // ⚠️ `excluir` FILTRA DE VERDAD. Hasta el 2026-09-01 este parámetro sólo se usaba para
+  // cambiar el texto del aviso de abajo, y `miembros` se construía entero: la referencia «sin
+  // financieros» era el MISMO cálculo que la de con ellos, y por eso daba exactamente los
+  // mismos cuatro números —total, CAGR, Sharpe y drawdown— con 56 nombres supuestamente fuera.
+  //
+  // No fallaba: contestaba. Y contestaba que los financieros no aportaban nada a la referencia,
+  // que es justo la pregunta de §11 —¿ganamos por elegir bien o por no tener bancos?— y la
+  // misma que decide si merece la pena meter bancos en el universo elegible.
+  const miembros = excluir?.size ? new Set([...todos].filter((t) => !excluir.has(t))) : todos;
+
+  // Y que no pueda volver en silencio: si se pidió excluir y no se quitó a nadie, es este fallo
+  // otra vez, y la referencia saldría idéntica en vez de rota.
+  if (excluir?.size && miembros.size === todos.size) {
+    throw new Error(`universoEW: se pidió excluir ${excluir.size} nombres y no se quitó ninguno — la referencia sin financieros sería idéntica a la normal`);
+  }
   let n = 0;
   // Esta referencia es CONTRA LO QUE SE MIDE TODO, así que un nombre que desaparezca de ella en
   // silencio desplaza el listón sin que nada avise. Los dos descartes de abajo se cuentan:
@@ -451,7 +467,7 @@ async function universoEW(eje, excluir = null) {
     if (fuera.sinPanel.length) console.warn(`     sin precios: ${fuera.sinPanel.slice(0, 20).join(" ")}${fuera.sinPanel.length > 20 ? ` … (+${fuera.sinPanel.length - 20})` : ""}`);
     if (fuera.empiezaTarde.length) console.warn(`     su serie empieza después del inicio de la ventana: ${fuera.empiezaTarde.slice(0, 10).join(" · ")}`);
   }
-  return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, deCuantos: miembros.size } };
+  return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, deCuantos: miembros.size }, excluidos: todos.size - miembros.size };
 }
 
 // ── EJECUCIÓN ───────────────────────────────────────────────────────────────────────────
