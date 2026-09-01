@@ -270,7 +270,7 @@ function curveHonest(selector) {
   }
   return { total: (eq - 1) * 100, cagr: (Math.pow(eq, 12 / rets.length) - 1) * 100, sharpe: std(rets) ? mean(rets) / std(rets) * Math.sqrt(12) : 0, maxDD: mdd * 100 };
 }
-function basketsAt(d, horizonte = "fwd1") {
+function basketsAt(d) {
   const comp = compByDate.get(d);
   if (!comp || comp.size < DECILE * 2) return null;
   const sorted = [...comp.entries()].sort((a, b) => b[1] - a[1]).map((e) => e[0]);
