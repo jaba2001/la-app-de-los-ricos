@@ -1,90 +1,73 @@
 {
- "generatedAt": "2026-08-31T22:30:19.042Z",
+ "generatedAt": "2026-09-01T08:25:01.633Z",
  "fuente": "research/resolver_cik.mjs → research/publicar_resolucion.mjs",
  "evidencia": "research/out/resolucion_cik.json",
- "criterio": "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) o la fuente de miembros actuales. Los niveles B y C sólo entran confirmados a mano en cik_revisados.json.",
- "entradas": 159,
- "porEvidencia": {
-  "A": 99,
-  "C+revisado": 7,
-  "C+corroborado": 12,
-  "B+revisado": 14,
-  "fuente": 1,
-  "A+corroborado": 2,
-  "corroborado": 22,
-  "revisado": 2
- },
- "sinPublicar": [
-  {
-   "ticker": "AKS",
-   "cik": "0000918160",
-   "nombre": "Cleveland-Cliffs Steel Holding Corp",
-   "evidencia": "B",
-   "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2020-02-20"
-  },
+ "criterio": "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice), la fuente de miembros actuales, o un nivel C que cumpla ese mismo listón: el emisor nombra su propio documento con el ticker de prefijo y el documento cae dentro del periodo (research/nivel_c.mjs, marcados C+auto). El nivel B y los C que no lo cumplan sólo entran confirmados a mano en cik_revisados.json.",
+ "admitidosPorNivelC": [
   {
    "ticker": "CCE",
    "cik": "0001491675",
    "nombre": "COCA-COLA EUROPEAN PARTNERS US, LLC",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «cce-20131231_10k.htm» · 10-K de 2014-02-07"
-  },
-  {
-   "ticker": "DO",
-   "cik": "0000949039",
-   "nombre": "DIAMOND OFFSHORE DRILLING, INC.",
-   "evidencia": "B",
-   "comprobacion": "fuera del periodo en el índice — símbolo en la tabla de registro de la §12(b) · 10-K de 2024-02-28"
+   "motivo": "el emisor nombra «cce-20131231_10k.htm» con su propio ticker, y es de 2014, dentro de 2010-2016"
   },
   {
    "ticker": "HCP",
    "cik": "0000765880",
    "nombre": "HEALTHPEAK PROPERTIES, INC.",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «hcp-10q6302019.htm» · 10-Q de 2019-08-01"
+   "motivo": "el emisor nombra «hcp-10q6302019.htm» con su propio ticker, y es de 2019, dentro de 2010-2019"
   },
   {
    "ticker": "HOT",
    "cik": "0000316206",
    "nombre": "STARWOOD HOTELS & RESORTS WORLDWIDE, LLC",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «hot-10q_20160630.htm» · 10-Q de 2016-07-29"
+   "motivo": "el emisor nombra «hot-10q_20160630.htm» con su propio ticker, y es de 2016, dentro de 2010-2016"
   },
   {
    "ticker": "LLL",
    "cik": "0001039101",
    "nombre": "L3 TECHNOLOGIES, INC.",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «lll-032919x10q.htm» · 10-Q de 2019-05-01"
+   "motivo": "el emisor nombra «lll-032919x10q.htm» con su propio ticker, y es de 2019, dentro de 2010-2019"
   },
   {
    "ticker": "MON",
    "cik": "0001110783",
    "nombre": "MONSANTO CO /NEW/",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «mon-20180228xq2.htm» · 10-Q de 2018-04-05"
+   "motivo": "el emisor nombra «mon-20180228xq2.htm» con su propio ticker, y es de 2018, dentro de 2010-2018"
   },
   {
    "ticker": "PLL",
    "cik": "0000075829",
    "nombre": "PALL CORP",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «pll-4302015xq3fy2015.htm» · 10-Q de 2015-05-21"
+   "motivo": "el emisor nombra «pll-4302015xq3fy2015.htm» con su propio ticker, y es de 2015, dentro de 2010-2015"
   },
   {
    "ticker": "PX",
    "cik": "0000884905",
    "nombre": "LINDE INC",
-   "evidencia": "C",
-   "comprobacion": "el emisor nombra su propio documento «px-q2201810q.htm» · 10-Q de 2018-07-26"
+   "motivo": "el emisor nombra «px-q2201810q.htm» con su propio ticker, y es de 2018, dentro de 2010-2018"
   }
  ],
+ "entradas": 168,
+ "porEvidencia": {
+  "A": 99,
+  "B+asistente": 2,
+  "C+revisado": 7,
+  "C+corroborado": 12,
+  "B+revisado": 14,
+  "fuente": 1,
+  "A+corroborado": 2,
+  "C+auto": 7,
+  "corroborado": 22,
+  "revisado": 2
+ },
+ "sinPublicar": [],
  "mapa": {
   "ABC": "0001140859",
   "ABMD": "0000815094",
   "ADS": "0001101215",
   "AET": "0001122304",
   "AGN": "0001578845",
+  "AKS": "0000918160",
   "ALTR": "0000768251",
   "ALXN": "0000899866",
   "ANDV": "0000050104",
@@ -107,6 +90,7 @@
   "BXLT": "0001620546",
   "CBE": "0001141982",
   "CBS": "0000813828",
+  "CCE": "0001491675",
   "CDAY": "0001725057",
   "CELG": "0000816284",
   "CEPH": "0000873364",
@@ -130,6 +114,7 @@
   "DISH": "0001001082",
   "DNB": "0001115222",
   "DNR": "0000945764",
+  "DO": "0000949039",
   "DRE": "0000783280",
   "DTV": "0001465112",
   "EMC": "0000790070",
@@ -155,9 +140,11 @@
   "HAR": "0000800459",
   "HBI": "0001359841",
   "HCBK": "0000921847",
+  "HCP": "0000765880",
   "HFC": "0000048039",
   "HNZ": "0000046640",
   "HOLX": "0000859737",
+  "HOT": "0000316206",
   "IGT": "0000353944",
   "IPG": "0000051644",
   "JCP": "0001166126",
@@ -166,6 +153,7 @@
   "JWN": "0000072333",
   "KRFT": "0001545158",
   "KSU": "0000054480",
+  "LLL": "0001039101",
   "LLTC": "0000791907",
   "LSI": "0000703360",
   "LVLT": "0000794323",
@@ -176,6 +164,7 @@
   "MJN": "0001452575",
   "MNK": "0001567892",
   "MOLX": "0000067472",
+  "MON": "0001110783",
   "MRO": "0000101778",
   "MWV": "0001159297",
   "MXIM": "0000743316",
@@ -194,6 +183,8 @@
   "PDCO": "0000891024",
   "PETM": "0000863157",
   "PKI": "0000031791",
+  "PLL": "0000075829",
+  "PX": "0000884905",
   "PXD": "0001038357",
   "QEP": "0001108827",
   "QLGC": "0000918386",

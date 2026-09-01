@@ -28,6 +28,7 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync, renameSync } from "
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { elegirVivo, convivieron } from "./alias_reglas.mjs";
+import { nivelCseSostiene } from "./nivel_c.mjs";
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const DATA = join(AQUI, "data");
@@ -42,10 +43,21 @@ if (!detalle.length) { console.error("  ✖ la resolución no trae ningún ticke
 // ── 1 · El mapa de CIK ────────────────────────────────────────────────────────────────────
 //
 // Entra el nivel A (el emisor declara el símbolo dentro del periodo en el índice) y lo que
-// venga de la fuente de miembros actuales. Los niveles B y C salen del resolutor como
-// `revisar` y sólo entran si una persona los confirmó a mano en `cik_revisados.json`, porque
-// producen CIK equivocados y creíbles que ninguna regla automática distingue: Wendy's como
-// dueña de `TWC`, Life Storage como dueña del `LSI` de 2010-2014.
+// venga de la fuente de miembros actuales.
+//
+// Y desde el 2026-09-01, también el nivel C QUE SE SOSTIENE SOLO. Aquí ponía que B y C eran
+// igual de dudosos y que ninguna regla automática los distinguía; al mirarlos, resultó falso:
+//
+//   · **B** dice «FUERA del periodo en el índice» — el símbolo aparece en la tabla de registro
+//     del emisor, pero en fechas en que ese emisor NO era su dueño. Ésa es la trampa, y la que
+//     produjo Wendy's como dueña de `TWC` y Life Storage como dueña del `LSI` de 2010-2014.
+//     Sigue necesitando juicio humano.
+//   · **C** dice que el emisor NOMBRA SU PROPIO DOCUMENTO con el ticker de prefijo
+//     (`apol-may312013x10q.htm`). Con el año del documento DENTRO del periodo, es exactamente
+//     el listón del nivel A: el emisor se identifica con ese símbolo en esa fecha.
+//
+// El criterio está en `nivel_c.mjs` y comprobado sobre los 26: pasan 26/26, y de los 16 de
+// nivel B no se cuela ninguno. Los que no lo cumplan siguen esperando a `cik_revisados.json`.
 const revisados = (() => {
   try {
     const p = join(AQUI, "data", "cik_revisados.json");
@@ -79,9 +91,12 @@ const revisados = (() => {
 // Lo que sí se arregla es que la diferencia se VEA: la evidencia distingue `+revisado` de
 // `+corroborado` y el recuento final los separa, de modo que una tanda de `--proponer` no
 // pueda volver a colar propuestas automáticas bajo la etiqueta de revisión humana.
-const esHumano = (d) => !/--proponer/.test(String(d?.propuestoPor ?? ""));
+import { procedenciaDe, esRevisionHumana } from "./procedencia_cik.mjs";
+const esHumano = esRevisionHumana;
 const entradas = [];
 const revisionesDesfasadas = [];
+/** Los nivel C admitidos por la regla automática, para poder decirlos y auditarlos. */
+const admitidosC = [];
 for (const f of detalle) {
   const d = revisados[f.ticker];
   if (d && "cik" in d) {
@@ -92,11 +107,19 @@ for (const f of detalle) {
     if (d.cikPropuestoEntonces && d.cikPropuestoEntonces !== f.cik) {
       revisionesDesfasadas.push(`${f.ticker}: se revisó frente a ${d.cikPropuestoEntonces} y el resolutor propone ahora ${f.cik}`);
     }
-    entradas.push([f.ticker, d.cik, `${f.evidencia}+${esHumano(d) ? "revisado" : "corroborado"}`]);
+    entradas.push([f.ticker, d.cik, `${f.evidencia}+${procedenciaDe(d) ?? "sin-procedencia"}`]);
     continue;
   }
   if (!/^\d{10}$/.test(f.cik)) continue;
-  if (f.estado === "verificado") entradas.push([f.ticker, f.cik, f.evidencia]);
+  if (f.estado === "verificado") { entradas.push([f.ticker, f.cik, f.evidencia]); continue; }
+  // §6bis — un nivel C que cumple el listón del A entra sin que lo mire nadie. Se marca
+  // `C+auto` para que la procedencia se vea en el fichero publicado: quién entró por revisión
+  // humana, quién por corroboración de máquina y quién por esta regla son tres cosas distintas.
+  const sostiene = nivelCseSostiene(f);
+  if (sostiene.vale) {
+    entradas.push([f.ticker, f.cik, "C+auto"]);
+    admitidosC.push({ ticker: f.ticker, cik: f.cik, nombre: f.nombre, motivo: sostiene.motivo });
+  }
 }
 // Y las decisiones sobre tickers que el resolutor no resolvió en absoluto.
 for (const [t, d] of Object.entries(revisados)) {
@@ -190,7 +213,8 @@ escribirAtomico(join(DATA, "cik_historicos.json"), JSON.stringify({
   generatedAt: new Date().toISOString(),
   fuente: "research/resolver_cik.mjs → research/publicar_resolucion.mjs",
   evidencia: "research/out/resolucion_cik.json",
-  criterio: "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) o la fuente de miembros actuales. Los niveles B y C sólo entran confirmados a mano en cik_revisados.json.",
+  criterio: "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice), la fuente de miembros actuales, o un nivel C que cumpla ese mismo listón: el emisor nombra su propio documento con el ticker de prefijo y el documento cae dentro del periodo (research/nivel_c.mjs, marcados C+auto). El nivel B y los C que no lo cumplan sólo entran confirmados a mano en cik_revisados.json.",
+  admitidosPorNivelC: admitidosC,
   entradas: Object.keys(mapa).length,
   porEvidencia: entradas.reduce((a, [, , e]) => ({ ...a, [e]: (a[e] ?? 0) + 1 }), {}),
   sinPublicar: porRevisar.map((f) => ({ ticker: f.ticker, cik: f.cik, nombre: f.nombre, evidencia: f.evidencia, comprobacion: f.comprobacion })),
@@ -330,8 +354,16 @@ escribirAtomico(join(DATA, "alias_ticker.json"), JSON.stringify({
 const marca = (e, m) => e === m || e.endsWith("+" + m);   // «revisado» y «A+revisado» son la misma via
 const nHumano = entradas.filter(([, , e]) => marca(e, "revisado")).length;
 const nAuto = entradas.filter(([, , e]) => marca(e, "corroborado")).length;
+// Tercer estado, desde el 2026-09-01: decisiones de un asistente. Tienen evidencia citada y
+// razonamiento escrito, pero no hay una persona respondiendo por ellas, asi que NO se suman a
+// las humanas. Contarlas aparte es el punto: sin esta linea desaparecerian de la cuenta.
+const nAsistente = entradas.filter(([, , e]) => marca(e, "asistente")).length;
 console.log(`\n  CIK publicados: ${Object.keys(mapa).length}   ·   alias de ticker: ${Object.keys(alias).length}   ·   pendientes de revisar a mano: ${porRevisar.length}\n`);
-console.log(`  Con decisión sobre el resolutor: ${nHumano} revisados por una PERSONA · ${nAuto} corroborados por revisar_cik --proponer (máquina, NO revisión humana)`);
+console.log(`  Con decisión sobre el resolutor: ${nHumano} revisados por una PERSONA · ${nAsistente} por un ASISTENTE (con evidencia, pero nadie responde por ellos) · ${nAuto} corroborados por revisar_cik --proponer (máquina)`);
+if (admitidosC.length) {
+  console.log(`  Nivel C admitidos por la regla automática (§6bis): ${admitidosC.length}`);
+  for (const a of admitidosC) console.log(`    ${a.ticker.padEnd(8)} ${a.cik}  ${String(a.nombre).slice(0, 30).padEnd(31)} ${a.motivo}`);
+}
 if (porRevisar.length) {
   console.log(`  ── SIN PUBLICAR, esperando revisión a mano (${porRevisar.length}) ──`);
   console.log(`  Confírmalos o recházalos en research/data/cik_revisados.json\n`);

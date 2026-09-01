@@ -154,12 +154,25 @@ console.log("\n  A · artefactos versionados (sin red)\n");
   const rev = dat("cik_revisados.json");
   if (!rev?.decisiones) aviso("falta research/data/cik_revisados.json — no se puede comprobar la procedencia de las decisiones");
   else if (hist) {
-    const esHumano = (d) => !/--proponer/.test(String(d?.propuestoPor ?? ""));
+    // La MISMA definición que usa el publicador, importada y no copiada: dos nociones de «quién
+    // decidió» acabarían derivando, y este repo ya tiene cicatrices de un valor duplicado en tres
+    // sitios que se separaron durante meses.
+    const { procedenciaDe, esRevisionHumana } = await import("../research/procedencia_cik.mjs");
+    const esHumano = esRevisionHumana;
     const publicados = new Set(Object.keys(hist.mapa ?? {}));
     const auto = Object.entries(rev.decisiones).filter(([t, d]) => publicados.has(t) && !esHumano(d)).map(([t]) => t);
     const ev = hist.porEvidencia ?? {};
     const nCorroborado = Object.entries(ev).filter(([k]) => k === "corroborado" || k.endsWith("+corroborado")).reduce((a, [, v]) => a + v, 0);
-    ok(nCorroborado === auto.length, `cik_historicos: las ${auto.length} decisiones escritas por --proponer figuran como «+corroborado», no como revisión humana (porEvidencia cuenta ${nCorroborado})`);
+    // Las NO humanas son dos cosas distintas —máquina y asistente— y las dos tienen que aparecer
+    // etiquetadas como tales. Si una se colara como «+revisado», el fichero publicado diría que
+    // una persona respondió por algo que nadie miró.
+    const nAsistente = Object.entries(ev).filter(([k]) => k === "asistente" || k.endsWith("+asistente")).reduce((a, [, v]) => a + v, 0);
+    ok(nCorroborado + nAsistente === auto.length,
+      `cik_historicos: las ${auto.length} decisiones NO humanas figuran como «+corroborado» o «+asistente» (porEvidencia cuenta ${nCorroborado} y ${nAsistente})`);
+    // Y ninguna decisión de asistente puede contarse como revisión humana.
+    const asistentes = Object.entries(rev.decisiones).filter(([, d]) => procedenciaDe(d) === "asistente").map(([t]) => t);
+    ok(!asistentes.some((t) => esHumano(rev.decisiones[t])),
+      `cik_revisados: una decisión de asistente NUNCA cuenta como revisión humana (${asistentes.join(", ") || "ninguna"})`);
     // Y ninguna decisión puede quedarse sin procedencia declarada: sin ese campo no se sabe
     // quién decidió, y lo que no se sabe acaba contándose como lo más favorable.
     const sinProc = Object.entries(rev.decisiones).filter(([, d]) => !d?.propuestoPor).map(([t]) => t);
@@ -377,6 +390,52 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     const iguales = campos.every((k) => con[k] === sin[k]);
     ok(!iguales,
       `§11 ${nombre}: quitar ${n} financieros tiene que mover la referencia EW y da los cuatro numeros identicos (${sin.total} % · ${sin.cagr} · ${sin.sharpe} · ${sin.maxDD}) — es universoEW(excluir) sin filtrar`);
+  }
+}
+
+
+// ── §6bis · el nivel C que se sostiene solo ───────────────────────────────────────────────
+//
+// El resolutor de CIK dejaba B y C «a revisar a mano» por igual. No son lo mismo: B dice «FUERA
+// del periodo en el indice» —la trampa que produjo Wendy's como duena de TWC— y C dice que el
+// emisor NOMBRA SU PROPIO DOCUMENTO con el ticker de prefijo. Con el ano del documento dentro
+// del periodo, C cumple el mismo liston que A.
+//
+// Este bloque fija el criterio y, sobre todo, sus DOS bordes: que un ticker corto no case con un
+// documento que solo empieza igual, y que un documento fuera del periodo no cuele.
+{
+  const { nivelCseSostiene, prefijoEsElTicker } = await import("../research/nivel_c.mjs");
+
+  const base = { evidencia: "C", ticker: "ARG", desde: "2010-01-06", hasta: "2016-05-20",
+                 comprobacion: "el emisor nombra su propio documento «arg-33116form10xk.htm» · 10-K de 2016" };
+
+  ok(nivelCseSostiene(base).vale, "nivel C con prefijo correcto y ano dentro del periodo: entra");
+
+  // El borde que importa: un ticker de una letra no puede casar con cualquier documento.
+  ok(!prefijoEsElTicker("apol-may312013x10q.htm", "A"),
+    "el ticker «A» NO casa con «apol-…»: hace falta un separador detras del prefijo");
+  ok(prefijoEsElTicker("apol-may312013x10q.htm", "APOL"), "«APOL» si casa con «apol-…»");
+  ok(prefijoEsElTicker("cbs_10k-123118.htm", "CBS"), "el separador vale tambien con guion bajo");
+  ok(!prefijoEsElTicker("argan-2015.htm", "ARG"), "«ARG» NO casa con «argan-…», que es otra empresa");
+
+  // Y el que separa C de B: un documento fuera del periodo no prueba nada.
+  const fuera = { ...base, comprobacion: "el emisor nombra su propio documento «arg-2020.htm» · 10-K de 2020" };
+  ok(!nivelCseSostiene(fuera).vale, "un documento de 2020 NO vale para un ticker que salio del indice en 2016");
+
+  ok(!nivelCseSostiene({ ...base, evidencia: "B" }).vale, "el nivel B nunca entra solo");
+  ok(!nivelCseSostiene({ ...base, comprobacion: "sin documento citado" }).vale, "sin documento citado, no entra");
+  ok(!nivelCseSostiene({ ...base, comprobacion: "«arg-x.htm» sin ano" }).vale, "sin ano legible, no entra");
+
+  // Sobre la evidencia de verdad: los 26 de nivel C pasan y ninguno de los 16 de B se cuela.
+  const ev = leer("resolucion_cik.json");
+  if (!ev) aviso("falta research/out/resolucion_cik.json — no se puede comprobar la regla del nivel C");
+  else {
+    const C = (ev.detalle ?? []).filter((x) => x.evidencia === "C");
+    const B = (ev.detalle ?? []).filter((x) => x.evidencia === "B");
+    const cOk = C.filter((x) => nivelCseSostiene(x).vale).length;
+    const bMal = B.filter((x) => nivelCseSostiene(x).vale).length;
+    ok(C.length === 0 || cOk === C.length, `§6bis: los ${C.length} de nivel C cumplen el criterio (pasan ${cOk})`);
+    ok(bMal === 0, `§6bis: ningun nivel B se cuela por la regla automatica (se colarian ${bMal} de ${B.length})`);
   }
 }
 

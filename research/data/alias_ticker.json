@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-31T22:30:19.360Z",
+ "generatedAt": "2026-09-01T08:25:01.769Z",
  "fuente": "research/publicar_resolucion.mjs",
  "criterio": "los dos tickers resuelven al MISMO CIK en la SEC —la misma prueba que `prices.mjs` exige a mano para BK y MMC— Y la correspondencia es uno a uno: un CIK con varios tickers vivos no identifica una sola acción (BF.B habría cogido los precios de BF-A), y dos tickers muertos que apuntan al mismo vivo eran clases distintas (DISCA y DISCK son hoy WBD).",
  "entradas": 22,
@@ -27,6 +27,12 @@
    "cik": "0001437107",
    "nombre": "Warner Bros. Discovery, Inc.",
    "motivo": "convivió en el índice con «DISCA» y los dos apuntan a «WBD»: eran clases distintas de la misma empresa y hoy son una sola"
+  },
+  {
+   "de": "HCP",
+   "cik": "0000765880",
+   "nombre": "HEALTHPEAK PROPERTIES, INC.",
+   "motivo": "está bloqueado por la auditoría de símbolos (la serie (2021-12-09→2025-02-27) no solapa con el periodo en el índice (2010-01-), y el bloqueo se decide mirando la serie de precios, que es más evidencia que el CIK"
   }
  ],
  "alias": {
