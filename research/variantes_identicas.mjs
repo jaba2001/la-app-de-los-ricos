@@ -109,6 +109,17 @@ const TOLERADOS = new Map([
   ["picks_rules_backtest_oos.json :: barridoUmbrales[13] == barridoUmbrales[14]",
    "Igual que las dos anteriores."],
 
+  // ── Un no-op de verdad, y el detector haciendo su trabajo ─────────────────────────────────
+  // En la ventana 2011-2018 la cartera NUNCA tuvo dos clases de la misma empresa (medido con
+  // `doble_clase.mjs`: cero solapes), así que deduplicar no cambia una sola operación y las dos
+  // ramas salen idénticas — por construcción, no por un parámetro ignorado.
+  //
+  // Es justo el contraste que hacía falta: el mismo síntoma que delató el no-op de §11 aparece
+  // aquí con una causa legítima. Por eso el detector exige explicación en vez de fallar solo: la
+  // coincidencia es la pregunta, no la respuesta.
+  ["deduplicacion_oos.json :: sinDeduplicar == conDeduplicar",
+   "En 2011-2018 no hay ninguna doble clase en cartera, así que deduplicar es un no-op real. La ventana reciente SÍ difiere (216,6 → 209,7)."],
+
   // ── Dos proveedores que dicen lo mismo ────────────────────────────────────────────────────
   // Yahoo y Tiingo devolviendo el mismo número de barras para el mismo valor es ACUERDO entre
   // fuentes independientes, que es justo lo que se quiere de una auditoría de símbolos. Va por
