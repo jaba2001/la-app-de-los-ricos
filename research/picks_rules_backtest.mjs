@@ -512,7 +512,14 @@ const ew = await universoEW(eje);
 // sale eso, hay una serie que no es de quien dice ser, y publicar el número es peor que fallar.
 {
   const TOPE_CAGR = 40, SUELO_CAGR = -30;
-  if (!Number.isFinite(ew.cagr) || ew.cagr > TOPE_CAGR || ew.cagr < SUELO_CAGR) {
+  // ⚠️ Sólo donde anualizar signifique algo. Con `--smoke` son 14 fechas —medio año— y un
+  // 22,8 % en ese tramo anualiza al 47 % sin que nada esté roto. Saltar ahí convertiría esto en
+  // ruido de cada prueba de humo, y un guardián que salta siempre deja de mirarse: exactamente
+  // el fallo que se corrigió esta misma mañana en el guardián de frescura.
+  const anos = eje.length / 252;
+  if (anos < 2) {
+    console.log(`  (la comprobación de plausibilidad de la referencia se salta: ${anos.toFixed(1)} años es muy poco para anualizar)`);
+  } else if (!Number.isFinite(ew.cagr) || ew.cagr > TOPE_CAGR || ew.cagr < SUELO_CAGR) {
     console.error(`\n  ⛔ La referencia equiponderada da un CAGR de ${ew.cagr?.toFixed?.(2) ?? ew.cagr} % (total ${ew.total?.toFixed?.(1)} %).`);
     console.error(`     Una cesta equiponderada del indice no hace eso. Casi seguro hay una serie que pertenece`);
     console.error(`     a otro instrumento: revisa los avisos de "saltos imposibles" y la auditoria de simbolos.`);

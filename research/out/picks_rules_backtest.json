@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-01T06:40:39.828Z",
+  "generatedAt": "2026-09-01T07:06:35.147Z",
   "window": "2019-2026",
   "huella": {
-    "sha": "610ed3f258fe9519",
+    "sha": "397275838736d776",
     "ficheros": {
       "cik_historicos.json": "2e4c0463ad38",
       "alias_ticker.json": "c52e4cce84ee",
-      "simbolos_reutilizados.json": "514e53c645a3"
+      "simbolos_reutilizados.json": "ae8ad5b911fb"
     },
     "versionReglas": 5,
     "miembros": {
@@ -61,6 +61,7 @@
         "CDAY"
       ],
       "empiezaTarde": 18,
+      "saltosImposibles": [],
       "deCuantos": 509
     },
     "universoEWSinFinancierosFuera": {
@@ -76,6 +77,7 @@
         "CDAY"
       ],
       "empiezaTarde": 17,
+      "saltosImposibles": [],
       "deCuantos": 454
     },
     "nota": "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo."

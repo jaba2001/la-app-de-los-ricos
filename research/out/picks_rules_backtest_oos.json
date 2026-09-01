@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-01T06:49:28.022Z",
+  "generatedAt": "2026-09-01T07:11:23.571Z",
   "window": "2011-2018",
   "huella": {
-    "sha": "610ed3f258fe9519",
+    "sha": "397275838736d776",
     "ficheros": {
       "cik_historicos.json": "2e4c0463ad38",
       "alias_ticker.json": "c52e4cce84ee",
-      "simbolos_reutilizados.json": "514e53c645a3"
+      "simbolos_reutilizados.json": "ae8ad5b911fb"
     },
     "versionReglas": 5,
     "miembros": {
@@ -35,9 +35,10 @@
   "cobertura": {
     "posicionesNoValoradas": {
       "sinPanel": [
+        "BMC",
         "APOL"
       ],
-      "sinRetornos": 3,
+      "sinRetornos": 2,
       "total": 4,
       "deCuantas": 92
     },
@@ -51,6 +52,7 @@
     "universoEWFuera": {
       "sinPanel": [
         "APOL",
+        "BMC",
         "CBS",
         "CHK",
         "COG",
@@ -58,6 +60,7 @@
         "DTV",
         "EMC",
         "GENZ",
+        "GR",
         "HAR",
         "IGT",
         "JCP",
@@ -73,6 +76,8 @@
         "SHLD",
         "BIG",
         "NSM",
+        "MOLX",
+        "CBE",
         "CVC",
         "BBBY",
         "PCP",
@@ -82,12 +87,14 @@
         "HFC",
         "WRK"
       ],
-      "empiezaTarde": 32,
+      "empiezaTarde": 31,
+      "saltosImposibles": [],
       "deCuantos": 471
     },
     "universoEWSinFinancierosFuera": {
       "sinPanel": [
         "APOL",
+        "BMC",
         "CBS",
         "CHK",
         "COG",
@@ -95,6 +102,7 @@
         "DTV",
         "EMC",
         "GENZ",
+        "GR",
         "HAR",
         "IGT",
         "JCP",
@@ -108,6 +116,8 @@
         "SHLD",
         "BIG",
         "NSM",
+        "MOLX",
+        "CBE",
         "CVC",
         "BBBY",
         "PCP",
@@ -117,7 +127,8 @@
         "HFC",
         "WRK"
       ],
-      "empiezaTarde": 32,
+      "empiezaTarde": 31,
+      "saltosImposibles": [],
       "deCuantos": 420
     },
     "nota": "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo."
@@ -135,16 +146,16 @@
       "maxDD": -22.9
     },
     "universoEW": {
-      "total": 83574.9,
-      "cagr": 133.18,
-      "sharpe": 0.75,
-      "maxDD": -20.9
+      "total": 153.6,
+      "cagr": 12.42,
+      "sharpe": 0.87,
+      "maxDD": -21
     },
     "universoEWSinFinancieros": {
-      "total": 112488.5,
-      "cagr": 142.05,
-      "sharpe": 0.74,
-      "maxDD": -20.5,
+      "total": 150.6,
+      "cagr": 12.25,
+      "sharpe": 0.86,
+      "maxDD": -20.6,
       "financierosExcluidos": 51,
       "nota": "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)."
     }
@@ -923,7 +934,7 @@
       "conCaja": 133.2,
       "sharpe": 0.87,
       "maxDD": -17,
-      "vsEW": -83441.7,
+      "vsEW": -20.4,
       "posiciones": 82,
       "pctInvertido": 86
     },
@@ -934,7 +945,7 @@
       "conCaja": 137.7,
       "sharpe": 0.88,
       "maxDD": -17.1,
-      "vsEW": -83437.3,
+      "vsEW": -15.9,
       "posiciones": 83,
       "pctInvertido": 86
     },
@@ -945,7 +956,7 @@
       "conCaja": 133.1,
       "sharpe": 0.86,
       "maxDD": -17.8,
-      "vsEW": -83441.8,
+      "vsEW": -20.4,
       "posiciones": 85,
       "pctInvertido": 86
     },
@@ -956,7 +967,7 @@
       "conCaja": 118,
       "sharpe": 0.79,
       "maxDD": -18.3,
-      "vsEW": -83457,
+      "vsEW": -35.6,
       "posiciones": 102,
       "pctInvertido": 86
     },
@@ -967,7 +978,7 @@
       "conCaja": 115.6,
       "sharpe": 0.79,
       "maxDD": -17.5,
-      "vsEW": -83459.4,
+      "vsEW": -38,
       "posiciones": 105,
       "pctInvertido": 86
     },
@@ -978,7 +989,7 @@
       "conCaja": 113.7,
       "sharpe": 0.78,
       "maxDD": -17.2,
-      "vsEW": -83461.3,
+      "vsEW": -39.9,
       "posiciones": 105,
       "pctInvertido": 85
     },
@@ -989,7 +1000,7 @@
       "conCaja": 76.6,
       "sharpe": 0.71,
       "maxDD": -17.3,
-      "vsEW": -83498.4,
+      "vsEW": -77,
       "posiciones": 91,
       "pctInvertido": 58
     },
@@ -1000,7 +1011,7 @@
       "conCaja": 76.7,
       "sharpe": 0.72,
       "maxDD": -17.2,
-      "vsEW": -83498.3,
+      "vsEW": -76.9,
       "posiciones": 92,
       "pctInvertido": 58
     },
@@ -1011,7 +1022,7 @@
       "conCaja": 74.7,
       "sharpe": 0.7,
       "maxDD": -17.2,
-      "vsEW": -83500.2,
+      "vsEW": -78.9,
       "posiciones": 92,
       "pctInvertido": 57
     },
@@ -1022,7 +1033,7 @@
       "conCaja": 33.1,
       "sharpe": 0.61,
       "maxDD": -8.7,
-      "vsEW": -83541.9,
+      "vsEW": -120.5,
       "posiciones": 48,
       "pctInvertido": 27
     },
@@ -1033,7 +1044,7 @@
       "conCaja": 33.7,
       "sharpe": 0.62,
       "maxDD": -8.7,
-      "vsEW": -83541.2,
+      "vsEW": -119.8,
       "posiciones": 48,
       "pctInvertido": 27
     },
@@ -1044,7 +1055,7 @@
       "conCaja": 33,
       "sharpe": 0.61,
       "maxDD": -8.7,
-      "vsEW": -83541.9,
+      "vsEW": -120.6,
       "posiciones": 48,
       "pctInvertido": 27
     },
@@ -1055,7 +1066,7 @@
       "conCaja": 7.2,
       "sharpe": 0.32,
       "maxDD": -5.4,
-      "vsEW": -83567.7,
+      "vsEW": -146.4,
       "posiciones": 19,
       "pctInvertido": 11
     },
@@ -1066,7 +1077,7 @@
       "conCaja": 7.2,
       "sharpe": 0.32,
       "maxDD": -5.4,
-      "vsEW": -83567.7,
+      "vsEW": -146.4,
       "posiciones": 19,
       "pctInvertido": 11
     },
@@ -1077,7 +1088,7 @@
       "conCaja": 7.2,
       "sharpe": 0.32,
       "maxDD": -5.4,
-      "vsEW": -83567.7,
+      "vsEW": -146.4,
       "posiciones": 19,
       "pctInvertido": 11
     }
@@ -1088,7 +1099,7 @@
       "conCaja": 76.7,
       "sharpe": 0.72,
       "maxDD": -17.2,
-      "vsEW": -83498.3,
+      "vsEW": -76.9,
       "posiciones": 92,
       "pctInvertido": 58
     },
@@ -1097,7 +1108,7 @@
       "conCaja": 115.3,
       "sharpe": 0.81,
       "maxDD": -19.5,
-      "vsEW": -83459.6,
+      "vsEW": -38.2,
       "posiciones": 66,
       "pctInvertido": 78
     },
@@ -1106,7 +1117,7 @@
       "conCaja": 80.7,
       "sharpe": 0.73,
       "maxDD": -17.4,
-      "vsEW": -83494.2,
+      "vsEW": -72.9,
       "posiciones": 95,
       "pctInvertido": 59
     },
@@ -1115,7 +1126,7 @@
       "conCaja": 82.2,
       "sharpe": 0.71,
       "maxDD": -17.7,
-      "vsEW": -83492.7,
+      "vsEW": -71.4,
       "posiciones": 102,
       "pctInvertido": 63
     },
@@ -1124,7 +1135,7 @@
       "conCaja": 83.1,
       "sharpe": 0.73,
       "maxDD": -17.1,
-      "vsEW": -83491.8,
+      "vsEW": -70.5,
       "posiciones": 97,
       "pctInvertido": 60
     },
@@ -1133,7 +1144,7 @@
       "conCaja": 82.1,
       "sharpe": 0.71,
       "maxDD": -17.1,
-      "vsEW": -83492.9,
+      "vsEW": -71.5,
       "posiciones": 101,
       "pctInvertido": 61
     },
@@ -1142,7 +1153,7 @@
       "conCaja": 128,
       "sharpe": 0.83,
       "maxDD": -19.7,
-      "vsEW": -83447,
+      "vsEW": -25.6,
       "posiciones": 70,
       "pctInvertido": 83
     },
@@ -1151,7 +1162,7 @@
       "conCaja": 126.4,
       "sharpe": 0.8,
       "maxDD": -20.4,
-      "vsEW": -83448.5,
+      "vsEW": -27.2,
       "posiciones": 70,
       "pctInvertido": 86
     },
@@ -1160,7 +1171,7 @@
       "conCaja": 142.7,
       "sharpe": 0.83,
       "maxDD": -18.4,
-      "vsEW": -83432.3,
+      "vsEW": -10.9,
       "posiciones": 72,
       "pctInvertido": 91
     },
@@ -1169,7 +1180,7 @@
       "conCaja": 132.3,
       "sharpe": 0.75,
       "maxDD": -20.5,
-      "vsEW": -83442.6,
+      "vsEW": -21.3,
       "posiciones": 74,
       "pctInvertido": 95
     }

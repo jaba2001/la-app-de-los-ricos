@@ -175,8 +175,14 @@ function padreDe(ruta) {
   return punto >= 0 ? ruta.slice(0, punto) : "(raíz)";
 }
 
+// Los artefactos de humo NO cuentan. `--smoke` corre 14 fechas de decision y deja 12
+// posiciones: con tan poco, casi todos los puntos del barrido de umbrales producen el MISMO
+// libro, y coincidir es lo normal, no una pista. Medido: 74 coincidencias, todas de ahi.
+// Ademas no son cifras publicadas — son una comprobacion mecanica de que el motor arranca.
+const ES_HUMO = (f) => f.includes("_smoke");
+
 let ficheros = [];
-try { ficheros = readdirSync(OUT).filter((f) => f.endsWith(".json")).sort(); } catch { /* sin out/ */ }
+try { ficheros = readdirSync(OUT).filter((f) => f.endsWith(".json") && !ES_HUMO(f)).sort(); } catch { /* sin out/ */ }
 
 const hallazgos = [];
 for (const f of ficheros) {

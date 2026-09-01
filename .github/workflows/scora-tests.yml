@@ -93,6 +93,11 @@ jobs:
       - name: Parámetros que entran y no se usan
         run: node --experimental-strip-types --no-warnings research/parametros_muertos.mjs
 
+      # Y la otra firma del mismo fallo: dos variantes de un cálculo que dan EXACTAMENTE lo
+      # mismo. Fue la única señal visible de que la referencia «sin financieros» era la de con
+      # financieros — cuatro números idénticos al decimal con 56 nombres supuestamente fuera.
+      - name: Variantes que dan exactamente lo mismo
+        run: node --experimental-strip-types --no-warnings research/variantes_identicas.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
