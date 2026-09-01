@@ -83,6 +83,16 @@ jobs:
       - name: Guardián de la capa de datos
         run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
 
+      # Un parámetro que entra en una función y no se usa nunca es la firma de un defecto que
+      # no rompe: la función acepta una pregunta y responde otra. El 2026-09-01 se encontró
+      # que `universoEW(eje, excluir)` ignoraba `excluir`, así que la referencia «universo
+      # equiponderado SIN financieros» era el MISMO cálculo que la de con ellos — cuatro
+      # números idénticos al decimal con 56 nombres supuestamente fuera. Durante meses eso
+      # contestó que los financieros no aportaban nada a la referencia, que es justo la
+      # pregunta de §11 y la que decide si merece la pena meter bancos en el universo.
+      - name: Parámetros que entran y no se usan
+        run: node --experimental-strip-types --no-warnings research/parametros_muertos.mjs
+
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
