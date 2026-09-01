@@ -30,6 +30,7 @@
 import { loadSP500Historical, membersAsOf, snapshotDate } from "./universe.mjs";
 import { señalAt } from "./picksSignal.mjs";
 import { rawPriceAsOf, lastBarDate } from "./prices.mjs";
+import { tickerToCik } from "./edgar.mjs";
 import { loadPanel } from "./momentumSignals.mjs";
 import {
   decide, emptyState, addMonths, daysBetween, cotizaEn,
@@ -84,7 +85,38 @@ if (!spy) { console.error("  ✖ sin calendario de mercado (panel de SPY)"); pro
   }
 }
 const siguienteHabil = (f) => spy.dates.find((d) => d >= f) ?? null;
-const objetivos = ["01", "15"].map((d) => siguienteHabil(`${HOY.slice(0, 8)}${d}`));
+const nominales = ["01", "15"].map((d) => `${HOY.slice(0, 8)}${d}`);
+const objetivos = nominales.map(siguienteHabil);
+
+// ⚠️ «NO SE SABE» NO ES «HOY NO TOCA», y confundirlos pierde una decisión para siempre.
+//
+// `siguienteHabil` busca el primer día de cotización a partir del 1 o del 15. Si el calendario
+// NO LLEGA a esa fecha —porque la barra de hoy aún no está publicada, o porque el proveedor se
+// retrasó— devuelve null, y la línea de abajo lo leía como «hoy no es fecha de decisión» y salía
+// con código 0. En silencio, y en la fecha exacta en que había que decidir.
+//
+// Y no se recupera solo. Al día siguiente el objetivo ya resuelve al día 1, que nunca volverá a
+// ser igual a HOY: la decisión no se retrasa, se pierde. El guardián de rancidez de más abajo
+// tampoco lo caza, porque un calendario que termina AYER está perfectamente fresco.
+//
+// Probado el 2026-09-01: el panel terminaba el 2026-08-31, hoy era día 1, y el cron dijo
+// «hoy no es fecha de decisión (las de este mes: )» — con la lista vacía, que era la pista.
+{
+  const ciegas = nominales.filter((f, i) => objetivos[i] == null && f <= HOY);
+  if (ciegas.length) {
+    console.error(`
+  ✖ No se puede saber si hoy toca decidir: el calendario de mercado termina el ${spy.dates.at(-1)}
+    y no alcanza a ${ciegas.join(" ni a ")}.`);
+    console.error(`    Eso NO es "hoy no toca": es "no se sabe", y callarse pierde la decisión para siempre —`);
+    console.error(`    mañana el objetivo ya resolverá a una fecha pasada y nunca coincidirá con hoy.`);
+    console.error(`    Causa habitual: se ha lanzado ANTES del cierre de EE. UU. (el cron va a las 21:30 UTC),`);
+    console.error(`    o el proveedor aún no ha publicado la barra de hoy. Reintenta después del cierre.\n`);
+    // Con --force hay una persona delante que ya ha aceptado el riesgo, y este banderín existe
+    // precisamente para poder probar los días conflictivos. Se avisa y se sigue; sin él, se para.
+    if (!FORCE) process.exit(1);
+    console.error("  ⚠ --force: se continúa de todas formas.");
+  }
+}
 
 if (!objetivos.includes(HOY)) {
   console.log(`  hoy no es fecha de decisión (las de este mes: ${objetivos.filter(Boolean).join(", ")})`);
@@ -233,6 +265,50 @@ console.log(`  Cartera resultante: ${d.nextState.holdings.length}/${TARGET_POSIT
 if (history.length < 3 && d.buys.length === 0) {
   console.log(`\n  ℹ Sin 3 decisiones previas dentro de ${PERSISTENCE_DAYS} días no se puede comprobar la persistencia, así que el motor NO compra.`);
   console.log(`    Es lo correcto al arrancar: las primeras ~6 semanas la cartera se queda vacía a propósito.`);
+}
+
+// ── 4bis · ¿HAY LA MISMA EMPRESA DOS VECES? ─────────────────────────────────────────────
+//
+// ⚠️ ESTO YA PASÓ, y estuvo casi cinco años sin que nadie lo viera. El backtest tiene GOOG y
+// GOOGL a la vez desde el 2021-10-01: 1.748 días con DOS posiciones en Alphabet. En una cartera
+// que promete 40 nombres diversificados eso es un 5 % en una empresa donde el diseño implica
+// 2,5 %. Medido, valía SIETE PUNTOS de la ventaja publicada (+44,3 pp → +37,5 pp).
+//
+// No es un fallo de datos: los dos tickers existen, cotizan y puntúan. Es que la regla cuenta
+// POSICIONES y el diseño quiere decir EMPRESAS.
+//
+// AQUÍ SÓLO SE AVISA, a propósito. Negarse a comprar sería cambiar la estrategia por la puerta
+// de atrás, y eso exige `PICKS_RULES_VERSION` nueva con su criterio escrito antes — no lo decide
+// un cron. Lo que sí puede hacer un cron es que no vuelva a pasar en silencio.
+{
+  const cartera = d.nextState.holdings.map((h) => h.ticker);
+  const porCik = new Map();
+  const sinResolver = [];
+  for (const t of cartera) {
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    // Un fallo de resolución NO se convierte en «no es duplicado»: dar por bueno lo que no se ha
+    // podido comprobar es justo el error que costó un artefacto entero el 2026-09-01.
+    if (!cik) { sinResolver.push(t); continue; }
+    if (!porCik.has(cik)) porCik.set(cik, []);
+    porCik.get(cik).push(t);
+  }
+  const dobles = [...porCik.entries()].filter(([, ts]) => ts.length > 1);
+
+  if (dobles.length) {
+    const detalle = dobles.map(([cik, ts]) => `${ts.join("+")} (CIK ${cik})`).join(" · ");
+    console.error(`
+  ⛔ LA MISMA EMPRESA ESTÁ DOS VECES EN LA CARTERA: ${detalle}`);
+    console.error(`     Son ${dobles.length * 2} posiciones sobre ${cartera.length} en ${dobles.length} empresa(s): el peso real es el doble del que dice el diseño.`);
+    console.error(`     NO se bloquea la decisión — deduplicar es un cambio de reglas. Ver PLAN_FALLOS_PENDIENTES.md §1.`);
+    // Anotación de GitHub Actions: sale en el resumen de la ejecución, no enterrada en el log.
+    console.log(`::warning title=Empresa duplicada en la cartera::${detalle}`);
+  } else if (cartera.length) {
+    console.log(`  ✓ sin empresas duplicadas (${porCik.size} emisores para ${cartera.length} posiciones${sinResolver.length ? `, ${sinResolver.length} sin CIK: ${sinResolver.join(" ")}` : ""})`);
+  }
+  if (sinResolver.length) {
+    console.log(`::warning title=Tickers sin CIK en la cartera::${sinResolver.join(" ")} — no se ha podido comprobar si duplican a otro`);
+  }
 }
 
 // ── 5 · Precios de ejecución ────────────────────────────────────────────────────────────
