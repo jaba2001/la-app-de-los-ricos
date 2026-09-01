@@ -237,12 +237,30 @@ const membresiaCongelada = ((t) => {
 // legible. La regla NO está dentro del motor: producción no puede aplicarla ni por error.
 function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERSISTENCIA_DIAS,
                    dias180 = DIAS_180, cuarentenaMeses = CUARENTENA_MESES, comprasPorFecha = COMPRAS_POR_FECHA,
-                   sinEstos = null } = {}) {
+                   sinEstos = null, cuantizar = false, emisorDe = null } = {}) {
   // `sinEstos` sirve a la prueba de estabilidad: recorta candidatos SIN recalcular percentiles,
   // que es justo la pregunta que interesa —«¿y si este nombre no hubiera estado disponible?»—.
-  const senal = sinEstos?.size
+  //
+  // `cuantizar` redondea cada percentil al múltiplo de 1/N más cercano, con N el número de
+  // nombres de esa fecha. Es la RESOLUCIÓN REAL de un percentil: con 371 nombres, 0,0027. Hoy la
+  // señal se guarda con cuatro decimales, veintisiete veces más fina de lo que el dato soporta,
+  // y por eso ACN (0,8094) y BKNG (0,8088) se ordenan como si la diferencia significara algo.
+  // Al cuantizar, esas dos caen en el mismo cubo, empatan de verdad, y entra en juego el
+  // desempate alfabético — que es estable y no depende del tamaño del universo.
+  const cortar = (m) => {
+    const N = Object.keys(m).length;
+    if (!N) return m;
+    const o = {};
+    for (const [t, v] of Object.entries(m)) o[t] = Math.round(v * N) / N;
+    return o;
+  };
+  const bruta = sinEstos?.size
     ? (f) => Object.fromEntries(Object.entries(PANEL[f]).filter(([t]) => !sinEstos.has(t)))
     : (f) => PANEL[f];
+  const cacheSenal = new Map();
+  const senal = cuantizar
+    ? (f) => { if (!cacheSenal.has(f)) cacheSenal.set(f, cortar(bruta(f))); return cacheSenal.get(f); }
+    : bruta;
   const overrides = { entryPctl: entry, exitPctl: exit, targetPositions: topN,
                       buysPerDate: comprasPorFecha, persistenceDays: persistencia,
                       quarantineMonths: cuarentenaMeses };
@@ -272,10 +290,31 @@ function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERS
       }
     }
 
-    const d = decide({ date: fecha, signal: sig, history, state, disqualified: porLos180, overrides });
+    // ── No dos clases de la misma empresa ────────────────────────────────────────────────
+    // Se reutiliza `disqualified`, que ya existe para la regla de 180 días. OJO: `decide()` usa
+    // esa misma lista para VENDER, así que aquí sólo pueden entrar candidatos que NO se tengan —
+    // si entrara uno en cartera, se vendería la posición buena en vez de bloquear la duplicada.
+    //
+    // La elegancia de hacerlo aquí y no en el universo: no hace falta decidir «qué clase se
+    // queda». Entra la que califique primero, y la otra queda bloqueada mientras dure. No hay
+    // regla arbitraria que justificar, y el percentil del universo no se toca —el S&P sí tiene
+    // las dos líneas, así que el pool refleja el índice de verdad—.
+    const duplicadas = [];
+    if (emisorDe) {
+      const emisoresEnCartera = new Set();
+      for (const h of state.holdings) { const e = emisorDe.get(h.ticker); if (e) emisoresEnCartera.add(e); }
+      const tenidos = new Set(state.holdings.map((h) => h.ticker));
+      for (const t of Object.keys(sig)) {
+        if (tenidos.has(t)) continue;
+        const e = emisorDe.get(t);
+        if (e && emisoresEnCartera.has(e)) duplicadas.push(t);
+      }
+    }
+    const d = decide({ date: fecha, signal: sig, history, state, disqualified: [...porLos180, ...duplicadas], overrides });
 
     for (const v of d.sells) {
       const motivo = porLos180.includes(v.ticker) ? "180 días sin recuperar"
+        : duplicadas.includes(v.ticker) ? "otra clase de la misma empresa"
         : v.reason === "senal_bajo_umbral" ? "señal bajo umbral 2 evaluaciones"
         : "fuera del universo";
       libro.push({ t: v.ticker, desde: v.since, hasta: fecha, motivo });
@@ -705,6 +744,154 @@ if (process.argv.includes("--estabilidad")) {
     resultados,
   }, null, 2));
   console.log(`  → escrito research/out/estabilidad${LONG ? "_oos" : ""}.json\n`);
+}
+
+// ── ¿MERECE LA PENA CUANTIZAR EL RANKING? ───────────────────────────────────────────────
+//
+// El ranking ordena por un percentil guardado con CUATRO DECIMALES cuando su resolución real es
+// 1/N — con 371 nombres, 0,0027. Veintisiete veces más fino de lo que el dato soporta. Por eso
+// ACN (0,8094) y BKNG (0,8088) se ordenan como si la diferencia dijera algo, y por eso quitar un
+// nombre cualquiera del universo los intercambia.
+//
+// Cuantizar al cubo de 1/N los haría empatar de verdad, y ahí sí actuaría el desempate
+// alfabético de `lib/picks.ts`, que es estable.
+//
+// LA PREGUNTA NO ES SI CAMBIA EL RESULTADO —cambiará— SINO SI LO HACE MÁS ESTABLE. Si el
+// intercuartil de la prueba de estabilidad no se estrecha, cuantizar es un cambio de estrategia
+// sin premio, y entonces no se hace. Esto lo mide antes de decidir nada.
+//
+//   node ... research/picks_rules_backtest.mjs --cuantizar [--long]
+//
+// Escribe su propio artefacto. NO toca el publicado.
+if (process.argv.includes("--cuantizar")) {
+  console.log(`
+  ── ¿MERECE LA PENA CUANTIZAR EL RANKING? ──`);
+
+  const simQ = simular({ cuantizar: true });
+  const vQ = await valorar(simQ.libro, { silencioso: true });
+  const cpQ = curva(vQ.soloPicks), ccQ = curva(vQ.conCaja);
+
+  // Cuántas decisiones cambian de verdad.
+  const clave = (o) => `${o.t}|${o.desde}`;
+  const base = new Set(libro.map(clave)), conQ = new Set(simQ.libro.map(clave));
+  const soloBase = [...base].filter((x) => !conQ.has(x));
+  const soloQ = [...conQ].filter((x) => !base.has(x));
+
+  console.log(`  posiciones      ${libro.length} → ${simQ.libro.length}`);
+  console.log(`  entradas que cambian: ${soloBase.length} salen, ${soloQ.length} entran`);
+  console.log(`  sólo picks      ${cPicks.total.toFixed(1)} % → ${cpQ.total.toFixed(1)} %`);
+  console.log(`  con caja        ${cCaja.total.toFixed(1)} % → ${ccQ.total.toFixed(1)} %`);
+  console.log(`  Sharpe          ${cCaja.sharpe.toFixed(2)} → ${ccQ.sharpe.toFixed(2)}`);
+
+  // Y LO QUE DECIDE: ¿se estrecha la banda? Misma prueba de estabilidad, con cuantización.
+  console.log(`  midiendo la estabilidad CON cuantización…`);
+  const compradosQ = [...new Set(simQ.libro.map((o) => o.t))].sort();
+  const totQ = [];
+  for (const t of compradosQ) {
+    const sim = simular({ cuantizar: true, sinEstos: new Set([t]) });
+    const v = await valorar(sim.libro, { silencioso: true });
+    totQ.push(curva(v.soloPicks).total);
+    process.stdout.write(`  ${totQ.length}/${compradosQ.length}\r`);
+  }
+  process.stdout.write("                    \r");
+  totQ.sort((a, b) => a - b);
+  const pcQ = (q) => totQ[Math.min(totQ.length - 1, Math.max(0, Math.round(q * (totQ.length - 1))))];
+  const iqrQ = pcQ(0.75) - pcQ(0.25);
+
+  console.log(`  intercuartil SIN cuantizar:  (ver estabilidad${LONG ? "_oos" : ""}.json)`);
+  console.log(`  intercuartil CON cuantizar:  ${pcQ(0.25).toFixed(1)} … ${pcQ(0.75).toFixed(1)}  = ${iqrQ.toFixed(1)} pp`);
+
+  writeFileSync(join(OUT, `cuantizacion${LONG ? "_oos" : ""}.json`), JSON.stringify({
+    generatedAt: new Date().toISOString(), window: VENTANA,
+    sinCuantizar: { soloPicks: fx(cPicks.total, 1), conCaja: fx(cCaja.total, 1), sharpe: fx(cCaja.sharpe, 2), posiciones: libro.length },
+    conCuantizar: { soloPicks: fx(cpQ.total, 1), conCaja: fx(ccQ.total, 1), sharpe: fx(ccQ.sharpe, 2), posiciones: simQ.libro.length },
+    entradasQueCambian: { salen: soloBase, entran: soloQ },
+    estabilidadConCuantizar: { p25: pcQ(0.25), p75: pcQ(0.75), iqr: fx(iqrQ, 1), min: totQ[0], max: totQ.at(-1), n: compradosQ.length },
+    nota: "La decisión no la toma el retorno sino el intercuartil: si no se estrecha, cuantizar es un cambio de estrategia sin premio.",
+  }, null, 2));
+  console.log(`  → escrito research/out/cuantizacion${LONG ? "_oos" : ""}.json\n`);
+}
+
+// ── ¿QUÉ PASA SI NO SE COMPRA LA MISMA EMPRESA DOS VECES? ───────────────────────────────
+//
+// La cartera tiene GOOG y GOOGL a la vez desde el 2021-10-01: 1.748 días con dos posiciones en
+// Alphabet, en una cartera que promete 40 nombres diversificados. Ver §2quater de las reglas.
+//
+// Aquí se mide la corrección, que NO se ha implementado en producción: cambia qué se compra, o
+// sea la estrategia, y eso exige `PICKS_RULES_VERSION` nueva con criterio escrito antes.
+//
+// El diseño evita la decisión difícil. En vez de elegir «qué clase se queda» —una regla
+// arbitraria que habría que justificar para todos los casos futuros— se bloquea la SEGUNDA:
+// entra la que califique primero y la otra queda fuera mientras dure la posición. Y no se toca
+// el universo: el S&P sí tiene las dos líneas de Alphabet, así que el pool de percentiles debe
+// seguir teniéndolas; lo que no debe es la CARTERA.
+//
+//   node ... research/picks_rules_backtest.mjs --dedup [--long]
+//
+// Escribe su propio artefacto. NO toca el publicado.
+if (process.argv.includes("--dedup")) {
+  console.log(`
+  ── ¿Y SI NO SE COMPRA LA MISMA EMPRESA DOS VECES? ──`);
+
+  const { tickerToCik } = await import("./edgar.mjs");
+  const nombres = new Set();
+  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) nombres.add(t);
+  const emisorDe = new Map();
+  const sinCik = [];
+  let hechos = 0;
+  for (const t of nombres) {
+    process.stdout.write(`  resolviendo emisores ${++hechos}/${nombres.size}\r`);
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    // Un ticker sin CIK NO se da por «no duplicado»: se cuenta y se dice. Dar por bueno lo que
+    // no se ha podido comprobar es el error que costó un artefacto entero esta semana.
+    if (cik) emisorDe.set(t, cik); else sinCik.push(t);
+  }
+  process.stdout.write("                                        \r");
+  if (sinCik.length) console.log(`  ⚠ ${sinCik.length} tickers sin CIK, no se puede saber si duplican: ${sinCik.slice(0, 10).join(" ")}${sinCik.length > 10 ? " …" : ""}`);
+
+  const simD = simular({ emisorDe });
+  const vD = await valorar(simD.libro, { silencioso: true });
+  const cpD = curva(vD.soloPicks), ccD = curva(vD.conCaja);
+
+  const clave = (o) => `${o.t}|${o.desde}`;
+  const base = new Set(libro.map(clave)), conD = new Set(simD.libro.map(clave));
+  const salen = [...base].filter((x) => !conD.has(x));
+  const entran = [...conD].filter((x) => !base.has(x));
+
+  console.log(`  posiciones      ${libro.length} → ${simD.libro.length}`);
+  console.log(`  entradas         ${salen.length} salen · ${entran.length} entran`);
+  if (salen.length) console.log(`    salen:  ${salen.slice(0, 12).join("  ")}`);
+  if (entran.length) console.log(`    entran: ${entran.slice(0, 12).join("  ")}`);
+  console.log(`  sólo picks      ${cPicks.total.toFixed(1)} % → ${cpD.total.toFixed(1)} %   (vs EW ${(cPicks.total - ew.total).toFixed(1)} → ${(cpD.total - ew.total).toFixed(1)} pp)`);
+  console.log(`  con caja        ${cCaja.total.toFixed(1)} % → ${ccD.total.toFixed(1)} %`);
+  console.log(`  Sharpe          ${cCaja.sharpe.toFixed(2)} → ${ccD.sharpe.toFixed(2)}   ·   maxDD ${cCaja.maxDD.toFixed(1)} → ${ccD.maxDD.toFixed(1)}`);
+
+  // ¿Y la estabilidad? Menos concentración debería estrechar la banda; hay que comprobarlo.
+  console.log(`  midiendo la estabilidad CON deduplicación…`);
+  const compradosD = [...new Set(simD.libro.map((o) => o.t))].sort();
+  const totD = [];
+  for (const t of compradosD) {
+    const sim = simular({ emisorDe, sinEstos: new Set([t]) });
+    const v = await valorar(sim.libro, { silencioso: true });
+    totD.push(curva(v.soloPicks).total);
+    process.stdout.write(`  ${totD.length}/${compradosD.length}\r`);
+  }
+  process.stdout.write("                    \r");
+  totD.sort((a, b) => a - b);
+  const pcD = (q) => totD[Math.min(totD.length - 1, Math.max(0, Math.round(q * (totD.length - 1))))];
+  console.log(`  intercuartil     ${pcD(0.25).toFixed(1)} … ${pcD(0.75).toFixed(1)}  = ${(pcD(0.75) - pcD(0.25)).toFixed(1)} pp   (sin deduplicar: ver estabilidad${LONG ? "_oos" : ""}.json)`);
+
+  writeFileSync(join(OUT, `deduplicacion${LONG ? "_oos" : ""}.json`), JSON.stringify({
+    generatedAt: new Date().toISOString(), window: VENTANA,
+    criterio: "Se bloquea el candidato cuyo emisor (CIK) ya está en cartera. Entra la clase que califique primero; el universo de percentiles NO se toca.",
+    sinCik,
+    sinDeduplicar: { soloPicks: fx(cPicks.total, 1), conCaja: fx(cCaja.total, 1), sharpe: fx(cCaja.sharpe, 2), maxDD: fx(cCaja.maxDD, 1), vsEW: fx(cPicks.total - ew.total, 1), posiciones: libro.length },
+    conDeduplicar: { soloPicks: fx(cpD.total, 1), conCaja: fx(ccD.total, 1), sharpe: fx(ccD.sharpe, 2), maxDD: fx(ccD.maxDD, 1), vsEW: fx(cpD.total - ew.total, 1), posiciones: simD.libro.length },
+    entradasQueCambian: { salen, entran },
+    estabilidad: { p25: pcD(0.25), p75: pcD(0.75), iqr: fx(pcD(0.75) - pcD(0.25), 1), min: totD[0], max: totD.at(-1), n: compradosD.length },
+  }, null, 2));
+  console.log(`  → escrito research/out/deduplicacion${LONG ? "_oos" : ""}.json\n`);
 }
 
 // ── ¿QUÉ REGLA HACE EL TRABAJO? (ablación: se quita una y se mira qué pasa) ─────────────
