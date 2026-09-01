@@ -365,8 +365,14 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     if (!j) { aviso(`falta ${f} — no se puede comprobar la referencia de §11`); continue; }
     const con = j.benchmarks?.universoEW, sin = j.benchmarks?.universoEWSinFinancieros;
     if (!con || !sin) { aviso(`${nombre}: el artefacto no trae las dos referencias de §11`); continue; }
+    // Un cero aqui NO es "no habia financieros": el indice tiene del orden de 70. Significa que
+    // las consultas de sector no respondieron y el catch las dejo a todas dentro. Si eso pasara
+    // en silencio, la referencia saldria identica por un motivo legitimo y la comprobacion de
+    // abajo se saltaria — devolviendo el mismo "+0 pp" que estuvo publicado meses.
     const n = sin.financierosExcluidos ?? 0;
-    if (!n) { aviso(`${nombre}: no se excluyo ningun financiero, no hay nada que comparar`); continue; }
+    ok(n >= 20,
+      `§11 ${nombre}: solo ${n} financieros excluidos, y el indice tiene ~70 — la referencia no puede medir nada asi (probablemente fallaron las consultas de SIC)`);
+    if (!n) continue;
     const campos = ["total", "cagr", "sharpe", "maxDD"];
     const iguales = campos.every((k) => con[k] === sin[k]);
     ok(!iguales,

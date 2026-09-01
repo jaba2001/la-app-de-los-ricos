@@ -493,6 +493,23 @@ const financieros = new Set();
     } catch { /* sin sector: se queda dentro, que es lo conservador */ }
   }
 }
+// El indice tiene ~70 financieras. Si aqui salen cuatro, no es que el indice haya cambiado:
+// es que las consultas de sector no respondieron y el catch de arriba las dejo a todas dentro.
+// Publicar la referencia igualmente daria un "+0 pp" indistinguible de una medicion de verdad,
+// que es como §11 estuvo meses contestando lo que no habia medido.
+{
+  const vistosEnPanel = new Set();
+  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) vistosEnPanel.add(t);
+  const MINIMO = 20;
+  if (vistosEnPanel.size > 200 && financieros.size < MINIMO) {
+    console.error(`\n  ⛔ §11: solo ${financieros.size} financieros identificados sobre ${vistosEnPanel.size} nombres del panel.`);
+    console.error(`     El indice tiene del orden de 70. Con tan pocos, la referencia "sin financieros" seria`);
+    console.error(`     casi la misma que la normal y su "+0 pp" no significaria nada.`);
+    console.error(`     Causa probable: las consultas de SIC a la SEC no respondieron (sin red, o 429).`);
+    console.error(`     No se publica una medicion que no se ha hecho. Reintenta con la cache de EDGAR caliente.\n`);
+    process.exit(1);
+  }
+}
 const ewSinFin = await universoEW(eje, financieros);
 const spy = await refDe("SPY", eje);
 const rsp = await refDe("RSP", eje);
