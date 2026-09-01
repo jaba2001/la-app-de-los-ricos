@@ -405,9 +405,22 @@ if (!REHACER && !SOLO) {
           // la siguiente. Medido: la tanda anterior dejó 66 pendientes y 16 «sin datos», y la
           // siguiente marcó 82. Oscilando así, la puerta del rebuild podía no abrirse nunca.
           //
-          // Y heredarlos es seguro por una razón distinta de la de los otros dos: un nombre sin
-          // serie no puede contaminar nada, porque no hay precios que servir. Si algún día hace
-          // falta volver a preguntarlos —el proveedor pudo añadir historia—, está `--rehacer`.
+          // ⚠️ AQUÍ PONÍA que heredarlos era seguro «porque un nombre sin serie no puede
+          // contaminar nada, no hay precios que servir». ESO ERA FALSO, y el 2026-09-01 costó
+          // un artefacto entero: la referencia equiponderada de 2011-2018 salió con un +83.575 %
+          // y un CAGR del 133 %.
+          //
+          // La auditoría y el cargador de precios NO preguntan por el mismo camino ni en el
+          // mismo momento. «Sin datos» dice que el proveedor no contestó A LA AUDITORÍA; el
+          // cargador hace su propia petición y puede obtener algo. Medido ese día: 11 de los 28
+          // «sin datos» SÍ devolvían serie, y seis con saltos imposibles — CBE +3.399.900 % en
+          // un día, MEE +11.886 %, PTV +4.900 %, BMC +2.599 %. Cooper Industries se fusionó en
+          // 2012; lo que devuelve su símbolo hoy no es Cooper Industries.
+          //
+          // La herencia se mantiene, porque el razonamiento de la cuota SÍ era correcto. Lo que
+          // se arregla es la consecuencia: «sin datos» pasa a BLOQUEAR (ver más abajo). En el
+          // caso que este comentario daba por supuesto —que no hay serie— bloquear no cuesta
+          // nada; en el caso que no vio, es justo lo que hacía falta.
           if (["ok", "reutilizado", "sin datos", "truncar", "sin historia"].includes(f.veredicto)) previoDetalle.set(f.ticker, f);
         }
       }
@@ -530,7 +543,22 @@ try {
     else console.log(`  ⚠ los bloqueos anteriores se hicieron con las reglas v${prev?.versionReglas ?? 0} y ahora van por la v${VERSION_REGLAS}: NO se heredan, hay que volver a ganárselos.`);
   }
 } catch { previos = {}; }
-const bloqueados = Object.fromEntries([...malos, ...sinHistoria].map((f) => [f.ticker, f.motivo]));
+// ⚠️ LOS «SIN DATOS» TAMBIÉN SE BLOQUEAN, desde el 2026-09-01.
+//
+// Un símbolo del que la auditoría no consiguió serie NO está verificado. Si más tarde el
+// cargador de precios sí obtiene una, esa serie es de procedencia desconocida — y el 2026-09-01
+// se comprobó que eso pasa de verdad: 11 de 28 devolvían precios al cargador, seis de ellos con
+// saltos imposibles. CBE (Cooper Industries, fusionada en 2012) traía un día de +3.399.900 % y
+// otro de −100 %; ese único nombre llevó la referencia equiponderada de 2011-2018 a +83.575 %.
+//
+// Bloquear es la respuesta conservadora y barata: si de verdad no hay serie, no se pierde nada;
+// si la hay, es de otro instrumento y no debe entrar. Lo que NO puede seguir pasando es que una
+// ausencia observada en un sitio se dé por válida en otro.
+const bloqueados = Object.fromEntries([
+  ...malos.map((f) => [f.ticker, f.motivo]),
+  ...sinHistoria.map((f) => [f.ticker, f.motivo]),
+  ...sinDatos.map((f) => [f.ticker, `la auditoría no obtuvo serie de ninguna fuente (${f.motivo}); si el cargador sí obtiene una, es de procedencia no verificada`]),
+]);
 const heredados = [];
 for (const f of noComp) {
   if (previos[f.ticker] && !bloqueados[f.ticker]) { bloqueados[f.ticker] = previos[f.ticker]; heredados.push(f.ticker); }

@@ -1,17 +1,17 @@
 {
- "generatedAt": "2026-08-31T21:56:16.749Z",
+ "generatedAt": "2026-09-01T06:55:36.234Z",
  "versionReglas": 5,
  "auditados": 345,
- "reutilizados": 46,
- "sinDatos": 28,
- "noComprobados": 15,
+ "reutilizados": 47,
+ "sinDatos": 42,
+ "noComprobados": 0,
  "detalle": [
   {
    "ticker": "AABA",
    "desde": "2010-01-06",
    "hasta": "2017-06-16",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 873 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -24,14 +24,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2019-11-06",
-    "barras": 2710,
-    "colaRepes": 6,
-    "ultimaReal": "2019-10-01",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 873 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -324,8 +319,8 @@
    "ticker": "AKS",
    "desde": "2010-01-06",
    "hasta": "2011-12-14",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 3012 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -338,14 +333,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-03-13",
-    "barras": 2818,
-    "colaRepes": 2,
-    "ultimaReal": "2020-03-12",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 3012 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -574,8 +564,8 @@
    "ticker": "ANRZQ",
    "desde": "2011-06-02",
    "hasta": "2012-10-01",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1395 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -588,14 +578,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-07-27",
-    "barras": 1905,
-    "colaRepes": 1,
-    "ultimaReal": "2016-07-27",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1395 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -900,8 +885,8 @@
    "ticker": "AVP",
    "desde": "2010-01-06",
    "hasta": "2015-03-19",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1751 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -914,14 +899,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-01-03",
-    "barras": 2770,
-    "colaRepes": 1,
-    "ultimaReal": "2020-01-03",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1751 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -4409,8 +4389,8 @@
    "ticker": "HRS",
    "desde": "2010-01-06",
    "hasta": "2019-04-02",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2708 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4423,22 +4403,17 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-31",
-    "barras": 4442,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-31",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 2708 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
    "ticker": "HSH",
    "desde": "2010-01-06",
    "hasta": "2012-06-25",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 795 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4451,14 +4426,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2014-08-29",
-    "barras": 1425,
-    "colaRepes": 3,
-    "ultimaReal": "2014-08-27",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 795 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -4801,8 +4771,8 @@
    "ticker": "JNS",
    "desde": "2010-01-06",
    "hasta": "2011-11-18",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2020 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4810,27 +4780,22 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 404,
+    "estado": 200,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-05-30",
-    "barras": 2116,
-    "colaRepes": 2,
-    "ultimaReal": "2017-05-26",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 2020 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
    "ticker": "JOY",
    "desde": "2011-02-28",
    "hasta": "2015-10-05",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 556 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4838,19 +4803,14 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 404,
+    "estado": 200,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-04-13",
-    "barras": 2085,
-    "colaRepes": 7,
-    "ultimaReal": "2017-04-05",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 556 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -4969,8 +4929,8 @@
    "ticker": "KORS",
    "desde": "2013-11-13",
    "hasta": "2018-09-18",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2904 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -4983,14 +4943,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2011-12-15",
-    "hasta": "2026-08-31",
-    "barras": 3697,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-31",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 2904 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -5265,8 +5220,8 @@
    "ticker": "LM",
    "desde": "2010-01-06",
    "hasta": "2016-11-29",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -5279,14 +5234,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2020-07-31",
-    "barras": 2915,
-    "colaRepes": 5,
-    "ultimaReal": "2020-07-27",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1340 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -5740,8 +5690,8 @@
    "ticker": "MIL",
    "desde": "2010-01-06",
    "hasta": "2010-07-12",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 2041 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -5749,19 +5699,14 @@
     "conocido": false
    },
    "yahoo": {
-    "estado": 404,
+    "estado": 200,
     "juicio": "sin datos",
-    "motivo": "el proveedor no devuelve serie (404)"
+    "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-02-12",
-    "barras": 1791,
-    "colaRepes": 1,
-    "ultimaReal": "2016-02-12",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 2041 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -6102,8 +6047,8 @@
    "ticker": "MWW",
    "desde": "2010-01-06",
    "hasta": "2011-12-14",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6116,14 +6061,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2016-11-09",
-    "barras": 1979,
-    "colaRepes": 8,
-    "ultimaReal": "2016-10-31",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1792 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -6502,8 +6442,8 @@
    "ticker": "NVLS",
    "desde": "2010-01-06",
    "hasta": "2012-06-04",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1876 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -6516,14 +6456,9 @@
     "motivo": "el proveedor no devuelve serie (200)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2017-07-24",
-    "barras": 1392,
-    "colaRepes": 1,
-    "ultimaReal": "2017-07-24",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1876 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -7768,8 +7703,8 @@
    "ticker": "SBNY",
    "desde": "2021-12-20",
    "hasta": "2023-01-04",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 1335 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "reutilizado",
+   "motivo": "la serie (2024-08-15→2026-08-31) no solapa con el periodo en el índice (2021-12-20→2023-01-04)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -7784,19 +7719,14 @@
     "hasta": "2026-08-31",
     "barras": 512,
     "colaRepes": 1,
-    "ultimaReal": "2026-08-28",
+    "ultimaReal": "2026-08-31",
     "juicio": "reutilizado",
     "motivo": "la serie (2024-08-15→2026-08-31) no solapa con el periodo en el índice (2021-12-20→2023-01-04)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-31",
-    "barras": 4442,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-31",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 1335 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {
@@ -9512,8 +9442,8 @@
    "ticker": "WYND",
    "desde": "2010-01-06",
    "hasta": "2018-05-24",
-   "veredicto": "no comprobado",
-   "motivo": "la serie sigue 3021 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó",
+   "veredicto": "sin datos",
+   "motivo": "el proveedor no devuelve serie (sin token)",
    "truncarEn": null,
    "fuenteBuena": null,
    "seguiaPresentando": null,
@@ -9526,14 +9456,9 @@
     "motivo": "el proveedor no devuelve serie (404)"
    },
    "tiingo": {
-    "estado": 200,
-    "desde": "2009-01-02",
-    "hasta": "2026-08-31",
-    "barras": 4442,
-    "colaRepes": 1,
-    "ultimaReal": "2026-08-31",
-    "juicio": "no comprobado",
-    "motivo": "la serie sigue 3021 días tras salir del índice (tope 400), pero NO se pudo comprobar si la empresa siguió presentando informes — sin CIK resuelto, o EDGAR no contestó"
+    "estado": "sin token",
+    "juicio": "sin datos",
+    "motivo": "el proveedor no devuelve serie (sin token)"
    }
   },
   {

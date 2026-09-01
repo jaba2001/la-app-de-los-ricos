@@ -412,6 +412,27 @@ async function refDe(ticker, eje) {
  * podría ser simplemente no haberlos tenido. Comparando contra el universo elegible **sin
  * financieros en ninguna de las dos partes**, lo que sobre es selección.
  */
+/**
+ * ¿Trae esta serie un salto que ninguna acción real hace?
+ *
+ * Devuelve el texto del salto, o null si la serie es plausible. El umbral (+300 % en una sesión)
+ * está puesto MUY por encima de los récords reales a propósito: GME +135 %, NKTR +156 %. No se
+ * trata de filtrar días extraordinarios, sino de cazar series que pertenecen a otro instrumento.
+ */
+const TOPE_SALTO = Math.log(4); // +300 % en un día
+function saltoImposible(p, desde, hasta) {
+  // Sólo el tramo que la referencia usa de verdad. Mirar la serie entera excluiría un nombre
+  // bueno en la ventana por una anomalía posterior — y precisamente los símbolos reutilizados
+  // se estropean DESPUÉS de que la empresa muera, o sea fuera de las ventanas antiguas.
+  for (let i = Math.max(1, desde + 1); i < p.ret.length && p.dates[i] <= hasta; i++) {
+    const r = p.ret[i];
+    if (Number.isFinite(r) && r > TOPE_SALTO) {
+      return `+${((Math.exp(r) - 1) * 100).toFixed(0)} % el ${p.dates[i]}`;
+    }
+  }
+  return null;
+}
+
 async function universoEW(eje, excluir = null) {
   const porDia = eje.map(() => []);
   const idx = new Map(eje.map((d, i) => [d, i]));
@@ -445,13 +466,20 @@ async function universoEW(eje, excluir = null) {
   //   · `sinPanel`  — no hay precios (o están bloqueados por símbolo reutilizado).
   //   · `empiezaTarde` — la serie arranca DESPUÉS del inicio de la ventana, y entonces el
   //     nombre se cae entero en vez de aportar desde que existe.
-  const fuera = { sinPanel: [], empiezaTarde: [] };
+  const fuera = { sinPanel: [], empiezaTarde: [], saltosImposibles: [] };
   for (const t of miembros) {
     const p = await panelDe(t);
     process.stdout.write(`  universo EW  ${++n}/${miembros.size}\r`);
     if (!p) { fuera.sinPanel.push(t); continue; }
     const a = idxOnOrBefore(p.dates, eje[0]);
     if (a < 0) { fuera.empiezaTarde.push(`${t} (${p.dates[0]})`); continue; }
+    // Una acción no sube un 300 % en una sesión. GME hizo +135 % en el squeeze de 2021 y NKTR
+    // +156 % con resultados de un ensayo — los dos REALES, y por eso el listón está tan alto:
+    // lo que se busca no es un día extraordinario sino una serie que no es de esta empresa.
+    // CBE (Cooper Industries, fusionada en 2012) traía +3.399.900 % en un día; ese solo nombre
+    // llevó esta referencia a +83.575 % el 2026-09-01.
+    const salto = saltoImposible(p, a, eje.at(-1));
+    if (salto) { fuera.saltosImposibles.push(`${t} (${salto})`); continue; }
     for (let i = a + 1; i < p.dates.length && p.dates[i] <= eje.at(-1); i++) {
       const j = idx.get(p.dates[i]);
       if (j == null) continue;
@@ -460,14 +488,15 @@ async function universoEW(eje, excluir = null) {
     }
   }
   process.stdout.write("                              \r");
-  const nFuera = fuera.sinPanel.length + fuera.empiezaTarde.length;
+  const nFuera = fuera.sinPanel.length + fuera.empiezaTarde.length + fuera.saltosImposibles.length;
   if (nFuera) {
     const pct = (100 * nFuera) / miembros.size;
     console.warn(`  ⚠ universo EW${excluir ? " (sin financieros)" : ""}: ${nFuera} de ${miembros.size} nombres (${pct.toFixed(1)} %) NO entran en la referencia.`);
     if (fuera.sinPanel.length) console.warn(`     sin precios: ${fuera.sinPanel.slice(0, 20).join(" ")}${fuera.sinPanel.length > 20 ? ` … (+${fuera.sinPanel.length - 20})` : ""}`);
     if (fuera.empiezaTarde.length) console.warn(`     su serie empieza después del inicio de la ventana: ${fuera.empiezaTarde.slice(0, 10).join(" · ")}`);
+    if (fuera.saltosImposibles.length) console.warn(`     ⛔ saltos imposibles (la serie no es de esta empresa): ${fuera.saltosImposibles.join(" · ")}`);
   }
-  return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, deCuantos: miembros.size }, excluidos: todos.size - miembros.size };
+  return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, saltosImposibles: fuera.saltosImposibles, deCuantos: miembros.size }, excluidos: todos.size - miembros.size };
 }
 
 // ── EJECUCIÓN ───────────────────────────────────────────────────────────────────────────
@@ -476,6 +505,21 @@ const { eje, soloPicks, conCaja, vivas, saltadas } = await valorar(libro);
 const cPicks = curva(soloPicks);
 const cCaja = curva(conCaja);
 const ew = await universoEW(eje);
+
+// ⚠️ RED FINAL, puesta el 2026-09-01 después de publicar una referencia con +83.575 % y un CAGR
+// del 133 %. Salió con código 0 y sin un solo aviso; sólo se cazó al compararla a mano con la
+// corrida del día anterior. Una cesta equiponderada del S&P 500 no compone al 133 % anual: si
+// sale eso, hay una serie que no es de quien dice ser, y publicar el número es peor que fallar.
+{
+  const TOPE_CAGR = 40, SUELO_CAGR = -30;
+  if (!Number.isFinite(ew.cagr) || ew.cagr > TOPE_CAGR || ew.cagr < SUELO_CAGR) {
+    console.error(`\n  ⛔ La referencia equiponderada da un CAGR de ${ew.cagr?.toFixed?.(2) ?? ew.cagr} % (total ${ew.total?.toFixed?.(1)} %).`);
+    console.error(`     Una cesta equiponderada del indice no hace eso. Casi seguro hay una serie que pertenece`);
+    console.error(`     a otro instrumento: revisa los avisos de "saltos imposibles" y la auditoria de simbolos.`);
+    console.error(`     No se publica una referencia que no puede ser cierta.\n`);
+    process.exit(1);
+  }
+}
 
 // ── SESGO SECTORIAL (§11, medición pendiente desde el 2026-08-21) ─────────────────────────
 // Se marca como financiero a quien lo sea según el SIC de la SEC, y se rehace la referencia
