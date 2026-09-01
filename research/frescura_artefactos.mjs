@@ -38,7 +38,7 @@ const ARTEFACTOS = [
 ];
 
 const tabla = await loadSP500Historical().catch(() => null);
-const ahora = huellaEntradas(tabla?.length ? tabla[tabla.length - 1].date : null);
+const ahora = huellaEntradas(tabla?.length ? tabla[tabla.length - 1] : null);
 
 console.log(`\n  FRESCURA DE ARTEFACTOS · huella actual ${ahora.sha} · reglas v${ahora.versionReglas}\n`);
 

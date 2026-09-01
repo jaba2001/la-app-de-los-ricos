@@ -606,7 +606,7 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
   // nuevo salvo mirando la fecha — y nadie la mira. El 2026-08-29 esta corrida abortó por
   // memoria DESPUÉS del panel, no escribió, y los números publicados siguieron siendo los del
   // día anterior sin que nada lo dijera. `research/frescura_artefactos.mjs` la comprueba.
-  huella: huellaEntradas(tablaMiembros?.length ? tablaMiembros[tablaMiembros.length - 1].date : null),
+  huella: huellaEntradas(tablaMiembros?.length ? tablaMiembros[tablaMiembros.length - 1] : null),
   rules: { entry: ENTRY, exit: EXIT, topN: TOP_N, comprasPorFecha: COMPRAS_POR_FECHA, persistenciaDias: PERSISTENCIA_DIAS, dias180: DIAS_180, cuarentenaMeses: CUARENTENA_MESES, costBps: COST_BPS },
   span: { from: eje[0], to: eje.at(-1), decisiones: fechasOk.length, diasMercado: eje.length },
   // Lo que NO entró en el cálculo, que es tan parte del resultado como lo que sí. Sin esto,

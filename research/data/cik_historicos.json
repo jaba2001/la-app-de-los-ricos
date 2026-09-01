@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-31T21:53:56.345Z",
+ "generatedAt": "2026-08-31T22:30:19.042Z",
  "fuente": "research/resolver_cik.mjs → research/publicar_resolucion.mjs",
  "evidencia": "research/out/resolucion_cik.json",
  "criterio": "nivel A (el emisor declara el símbolo DENTRO del periodo en el índice) o la fuente de miembros actuales. Los niveles B y C sólo entran confirmados a mano en cik_revisados.json.",

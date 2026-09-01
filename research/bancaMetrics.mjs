@@ -14,14 +14,32 @@
 // QUÉ SE CONSTRUYE Y QUÉ NO. Medido en `research/banca_cobertura.mjs` ANTES de escribir una
 // línea, sobre la caché real y contando sólo tags vivos:
 //
-//   · Rentabilidad y eficiencia bancaria ....... 20/20 bancos comerciales · 100 %  → SE HACE
-//   · Siniestralidad de seguros ................ 27/34 aseguradoras       ·  79 %  → SE HACE
+//   · Rentabilidad y eficiencia bancaria ....... 21/25 bancos comerciales ·  84 %  → SE HACE
+//   · Siniestralidad de seguros ................ 27/37 aseguradoras       ·  73 %  → SE HACE
 //   · Calidad del crédito (mora, dotaciones) ....  8/20                   ·  40 %  → NO
 //   · Solvencia regulatoria (Tier 1) ............  6/20                   ·  30 %  → NO
 //   · CET1 ......................................  0/20                   ·   0 %  → NO
 //
 // Las tres últimas no se construyen. Un ranking sobre una métrica que sólo existe para el
 // 40 % ordena la DISPONIBILIDAD DEL DATO, no el negocio — y encima lo hace de forma creíble.
+//
+// ⚠️ LAS DOS PRIMERAS CIFRAS SE VOLVIERON A MEDIR el 2026-09-01 Y BAJARON. Aquí ponía «20/20,
+// 100 %», y esa cifra salía del universo con sesgo de supervivencia: la fuente de miembros
+// antigua omitía a las empresas que murieron, así que había menos bancos y los que quedaban
+// eran los supervivientes — los que más publican. Sobre la fuente corregida son 21 de 25.
+// Un 100 % de cobertura casi nunca es una buena noticia: suele significar que el denominador
+// está mal.
+//
+// Y «financieras» no es una sola cosa. Por subsector la cobertura no se parece en nada:
+//
+//   · Banca comercial ........ 21/25 ·  84 %
+//   · Seguros ................ 27/37 ·  73 %
+//   · Mercados de capitales ...  7/28 ·  25 %
+//   · Holdings y fondos .......  0/38 ·   0 %
+//
+// Los dos últimos NO son un fallo que arreglar: una gestora de activos no tiene ratio de
+// eficiencia bancaria ni siniestralidad, igual que un banco no tiene margen de explotación.
+// Ver `PLAN_BANCOS_MEDICION.md` para qué haría falta antes de meter esto en la señal.
 //
 // ⚠️ ESTO NO ALIMENTA LA SEÑAL DE PRODUCCIÓN. `picksSignal.mjs` no lo importa. Meter bancos
 // en el universo elegible cambia la estrategia, no arregla un fallo, así que exige abrir una

@@ -307,6 +307,49 @@ console.log("\n  A · artefactos versionados (sin red)\n");
     "alias: SYMC y NLOK se suceden — la misma empresa con dos nombres, y los dos alias valen");
 }
 
+// ── La huella: que NO salte sola cada medianoche ──────────────────────────────────────────
+//
+// El 2026-09-01 el guardián de frescura declaró caducos los dos backtests a las 00:00, con las
+// entradas intactas. La causa: `conFotoDeHoy()` sella la foto de miembros con la fecha de HOY
+// todos los días, cambie o no el índice, y esa fecha entraba en el resumen. Un guardián que
+// salta 365 días al año se aprende a ignorar — y entonces ya no caza el fallo para el que se
+// escribió. Esto lo fija: cuenta el CONTENIDO, nunca la fecha.
+{
+  const { huellaEntradas, comprobarHuella } = await import("../research/huella.mjs");
+
+  const lista = ["AAPL", "MSFT", "NVDA"];
+  const ayer = huellaEntradas({ date: "2026-08-31", tickers: lista });
+  const hoy  = huellaEntradas({ date: "2026-09-01", tickers: lista });
+
+  ok(ayer.sha === hoy.sha,
+    `huella: misma lista y otra fecha tiene que dar el mismo resumen (${ayer.sha} vs ${hoy.sha}) — si no, todo caduca cada medianoche`);
+  ok(comprobarHuella({ huella: ayer }, hoy).vale,
+    "huella: un artefacto de ayer con el índice sin cambios SIGUE siendo citable");
+
+  // Y el reverso, que es lo que sí tiene que saltar.
+  const distinta = huellaEntradas({ date: "2026-09-01", tickers: [...lista, "AVGO"] });
+  ok(ayer.sha !== distinta.sha, "huella: si el índice cambia, el resumen cambia");
+  const { vale, motivos } = comprobarHuella({ huella: ayer }, distinta);
+  ok(!vale, "huella: un artefacto anterior a un cambio del índice NO se puede citar");
+  ok(motivos.some((m) => m.includes("el índice ha cambiado")),
+    `huella: el motivo dice qué cambió (${motivos.join(" | ") || "(ninguno)"})`);
+
+  // El orden de los tickers no es información: dos lecturas de la misma foto pueden venir
+  // ordenadas distinto y eso no invalida nada.
+  ok(huellaEntradas({ date: "x", tickers: ["MSFT", "AAPL", "NVDA"] }).sha === ayer.sha,
+    "huella: el orden de la lista de miembros no cambia el resumen");
+
+  // Un artefacto viejo —sin el contenido guardado— no se da por bueno: de ése justamente no
+  // se puede saber con qué índice se calculó.
+  const legado = { huella: { ...ayer, miembros: undefined, ultimaFotoMiembros: "2026-08-31" } };
+  ok(!comprobarHuella(legado, hoy).vale,
+    "huella: un artefacto sin el contenido del índice no se da por bueno");
+
+  // Sin foto de miembros no se revienta: se degrada.
+  ok(huellaEntradas(null).miembros === null, "huella: sin foto de miembros no lanza");
+}
+
+
 // ══ B · HUMO CONTRA LA SEC ════════════════════════════════════════════════════════════════
 if (SIN_RED) {
   console.log("\n  B · humo contra la SEC — SALTADO (--sin-red)\n");
