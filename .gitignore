@@ -85,3 +85,5 @@ research/out/*
 # Temporales de las escrituras atómicas a research/data/ (temporal + rename). Si una
 # ejecución se corta puede quedar uno suelto; no debe entrar en git ni confundirse con el bueno.
 research/data/*.tmp
+!research/out/deduplicacion.json
+!research/out/cuantizacion.json

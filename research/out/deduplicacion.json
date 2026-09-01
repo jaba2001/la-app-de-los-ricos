@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-09-01T07:50:56.483Z",
+  "window": "2019-2026",
+  "criterio": "Se bloquea el candidato cuyo emisor (CIK) ya está en cartera. Entra la clase que califique primero; el universo de percentiles NO se toca.",
+  "sinCik": [],
+  "sinDeduplicar": {
+    "soloPicks": 216.6,
+    "conCaja": 132.6,
+    "sharpe": 0.73,
+    "maxDD": -27.2,
+    "vsEW": 44.3,
+    "posiciones": 99
+  },
+  "conDeduplicar": {
+    "soloPicks": 209.7,
+    "conCaja": 126,
+    "sharpe": 0.72,
+    "maxDD": -26.4,
+    "vsEW": 37.4,
+    "posiciones": 98
+  },
+  "entradasQueCambian": {
+    "salen": [
+      "WST|2021-10-15",
+      "GOOGL|2021-10-01"
+    ],
+    "entran": [
+      "WST|2021-10-01"
+    ]
+  },
+  "estabilidad": {
+    "p25": 207.6312330852252,
+    "p75": 212.1405538409757,
+    "iqr": 4.5,
+    "min": 182.42573940699765,
+    "max": 225.07580713971777,
+    "n": 79
+  }
+}
