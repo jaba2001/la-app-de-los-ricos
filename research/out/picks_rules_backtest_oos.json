@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T07:28:53.498Z",
+  "generatedAt": "2026-09-01T08:06:56.434Z",
   "window": "2011-2018",
   "huella": {
     "sha": "397275838736d776",
@@ -1111,6 +1111,15 @@
       "vsEW": -38.2,
       "posiciones": 66,
       "pctInvertido": 78
+    },
+    "sin deduplicar (como la v2)": {
+      "soloPicks": 161.3,
+      "conCaja": 76.7,
+      "sharpe": 0.72,
+      "maxDD": -17.2,
+      "vsEW": -76.9,
+      "posiciones": 92,
+      "pctInvertido": 58
     },
     "sin cuarentena de 12 meses": {
       "soloPicks": 165.4,

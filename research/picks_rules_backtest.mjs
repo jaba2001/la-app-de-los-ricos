@@ -237,7 +237,13 @@ const membresiaCongelada = ((t) => {
 // legible. La regla NO está dentro del motor: producción no puede aplicarla ni por error.
 function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERSISTENCIA_DIAS,
                    dias180 = DIAS_180, cuarentenaMeses = CUARENTENA_MESES, comprasPorFecha = COMPRAS_POR_FECHA,
-                   sinEstos = null, cuantizar = false, emisorDe = null } = {}) {
+                   sinEstos = null, cuantizar = false, sinDedup = false } = {}) {
+  // §2quater — el mapa de emisores es de ámbito de módulo y se usa SIEMPRE, porque la
+  // deduplicación es la regla (v3) y no un experimento. `sinDedup` existe sólo para que la
+  // ablación pueda medir qué costaba no tenerla, igual que con las demás reglas.
+  // Objeto plano, no Map: es lo que espera `decide()`. Se calcula UNA vez por simulación y no
+  // en cada fecha — son cientos de corridas por 182 fechas.
+  const emisorDe = sinDedup ? undefined : EMISOR_OBJ;
   // `sinEstos` sirve a la prueba de estabilidad: recorta candidatos SIN recalcular percentiles,
   // que es justo la pregunta que interesa —«¿y si este nombre no hubiera estado disponible?»—.
   //
@@ -290,31 +296,13 @@ function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERS
       }
     }
 
-    // ── No dos clases de la misma empresa ────────────────────────────────────────────────
-    // Se reutiliza `disqualified`, que ya existe para la regla de 180 días. OJO: `decide()` usa
-    // esa misma lista para VENDER, así que aquí sólo pueden entrar candidatos que NO se tengan —
-    // si entrara uno en cartera, se vendería la posición buena en vez de bloquear la duplicada.
-    //
-    // La elegancia de hacerlo aquí y no en el universo: no hace falta decidir «qué clase se
-    // queda». Entra la que califique primero, y la otra queda bloqueada mientras dure. No hay
-    // regla arbitraria que justificar, y el percentil del universo no se toca —el S&P sí tiene
-    // las dos líneas, así que el pool refleja el índice de verdad—.
-    const duplicadas = [];
-    if (emisorDe) {
-      const emisoresEnCartera = new Set();
-      for (const h of state.holdings) { const e = emisorDe.get(h.ticker); if (e) emisoresEnCartera.add(e); }
-      const tenidos = new Set(state.holdings.map((h) => h.ticker));
-      for (const t of Object.keys(sig)) {
-        if (tenidos.has(t)) continue;
-        const e = emisorDe.get(t);
-        if (e && emisoresEnCartera.has(e)) duplicadas.push(t);
-      }
-    }
-    const d = decide({ date: fecha, signal: sig, history, state, disqualified: [...porLos180, ...duplicadas], overrides });
+    // §2quater — el motor no compra dos clases de la misma empresa. La lógica vive en
+    // `lib/picks.ts`, no aquí: así el backtest y el cron aplican EXACTAMENTE la misma regla y
+    // los tests la cubren. Aquí sólo se le pasa quién es el emisor de cada ticker.
+    const d = decide({ date: fecha, signal: sig, history, state, disqualified: porLos180, issuer: emisorDe, overrides });
 
     for (const v of d.sells) {
       const motivo = porLos180.includes(v.ticker) ? "180 días sin recuperar"
-        : duplicadas.includes(v.ticker) ? "otra clase de la misma empresa"
         : v.reason === "senal_bajo_umbral" ? "señal bajo umbral 2 evaluaciones"
         : "fuera del universo";
       libro.push({ t: v.ticker, desde: v.since, hasta: fecha, motivo });
@@ -543,6 +531,32 @@ async function universoEW(eje, excluir = null) {
   }
   return { ...curva(porDia.map((a) => (a.length ? mean(a) : 0))), fuera: { sinPanel: fuera.sinPanel, empiezaTarde: fuera.empiezaTarde.length, saltosImposibles: fuera.saltosImposibles, deCuantos: miembros.size }, excluidos: todos.size - miembros.size };
 }
+
+// ── QUIÉN ES EL EMISOR DE CADA TICKER (§2quater) ────────────────────────────────────────
+//
+// Se resuelve UNA vez y se reutiliza en todas las simulaciones —barrido, ablación, estabilidad—
+// porque son cientos de corridas y `tickerToCik` va a disco.
+//
+// Un ticker que no resuelva NO se da por «no duplicado»: se cuenta y se dice. Dar por bueno lo
+// que no se ha podido comprobar es el error que costó un artefacto entero esta semana.
+const EMISOR_DE = new Map();
+const SIN_EMISOR = [];
+{
+  const { tickerToCik } = await import("./edgar.mjs");
+  const nombres = new Set();
+  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) nombres.add(t);
+  let hechos = 0;
+  for (const t of nombres) {
+    process.stdout.write(`  emisores ${++hechos}/${nombres.size}\r`);
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    if (cik) EMISOR_DE.set(t, cik); else SIN_EMISOR.push(t);
+  }
+  process.stdout.write("                         \r");
+  console.log(`  §2quater · ${EMISOR_DE.size} de ${nombres.size} tickers con emisor conocido${SIN_EMISOR.length ? `; sin resolver: ${SIN_EMISOR.join(" ")}` : ""}`);
+}
+/** El mismo mapa como objeto plano, que es lo que `decide()` recibe. */
+const EMISOR_OBJ = Object.fromEntries(EMISOR_DE);
 
 // ── EJECUCIÓN ───────────────────────────────────────────────────────────────────────────
 const { libro, huecos } = simular();
@@ -812,88 +826,6 @@ if (process.argv.includes("--cuantizar")) {
   console.log(`  → escrito research/out/cuantizacion${LONG ? "_oos" : ""}.json\n`);
 }
 
-// ── ¿QUÉ PASA SI NO SE COMPRA LA MISMA EMPRESA DOS VECES? ───────────────────────────────
-//
-// La cartera tiene GOOG y GOOGL a la vez desde el 2021-10-01: 1.748 días con dos posiciones en
-// Alphabet, en una cartera que promete 40 nombres diversificados. Ver §2quater de las reglas.
-//
-// Aquí se mide la corrección, que NO se ha implementado en producción: cambia qué se compra, o
-// sea la estrategia, y eso exige `PICKS_RULES_VERSION` nueva con criterio escrito antes.
-//
-// El diseño evita la decisión difícil. En vez de elegir «qué clase se queda» —una regla
-// arbitraria que habría que justificar para todos los casos futuros— se bloquea la SEGUNDA:
-// entra la que califique primero y la otra queda fuera mientras dure la posición. Y no se toca
-// el universo: el S&P sí tiene las dos líneas de Alphabet, así que el pool de percentiles debe
-// seguir teniéndolas; lo que no debe es la CARTERA.
-//
-//   node ... research/picks_rules_backtest.mjs --dedup [--long]
-//
-// Escribe su propio artefacto. NO toca el publicado.
-if (process.argv.includes("--dedup")) {
-  console.log(`
-  ── ¿Y SI NO SE COMPRA LA MISMA EMPRESA DOS VECES? ──`);
-
-  const { tickerToCik } = await import("./edgar.mjs");
-  const nombres = new Set();
-  for (const f of fechasOk) for (const t of Object.keys(PANEL[f])) nombres.add(t);
-  const emisorDe = new Map();
-  const sinCik = [];
-  let hechos = 0;
-  for (const t of nombres) {
-    process.stdout.write(`  resolviendo emisores ${++hechos}/${nombres.size}\r`);
-    let cik = null;
-    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
-    // Un ticker sin CIK NO se da por «no duplicado»: se cuenta y se dice. Dar por bueno lo que
-    // no se ha podido comprobar es el error que costó un artefacto entero esta semana.
-    if (cik) emisorDe.set(t, cik); else sinCik.push(t);
-  }
-  process.stdout.write("                                        \r");
-  if (sinCik.length) console.log(`  ⚠ ${sinCik.length} tickers sin CIK, no se puede saber si duplican: ${sinCik.slice(0, 10).join(" ")}${sinCik.length > 10 ? " …" : ""}`);
-
-  const simD = simular({ emisorDe });
-  const vD = await valorar(simD.libro, { silencioso: true });
-  const cpD = curva(vD.soloPicks), ccD = curva(vD.conCaja);
-
-  const clave = (o) => `${o.t}|${o.desde}`;
-  const base = new Set(libro.map(clave)), conD = new Set(simD.libro.map(clave));
-  const salen = [...base].filter((x) => !conD.has(x));
-  const entran = [...conD].filter((x) => !base.has(x));
-
-  console.log(`  posiciones      ${libro.length} → ${simD.libro.length}`);
-  console.log(`  entradas         ${salen.length} salen · ${entran.length} entran`);
-  if (salen.length) console.log(`    salen:  ${salen.slice(0, 12).join("  ")}`);
-  if (entran.length) console.log(`    entran: ${entran.slice(0, 12).join("  ")}`);
-  console.log(`  sólo picks      ${cPicks.total.toFixed(1)} % → ${cpD.total.toFixed(1)} %   (vs EW ${(cPicks.total - ew.total).toFixed(1)} → ${(cpD.total - ew.total).toFixed(1)} pp)`);
-  console.log(`  con caja        ${cCaja.total.toFixed(1)} % → ${ccD.total.toFixed(1)} %`);
-  console.log(`  Sharpe          ${cCaja.sharpe.toFixed(2)} → ${ccD.sharpe.toFixed(2)}   ·   maxDD ${cCaja.maxDD.toFixed(1)} → ${ccD.maxDD.toFixed(1)}`);
-
-  // ¿Y la estabilidad? Menos concentración debería estrechar la banda; hay que comprobarlo.
-  console.log(`  midiendo la estabilidad CON deduplicación…`);
-  const compradosD = [...new Set(simD.libro.map((o) => o.t))].sort();
-  const totD = [];
-  for (const t of compradosD) {
-    const sim = simular({ emisorDe, sinEstos: new Set([t]) });
-    const v = await valorar(sim.libro, { silencioso: true });
-    totD.push(curva(v.soloPicks).total);
-    process.stdout.write(`  ${totD.length}/${compradosD.length}\r`);
-  }
-  process.stdout.write("                    \r");
-  totD.sort((a, b) => a - b);
-  const pcD = (q) => totD[Math.min(totD.length - 1, Math.max(0, Math.round(q * (totD.length - 1))))];
-  console.log(`  intercuartil     ${pcD(0.25).toFixed(1)} … ${pcD(0.75).toFixed(1)}  = ${(pcD(0.75) - pcD(0.25)).toFixed(1)} pp   (sin deduplicar: ver estabilidad${LONG ? "_oos" : ""}.json)`);
-
-  writeFileSync(join(OUT, `deduplicacion${LONG ? "_oos" : ""}.json`), JSON.stringify({
-    generatedAt: new Date().toISOString(), window: VENTANA,
-    criterio: "Se bloquea el candidato cuyo emisor (CIK) ya está en cartera. Entra la clase que califique primero; el universo de percentiles NO se toca.",
-    sinCik,
-    sinDeduplicar: { soloPicks: fx(cPicks.total, 1), conCaja: fx(cCaja.total, 1), sharpe: fx(cCaja.sharpe, 2), maxDD: fx(cCaja.maxDD, 1), vsEW: fx(cPicks.total - ew.total, 1), posiciones: libro.length },
-    conDeduplicar: { soloPicks: fx(cpD.total, 1), conCaja: fx(ccD.total, 1), sharpe: fx(ccD.sharpe, 2), maxDD: fx(ccD.maxDD, 1), vsEW: fx(cpD.total - ew.total, 1), posiciones: simD.libro.length },
-    entradasQueCambian: { salen, entran },
-    estabilidad: { p25: pcD(0.25), p75: pcD(0.75), iqr: fx(pcD(0.75) - pcD(0.25), 1), min: totD[0], max: totD.at(-1), n: compradosD.length },
-  }, null, 2));
-  console.log(`  → escrito research/out/deduplicacion${LONG ? "_oos" : ""}.json\n`);
-}
-
 // ── ¿QUÉ REGLA HACE EL TRABAJO? (ablación: se quita una y se mira qué pasa) ─────────────
 // Motivo para mirar esto: en la primera corrida, 52 de las 55 ventas las provocó la regla
 // de los 180 días y sólo 3 el umbral de salida. O sea que §5.1 está casi muerta y §5.3 ES
@@ -907,6 +839,9 @@ if (!process.argv.includes("--no-ablacion")) {
   const VARIANTES = {
     "reglas completas (§2-§6)":      {},
     "sin la regla de 180 días":      { dias180: 0 },
+    // Qué costaba la v2, que compraba las dos clases de una misma empresa. Se mide como una
+    // regla más para que el coste quede publicado y no haya que fiarse de un documento.
+    "sin deduplicar (como la v2)":   { sinDedup: true },
     "sin cuarentena de 12 meses":    { cuarentenaMeses: 0 },
     "sin persistencia de 60 días":   { persistencia: 0 },
     "2/fecha = 4 al mes":            { comprasPorFecha: 2 },

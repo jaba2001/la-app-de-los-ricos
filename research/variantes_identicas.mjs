@@ -117,8 +117,8 @@ const TOLERADOS = new Map([
   // Es justo el contraste que hacía falta: el mismo síntoma que delató el no-op de §11 aparece
   // aquí con una causa legítima. Por eso el detector exige explicación en vez de fallar solo: la
   // coincidencia es la pregunta, no la respuesta.
-  ["deduplicacion_oos.json :: sinDeduplicar == conDeduplicar",
-   "En 2011-2018 no hay ninguna doble clase en cartera, así que deduplicar es un no-op real. La ventana reciente SÍ difiere (216,6 → 209,7)."],
+  ["picks_rules_backtest_oos.json :: ablacionReglas.reglas completas (§2-§6) == ablacionReglas.sin deduplicar (como la v2)",
+   "En 2011-2018 la cartera nunca tuvo dos clases de la misma empresa (cero solapes, medido con doble_clase.mjs), así que la regla de §2quater es un no-op REAL en esa ventana. La reciente sí difiere: 209,7 contra 216,6."],
 
   // ── Dos proveedores que dicen lo mismo ────────────────────────────────────────────────────
   // Yahoo y Tiingo devolviendo el mismo número de barras para el mismo valor es ACUERDO entre

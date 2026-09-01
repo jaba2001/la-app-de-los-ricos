@@ -32,7 +32,10 @@ eq(addMonths("2026-01-31", 1), "2026-02-28", "addMonths satura al último día d
 eq(addMonths("2024-01-31", 1), "2024-02-29", "addMonths respeta el año bisiesto");
 
 // ── Constantes: el contrato de la v2 ────────────────────────────────────────────────────
-eq(PICKS_RULES_VERSION, 2, "la versión de reglas es 2");
+// v2 → v3 el 2026-09-01, al impedir dos clases de la misma empresa (§2quater). Esta línea es
+// el guardián: un cambio de reglas SIN abrir versión mezclaría dos track records, y el fallo
+// sería invisible. Al subir la versión, este test falla y obliga a mirar por qué.
+eq(PICKS_RULES_VERSION, 3, "la versión de reglas es 3 (v3: un emisor, una posición)");
 eq(ENTRY_PCTL, 0.70, "entrada en p70 (§3)");
 eq(EXIT_PCTL, 0.50, "salida en p50 (§5.1)");
 eq(TARGET_POSITIONS, 40, "tope de 40 posiciones (§6)");
@@ -93,6 +96,51 @@ const FECHAS_60D = ["2026-01-02", "2026-01-15", "2026-02-02", "2026-02-16"];   /
   const d2 = decide({ date: "2026-02-16", signal: revuelto, history: hist(FECHAS_60D.slice(0, 3), revuelto), state: emptyState() });
   eq(d1.buys.map((b) => b.ticker), ["AAA", "MMM"], "a igualdad de percentil desempata el ticker");
   eq(d1.buys.map((b) => b.ticker), d2.buys.map((b) => b.ticker), "el orden de las claves NO cambia la decisión");
+}
+
+// ── §2quater · UN EMISOR, UNA POSICIÓN ──────────────────────────────────────────────────
+//
+// La v2 tuvo GOOG y GOOGL en cartera a la vez 1.748 días: dos posiciones en Alphabet en una
+// cartera que promete 40 nombres diversificados. Valía 6,9 pp de la ventaja publicada.
+{
+  const señal = { GOOG: 0.95, GOOGL: 0.94, MSFT: 0.90, AAPL: 0.85 };
+  const emisor = { GOOG: "0001652044", GOOGL: "0001652044", MSFT: "0000789019", AAPL: "0000320193" };
+  const h = hist(FECHAS_60D.slice(0, 3), señal);
+
+  // Sin el mapa de emisores, el motor se comporta como la v2 (y compra las dos clases).
+  const v2 = decide({ date: "2026-02-16", signal: señal, history: h, state: emptyState() });
+  eq(v2.buys.map((b) => b.ticker), ["GOOG", "GOOGL"], "sin mapa de emisores compra las dos clases (comportamiento v2)");
+
+  // Con el mapa, la segunda clase NO se compra ni siquiera en la misma fecha.
+  const v3 = decide({ date: "2026-02-16", signal: señal, history: h, state: emptyState(), issuer: emisor });
+  eq(v3.buys.map((b) => b.ticker), ["GOOG", "MSFT"], "no compra dos clases del mismo emisor en la misma fecha");
+  ok(!v3.eligibleNotBought.some((x) => x.ticker === "GOOGL"),
+    "la segunda clase NO figura como «no cupo»: no era elegible, y esa lista significa otra cosa");
+
+  // Y tampoco cuando la primera ya está en cartera de antes.
+  const conGoog = { holdings: [{ ticker: "GOOG", since: "2025-01-02" }], quarantineUntil: {}, belowExitCount: {} };
+  const d = decide({ date: "2026-02-16", signal: señal, history: h, state: conGoog, issuer: emisor });
+  ok(!d.buys.some((b) => b.ticker === "GOOGL"), "no compra la segunda clase teniendo ya la primera");
+  eq(d.buys.map((b) => b.ticker), ["MSFT", "AAPL"], "el cupo lo ocupan los siguientes de la lista, no se desperdicia");
+
+  // ⚠️ Lo que NO puede pasar: que deduplicar VENDA. Un duplicado ya en cartera se queda —
+  // vender la posición buena para «arreglarlo» sería peor que el duplicado.
+  const lasDos = { holdings: [{ ticker: "GOOG", since: "2025-01-02" }, { ticker: "GOOGL", since: "2025-01-02" }], quarantineUntil: {}, belowExitCount: {} };
+  const d2 = decide({ date: "2026-02-16", signal: señal, history: h, state: lasDos, issuer: emisor });
+  eq(d2.sells.map((s) => s.ticker), [], "deduplicar NUNCA vende: las dos clases ya compradas se quedan");
+  ok(d2.nextState.holdings.length === 4, "y el cupo sigue llenándose con nombres nuevos");
+
+  // Un ticker sin emisor conocido no se bloquea (no se puede saber que duplique), pero tampoco
+  // bloquea a otros: la ausencia de dato no se convierte en una afirmación.
+  const parcial = { GOOG: "0001652044" };
+  const d3 = decide({ date: "2026-02-16", signal: señal, history: h, state: emptyState(), issuer: parcial });
+  eq(d3.buys.map((b) => b.ticker), ["GOOG", "GOOGL"], "un ticker sin emisor conocido no se bloquea: no se puede afirmar que duplique");
+
+  // Emisores distintos con percentiles idénticos siguen desempatando por ticker.
+  const tres = { BBB: 0.9, AAA: 0.9, CCC: 0.9 };
+  const emisor3 = { AAA: "1", BBB: "2", CCC: "3" };
+  const d4 = decide({ date: "2026-02-16", signal: tres, history: hist(FECHAS_60D.slice(0, 3), tres), state: emptyState(), issuer: emisor3 });
+  eq(d4.buys.map((b) => b.ticker), ["AAA", "BBB"], "con emisores distintos, el desempate alfabético sigue igual");
 }
 
 // ── Salida por señal: hacen falta DOS evaluaciones (§5.1) ───────────────────────────────

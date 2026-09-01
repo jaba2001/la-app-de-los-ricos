@@ -18,8 +18,13 @@
 // DISCA+DISCK+WBD en 79— y diecisiete parejas más que son renombres y nunca coexisten (FB→META,
 // COG→CTRA, ANTM→ELV…), ésas bien tratadas.
 //
-// ESTO SÓLO MIDE Y AVISA. Deduplicar cambia qué se compra, o sea la estrategia, y eso exige una
-// `PICKS_RULES_VERSION` nueva y un criterio escrito antes. No lo decide quien escribe el código.
+// ✅ ARREGLADO EL 2026-09-01 en la v3 de las reglas (§2quater): el motor ya no compra la segunda
+// clase de una empresa que ya tiene. La lógica está en `lib/picks.ts`, donde la cubren los tests.
+//
+// ESTE FICHERO SE QUEDA, y a propósito. Es la comprobación INDEPENDIENTE de que la regla
+// funciona: mira el RESULTADO —el libro de operaciones— en vez de confiar en el código que lo
+// produjo. Un guardián que sólo protege de lo que aún no se ha arreglado deja de servir el día
+// que se arregla; éste sirve justo a partir de ese día, para que se vea si alguien la rompe.
 //
 //   node --experimental-strip-types --no-warnings research/doble_clase.mjs [--long]
 //
@@ -87,7 +92,7 @@ for (const s of solapan) {
 }
 console.error(`
   Cada solape es una empresa con DOBLE peso en una cartera que promete 40 posiciones
-  diversificadas. Deduplicar cambia qué se compra —es estrategia, no un arreglo— y exige
-  \`PICKS_RULES_VERSION\` nueva con su criterio escrito antes. Ver PLAN_FALLOS_PENDIENTES.md §1.
+  diversificadas. Desde la v3 esto NO debería poder pasar: si sale, la regla de §2quater se ha
+  roto o el artefacto es de antes del 2026-09-01. Mira \`lib/picks.ts\` y el mapa de emisores.
 `);
 process.exit(1);

@@ -17,8 +17,16 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Versión de las reglas. Un cambio aquí ABRE UNA SERIE NUEVA: los track records de dos
- *  versiones no se mezclan jamás, igual que `score_version` en `sl_cohort`. */
-export const PICKS_RULES_VERSION = 2;
+ *  versiones no se mezclan jamás, igual que `score_version` en `sl_cohort`.
+ *
+ *  v3 (2026-09-01) — UN EMISOR, UNA POSICIÓN (§2quater). La v2 tenía `GOOG` y `GOOGL` en
+ *  cartera a la vez durante 1.748 días: dos posiciones en Alphabet en una cartera que promete
+ *  40 nombres diversificados, o sea un 5 % donde el diseño implica 2,5 %. No fue una decisión
+ *  de nadie — la regla contaba POSICIONES y el diseño quería decir EMPRESAS.
+ *
+ *  Se abre versión aunque sea corrección de un defecto y no un cambio de criterio: el track
+ *  record de la v2 incluye ese doble peso, así que no es comparable con el de la v3. */
+export const PICKS_RULES_VERSION = 3;
 
 /** Percentil de calidad para poder ENTRAR. Medido: entre p70 y p85 la calidad de los picks
  *  es plana; lo que cambia es cuánto capital llega a invertirse (94% a p70, 47% a p80). */
@@ -103,6 +111,11 @@ export interface PicksInput {
    *  backtest NO lo simuló: se declara aquí para que producción pueda aplicarlo, y para que
    *  quede escrito que esa regla concreta no está respaldada por el backtest. */
   disqualified?: string[];
+  /** §2quater — ticker → identificador del EMISOR (en producción, el CIK de la SEC). Con esto
+   *  el motor no compra dos clases de la misma empresa. Opcional: si falta, no se deduplica y
+   *  el comportamiento es el de la v2 — pero producción y el backtest SIEMPRE lo pasan, y hay
+   *  un guardián en `cron-picks.mjs` que avisa si la cartera acaba con un emisor repetido. */
+  issuer?: Record<string, string>;
   /** Sólo para tests: permite fijar los parámetros sin tocar las constantes. */
   overrides?: Partial<{
     entryPctl: number; exitPctl: number; targetPositions: number;
@@ -153,6 +166,7 @@ export function decide(input: PicksInput): PicksDecision {
   const quarantineMonths = o.quarantineMonths ?? QUARANTINE_MONTHS;
 
   const { date, signal, history, state } = input;
+  const issuer = input.issuer ?? null;
   const disqualified = new Set(input.disqualified ?? []);
 
   const holdings = state.holdings.map((h) => ({ ...h }));
@@ -217,8 +231,45 @@ export function decide(input: PicksInput): PicksDecision {
   eligible.sort((a, b) => (b.pctl - a.pctl) || a.ticker.localeCompare(b.ticker));
 
   const slots = Math.max(0, targetPositions - survivors.length);
-  const buys = eligible.slice(0, Math.min(buysPerDate, slots));
-  const eligibleNotBought = eligible.slice(buys.length);
+  const cupo = Math.min(buysPerDate, slots);
+
+  // ── §2quater · UN EMISOR, UNA POSICIÓN ──────────────────────────────────────────────────
+  //
+  // La v2 tuvo `GOOG` y `GOOGL` a la vez 1.748 días. Alphabet pesaba el doble de lo que el
+  // diseño dice, y nadie lo eligió: la regla contaba posiciones y el diseño quería empresas.
+  //
+  // DOS DECISIONES DE DISEÑO, y las dos importan:
+  //
+  //   · Se bloquea la SEGUNDA clase, no «la peor». Entra la que califique primero y la otra
+  //     queda fuera mientras dure la posición. Así no hay que inventar una regla de «qué clase
+  //     se queda» —¿la más líquida? ¿la que vota?— que habría que justificar para todos los
+  //     casos futuros y que sería arbitraria en casi todos.
+  //
+  //   · NO se toca el universo. El S&P 500 sí tiene las dos líneas de Alphabet, así que el
+  //     pool de percentiles debe seguir teniéndolas: es el índice de verdad. Lo que no debe
+  //     tenerlas es la CARTERA. Deduplicar arriba movería todos los percentiles; deduplicar
+  //     aquí cambia sólo lo que estaba mal.
+  //
+  // Y una que no es de diseño sino de cuidado: esto NO puede tocar las ventas. Un emisor
+  // duplicado que ya se tiene se queda —vender la posición buena para «arreglar» el duplicado
+  // sería peor que el duplicado—; lo que se impide es COMPRAR la segunda.
+  const emisoresTomados = new Set<string>();
+  if (issuer) for (const h of survivors) { const e = issuer[h.ticker]; if (e) emisoresTomados.add(e); }
+
+  const buys: { ticker: string; pctl: number }[] = [];
+  const eligibleNotBought: { ticker: string; pctl: number }[] = [];
+  for (const c of eligible) {
+    const e = issuer ? issuer[c.ticker] : undefined;
+    // Una segunda clase no es «no cupo»: es que no era elegible. Fuera de las dos listas, para
+    // que `eligibleNotBought` siga significando lo que dice —candidatos que cumplían todo.
+    if (e && emisoresTomados.has(e)) continue;
+    if (buys.length < cupo) {
+      buys.push(c);
+      if (e) emisoresTomados.add(e);   // impide comprar las dos clases en la MISMA fecha
+    } else {
+      eligibleNotBought.push(c);
+    }
+  }
 
   for (const b of buys) survivors.push({ ticker: b.ticker, since: date });
 

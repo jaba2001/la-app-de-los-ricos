@@ -249,7 +249,36 @@ const history = previos
   .filter((r) => daysBetween(r.decision_date, HOY) <= PERSISTENCE_DAYS)
   .map((r) => ({ date: r.decision_date, signal: r.signal ?? {} }));
 
-const d = decide({ date: HOY, signal, history, state });
+// ── §2quater · quién es el emisor de cada ticker ────────────────────────────────────────
+//
+// La v3 no compra dos clases de la misma empresa, y para eso el motor necesita saber quién
+// emite cada ticker. Se resuelve sobre el universo con señal, que son unos cientos de nombres
+// y va contra la caché de EDGAR.
+//
+// ⚠️ Un ticker que no resuelva NO se da por «no duplicado»: se cuenta y se avisa. Dar por bueno
+// lo que no se ha podido comprobar es el error que costó un artefacto entero esta semana. Con
+// el emisor desconocido el motor no puede bloquearlo —no sabe que duplique— así que lo único
+// honesto es decirlo en alto.
+const emisor = {};
+const sinEmisor = [];
+{
+  const candidatos = Object.keys(signal);
+  let hechos = 0;
+  for (const t of candidatos) {
+    process.stdout.write(`  emisores ${++hechos}/${candidatos.length}\r`);
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    if (cik) emisor[t] = cik; else sinEmisor.push(t);
+  }
+  process.stdout.write("                         \r");
+  console.log(`  §2quater · ${Object.keys(emisor).length} de ${candidatos.length} tickers con emisor conocido`);
+  if (sinEmisor.length) {
+    console.log(`  ⚠ sin emisor (no se puede saber si duplican): ${sinEmisor.join(" ")}`);
+    console.log(`::warning title=Tickers sin CIK en el universo::${sinEmisor.join(" ")}`);
+  }
+}
+
+const d = decide({ date: HOY, signal, history, state, issuer: emisor });
 
 console.log(`\n  ── DECISIÓN ──`);
 console.log(`  Ventas   ${d.sells.length ? "" : "— ninguna"}`);
@@ -277,9 +306,13 @@ if (history.length < 3 && d.buys.length === 0) {
 // No es un fallo de datos: los dos tickers existen, cotizan y puntúan. Es que la regla cuenta
 // POSICIONES y el diseño quiere decir EMPRESAS.
 //
-// AQUÍ SÓLO SE AVISA, a propósito. Negarse a comprar sería cambiar la estrategia por la puerta
-// de atrás, y eso exige `PICKS_RULES_VERSION` nueva con su criterio escrito antes — no lo decide
-// un cron. Lo que sí puede hacer un cron es que no vuelva a pasar en silencio.
+// DESDE LA v3 ESTO NO DEBERÍA SALTAR NUNCA: el motor ya no compra la segunda clase. Se queda
+// igualmente, y a propósito — es la comprobación INDEPENDIENTE de que la regla funciona. Un
+// guardián que sólo protege de lo que aún no se ha arreglado deja de ser útil el día que se
+// arregla; éste sirve para que, si alguien rompe la regla, se vea en la primera decisión.
+//
+// Sigue sin bloquear: si algún día saltara, abortar la decisión del día sería peor que
+// publicarla con el aviso puesto.
 {
   const cartera = d.nextState.holdings.map((h) => h.ticker);
   const porCik = new Map();
