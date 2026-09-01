@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-08-24T20:18:37.348Z",
-  "totalTrials": 315,
-  "artifacts": 38,
+  "generatedAt": "2026-09-01T17:42:27.326Z",
+  "totalTrials": 342,
+  "artifacts": 39,
   "isLowerBound": true,
   "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
   "sharpeSamples": 137,
@@ -20,17 +20,25 @@
       "file": "picks_rules_backtest_oos.json",
       "lab": "picks_rules_backtest",
       "note": "Ablación de las reglas de Scora Picks",
-      "trials": 25,
+      "trials": 26,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T16:59:01.237Z"
+      "generatedAt": "2026-09-01T16:57:23.069Z"
     },
     {
       "file": "picks_rules_backtest.json",
       "lab": "picks_rules_backtest",
       "note": "Ablación de las reglas de Scora Picks",
+      "trials": 26,
+      "sharpesFound": 0,
+      "generatedAt": "2026-09-01T08:37:56.989Z"
+    },
+    {
+      "file": "picks_rules_backtest_smoke.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
       "trials": 25,
       "sharpesFound": 0,
-      "generatedAt": "2026-08-24T16:54:47.585Z"
+      "generatedAt": "2026-09-01T07:12:45.754Z"
     },
     {
       "file": "quality_lowvol_lab_oos.json",
@@ -324,6 +332,14 @@
     },
     {
       "file": "health_scale_lab_oos.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "picks_rules_backtest_oos_parcial.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "picks_rules_backtest_parcial.json",
       "reason": "forma no reconocida"
     }
   ]
