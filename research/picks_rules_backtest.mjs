@@ -236,7 +236,13 @@ const membresiaCongelada = ((t) => {
 // luego se reetiqueta el motivo en el libro, para que la tabla de ablación siga siendo
 // legible. La regla NO está dentro del motor: producción no puede aplicarla ni por error.
 function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERSISTENCIA_DIAS,
-                   dias180 = DIAS_180, cuarentenaMeses = CUARENTENA_MESES, comprasPorFecha = COMPRAS_POR_FECHA } = {}) {
+                   dias180 = DIAS_180, cuarentenaMeses = CUARENTENA_MESES, comprasPorFecha = COMPRAS_POR_FECHA,
+                   sinEstos = null } = {}) {
+  // `sinEstos` sirve a la prueba de estabilidad: recorta candidatos SIN recalcular percentiles,
+  // que es justo la pregunta que interesa —«¿y si este nombre no hubiera estado disponible?»—.
+  const senal = sinEstos?.size
+    ? (f) => Object.fromEntries(Object.entries(PANEL[f]).filter(([t]) => !sinEstos.has(t)))
+    : (f) => PANEL[f];
   const overrides = { entryPctl: entry, exitPctl: exit, targetPositions: topN,
                       buysPerDate: comprasPorFecha, persistenceDays: persistencia,
                       quarantineMonths: cuarentenaMeses };
@@ -247,12 +253,12 @@ function simular({ entry = ENTRY, exit = EXIT, topN = TOP_N, persistencia = PERS
 
   for (let k = 0; k < fechasOk.length; k++) {
     const fecha = fechasOk[k];
-    const sig = PANEL[fecha];
+    const sig = senal(fecha);
 
     // Fechas de decisión anteriores que caen dentro de la ventana de persistencia.
     const history = [];
     for (let j = k - 1; j >= 0 && dias(fechasOk[j], fecha) <= persistencia; j--) {
-      history.unshift({ date: fechasOk[j], signal: PANEL[fechasOk[j]] });
+      history.unshift({ date: fechasOk[j], signal: senal(fechasOk[j]) });
     }
 
     // Regla de 180 días (sólo backtest histórico).
@@ -631,6 +637,76 @@ if (!process.argv.includes("--no-sweep")) {
   globalThis.__barrido = barrido;
 }
 
+// ── ¿CUÁNTO AGUANTA LA CIFRA? (estabilidad frente a un nombre de menos) ─────────────────
+//
+// ⚠️ MOTIVO, medido el 2026-09-01. Dos corridas con las mismas entradas —sólo cambió la foto
+// de miembros, y el universo pasó de 510 a 509 nombres— dieron +212,1 % y +216,6 %. La causa
+// no fue un desempate mal resuelto: el motor ordena por percentil y, a igualdad, alfabético,
+// y eso está bien. Fue que el 2023-03-15 ACN puntuaba 0,8094 y BKNG 0,8088 — SEIS
+// DIEZMILÉSIMAS, cuando la resolución de un percentil sobre 371 nombres es 0,0027. Los separa
+// menos de lo que vale un nombre, así que quitar uno cualquiera los intercambia. Y como la
+// estrategia depende del camino, ese cambio arrastró a META de venderse con +157 % a no
+// venderse y acabar en +451 %.
+//
+// `research/filo_decision.mjs` mide cuántas decisiones viven en ese filo: 7 de 34 (21 %) de
+// las que tienen competencia real, incluida una en que GOOG y GOOGL empatan exactamente.
+//
+// Esto NO dice que el resultado esté mal. Dice cuánto vale el último dígito, que es una
+// pregunta distinta y que hasta hoy no se había contestado. Se mide quitando un nombre
+// comprado cada vez: el contrafactual mínimo, «¿y si éste no hubiera estado?».
+//
+//   node ... research/picks_rules_backtest.mjs --estabilidad [--long]
+//
+// No entra en el artefacto publicado: escribe el suyo. Es una medición sobre la medición.
+if (process.argv.includes("--estabilidad")) {
+  const comprados = [...new Set(libro.map((o) => o.t))].sort();
+  // Quitar un nombre que nunca se compró no cambia nada, así que se prueban los que sí.
+  const muestra = comprados;
+  console.log(`
+  ── ¿CUÁNTO AGUANTA LA CIFRA? ${muestra.length} corridas, cada una sin UNO de los nombres comprados ──`);
+
+  const resultados = [];
+  for (const t of muestra) {
+    const sim = simular({ sinEstos: new Set([t]) });
+    const v = await valorar(sim.libro, { silencioso: true });
+    const cp = curva(v.soloPicks), cc = curva(v.conCaja);
+    resultados.push({ sin: t, soloPicks: fx(cp.total, 1), conCaja: fx(cc.total, 1), sharpe: fx(cc.sharpe, 2), vsEW: fx(cp.total - ew.total, 1), posiciones: sim.libro.length });
+    process.stdout.write(`  estabilidad ${resultados.length}/${muestra.length}\r`);
+  }
+  process.stdout.write("                              \r");
+
+  const tot = resultados.map((r) => r.soloPicks).sort((a, b) => a - b);
+  const pct = (q) => tot[Math.min(tot.length - 1, Math.max(0, Math.round(q * (tot.length - 1))))];
+  const base = cPicks.total;
+  const mediana = pct(0.5);
+
+  console.log(`  base (sin quitar nada)   ${base.toFixed(1)} %`);
+  console.log(`  mediana                  ${mediana.toFixed(1)} %`);
+  console.log(`  rango                    ${tot[0].toFixed(1)} % … ${tot.at(-1).toFixed(1)} %   (amplitud ${(tot.at(-1) - tot[0]).toFixed(1)} pp)`);
+  console.log(`  intervalo intercuartil    ${pct(0.25).toFixed(1)} % … ${pct(0.75).toFixed(1)} %`);
+
+  const peores = [...resultados].sort((a, b) => a.soloPicks - b.soloPicks).slice(0, 5);
+  const mejores = [...resultados].sort((a, b) => b.soloPicks - a.soloPicks).slice(0, 5);
+  console.log(`  quitar estos hunde más:  ${peores.map((r) => `${r.sin} ${r.soloPicks.toFixed(0)}%`).join("  ")}`);
+  console.log(`  quitar estos mejora:     ${mejores.map((r) => `${r.sin} ${r.soloPicks.toFixed(0)}%`).join("  ")}`);
+  console.log(`
+  → La cifra publicada (${base.toFixed(1)} %) no es un punto: es el centro de una banda de
+    ${(tot.at(-1) - tot[0]).toFixed(0)} pp que se recorre entera cambiando UN nombre del universo. Citarla con un
+    decimal sugiere una precisión que no tiene.`);
+
+  writeFileSync(join(OUT, `estabilidad${LONG ? "_oos" : ""}.json`), JSON.stringify({
+    generatedAt: new Date().toISOString(),
+    window: VENTANA,
+    base, mediana,
+    min: tot[0], max: tot.at(-1), amplitud: fx(tot.at(-1) - tot[0], 1),
+    p25: pct(0.25), p75: pct(0.75),
+    nombresProbados: muestra.length,
+    nota: "Cada corrida quita UNO de los nombres comprados y rehace la simulación entera. Mide dependencia del camino, no error de estimación.",
+    resultados,
+  }, null, 2));
+  console.log(`  → escrito research/out/estabilidad${LONG ? "_oos" : ""}.json\n`);
+}
+
 // ── ¿QUÉ REGLA HACE EL TRABAJO? (ablación: se quita una y se mira qué pasa) ─────────────
 // Motivo para mirar esto: en la primera corrida, 52 de las 55 ventas las provocó la regla
 // de los 180 días y sólo 3 el umbral de salida. O sea que §5.1 está casi muerta y §5.3 ES
@@ -684,7 +760,25 @@ const h2 = cCaja.total > ew.total;
 console.log(`  ${h2 ? "✔" : "✖"}  H2 la cartera con reglas bate al universo EW (${cCaja.total.toFixed(0)}% vs ${ew.total.toFixed(0)}%)`);
 console.log(`  ℹ  H3 el precio de la rampa: ${(cPicks.total - cCaja.total).toFixed(0)} pp entre sólo-picks y con-caja`);
 
-writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_smoke" : ""}.json`), JSON.stringify({
+// ⚠️ UNA CORRIDA INCOMPLETA NO PISA EL ARTEFACTO PUBLICADO.
+//
+// `--no-sweep` y `--no-ablacion` existen para iterar rápido, pero escribían en el MISMO
+// fichero que la corrida buena. El 2026-09-01, lanzando la prueba de estabilidad con los dos
+// puestos, el artefacto publicado quedó con `barridoUmbrales: null` y sin `ablacionReglas`,
+// y ningún guardián se enteró: la huella seguía cuadrando porque las ENTRADAS no habían
+// cambiado, sólo faltaban secciones de la salida.
+//
+// Es la misma forma que todo lo demás de este día — algo que no rompe y publica de menos—, y
+// se cae en ella con una sola bandera de más. Así que las corridas parciales van a su propio
+// fichero y lo dicen.
+const COMPLETA = !process.argv.includes("--no-sweep") && !process.argv.includes("--no-ablacion");
+const NOMBRE = `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_smoke" : ""}${COMPLETA ? "" : "_parcial"}.json`;
+if (!COMPLETA) {
+  console.warn(`
+  ⚠ Corrida INCOMPLETA (--no-sweep y/o --no-ablacion): se escribe en ${NOMBRE} y NO se toca el
+    artefacto publicado. Para regenerar el bueno, córrelo sin esas banderas.`);
+}
+writeFileSync(join(OUT, NOMBRE), JSON.stringify({
   generatedAt: new Date().toISOString(), window: VENTANA,
   // ⚠️ DE QUÉ ENTRADAS SALIÓ ESTO. Sin la huella, un artefacto viejo es indistinguible de uno
   // nuevo salvo mirando la fecha — y nadie la mira. El 2026-08-29 esta corrida abortó por
@@ -731,4 +825,4 @@ writeFileSync(join(OUT, `picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_sm
 // pisa (la escritura si lleva el sufijo), pero invita a creer que si, y en las dos direcciones:
 // o corres un smoke para revisar algo y te quedas pensando que has machacado los numeros
 // buenos, o abres ese fichero convencido de que trae lo que acabas de correr.
-console.log(`\n  → escrito research/out/picks_rules_backtest${LONG ? "_oos" : ""}${SMOKE ? "_smoke" : ""}.json\n`);
+console.log(`\n  → escrito research/out/${NOMBRE}\n`);

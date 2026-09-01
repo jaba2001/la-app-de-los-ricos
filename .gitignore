@@ -57,6 +57,12 @@ research/out/*
 !research/out/ebit_reconstruccion.json
 !research/out/picks_rules_backtest.json
 !research/out/picks_rules_backtest_oos.json
+# La banda de estabilidad: cuanto se mueve la cifra publicada si falta UN nombre del
+# universo. Sostiene la advertencia de que +216,6 % es el centro de un rango y no un punto,
+# asi que va versionada por el mismo motivo que el resto — una cifra con incertidumbre
+# declarada necesita que la incertidumbre sea reproducible.
+!research/out/estabilidad.json
+!research/out/estabilidad_oos.json
 !research/out/pillar_dilution_lab.json
 !research/out/pillar_dilution_lab_oos.json
 !research/out/health_scale_lab.json
