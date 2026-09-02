@@ -103,6 +103,11 @@ jobs:
       # sea cierto, porque sale con el logo de la empresa al lado. Dos umbrales, dos funciones.
       - name: Integridad de lo que se publica con precios
         run: node --experimental-strip-types --no-warnings scripts/integridad.test.mjs
+      # Las ventanas de un ranking van por FECHA y no por numero de sesiones — no porque
+      # protejan de un dato roto (se comprobo que no: parten el mismo artefacto) sino porque
+      # el borde es reproducible. Y `base` es el cierre de REFERENCIA, no el primer dia.
+      - name: Ventanas de los rankings de precios
+        run: node --experimental-strip-types --no-warnings scripts/ventanas.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números

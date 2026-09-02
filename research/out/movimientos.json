@@ -1,0 +1,872 @@
+{
+  "generatedAt": "2026-09-02T06:47:28.967Z",
+  "universoAsOf": "2026-09-02",
+  "cierre": "2026-08-31",
+  "top": 10,
+  "ventanas": {
+    "1d": {
+      "nombre": "1 día",
+      "tramo": {
+        "base": "2026-08-28",
+        "hasta": "2026-08-31"
+      },
+      "medidos": 503,
+      "ganadores": [
+        {
+          "ticker": "CRWD",
+          "pct": 5.77,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "TSLA",
+          "pct": 5.51,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SNDK",
+          "pct": 5.5,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "COIN",
+          "pct": 5.31,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SLB",
+          "pct": 4.83,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "DE",
+          "pct": 3.9,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "QCOM",
+          "pct": 3.83,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "ULTA",
+          "pct": 3.79,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CF",
+          "pct": 3.37,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "FFIV",
+          "pct": 3.27,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "perdedores": [
+        {
+          "ticker": "EIX",
+          "pct": -23.07,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PCG",
+          "pct": -20.06,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "AON",
+          "pct": -9.53,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "HWM",
+          "pct": -7.51,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "TTWO",
+          "pct": -6.67,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "AXON",
+          "pct": -5.69,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CLX",
+          "pct": -4.73,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "WYNN",
+          "pct": -4.18,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "TAP",
+          "pct": -4.1,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "UBER",
+          "pct": -4.02,
+          "sesiones": 1,
+          "huecos": 0,
+          "base": "2026-08-28",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "retiradosPorIntegridad": []
+    },
+    "1s": {
+      "nombre": "1 semana",
+      "tramo": {
+        "base": "2026-08-21",
+        "hasta": "2026-08-31"
+      },
+      "medidos": 503,
+      "ganadores": [
+        {
+          "ticker": "CRM",
+          "pct": 23.12,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CRWD",
+          "pct": 20.34,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "VEEV",
+          "pct": 15.24,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "NOW",
+          "pct": 15.19,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SLB",
+          "pct": 11.56,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "FTNT",
+          "pct": 11.35,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CDW",
+          "pct": 10.97,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SNPS",
+          "pct": 10.49,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "GEN",
+          "pct": 7.16,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PANW",
+          "pct": 6.78,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "perdedores": [
+        {
+          "ticker": "PCG",
+          "pct": -24.6,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "EIX",
+          "pct": -24.6,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PYPL",
+          "pct": -14.44,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "MRVL",
+          "pct": -10.71,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "GNRC",
+          "pct": -10,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CASY",
+          "pct": -9.99,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "HWM",
+          "pct": -9.84,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "AXON",
+          "pct": -9.75,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "AON",
+          "pct": -9.46,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "WYNN",
+          "pct": -8.97,
+          "sesiones": 6,
+          "huecos": 0,
+          "base": "2026-08-21",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "retiradosPorIntegridad": []
+    },
+    "1m": {
+      "nombre": "1 mes",
+      "tramo": {
+        "base": "2026-07-31",
+        "hasta": "2026-08-31"
+      },
+      "medidos": 503,
+      "ganadores": [
+        {
+          "ticker": "MRNA",
+          "pct": 156,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": "con aviso: +177.0 % en una sesión"
+        },
+        {
+          "ticker": "PLTR",
+          "pct": 51.45,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "VEEV",
+          "pct": 40.2,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CRM",
+          "pct": 39.95,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PSKY",
+          "pct": 37.06,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "NEM",
+          "pct": 34.52,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "NOW",
+          "pct": 33.05,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SMCI",
+          "pct": 31.27,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "IT",
+          "pct": 31.18,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "SNDK",
+          "pct": 28.96,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "perdedores": [
+        {
+          "ticker": "DVA",
+          "pct": -26.69,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "EIX",
+          "pct": -26.43,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "TTD",
+          "pct": -23.95,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PCG",
+          "pct": -23.65,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "HONA",
+          "pct": -23.52,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "APP",
+          "pct": -21.18,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "APTV",
+          "pct": -20.74,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "TPR",
+          "pct": -19.02,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "NRG",
+          "pct": -17.71,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "WDC",
+          "pct": -17.31,
+          "sesiones": 21,
+          "huecos": 0,
+          "base": "2026-07-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "retiradosPorIntegridad": [
+        {
+          "ticker": "MNST",
+          "pct": -4.71,
+          "motivo": "-50.7 % el 2026-07-31 y +94.1 % el 2026-08-03: neto -4.2 % en 1 sesión(es)"
+        }
+      ]
+    },
+    "ytd": {
+      "nombre": "YTD",
+      "tramo": {
+        "base": "2025-12-31",
+        "hasta": "2026-08-31"
+      },
+      "medidos": 501,
+      "ganadores": [
+        {
+          "ticker": "SNDK",
+          "pct": 560,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "MRNA",
+          "pct": 375.89,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": "con aviso: +177.0 % en una sesión"
+        },
+        {
+          "ticker": "DELL",
+          "pct": 265.57,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "MU",
+          "pct": 236.11,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "STX",
+          "pct": 201.54,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "WDC",
+          "pct": 161.73,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "MRVL",
+          "pct": 149.44,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "LITE",
+          "pct": 148.18,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "INTC",
+          "pct": 142.57,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "MPC",
+          "pct": 132.22,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "perdedores": [
+        {
+          "ticker": "TTD",
+          "pct": -63.86,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "APP",
+          "pct": -53.69,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "CSGP",
+          "pct": -52.31,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "BSX",
+          "pct": -49.34,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PODD",
+          "pct": -47.7,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "INTU",
+          "pct": -45.25,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "LULU",
+          "pct": -42.13,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "PNR",
+          "pct": -41.37,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "APTV",
+          "pct": -41.17,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        },
+        {
+          "ticker": "ROL",
+          "pct": -39.22,
+          "sesiones": 166,
+          "huecos": 0,
+          "base": "2025-12-31",
+          "hasta": "2026-08-31",
+          "publicable": true,
+          "aviso": null
+        }
+      ],
+      "retiradosPorIntegridad": [
+        {
+          "ticker": "MNST",
+          "pct": -40.11,
+          "motivo": "-51.1 % el 2026-07-20 y +95.6 % el 2026-07-23: neto -4.3 % en 3 sesión(es)"
+        }
+      ]
+    }
+  }
+}
