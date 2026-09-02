@@ -88,3 +88,4 @@ research/data/*.tmp
 !research/out/cuantizacion.json
 !research/out/integridad_precios.json
 !research/out/movimientos.json
+!research/out/insiders.json

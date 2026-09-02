@@ -108,6 +108,11 @@ jobs:
       # el borde es reproducible. Y `base` es el cierre de REFERENCIA, no el primer dia.
       - name: Ventanas de los rankings de precios
         run: node --experimental-strip-types --no-warnings scripts/ventanas.test.mjs
+      # El Form 4 tiene cuatro trampas que hunden un titular: una TENENCIA no es una operacion,
+      # el codigo M es un ejercicio de opciones y no una venta, el plan 10b5-1 se declara en el
+      # documento, y la direccion la da A/D y no el codigo. Cada test dice que titular romperia.
+      - name: Parser de Form 4 (movimientos de directivos)
+        run: node --experimental-strip-types --no-warnings scripts/form4.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
