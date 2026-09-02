@@ -330,6 +330,18 @@ export async function aboveSMA(ticker, n, date) {
 // Full history of daily log total-returns (adj-based), memoized via the same cache.
 // Used by correlation.mjs to build the realized-correlation engine. PIT-safe: callers
 // slice a trailing window ending on-or-before their as-of date.
+/**
+ * La serie ENTERA, con crudo y ajustado en cada barra.
+ *
+ * Existe para el guardián de integridad (`lib/integridadPrecios.ts`), que compara el FACTOR
+ * `crudo/ajustado` entre barras consecutivas — un split aplicado a medias sólo se ve ahí. Con
+ * `priceAsOf`/`rawPriceAsOf` haría dos búsquedas binarias por barra sobre miles de barras.
+ *
+ * Devuelve la estructura interna tal cual: `{ date, raw, adj }`. No se copia a propósito; quien
+ * la reciba no debe mutarla.
+ */
+export async function serieCompleta(ticker) { return series(ticker); }
+
 export async function returnsSeries(ticker) {
   const r = await series(ticker);
   const out = [];

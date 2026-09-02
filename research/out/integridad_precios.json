@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-09-02T06:41:23.069Z",
+  "universoAsOf": "2026-09-02",
+  "desde": "2026-08-03",
+  "miembros": 503,
+  "conSerie": 503,
+  "sinSerie": 0,
+  "noPublicables": [
+    {
+      "ticker": "MNST",
+      "motivo": "+94.1 % el 2026-08-03 y -50.2 % el 2026-08-06: neto -3.2 % en 3 sesión(es)"
+    }
+  ],
+  "conAviso": [
+    {
+      "ticker": "MRNA",
+      "motivo": "con aviso: +177.0 % en una sesión"
+    }
+  ],
+  "cierreReferencia": "2026-08-31",
+  "cierresDesalineados": []
+}

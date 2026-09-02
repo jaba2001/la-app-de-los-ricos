@@ -98,6 +98,11 @@ jobs:
       # financieros — cuatro números idénticos al decimal con 56 nombres supuestamente fuera.
       - name: Variantes que dan exactamente lo mismo
         run: node --experimental-strip-types --no-warnings research/variantes_identicas.mjs
+      # Lo que se enseña en una pagina publica no lleva los umbrales del backtest. Alli GME
+      # +135 % es real y tirarlo sesgaria la referencia; aqui un +177 % hay que marcarlo aunque
+      # sea cierto, porque sale con el logo de la empresa al lado. Dos umbrales, dos funciones.
+      - name: Integridad de lo que se publica con precios
+        run: node --experimental-strip-types --no-warnings scripts/integridad.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
