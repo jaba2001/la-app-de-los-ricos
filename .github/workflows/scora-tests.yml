@@ -170,6 +170,13 @@ jobs:
       # en una ventana que incluye 2008 es IMPOSIBLE. Eso es lo que este test fija.
       - name: La serie mensual del allocator
         run: node --experimental-strip-types --no-warnings scripts/serie.test.mjs
+
+      # Metricas de la fase 1: M2, captura alcista/bajista, forma de la distribucion y la
+      # significacion de una diferencia de Sharpe. El punto critico esta en esta ultima:
+      # Jobson-Korkie va con los Sharpe POR PERIODO y T = observaciones, NO con los anualizados
+      # y T en años — no son equivalentes y la version mal daba t=1,62 donde la buena da 1,92.
+      - name: Metricas ajustadas al riesgo (fase 1)
+        run: node --experimental-strip-types --no-warnings scripts/riesgo.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
