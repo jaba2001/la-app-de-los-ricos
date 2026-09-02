@@ -155,6 +155,13 @@ jobs:
       # hecho publicado dos veces (Apple), y el total y el desglose con etiquetas distintas.
       - name: Ingresos por segmento
         run: node --experimental-strip-types --no-warnings scripts/segmentos.test.mjs
+
+      # La compuerta de la prosa (fase 5b). El modelo REDACTA, no aporta datos: si su texto trae
+      # un numero, una causa o un pronostico que no esta en los hechos, NO se publica y se cae al
+      # texto determinista de 5a. Ojo con dos cosas que ya mordieron: `checkAdvice` de
+      # grounding.ts es SOLO INGLES, y `` no existe detras de una vocal acentuada.
+      - name: La compuerta de la prosa (5b)
+        run: node --experimental-strip-types --no-warnings scripts/narrativallm.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
