@@ -148,3 +148,32 @@ export function retrasoDias(periodoISO: string | null, presentado: string | null
   if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
   return Math.round((b - a) / 86400000);
 }
+
+/**
+ * ¿En qué unidad declara los valores esta presentación? Devuelve el factor a aplicar.
+ *
+ * ⚠️ **LA COLUMNA `value` CAMBIÓ DE UNIDAD.** Hasta la reforma de 2022 el 13F declaraba el valor
+ * en MILES de dólares; desde 2023 en dólares. Y no todos los declarantes se cambiaron: el
+ * 2026-09-02, con los seis gestores medidos, cinco declaraban en dólares y **Duquesne Family
+ * Office seguía en miles**. Sin corregirlo, su cartera se publicaba como «4 M$» cuando son unos
+ * 4.000 M$: un error de tres órdenes de magnitud en una cifra que se enseña.
+ *
+ * NO se detecta por la fecha —hay declarantes tardíos en las dos direcciones— sino por el dato:
+ * `valor / cantidad` es el PRECIO POR ACCIÓN, y un precio tiene un rango conocido. Si la mediana
+ * de la cartera sale por debajo de un dólar, no es que el gestor compre céntimos: es que los
+ * valores están en miles.
+ *
+ * Devuelve `null` si no hay con qué decidir (sin posiciones en acciones con cantidad), y en ese
+ * caso NO se escala: preferible una cifra sin tocar que una multiplicada a ciegas.
+ */
+export function escalaDeValor(posiciones: Posicion[]): { factor: number; precioMediano: number } | null {
+  const precios = posiciones
+    .filter((p) => !p.opcion && p.tipoCantidad !== "PRN" && (p.cantidad ?? 0) > 0 && (p.valor ?? 0) > 0)
+    .map((p) => (p.valor as number) / (p.cantidad as number))
+    .sort((a, b) => a - b);
+  if (!precios.length) return null;
+  const mediano = precios[Math.floor(precios.length / 2)];
+  // Una acción por debajo de 1 $ existe, pero una CARTERA cuyo precio MEDIANO está por debajo de
+  // 1 $ no: eso es la unidad, no el mercado.
+  return mediano < 1 ? { factor: 1000, precioMediano: mediano } : { factor: 1, precioMediano: mediano };
+}

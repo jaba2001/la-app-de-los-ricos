@@ -6,7 +6,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/parse13f.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { parse13F, periodoISO, ficheroDeTabla, retrasoDias } from "../lib/parse13f.ts";
+import { parse13F, periodoISO, ficheroDeTabla, retrasoDias, escalaDeValor } from "../lib/parse13f.ts";
 
 let pass = 0, fail = 0;
 const ok = (cond, msg) => { if (cond) pass++; else { fail++; console.error(`  ✖ ${msg}`); } };
@@ -130,5 +130,35 @@ const CON_NS = `<?xml version="1.0" encoding="utf-8"?>
   eq(parse13F(sinValor).valorTotal, 0, "y no suma al total");
 }
 
-console.log(pass && !fail ? `\n✓ parse13f: ${pass} passed, 0 failed\n` : `\n✖ parse13f: ${pass} passed, ${fail} failed\n`);
+
+// ── La unidad de la columna `value` ──────────────────────────────────────────────────────
+// Medido el 2026-09-02 con seis gestores reales: cinco declaran en dólares (precio implícito
+// 146-343 $) y Duquesne Family Office en MILES (0,27 $). Publicar su cartera sin corregir daba
+// «4 M$» en vez de unos 4.000 M$.
+{
+  const enDolares = [
+    { emisor: "A", cusip: "1", figi: null, titulo: "COM", valor: 22248000, cantidad: 100000, tipoCantidad: "SH", opcion: null },
+    { emisor: "B", cusip: "2", figi: null, titulo: "COM", valor: 14664000, cantidad: 100000, tipoCantidad: "SH", opcion: null },
+  ];
+  const e = escalaDeValor(enDolares);
+  eq(e.factor, 1, "precios de 146-222 $: los valores ya están en dólares");
+
+  const enMiles = enDolares.map((p) => ({ ...p, valor: p.valor / 1000 }));
+  const m = escalaDeValor(enMiles);
+  eq(m.factor, 1000, "precio implícito de 0,22 $: los valores están en miles");
+  ok(m.precioMediano < 1, "y lo justifica con el precio mediano");
+
+  // Las opciones y la deuda NO entran en el cálculo: su `cantidad` es principal o contratos, no
+  // acciones, y el cociente no es un precio.
+  const conRuido = [...enDolares,
+    { emisor: "C", cusip: "3", figi: null, titulo: "PUT", valor: 1, cantidad: 999999999, tipoCantidad: "SH", opcion: "Put" },
+    { emisor: "D", cusip: "4", figi: null, titulo: "NOTE", valor: 1, cantidad: 999999999, tipoCantidad: "PRN", opcion: null }];
+  eq(escalaDeValor(conRuido).factor, 1, "una put y un bono no arrastran la mediana");
+
+  eq(escalaDeValor([]), null, "sin posiciones no se decide nada (y no se escala a ciegas)");
+  eq(escalaDeValor([{ emisor: "X", cusip: "9", figi: null, titulo: "COM", valor: 100, cantidad: 0, tipoCantidad: "SH", opcion: null }]), null,
+     "con cantidad cero tampoco: no hay precio que calcular");
+}
+
+console.log(`\n${fail ? "✖" : "✓"} parse13f: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);
