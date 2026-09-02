@@ -403,6 +403,63 @@ async function valorar(libro, { silencioso = false } = {}) {
     patrimonioAyer = ahora;
   }
 
+  // MODELO C — la parte no invertida está en el ÍNDICE, no parada (H4, 2026-09-02).
+  //
+  // El modelo A deja la caja al 0 %, y eso cuesta 83,7 pp entre `soloPicks` y `conCaja`. Pero
+  // nadie tiene el 23 % de su patrimonio en efectivo ocho años esperando a que salte una regla:
+  // lo tiene en el índice. Este modelo mide lo que de verdad sería Scora Picks —**un sesgo SOBRE
+  // el índice**, no una alternativa a estar invertido— sin cambiar NI UNA decisión de compra.
+  //
+  // Cero parámetros nuevos, a propósito: cada parámetro libre es una oportunidad de sobreajustar
+  // y otro ensayo del presupuesto.
+  const pSPY = await panelDe("SPY");
+  const rSPY = new Map();
+  if (pSPY) for (const x of retornosEntre(pSPY, eje[0], eje.at(-1))) rSPY.set(x.d, x.r);
+  // Sin serie del índice NO se inventa una: se devuelve null y quien lo publique tiene que decir
+  // que no se pudo calcular. Un cero aquí se leería como «el modelo C no aporta».
+  const hayIndice = rSPY.size >= eje.length * 0.9;
+
+  let conIndice = null;
+  if (hayIndice) {
+    let cajaC = 100;
+    const valorC = new Map();
+    conIndice = [];
+    let patC = 100;
+    for (let i = 0; i < eje.length; i++) {
+      cajaC *= 1 + (rSPY.get(eje[i]) ?? 0);                 // la caja rinde lo que el índice
+      for (const x of activos[i]) if (valorC.has(x.t)) valorC.set(x.t, valorC.get(x.t) * (1 + x.r));
+      for (const t of flujos[i].ventas) { cajaC += (valorC.get(t) ?? 0) * (1 - COST_BPS / 10000); valorC.delete(t); }
+      const antes = cajaC + [...valorC.values()].reduce((s, x) => s + x, 0);
+      for (const t of flujos[i].compras) {
+        const objetivo = Math.min(cajaC, antes / TOP_N);
+        if (objetivo <= 0.01) continue;
+        // Se paga el coste igual: pasar de índice a valor concreto es una operación real.
+        cajaC -= objetivo; valorC.set(t, objetivo * (1 - COST_BPS / 10000));
+      }
+      const ahora = cajaC + [...valorC.values()].reduce((s, x) => s + x, 0);
+      conIndice.push(patC > 0 ? ahora / patC - 1 : 0);
+      patC = ahora;
+    }
+  }
+
+  // ⚠️ AUTOCOMPROBACIÓN DEL MODELO C: sin ninguna compra tiene que reproducir el índice EXACTO.
+  //
+  // Existe porque el primer resultado de H4 en 2011-2018 dejó al modelo C (130,1 %) por DEBAJO de
+  // sus dos componentes —los picks 154,8 % y el índice 134,9 %—, y una mezcla por debajo de las
+  // dos partes es o un efecto de calendario real o un fallo de fontanería. Sin esta comprobación
+  // no hay forma de distinguirlos, y publicar el número sin saber cuál es sería exactamente el
+  // error que este repo lleva toda la sesión cazando.
+  if (hayIndice && !silencioso) {
+    let c = 100;
+    for (let i = 0; i < eje.length; i++) c *= 1 + (rSPY.get(eje[i]) ?? 0);
+    const solo = c - 100;
+    const refIdx = (pSPY ? curva(retornosEntre(pSPY, eje[0], eje.at(-1)).map((x) => x.r)) : null);
+    if (refIdx && Math.abs(solo - refIdx.total) > 0.5) {
+      throw new Error(`modelo C roto: sin compras da ${solo.toFixed(1)} % y el índice ${refIdx.total.toFixed(1)} %`);
+    }
+    console.log(`  ✓ modelo C: sin compras reproduce el índice (${solo.toFixed(1)} % vs ${refIdx?.total.toFixed(1)} %)`);
+  }
+
   // Nº medio de posiciones vivas y rotación
   const vivas = activos.map((a) => a.length);
   const nSalt = saltadas.sinPanel.length + saltadas.sinRetornos.length;
@@ -413,7 +470,7 @@ async function valorar(libro, { silencioso = false } = {}) {
     if (saltadas.sinRetornos.length) console.warn(`     sin retornos en su periodo: ${saltadas.sinRetornos.slice(0, 12).join(" · ")}`);
     if (pct > 5) console.warn(`     ⚠⚠ por encima del 5 %: este resultado no es comparable con uno calculado sobre el libro completo.`);
   }
-  return { eje, soloPicks, conCaja, vivas, saltadas: { sinPanel: [...new Set(saltadas.sinPanel)], sinRetornos: saltadas.sinRetornos.length, total: nSalt, deCuantas: libro.length } };
+  return { eje, soloPicks, conCaja, conIndice, vivas, saltadas: { sinPanel: [...new Set(saltadas.sinPanel)], sinRetornos: saltadas.sinRetornos.length, total: nSalt, deCuantas: libro.length } };
 }
 
 /** Referencia: comprar y mantener un ETF durante toda la ventana. */
@@ -560,9 +617,10 @@ const EMISOR_OBJ = Object.fromEntries(EMISOR_DE);
 
 // ── EJECUCIÓN ───────────────────────────────────────────────────────────────────────────
 const { libro, huecos } = simular();
-const { eje, soloPicks, conCaja, vivas, saltadas } = await valorar(libro);
+const { eje, soloPicks, conCaja, conIndice, vivas, saltadas } = await valorar(libro);
 const cPicks = curva(soloPicks);
 const cCaja = curva(conCaja);
+const cIndice = conIndice ? curva(conIndice) : null;
 const ew = await universoEW(eje);
 
 // ⚠️ RED FINAL, puesta el 2026-09-01 después de publicar una referencia con +83.575 % y un CAGR
@@ -882,6 +940,19 @@ const h2 = cCaja.total > ew.total;
 console.log(`  ${h2 ? "✔" : "✖"}  H2 la cartera con reglas bate al universo EW (${cCaja.total.toFixed(0)}% vs ${ew.total.toFixed(0)}%)`);
 console.log(`  ℹ  H3 el precio de la rampa: ${(cPicks.total - cCaja.total).toFixed(0)} pp entre sólo-picks y con-caja`);
 
+// H4 (preespecificada en HIPOTESIS_H4_RAMPA.md): la parte no invertida, en el índice.
+// EL CRITERIO ES LAS DOS COSAS A LA VEZ: batir a SPY en retorno Y en Sharpe. Subir el retorno
+// metiendo más beta lo hace cualquiera con apalancamiento; lo que hay que demostrar es que
+// aporta POR UNIDAD DE RIESGO.
+if (cIndice && spy) {
+  const dRet = cIndice.total - spy.total, dSh = cIndice.sharpe - spy.sharpe;
+  console.log(`  ℹ  H4 modelo C (caja en el índice): ${cIndice.total.toFixed(1)} % · Sharpe ${cIndice.sharpe.toFixed(2)} · maxDD ${cIndice.maxDD.toFixed(1)}`);
+  console.log(`     contra SPY (${spy.total.toFixed(1)} % · Sharpe ${spy.sharpe.toFixed(2)}): ${dRet >= 0 ? "+" : ""}${dRet.toFixed(1)} pp · Sharpe ${dSh >= 0 ? "+" : ""}${dSh.toFixed(2)}`);
+  console.log(`     H4 ${dRet > 0 && dSh >= 0 ? "SE CUMPLE" : dRet > 0 ? "NO: sube el beta, no el alfa (retorno sí, Sharpe no)" : "NO se cumple"}`);
+} else if (!cIndice) {
+  console.log(`  ⚠  H4 modelo C: NO se pudo calcular (sin serie del índice sobre el eje). No es un cero.`);
+}
+
 // ⚠️ UNA CORRIDA INCOMPLETA NO PISA EL ARTEFACTO PUBLICADO.
 //
 // `--no-sweep` y `--no-ablacion` existen para iterar rápido, pero escribían en el MISMO
@@ -926,7 +997,10 @@ writeFileSync(join(OUT, NOMBRE), JSON.stringify({
                   financierosExcluidos: financieros.size,
                   nota: "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)." } },
   carteras: { soloPicks: { total: fx(cPicks.total, 1), cagr: fx(cPicks.cagr, 2), sharpe: fx(cPicks.sharpe, 2), maxDD: fx(cPicks.maxDD, 1) },
-              conCaja: { total: fx(cCaja.total, 1), cagr: fx(cCaja.cagr, 2), sharpe: fx(cCaja.sharpe, 2), maxDD: fx(cCaja.maxDD, 1) } },
+              conCaja: { total: fx(cCaja.total, 1), cagr: fx(cCaja.cagr, 2), sharpe: fx(cCaja.sharpe, 2), maxDD: fx(cCaja.maxDD, 1) },
+              // `null` = no se pudo calcular, que NO es lo mismo que cero. Ver H4.
+              conIndice: cIndice ? { total: fx(cIndice.total, 1), cagr: fx(cIndice.cagr, 2), sharpe: fx(cIndice.sharpe, 2), maxDD: fx(cIndice.maxDD, 1),
+                nota: "Modelo C (H4): la parte no invertida se mantiene en SPY en vez de en caja al 0 %. NO cambia ninguna decisión de compra." } : null },
   mecanica: { posiciones: libro.length, mesesHastaLlenar: mesesRampa < 0 ? null : +(mesesRampa / 21).toFixed(1),
               posicionesMedias: fx(mean(vivas), 1), fechasSinCompra: huecos.length,
               permanenciaMesesMedia: cerradas.length ? fx(mean(cerradas.map((o) => o.dias)) / 30.4, 1) : null,
