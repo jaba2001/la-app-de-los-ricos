@@ -89,3 +89,4 @@ research/data/*.tmp
 !research/out/integridad_precios.json
 !research/out/movimientos.json
 !research/out/insiders.json
+!research/out/sankey_universo.json

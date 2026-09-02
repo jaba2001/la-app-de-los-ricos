@@ -113,6 +113,11 @@ jobs:
       # documento, y la direccion la da A/D y no el codigo. Cada test dice que titular romperia.
       - name: Parser de Form 4 (movimientos de directivos)
         run: node --experimental-strip-types --no-warnings scripts/form4.test.mjs
+      # El diagrama de «cómo gana dinero X» SIEMPRE cierra, y lo que no se puede atribuir se
+      # dibuja como bloque «No desglosado» con su tamaño real. Escalar las barras para que
+      # encajen queda bonito y miente; dejar el diagrama abierto esconde el hueco.
+      - name: Diagrama de flujo (cómo gana dinero X)
+        run: node --experimental-strip-types --no-warnings scripts/sankey.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
