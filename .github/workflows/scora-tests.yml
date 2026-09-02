@@ -148,6 +148,13 @@ jobs:
       # preferente, y tratarla como tal borraria a Berkshire del mapa.
       - name: Emparejamiento CUSIP → ticker
         run: node --experimental-strip-types --no-warnings scripts/mapacusip.test.mjs
+
+      # Ingresos por segmento (fase 6). `companyfacts` NO trae ejes dimensionales, asi que esto
+      # sale del XBRL de la propia presentacion. Cada caso del test es un fallo real medido:
+      # padre e hijos conviviendo en el mismo eje (NVIDIA sumaba 1,90 veces su total), el mismo
+      # hecho publicado dos veces (Apple), y el total y el desglose con etiquetas distintas.
+      - name: Ingresos por segmento
+        run: node --experimental-strip-types --no-warnings scripts/segmentos.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
