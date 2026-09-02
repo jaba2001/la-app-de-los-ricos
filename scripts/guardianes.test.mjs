@@ -18,7 +18,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/guardianes.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from "fs";
+import { readFileSync, writeFileSync, unlinkSync, existsSync, readdirSync } from "fs";
 import { execFileSync } from "child_process";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -124,11 +124,27 @@ ok(enLocalNoCI.length === 0,
    `corre en test:all pero no en CI (un fallo llega a main sin que nadie lo vea): ${enLocalNoCI.join(", ")}`);
 ok(deCI.size >= 15, `CI tiene que correr al menos 15 comprobaciones, tiene ${deCI.size}`);
 
+// ⚠️ EL CONTRASTE DE ARRIBA TIENE UN HUECO: sólo compara las dos listas entre sí, así que un
+// test que no esté en NINGUNA de las dos es simétrico y pasa. Ocurrió el mismo día con
+// `mapacusip.test.mjs` (54 asserts escritos y cableados en ningún sitio). Un test que no corre
+// es peor que no tenerlo: aparenta cobertura. Se comprueba contra el DISCO, no contra las listas.
+const enDisco = readdirSync(join(RAIZ, "scripts")).filter((f) => f.endsWith(".test.mjs")).map((f) => `scripts/${f}`);
+const huerfanos = enDisco.filter((f) => !deTestAll().has(f) && !deCI.has(f));
+ok(huerfanos.length === 0,
+   `hay tests en scripts/ que no corren en ningún sitio (aparentan cobertura): ${huerfanos.join(", ")}`);
+
 // El typecheck no es un .mjs y se escapaba del contraste de arriba: estaba en CI y no en
 // test:all, o sea la misma asimetría con otra cara. Se comprueba aparte.
-const ciTypecheck = /tscs+--noEmit/.test(wf);
-const localTypecheck = /typecheck/.test(scripts["test:all"] ?? "") && /tscs+--noEmit/.test(scripts.typecheck ?? "");
-ok(!ciTypecheck || localTypecheck, "si CI hace typecheck, test:all también tiene que hacerlo");
+// ⚠️ Aquí ponía `/tscs+--noEmit/` — la `\s` se perdió al escribir el fichero desde el shell, y
+// una expresión que no casa NUNCA hacía que `ciTypecheck` fuese siempre falso: la aserción
+// pasaba EN VACÍO. Una comprobación que no comprueba nada es el mismo defecto que este fichero
+// persigue, escondido dentro del que lo persigue. Por eso se afirma primero que casa de verdad.
+const RE_TSC = /tsc\s+--noEmit/;
+ok(RE_TSC.test("npx tsc --noEmit"), "la expresión del typecheck casa de verdad (si no, lo de abajo pasa en vacío)");
+const ciTypecheck = RE_TSC.test(wf);
+const localTypecheck = /typecheck/.test(scripts["test:all"] ?? "") && RE_TSC.test(scripts.typecheck ?? "");
+ok(ciTypecheck, "CI tiene que hacer typecheck");
+ok(!ciTypecheck || localTypecheck, "y si CI lo hace, test:all también");
 
 console.log(`\n${fail ? "✖" : "✓"} guardianes: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

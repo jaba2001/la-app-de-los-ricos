@@ -141,6 +141,13 @@ jobs:
       # posiciones teniendo 997 — y cero se lee como «no tiene nada», no como «no sé leerlo».
       - name: Parser de 13F (carteras institucionales)
         run: node --experimental-strip-types --no-warnings scripts/parse13f.test.mjs
+
+      # El emparejamiento CUSIP -> ticker. Cada caso salio de un fallo real medido contra la SEC:
+      # el apostrofo (la SEC escribe LOWES, no LOWE'S), la barra desnuda de `AMETEK INC/`, el
+      # `N.V.` que se parte en dos fichas, y el falso amigo del guion — BRK-A es una CLASE, no una
+      # preferente, y tratarla como tal borraria a Berkshire del mapa.
+      - name: Emparejamiento CUSIP → ticker
+        run: node --experimental-strip-types --no-warnings scripts/mapacusip.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
