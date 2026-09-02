@@ -26,6 +26,8 @@ import { serieCompleta, returnsSeries } from "./prices.mjs";
 import { loadSP500Historical, membersAsOf, snapshotDate } from "./universe.mjs";
 import { revisarSerie, veredicto, cierresDesalineados } from "../lib/integridadPrecios.ts";
 import { VENTANAS, tramoDe, retornoEnTramo } from "../lib/ventanas.ts";
+import { hechosDeCabecera, hechoDeAmplitud, redactar } from "../lib/narrativa.ts";
+import { tickerToCik, sicSector } from "./edgar.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : d; };
@@ -65,6 +67,25 @@ if (fuera.length) {
   console.log(`  ⚠ ${fuera.length} series no cierran ahí y quedan FUERA del ranking: ${fuera.slice(0, 10).map((f) => `${f.ticker}(${f.fecha})`).join(" ")}`);
 }
 const alineadas = filas.filter((f) => f.barras.at(-1).date === referencia);
+
+// ── Sectores, para los hechos del pie ────────────────────────────────────────────────────
+// ⚠️ El SIC no resuelve a todos —en 3820-3829 conviven Thermo Fisher, KLA y Rockwell— y los que
+// falten NO se agrupan en un cajón: `lib/narrativa.ts` los cuenta y, si son muchos, se calla en
+// vez de afirmar una concentración sobre media cabecera.
+const sectorDe = new Map();
+{
+  let k = 0;
+  for (const f of alineadas) {
+    process.stdout.write(`  sectores ${++k}/${alineadas.length}\r`);
+    try {
+      const cik = await tickerToCik(f.t);
+      const s = cik ? await sicSector(cik) : null;
+      if (s) sectorDe.set(f.t, s);
+    } catch { /* sin sector: se cuenta solo, al no estar en el mapa */ }
+  }
+  process.stdout.write("                    \r");
+  console.log(`  con sector: ${sectorDe.size}/${alineadas.length}`);
+}
 
 // ── 2 · Cada ventana ─────────────────────────────────────────────────────────────────────
 const resultado = { generatedAt: new Date().toISOString(), universoAsOf: asOf, cierre: referencia, top: TOP, ventanas: {} };
@@ -112,6 +133,18 @@ for (const v of VENTANAS) {
     retiradosPorIntegridad: retiradas.map((m) => ({ ticker: m.ticker, pct: m.pct, motivo: m.aviso })),
   };
 
+  // ── Los hechos del pie ────────────────────────────────────────────────────────────────
+  // Se calculan DESPUÉS del ranking y sobre las filas ya publicadas. El resumen no elige qué
+  // enseñar: describe lo que ya se enseña. Al revés sería una selección disfrazada de resumen.
+  const conSector = (fs) => fs.map((x) => ({ ticker: x.ticker, pct: x.pct, sector: sectorDe.get(x.ticker) ?? null }));
+  const hechos = [
+    hechoDeAmplitud(conSector(limpias)),
+    ...hechosDeCabecera(conSector(resultado.ventanas[v.id].ganadores), "suben"),
+    ...hechosDeCabecera(conSector(resultado.ventanas[v.id].perdedores), "bajan"),
+  ].filter(Boolean);
+  resultado.ventanas[v.id].hechos = hechos;
+  resultado.ventanas[v.id].resumen = redactar(hechos);
+
   const g = resultado.ventanas[v.id].ganadores, p = resultado.ventanas[v.id].perdedores;
   console.log(`\n  ── ${v.nombre}  (desde el cierre del ${tramoComun?.base} hasta ${tramoComun?.hasta}, ${medidas.length} nombres) ──`);
   console.log(`     ganan:   ${g.slice(0, 5).map((x) => `${x.ticker} ${x.pct >= 0 ? "+" : ""}${x.pct}%${x.aviso ? " ⚠" : ""}`).join("  ")}`);
@@ -119,6 +152,7 @@ for (const v of VENTANAS) {
   // El campo es `aviso`, no `motivo`: la primera versión imprimía «MNST (undefined)» — el dato
   // estaba bien en el artefacto y sólo mentía la consola, que es como se cuelan estas cosas.
   if (retiradas.length) console.log(`     retirados por integridad: ${retiradas.map((m) => `${m.ticker} (${m.aviso})`).join(" · ")}`);
+  if (resultado.ventanas[v.id].resumen) console.log(`     · ${resultado.ventanas[v.id].resumen}`);
 }
 
 writeFileSync(join(OUT, "movimientos.json"), JSON.stringify(resultado, null, 2) + "\n", "utf8");

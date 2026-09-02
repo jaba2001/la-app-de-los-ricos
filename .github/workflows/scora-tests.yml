@@ -118,6 +118,13 @@ jobs:
       # encajen queda bonito y miente; dejar el diagrama abierto esconde el hueco.
       - name: Diagrama de flujo (cómo gana dinero X)
         run: node --experimental-strip-types --no-warnings scripts/sankey.test.mjs
+      # El pie de una tabla de movimientos deriva HECHOS de las filas ya publicadas: no escribe
+      # prosa, no infiere causas, y sobre todo NO elige qué filas enseñar. Un resumen que
+      # seleccionara sería una selección disfrazada. Los tests fijan que no se afirme una
+      # concentración sectorial cuando faltan sectores, y que una coincidencia entre sectores
+      # distintos no se venda como patrón.
+      - name: Los hechos del pie de la tabla
+        run: node --experimental-strip-types --no-warnings scripts/narrativa.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
