@@ -210,14 +210,108 @@ De `Gestion de carteras.pdf` §5.2, sobre construcción de carteras activas:
 
 ## 8 · El plan revisado, por fases
 
-| # | fase | esfuerzo | qué desbloquea |
-|---|---|---|---|
-| **1** | **Métricas ajustadas al riesgo completas** sobre lo que YA existe: M², Sortino, Calmar, captura alcista/bajista, asimetría, curtosis, y las dos referencias (60/40 + SPY) | **bajo** — aritmética sobre series que ya tenemos | **Defiende el claim de producto.** Es lo que bloquea el lanzamiento |
-| **2** | **Tests de temporización** Merton-Henriksson y Treynor-Mazuy sobre el allocator, con su significación | bajo-medio | Prueba o refuta el edge declarado, en su propio terreno |
-| **3** | **Brinson por categoría de activo**, con cuadre exacto | medio | Dice de dónde viene el resultado del allocator |
-| **4** | **Índice ponderado por capitalización** punto en el tiempo (la fase 1 del plan v1) | **alto** | Sólo hace falta para Picks, no para el claim |
-| **5** | **Picks con pesos activos**: infraponderar en vez de excluir, dimensionar por convicción | medio | La pregunta de investigación, no la de producto |
-| **6** | **Significación y deflación** por ensayos | bajo | Cierra todo |
+### Fase 0 · Persistir la serie mensual — **descubierta al verificar**
+
+⚠️ **`growth_metrics.mjs` SÍ calcula la serie mensual de retornos y los pesos por activo dentro de
+`run(step)`, pero el artefacto que escribe son 1 KB de agregados.** Los números canónicos existen;
+la serie que los produjo, no. **Las seis fases dependen de esto** y el plan no lo contemplaba.
+
+| | |
+|---|---|
+| **Qué** | Persistir `{fecha, ret_estrategia, ret_spy, ret_6040, pesos:{SPY,TLT,IEF,GLD,DBC,BIL,BTCUSD}, rotación}` — 234 filas |
+| **Datos** | ✅ todos; ya se computan, sólo no se guardan |
+| **Criterio** | Los agregados recalculados **desde la serie guardada** tienen que reproducir *exactamente* los de `trackRecord.ts`: 636,7 % · Sharpe 1,00 · maxDD −16,2. Si no cuadran, la serie no es la que produjo esas cifras |
+| **Trampa** | El coste (`turn/2 × 2 × COST_BPS`) se aplica DENTRO de `run`. Guardar el retorno bruto infla todas las métricas de golpe |
+| **Esfuerzo** | muy bajo |
+
+### Fase 1 · Métricas ajustadas al riesgo, completas
+
+`lib/metricasRiesgo.ts`, puro y comprobable: **M² = Sharpe_p × σ_bench + Rf** (y M²-alfa),
+**Sortino**, **Calmar**, **captura alcista/bajista**, **asimetría y curtosis** —CAIA: una promesa de
+drawdown obliga a enseñar la forma de la distribución porque el Sharpe supone normalidad— y **ρ
+con cada referencia**, que es la que decide la significación de todo lo demás.
+
+| | |
+|---|---|
+| **Criterio** | M² por dos caminos —desde el Sharpe y desde la serie apalancada— tiene que dar el mismo número. Si divergen, uno está mal |
+| **Trampa** | **La tasa libre de riesgo.** M², Sharpe y Sortino dependen de `Rf`, y usar 0 % constante sobre 2007-2026 —que incluye la ZIRP y luego el 5 %— distorsiona en direcciones opuestas según el tramo. Serie de `BIL` o FRED, nunca una constante |
+| **Desbloquea** | **El claim de producto**, que hoy está publicado en la web sin todo su respaldo |
+| **Esfuerzo** | bajo |
+
+### Fase 2 · Los tests de temporización — **la que más vale por esfuerzo**
+
+Lo que está en juego, y por eso es decisiva:
+
+| resultado | qué significa | consecuencia |
+|---|---|---|
+| **γ > 0 significativo** | El allocator **acierta el momento**: sube beta en alzas, la baja en caídas | El claim queda probado en su propio terreno |
+| **γ ≈ 0, α > 0** | La reducción de drawdown viene de **beta baja siempre**, no de acertar | Sigue siendo honesto, pero es «cartera defensiva», no «asignación por régimen». **Cambia el producto** |
+| **γ < 0** | Temporización con el signo cambiado | Hay que rehacer el allocator |
+
+| | |
+|---|---|
+| **Criterio** | Los **dos** tests, con error estándar **Newey-West** — los retornos mensuales tienen autocorrelación y sin corregirla el *t* sale inflado. Se publican los dos aunque discrepen: que discrepen ES el resultado |
+| **Trampa** | `Rm` tiene que ser la referencia del **mandato**. Contra SPY, el allocator parecerá tener *timing* sólo por llevar renta fija |
+| **Coste** | Gasta **dos ensayos** del presupuesto |
+| **Esfuerzo** | bajo-medio (OLS, sin dependencias nuevas) |
+
+### Fase 3 · Brinson por categoría de activo
+
+El allocator mueve **siete categorías** y los pesos ya se calculan cada mes:
+`SPY` (renta variable) · `TLT` (RF larga) · `IEF` (RF media) · `GLD` (oro) · `DBC` (materias
+primas) · `BIL` (monetario) · `BTCUSD` (cripto). Es el ejemplo canónico del curso extendido, **sin
+GICS de por medio**.
+
+| | |
+|---|---|
+| **Criterio** | Asignación + selección tienen que sumar **exactamente** el retorno activo (en el ejemplo del curso: −4 % + 0,3 % = −3,7 %). Si no cuadra, no se publica |
+| **Trampa útil** | Al usar **un ETF por clase**, la «selección» debería salir ≈ 0 por construcción. **Si sale distinta de cero, hay un error de contabilidad** — comprobación gratis de la propia implementación |
+| **Esfuerzo** | medio |
+
+### Fase 4 · Índice ponderado por capitalización — **degradada de 1.ª a 4.ª**
+
+Es la antigua fase 1 del plan v1. Sólo hace falta para **Picks**; el claim de producto no la
+necesita. Que el v1 pusiera aquí «el 70 % del trabajo» es el error de orden que la revisión corrige.
+
+| | |
+|---|---|
+| **Criterio** | Correlación diaria con SPY **> 0,99** y diferencia anual **< 0,5 pp**, o no se sigue |
+| **Trampas** | `dei:EntityCommonStockSharesOutstanding` es de portada y va con hasta 90 días de retraso · en Alphabet o Berkshire hay que **sumar las clases** o se subestima la capitalización |
+| **Esfuerzo** | **alto** |
+
+### Fase 5 · Picks con pesos activos
+
+1. **Infraponderar, no excluir** — hoy no tener Apple es una apuesta corta involuntaria del ~7 %.
+2. **Dimensionar por convicción**: `peso_activo ∝ alfa × confianza / volatilidad`, que es a lo que
+   se reducen las tres reglas del temario, y sustituye al «peso índice × k» que inventé sin base.
+
+| | |
+|---|---|
+| **Criterio** | Se miden los tres esquemas y **se publican los tres**, incluido el que pierde |
+| **Esfuerzo** | medio |
+
+### Fase 6 · Significación y deflación
+
+**Separar las tres preguntas que el plan v1 mezclaba:**
+
+| pregunta | quién la contesta |
+|---|---|
+| ¿Es significativo? | Jobson-Korkie/Memmel con el **ρ medido** en la fase 1, no supuesto |
+| ¿Está sobreajustado? | El `walkForward` que **ya existe**: 178 meses OOS, Sharpe 0,99, *gap* 0,01 |
+| ¿Es robusto? | Ventanas alternativas. Y **el drawdown no necesita significación**: −50,7 % vs −16,2 % es un hecho del peor caso observado |
+
+### El orden, y su razón
+
+```
+0 → 1 → 2 → 3      el claim de producto: barato, y bloquea el lanzamiento
+        ↓
+        6          significación, en cuanto haya ρ
+        ↓
+      4 → 5        la investigación: cara, y no bloquea nada
+```
+
+**Con 0, 1 y 2 —quizá una semana— ya se sabe si el claim publicado se sostiene y si el allocator
+hace lo que dice.** Las fases 4 y 5 son meses y contestan otra pregunta.
 
 **El cambio de orden es la consecuencia práctica de la revisión.** El plan v1 empezaba por lo más
 caro (reconstruir el índice ponderado, «el 70 % del trabajo») para responder una pregunta que el
