@@ -90,3 +90,4 @@ research/data/*.tmp
 !research/out/movimientos.json
 !research/out/insiders.json
 !research/out/sankey_universo.json
+!research/data/cusip_ticker.json
