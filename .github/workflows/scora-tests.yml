@@ -80,6 +80,17 @@ jobs:
       # Si un commit degrada la extracción, salta aquí antes de que nadie publique encima.
       # La segunda es un humo contra la SEC de verdad con seis nombres, uno por defecto; si la
       # SEC no responde, avisa y se salta en vez de romper el build.
+      # El contrato del proxy: 39 rutas. Hasta el 2026-09-02 esto sólo corría en local, así que
+      # una ruta rota llegaba a main sin que nada la viera.
+      - name: Contrato del proxy (39 rutas)
+        run: node scripts/smoke-proxy.mjs
+
+      # Y los guardianes, vigilados. Un guardián que deja de vigilar no falla: contesta que todo
+      # va bien. Fija que `variantes_identicas` distingue registros de variantes SIN quedarse
+      # ciego al no-op de §11, y que esta lista y `npm run test:all` son la misma.
+      - name: Los guardianes, vigilados
+        run: node --experimental-strip-types --no-warnings scripts/guardianes.test.mjs
+
       - name: Guardián de la capa de datos
         run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
 

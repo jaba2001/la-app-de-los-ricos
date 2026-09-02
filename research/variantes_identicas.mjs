@@ -27,6 +27,18 @@
 // nada. Las tablas de datos largas (más de MAX_HERMANOS filas) también se saltan: son registros,
 // no configuraciones que comparar.
 //
+// REGISTROS FRENTE A VARIANTES, que es la distinción que lo hace usable en artefactos de datos.
+// Si dos hermanos llevan un campo de IDENTIDAD distinto —`ticker`, `cik`, `symbol`— no son dos
+// variantes de un cálculo: son dos ENTIDADES, y que sus números coincidan es una coincidencia del
+// mundo, no una pista. Medido el 2026-09-02: PCG y EIX, las dos eléctricas de California, cayeron
+// −24,6022 % y −24,5984 % en la misma semana. Números distintos que redondean al mismo −24,6. Un
+// guardián que se pone rojo cada vez que dos valores co-mueven acaba desactivado, y eso es peor
+// que no tenerlo.
+//
+// Y LA VUELTA, que antes no veía en absoluto: si dos hermanos llevan la MISMA identidad, eso sí
+// es un fallo —la misma entidad publicada dos veces— y se señala aparte, sin pasar por TOLERADOS.
+// Distinguir las dos direcciones cuesta lo mismo que ignorar las dos.
+//
 // Es un detector de humo: una coincidencia NO prueba que haya un fallo. Dos ramas pueden dar lo
 // mismo legítimamente —una referencia que no depende del parámetro que se barre, un umbral que
 // no llega a morder—. Lo que exige es una explicación escrita, en TOLERADOS.
@@ -42,6 +54,22 @@ const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 /** Configuración de la variante, no resultado. Comparar esto haría inútil el barrido. */
 const PARAMETROS = new Set(["entry", "exit", "top", "topN", "k", "K", "n", "meses", "dias", "deCuantos", "financierosExcluidos", "excluidos"]);
 
+/**
+ * Campos que dicen DE QUÉ es la fila. Si dos hermanos los llevan y difieren, son entidades
+ * distintas y no variantes de un cálculo — ver la nota de la cabecera.
+ */
+const IDENTIDAD = ["ticker", "symbol", "cik", "id", "emisor", "issuer"];
+
+/** La identidad de una fila, o `undefined` si no lleva ninguna. */
+const identidadDe = (o) => {
+  for (const k of IDENTIDAD) {
+    const v = o?.[k];
+    if (typeof v === "string" && v.trim()) return `${k}=${v.trim()}`;
+    if (typeof v === "number" && Number.isFinite(v)) return `${k}=${v}`;
+  }
+  return undefined;
+};
+
 /** Con menos campos que esto, dos grupos coinciden por redondeo y no por identidad. */
 const MIN_CAMPOS = 3;
 
@@ -52,11 +80,15 @@ const MAX_HERMANOS = 40;
  * Coincidencias ya miradas y explicadas. Sin motivo escrito no entran: una lista de
  * excepciones muda es exactamente el sitio donde se esconden los fallos que esto busca.
  */
+// ⚠️ TRES TOLERANCIAS RETIRADAS el 2026-09-02, encontradas por el aviso de tolerancias muertas
+// que se añadió ese mismo día. Ninguna podía saltar ya, y llevaban meses aparentando vigilar:
+//
+//   · `barridoUmbrales[7] == ablacionReglas.reglas completas` (x2, reciente y antigua). Los
+//     números SIGUEN siendo idénticos —209,7 / 126 / 0,72 / −26,4—, pero desde que se añadió la
+//     regla de «sólo hermanos» tienen padres distintos (`barridoUmbrales` y `ablacionReglas`) y
+//     ni se comparan. La excepción sobrevivió al refactor que la dejó sin objeto.
+//   · `momentum_lab_smoke.json`: los ficheros `_smoke` se excluyen desde que existe `ES_HUMO`.
 const TOLERADOS = new Map([
-  ["picks_rules_backtest.json :: barridoUmbrales[7] == ablacionReglas.reglas completas (§2-§6)",
-   "Son la MISMA configuración: el punto del barrido que coincide con los ajustes de producción. Idénticos por construcción."],
-  ["picks_rules_backtest_oos.json :: barridoUmbrales[7] == ablacionReglas.reglas completas (§2-§6)",
-   "Igual que la anterior, en la ventana antigua."],
 
   // ── rs_spy y mom12_1: idénticos por ÁLGEBRA, no por fallo ────────────────────────────────
   // `rs_spy = mom12_1 − spyMom`, y `spyMom` (el momento del propio SPY) es constante DENTRO de
@@ -73,8 +105,6 @@ const TOLERADOS = new Map([
   ["momentum_audit_long.json :: A1_significance.mom12_1 == A1_significance.rs_spy",
    "Igual: identidad algebraica, no coincidencia."],
   ["momentum_lab.json :: ic.mom12_1 == ic.rs_spy",
-   "Igual: identidad algebraica, no coincidencia."],
-  ["momentum_lab_smoke.json :: ic.mom12_1 == ic.rs_spy",
    "Igual: identidad algebraica, no coincidencia."],
 
   // ── Coincidencias de denominador pequeño o marcador perfecto ──────────────────────────────
@@ -142,7 +172,7 @@ function gruposDe(obj, ruta = "", acc = []) {
   if (obj == null || typeof obj !== "object") return acc;
   if (!Array.isArray(obj)) {
     const firma = firmaDe(obj);
-    if (Object.keys(firma).length >= MIN_CAMPOS) acc.push([ruta || "(raíz)", firma]);
+    if (Object.keys(firma).length >= MIN_CAMPOS) acc.push([ruta || "(raíz)", firma, identidadDe(obj)]);
     for (const [k, v] of Object.entries(obj)) gruposDe(v, ruta ? `${ruta}.${k}` : k, acc);
   } else {
     obj.forEach((v, i) => gruposDe(v, `${ruta}[${i}]`, acc));
@@ -195,7 +225,7 @@ const ES_HUMO = (f) => f.includes("_smoke");
 let ficheros = [];
 try { ficheros = readdirSync(OUT).filter((f) => f.endsWith(".json") && !ES_HUMO(f)).sort(); } catch { /* sin out/ */ }
 
-const hallazgos = [];
+const hallazgos = [], duplicados = [], usadas = new Set();
 for (const f of ficheros) {
   let j;
   try { j = JSON.parse(readFileSync(join(OUT, f), "utf8")); } catch { continue; }
@@ -210,19 +240,27 @@ for (const f of ficheros) {
 
   // Se agrupa por PADRE + firma: sólo se comparan variantes del mismo cálculo.
   const cubos = new Map();
-  for (const [ruta, firma] of grupos) {
+  for (const [ruta, firma, ident] of grupos) {
     const pa = padreDe(ruta);
     if ((cuantos.get(pa) ?? 0) > MAX_HERMANOS) continue;
     const c = pa + " ⇢ " + claveDe(firma);
     if (!cubos.has(c)) cubos.set(c, []);
-    cubos.get(c).push([ruta, firma]);
+    cubos.get(c).push([ruta, firma, ident]);
   }
   for (const iguales of cubos.values()) {
     if (iguales.length < 2) continue;
     for (let i = 0; i < iguales.length; i++) {
       for (let k = i + 1; k < iguales.length; k++) {
-        const [ra, fa] = iguales[i], [rb] = iguales[k];
-        if (TOLERADOS.has(claveTolerancia(f, ra, rb))) continue;
+        const [ra, fa, ida] = iguales[i], [rb, , idb] = iguales[k];
+
+        // Dos ENTIDADES distintas con los mismos números: coincidencia del mundo, no un no-op.
+        if (ida && idb && ida !== idb) continue;
+
+        // La misma entidad dos veces: eso sí es un fallo, y no admite tolerancia.
+        if (ida && idb && ida === idb) { duplicados.push({ f, ra, rb, ident: ida }); continue; }
+
+        const ct = claveTolerancia(f, ra, rb);
+        if (TOLERADOS.has(ct)) { usadas.add(ct); continue; }
         hallazgos.push({ f, ra, rb, firma: fa });
       }
     }
@@ -230,6 +268,31 @@ for (const f of ficheros) {
 }
 
 console.log("\n  VARIANTES QUE DAN EXACTAMENTE LO MISMO\n");
+
+// La misma entidad dos veces en la misma lista. No pasa por TOLERADOS: no hay explicación
+// legítima para publicar dos veces la misma fila.
+if (duplicados.length) {
+  for (const d of duplicados) {
+    console.error(`  ✖ ${d.f} — MISMA ENTIDAD DOS VECES (${d.ident})`);
+    console.error(`      ${d.ra}`);
+    console.error(`      ${d.rb}\n`);
+  }
+  console.error(`  ⛔ ${duplicados.length} fila(s) duplicada(s). No es una variante: es la misma`);
+  console.error(`     entidad publicada dos veces.\n`);
+  process.exit(1);
+}
+// ⚠️ UNA TOLERANCIA QUE YA NO CASA CON NADA es una regla que dejó de vigilar sin decirlo — la
+// misma familia de defecto que este guardián persigue: algo que no rompe y contesta que todo va
+// bien. O el artefacto cambió de forma y la clave quedó obsoleta, o la coincidencia desapareció
+// y sobra la excepción. Avisa sin romper: no es un fallo de datos, es deuda de mantenimiento.
+const muertas = [...TOLERADOS.keys()].filter((k) => !usadas.has(k));
+if (muertas.length) {
+  console.log("  ⚠ " + muertas.length + " tolerancia(s) que ya no casan con nada:");
+  for (const m of muertas) console.log("      " + m);
+  console.log("      (o el artefacto cambió de forma, o la excepción sobra)");
+  console.log("");
+}
+
 if (!hallazgos.length) {
   console.log(`  ✅ ninguna sin explicar (${TOLERADOS.size} coincidencias legítimas toleradas con su motivo).\n`);
   process.exit(0);

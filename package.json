@@ -14,7 +14,7 @@
     "test:css": "node scripts/css-lint.mjs",
     "test:p2": "node --experimental-strip-types --no-warnings scripts/p2.test.mjs",
     "test:retrieval": "node --experimental-strip-types --no-warnings scripts/retrieval.test.mjs",
-    "test:all": "npm run test && npm run test:p2 && npm run test:percentile && npm run test:roadmap && npm run test:theory && npm run test:picks && npm run test:retrieval && npm run test:integridad && npm run test:ventanas && npm run test:form4 && npm run test:sankey && npm run test:narrativa && npm run test:13f && npm run test:css && npm run test:smoke",
+    "test:all": "npm run test && npm run test:p2 && npm run test:percentile && npm run test:roadmap && npm run test:theory && npm run test:picks && npm run test:retrieval && npm run test:integridad && npm run test:ventanas && npm run test:form4 && npm run test:sankey && npm run test:narrativa && npm run test:13f && npm run test:css && npm run test:smoke && npm run test:datos && npm run test:guardianes && npm run guard:frescura && npm run guard:parametros && npm run guard:variantes && npm run guard:parser && npm run guard:redteam && npm run typecheck",
     "test:percentile": "node --experimental-strip-types --no-warnings scripts/percentile.test.mjs",
     "test:roadmap": "node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs",
     "test:integridad": "node --experimental-strip-types --no-warnings scripts/integridad.test.mjs",
@@ -22,7 +22,15 @@
     "test:form4": "node --experimental-strip-types --no-warnings scripts/form4.test.mjs",
     "test:sankey": "node --experimental-strip-types --no-warnings scripts/sankey.test.mjs",
     "test:narrativa": "node --experimental-strip-types --no-warnings scripts/narrativa.test.mjs",
-    "test:13f": "node --experimental-strip-types --no-warnings scripts/parse13f.test.mjs"
+    "test:13f": "node --experimental-strip-types --no-warnings scripts/parse13f.test.mjs",
+    "test:datos": "node --experimental-strip-types --no-warnings scripts/datos.test.mjs",
+    "test:guardianes": "node --experimental-strip-types --no-warnings scripts/guardianes.test.mjs",
+    "guard:frescura": "node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs",
+    "guard:parametros": "node --experimental-strip-types --no-warnings research/parametros_muertos.mjs",
+    "guard:variantes": "node --experimental-strip-types --no-warnings research/variantes_identicas.mjs",
+    "guard:parser": "node --experimental-strip-types --no-warnings research/parser_regression.mjs",
+    "guard:redteam": "node --experimental-strip-types --no-warnings research/redteam_grounding.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
