@@ -162,6 +162,14 @@ jobs:
       # grounding.ts es SOLO INGLES, y `` no existe detras de una vocal acentuada.
       - name: La compuerta de la prosa (5b)
         run: node --experimental-strip-types --no-warnings scripts/narrativallm.test.mjs
+
+      # La serie mensual del allocator. Existe por un incidente que NINGUN test habria cazado: el
+      # cache de precios de SPY se trunco a 2018-06 y los 36 meses de la crisis de 2008 se
+      # volvieron meses planos. Todo era coherente consigo mismo —los agregados cuadraban con la
+      # serie— y lo unico que delataba el fallo era saber que un maxDD de -23,9 % para el S&P 500
+      # en una ventana que incluye 2008 es IMPOSIBLE. Eso es lo que este test fija.
+      - name: La serie mensual del allocator
+        run: node --experimental-strip-types --no-warnings scripts/serie.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números

@@ -25,9 +25,14 @@ research/out/*
 # golden test. Mientras estuvieron ignorados, esos guardianes se saltaban en SILENCIO en
 # cada checkout limpio y los pesos derivaron meses sin que nadie lo viera. Un guardián que
 # se salta solo es peor que no tener guardián: da la señal verde sin haber mirado.
-# Son ficheros de 1-105 KB. Versionarlos es el precio de que la evidencia sea reproducible.
+# Son ficheros de 1-254 KB. Versionarlos es el precio de que la evidencia sea reproducible.
 !research/out/signals_ic.json
 !research/out/growth_metrics.json
+# La SERIE mensual del allocator (236 meses x 5 estrategias x 7 activos). Es la entrada de
+# `scripts/serie.test.mjs`, que sin ella no puede correr en un checkout limpio — y ese test es
+# el unico que caza el incidente del 2026-09-01: el cache de SPY truncado a 2018-06 convirtio
+# los 36 meses de la crisis de 2008 en meses planos, y TODO lo demas seguia cuadrando.
+!research/out/growth_series.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

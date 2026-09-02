@@ -37,27 +37,27 @@ export interface BacktestSummary {
 // research/walkforward.mjs (OOS), research/backtest.mjs --full 500 (0A momentum).
 
 // ── GROWTH profile (default product mandate) — the EXACT production path ─────────────
-// research/growth_metrics.mjs, 234 months 2007-2026, net 10bp/side, stationary regime,
+// research/growth_metrics.mjs, 236 months 2007-2026, net 10bp/side, stationary regime,
 // measured through the LIVE allocate.mjs (growthWeights + dual-momentum + 5% BTC sleeve).
 // Benchmark = the S&P 500. 2026-07-12 CAPTURE RETUNE (60% equity floor in risk-off instead
-// of the old full switch): it now NEARLY MATCHES the index's raw total return — +636.7% vs
-// +652.2%, CAGR 10.78% vs 10.9% — at a THIRD of the drawdown and half the tail risk (Sharpe
-// 1.00 vs 0.72, Sortino 1.74 vs 1.07, Calmar 0.66 vs 0.22, Jensen α +5.1%/yr, maxDD −16.2%
+// of the old full switch): it now NEARLY MATCHES the index's raw total return — +652.6% vs
+// +668.4%, CAGR 10.81% vs 10.92% — at a THIRD of the drawdown and half the tail risk (Sharpe
+// 1.01 vs 0.72, Sortino 1.75 vs 1.07, Calmar 0.67 vs 0.22, Jensen α +5.11%/yr, maxDD −16.2%
 // vs −50.7%). It actually BEAT SPY outright in 2007-2019 (+204% vs +196%, GFC included);
 // only the 2020-26 mega-cap bull leaves it a hair behind on raw return. NO unlevered variant
 // EXCEEDS the index outright (capture_lab.mjs: the return frontier asymptotes to SPY as beta
 // → 1) and we never lever — leverage/CPPI/collar all measured & rejected. Full risk report
 // (Sortino/VaR/CVaR/α/IR) drives the lib/riskMetrics.ts-backed UI.
 export const GROWTH_BACKTEST = {
-  period: "Jan 2007 – Jun 2026",
-  months: 234,
-  strategy:  { label: "Growth — 60% equity floor + trend gate + 5% BTC sleeve", totalReturn: 636.7, cagr: 10.78, sharpe: 1.0, sortino: 1.74, calmar: 0.66, maxDrawdown: -16.2, var95: -4.25, cvar95: -6.36, alpha: 5.1, informationRatio: -0.08, beta: 0.49 },
-  spy:       { label: "S&P 500 (SPY) buy & hold", totalReturn: 652.2, cagr: 10.9, sharpe: 0.72, sortino: 1.07, calmar: 0.22, maxDrawdown: -50.7, var95: -8.21, cvar95: -11.18 },
-  bench6040: { label: "Static 60/40 (context)", totalReturn: 368.0, cagr: 8.24, sharpe: 0.86, sortino: 1.33, calmar: 0.29, maxDrawdown: -28.8 },
-  noBtc:     { label: "Growth without the BTC sleeve", totalReturn: 580.4, cagr: 10.33, sharpe: 0.98, sortino: 1.67, maxDrawdown: -16.2 },
+  period: "Jan 2007 – Aug 2026",
+  months: 236,
+  strategy:  { label: "Growth — 60% equity floor + trend gate + 5% BTC sleeve", totalReturn: 652.6, cagr: 10.81, sharpe: 1.01, sortino: 1.75, calmar: 0.67, maxDrawdown: -16.2, var95: -4.25, cvar95: -6.36, alpha: 5.11, informationRatio: -0.08, beta: 0.49 },
+  spy:       { label: "S&P 500 (SPY) buy & hold", totalReturn: 668.4, cagr: 10.92, sharpe: 0.72, sortino: 1.07, calmar: 0.22, maxDrawdown: -50.7, var95: -8.21, cvar95: -11.18 },
+  bench6040: { label: "Static 60/40 (context)", totalReturn: 374.3, cagr: 8.24, sharpe: 0.86, sortino: 1.33, calmar: 0.29, maxDrawdown: -28.8 },
+  noBtc:     { label: "Growth without the BTC sleeve", totalReturn: 595, cagr: 10.36, sharpe: 0.99, sortino: 1.68, maxDrawdown: -16.2 },
   subPeriods: [
     { label: "2007–2019", strat: "+204% · Sharpe 0.96 · −16% DD", spy: "+196% · 0.62 · −51%" },
-    { label: "2020–2026", strat: "+142% · Sharpe 1.10 · −16% DD", spy: "+154% · 0.89 · −24%" },
+    { label: "2020–2026", strat: "+148% · Sharpe 1.11 · −16% DD", spy: "+159% · 0.90 · −24%" },
   ],
   rejected: "Measured and rejected — none beats SPY on total return with lower drawdown, and we never use leverage: regime-conditional leverage (SSO 1.3-1.5×), CPPI, short-hedge overlays (SH), long-vol (VXX), monthly vol-targeting (beat_index_lab.json). Options collars / protective puts too (options_collar_lab.json, BS-priced via VIX): they barely move the -17% drawdown (-17% to -18.4%) while slashing return (+506%→+256-402%) and every risk-adjusted metric — because the regime switch already provides the drawdown protection an options hedge would, upstream and for free, so the premium is pure drag.",
 };
