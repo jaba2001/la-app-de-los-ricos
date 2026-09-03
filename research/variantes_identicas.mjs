@@ -150,6 +150,22 @@ const TOLERADOS = new Map([
   ["picks_rules_backtest_oos.json :: ablacionReglas.reglas completas (§2-§6) == ablacionReglas.sin deduplicar (como la v2)",
    "En 2011-2018 la cartera nunca tuvo dos clases de la misma empresa (cero solapes, medido con doble_clase.mjs), así que la regla de §2quater es un no-op REAL en esa ventana. La reciente sí difiere: 209,7 contra 216,6."],
 
+  // ── El drawdown que no se mueve: la coincidencia ES el hallazgo ──────────────────────────
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[2] == robustezDrawdown.ventanas[3]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[4] == robustezDrawdown.ventanas[5]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[4] == robustezDrawdown.ventanas[6]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[4] == robustezDrawdown.ventanas[7]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[5] == robustezDrawdown.ventanas[6]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[5] == robustezDrawdown.ventanas[7]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+  ["informe_capacidad.json :: robustezDrawdown.ventanas[6] == robustezDrawdown.ventanas[7]",
+   "El drawdown NO se mueve al cambiar la ventana, y ESE es el resultado. Es lo que debe hacer una estrategia con control de riesgo: su peor caida (-16,2 % desde 2009-2010, -15,8 % desde 2012) ocurrio en un momento concreto que esas ventanas siguen conteniendo. El SPY marca -23,9 % en todas ellas por lo mismo: su peor caida sin 2008 es el desplome de 2020, que todas incluyen. Coincidir aqui es la evidencia, no un no-op."],
+
   // ── Dos proveedores que dicen lo mismo ────────────────────────────────────────────────────
   // Yahoo y Tiingo devolviendo el mismo número de barras para el mismo valor es ACUERDO entre
   // fuentes independientes, que es justo lo que se quiere de una auditoría de símbolos. Va por

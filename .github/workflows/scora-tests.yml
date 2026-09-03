@@ -190,6 +190,13 @@ jobs:
       # atribucion esta mal y no se publica.
       - name: Atribucion de Brinson
         run: node --experimental-strip-types --no-warnings scripts/brinson.test.mjs
+
+      # Sharpe deflactado (Bailey & Lopez de Prado). El repo llevaba deflactando a ojo contra
+      # raiz(2 ln N); esto lo hace bien y añade la correccion por asimetria y curtosis. El control
+      # que importa: colas MAS gruesas tienen que BAJAR la probabilidad, no subirla — si subiera,
+      # la deflacion estaria premiando el riesgo de cola.
+      - name: Sharpe deflactado
+        run: node --experimental-strip-types --no-warnings scripts/deflacion.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números

@@ -37,6 +37,9 @@ research/out/*
 # Brinson. Es la evidencia del claim ajustado al riesgo — lo que un evaluador (o un abogado)
 # pediria ver — y la entrada de cualquier guardian que se escriba encima.
 !research/out/informe_gestion_activa.json
+# Rotacion, capacidad, deflacion y robustez del drawdown: la evidencia de que el «tercio del
+# drawdown» depende de 2008, que es lo que un evaluador va a comprobar primero.
+!research/out/informe_capacidad.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

@@ -103,6 +103,25 @@ export default function TrackRecordPage() {
             Those are descriptions, and they are the ones we stand behind.
           </p>
           <p>
+            <strong>But &ldquo;a third of the drawdown&rdquo; leans on 2008.</strong> Started from{" "}
+            {G.robustezDrawdown.ventanasProbadas} different years, this strategy&rsquo;s worst loss barely
+            moves — always between {G.robustezDrawdown.allocatorMax}% and {G.robustezDrawdown.allocatorMin}%,
+            which is what risk control is supposed to look like. The index&rsquo;s does move: −50.7% with the
+            financial crisis in the window, −23.9% without it. So the ratio is{" "}
+            <strong>{G.robustezDrawdown.ratioRegistroCompleto}</strong> over the full record and{" "}
+            <strong>{G.robustezDrawdown.ratioDesde2009}</strong> from 2009 onward. Both are true. Anyone
+            who plots the series from 2010 will find the second one, so we put it here first.
+          </p>
+          <p>
+            <strong>And the Sharpe does not survive deflation for the number of strategies we tried.</strong>{" "}
+            Had we tested this once, the observed Sharpe would clear the bar comfortably (deflated
+            probability {(G.deflacion.dsrConUnSoloEnsayo * 100).toFixed(1)}%). After{" "}
+            {G.deflacion.ensayos} recorded trials on the same two decades of data, it drops to{" "}
+            <strong>{(G.deflacion.dsr * 100).toFixed(1)}%</strong> — under the 95% convention. That is the
+            price of having searched, and it is why every hypothesis from here on is written down
+            before it is run.
+          </p>
+          <p>
             <strong>Returns are not normally distributed, and the Sharpe ratio assumes they are.</strong>{" "}
             Excess kurtosis is <strong>+{G.forma.curtosisExceso}</strong> — fatter tails, more extreme
             months, than the ratio&rsquo;s own maths presumes. Skew is near zero ({G.forma.asimetria}); the
