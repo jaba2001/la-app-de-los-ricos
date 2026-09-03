@@ -55,6 +55,11 @@ deja sólo estas:
 | **Bróker minorista tradicional** | ~+6 pp | — | llamada de margen; el rango habitual es 8-12 % nominal |
 | ~~ETF apalancado 2x~~ | — | — | **NO APLICA**: sólo sobre índices, y con decaimiento diario |
 
+⚠️ El ETF apalancado no tiene fila con números **a propósito**. La primera versión le puso un
+diferencial «para comparar» y el guardián de variantes idénticas lo cazó: daba exactamente los
+mismos totales que la fila del bróker, porque el número no significaba nada. Una fila que
+calcula un total para algo que **no se puede hacer** es un no-op con aspecto de resultado.
+
 Los diferenciales son órdenes de magnitud públicos, **no cotizaciones**: hay que verificarlos
 con el bróker antes de decidir nada.
 

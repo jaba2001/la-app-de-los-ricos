@@ -84,8 +84,12 @@ const VIAS = [
   ["Bróker de bajo coste (tramo alto)", 1.0, "el diferencial baja con el saldo; a saldos pequeños es mayor"],
   ["Bróker de bajo coste (tramo bajo)", 2.5, "lo que paga una cuenta pequeña de verdad"],
   ["Bróker minorista tradicional", 6.0, "el rango habitual va del 8 % al 12 % nominal"],
-  ["ETF apalancado 2x", 1.0, "NO APLICA a una cartera propia: sólo existe sobre índices, y con decaimiento diario"],
 ];
+// ⚠️ EL ETF APALANCADO NO ESTA EN LA TABLA, y esa es la decision. Al principio lo puse con un
+// diferencial del 1,0 «para comparar» y el guardian de variantes identicas lo cazó: daba
+// EXACTAMENTE los mismos numeros que la fila del broker, porque el numero no significaba nada.
+// Una fila que calcula un total para algo que NO SE PUEDE HACER es un no-op con aspecto de
+// resultado. Se dice en texto, que es lo que es: una razon para descartarlo, no una opcion.
 console.log(`\n  QUÉ SOBREVIVE A CADA VÍA (órdenes de magnitud, a verificar con el bróker):`);
 console.log(`     vía                                  spread   B          C`);
 const filas = [];

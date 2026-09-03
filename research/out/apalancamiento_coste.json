@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T19:26:52.159Z",
+  "generatedAt": "2026-09-03T19:30:50.823Z",
   "factorB": 1.821,
   "volObjetivo": 0.1629,
   "tope": 2,
@@ -41,15 +41,6 @@
       "bateB": true,
       "bateC": true,
       "nota": "el rango habitual va del 8 % al 12 % nominal"
-    },
-    {
-      "via": "ETF apalancado 2x",
-      "spreadPp": 1,
-      "totalB": 1527.5,
-      "totalC": 1218.9,
-      "bateB": true,
-      "bateC": true,
-      "nota": "NO APLICA a una cartera propia: sólo existe sobre índices, y con decaimiento diario"
     }
   ],
   "spyTotal": 668.4,
