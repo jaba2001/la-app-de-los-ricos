@@ -15,7 +15,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { loadSP500Historical, membersAsOf, snapshotDate } from "./universe.mjs";
-import { diagnosticar, banderas, puente, destino, esFinanciera, UMBRALES } from "../lib/flujoCaja.ts";
+import { diagnosticar, banderas, puente, destino, sankeyCaja, esFinanciera, UMBRALES } from "../lib/flujoCaja.ts";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 const iN = process.argv.indexOf("--n");
@@ -36,7 +36,7 @@ for (const t of universo) {
     if (!f) { filas.push({ ticker: t, estado: "sin fundamentales" }); continue; }
     const sector = await sicSector(cik).catch(() => null);
     const fc = { ...f, sector };
-    const d = diagnosticar(fc), b = banderas(fc, d), p = puente(f), s = destino(f);
+    const d = diagnosticar(fc), b = banderas(fc, d), p = puente(fc), s = destino(fc), sk = sankeyCaja(fc);
     filas.push({
       ticker: t, estado: "ok", financiera: d.financiera, sector,
       diagnostico: {
@@ -49,6 +49,10 @@ for (const t of universo) {
       banderas: b,
       puente: p ? { pasos: p.pasos.length, sinExplicar: p.sinExplicar, suficiente: p.suficiente } : null,
       destino: s ? { cuadra: s.cuadra, residuo: s.residuo } : null,
+      sankey: { nivel: sk.nivel, flujos: sk.flujos.length, cuadra: sk.cuadra,
+        // El cierre ARITMETICO del dibujo, comprobado sobre el dato real y no solo en el test.
+        cierre: +(sk.flujos.filter((x) => x.lado === "origen").reduce((a, b) => a + b.valor, 0)
+                - sk.flujos.filter((x) => x.lado === "destino").reduce((a, b) => a + b.valor, 0)).toFixed(2) },
     });
   } catch (e) { filas.push({ ticker: t, estado: "error", motivo: e.message }); }
 }
@@ -58,6 +62,11 @@ const fin = ok.filter((x) => x.financiera);
 const conB = ok.filter((x) => x.banderas.length > 0);
 const cuadran = ok.filter((x) => x.destino?.cuadra);
 const puenteOk = ok.filter((x) => x.puente?.suficiente);
+const skCompleto = ok.filter((x) => x.sankey.nivel === "completo");
+const skPublica = ok.filter((x) => x.sankey.cuadra);
+// ⚠️ ESTE es el numero que no puede fallar: si un solo diagrama no cierra en aritmetica, el
+// dibujo esta escalando barras para que encajen, que es la forma bonita de mentir.
+const skAbierto = ok.filter((x) => Math.abs(x.sankey.cierre) > 0.01);
 
 const pc = (n, d = ok.length) => `${n}/${d}  ${d ? (100 * n / d).toFixed(0) : 0} %`;
 console.log(`  leidos                      ${pc(ok.length, filas.length)}`);
@@ -65,6 +74,14 @@ console.log(`  financieras (sin FCF)       ${pc(fin.length)}`);
 console.log(`  el destino de la caja CUADRA ${pc(cuadran.length)}   <- criterio de publicacion`);
 console.log(`  el puente es suficiente     ${pc(puenteOk.length)}`);
 console.log(`  con al menos una bandera    ${pc(conB.length)}`);
+console.log(`  sankey de caja: nivel completo ${pc(skCompleto.length)}`);
+console.log(`  sankey publicable (cuadra)  ${pc(skPublica.length)}`);
+console.log(`  sankey que NO cierra         ${skAbierto.length}   <- tiene que ser 0`);
+if (skAbierto.length) {
+  console.error(`
+  ⛔ ${skAbierto.length} diagrama(s) no cierran en aritmetica: ${skAbierto.slice(0, 6).map((x) => x.ticker + " " + x.sankey.cierre).join(" · ")}`);
+  process.exitCode = 1;
+}
 
 const porClave = {};
 for (const x of ok) for (const b of x.banderas) (porClave[b.clave] ??= []).push(x.ticker);
@@ -86,6 +103,7 @@ writeFileSync(join(OUT, "calidad_caja.json"), JSON.stringify({
   generatedAt: new Date().toISOString(), asOf: ASOF, umbrales: UMBRALES,
   resumen: { leidos: ok.length, deCuantos: filas.length, financieras: fin.length,
     destinoCuadra: cuadran.length, puenteSuficiente: puenteOk.length, conBandera: conB.length,
+    sankeyCompleto: skCompleto.length, sankeyPublicable: skPublica.length, sankeyAbierto: skAbierto.length,
     tasaBanderas: +tasa.toFixed(3) },
   porClave: Object.fromEntries(Object.entries(porClave).map(([k, v]) => [k, v.length])),
   filas,

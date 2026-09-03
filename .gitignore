@@ -47,6 +47,12 @@ research/out/*
 # Lleva dentro el bloque de COBERTURA: es la prueba de que el percentil sale de la muestra
 # que dice, y no de una serie truncada que contesta igual.
 !research/out/tipos.json
+# La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,149, 8 falsas alarmas. Es lo
+# que impide publicar el booleano como si fuera una alerta.
+!research/out/aviso_credito_base.json
+# La comprobacion previa que AHORRO el ensayo 345: rho 0,769 sobre un criterio de 0,70 escrito
+# antes de mirar. Es la evidencia de que la regla no se ajusto al resultado.
+!research/out/precheck_credito.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

@@ -143,6 +143,35 @@ export function credito(serie: { date: string; v: number }[], hasta: string):
  * El listón: la frase que hace útil todo lo anterior. No predice nada — sólo dice contra
  * qué hay que medirse, que es justo lo que el vídeo explica y ningún panel retail enseña.
  */
+/**
+ * ⚠️ LA TASA BASE DEL AVISO, MEDIDA. Sin esto, `ensanchando: true` se lee como una alerta y
+ * es exactamente lo que el vídeo hace: *«el mercado de bonos huele el problema antes que el
+ * de acciones»*. Medido sobre 33 años y 22 episodios independientes (`aviso_credito_base.mjs`):
+ *
+ *   · tras un aviso, la peor caída del año siguiente es −16,4 % frente al −14,3 % de un mes
+ *     cualquiera. La diferencia existe, pero **p = 0,149 en permutación: no se distingue del azar.**
+ *   · **8 de los 22 avisos fueron seguidos de un año de más del +20 %.** Marzo de 2020 es el
+ *     caso de manual: el aviso se enciende EN el suelo, no antes.
+ *
+ * El mecanismo es cierto —en 2007 se encendió 397 días antes de Lehman— pero como SEÑAL no
+ * sobrevive al test. Por eso `ensanchando` es un hecho sobre los datos y no una recomendación,
+ * y esta función es la que obliga a publicarlo con su tasa base al lado.
+ */
+export const BASE_AVISO = {
+  episodios: 22, desde: 1993,
+  caidaTrasAviso: -16.4, caidaSinCondicionar: -14.3, p: 0.149,
+  seguidosDeUnBuenAno: 8,
+} as const;
+
+/** La frase honesta para acompañar a un aviso encendido. NUNCA se publica el booleano solo. */
+export function avisoConTasaBase(ensanchando: boolean): string {
+  if (!ensanchando) return "El diferencial de crédito no se está abriendo por encima del corte declarado.";
+  return `El diferencial se está abriendo. Contexto medido: de ${BASE_AVISO.episodios} avisos como éste desde ` +
+    `${BASE_AVISO.desde}, ${BASE_AVISO.seguidosDeUnBuenAno} fueron seguidos de un año de más del +20 %. ` +
+    `La caída media posterior (${BASE_AVISO.caidaTrasAviso} %) no se distingue estadísticamente de la de un ` +
+    `mes cualquiera (${BASE_AVISO.caidaSinCondicionar} %, p = ${BASE_AVISO.p}). Es contexto, no una señal.`;
+}
+
 export function liston(a10: number | null, real10: number | null): string | null {
   const n = num(a10);
   if (n == null) return null;

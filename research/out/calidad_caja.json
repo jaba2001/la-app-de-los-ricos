@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T08:22:43.448Z",
+  "generatedAt": "2026-09-03T08:45:02.516Z",
   "asOf": "2026-06-30",
   "umbrales": {
     "cashConversionMala": 0.8,
@@ -14,6 +14,9 @@
     "destinoCuadra": 55,
     "puenteSuficiente": 11,
     "conBandera": 20,
+    "sankeyCompleto": 46,
+    "sankeyPublicable": 55,
+    "sankeyAbierto": 0,
     "tasaBanderas": 0.333
   },
   "porClave": {
@@ -47,6 +50,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -71,6 +80,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -95,6 +110,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -119,6 +140,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -143,6 +170,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 24000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -167,6 +200,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -191,6 +230,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -215,6 +260,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -259,6 +310,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -283,6 +340,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -307,6 +370,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -331,6 +400,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -365,6 +440,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -389,6 +470,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -423,6 +510,12 @@
       "destino": {
         "cuadra": false,
         "residuo": 131000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": false,
+        "cierre": 0
       }
     },
     {
@@ -447,6 +540,12 @@
       "destino": {
         "cuadra": false,
         "residuo": -105000000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": false,
+        "cierre": 0
       }
     },
     {
@@ -471,6 +570,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -495,6 +600,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 6900000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -519,6 +630,12 @@
       "destino": {
         "cuadra": false,
         "residuo": 184000000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": false,
+        "cierre": 0
       }
     },
     {
@@ -543,6 +660,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -576,6 +699,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -600,6 +729,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -624,6 +759,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -648,6 +789,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -672,6 +819,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -707,6 +860,12 @@
       "destino": {
         "cuadra": true,
         "residuo": -17000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 9,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -731,6 +890,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -755,6 +920,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -779,6 +950,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -803,6 +980,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -827,6 +1010,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -861,6 +1050,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 747000000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -885,6 +1080,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -909,6 +1110,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -933,6 +1140,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -957,6 +1170,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 5,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -991,6 +1210,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1015,6 +1240,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 89700000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1039,6 +1270,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1063,6 +1300,12 @@
       "destino": {
         "cuadra": true,
         "residuo": -951000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1087,6 +1330,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1120,6 +1369,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1144,6 +1399,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1187,6 +1448,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1230,6 +1497,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1254,6 +1527,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1288,6 +1567,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1321,6 +1606,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1345,6 +1636,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1389,6 +1686,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 8620000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1423,6 +1726,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1447,6 +1756,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1491,6 +1806,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 22000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1524,6 +1845,12 @@
       "destino": {
         "cuadra": false,
         "residuo": 30000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": false,
+        "cierre": 0
       }
     },
     {
@@ -1558,6 +1885,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 5000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 9,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1593,6 +1926,12 @@
       "destino": {
         "cuadra": false,
         "residuo": -361000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 9,
+        "cuadra": false,
+        "cierre": 0
       }
     },
     {
@@ -1628,6 +1967,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1652,6 +1997,12 @@
       "destino": {
         "cuadra": true,
         "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1695,6 +2046,12 @@
       "destino": {
         "cuadra": true,
         "residuo": -6000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
       }
     },
     {
@@ -1719,6 +2076,12 @@
       "destino": {
         "cuadra": true,
         "residuo": -49600000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
       }
     }
   ]

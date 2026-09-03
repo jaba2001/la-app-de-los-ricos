@@ -271,3 +271,115 @@ export function destino(f: EntradaCaja, tolerancia = 0.02): DestinoCaja | null {
     cuadra: residuo == null ? false : Math.abs(residuo) / escala <= tolerancia,
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EL SANKEY DE CAJA — el gemelo del de resultados
+//
+// Aquel contaba cómo se gana el dinero; éste cuenta **a dónde va**. La cadena que lo hace
+// comprobable en vez de decorativo es la identidad del estado de flujos:
+//
+//     CFO + inversión + financiación + efecto divisa = variación de la caja
+//
+// ⚠️ MISMO LISTÓN QUE SU HERMANO, y por la misma razón: la tentación de un Sankey es
+// escalar las barras para que encajen. Queda bonito y miente. Aquí lo que no se puede
+// atribuir a un concepto conocido se dibuja como **«resto»** con su tamaño real y NUNCA se
+// reparte entre los demás. Si `cuadra` es falso, no se publica.
+//
+// La granularidad sale de lo que EDGAR expone de verdad: dentro de la inversión sabemos el
+// capex; dentro de la financiación, recompras y dividendos. Lo demás —adquisiciones, compra
+// y venta de inversiones financieras, emisión y amortización de deuda— va agregado en su
+// «resto», que es honesto: son bloques que existen, no huecos.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface FlujoCaja {
+  concepto: string;
+  /** Magnitud siempre POSITIVA: el sentido lo dice `lado`, no el signo. */
+  valor: number;
+  lado: "origen" | "destino";
+  clase: "operacion" | "inversion" | "financiacion" | "divisa" | "caja" | "resto";
+}
+
+export interface SankeyCaja {
+  nivel: "completo" | "minimo" | "sin_datos";
+  flujos: FlujoCaja[];
+  cfo: number;
+  variacionDeclarada: number | null;
+  residuo: number | null;
+  /** Si es falso, NO se publica. Mismo criterio que el Sankey de resultados. */
+  cuadra: boolean;
+  /** Un banco no tiene esta lectura: su CFO negativo es la operación, no una fuga. */
+  financiera: boolean;
+}
+
+/**
+ * Construye el diagrama. `nivel`:
+ *   · `completo` — hay capex Y alguna partida de retribución al accionista.
+ *   · `minimo`   — hay CFO y los agregados, pero sin desglose fino. Se dibuja igual.
+ *   · `sin_datos`— no hay ni CFO. Se dice, no se rellena.
+ */
+export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
+  const d = destino(f, tolerancia);
+  if (!d) return { nivel: "sin_datos", flujos: [], cfo: 0, variacionDeclarada: null,
+                   residuo: null, cuadra: false, financiera: esFinanciera(f) };
+
+  const flujos: FlujoCaja[] = [];
+  const push = (concepto: string, valor: number | null | undefined,
+                lado: FlujoCaja["lado"], clase: FlujoCaja["clase"]) => {
+    if (valor != null && Math.abs(valor) > 0) flujos.push({ concepto, valor: Math.abs(valor), lado, clase });
+  };
+
+  // ── ORIGEN. Un CFO negativo no es un destino con signo: es que el negocio CONSUME caja,
+  // y entonces la historia que cuenta el diagrama es de dónde sale ese dinero.
+  if (d.cfo >= 0) push("Flujo de explotación", d.cfo, "origen", "operacion");
+  else push("El negocio consume caja", d.cfo, "destino", "operacion");
+
+  // ── INVERSIÓN. `capexTTM` viene como magnitud positiva; el resto de la inversión es lo
+  // que queda del agregado, y puede ser entrada (vender inversiones) o salida.
+  const capex = f.capexTTM ?? null;
+  const cfi = f.cfiTTM ?? null;
+  if (capex != null) push("Capex", capex, "destino", "inversion");
+  if (cfi != null) {
+    const resto = cfi + (capex ?? 0);   // cfi es negativo cuando sale caja
+    push(capex == null ? "Inversión (sin desglosar)" : "Resto de inversión",
+         resto, resto < 0 ? "destino" : "origen", capex == null ? "inversion" : "resto");
+  }
+
+  // ── FINANCIACIÓN. Recompras y dividendos son lo que el vídeo llama la retribución; el
+  // resto es sobre todo deuda, y su SIGNO es la mitad de la historia: endeudarse es un
+  // origen de caja, amortizar un destino.
+  const buy = f.buybacksTTM ?? null, div = f.dividendsTTM ?? null;
+  const cff = f.cffTTM ?? null;
+  push("Recompras", buy, "destino", "financiacion");
+  push("Dividendos", div, "destino", "financiacion");
+  if (cff != null) {
+    const retribucion = (buy ?? 0) + (div ?? 0);
+    const resto = cff + retribucion;
+    const sinDesglose = buy == null && div == null;
+    push(sinDesglose ? "Financiación (sin desglosar)" : "Resto de financiación (deuda)",
+         resto, resto < 0 ? "destino" : "origen", sinDesglose ? "financiacion" : "resto");
+  }
+
+  push("Efecto del tipo de cambio", f.fxCashTTM, (f.fxCashTTM ?? 0) < 0 ? "destino" : "origen", "divisa");
+
+  // ── EL CIERRE. La variación de caja es lo que queda, y se dibuja con su signo real: si la
+  // caja BAJA, es un origen más (se tiró de hucha), no un destino.
+  const v = d.variacionDeclarada ?? d.variacionCalculada;
+  push(v >= 0 ? "Aumento de la caja" : "Reducción de la caja", v, v >= 0 ? "destino" : "origen", "caja");
+
+  // ⚠️ EL BLOQUE QUE HACE QUE EL DIBUJO NO MIENTA, y que el test sintético no podía pedir
+  // porque ahí el residuo siempre era cero. Sobre datos reales SIEMPRE hay residuo: la
+  // variación que la empresa DECLARA casi nunca es exactamente la suma de sus tres flujos
+  // —redondeos, caja restringida, equivalentes reclasificados—. Medido: 16 de 60 diagramas
+  // del S&P 500 no cerraban por esto, todos dentro de la tolerancia del 2 %.
+  //
+  // Se dibuja con su tamaño real y del lado que corresponde, exactamente igual que el
+  // «No desglosado» del Sankey de resultados. Repartirlo entre los demás para que encaje es
+  // la forma bonita de mentir; enseñarlo es lo que convierte el hueco en información.
+  if (d.residuo != null && d.residuo !== 0)
+    push("No explicado", d.residuo, d.residuo > 0 ? "origen" : "destino", "resto");
+
+  const tieneDesglose = capex != null && (buy != null || div != null);
+  const nivel: SankeyCaja["nivel"] = tieneDesglose ? "completo" : "minimo";
+  return { nivel, flujos, cfo: d.cfo, variacionDeclarada: d.variacionDeclarada,
+           residuo: d.residuo, cuadra: d.cuadra, financiera: esFinanciera(f) };
+}

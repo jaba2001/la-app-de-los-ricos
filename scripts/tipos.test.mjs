@@ -12,7 +12,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { pendiente, forma, descomponer, percentil, credito, liston, UMBRALES_TIPOS } from "../lib/tipos.ts";
+import { pendiente, forma, descomponer, percentil, credito, liston, avisoConTasaBase, BASE_AVISO, UMBRALES_TIPOS } from "../lib/tipos.ts";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
@@ -109,6 +109,22 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   const l = liston(4.80, 2.10);
   ok(/4\.80/.test(l) && /2\.10/.test(l), "el listón cita los dos números");
   ok(!/subir|bajar|comprar|vender|va a/i.test(l), "y NO predice nada: es capa explicativa");
+}
+
+// ── EL AVISO NUNCA SE PUBLICA SOLO ───────────────────────────────────────────────────────
+// ⚠️ Este bloque existe porque la medicion dijo que NO. El aviso se encendio 397 dias antes de
+// Lehman, que es una anecdota preciosa; medido sobre 22 episodios independientes en 33 años,
+// p = 0,149 y 8 de 22 fueron seguidos de un año de mas del +20 %. El mecanismo es cierto y la
+// señal no sobrevive al test, asi que el booleano no puede salir sin su tasa base al lado.
+{
+  const t = avisoConTasaBase(true);
+  ok(/22/.test(t) && /8/.test(t), "el aviso encendido cita cuantos episodios hubo y cuantos fallaron");
+  ok(/0\.149|0,149/.test(t), "y el p-valor que dice que no se distingue del azar");
+  ok(/contexto, no una señal|no una señal/i.test(t), "y se declara explicitamente como contexto, no señal");
+  ok(!/comprar|vender|salir|proteger|crisis viene/i.test(t), "y no recomienda nada");
+  ok(/no se esta abriendo|no se está abriendo/i.test(avisoConTasaBase(false)), "apagado, dice justo eso");
+  ok(BASE_AVISO.p > 0.05, "la tasa base guardada refleja que NO es significativo");
+  ok(BASE_AVISO.seguidosDeUnBuenAno / BASE_AVISO.episodios > 0.3, "mas de un tercio de los avisos fueron falsas alarmas");
 }
 
 console.log(pass && !fail ? `\n✓ tipos: ${pass} passed, 0 failed\n` : `\n✖ tipos: ${pass} passed, ${fail} failed\n`);

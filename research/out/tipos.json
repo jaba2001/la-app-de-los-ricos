@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T08:37:01.498Z",
+  "generatedAt": "2026-09-03T08:48:48.252Z",
   "asOf": "2026-09-03",
   "umbrales": {
     "planaHasta": 0.25,
@@ -81,6 +81,15 @@
     "hace90d": 1.51,
     "delta": 0.07000000000000006,
     "ensanchando": false
+  },
+  "avisoTexto": "El diferencial de crédito no se está abriendo por encima del corte declarado.",
+  "tasaBaseAviso": {
+    "episodios": 22,
+    "desde": 1993,
+    "caidaTrasAviso": -16.4,
+    "caidaSinCondicionar": -14.3,
+    "p": 0.149,
+    "seguidosDeUnBuenAno": 8
   },
   "percentilNominal10a": 44.1,
   "liston": "El Tesoro a 10 años paga 4.79 % sin riesgo de impago: cualquier activo con riesgo tiene que batir eso para compensar. Descontada la inflación esperada, el listón real es 2.44 %."

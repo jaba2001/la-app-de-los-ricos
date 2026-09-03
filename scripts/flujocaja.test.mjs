@@ -13,7 +13,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/flujocaja.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { diagnosticar, banderas, puente, destino, esFinanciera, UMBRALES } from "../lib/flujoCaja.ts";
+import { diagnosticar, banderas, puente, destino, esFinanciera, sankeyCaja, UMBRALES } from "../lib/flujoCaja.ts";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
@@ -163,6 +163,88 @@ const SANA = {
   const conFx = destino({ ocfTTM: 100, cfiTTM: -20, cffTTM: -10, fxCashTTM: 5, deltaCashConFxTTM: 75 });
   ok(conFx.cuadra, "el efecto divisa forma parte del cuadre");
   ok(conFx.bloques.some((b) => /cambio/i.test(b.concepto)), "y aparece como bloque propio");
+}
+
+// ── EL SANKEY DE CAJA: lo que hay que fijar es que CIERRE ────────────────────────────────
+// ⚠️ Un Sankey que no cierra se arregla escalando barras, queda bonito y miente. Lo que este
+// bloque comprueba no es que se dibuje: es que la suma de los origenes sea EXACTAMENTE la de
+// los destinos, en los cuatro casos donde el signo cambia de sitio.
+{
+  const cierra = (s, m) => {
+    const o = s.flujos.filter((x) => x.lado === "origen").reduce((a, b) => a + b.valor, 0);
+    const d = s.flujos.filter((x) => x.lado === "destino").reduce((a, b) => a + b.valor, 0);
+    ok(Math.abs(o - d) < 1e-9, `${m} — origenes ${o} != destinos ${d}`);
+    return { o, d };
+  };
+
+  const s = sankeyCaja(SANA);
+  ok(s.nivel === "completo", "con capex y retribucion, el nivel es completo");
+  ok(s.cuadra, "y cuadra con la variacion declarada");
+  const { o } = cierra(s, "el diagrama de una industrial sana cierra");
+  cerca(o, 140, 1e-9, "y el total es el CFO: 140");
+  // 140 = capex 40 + resto inversion 10 + recompras 30 + dividendos 20 + resto financiacion 10 + caja 30
+  const v = (c) => s.flujos.find((x) => x.concepto === c)?.valor ?? null;
+  cerca(v("Capex"), 40, 1e-9, "el capex sale con su magnitud");
+  cerca(v("Resto de inversion") ?? v("Resto de inversión"), 10, 1e-9, "y el resto de inversion es CFI + capex, no un hueco");
+  cerca(v("Resto de financiacion (deuda)") ?? v("Resto de financiación (deuda)"), 10, 1e-9, "igual con la financiacion");
+
+  // ⚠️ TODO valor es positivo: el sentido lo lleva `lado`, no el signo. Mezclarlos es como se
+  // dibujan las barras que apuntan al lado equivocado.
+  ok(s.flujos.every((x) => x.valor > 0), "ningun flujo lleva el signo dentro del valor");
+
+  // Caja que BAJA: es un origen (se tira de hucha), no un destino negativo.
+  const baja = sankeyCaja({ ...SANA, cffTTM: -160, deltaCashConFxTTM: -70 });
+  cierra(baja, "con la caja bajando tambien cierra");
+  const c = baja.flujos.find((x) => x.clase === "caja");
+  ok(c.lado === "origen" && /Reducci/.test(c.concepto), "y la reduccion de caja aparece como ORIGEN");
+
+  // Deuda EMITIDA: el resto de financiacion pasa a ser un origen.
+  const emite = sankeyCaja({ ...SANA, cffTTM: 100, deltaCashConFxTTM: 190 });
+  cierra(emite, "emitiendo deuda tambien cierra");
+  const r = emite.flujos.find((x) => /deuda/i.test(x.concepto));
+  ok(r.lado === "origen", "endeudarse es un ORIGEN de caja, no un destino");
+
+  // Un negocio que CONSUME caja: el CFO cambia de lado y la historia es de donde sale.
+  const quema = sankeyCaja({ ...SANA, ocfTTM: -40, cfiTTM: -50, cffTTM: 200, deltaCashConFxTTM: 110 });
+  cierra(quema, "un negocio que quema caja tambien cierra");
+  const op = quema.flujos.find((x) => x.clase === "operacion");
+  ok(op.lado === "destino" && /consume/i.test(op.concepto), "y el CFO negativo se dibuja como consumo, no como origen");
+
+  // Sin desglose fino se dibuja igual, pero se DECLARA que es minimo.
+  const min = sankeyCaja({ ocfTTM: 100, cfiTTM: -30, cffTTM: -20, deltaCashConFxTTM: 50 });
+  ok(min.nivel === "minimo", "sin capex ni retribucion el nivel es minimo, no completo");
+  ok(min.flujos.some((x) => /sin desglosar/i.test(x.concepto)), "y los agregados se marcan como no desglosados");
+  cierra(min, "y aun asi cierra");
+
+  // Sin CFO no se inventa nada.
+  const nada = sankeyCaja({});
+  ok(nada.nivel === "sin_datos" && nada.flujos.length === 0 && !nada.cuadra, "sin CFO: sin_datos, sin flujos y sin cuadre");
+
+  // ⚠️ Si no cuadra con la variacion declarada, NO se publica — aunque el dibujo cierre solo.
+  const roto = sankeyCaja({ ...SANA, deltaCashConFxTTM: 900 });
+  ok(!roto.cuadra, "si la variacion declarada no cuadra, cuadra=false");
+  ok(roto.flujos.length > 0, "el diagrama existe, pero el criterio de publicacion es `cuadra`");
+
+  // Un banco: se construye, pero se marca para que nadie lea su CFO como el de una industrial.
+  ok(sankeyCaja({ ...SANA, deposits: 5000 }).financiera, "el diagrama de un banco viene marcado como financiera");
+
+  // ⚠️ EL CASO QUE ESTE TEST NO PEDIA Y LOS DATOS REALES SI. En los seis casos de arriba el
+  // residuo es cero, asi que el dibujo cerraba solo. Sobre el S&P 500, 16 de 60 diagramas NO
+  // cerraban: la variacion que la empresa DECLARA casi nunca es exactamente la suma de sus
+  // tres flujos. El arreglo no es tolerar el hueco, es DIBUJARLO.
+  const conResiduo = sankeyCaja({ ...SANA, deltaCashConFxTTM: 32 });   // calculada 30, declarada 32
+  cerca(conResiduo.residuo, 2, 1e-9, "el residuo se calcula");
+  const ne = conResiduo.flujos.find((x) => x.concepto === "No explicado");
+  ok(ne != null, "y aparece como bloque propio «No explicado»");
+  cerca(ne.valor, 2, 1e-9, "con su tamano REAL, sin repartirlo entre los demas");
+  ok(ne.lado === "origen", "declarar mas caja de la que explican los flujos es un origen no explicado");
+  cierra(conResiduo, "y con ese bloque el diagrama vuelve a cerrar exactamente");
+  ok(conResiduo.cuadra, "2 sobre un CFO de 140 esta dentro de la tolerancia: sigue siendo publicable");
+
+  // Y al reves: menos caja declarada que la que explican los flujos.
+  const menos = sankeyCaja({ ...SANA, deltaCashConFxTTM: 28 });
+  ok(menos.flujos.find((x) => x.concepto === "No explicado").lado === "destino", "y al reves es un destino no explicado");
+  cierra(menos, "que tambien cierra");
 }
 
 console.log(pass && !fail ? `\n✓ flujoCaja: ${pass} passed, 0 failed\n` : `\n✖ flujoCaja: ${pass} passed, ${fail} failed\n`);

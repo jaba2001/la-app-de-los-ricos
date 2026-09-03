@@ -14,7 +14,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { forma, descomponer, credito, liston, percentil, UMBRALES_TIPOS } from "../lib/tipos.ts";
+import { forma, descomponer, credito, liston, percentil, avisoConTasaBase, BASE_AVISO, UMBRALES_TIPOS } from "../lib/tipos.ts";
 
 const FRED = process.env.FRED_KEY || "89002273b3b4289f0869a5e5318b7277";
 const AQUI = dirname(fileURLToPath(import.meta.url));
@@ -99,6 +99,9 @@ if (cr) {
   console.log(`    percentil        ${cr.percentil == null ? "— (" + cr.motivoPercentil + ")" : cr.percentil.toFixed(0) + " %  de " + S.BAA10Y.length + " obs desde " + S.BAA10Y[0].date}`);
   console.log(`    hace 90 días     ${cr.hace90d == null ? "—" : cr.hace90d.toFixed(2)} pp   delta ${cr.delta == null ? "—" : (cr.delta > 0 ? "+" : "") + cr.delta.toFixed(2)}`);
   console.log(`    ensanchándose    ${cr.ensanchando ? "SÍ" : "no"}   (corte declarado: ${UMBRALES_TIPOS.ensancheMinimo} pp en ${UMBRALES_TIPOS.ventanaEnsanche} días)`);
+  // ⚠️ El booleano NUNCA sale solo: medido sobre 22 episodios, p = 0,149. Es contexto.
+  console.log(`
+    ${avisoConTasaBase(cr.ensanchando)}`);
 }
 
 const frase = liston(curva.a10, ult("DFII10"));
@@ -112,6 +115,7 @@ writeFileSync(join(AQUI, "out", "tipos.json"), JSON.stringify({
   generatedAt: new Date().toISOString(), asOf: HASTA, umbrales: UMBRALES_TIPOS,
   cobertura: Object.fromEntries(Object.entries(SERIES).map(([id, c]) => [id, { obs: S[id].length, desde: S[id][0]?.date ?? null, ...c }])),
   curva, forma: fm, descomposicion: desc, credito: cr,
+  avisoTexto: cr ? avisoConTasaBase(cr.ensanchando) : null, tasaBaseAviso: BASE_AVISO,
   percentilNominal10a: p2.pct == null ? null : +p2.pct.toFixed(1), liston: frase,
 }, null, 2) + "\n", "utf8");
 console.log(`\n  → research/out/tipos.json\n`);
