@@ -40,6 +40,9 @@ research/out/*
 # Rotacion, capacidad, deflacion y robustez del drawdown: la evidencia de que el «tercio del
 # drawdown» depende de 2008, que es lo que un evaluador va a comprobar primero.
 !research/out/informe_capacidad.json
+# Calidad de la caja: el diagnostico y las banderas rojas por empresa. Es la evidencia de que los
+# umbrales no marcan a medio indice, que es el listado de cordura de esa capa.
+!research/out/calidad_caja.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

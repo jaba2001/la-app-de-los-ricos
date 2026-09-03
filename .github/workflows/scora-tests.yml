@@ -197,6 +197,14 @@ jobs:
       # la deflacion estaria premiando el riesgo de cola.
       - name: Sharpe deflactado
         run: node --experimental-strip-types --no-warnings scripts/deflacion.test.mjs
+
+      # La capa de caja: 'lo que no es caja, no vale'. Lo que este test fija no son los ratios
+      # —eso es aritmetica— sino que no se lea el estado financiero de un banco ni de una utility
+      # regulada con la plantilla de una industrial. Ejecutandolo aparecieron los dos falsos
+      # positivos: JPMorgan con conversion -1,83 (prestar ES su operacion) y AEE/AWK/ATO por
+      # repartir dividendo con FCF negativo (su modelo es endeudarse para construir).
+      - name: La capa de caja
+        run: node --experimental-strip-types --no-warnings scripts/flujocaja.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
