@@ -11,7 +11,7 @@
 // Run: node --experimental-strip-types --no-warnings research/parser_regression.mjs [TICKERS…]
 //      --refresh   re-download even if cached
 // ─────────────────────────────────────────────────────────────────────────────
-import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { writeFileSync, readFileSync, existsSync, mkdirSync, statSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tickerToCik } from "./edgar.mjs";
@@ -118,6 +118,17 @@ const APPROVED_MOVES = {
     'antes anclaba en la referencia cruzada «Item 1. Business— Executive Officers of the Registrant " is also incorporated by…» (mitad de frase); ahora en el encabezado real «ITEM 1. BUSINESS General Seagate is a leading provider…»',
   "CSCO/Business":
     'antes anclaba en la cita «Item 1. Business." Other Key Financial Measures…»; ahora en el encabezado real, y además completo (48k vs 42k) al dejar de cortar en una cita en línea a Item 1A',
+  // Aparecio en CI el 2026-09-03 y NO en local: la cache tenia el 10-K de agosto y Cisco
+  // habia presentado el del ejercicio nuevo. Verificado sobre el documento refrescado —
+  // «Item 1A. Risk Factors» sale 17 veces en el fichero, y las dos candidatas son:
+  //   · 100.191 → «Table of Contents Item 1A. Risk Factors Set forth below y elsewhere…»
+  //               va detras de un salto de pagina: es el ENCABEZADO REAL.
+  //   · 204.114 → «…en Part I, Item 1A. Risk Factors. Total gross margin decreased…»
+  //               esta DENTRO de MD&A: es una referencia cruzada.
+  // La regla vieja (cuerpo mas largo) se quedaba con la segunda. Mismo defecto y mismo
+  // arreglo que CSCO/Business, en la seccion de al lado.
+  "CSCO/Risk Factors":
+    'antes anclaba en la referencia cruzada dentro de MD&A («…in Part I, Item 1A. Risk Factors. Total gross margin decreased by 0.4 percentage points…», posicion 204.114); ahora en el encabezado real tras el salto de pagina («Item 1A. Risk Factors Set forth below and elsewhere in this report…», posicion 100.191)',
 };
 
 const tickers = (process.argv.slice(2).filter((a) => !a.startsWith("--")).length
@@ -125,6 +136,24 @@ const tickers = (process.argv.slice(2).filter((a) => !a.startsWith("--")).length
   : DEFAULT).map((s) => s.toUpperCase());
 
 console.log(`\n  PARSER REGRESSION · ${tickers.length} filings · cache: research/out/filings_cache\n`);
+
+// ⚠️ LA EDAD DE LA CACHE, VISIBLE. El 2026-09-03 este arnes paso en local y fallo en CI: el
+// CSCO cacheado era del 10 de agosto y Cisco habia presentado el 10-K del ejercicio nuevo,
+// que el CI descarga fresco. Un arnes que juzga documentos que no controlamos y calla la edad
+// de los suyos da un verde que no significa lo mismo en las dos maquinas. Ahora avisa.
+{
+  const viejos = tickers.map((t) => {
+    const p = join(CACHE, t + ".html");
+    if (!existsSync(p)) return null;
+    const dias = (Date.now() - statSync(p).mtimeMs) / 86400000;
+    return dias > 21 ? [t, Math.round(dias)] : null;
+  }).filter(Boolean);
+  if (viejos.length) {
+    console.log(`  ⚠ cache con mas de 3 semanas: ${viejos.map(([t, d]) => `${t} (${d} d)`).join(", ")}`);
+    console.log(`    El CI descarga siempre fresco, asi que aqui puede salir verde y alli rojo.`);
+    console.log(`    Reproduce lo que ve el CI con --refresh antes de fiarte de un PASS.\n`);
+  }
+}
 
 const lost = [];      // sección que el parser viejo tenía y el nuevo pierde  → REGRESIÓN
 const moved = [];     // sección que ambos tienen pero arranca en otro sitio  → REVISAR A MANO
