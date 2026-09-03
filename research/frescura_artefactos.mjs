@@ -61,16 +61,26 @@ for (const [fichero, nombre] of ARTEFACTOS) {
     .filter(([, d]) => d && suFecha && d > suFecha)
     .map(([f]) => f);
 
-  if (vale && !masNuevas.length) {
+  // ⚠️ EL VEREDICTO LO DA LA HUELLA, NO EL RELOJ. Esto estaba escrito arriba —«se dice como
+  // pista, no como veredicto»— y el código hacía lo contrario: con la huella BUENA y un mtime
+  // más nuevo, contaba caduco y salía con 1.
+  //
+  // En CI eso no es un matiz, es un fallo estructural: `fechaDe` devuelve el mtime, y en un
+  // clon limpio TODOS los ficheros llevan la hora del checkout, siempre posterior al
+  // `generatedAt` del artefacto. Es decir, esta comprobación no podía pasar nunca en CI —
+  // tumbaba el workflow entero por un dato que el propio mensaje reconocía irrelevante
+  // («aunque su contenido no cambió»). Se descubrió al reparar el YAML que llevaba cinco días
+  // impidiendo que el CI llegara siquiera a ejecutar este paso.
+  if (vale) {
     console.log(`  ✓ ${nombre.padEnd(20)} al día  ·  generado ${String(suFecha).slice(0, 16)}`);
+    // La pista sigue publicándose: puede delatar una reescritura que la huella no cubra.
+    if (masNuevas.length) console.log(`      · pista: las entradas se reescribieron después (${masNuevas.join(", ")}), pero la huella coincide, así que el artefacto SÍ sale de estas entradas`);
     continue;
   }
   caducos++;
   console.log(`  ✖ ${nombre.padEnd(20)} CADUCO  ·  generado ${String(suFecha).slice(0, 16)}`);
   for (const m of motivos) console.log(`      · ${m}`);
-  // Que un fichero sea más nuevo NO es por sí solo prueba de que el artefacto esté mal —la
-  // auditoría reescribe sin cambiar nada— así que se dice como pista, no como veredicto.
-  if (masNuevas.length && vale) console.log(`      · las entradas se reescribieron después (${masNuevas.join(", ")}), aunque su contenido no cambió`);
+  if (masNuevas.length) console.log(`      · además, las entradas se reescribieron después (${masNuevas.join(", ")})`);
 }
 
 if (caducos) {
