@@ -106,6 +106,12 @@ console.log(`  panel: ${[...panel.values()].reduce((s, a) => s + a.length, 0)} f
  *
  * Una serie con ceros de relleno no es una serie corta: es una serie FALSA, porque los ceros
  * bajan la volatilidad y el Sharpe sale de una distribución que no existió.
+ *
+ * ⚠️ Y LA LECCIÓN, auditada después: los backtests PUBLICADOS no tienen este problema. Usan
+ * `picks_signal_panel_*`, que se construye con la historia completa y tiene una **mediana de
+ * 324 nombres por fecha** en 2011-2018. Este arnés llamaba a `priceAsOf` directo contra la
+ * caché, que arranca en 2018-06 por defecto, y se quedaba en 6-11. El defecto era de este
+ * fichero, no del repo. **Para un backtest sobre el universo se usa el panel, no la caché.**
  */
 async function serie(fechas, medida) {
   const rets = []; let antes = new Set(); let vacios = 0;
