@@ -159,7 +159,7 @@ jobs:
       # La compuerta de la prosa (fase 5b). El modelo REDACTA, no aporta datos: si su texto trae
       # un numero, una causa o un pronostico que no esta en los hechos, NO se publica y se cae al
       # texto determinista de 5a. Ojo con dos cosas que ya mordieron: `checkAdvice` de
-      # grounding.ts es SOLO INGLES, y `` no existe detras de una vocal acentuada.
+      # grounding.ts es SOLO INGLES, y `\b` no existe detras de una vocal acentuada.
       - name: La compuerta de la prosa (5b)
         run: node --experimental-strip-types --no-warnings scripts/narrativallm.test.mjs
 
@@ -209,6 +209,13 @@ jobs:
       # La capa de tipos. Lo que fija no es la resta 10a-2a sino que un percentil no se de
       # sobre una muestra que no lo sostiene — el error real fue tratar 786 obs desde 2023
       # de la serie de ICE BofA como si fueran 41 anos de historia.
+      # LOS GUARDIANES SE VIGILAN ENTRE SI. Este workflow estuvo ROJO cinco dias fallando en
+      # 0 segundos —antes de ejecutar nada— por un caracter de control 0x08 en el YAML, y
+      # nadie se entero porque test:all seguia verde en local. Un guardian que deja de
+      # vigilar no falla: calla. Va el PRIMERO para que un YAML roto se vea antes que nada.
+      - name: Los workflows (que el CI siga vivo)
+        run: node --experimental-strip-types --no-warnings scripts/workflows.test.mjs
+
       - name: La capa de tipos
         run: node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
