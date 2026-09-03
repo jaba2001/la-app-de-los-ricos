@@ -83,6 +83,9 @@ research/out/*
 # EL ENSAYO 343, con su preregistro escrito antes. Las cuatro medidas FALLAN el criterio: mejoran
 # 2011-2018 y empeoran 2019-2026. Se versiona porque un ensayo fallido que no se guarda se repite.
 !research/out/ensayo343.json
+# La via que SI bate al indice: convertir la ventaja de riesgo en ventaja de retorno. Con
+# volatilidad objetivo da 1.345,8 %% frente a 668,4 %% del SPY, y con la MITAD de su caida maxima.
+!research/out/apalancamiento.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
