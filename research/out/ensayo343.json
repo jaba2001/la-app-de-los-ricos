@@ -1,0 +1,127 @@
+{
+  "generatedAt": "2026-09-03T17:45:38.015Z",
+  "preregistro": "PREREGISTRO_ENSAYO_343.md",
+  "universo": 206,
+  "top": 20,
+  "pesoNuevo": 0.1,
+  "costeBps": 10,
+  "M": 343,
+  "resultados": [
+    {
+      "medida": "BASE",
+      "nombre": "Score actual (referencia)",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": -0.2,
+          "meses": 95,
+          "total": -5.8
+        },
+        "2019-2026": {
+          "sharpe": 0.874,
+          "meses": 89,
+          "total": 206.4
+        }
+      }
+    },
+    {
+      "medida": "conversion",
+      "nombre": "Conversión a caja",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": -0.132,
+          "meses": 95,
+          "total": -3.9
+        },
+        "2019-2026": {
+          "sharpe": 0.847,
+          "meses": 89,
+          "total": 197.1
+        }
+      }
+    },
+    {
+      "medida": "banderas",
+      "nombre": "Banderas rojas de caja",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": -0.088,
+          "meses": 95,
+          "total": -2.2
+        },
+        "2019-2026": {
+          "sharpe": 0.769,
+          "meses": 89,
+          "total": 162.3
+        }
+      }
+    },
+    {
+      "medida": "vidaUtil",
+      "nombre": "Vida útil implícita",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": -0.106,
+          "meses": 95,
+          "total": -2.9
+        },
+        "2019-2026": {
+          "sharpe": 0.78,
+          "meses": 89,
+          "total": 171.5
+        }
+      }
+    },
+    {
+      "medida": "recompra",
+      "nombre": "Retorno desde la recompra",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": -0.189,
+          "meses": 95,
+          "total": -5.5
+        },
+        "2019-2026": {
+          "sharpe": 0.805,
+          "meses": 89,
+          "total": 175.1
+        }
+      }
+    }
+  ],
+  "veredictos": [
+    {
+      "medida": "conversion",
+      "nombre": "Conversión a caja",
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.283,
+      "tDiferencia": -0.44,
+      "pasa": false
+    },
+    {
+      "medida": "banderas",
+      "nombre": "Banderas rojas de caja",
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.215,
+      "tDiferencia": -1.71,
+      "pasa": false
+    },
+    {
+      "medida": "vidaUtil",
+      "nombre": "Vida útil implícita",
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.221,
+      "tDiferencia": -1.56,
+      "pasa": false
+    },
+    {
+      "medida": "recompra",
+      "nombre": "Retorno desde la recompra",
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.245,
+      "tDiferencia": -1.53,
+      "pasa": false
+    }
+  ],
+  "entran": 0,
+  "patron": "Las cuatro medidas MEJORAN 2011-2018 (donde el score base tiene Sharpe negativo) y EMPEORAN 2019-2026. No es ruido: es un sesgo de calidad, y 2019-2026 es la ventana en la que el tamaño batio a la calidad por 3,54 pp/año. Es una HIPOTESIS para otro ensayo con su propio preregistro, no un permiso para este."
+}

@@ -876,6 +876,16 @@ const RND = ["ResearchAndDevelopmentExpense"];
 const SBC = ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense"];
 const RECV = ["AccountsReceivableNetCurrent", "ReceivablesNetCurrent", "AccountsReceivableGrossCurrent"];
 const PPE = ["PropertyPlantAndEquipmentNet"];
+// ── Ensayo 343: lo que hace falta para la vida util implicita y el precio de recompra ──────
+// El inmovilizado BRUTO —no el neto— porque la vida util implicita es bruto/depreciacion: con
+// el neto, una empresa con activos muy depreciados pareceria tener vida util corta cuando lo
+// que pasa es que son viejos. Y las ACCIONES recompradas, que con el importe dan el precio
+// medio al que la directiva compro. Ninguno de los dos estaba, asi que las dos medidas no eran
+// point-in-time y no se podian probar.
+const PPEG = ["PropertyPlantAndEquipmentGross"];
+const DEPSOLA = ["Depreciation"];
+const AMORTINT = ["AmortizationOfIntangibleAssets", "AmortizationOfIntangibleAssetsExcludingFinancingCosts"];
+const SHREP = ["TreasuryStockSharesAcquired", "StockRepurchasedDuringPeriodShares", "StockRepurchasedAndRetiredDuringPeriodShares"];
 const INV = ["InventoryNet"];
 const GW = ["Goodwill"];
 // ── Fase F4 (2026-08-23) — el juego de métricas propio de BANCA y SEGUROS ────────────────
@@ -1021,6 +1031,9 @@ export async function fundamentalsAsOf(cik, asOf) {
    * nunca a la vía anual: para la inmensa mayoría no cambia nada.
    */
   const F = (tags, skip = 0) => flowTTM(fj, tags, asOf, skip, cur, true, suelo(skip));
+  // ⚠️ Las ACCIONES no estan en USD. `F` busca en la moneda de la empresa y por eso devolvia
+  // null para el recuento de acciones recompradas: no fallaba, no encontraba. Ensayo 343.
+  const FSH = (tags, skip = 0) => flowTTM(fj, tags, asOf, skip, "shares", true, suelo(skip));
   // Un instante de balance rancio es igual de tóxico que un flujo rancio: el activo de 2026
   // contra el pasivo de 2013 no es un descuadre de la empresa, es un dato muerto. El suelo se
   // PASA A LA BÚSQUEDA para que un tag envejecido no entierre a los siguientes.
@@ -1181,6 +1194,12 @@ export async function fundamentalsAsOf(cik, asOf) {
 
     // ── Fase F2 · entradas de los modelos forenses ──────────────────────────────────────
     receivables: I(T(RECV, "RECV")), ppe: I(T(PPE, "PPE")), inventory: I(T(INV, "INV")), goodwill: I(GW),
+    // Ensayo 343. `ppeGross` e `depSola`/`amortInt` para la vida util; `sharesRepurchasedTTM`
+    // para el precio de recompra. Todos degradan a null si la empresa no los etiqueta.
+    ppeGross: I(PPEG),
+    depSolaTTM: F(DEPSOLA, 4)?.val ?? null,
+    amortIntTTM: F(AMORTINT, 4)?.val ?? null,
+    sharesRepurchasedTTM: FSH(SHREP, 4)?.val ?? null,
 
     // ── Fase F4 · banca y seguros ────────────────────────────────────────────────────────
     niiTTM: F(NII)?.val ?? null,
@@ -1208,7 +1227,7 @@ export async function fundamentalsAsOf(cik, asOf) {
       assets: IPREV(["Assets"]),
       equity: IPREV(T(EQUITY, "EQUITY")),
       curA: IPREV(["AssetsCurrent"]), curL: IPREV(["LiabilitiesCurrent"]),
-      receivables: IPREV(T(RECV, "RECV")), ppe: IPREV(T(PPE, "PPE")),
+      receivables: IPREV(T(RECV, "RECV")), ppe: IPREV(T(PPE, "PPE")), ppeGross: IPREV(PPEG),
       inventory: IPREV(T(INV, "INV")),
       debt: (() => { const a = IPREV(["LongTermDebtNoncurrent", "LongTermDebt"]);
                      const b = IPREV(["LongTermDebtCurrent", "DebtCurrent"]);
