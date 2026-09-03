@@ -1,5 +1,20 @@
 # Roadmap · convertir la ventaja de riesgo en ventaja de retorno
 
+> # ⛔ VÍA CERRADA POR DECISIÓN DE PRODUCTO · 2026-09-03
+>
+> **«Quisiera evitar apalancamientos, podrían ser peligrosos para una persona sin experiencia.»**
+>
+> La fase 1 se completó y la idea sobrevivió técnicamente: B a 1,82x da 1.283,3 % frente a
+> 670,5 % del índice, con cero llamadas de margen incluso con mantenimiento del 35 %. **Y aun
+> así se cierra**, porque un contrato de margen no es un producto para el usuario de Scora: la
+> llamada se resuelve en horas, el bróker puede subir el mantenimiento cuando quiera, y el hueco
+> de apertura no se deshace.
+>
+> El ensayo 344 quedó **preregistrado y sin ejecutar**; el registro sigue en 343.
+>
+> Lo de abajo se conserva **medido y archivado**, no borrado: si algún día hay una audiencia
+> distinta, el trabajo está hecho. Ver `PREREGISTRO_ENSAYO_344.md`.
+
 **Fecha:** 2026-09-03 · **Estado:** investigado y medido; **nada implementado**
 **Origen:** Alejandro no aceptó que 343 ensayos significaran «no se puede», y tenía razón — no
 lo habíamos buscado por aquí.
