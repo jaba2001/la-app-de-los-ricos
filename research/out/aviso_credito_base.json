@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T08:47:59.508Z",
+  "generatedAt": "2026-09-03T09:05:04.071Z",
   "meses": 393,
   "conAviso": {
     "n": 55,
@@ -130,7 +130,7 @@
   "episodioTest": {
     "n": 22,
     "caidaMedia": -16.4,
-    "p": 0.1489,
+    "p": 0.1458,
     "significativo": false
   },
   "falsasAlarmas": [

@@ -159,7 +159,7 @@ export function credito(serie: { date: string; v: number }[], hasta: string):
  */
 export const BASE_AVISO = {
   episodios: 22, desde: 1993,
-  caidaTrasAviso: -16.4, caidaSinCondicionar: -14.3, p: 0.149,
+  caidaTrasAviso: -16.4, caidaSinCondicionar: -14.3, p: 0.146,
   seguidosDeUnBuenAno: 8,
 } as const;
 

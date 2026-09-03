@@ -119,7 +119,10 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
 {
   const t = avisoConTasaBase(true);
   ok(/22/.test(t) && /8/.test(t), "el aviso encendido cita cuantos episodios hubo y cuantos fallaron");
-  ok(/0\.149|0,149/.test(t), "y el p-valor que dice que no se distingue del azar");
+  ok(/0\.146|0,146/.test(t), "y el p-valor que dice que no se distingue del azar");
+  // ⚠️ El punto va ESCAPADO. Sin escapar, `0.146` casa tambien «0x146» o «0,146» por accidente
+  // y el test pasaria aunque la cifra estuviera mal. Ya paso en esta sesion con un sed.
+  ok(!/0\.146/.test("0X146"), "y el punto escapado no casa cualquier caracter");
   ok(/contexto, no una señal|no una señal/i.test(t), "y se declara explicitamente como contexto, no señal");
   ok(!/comprar|vender|salir|proteger|crisis viene/i.test(t), "y no recomienda nada");
   ok(/no se esta abriendo|no se está abriendo/i.test(avisoConTasaBase(false)), "apagado, dice justo eso");

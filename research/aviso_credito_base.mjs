@@ -88,11 +88,22 @@ console.log(`  ⇒ ${Math.abs(dif) < 3 ? "el aviso NO distingue: la caída poste
   const inicios = eps.map((e) => filas.find((x) => x.fecha === e.inicio)).filter(Boolean);
   const obs = inicios.reduce((s, v) => s + v.f.dd, 0) / inicios.length;
   const universo = filas.map((x) => x.f.dd);
+  // ⚠️ SEMILLA FIJA, y no es un detalle. Con `Math.random()` el p-valor se movia en cada
+  // corrida (0,1489 → 0,1488) y el artefacto cambiaba en git cada vez que se ejecutaba. Un
+  // numero que se cita en un commit y no se puede reproducir exactamente no es evidencia:
+  // es una cifra que salio una vez. Mulberry32 con semilla declarada lo hace determinista.
+  let semilla = 20260903;
+  const azar = () => {
+    semilla |= 0; semilla = (semilla + 0x6D2B79F5) | 0;
+    let t = Math.imul(semilla ^ (semilla >>> 15), 1 | semilla);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
   let peores = 0;
   const N = 20000, k = inicios.length;
   for (let i = 0; i < N; i++) {
     let s = 0;
-    for (let j = 0; j < k; j++) s += universo[(Math.random() * universo.length) | 0];
+    for (let j = 0; j < k; j++) s += universo[(azar() * universo.length) | 0];
     if (s / k <= obs) peores++;
   }
   const p = peores / N;

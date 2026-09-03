@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T08:48:48.252Z",
+  "generatedAt": "2026-09-03T09:05:36.993Z",
   "asOf": "2026-09-03",
   "umbrales": {
     "planaHasta": 0.25,
@@ -88,7 +88,7 @@
     "desde": 1993,
     "caidaTrasAviso": -16.4,
     "caidaSinCondicionar": -14.3,
-    "p": 0.149,
+    "p": 0.146,
     "seguidosDeUnBuenAno": 8
   },
   "percentilNominal10a": 44.1,
