@@ -62,10 +62,15 @@ sesgo documentado. Encaja con las banderas que ya existen y no toca ninguna deci
 **Criterio:** cobertura ≥ 60 % del S&P 500 y que el listón de cordura se cumpla — si marca a
 más de un tercio del índice, el umbral describe el mercado y no señala nada.
 
-**RESULTADO (medido, no estimado):** cobertura del **62 %**, con el **7 %** alargando la vida
-útil y el **5 %** acortándola. Las dos por debajo del tercio, así que el listón de cordura se
-cumple: la métrica señala excepciones y no describe el auge de capex. El módulo acabó en
-`lib/vidaUtil.ts` y no en `flujoCaja.ts`, que es donde el plan lo situaba.
+**RESULTADO (medido sobre las 503 del índice, no sobre una muestra):** cobertura del **63 %**,
+con el **6 %** alargando la vida útil y el **7 %** acortándola. Las dos muy por debajo del
+tercio, así que el listón de cordura se cumple: la métrica señala excepciones y no describe el
+auge de capex. El módulo acabó en `lib/vidaUtil.ts` y no en `flujoCaja.ts`, que es donde el plan
+lo situaba.
+
+**Y el sesgo de la fórmula ingenua sobre el índice entero:** mediana **0,56 años**, máximo
+**17,2** (UPS). Sobre 60 nombres la mediana salía 0,67 y el máximo 1,80 — la muestra pequeña
+escondía que en algunas empresas la corrección no es un matiz, es toda la cifra.
 
 ⚠️ Este párrafo lo añadió la auditoría del 03-09-2026. El plan declaraba el criterio y **nunca
 recogía si se había cumplido ni con qué número** — un criterio sin resultado escrito es un
@@ -79,11 +84,15 @@ es la directiva **poniendo su dinero** en una banda concreta. Se deriva de
 **Cobertura MEDIDA, y la cifra buena no fue la primera.** Sobre 45 nombres del S&P 500, el
 **69 %** tiene los dos tags. Pero al construirlo resultó que lo publicable de verdad —con el
 importe del MISMO ejercicio, un hecho no rancio y una serie de precios con la que comprobarlo—
-es el **55 %**. (Y con 4 nombres salía 25 %: n=4 no es una medición de cobertura.)
+es el **62 %** sobre las 503 del índice. (Y con 4 nombres salía 25 %, y con 60 el 55 %: ni
+4 ni 60 nombres son una medición de cobertura del índice.)
 
-**RESULTADO (medido):** de los que tienen precio de recompra, el **88 %** cae dentro del rango en
-que la acción cotizó de verdad y el **9 %** sale IMPOSIBLE — que es el confundidor de las
-retenciones fiscales apareciendo en los datos reales, no en la teoría. Ésos no se publican.
+**RESULTADO (medido sobre las 503):** cobertura del **62 %**; de ésos, el **82 %** cae dentro
+del rango en que la acción cotizó de verdad y el **17 %** sale IMPOSIBLE — el confundidor de las
+retenciones fiscales apareciendo en datos reales, no en la teoría. Ésos no se publican.
+
+⚠️ Sobre 60 nombres ese porcentaje salía **9 %**: al medir el índice entero se DUPLICA. Es un
+recordatorio de que una muestra alfabética de 60 no es el índice, y la cifra honesta es la grande.
 
 ⚠️ Corregido en la auditoría del 03-09-2026: este documento publicaba el 69 % como si fuera la
 cifra utilizable. Lo era de «tiene los dos tags», no de «se puede publicar».

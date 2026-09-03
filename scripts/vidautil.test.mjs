@@ -152,5 +152,70 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
      "y de 2023 a 2025 la vida corregida de Microsoft BAJA — lo contrario de «todos están alargando»");
 }
 
+// ── LA FOTO DE LA WEB TIENE QUE SER LA DEL ARTEFACTO ─────────────────────────────────────
+// ⚠️ `lib/calidadContableDatos.ts` es una COPIA de `research/out/calidad_contable.json`
+// generada por el runner. Dos copias que se mueven por separado es el defecto que ya mordio con
+// ENSEMBLE_WEIGHTS: si alguien reejecuta la medicion y no regenera el fichero, la web pinta
+// cifras viejas y NADA falla. Aqui falla.
+{
+  const gen = readFileSync("lib/calidadContableDatos.ts", "utf8");
+  const art = JSON.parse(readFileSync("research/out/calidad_contable.json", "utf8"));
+
+  ok(/NO editar a mano/.test(gen), "el fichero generado avisa de que no se edita a mano");
+  ok(/CALIDAD_ASOF/.test(gen) && /CALIDAD_UNIVERSO/.test(gen), "y lleva su fecha y su universo");
+
+  const universo = Number((gen.match(/CALIDAD_UNIVERSO = (\d+)/) ?? [])[1]);
+  const leidos = art.resumen.leidos;
+  ok(universo === leidos, `el universo del fichero (${universo}) es el del artefacto (${leidos})`);
+
+  // Muestreo real: cada nombre del fichero tiene que decir lo mismo que su fila del artefacto.
+  const datos = JSON.parse((gen.match(/CALIDAD_CONTABLE: Record<string, FilaCalidad> = (\{.*\});/s) ?? [])[1] ?? "{}");
+  const tickers = Object.keys(datos);
+  ok(tickers.length > 100, `el fichero lleva ${tickers.length} nombres`);
+  let discrepan = 0;
+  for (const t of tickers) {
+    const f = art.filas.find((x) => x.ticker === t);
+    if (!f) { discrepan++; continue; }
+    if (datos[t].vidaCorregida != null && datos[t].vidaCorregida !== f.vida?.corregida) discrepan++;
+    else if (datos[t].precioRecompra != null && datos[t].precioRecompra !== f.recompra?.precioMedio) discrepan++;
+  }
+  ok(discrepan === 0, `${discrepan} nombres del fichero NO coinciden con el artefacto`);
+
+  // ⚠️ Y lo que NO puede colarse a la web: vidas fuera de banda y precios declarados no creibles.
+  const fuera = tickers.filter((t) => {
+    const f = art.filas.find((x) => x.ticker === t);
+    return f?.vida?.fuera === true && datos[t].vidaCorregida != null;
+  });
+  ok(fuera.length === 0, `${fuera.length} vidas fuera de banda se colaron al fichero de la web`);
+  const noCreibles = tickers.filter((t) => {
+    const f = art.filas.find((x) => x.ticker === t);
+    return f?.recompra?.creible === false && datos[t].precioRecompra != null;
+  });
+  ok(noCreibles.length === 0, `${noCreibles.length} precios NO creibles se colaron al fichero de la web`);
+}
+
+// ── Y lo que el componente tiene que respetar ────────────────────────────────────────────
+{
+  const ui = readFileSync("components/stock/CalidadContable.tsx", "utf8");
+  ok(ui.includes("calidadContableDatos"), "el componente lee la foto precalculada, no recalcula");
+  // ⚠️ SE COMPRUEBA EL CODIGO, NO LA PROSA. La primera version de este assert buscaba `/ *dep`
+  // y fallaba porque un COMENTARIO del componente escribe «bruto/depreciación». Es la misma
+  // familia que el 0,149 y el \b: comprobar el texto en vez de lo que hace el fichero.
+  const codigo = ui.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+  ok(!/Math\.(pow|log|exp)/.test(codigo), "y no hace aritmetica propia con los campos crudos");
+  ok(!/depreciacion|brutoFin|brutoIni/.test(codigo),
+     "ni toca los campos crudos de los que sale la vida util: eso es del modulo");
+  // La señal de vida util es SIEMPRE aviso: la metrica no distingue criterio contable de mezcla.
+  ok(/>Aviso</.test(ui), "las señales se pintan como AVISO");
+  ok(!/>Alerta</.test(ui), "y NUNCA como alerta: la metrica no puede acusar");
+  // La fecha de la foto no es opcional.
+  ok(/\{asOf\}/.test(ui), "la pantalla publica la fecha de la foto");
+  ok(/No se actualiza sola|precalculada/i.test(ui), "y dice que no es un dato vivo");
+  // La recompra describe, no pronostica.
+  ok(/no un pron[oó]stico/.test(ui), "el precio de recompra se declara descriptivo");
+  ok(!/comprar ahora|objetivo de precio|va a subir/i.test(ui), "y no recomienda nada");
+  ok(/asignaci[oó]n de capital/.test(ui), "y cuando pagaron caro, juzga la asignacion de capital");
+}
+
 console.log(pass && !fail ? `\n✓ vidaUtil: ${pass} passed, 0 failed\n` : `\n✖ vidaUtil: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

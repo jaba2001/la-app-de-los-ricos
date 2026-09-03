@@ -219,4 +219,57 @@ writeFileSync(join(AQUI, "out", "calidad_contable.json"), JSON.stringify({
   },
   filas,
 }, null, 2) + "\n", "utf8");
+
+// ⚠️ LA VERSION LIGERA PARA LA WEB SE GENERA AQUI, no en un script aparte, para que no pueda
+// derivar del artefacto que la sostiene. El completo son ~300 KB y no se manda al navegador;
+// este lleva solo lo que el panel pinta, y el `asOf` para que la pantalla pueda decir de cuando
+// es. Mismo patron que `lib/trackRecord.ts`: una foto versionada, no un dato vivo.
+//
+// Se publica SOLO lo publicable: vidas fuera de banda y precios de recompra no creibles no
+// entran, para que la pantalla no pueda enseñar algo que el modulo ya declaro que no vale.
+{
+  const slim = {};
+  for (const f of ok) {
+    const tieneVida = f.vida?.corregida != null && !f.vida.fuera;
+    const tieneRec = f.recompra?.precioMedio != null && f.recompra.creible !== false;
+    if (!tieneVida && !tieneRec) continue;
+    slim[f.ticker] = {
+      ...(tieneVida ? {
+        vidaCorregida: f.vida.corregida, vidaIngenua: f.vida.ingenua, vidaPrevia: f.vida.previa,
+        crecimientoPct: f.vida.crecimientoPct, ruidoso: f.vida.ruidoso, viaDep: f.viaDep,
+        senales: (f.señalesVida ?? []).map((s) => ({ clave: s.clave, texto: s.texto, evidencia: s.evidencia })),
+      } : {}),
+      ...(tieneRec ? {
+        precioRecompra: f.recompra.precioMedio, retornoRecompraPct: f.recompra.retornoPct,
+        recompraCreible: f.recompra.creible, anoRecompra: f.anoRecompra,
+      } : {}),
+    };
+  }
+  const ts = [
+    "// GENERADO por research/calidad_contable.mjs — NO editar a mano.",
+    "//",
+    "// Foto precalculada de la vida util implicita y el precio de recompra. Existe porque la web",
+    "// habla con FMP y FMP NO expone lo que estas dos medidas necesitan: no da el inmovilizado",
+    "// BRUTO (solo el neto), no separa la depreciacion de la amortizacion de intangibles, y no",
+    "// publica las ACCIONES recompradas. Todo eso sale de EDGAR, y el endpoint del proxy tampoco",
+    "// lo sirve. Se comprobo ANTES de construir el panel, no despues.",
+    "//",
+    "// ⚠️ ES UNA FOTO, NO UN DATO VIVO. La pantalla dice de cuando es.",
+    "",
+    "export interface SenalCalidad { clave: string; texto: string; evidencia: Record<string, number> }",
+    "export interface FilaCalidad {",
+    "  vidaCorregida?: number; vidaIngenua?: number; vidaPrevia?: number | null;",
+    "  crecimientoPct?: number | null; ruidoso?: boolean; viaDep?: string; senales?: SenalCalidad[];",
+    "  precioRecompra?: number; retornoRecompraPct?: number | null;",
+    "  recompraCreible?: boolean | null; anoRecompra?: number | null;",
+    "}",
+    "",
+    `export const CALIDAD_ASOF = ${JSON.stringify(new Date().toISOString().slice(0, 10))};`,
+    `export const CALIDAD_UNIVERSO = ${ok.length};`,
+    `export const CALIDAD_CONTABLE: Record<string, FilaCalidad> = ${JSON.stringify(slim)};`,
+    "",
+  ].join("\n");
+  writeFileSync(join(AQUI, "..", "lib", "calidadContableDatos.ts"), ts, "utf8");
+  console.log(`  → lib/calidadContableDatos.ts  (${Object.keys(slim).length} nombres, ${Math.round(ts.length / 1024)} KB)`);
+}
 console.log(`\n  → research/out/calidad_contable.json\n`);
