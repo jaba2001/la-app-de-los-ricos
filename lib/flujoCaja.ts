@@ -383,3 +383,122 @@ export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
   return { nivel, flujos, cfo: d.cfo, variacionDeclarada: d.variacionDeclarada,
            residuo: d.residuo, cuadra: d.cuadra, financiera: esFinanciera(f) };
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EL ADAPTADOR DESDE FMP — donde viven los bugs de verdad
+//
+// El módulo de arriba es aritmética pura sobre nombres de EDGAR. La aplicación no habla con
+// EDGAR: habla con FMP a través del proxy, y ahí los mismos conceptos vienen con OTRO nombre
+// y OTRO signo. Traducir mal esto no da un error: da un diagnóstico plausible y equivocado.
+//
+// ⚠️ LAS TRES TRAMPAS, todas documentadas porque las tres producen números creíbles:
+//
+//   1. **EL SIGNO.** FMP devuelve `capitalExpenditure`, `commonStockRepurchased` y
+//      `dividendsPaid` en NEGATIVO (son salidas de caja). `EntradaCaja` los espera como
+//      MAGNITUD POSITIVA, porque el sentido lo lleva el concepto, no el signo. Sumar un capex
+//      negativo daría un FCF mayor que el CFO, que es exactamente el error que hace que una
+//      empresa parezca generar caja donde la quema.
+//
+//   2. **EL TYPO DE FMP.** El campo de inversión se llama `netCashUsedForInvestingActivites`
+//      —sin la segunda «i» de Activities— en el esquema histórico, y
+//      `netCashProvidedByInvestingActivities` en el nuevo. Leer sólo uno deja el destino de la
+//      caja sin su bloque mayor y el diagrama no cuadra, sin que nada falle.
+//
+//   3. **EL TTM.** Son trimestres, y hacen falta CUATRO para un año. Con tres, el CFO sale un
+//      25 % corto y todos los ratios con él. Si no hay cuatro, se devuelve `null`: un TTM
+//      incompleto presentado como anual es una cifra falsa, no una aproximación.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Una fila trimestral de FMP, con los dos nombres del campo de inversión. */
+export interface FilaFMP {
+  date?: string;
+  netIncome?: number | null;
+  revenue?: number | null;
+  operatingCashFlow?: number | null;
+  capitalExpenditure?: number | null;
+  depreciationAndAmortization?: number | null;
+  stockBasedCompensation?: number | null;
+  commonStockRepurchased?: number | null;
+  dividendsPaid?: number | null;
+  netCashUsedForInvestingActivites?: number | null;      // el nombre historico, con el typo
+  netCashProvidedByInvestingActivities?: number | null;  // el nombre nuevo
+  netCashUsedProvidedByFinancingActivities?: number | null;
+  netCashProvidedByFinancingActivities?: number | null;
+  effectOfForexChangesOnCash?: number | null;
+  netChangeInCash?: number | null;
+}
+
+export interface FilaBalance { date?: string; netReceivables?: number | null; inventory?: number | null }
+export interface FilaResultados { date?: string; revenue?: number | null; netIncome?: number | null }
+
+const nUm = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
+
+/** Suma un campo sobre `n` filas. `null` si falta CUALQUIERA: un TTM con huecos no es un TTM. */
+function sumar(filas: FilaFMP[], campo: keyof FilaFMP, n = 4): number | null {
+  if (filas.length < n) return null;
+  let s = 0;
+  for (let i = 0; i < n; i++) {
+    const v = nUm(filas[i][campo]);
+    if (v == null) return null;
+    s += v;
+  }
+  return s;
+}
+
+/** Como `sumar`, pero probando varios nombres — para el campo con el typo de FMP. */
+function sumarAlias(filas: FilaFMP[], campos: (keyof FilaFMP)[], n = 4): number | null {
+  for (const c of campos) { const v = sumar(filas, c, n); if (v != null) return v; }
+  return null;
+}
+
+/**
+ * Traduce las filas trimestrales de FMP a la entrada del módulo. `caja` y `resultados` vienen
+ * más recientes primero, que es como los sirve FMP.
+ *
+ * Devuelve `null` si no hay cuatro trimestres de caja: sin eso no hay TTM que valga.
+ */
+export function desdeFMP(
+  caja: FilaFMP[], resultados: FilaResultados[] = [], balance: FilaBalance[] = [],
+  extra: { marketCap?: number | null; sector?: string | null; deposits?: number | null } = {},
+): EntradaCaja | null {
+  if (!Array.isArray(caja) || caja.length < 4) return null;
+
+  const abs = (v: number | null) => (v == null ? null : Math.abs(v));
+  const inv = ["netCashUsedForInvestingActivites", "netCashProvidedByInvestingActivities"] as (keyof FilaFMP)[];
+  const fin = ["netCashUsedProvidedByFinancingActivities", "netCashProvidedByFinancingActivities"] as (keyof FilaFMP)[];
+
+  const ttm: EntradaCaja = {
+    ocfTTM: sumar(caja, "operatingCashFlow"),
+    niTTM: sumar(caja, "netIncome") ?? (resultados.length >= 4 ? sumar(resultados as FilaFMP[], "netIncome") : null),
+    // ⚠️ magnitudes positivas: el signo de FMP se descarta a proposito, no por descuido.
+    capexTTM: abs(sumar(caja, "capitalExpenditure")),
+    buybacksTTM: abs(sumar(caja, "commonStockRepurchased")),
+    dividendsTTM: abs(sumar(caja, "dividendsPaid")),
+    daTTM: abs(sumar(caja, "depreciationAndAmortization")),
+    sbcTTM: abs(sumar(caja, "stockBasedCompensation")),
+    // ⚠️ estos SI conservan el signo: un CFI positivo es vender inversiones, y eso es informacion.
+    cfiTTM: sumarAlias(caja, inv),
+    cffTTM: sumarAlias(caja, fin),
+    fxCashTTM: sumar(caja, "effectOfForexChangesOnCash"),
+    deltaCashConFxTTM: sumar(caja, "netChangeInCash"),
+    revTTM: resultados.length >= 4 ? sumar(resultados as FilaFMP[], "revenue") : null,
+    receivables: nUm(balance[0]?.netReceivables),
+    inventory: nUm(balance[0]?.inventory),
+    marketCap: nUm(extra.marketCap ?? null),
+    sector: extra.sector ?? null,
+    deposits: nUm(extra.deposits ?? null),
+  };
+
+  // El periodo anterior (trimestres 5-8) da el crecimiento del CFO y el circulante de partida.
+  if (caja.length >= 8) {
+    const prev = caja.slice(4, 8);
+    ttm.prev = {
+      ocfTTM: sumar(prev, "operatingCashFlow"),
+      niTTM: sumar(prev, "netIncome"),
+      revTTM: resultados.length >= 8 ? sumar((resultados as FilaFMP[]).slice(4, 8), "revenue") : null,
+      receivables: nUm(balance[4]?.netReceivables),
+      inventory: nUm(balance[4]?.inventory),
+    };
+  }
+  return ttm;
+}

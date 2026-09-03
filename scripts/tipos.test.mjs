@@ -13,6 +13,7 @@
 //   node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { pendiente, forma, descomponer, percentil, credito, liston, avisoConTasaBase, BASE_AVISO, UMBRALES_TIPOS } from "../lib/tipos.ts";
+import { readFileSync } from "fs";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
@@ -114,7 +115,7 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
 // ── EL AVISO NUNCA SE PUBLICA SOLO ───────────────────────────────────────────────────────
 // ⚠️ Este bloque existe porque la medicion dijo que NO. El aviso se encendio 397 dias antes de
 // Lehman, que es una anecdota preciosa; medido sobre 22 episodios independientes en 33 años,
-// p = 0,149 y 8 de 22 fueron seguidos de un año de mas del +20 %. El mecanismo es cierto y la
+// p = 0,146 y 8 de 22 fueron seguidos de un año de mas del +20 %. El mecanismo es cierto y la
 // señal no sobrevive al test, asi que el booleano no puede salir sin su tasa base al lado.
 {
   const t = avisoConTasaBase(true);
@@ -128,6 +129,49 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   ok(/no se esta abriendo|no se está abriendo/i.test(avisoConTasaBase(false)), "apagado, dice justo eso");
   ok(BASE_AVISO.p > 0.05, "la tasa base guardada refleja que NO es significativo");
   ok(BASE_AVISO.seguidosDeUnBuenAno / BASE_AVISO.episodios > 0.3, "mas de un tercio de los avisos fueron falsas alarmas");
+}
+
+// ── PARIDAD: la web y el artefacto tienen que mirar las MISMAS series ────────────────────
+// ⚠️ Este bloque nacio ROTO y el control positivo lo caza: la primera version comprobaba
+// `runner.includes(id)` sobre el texto entero del fichero, asi que daba verde porque el ID
+// aparecia EN UN COMENTARIO. Cambie BAA10Y por BAMLH0A0HYM2 en el componente y el test siguio
+// pasando: comparaba prosa, no codigo. Es la misma familia que el \b sin escapar.
+//
+// Ahora se extraen los identificadores de donde de verdad se usan: las CLAVES del objeto
+// SERIES del runner, y los argumentos de las llamadas `traer("XXX", …)` del componente.
+{
+  const runner = readFileSync("research/tipos.mjs", "utf8");
+  const ui = readFileSync("components/macro/CurvaTipos.tsx", "utf8");
+
+  // Del runner: las claves del contrato de cobertura, no cualquier mencion en el fichero.
+  const bloque = runner.slice(runner.indexOf("const SERIES = {"), runner.indexOf("\n};", runner.indexOf("const SERIES = {")));
+  const delRunner = new Set([...bloque.matchAll(/^\s{2}(\w+):\s*\{/gm)].map((m) => m[1]));
+  // Del componente: solo lo que se PIDE de verdad.
+  const delUi = new Set([...ui.matchAll(/traer\(\s*"([A-Z0-9]+)"/g)].map((m) => m[1]));
+
+  ok(delRunner.size >= 7, `el contrato del runner declara ${delRunner.size} series`);
+  ok(delUi.size >= 7, `el componente pide ${delUi.size} series`);
+
+  // Toda serie que la web pinta tiene que estar vigilada por el contrato del runner. Si no,
+  // la web pintaria un percentil sobre una serie que nadie comprueba que traiga historia.
+  for (const id of delUi)
+    ok(delRunner.has(id), `el componente pide ${id}, que NO esta en el contrato de cobertura del runner`);
+
+  // Y las que el runner declara para PINTAR tienen que estar en la web. STLFSI4 es la
+  // excepcion declarada: el runner la vigila justamente porque nadie la pinta.
+  const SOLO_VIGILADAS = new Set(["STLFSI4"]);
+  for (const id of delRunner)
+    if (!SOLO_VIGILADAS.has(id)) ok(delUi.has(id), `${id} esta en el contrato del runner pero la web no lo pide`);
+
+  // El percentil de la web sale de la misma historia larga: si alguien lo cambia a mensual o
+  // recorta el arranque, el numero deja de coincidir con el del artefacto.
+  ok(/traer\(\s*"BAA10Y"\s*,\s*"1986-01-01"\s*\)/.test(ui),
+     "el componente pide BAA10Y desde 1986, para que su percentil sea el MISMO que el del artefacto");
+  ok(/frequency=d/.test(ui), "y en frecuencia diaria, por lo mismo");
+
+  // El aviso no puede publicarse sin su tasa base tampoco en la web, y no como texto suelto:
+  // llamando a la funcion que la adjunta.
+  ok(/\{\s*avisoConTasaBase\(/.test(ui), "el componente RENDERIZA avisoConTasaBase(), no el booleano solo");
 }
 
 console.log(pass && !fail ? `\n✓ tipos: ${pass} passed, 0 failed\n` : `\n✖ tipos: ${pass} passed, ${fail} failed\n`);

@@ -22,6 +22,9 @@ const Verdict           = dynamic(() => import("@/components/stock/Verdict"),   
 const StockOverview     = dynamic(() => import("@/components/stock/StockOverview"),     { loading: TabSk, ssr: false });
 const StockSignals      = dynamic(() => import("@/components/stock/StockSignals"),      { loading: TabSk, ssr: false });
 const StockFundamentals = dynamic(() => import("@/components/stock/StockFundamentals"), { loading: TabSk, ssr: false });
+// La capa de caja (fase 1): «lo que no es caja, no vale». Diagnostico, banderas rojas y el
+// destino de la caja, con el mismo liston que el Sankey de resultados: si no cuadra, no se pinta.
+const FlujoDeCaja       = dynamic(() => import("@/components/stock/FlujoDeCaja"),       { loading: TabSk, ssr: false });
 const StockValuation    = dynamic(() => import("@/components/stock/StockValuation"),    { loading: TabSk, ssr: false });
 const StockChart        = dynamic(() => import("@/components/stock/StockChart"),        { loading: TabSk, ssr: false });
 const StockResearch     = dynamic(() => import("@/components/stock/StockResearch"),     { loading: TabSk, ssr: false });
@@ -952,6 +955,7 @@ export default function StockTickerPage() {
             {activeTab === "fundamentals" && (
               <>
                 <StockFundamentals data={data} loading={loading} ticker={ticker} />
+                <FlujoDeCaja data={data} loading={loading} />
                 {data && <RevenueForecast data={data} />}
               </>
             )}

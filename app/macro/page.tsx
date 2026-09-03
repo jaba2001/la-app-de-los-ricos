@@ -28,6 +28,9 @@ const MetalsCockpit    = dynamic(() => import("@/components/macro/MetalsCockpit"
 const EtfLab           = dynamic(() => import("@/components/macro/EtfLab"),           { loading: TabSk, ssr: false });
 const ArbitrageStress  = dynamic(() => import("@/components/macro/ArbitrageStress"),  { loading: TabSk, ssr: false });
 const VarianceRiskPrem = dynamic(() => import("@/components/macro/VarianceRiskPremium"), { loading: TabSk, ssr: false });
+// La capa de tipos (fase 2): la curva, el reparto nominal/real y el diferencial de credito.
+// Es explicativa — no toca el asignador ni el score — y por eso vive en la pestaña de mercados.
+const CurvaTipos       = dynamic(() => import("@/components/macro/CurvaTipos"),       { loading: TabSk, ssr: false });
 
 const TABS = [
   { id: "overview",    label: "Overview" },
@@ -186,7 +189,7 @@ export default function MacroPage() {
           <>
             {activeTab === "overview"   && <MacroOverview   macro={macro} loading={loading} />}
             {activeTab === "indicators" && <MacroIndicators macro={macro} loading={loading} />}
-            {activeTab === "markets"    && <MacroMarkets    macro={macro} loading={loading} />}
+            {activeTab === "markets"    && <><CurvaTipos /><MacroMarkets    macro={macro} loading={loading} /></>}
             {activeTab === "monitors"   && <><VarianceRiskPrem macro={macro} /><ArbitrageStress macro={macro} /><MacroMonitors   macro={macro} loading={loading} /></>}
             {activeTab === "analog"     && <MacroHistoricalAnalog macro={macro} loading={loading} />}
             {activeTab === "geopolitics" && <MacroGeopolitics macro={macro} loading={loading} />}

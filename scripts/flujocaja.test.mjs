@@ -13,7 +13,8 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/flujocaja.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { diagnosticar, banderas, puente, destino, esFinanciera, sankeyCaja, UMBRALES } from "../lib/flujoCaja.ts";
+import { diagnosticar, banderas, puente, destino, esFinanciera, sankeyCaja, desdeFMP, UMBRALES } from "../lib/flujoCaja.ts";
+import { readFileSync } from "fs";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
@@ -245,6 +246,97 @@ const SANA = {
   const menos = sankeyCaja({ ...SANA, deltaCashConFxTTM: 28 });
   ok(menos.flujos.find((x) => x.concepto === "No explicado").lado === "destino", "y al reves es un destino no explicado");
   cierra(menos, "que tambien cierra");
+}
+
+// ── EL ADAPTADOR DESDE FMP: los tres errores que dan numeros creibles ────────────────────
+// ⚠️ Aqui es donde se rompe de verdad. El modulo de arriba es aritmetica; esto es traduccion,
+// y una traduccion mala no falla: da un diagnostico plausible y equivocado.
+{
+  // FMP: capex, recompras y dividendos en NEGATIVO; inversion con el typo historico.
+  const q = (i) => ({
+    date: `2026-0${i}-30`, netIncome: 25, revenue: 250, operatingCashFlow: 35,
+    capitalExpenditure: -10, depreciationAndAmortization: 7.5, stockBasedCompensation: 3.75,
+    commonStockRepurchased: -7.5, dividendsPaid: -5,
+    netCashUsedForInvestingActivites: -12.5, netCashUsedProvidedByFinancingActivities: -15,
+    effectOfForexChangesOnCash: 0, netChangeInCash: 7.5,
+  });
+  const caja = [q(1), q(2), q(3), q(4), q(1), q(2), q(3), q(4)];
+  const res = Array.from({ length: 8 }, () => ({ revenue: 250, netIncome: 25 }));
+  const bal = Array.from({ length: 8 }, () => ({ netReceivables: 100, inventory: 80 }));
+  const e = desdeFMP(caja, res, bal, { marketCap: 2000, sector: "Technology" });
+
+  cerca(e.ocfTTM, 140, 1e-9, "el TTM suma CUATRO trimestres: 35x4 = 140");
+  // ⚠️ TRAMPA 1: el signo. Si el capex entrara en negativo, el FCF saldria 150 > CFO.
+  cerca(e.capexTTM, 40, 1e-9, "el capex se convierte a MAGNITUD positiva");
+  cerca(e.buybacksTTM, 30, 1e-9, "las recompras tambien");
+  cerca(e.dividendsTTM, 20, 1e-9, "y los dividendos");
+  const d = diagnosticar(e);
+  cerca(d.fcf, 100, 1e-9, "y por tanto el FCF es CFO - capex = 100, NUNCA mayor que el CFO");
+  ok(d.fcf < e.ocfTTM, "el FCF de una empresa con capex es menor que su CFO — el sintoma del signo mal");
+
+  // ⚠️ TRAMPA 2: el typo de FMP. `netCashUsedForInvestingActivites`, sin la segunda «i».
+  cerca(e.cfiTTM, -50, 1e-9, "lee el campo de inversion con el nombre historico (con typo)");
+  ok(e.cfiTTM < 0, "y CONSERVA el signo: gastar en inversion es negativo, y eso es informacion");
+  const nuevo = caja.map(({ netCashUsedForInvestingActivites, ...r }) => ({ ...r, netCashProvidedByInvestingActivities: -12.5 }));
+  cerca(desdeFMP(nuevo, res, bal).cfiTTM, -50, 1e-9, "y tambien con el nombre nuevo del esquema");
+  const sinNinguno = caja.map(({ netCashUsedForInvestingActivites, ...r }) => r);
+  ok(desdeFMP(sinNinguno, res, bal).cfiTTM === null, "sin ninguno de los dos: null, no cero");
+
+  // ⚠️ TRAMPA 3: el TTM incompleto. Con tres trimestres el CFO sale un 25 % corto.
+  ok(desdeFMP(caja.slice(0, 3), res, bal) === null, "con tres trimestres NO se devuelve un TTM");
+  ok(desdeFMP([], res, bal) === null, "ni sin ninguno");
+  const hueco = [{ ...q(1), operatingCashFlow: null }, q(2), q(3), q(4)];
+  ok(desdeFMP(hueco, res, bal).ocfTTM === null, "y un trimestre sin dato deja el TTM en null, no lo suma como cero");
+
+  // El periodo anterior alimenta el crecimiento; sin ocho trimestres no se inventa.
+  ok(e.prev != null && e.prev.ocfTTM === 140, "los trimestres 5-8 dan el periodo anterior");
+  ok(desdeFMP(caja.slice(0, 4), res, bal).prev === undefined, "con solo cuatro no hay periodo anterior");
+
+  // Y el diagrama construido desde FMP tiene que CERRAR, igual que el construido desde EDGAR.
+  const sk = sankeyCaja(e);
+  const o = sk.flujos.filter((x) => x.lado === "origen").reduce((a, b) => a + b.valor, 0);
+  const de = sk.flujos.filter((x) => x.lado === "destino").reduce((a, b) => a + b.valor, 0);
+  ok(Math.abs(o - de) < 1e-9, `el sankey desde datos de FMP tambien cierra (${o} vs ${de})`);
+  ok(sk.cuadra, "y cuadra con la variacion declarada por FMP");
+}
+
+// ── LO QUE LA WEB TIENE QUE RESPETAR ─────────────────────────────────────────────────────
+// ⚠️ La aritmetica de arriba puede ser perfecta y el componente publicar igualmente un
+// diagrama que no cuadra. Lo que se fija aqui es que la interfaz respete los mismos listones
+// que el modulo, y se comprueba contra el CODIGO —no contra los comentarios—, porque la
+// primera version del test hermano daba verde comparando prosa.
+{
+  const ui = readFileSync("components/stock/FlujoDeCaja.tsx", "utf8");
+
+  // 1. El criterio de publicacion del diagrama es `cuadra`, y tiene que estar EN una rama.
+  ok(/!sk\.cuadra\s*\?/.test(ui) || /if\s*\(\s*!sk\.cuadra/.test(ui),
+     "el componente ramifica sobre `cuadra`: si no cuadra, NO dibuja el diagrama");
+
+  // 2. Sin cuatro trimestres no se pinta nada. `desdeFMP` devuelve null y hay que atenderlo.
+  ok(/!modelo/.test(ui), "y atiende el caso de que desdeFMP devuelva null (TTM incompleto)");
+
+  // 3. Una financiera se marca. Sin esto, un usuario lee la conversion de JPMorgan como la de
+  //    una industrial, que es el falso positivo real que costo encontrar.
+  // ⚠️ NO basta con que `d.financiera` se mencione una vez. La primera version de este assert
+  // pedia eso, y un control positivo que sustituia UNA de las tres apariciones seguia pasando:
+  // la aserción se cumplia con la mencion mas trivial. Se exige el AVISO renderizado —el
+  // bloque que le dice al lector que un CFO negativo en un banco es normal— y que el FCF se
+  // suprima, que son las dos cosas que evitan leer a JPMorgan como una industrial.
+  ok(/\{d\.financiera && \(/.test(ui), "renderiza el aviso de entidad financiera, no solo menciona el campo");
+  ok(/d\.financiera \? "n\/a"/.test(ui), "y suprime el FCF, que en un banco no es un concepto con sentido");
+  ok(/pr[eé]stamos/i.test(ui), "y explica por que: conceder prestamos ES su operacion");
+
+  // 4. Toda la aritmetica sale del modulo probado, no del componente. Si alguien recalcula un
+  //    ratio a mano en el JSX, deja de estar cubierto por estos 100+ asserts.
+  // ⚠️ SIN REGEX CONSTRUIDA A MANO, y por una razon concreta: la primera version de esta linea
+  // era new RegExp(`\b${f}\b`) — con UNA barra, porque el shell colapso la doble al escribir el
+  // fichero. En una plantilla de JS eso NO es una frontera de palabra: es el caracter de
+  // RETROCESO (0x08), y el patron nunca casaba. Los cuatro asserts fallaban con el componente
+  // correcto. Es exactamente el byte que dejo el CI rojo cinco dias. `includes` no tiene escapes.
+  for (const f of ["desdeFMP", "diagnosticar", "banderas", "sankeyCaja"])
+    ok(ui.includes(`${f}(`), `el componente llama a ${f}() del modulo en vez de recalcular`);
+  ok(!/\/\s*niTTM|ocfTTM\s*\/|capexTTM\s*[-+]/.test(ui.replace(/\/\*[\s\S]*?\*\//g, "")),
+     "y no hace aritmetica propia con los campos crudos");
 }
 
 console.log(pass && !fail ? `\n✓ flujoCaja: ${pass} passed, 0 failed\n` : `\n✖ flujoCaja: ${pass} passed, ${fail} failed\n`);
