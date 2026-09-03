@@ -47,6 +47,10 @@ research/out/*
 # Lleva dentro el bloque de COBERTURA: es la prueba de que el percentil sale de la muestra
 # que dice, y no de una serie truncada que contesta igual.
 !research/out/tipos.json
+# La vida util implicita y el precio de recompra por empresa, con las tres vias de la
+# depreciacion y el control de cordura del precio. Es la evidencia de que las cifras salen de
+# donde se dice y no de un tag muerto.
+!research/out/calidad_contable.json
 # La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,149, 8 falsas alarmas. Es lo
 # que impide publicar el booleano como si fuera una alerta.
 !research/out/aviso_credito_base.json

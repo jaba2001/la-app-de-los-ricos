@@ -216,6 +216,14 @@ jobs:
       - name: Los workflows (que el CI siga vivo)
         run: node --experimental-strip-types --no-warnings scripts/workflows.test.mjs
 
+      # La vida util implicita y el precio de recompra. Lo que fijan no es la division sino los
+      # confundidores: que el crecimiento del activo infla la vida util sola (la mitad del
+      # aparente alargamiento de Oracle era artefacto), que la amortizacion de intangibles la
+      # hunde (Amgen daba 2,92 años para una farmaceutica con plantas), y que un hecho de
+      # recompra de 2016 comparado con el precio de hoy da +2.922 % y no significa nada.
+      - name: La calidad contable (vida util y recompras)
+        run: node --experimental-strip-types --no-warnings scripts/vidautil.test.mjs && node --experimental-strip-types --no-warnings scripts/recompras.test.mjs
+
       - name: La capa de tipos
         run: node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las

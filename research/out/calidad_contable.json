@@ -1,0 +1,1545 @@
+{
+  "generatedAt": "2026-09-03T11:17:24.249Z",
+  "umbralesVida": {
+    "vidaMin": 2,
+    "vidaMax": 40,
+    "extensionMinima": 0.1,
+    "crecimientoRuidoso": 0.5
+  },
+  "umbralesRecompra": {
+    "toleranciaRango": 0.05,
+    "diferenciaMinima": 0.05,
+    "antiguedadMaxAnos": 2
+  },
+  "resumen": {
+    "leidos": 60,
+    "deCuantos": 60,
+    "conVida": 37,
+    "alargan": 4,
+    "acortan": 3,
+    "conRecompra": 33,
+    "recompraCreible": 29,
+    "recompraImposible": 3,
+    "compraronBarato": 10,
+    "compraronCaro": 6,
+    "sesgoMedianoAnos": 0.67
+  },
+  "filas": [
+    {
+      "ticker": "A",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2015,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 19.36,
+        "corregida": 18.34,
+        "sesgo": 1.02,
+        "previa": 18.71,
+        "cambioPct": -2,
+        "crecimientoPct": 11.8,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 44.5,
+        "retornoPct": 245.1,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "AAPL",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 15.73,
+        "corregida": 15.31,
+        "sesgo": 0.42,
+        "previa": 14.25,
+        "cambioPct": 7.4,
+        "crecimientoPct": 5.6,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 225.65,
+        "retornoPct": 40.4,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "ABBV",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2017,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 17.76,
+        "corregida": 16.93,
+        "sesgo": 0.83,
+        "previa": 15.64,
+        "cambioPct": 8.2,
+        "crecimientoPct": 10.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 108.46,
+        "retornoPct": 136.4,
+        "creible": false,
+        "motivo": "precio medio 108.46 por encima del máximo del periodo (98.21): las dos cifras no describen el mismo periodo"
+      },
+      "lectura": {
+        "clave": "no_creible"
+      }
+    },
+    {
+      "ticker": "ABNB",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2022,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 108.7,
+        "retornoPct": 68.6,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "ABT",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 17.59,
+        "corregida": 16.72,
+        "sesgo": 0.87,
+        "previa": 16.67,
+        "cambioPct": 0.3,
+        "crecimientoPct": 10.9,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ACGL",
+      "estado": "ok",
+      "ano": null,
+      "anoRecompra": 2023,
+      "viaDep": "sin_dato",
+      "vida": null,
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": null,
+        "retornoPct": null,
+        "creible": null,
+        "motivo": "importe o acciones no positivos"
+      },
+      "lectura": null
+    },
+    {
+      "ticker": "ACN",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 7.22,
+        "corregida": 7.01,
+        "sesgo": 0.21,
+        "previa": 7.61,
+        "cambioPct": -7.9,
+        "crecimientoPct": 6.1,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 328.03,
+        "retornoPct": -42.2,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "ADBE",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2024,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 7.09,
+        "corregida": 7.08,
+        "sesgo": 0.01,
+        "previa": 7.06,
+        "cambioPct": 0.3,
+        "crecimientoPct": 0.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 542.86,
+        "retornoPct": -46.1,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "ADI",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 18.2,
+        "corregida": 17.94,
+        "sesgo": 0.27,
+        "previa": 19.06,
+        "cambioPct": -5.9,
+        "crecimientoPct": 3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ADM",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 32.4,
+        "corregida": 31.7,
+        "sesgo": 0.7,
+        "previa": 32.53,
+        "cambioPct": -2.5,
+        "crecimientoPct": 4.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ADP",
+      "estado": "ok",
+      "ano": 2026,
+      "anoRecompra": 2026,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 13.35,
+        "corregida": 13.08,
+        "sesgo": 0.27,
+        "previa": 12.59,
+        "cambioPct": 3.9,
+        "crecimientoPct": 4.2,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 242.24,
+        "retornoPct": 18.1,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "ADSK",
+      "estado": "ok",
+      "ano": 2026,
+      "anoRecompra": 2026,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 14.05,
+        "corregida": 13.74,
+        "sesgo": 0.3,
+        "previa": 13.95,
+        "cambioPct": -1.5,
+        "crecimientoPct": 4.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 280.4,
+        "retornoPct": -7.8,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "AEE",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AEP",
+      "estado": "ok",
+      "ano": 2023,
+      "anoRecompra": 2011,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 34.58,
+        "corregida": 33.86,
+        "sesgo": 0.72,
+        "previa": 29.91,
+        "cambioPct": 13.2,
+        "crecimientoPct": 4.4,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_alargada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita de su inmovilizado pasa de 29.9 a 33.9 años, lo que reduce el gasto por depreciación y sube el beneficio declarado sin que entre caja. Puede ser un cambio de criterio contable o simplemente que ahora compra activos de vida más larga: esta medida NO las distingue.",
+          "evidencia": {
+            "vidaAntes": 29.91,
+            "vidaAhora": 33.86,
+            "cambioPct": 13.2,
+            "beneficioAnadido": 386673894,
+            "crecimientoActivoPct": 4.4
+          }
+        }
+      ],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AES",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2020,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AFL",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": 28.28,
+        "corregida": 28.56,
+        "sesgo": -0.28,
+        "previa": 26.71,
+        "cambioPct": 6.9,
+        "crecimientoPct": -1.9,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 106.99,
+        "retornoPct": 8.3,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AIG",
+      "estado": "ok",
+      "ano": 2021,
+      "anoRecompra": 2025,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 80.05,
+        "retornoPct": -4.6,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": null
+    },
+    {
+      "ticker": "AIZ",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 9.53,
+        "corregida": 8.82,
+        "sesgo": 0.71,
+        "previa": 8.42,
+        "cambioPct": 4.8,
+        "crecimientoPct": 17.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 212.04,
+        "retornoPct": 32.9,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AJG",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 11.02,
+        "corregida": 9.9,
+        "sesgo": 1.13,
+        "previa": 9.99,
+        "cambioPct": -0.9,
+        "crecimientoPct": 25.7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AKAM",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2013,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 9.97,
+        "corregida": 9.3,
+        "sesgo": 0.67,
+        "previa": 8.87,
+        "cambioPct": 4.8,
+        "crecimientoPct": 15.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 41.16,
+        "retornoPct": 163.9,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "ALB",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ALGN",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2013,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 8.69,
+        "corregida": 8.76,
+        "sesgo": -0.08,
+        "previa": 14.95,
+        "cambioPct": -41.4,
+        "crecimientoPct": -1.8,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_acortada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita baja de 15.0 a 8.8 años: reconoce MÁS gasto por depreciación y por tanto menos beneficio. Es lo contrario de un maquillaje, y suele señalar que la empresa espera que sus activos se queden obsoletos antes.",
+          "evidencia": {
+            "vidaAntes": 14.95,
+            "vidaAhora": 8.76,
+            "cambioPct": -41.4
+          }
+        }
+      ],
+      "recompra": {
+        "precioMedio": 35.22,
+        "retornoPct": 353.6,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "ALL",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 205.5,
+        "retornoPct": 25.5,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "ALLE",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2019,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 19.06,
+        "corregida": 18.06,
+        "sesgo": 1,
+        "previa": 18.9,
+        "cambioPct": -4.5,
+        "crecimientoPct": 11.7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 98.26,
+        "retornoPct": 58,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "AMAT",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 21.88,
+        "corregida": 20.08,
+        "sesgo": 1.8,
+        "previa": 19.48,
+        "cambioPct": 3,
+        "crecimientoPct": 19.7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 163.17,
+        "retornoPct": 180.9,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AMCR",
+      "estado": "ok",
+      "ano": 2020,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": 20.92,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AMD",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 9.46,
+        "corregida": 8.54,
+        "sesgo": 0.91,
+        "previa": 8.1,
+        "cambioPct": 5.5,
+        "crecimientoPct": 24,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 109.67,
+        "retornoPct": 329.2,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AME",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 14.66,
+        "corregida": 14.07,
+        "sesgo": 0.59,
+        "previa": 14.64,
+        "cambioPct": -3.9,
+        "crecimientoPct": 8.8,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 188.72,
+        "retornoPct": 24.6,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AMGN",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 24.94,
+        "corregida": 23.57,
+        "sesgo": 1.38,
+        "previa": 23.54,
+        "cambioPct": 0.1,
+        "crecimientoPct": 12.4,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": null,
+        "retornoPct": null,
+        "creible": null,
+        "motivo": "importe o acciones no positivos"
+      },
+      "lectura": null
+    },
+    {
+      "ticker": "AMP",
+      "estado": "ok",
+      "ano": 2020,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AMT",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 179.07,
+        "retornoPct": -1.9,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": null
+    },
+    {
+      "ticker": "AMZN",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 12.76,
+        "corregida": 11.09,
+        "sesgo": 1.67,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": 35.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ANET",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 14.62,
+        "corregida": 12.46,
+        "sesgo": 2.16,
+        "previa": 8.94,
+        "cambioPct": 39.4,
+        "crecimientoPct": 42,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_alargada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita de su inmovilizado pasa de 8.9 a 12.5 años, lo que reduce el gasto por depreciación y sube el beneficio declarado sin que entre caja. Puede ser un cambio de criterio contable o simplemente que ahora compra activos de vida más larga: esta medida NO las distingue.",
+          "evidencia": {
+            "vidaAntes": 8.94,
+            "vidaAhora": 12.46,
+            "cambioPct": 39.4,
+            "beneficioAnadido": 12169269,
+            "crecimientoActivoPct": 42
+          }
+        }
+      ],
+      "recompra": {
+        "precioMedio": 100.82,
+        "retornoPct": 94.1,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "AON",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 12.48,
+        "corregida": 11.95,
+        "sesgo": 0.53,
+        "previa": 11.7,
+        "cambioPct": 2.1,
+        "crecimientoPct": 9.4,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AOS",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 22.25,
+        "corregida": 21.77,
+        "sesgo": 0.49,
+        "previa": 22.05,
+        "cambioPct": -1.3,
+        "crecimientoPct": 4.6,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 67.45,
+        "retornoPct": -12.3,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "APA",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "APD",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2022,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 28,
+        "corregida": 27.08,
+        "sesgo": 0.92,
+        "previa": 25.6,
+        "cambioPct": 5.8,
+        "crecimientoPct": 7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "APH",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 8.44,
+        "corregida": 7.48,
+        "sesgo": 0.96,
+        "previa": 9.92,
+        "cambioPct": -24.6,
+        "crecimientoPct": 29.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_acortada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita baja de 9.9 a 7.5 años: reconoce MÁS gasto por depreciación y por tanto menos beneficio. Es lo contrario de un maquillaje, y suele señalar que la empresa espera que sus activos se queden obsoletos antes.",
+          "evidencia": {
+            "vidaAntes": 9.92,
+            "vidaAhora": 7.48,
+            "cambioPct": -24.6
+          }
+        }
+      ],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "APO",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "APP",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "APTV",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2024,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 12.08,
+        "corregida": 11.54,
+        "sesgo": 0.54,
+        "previa": 11.29,
+        "cambioPct": 2.1,
+        "crecimientoPct": 9.9,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 92.37,
+        "retornoPct": -51.5,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "ARE",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ARES",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2019,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "ATO",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2015,
+      "viaDep": "total_contaminado",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AVGO",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2024,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 12.94,
+        "corregida": 12.59,
+        "sesgo": 0.35,
+        "previa": 11.13,
+        "cambioPct": 13.1,
+        "crecimientoPct": 5.7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_alargada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita de su inmovilizado pasa de 11.1 a 12.6 años, lo que reduce el gasto por depreciación y sube el beneficio declarado sin que entre caja. Puede ser un cambio de criterio contable o simplemente que ahora compra activos de vida más larga: esta medida NO las distingue.",
+          "evidencia": {
+            "vidaAntes": 11.13,
+            "vidaAhora": 12.59,
+            "cambioPct": 13.1,
+            "beneficioAnadido": 75052715,
+            "crecimientoActivoPct": 5.7
+          }
+        }
+      ],
+      "recompra": {
+        "precioMedio": 107.1,
+        "retornoPct": 245.8,
+        "creible": false,
+        "motivo": "precio medio 107.10 por debajo del mínimo del periodo (136.27): el recuento de acciones probablemente incluye retenciones por impuestos de la retribución en acciones, que no se compran en el mercado"
+      },
+      "lectura": {
+        "clave": "no_creible"
+      }
+    },
+    {
+      "ticker": "AVY",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2019,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 118.85,
+        "retornoPct": 46.5,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "AWK",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "AXON",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2016,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 8.99,
+        "corregida": 7.86,
+        "sesgo": 1.13,
+        "previa": 8.74,
+        "cambioPct": -10.2,
+        "crecimientoPct": 33.6,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_acortada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita baja de 8.7 a 7.9 años: reconoce MÁS gasto por depreciación y por tanto menos beneficio. Es lo contrario de un maquillaje, y suele señalar que la empresa espera que sus activos se queden obsoletos antes.",
+          "evidencia": {
+            "vidaAntes": 8.74,
+            "vidaAhora": 7.86,
+            "cambioPct": -10.2
+          }
+        }
+      ],
+      "recompra": {
+        "precioMedio": 18.75,
+        "retornoPct": 2922,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "AXP",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2025,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 342,
+        "retornoPct": -3.5,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": null
+    },
+    {
+      "ticker": "AZO",
+      "estado": "ok",
+      "ano": 2020,
+      "anoRecompra": 2025,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 20.69,
+        "corregida": 20.15,
+        "sesgo": 0.54,
+        "previa": 20.51,
+        "cambioPct": -1.8,
+        "crecimientoPct": 5.5,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 3530.62,
+        "retornoPct": -15.3,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_caro"
+      }
+    },
+    {
+      "ticker": "BA",
+      "estado": "ok",
+      "ano": 2011,
+      "anoRecompra": 2025,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 16,
+        "corregida": 15.63,
+        "sesgo": 0.36,
+        "previa": 14.51,
+        "cambioPct": 7.7,
+        "crecimientoPct": 4.7,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "BAC",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2014,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 16.57,
+        "retornoPct": 273.9,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "BALL",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2017,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": null,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 41.2,
+        "retornoPct": 52.8,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "BAX",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2022,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 21.03,
+        "corregida": 20.5,
+        "sesgo": 0.53,
+        "previa": 20.56,
+        "cambioPct": -0.3,
+        "crecimientoPct": 5.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 64,
+        "retornoPct": -59.4,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "BBY",
+      "estado": "ok",
+      "ano": 2026,
+      "anoRecompra": 2026,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": 8.16,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 68.25,
+        "retornoPct": 17.4,
+        "creible": true,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "recompro_barato"
+      }
+    },
+    {
+      "ticker": "BDX",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": null,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 20.76,
+        "corregida": 20.25,
+        "sesgo": 0.5,
+        "previa": 20.68,
+        "cambioPct": -2,
+        "crecimientoPct": 5.1,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "BEN",
+      "estado": "ok",
+      "ano": 2020,
+      "anoRecompra": null,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 93.2,
+        "corregida": 88.45,
+        "sesgo": 4.75,
+        "previa": 25.13,
+        "cambioPct": 252,
+        "crecimientoPct": 11.3,
+        "ruidoso": false,
+        "fuera": true
+      },
+      "señalesVida": [],
+      "recompra": null,
+      "lectura": null
+    },
+    {
+      "ticker": "BF.B",
+      "estado": "ok",
+      "ano": 2014,
+      "anoRecompra": 2024,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": 21.08,
+        "corregida": 20.1,
+        "sesgo": 0.98,
+        "previa": 17.95,
+        "cambioPct": 12,
+        "crecimientoPct": 10.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [
+        {
+          "clave": "vida_util_alargada",
+          "gravedad": "aviso",
+          "texto": "La vida útil implícita de su inmovilizado pasa de 18.0 a 20.1 años, lo que reduce el gasto por depreciación y sube el beneficio declarado sin que entre caja. Puede ser un cambio de criterio contable o simplemente que ahora compra activos de vida más larga: esta medida NO las distingue.",
+          "evidencia": {
+            "vidaAntes": 17.95,
+            "vidaAhora": 20.1,
+            "cambioPct": 12,
+            "beneficioAnadido": 5985800,
+            "crecimientoActivoPct": 10.3
+          }
+        }
+      ],
+      "recompra": {
+        "precioMedio": 57.87,
+        "retornoPct": null,
+        "creible": null,
+        "motivo": null
+      },
+      "lectura": {
+        "clave": "rancio"
+      }
+    },
+    {
+      "ticker": "BG",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2024,
+      "viaDep": "total_menos_amortizacion",
+      "vida": {
+        "ingenua": null,
+        "corregida": null,
+        "sesgo": null,
+        "previa": 22.34,
+        "cambioPct": null,
+        "crecimientoPct": null,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": 62.65,
+        "retornoPct": 85.5,
+        "creible": false,
+        "motivo": "precio medio 62.65 por debajo del mínimo del periodo (76.89): el recuento de acciones probablemente incluye retenciones por impuestos de la retribución en acciones, que no se compran en el mercado"
+      },
+      "lectura": {
+        "clave": "no_creible"
+      }
+    },
+    {
+      "ticker": "BIIB",
+      "estado": "ok",
+      "ano": 2025,
+      "anoRecompra": 2024,
+      "viaDep": "depreciacion_sola",
+      "vida": {
+        "ingenua": 21.95,
+        "corregida": 21.7,
+        "sesgo": 0.25,
+        "previa": 20.17,
+        "cambioPct": 7.6,
+        "crecimientoPct": 2.3,
+        "ruidoso": false,
+        "fuera": false
+      },
+      "señalesVida": [],
+      "recompra": {
+        "precioMedio": null,
+        "retornoPct": null,
+        "creible": null,
+        "motivo": "importe o acciones no positivos"
+      },
+      "lectura": null
+    }
+  ]
+}
