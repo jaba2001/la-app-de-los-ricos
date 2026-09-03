@@ -12,7 +12,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { pendiente, forma, descomponer, percentil, credito, liston, avisoConTasaBase, BASE_AVISO, UMBRALES_TIPOS } from "../lib/tipos.ts";
+import { pendiente, forma, descomponer, percentil, credito, liston, avisoConTasaBase, lecturaTipoReal, BASE_AVISO, SENSIBILIDAD_REAL, UMBRALES_TIPOS } from "../lib/tipos.ts";
 import { readFileSync } from "fs";
 
 let pass = 0, fail = 0;
@@ -172,6 +172,32 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   // El aviso no puede publicarse sin su tasa base tampoco en la web, y no como texto suelto:
   // llamando a la funcion que la adjunta.
   ok(/\{\s*avisoConTasaBase\(/.test(ui), "el componente RENDERIZA avisoConTasaBase(), no el booleano solo");
+}
+
+// ── EL TIPO REAL: EL NUMERO CONTEMPORANEO NUNCA SALE SOLO ────────────────────────────────
+// ⚠️ Dos de los cuatro videos afirman que cuando el tipo real baja, el oro sube. Es CIERTO y
+// enorme: +2,46 %/mes bajando contra -0,79 % subiendo. Y es contemporaneo: mide el MISMO mes.
+// Mirando al siguiente, el |rho| medio cae de 0,312 a 0,098 — un 69 %. Publicar el primero sin
+// el segundo convierte una explicacion correcta en una señal que no existe.
+{
+  const t = lecturaTipoReal(-0.15);
+  ok(/2\.46|2,46/.test(t), "la frase cita el retorno con el tipo real bajando");
+  ok(/CONTEMPOR|contempor/i.test(t), "y declara que es contemporaneo");
+  ok(/-0\.078|-0,078/.test(t), "y publica el rho PREDICTIVO al lado");
+  ok(/no anticipa/i.test(t), "y dice explicitamente que no anticipa nada");
+  ok(/ha bajado/.test(t), "y con un delta negativo dice que ha bajado");
+  ok(/ha subido/.test(lecturaTipoReal(0.15)), "y al reves");
+  ok(!/comprar|vender|oportunidad|deberia/i.test(t), "sin recomendar nada");
+  ok(lecturaTipoReal(null).length > 50, "sin delta se publica igual el contexto");
+
+  // La constante refleja que el poder predictivo se derrumba.
+  ok(SENSIBILIDAD_REAL.rhoMedioPredictivo < SENSIBILIDAD_REAL.rhoMedioContemporaneo / 2,
+     "la constante guarda que el predictivo es menos de la mitad del contemporaneo");
+  ok(Math.abs(SENSIBILIDAD_REAL.oro.contemporaneo) > Math.abs(SENSIBILIDAD_REAL.sp500.contemporaneo) * 2,
+     "y que la relacion es MUCHO mas fuerte en el oro que en las acciones");
+  ok(Math.abs(SENSIBILIDAD_REAL.bitcoin.contemporaneo) < Math.abs(SENSIBILIDAD_REAL.oro.contemporaneo) / 2,
+     "y que Bitcoin, que el video 4 mete en el mismo saco, esta MUY por debajo del oro");
+  ok(SENSIBILIDAD_REAL.bitcoin.meses < 120, "con una muestra corta, ademas: su predictivo es ruido");
 }
 
 console.log(pass && !fail ? `\n✓ tipos: ${pass} passed, 0 failed\n` : `\n✖ tipos: ${pass} passed, ${fail} failed\n`);

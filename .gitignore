@@ -63,6 +63,12 @@ research/out/*
 # La comprobacion previa que AHORRO el ensayo 345: rho 0,769 sobre un criterio de 0,70 escrito
 # antes de mirar. Es la evidencia de que la regla no se ajusto al resultado.
 !research/out/precheck_credito.json
+# La comprobacion previa de la fase C, con el criterio escrito antes y el MARGEN reportado:
+# 0,681 y 0,705 alrededor de 0,70. Decidir sobre cinco milesimas no es decidir, y eso consta.
+!research/out/precheck_aceleracion.json
+# La sensibilidad al tipo real, con la columna PREDICTIVA al lado de la contemporanea. Es la
+# prueba de que la relacion explica y no anticipa: |rho| medio 0,312 -> 0,098.
+!research/out/tipos_reales.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

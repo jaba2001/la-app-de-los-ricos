@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-09-03T11:41:09.709Z",
+  "criterioPreescrito": 0.7,
+  "puerta1": {
+    "que": "aceleracion del precio vs momentum 12m",
+    "rho": 0.6809,
+    "n": 368,
+    "cerrada": false
+  },
+  "puerta2": {
+    "que": "aceleracion de la liquidez vs impulso 6m del regimen",
+    "rho": 0.7049,
+    "n": 271,
+    "cerrada": true
+  },
+  "veredicto": "NO SE GASTA EL ENSAYO 345 — puerta 2 (aceleracion = impulso de liquidez) cerrada",
+  "margenAlCriterio": 0.0049,
+  "alFilo": true,
+  "matiz": "Las dos puertas caen practicamente EN el criterio (0,681 y 0,705 alrededor de 0,70). Lo que decide no es de que lado cae cada una sino que las dos estan cerca: la aceleracion es en gran medida redundante con el momentum (auditado, -136 pp) y con el impulso de liquidez del regimen. La conclusion aguanta entre 0,60 y 0,75; con 0,80 no."
+}

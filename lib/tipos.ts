@@ -163,6 +163,43 @@ export const BASE_AVISO = {
   seguidosDeUnBuenAno: 8,
 } as const;
 
+/**
+ * ⚠️ LA SENSIBILIDAD AL TIPO REAL, MEDIDA — y por qué se publica como CONTEXTO y no como señal.
+ *
+ * Dos de los vídeos afirman lo mismo: cuando el tipo real baja, el oro sube. Es cierto y la
+ * lógica es buena —el oro no paga cupón, así que su coste de oportunidad ES el tipo real—.
+ * Medido sobre 259 meses desde 2003 (`research/tipos_reales.mjs`):
+ *
+ *   · **Contemporáneo**: ρ = −0,34 en el oro. Con el tipo real bajando hace **+2,46 %/mes**;
+ *     subiendo, **−0,79 %**. Una diferencia de 3,25 puntos al mes. Enorme.
+ *   · **PREDICTIVO** (el cambio de este mes contra el retorno del SIGUIENTE): ρ = −0,078.
+ *
+ * El |ρ| medio de los CINCO activos pasa de **0,312 a 0,098 al mirar hacia adelante**: cae un
+ * 69 %. Y la relacion es fuerte solo donde el argumento tiene sentido: oro −0,34 y plata −0,30,
+ * frente a **Bitcoin −0,11 y S&P 500 −0,12**, que el video 4 mete en el mismo saco. La relación explica lo que pasó y no anticipa nada, porque para operarla haría falta
+ * conocer el movimiento del tipo por adelantado — y quien lo conociera tendría negocios mejores
+ * que el oro. Por eso esta constante existe: para que el número no se publique sin su límite.
+ */
+export const SENSIBILIDAD_REAL = {
+  meses: 259, desde: 2003,
+  oro: { contemporaneo: -0.339, predictivo: -0.078, bajando: 2.46, subiendo: -0.79 },
+  plata: { contemporaneo: -0.304, predictivo: -0.083 },
+  sp500: { contemporaneo: -0.115, predictivo: -0.108 },
+  bitcoin: { contemporaneo: -0.113, predictivo: -0.167, meses: 98 },
+  rhoMedioContemporaneo: 0.312, rhoMedioPredictivo: 0.098,
+} as const;
+
+/** La frase honesta para el panel. El número contemporáneo NUNCA sale sin el predictivo. */
+export function lecturaTipoReal(deltaReal: number | null): string {
+  const s = SENSIBILIDAD_REAL;
+  const base = `Medido sobre ${s.meses} meses desde ${s.desde}: con el tipo real bajando, el oro hace ` +
+    `${s.oro.bajando >= 0 ? "+" : ""}${s.oro.bajando} %/mes; subiendo, ${s.oro.subiendo} %. ` +
+    `Pero eso es CONTEMPORÁNEO: mide el mismo mes. Mirando al mes siguiente la correlación cae de ` +
+    `${s.oro.contemporaneo} a ${s.oro.predictivo}. Explica lo que pasó, no anticipa lo que viene.`;
+  if (deltaReal == null) return base;
+  return `El tipo real ${deltaReal < 0 ? "ha bajado" : "ha subido"} ${Math.abs(deltaReal).toFixed(2)} puntos. ${base}`;
+}
+
 /** La frase honesta para acompañar a un aviso encendido. NUNCA se publica el booleano solo. */
 export function avisoConTasaBase(ensanchando: boolean): string {
   if (!ensanchando) return "El diferencial de crédito no se está abriendo por encima del corte declarado.";

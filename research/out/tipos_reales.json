@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-09-03T11:36:38.169Z",
+  "serie": "DFII10",
+  "desde": "2003-01-02",
+  "advertencia": "Las correlaciones contemporaneas comparan el cambio del tipo real de un mes con el retorno de ESE MISMO mes. Explican lo que paso; NO se pueden operar. La columna predictiva esta para poder enseñar que no lo son.",
+  "rhoMedioContemporaneo": 0.312,
+  "rhoMedioPredictivo": 0.098,
+  "activos": [
+    {
+      "ticker": "GLD",
+      "nombre": "Oro",
+      "estado": "ok",
+      "n": 259,
+      "rhoContemporaneo": -0.339,
+      "betaPorPunto": -7.94,
+      "rhoPredictivo": -0.078,
+      "mesesBajando": 133,
+      "retornoBajando": 2.46,
+      "mesesSubiendo": 118,
+      "retornoSubiendo": -0.79,
+      "diferencia": 3.25
+    },
+    {
+      "ticker": "SLV",
+      "nombre": "Plata",
+      "estado": "ok",
+      "n": 242,
+      "rhoContemporaneo": -0.304,
+      "betaPorPunto": -12.72,
+      "rhoPredictivo": -0.083,
+      "mesesBajando": 126,
+      "retornoBajando": 3.37,
+      "mesesSubiendo": 109,
+      "retornoSubiendo": -1.89,
+      "diferencia": 5.27
+    },
+    {
+      "ticker": "SPY",
+      "nombre": "S&P 500",
+      "estado": "ok",
+      "n": 282,
+      "rhoContemporaneo": -0.115,
+      "betaPorPunto": -2.23,
+      "rhoPredictivo": -0.108,
+      "mesesBajando": 147,
+      "retornoBajando": 1.11,
+      "mesesSubiendo": 126,
+      "retornoSubiendo": 0.69,
+      "diferencia": 0.42
+    },
+    {
+      "ticker": "TLT",
+      "nombre": "Tesoro largo",
+      "estado": "ok",
+      "n": 282,
+      "rhoContemporaneo": -0.69,
+      "betaPorPunto": -11.77,
+      "rhoPredictivo": 0.055,
+      "mesesBajando": 147,
+      "retornoBajando": 2.36,
+      "mesesSubiendo": 126,
+      "retornoSubiendo": -1.97,
+      "diferencia": 4.33
+    },
+    {
+      "ticker": "BTC-USD",
+      "nombre": "Bitcoin",
+      "estado": "ok",
+      "n": 98,
+      "rhoContemporaneo": -0.113,
+      "betaPorPunto": -11.29,
+      "rhoPredictivo": -0.167,
+      "mesesBajando": 50,
+      "retornoBajando": 4.54,
+      "mesesSubiendo": 44,
+      "retornoSubiendo": 1.14,
+      "diferencia": 3.4
+    }
+  ]
+}

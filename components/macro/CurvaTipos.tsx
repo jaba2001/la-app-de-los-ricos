@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import {
-  forma, descomponer, credito, liston, avisoConTasaBase, UMBRALES_TIPOS,
+  forma, descomponer, credito, liston, avisoConTasaBase, lecturaTipoReal, UMBRALES_TIPOS,
   type Curva, type FormaCurva,
 } from "@/lib/tipos";
 
@@ -36,6 +36,7 @@ const EXPLICA: Record<FormaCurva, string> = {
 export default function CurvaTipos() {
   const [curva, setCurva] = useState<Curva | null>(null);
   const [real10, setReal10] = useState<number | null>(null);
+  const [deltaReal, setDeltaReal] = useState<number | null>(null);
   const [inf5a5, setInf5a5] = useState<number | null>(null);
   const [serieBaa, setSerieBaa] = useState<{ date: string; v: number }[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -66,6 +67,11 @@ export default function CurvaTipos() {
       ]);
       setCurva({ m3: ultimo(m3), a2: ultimo(a2), a10: ultimo(a10), a30: ultimo(a30) });
       setReal10(ultimo(dfii));
+      // El cambio del tipo real en ~30 dias, para la lectura de sensibilidad de los metales.
+      const corte = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+      const antes = dfii.filter((o) => o.date <= corte);
+      const hoyReal = ultimo(dfii);
+      setDeltaReal(antes.length && hoyReal != null ? hoyReal - antes[antes.length - 1].v : null);
       setInf5a5(ultimo(t5));
       setSerieBaa(baa);
       if (!ultimo(a10)) setError("FRED no ha devuelto el tramo de 10 años.");
@@ -181,6 +187,19 @@ export default function CurvaTipos() {
                 Corte declarado: {UMBRALES_TIPOS.ensancheMinimo} pp en {UMBRALES_TIPOS.ventanaEnsanche} días.
                 Se usa BAA10Y (Baa − Tesoro 10a) y no la serie de alto rendimiento de ICE BofA porque FRED
                 sólo sirve 786 observaciones de ésta desde 2023: mide lo mismo con 41 años en vez de tres.
+              </div>
+            </div>
+          )}
+
+          {/* ⚠️ EL NUMERO CONTEMPORANEO NUNCA SALE SOLO. La relacion tipo real → oro es real y
+              enorme (+2,46 %/mes bajando contra -0,79 % subiendo) y es del MISMO mes: mirando al
+              siguiente el |rho| medio cae de 0,312 a 0,098. `lecturaTipoReal` obliga a publicar
+              las dos cifras juntas, y scripts/tipos.test.mjs falla si alguien quita la segunda. */}
+          {real10 != null && (
+            <div style={{ marginTop: "var(--sr-sp-4)" }}>
+              <div className="section-label">El tipo real y los metales</div>
+              <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700, padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-text-3) 8%, transparent)" }}>
+                {lecturaTipoReal(deltaReal)}
               </div>
             </div>
           )}
