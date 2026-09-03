@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-09-03T21:35:05.735Z",
+  "meses": 236,
+  "validacion": {
+    "reconstruido": 612.4,
+    "publicado": 652.6,
+    "fiable": true
+  },
+  "porUmbral": [
+    {
+      "umbral": 30,
+      "total": 544.1,
+      "sharpe": 0.815,
+      "maxDD": -24.7
+    },
+    {
+      "umbral": 35,
+      "total": 509.7,
+      "sharpe": 0.807,
+      "maxDD": -24.7
+    },
+    {
+      "umbral": 40,
+      "total": 532.3,
+      "sharpe": 0.848,
+      "maxDD": -24.7
+    },
+    {
+      "umbral": 45,
+      "total": 617.1,
+      "sharpe": 0.961,
+      "maxDD": -18.4
+    },
+    {
+      "umbral": 50,
+      "total": 612.4,
+      "sharpe": 0.992,
+      "maxDD": -17.2
+    },
+    {
+      "umbral": 55,
+      "total": 526.8,
+      "sharpe": 0.974,
+      "maxDD": -17.2
+    },
+    {
+      "umbral": 60,
+      "total": 473.3,
+      "sharpe": 0.955,
+      "maxDD": -17.2
+    },
+    {
+      "umbral": 65,
+      "total": 462.2,
+      "sharpe": 0.974,
+      "maxDD": -15.8
+    },
+    {
+      "umbral": 70,
+      "total": 448.8,
+      "sharpe": 1.025,
+      "maxDD": -15.8
+    }
+  ],
+  "porManga": [
+    {
+      "manga": 0,
+      "total": 559.8,
+      "sharpe": 0.968,
+      "maxDD": -17.2
+    },
+    {
+      "manga": 0.025,
+      "total": 585.9,
+      "sharpe": 0.982,
+      "maxDD": -17.2
+    },
+    {
+      "manga": 0.05,
+      "total": 612.4,
+      "sharpe": 0.992,
+      "maxDD": -17.2
+    },
+    {
+      "manga": 0.1,
+      "total": 667,
+      "sharpe": 1.003,
+      "maxDD": -17.2
+    }
+  ],
+  "mejorPorTotal": 45,
+  "mejorPorSharpe": 70,
+  "produccionEnPico": false,
+  "dispersionPct": 27.5,
+  "nota": "NO es un barrido y no gasta ensayo: no se busca el mejor valor sino la FORMA de la superficie alrededor del ajuste actual. Que produccion sea el maximo de su rejilla seria la firma de un parametro ajustado."
+}

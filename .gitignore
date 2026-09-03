@@ -93,6 +93,9 @@ research/out/*
 # 1,82x incluso con mantenimiento del 35 %, y por una razon aritmetica: la cartera cae -17,2 %
 # como mucho y el disparo esta en -30,7 %. Control positivo a 4x: 5 y 13 llamadas.
 !research/out/margen_fase1.json
+# La FORMA de la superficie alrededor del ajuste actual del asignador. No es un barrido: mide si
+# el umbral de produccion (50) es el pico de su rejilla —firma de parametro ajustado— o la meseta.
+!research/out/sensibilidad_asignador.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
