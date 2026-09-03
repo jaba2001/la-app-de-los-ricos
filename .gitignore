@@ -89,6 +89,10 @@ research/out/*
 # El punto de equilibrio del coste de financiacion: +7,2 pp para B y +6,9 para C. Es lo que dice
 # que el coste NO es el cuello de botella — lo son la llamada de margen y el hueco.
 !research/out/apalancamiento_coste.json
+# FASE 1: la llamada de margen simulada DIA A DIA sobre la serie reconstruida. Cero llamadas a
+# 1,82x incluso con mantenimiento del 35 %, y por una razon aritmetica: la cartera cae -17,2 %
+# como mucho y el disparo esta en -30,7 %. Control positivo a 4x: 5 y 13 llamadas.
+!research/out/margen_fase1.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
