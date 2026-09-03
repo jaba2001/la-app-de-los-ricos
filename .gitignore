@@ -99,6 +99,9 @@ research/out/*
 # La cadencia y la ventana de la puerta de tendencia: LAS DOS son el maximo de su rejilla, con
 # dispersiones del 33 % y el 57 %. Es la fragilidad mas grande encontrada en las cifras publicadas.
 !research/out/sensibilidad_cadencia.json
+# ¿Sobrevive la optimalidad de los parametros al partir la muestra? NO: el argmax baila en las
+# TRES palancas. Pero calibrar sobre el pasado tampoco habria ayudado (3 de 6, cara o cruz).
+!research/out/estabilidad_parametros.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

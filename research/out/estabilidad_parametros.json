@@ -1,0 +1,182 @@
+{
+  "generatedAt": "2026-09-03T22:06:12.595Z",
+  "bloques": [
+    "2007-2013",
+    "2014-2020",
+    "2021-2026"
+  ],
+  "estabilidad": {
+    "umbral": {
+      "palanca": "umbral",
+      "produccion": 50,
+      "porBloque": [
+        {
+          "bloque": "2007-2013",
+          "argmax": 70,
+          "produccionRank": 3,
+          "de": 9,
+          "sharpeProd": 0.888,
+          "sharpeMejor": 0.988
+        },
+        {
+          "bloque": "2014-2020",
+          "argmax": 70,
+          "produccionRank": 3,
+          "de": 9,
+          "sharpeProd": 0.895,
+          "sharpeMejor": 0.905
+        },
+        {
+          "bloque": "2021-2026",
+          "argmax": 50,
+          "produccionRank": 1,
+          "de": 9,
+          "sharpeProd": 1.285,
+          "sharpeMejor": 1.285
+        }
+      ],
+      "estable": false,
+      "produccionSiempreTop2": false
+    },
+    "cadencia": {
+      "palanca": "cadencia",
+      "produccion": 1,
+      "porBloque": [
+        {
+          "bloque": "2007-2013",
+          "argmax": 2,
+          "produccionRank": 4,
+          "de": 5,
+          "sharpeProd": 0.888,
+          "sharpeMejor": 0.974
+        },
+        {
+          "bloque": "2014-2020",
+          "argmax": 2,
+          "produccionRank": 2,
+          "de": 5,
+          "sharpeProd": 0.895,
+          "sharpeMejor": 0.895
+        },
+        {
+          "bloque": "2021-2026",
+          "argmax": 1,
+          "produccionRank": 1,
+          "de": 5,
+          "sharpeProd": 1.285,
+          "sharpeMejor": 1.285
+        }
+      ],
+      "estable": false,
+      "produccionSiempreTop2": false
+    },
+    "ventana": {
+      "palanca": "ventana",
+      "produccion": 12,
+      "porBloque": [
+        {
+          "bloque": "2007-2013",
+          "argmax": 24,
+          "produccionRank": 2,
+          "de": 6,
+          "sharpeProd": 0.888,
+          "sharpeMejor": 0.893
+        },
+        {
+          "bloque": "2014-2020",
+          "argmax": 24,
+          "produccionRank": 3,
+          "de": 6,
+          "sharpeProd": 0.895,
+          "sharpeMejor": 0.969
+        },
+        {
+          "bloque": "2021-2026",
+          "argmax": 9,
+          "produccionRank": 3,
+          "de": 6,
+          "sharpeProd": 1.285,
+          "sharpeMejor": 1.433
+        }
+      ],
+      "estable": false,
+      "produccionSiempreTop2": false
+    }
+  },
+  "fueraDeMuestra": [
+    {
+      "palanca": "umbral",
+      "calibradoEn": "2007-2013",
+      "aplicadoA": "2014-2020",
+      "elegido": 70,
+      "produccion": 50,
+      "coincide": false,
+      "sharpeElegido": 0.905,
+      "sharpeProduccion": 0.895,
+      "elegidoGana": true
+    },
+    {
+      "palanca": "umbral",
+      "calibradoEn": "2014-2020",
+      "aplicadoA": "2021-2026",
+      "elegido": 70,
+      "produccion": 50,
+      "coincide": false,
+      "sharpeElegido": 1.233,
+      "sharpeProduccion": 1.285,
+      "elegidoGana": false
+    },
+    {
+      "palanca": "cadencia",
+      "calibradoEn": "2007-2013",
+      "aplicadoA": "2014-2020",
+      "elegido": 2,
+      "produccion": 1,
+      "coincide": false,
+      "sharpeElegido": 0.895,
+      "sharpeProduccion": 0.895,
+      "elegidoGana": true
+    },
+    {
+      "palanca": "cadencia",
+      "calibradoEn": "2014-2020",
+      "aplicadoA": "2021-2026",
+      "elegido": 2,
+      "produccion": 1,
+      "coincide": false,
+      "sharpeElegido": 1.131,
+      "sharpeProduccion": 1.285,
+      "elegidoGana": false
+    },
+    {
+      "palanca": "ventana",
+      "calibradoEn": "2007-2013",
+      "aplicadoA": "2014-2020",
+      "elegido": 24,
+      "produccion": 12,
+      "coincide": false,
+      "sharpeElegido": 0.969,
+      "sharpeProduccion": 0.895,
+      "elegidoGana": true
+    },
+    {
+      "palanca": "ventana",
+      "calibradoEn": "2014-2020",
+      "aplicadoA": "2021-2026",
+      "elegido": 24,
+      "produccion": 12,
+      "coincide": false,
+      "sharpeElegido": 1.084,
+      "sharpeProduccion": 1.285,
+      "elegidoGana": false
+    }
+  ],
+  "resumen": {
+    "argmaxEstables": 0,
+    "produccionTop2": 0,
+    "calibradoCoincide": 0,
+    "calibradoGana": 3,
+    "de": 6
+  },
+  "nota": "No busca el mejor parametro. Pregunta si la optimalidad de los valores de produccion sobrevive al partir la muestra, y si calibrar sobre el pasado habria elegido otra cosa."
+}
