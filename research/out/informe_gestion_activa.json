@@ -1,0 +1,254 @@
+{
+  "generatedAt": "2026-09-03T06:30:03.997Z",
+  "ventana": {
+    "desde": "2007-01-01",
+    "hasta": "2026-08-01",
+    "meses": 236
+  },
+  "tasaLibreRiesgo": {
+    "fuente": "FRED TB3MS (letras 3 meses, mensual)",
+    "mediaAnual": 1.55,
+    "nota": "Antes se usaba 0 en todas las metricas publicadas. Con la tasa real el Sharpe de growth pasa de 1,01 a 0,87."
+  },
+  "metricas": {
+    "growth": {
+      "sharpeRf0": 1.01,
+      "sharpe": 0.867,
+      "sortino": 1.465,
+      "calmar": 0.67,
+      "maxDrawdown": -16.2,
+      "m2": 14.13,
+      "m2Alpha": 3.92,
+      "capturaAlcista": 65.49640974692389,
+      "capturaBajista": 46.29576783302474,
+      "asimetria": 0.065,
+      "curtosisExceso": 2.516,
+      "rhoConSpy": 0.743
+    },
+    "defensive": {
+      "sharpeRf0": 1.04,
+      "sharpe": 0.787,
+      "sortino": 1.257,
+      "calmar": 0.62,
+      "maxDrawdown": -10.1,
+      "m2": 12.82,
+      "m2Alpha": 2.61,
+      "capturaAlcista": 32.17094388925549,
+      "capturaBajista": 16.949959849255375,
+      "asimetria": -0.351,
+      "curtosisExceso": 1.15,
+      "rhoConSpy": 0.6
+    },
+    "bench6040": {
+      "sharpeRf0": 0.857,
+      "sharpe": 0.698,
+      "sortino": 1.051,
+      "calmar": 0.29,
+      "maxDrawdown": -28.8,
+      "m2": 11.38,
+      "m2Alpha": 1.17,
+      "capturaAlcista": 60.91142615840363,
+      "capturaBajista": 52.85817488681074,
+      "asimetria": -0.551,
+      "curtosisExceso": 1.603,
+      "rhoConSpy": 0.96
+    },
+    "spy": {
+      "sharpeRf0": 0.722,
+      "sharpe": 0.626,
+      "sortino": 0.918,
+      "calmar": 0.22,
+      "maxDrawdown": -50.7,
+      "m2": null,
+      "m2Alpha": null,
+      "capturaAlcista": null,
+      "capturaBajista": null,
+      "asimetria": -0.705,
+      "curtosisExceso": 1.639,
+      "rhoConSpy": 1
+    }
+  },
+  "significacion": {
+    "growth_vs_spy": {
+      "sharpeA": 0.867,
+      "sharpeB": 0.626,
+      "diferencia": 0.241,
+      "rho": 0.743,
+      "errorTipico": 0.04732,
+      "t": 1.47,
+      "significativo": false,
+      "meses": 236
+    },
+    "growth_vs_bench6040": {
+      "sharpeA": 0.867,
+      "sharpeB": 0.698,
+      "diferencia": 0.169,
+      "rho": 0.712,
+      "errorTipico": 0.05005,
+      "t": 0.97,
+      "significativo": false,
+      "meses": 236
+    },
+    "defensive_vs_spy": {
+      "sharpeA": 0.787,
+      "sharpeB": 0.626,
+      "diferencia": 0.16,
+      "rho": 0.601,
+      "errorTipico": 0.05878,
+      "t": 0.79,
+      "significativo": false,
+      "meses": 236
+    },
+    "defensive_vs_bench6040": {
+      "sharpeA": 0.787,
+      "sharpeB": 0.698,
+      "diferencia": 0.088,
+      "rho": 0.68,
+      "errorTipico": 0.05267,
+      "t": 0.48,
+      "significativo": false,
+      "meses": 236
+    }
+  },
+  "temporizacion": {
+    "growth_vs_spy": {
+      "mertonHenriksson": {
+        "alfa": -0.064,
+        "alfaT": -0.28,
+        "betaBajista": 0.382,
+        "betaAlcista": 0.609,
+        "gamma": 0.2278,
+        "gammaT": 1.38,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      },
+      "treynorMazuy": {
+        "alfa": 0.0466,
+        "alfaT": 0.34,
+        "betaBajista": 0.51,
+        "betaAlcista": 0.51,
+        "gamma": 0.01305,
+        "gammaT": 2.08,
+        "significativo": true,
+        "n": 236,
+        "rezagos": 4
+      }
+    },
+    "growth_vs_bench6040": {
+      "mertonHenriksson": {
+        "alfa": -0.0009,
+        "alfaT": 0,
+        "betaBajista": 0.631,
+        "betaAlcista": 0.933,
+        "gamma": 0.3025,
+        "gammaT": 1.29,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      },
+      "treynorMazuy": {
+        "alfa": 0.1105,
+        "alfaT": 0.61,
+        "betaBajista": 0.792,
+        "betaAlcista": 0.792,
+        "gamma": 0.02592,
+        "gammaT": 1.54,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      }
+    },
+    "defensive_vs_spy": {
+      "mertonHenriksson": {
+        "alfa": 0.1233,
+        "alfaT": 0.87,
+        "betaBajista": 0.201,
+        "betaAlcista": 0.245,
+        "gamma": 0.0443,
+        "gammaT": 0.56,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      },
+      "treynorMazuy": {
+        "alfa": 0.1262,
+        "alfaT": 1.34,
+        "betaBajista": 0.227,
+        "betaAlcista": 0.227,
+        "gamma": 0.00331,
+        "gammaT": 1.16,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      }
+    },
+    "defensive_vs_bench6040": {
+      "mertonHenriksson": {
+        "alfa": 0.1247,
+        "alfaT": 1.03,
+        "betaBajista": 0.403,
+        "betaAlcista": 0.432,
+        "gamma": 0.0288,
+        "gammaT": 0.3,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      },
+      "treynorMazuy": {
+        "alfa": 0.1476,
+        "alfaT": 1.56,
+        "betaBajista": 0.418,
+        "betaAlcista": 0.418,
+        "gamma": 0.00102,
+        "gammaT": 0.18,
+        "significativo": false,
+        "n": 236,
+        "rezagos": 4
+      }
+    }
+  },
+  "brinson": {
+    "referencia": "60/40 (SPY 60 % / IEF 40 %)",
+    "convenio": "dos factores; la interaccion va en seleccion",
+    "asignacion": 53.429178850000014,
+    "seleccion": 2.1322117499999953,
+    "retornoActivoSumado": 55.561390599999996,
+    "retornoActivoCompuesto": 332.7238924080174,
+    "residuoComposicion": 277.1625018080174,
+    "periodos": 236,
+    "todosCuadran": true,
+    "porClase": {
+      "renta variable": {
+        "asignacion": 17.009369279999998,
+        "seleccion": -1.110223024625157e-16,
+        "pesoMedio": 0.6667372881355932
+      },
+      "duracion": {
+        "asignacion": 33.03534095999999,
+        "seleccion": 2.132211749999997,
+        "pesoMedio": 0.10233050847457593
+      },
+      "metales": {
+        "asignacion": 4.776545639999999,
+        "seleccion": -1.0824674490095276e-16,
+        "pesoMedio": 0.051483050847457544
+      },
+      "materias primas": {
+        "asignacion": 0,
+        "seleccion": 0,
+        "pesoMedio": 0
+      },
+      "caja": {
+        "asignacion": -10.302936949999996,
+        "seleccion": -1.4745149545802854e-18,
+        "pesoMedio": 0.17224576271186445
+      },
+      "cripto": {
+        "asignacion": 8.91085992,
+        "seleccion": -3.552713678800501e-16,
+        "pesoMedio": 0.007203389830508478
+      }
+    }
+  }
+}

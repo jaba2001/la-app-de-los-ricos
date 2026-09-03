@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-02T23:12:57.914Z",
+  "generatedAt": "2026-09-03T06:26:07.667Z",
   "months": 236,
   "window": {
     "start": "2007-01-01"
@@ -7,8 +7,8 @@
   "totals": {
     "growth": 652.6,
     "growthNoBtc": 595,
-    "defensive": 224.8,
-    "bench6040": 374.3,
+    "defensive": 231,
+    "bench6040": 372.1,
     "spy": 668.4
   },
   "report": {
@@ -41,21 +41,21 @@
       "treynor": 21.51
     },
     "defensive": {
-      "cagr": 6.17,
-      "vol": 6.02,
-      "sharpe": 1.03,
-      "sortino": 1.72,
-      "calmar": 0.61,
+      "cagr": 6.28,
+      "vol": 6.04,
+      "sharpe": 1.04,
+      "sortino": 1.74,
+      "calmar": 0.62,
       "maxDrawdown": -10.1,
       "var95": -2.42,
       "cvar95": -3.65,
       "beta": 0.22,
-      "alpha": 3.58,
-      "informationRatio": -0.41,
-      "treynor": 27.86
+      "alpha": 3.67,
+      "informationRatio": -0.4,
+      "treynor": 28.26
     },
     "bench6040": {
-      "cagr": 8.24,
+      "cagr": 8.21,
       "vol": 9.8,
       "sharpe": 0.86,
       "sortino": 1.33,
@@ -64,9 +64,9 @@
       "var95": -4.44,
       "cvar95": -6.46,
       "beta": 0.58,
-      "alpha": 1.63,
+      "alpha": 1.61,
       "informationRatio": -0.45,
-      "treynor": 14.59
+      "treynor": 14.54
     },
     "spy": {
       "cagr": 10.92,

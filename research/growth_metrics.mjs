@@ -75,6 +75,9 @@ async function run(step, etiqueta = "?") {
   // un error. Se cuenta y se comprueba abajo — ver la nota de `faltantes`.
   const faltan = Object.fromEntries(ASSETS.map((a) => [a, 0]));
   const conPeso = Object.fromEntries(ASSETS.map((a) => [a, 0]));
+  // Retorno mensual de CADA activo, se tenga o no. Es lo que necesita la atribución de Brinson:
+  // sin el retorno del activo no se puede separar «cuánto puse» de «qué eligí».
+  const retActivo = [];
   for (const date of dates) {
     const macro = await regimeStationaryAsOf(date);
     const w = await step(date, macro);
@@ -88,11 +91,14 @@ async function run(step, etiqueta = "?") {
     }
     let turn = 0; for (const a of ASSETS) turn += Math.abs((w[a] || 0) - (prev[a] || 0));
     rets.push(gross - (turn / 2) * 2 * COST_BPS / 100);
+    const fila = {};
+    for (const a of ASSETS) { const r = await fwd1(a, date); if (r != null) fila[a] = +r.toFixed(6); }
+    retActivo.push(fila);
     pesos.push(Object.fromEntries(ASSETS.map((a) => [a, +(w[a] || 0).toFixed(6)])));
     rotacion.push(+(turn / 2).toFixed(6));
     prev = w;
   }
-  return { rets, pesos, rotacion, faltan, conPeso, etiqueta };
+  return { rets, pesos, rotacion, retActivo, faltan, conPeso, etiqueta };
 }
 
 /**
@@ -229,6 +235,9 @@ const serie = {
   unidades: "retornos MENSUALES en PORCENTAJE y NETOS de coste (COST_BPS=10 por lado, aplicado sobre la rotación de ida)",
   activos: ASSETS,
   fechas: dates,
+  // Los retornos por activo son los MISMOS para las cinco estrategias (dependen del mercado, no
+  // de los pesos), así que se guardan una sola vez. Los necesita la atribución de Brinson.
+  retornosActivo: growthRun.retActivo,
   estrategias: {
     growth:      { rets: growthRun.rets,      pesos: growthRun.pesos,      rotacion: growthRun.rotacion },
     growthNoBtc: { rets: growthNoBtcRun.rets, pesos: growthNoBtcRun.pesos, rotacion: growthNoBtcRun.rotacion },

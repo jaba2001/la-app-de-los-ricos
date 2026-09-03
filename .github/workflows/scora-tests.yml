@@ -177,6 +177,19 @@ jobs:
       # y T en años — no son equivalentes y la version mal daba t=1,62 donde la buena da 1,92.
       - name: Metricas ajustadas al riesgo (fase 1)
         run: node --experimental-strip-types --no-warnings scripts/riesgo.test.mjs
+
+      # Tests de temporizacion (Merton-Henriksson / Treynor-Mazuy) con errores robustos. Lo que
+      # fijan no es que funcionen sino que NO den falso positivo: la sonda con errores OLS
+      # clasicos daba gamma con t=2,58 y parecia evidencia de habilidad; con errores robustos
+      # cae a 1,42. Lo que la destruyo fue la HETEROCEDASTICIDAD, no la autocorrelacion.
+      - name: Tests de temporizacion
+        run: node --experimental-strip-types --no-warnings scripts/temporizacion.test.mjs
+
+      # Atribucion de Brinson, validada contra el ejemplo resuelto del temario: -4 % + 0,3 % =
+      # -3,7 %. El criterio es el CUADRE — si las contribuciones no suman el retorno activo, la
+      # atribucion esta mal y no se publica.
+      - name: Atribucion de Brinson
+        run: node --experimental-strip-types --no-warnings scripts/brinson.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
