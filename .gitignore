@@ -50,6 +50,12 @@ research/out/*
 # La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,149, 8 falsas alarmas. Es lo
 # que impide publicar el booleano como si fuera una alerta.
 !research/out/aviso_credito_base.json
+# Las cuatro cifras de los videos comprobadas una a una, con lo que NO se construye escrito
+# dentro del propio artefacto.
+!research/out/soberano.json
+# El chequeo del oro: 8 fondos fisicos y 4 controles positivos (DGP es una NOTA sin garantia
+# cotizando como oro). Sin los controles cazados el script no publica veredicto.
+!research/out/oro_respaldo.json
 # La comprobacion previa que AHORRO el ensayo 345: rho 0,769 sobre un criterio de 0,70 escrito
 # antes de mirar. Es la evidencia de que la regla no se ajusto al resultado.
 !research/out/precheck_credito.json
