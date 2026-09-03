@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-09-03T21:54:19.363Z",
+  "generatedAt": "2026-09-03T22:01:27.837Z",
   "meses": 236,
   "validacion": {
-    "total": 612.4,
+    "total": 636.6,
     "publicado": 652.6,
     "maxDD": -17.2,
     "publicadoDD": -17.2
@@ -11,86 +11,86 @@
     {
       "cada": 1,
       "nombre": "mensual (producción)",
-      "total": 612.4,
-      "sharpe": 0.992,
+      "total": 636.6,
+      "sharpe": 1.003,
       "maxDD": -17.2
     },
     {
       "cada": 2,
       "nombre": "bimestral",
-      "total": 562.2,
-      "sharpe": 0.989,
-      "maxDD": -20.9
+      "total": 579.6,
+      "sharpe": 0.994,
+      "maxDD": -21.6
     },
     {
       "cada": 3,
       "nombre": "trimestral",
-      "total": 623.1,
-      "sharpe": 0.931,
+      "total": 643.7,
+      "sharpe": 0.939,
       "maxDD": -24.7
     },
     {
       "cada": 6,
       "nombre": "semestral",
-      "total": 562.1,
-      "sharpe": 0.864,
+      "total": 589.1,
+      "sharpe": 0.876,
       "maxDD": -24.8
     },
     {
       "cada": 12,
       "nombre": "anual",
-      "total": 419.8,
-      "sharpe": 0.71,
-      "maxDD": -32.3
+      "total": 438.2,
+      "sharpe": 0.72,
+      "maxDD": -32.2
     }
   ],
   "porVentana": [
     {
       "ventana": "3-1",
-      "total": 264.1,
-      "sharpe": 0.698,
-      "maxDD": -24.7
+      "total": 272.8,
+      "sharpe": 0.705,
+      "maxDD": -25.2
     },
     {
       "ventana": "6-1",
-      "total": 369.6,
-      "sharpe": 0.843,
-      "maxDD": -18
+      "total": 366.1,
+      "sharpe": 0.832,
+      "maxDD": -18.7
     },
     {
       "ventana": "9-1",
-      "total": 521.1,
-      "sharpe": 0.948,
-      "maxDD": -19
+      "total": 544,
+      "sharpe": 0.962,
+      "maxDD": -19.2
     },
     {
       "ventana": "12-1",
-      "total": 612.4,
-      "sharpe": 0.992,
+      "total": 636.6,
+      "sharpe": 1.003,
       "maxDD": -17.2
     },
     {
       "ventana": "18-1",
-      "total": 473.3,
-      "sharpe": 0.882,
-      "maxDD": -22
+      "total": 497.8,
+      "sharpe": 0.902,
+      "maxDD": -21.7
     },
     {
       "ventana": "24-1",
-      "total": 520,
-      "sharpe": 0.954,
-      "maxDD": -22.1
+      "total": 549.7,
+      "sharpe": 0.978,
+      "maxDD": -21.8
     },
     {
       "ventana": "12-0",
-      "total": 508.9,
-      "sharpe": 0.971,
+      "total": 522.2,
+      "sharpe": 0.977,
       "maxDD": -17.2
     }
   ],
   "cadenciaEnPico": true,
   "ventanaEnPico": true,
-  "dispersionCadenciaPct": 33.2,
-  "dispersionVentanaPct": 56.9,
+  "dispersionCadenciaPct": 32.3,
+  "dispersionVentanaPct": 57.1,
   "nota": "NO es un barrido y no gasta ensayo: mide la FORMA de la superficie alrededor del ajuste actual. Si otra configuracion rinde mas, eso NO es una mejora — es una advertencia de que el resultado dependia de un numero elegido a dedo."
 }

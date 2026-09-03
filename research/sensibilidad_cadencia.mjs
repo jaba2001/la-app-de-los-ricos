@@ -47,7 +47,17 @@ const p = (a, d) => { const m = PX[a]; if (!m) return null;
 const menos = (d, n) => { const x = new Date(d); x.setUTCMonth(x.getUTCMonth() - n); return x.toISOString().slice(0, 10); };
 
 const BTC_DESDE = "2018-06-01", COSTE_BPS = 10, UMBRAL = 50, SLEEVE = 0.05;
-const RISKOFF = { SPY: 0.6, TLT: 0.1, IEF: 0.15, GLD: 0.1, DBC: 0, BIL: 0.05, BTCUSD: 0 };
+// ⚠️ LA CESTA SE LEE DEL CODIGO DE PRODUCCION, NO SE COPIA. La primera version de estos dos
+// analisis la escribio de memoria y la escribio MAL —TLT e IEF intercambiados, GLD 0,10 en vez
+// de 0,15 y un 5 % de BIL que no existe— y **la validacion doble paso igual**: el total y la
+// caida seguian cuadrando porque la puerta de tendencia domina el resultado. Dos numeros
+// tampoco bastan para validar un modelo. Ahora se parsea del fichero: si alguien cambia la
+// cesta, esto se entera o falla.
+const FUENTE = readFileSync(join(AQUI, "allocate.mjs"), "utf8");
+const M_RISKOFF = FUENTE.match(/const GROWTH_RISKOFF = (\{[^}]*\})/);
+if (!M_RISKOFF) { console.error("  ⛔ no se encuentra GROWTH_RISKOFF en allocate.mjs"); process.exit(1); }
+const RISKOFF = JSON.parse(M_RISKOFF[1].replace(/([A-Z]+):/g, '"$1":').replace(/,\s*\}/, "}"));
+
 
 await preloadStationary();
 const riskOn = [];

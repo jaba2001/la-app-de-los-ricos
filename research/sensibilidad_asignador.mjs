@@ -62,10 +62,16 @@ for (const f of fechas) { const r = await riskOnAsOf(f); riskOn.push(typeof r ==
 const validos = riskOn.filter((x) => x != null).length;
 console.log(`  serie riskOn: ${validos}/${fechas.length} meses con valor · rango ${Math.min(...riskOn.filter((x) => x != null)).toFixed(0)}-${Math.max(...riskOn.filter((x) => x != null)).toFixed(0)}`);
 
-// Las cestas de PRODUCCION, leidas del modulo para no reimplementarlas.
-const { GROWTH_RISKOFF } = await import("./allocate.mjs").then((m) => ({ GROWTH_RISKOFF: m.GROWTH_RISKOFF ?? null }));
-const RISKOFF = GROWTH_RISKOFF ?? { SPY: 0.6, TLT: 0.1, IEF: 0.15, GLD: 0.1, DBC: 0, BIL: 0.05, BTCUSD: 0 };
-if (!GROWTH_RISKOFF) console.log(`  ⚠️ GROWTH_RISKOFF no exportado: se usa la cesta declarada arriba, que hay que verificar`);
+// ⚠️ LA CESTA SE LEE DEL CODIGO DE PRODUCCION, NO SE COPIA. La primera version de estos dos
+// analisis la escribio de memoria y la escribio MAL —TLT e IEF intercambiados, GLD 0,10 en vez
+// de 0,15 y un 5 % de BIL que no existe— y **la validacion doble paso igual**: el total y la
+// caida seguian cuadrando porque la puerta de tendencia domina el resultado. Dos numeros
+// tampoco bastan para validar un modelo. Ahora se parsea del fichero: si alguien cambia la
+// cesta, esto se entera o falla.
+const FUENTE = readFileSync(join(AQUI, "allocate.mjs"), "utf8");
+const M_RISKOFF = FUENTE.match(/const GROWTH_RISKOFF = (\{[^}]*\})/);
+if (!M_RISKOFF) { console.error("  ⛔ no se encuentra GROWTH_RISKOFF en allocate.mjs"); process.exit(1); }
+const RISKOFF = JSON.parse(M_RISKOFF[1].replace(/([A-Z]+):/g, '"$1":').replace(/,\s*\}/, "}"));
 
 /** Corre la estrategia con un umbral y una manga de BTC dados. Todo lo demas, igual. */
 function correr(umbral, sleeve) {
