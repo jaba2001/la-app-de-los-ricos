@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T06:30:03.997Z",
+  "generatedAt": "2026-09-03T06:58:06.278Z",
   "ventana": {
     "desde": "2007-01-01",
     "hasta": "2026-08-01",
@@ -218,6 +218,14 @@
     "residuoComposicion": 277.1625018080174,
     "periodos": 236,
     "todosCuadran": true,
+    "carino": {
+      "asignacion": 319.64399341752505,
+      "seleccion": 13.079898990493579,
+      "retornoActivoCompuesto": 332.7238924080174,
+      "residuo": -1.2505552149377763e-12,
+      "cuadra": true,
+      "periodos": 236
+    },
     "porClase": {
       "renta variable": {
         "asignacion": 17.009369279999998,

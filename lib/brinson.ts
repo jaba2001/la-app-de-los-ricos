@@ -108,3 +108,59 @@ export function encadenar(periodos: Atribucion[]): {
     periodos: periodos.length, todosCuadran: periodos.every((p) => p.cuadra),
   };
 }
+
+/**
+ * Encadenado de Carino (1999) — el que hace que las contribuciones sumen el retorno COMPUESTO.
+ *
+ * ⚠️ **EXISTE PORQUE `encadenar()` NO BASTA, y el número lo dejaba claro.** Sumar las
+ * atribuciones mensuales del allocator daba 55,6 pp, mientras que el retorno activo compuesto de
+ * los mismos 236 meses es **332,7 pp**: un residuo de 277 pp, cinco veces mayor que aquello que
+ * decía descomponer. Con esa diferencia, decir «la asignación aporta 53,4 pp» es incorrecto en
+ * magnitud aunque el reparto relativo sea informativo.
+ *
+ * Carino resuelve la incoherencia con un factor de escala por periodo:
+ *
+ *     k_t = [ln(1+Rp_t) − ln(1+Rb_t)] / (Rp_t − Rb_t)          (→ 1/(1+Rp_t) si Rp_t = Rb_t)
+ *     K   = [ln(1+Rp)   − ln(1+Rb)]   / (Rp − Rb)              sobre el periodo entero
+ *     contribución ajustada = contribución × k_t / K
+ *
+ * Así la suma de las contribuciones ajustadas es EXACTAMENTE el retorno activo compuesto. No es
+ * un apaño: es el método estándar de la industria, y la alternativa —repartir el residuo a
+ * prorrata sin decirlo— es inventar atribución.
+ *
+ * Retornos de entrada en PORCENTAJE, como en el resto del módulo.
+ */
+export function encadenarCarino(periodos: Atribucion[]): {
+  asignacion: number; seleccion: number; retornoActivoCompuesto: number;
+  residuo: number; cuadra: boolean; periodos: number;
+} {
+  if (!periodos.length) {
+    return { asignacion: 0, seleccion: 0, retornoActivoCompuesto: 0, residuo: 0, cuadra: true, periodos: 0 };
+  }
+  let ep = 1, eb = 1;
+  for (const p of periodos) { ep *= 1 + p.retornoCartera / 100; eb *= 1 + p.retornoReferencia / 100; }
+  const Rp = ep - 1, Rb = eb - 1;
+  const activoCompuesto = (Rp - Rb) * 100;
+
+  // K del periodo completo, con su límite cuando cartera y referencia empatan.
+  const K = Math.abs(Rp - Rb) < 1e-12
+    ? 1 / (1 + Rp)
+    : (Math.log(1 + Rp) - Math.log(1 + Rb)) / (Rp - Rb);
+
+  let asignacion = 0, seleccion = 0;
+  for (const p of periodos) {
+    const rp = p.retornoCartera / 100, rb = p.retornoReferencia / 100;
+    const kt = Math.abs(rp - rb) < 1e-12
+      ? 1 / (1 + rp)
+      : (Math.log(1 + rp) - Math.log(1 + rb)) / (rp - rb);
+    const escala = kt / K;
+    asignacion += p.totalAsignacion * escala;
+    seleccion += p.totalSeleccion * escala;
+  }
+  const residuo = activoCompuesto - (asignacion + seleccion);
+  return {
+    asignacion, seleccion, retornoActivoCompuesto: activoCompuesto,
+    residuo, cuadra: Math.abs(residuo) <= Math.max(0.01, Math.abs(activoCompuesto) * 1e-6),
+    periodos: periodos.length,
+  };
+}

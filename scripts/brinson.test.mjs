@@ -7,7 +7,7 @@
 //
 //   node --experimental-strip-types --no-warnings scripts/brinson.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
-import { atribuir, encadenar } from "../lib/brinson.ts";
+import { atribuir, encadenar, encadenarCarino } from "../lib/brinson.ts";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
@@ -102,6 +102,59 @@ const cerca = (a, b, tol, m) => ok(Math.abs(a - b) <= tol, `${m} — esperado ${
   // ⚠️ El compuesto NO es la suma. Esa diferencia se REPORTA, no se reparte en silencio.
   ok(Math.abs(e.residuoComposicion) > 0, `el efecto de composicion existe y se reporta (${e.residuoComposicion.toFixed(4)} pp)`);
   ok(e.periodos === 12, "y se dice cuantos periodos se encadenaron");
+}
+
+
+// ── EL ENCADENADO DE CARINO ──────────────────────────────────────────────────────────────
+// ⚠️ La suma aritmetica NO explica el retorno compuesto, y en el allocator la diferencia era
+// brutal: 55,6 pp sumados contra 332,7 pp compuestos, un residuo 5 VECES MAYOR que lo que decia
+// descomponer. Carino escala cada periodo para que la suma de contribuciones sea EXACTAMENTE el
+// retorno activo compuesto.
+{
+  let s = 1234;
+  const rnd = () => { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; };
+  const p = [];
+  for (let i = 0; i < 240; i++) {
+    const rc = (rnd() - 0.45) * 8, rb = (rnd() - 0.48) * 6;
+    p.push(atribuir([
+      { categoria: "a", pesoCartera: 0.7, pesoReferencia: 0.6, retornoCartera: rc, retornoReferencia: rb },
+      { categoria: "b", pesoCartera: 0.3, pesoReferencia: 0.4, retornoCartera: rc * 0.5, retornoReferencia: rb * 0.5 },
+    ]));
+  }
+  const ar = encadenar(p), ca = encadenarCarino(p);
+  ok(ca.cuadra, `Carino cuadra con el compuesto (residuo ${ca.residuo.toExponential(2)})`);
+  cerca(ca.asignacion + ca.seleccion, ca.retornoActivoCompuesto, 1e-8, "la suma ajustada ES el retorno activo compuesto");
+  ok(Math.abs(ar.residuoComposicion) > Math.abs(ca.residuo), "y el aritmetico deja un residuo mucho mayor");
+
+  // El REPARTO relativo tiene que sobrevivir al cambio de metodo: si no, una de las dos
+  // atribuciones estaria diciendo algo distinto sobre la misma cartera.
+  const rAr = ar.asignacion / (ar.asignacion + ar.seleccion);
+  const rCa = ca.asignacion / (ca.asignacion + ca.seleccion);
+  ok(Math.abs(rAr - rCa) < 0.05, `el reparto asignacion/seleccion apenas cambia (${(100*rAr).toFixed(1)} % vs ${(100*rCa).toFixed(1)} %)`);
+}
+
+// Un solo periodo: Carino tiene que devolver la atribucion tal cual, sin escalar nada.
+{
+  const a = atribuir([
+    { categoria: "x", pesoCartera: 0.8, pesoReferencia: 0.5, retornoCartera: 3, retornoReferencia: 2 },
+    { categoria: "y", pesoCartera: 0.2, pesoReferencia: 0.5, retornoCartera: 1, retornoReferencia: 1 },
+  ]);
+  const c = encadenarCarino([a]);
+  cerca(c.asignacion, a.totalAsignacion, 1e-9, "con un solo periodo Carino no escala la asignacion");
+  cerca(c.seleccion, a.totalSeleccion, 1e-9, "ni la seleccion");
+}
+
+// Sin periodos no revienta.
+ok(encadenarCarino([]).cuadra, "una lista vacia devuelve algo coherente");
+
+// Cartera identica a la referencia: el limite de k_t no puede dar NaN.
+{
+  const p = Array.from({ length: 12 }, () => atribuir([
+    { categoria: "u", pesoCartera: 0.5, pesoReferencia: 0.5, retornoCartera: 1, retornoReferencia: 1 },
+  ]));
+  const c = encadenarCarino(p);
+  ok(Number.isFinite(c.asignacion) && Number.isFinite(c.seleccion), "cartera = referencia: el limite no da NaN");
+  cerca(c.retornoActivoCompuesto, 0, 1e-9, "y el retorno activo es cero");
 }
 
 console.log(pass && !fail ? `\n✓ brinson: ${pass} passed, 0 failed\n` : `\n✖ brinson: ${pass} passed, ${fail} failed\n`);

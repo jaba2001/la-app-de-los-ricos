@@ -20,7 +20,7 @@ import { rfMensual } from "./tasaLibre.mjs";
 import { riskReport, sharpe, sortino, m2, m2Alpha, captura, asimetria, curtosisExceso,
          correlacion, diferenciaSharpe, maxDrawdown } from "../lib/riskMetrics.ts";
 import { mertonHenriksson, treynorMazuy } from "../lib/temporizacion.ts";
-import { atribuir, encadenar } from "../lib/brinson.ts";
+import { atribuir, encadenar, encadenarCarino } from "../lib/brinson.ts";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 const S = JSON.parse(readFileSync(join(OUT, "growth_series.json"), "utf8"));
@@ -120,12 +120,18 @@ for (let i = 0; i < S.fechas.length; i++) {
   periodos.push(atribuir(entradas, 1e-9));
 }
 const cadena = encadenar(periodos);
+const carino = encadenarCarino(periodos);
 console.log(`\n  ATRIBUCIÓN DE BRINSON por categoría de activo, contra el 60/40 (${cadena.periodos} meses):`);
 console.log(`    los ${cadena.periodos} periodos cuadran individualmente: ${cadena.todosCuadran ? "✓ SÍ" : "✗ NO"}`);
 console.log(`    asignación (CUÁNTO en cada clase) : ${cadena.asignacion >= 0 ? "+" : ""}${cadena.asignacion.toFixed(1)} pp`);
 console.log(`    selección  (CUÁL dentro de la clase): ${cadena.seleccion >= 0 ? "+" : ""}${cadena.seleccion.toFixed(1)} pp`);
 console.log(`    suma                                : ${(cadena.asignacion + cadena.seleccion).toFixed(1)} pp = retorno activo sumado ${cadena.retornoActivoSumado.toFixed(1)} pp`);
-console.log(`    (compuesto ${cadena.retornoActivoCompuesto.toFixed(1)} pp · el residuo de composición, ${cadena.residuoComposicion.toFixed(1)} pp, se reporta y NO se reparte)`);
+console.log(`
+    ⚠️ La suma ARITMÉTICA no explica el compuesto: ${cadena.retornoActivoSumado.toFixed(1)} pp contra ${cadena.retornoActivoCompuesto.toFixed(1)} pp,`);
+console.log(`       un residuo de ${cadena.residuoComposicion.toFixed(1)} pp. Con el encadenado de CARINO las contribuciones sí suman el compuesto:`);
+console.log(`         asignación ${carino.asignacion >= 0 ? "+" : ""}${carino.asignacion.toFixed(1)} pp · selección ${carino.seleccion >= 0 ? "+" : ""}${carino.seleccion.toFixed(1)} pp` +
+            ` = ${(carino.asignacion + carino.seleccion).toFixed(1)} pp (residuo ${carino.residuo.toExponential(1)})`);
+console.log(`         reparto: ${(100 * carino.asignacion / (carino.asignacion + carino.seleccion)).toFixed(1)} % asignación · ${(100 * carino.seleccion / (carino.asignacion + carino.seleccion)).toFixed(1)} % selección`);
 
 // Por clase, acumulado.
 const porClase = {};
@@ -147,6 +153,6 @@ writeFileSync(join(OUT, "informe_gestion_activa.json"), JSON.stringify({
     nota: "Antes se usaba 0 en todas las metricas publicadas. Con la tasa real el Sharpe de growth pasa de 1,01 a 0,87." },
   metricas, significacion, temporizacion,
   brinson: { referencia: "60/40 (SPY 60 % / IEF 40 %)", convenio: "dos factores; la interaccion va en seleccion",
-    ...cadena, porClase },
+    ...cadena, carino, porClase },
 }, null, 2) + "\n", "utf8");
 console.log(`\n  → research/out/informe_gestion_activa.json\n`);
