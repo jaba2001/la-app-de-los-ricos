@@ -163,3 +163,76 @@ si `BAA10Y` aporta algo sobre el `STLFSI4` que ya está dentro. Es media hora de
 ahorrar el ensayo entero.
 
 **La fase 4 la dejaría para el final** o para nunca: es donde más narrativa hay y menos evidencia.
+
+---
+
+# EJECUTADO · 2026-09-03 — y las siete cosas que el propio plan daba por buenas y no lo eran
+
+Las cinco fases están construidas, medidas y en remoto. Lo que sigue no es el resumen de lo
+que se hizo —eso está en los commits— sino **la lista de lo que este documento afirmaba y la
+medición corrigió**, que es la parte que sirve para el siguiente plan.
+
+## Lo que se construyó
+
+| fase | qué | dónde | estado |
+|---|---|---|---|
+| 1 | Capa de caja: diagnóstico, banderas, puente, destino y **Sankey de caja** | `lib/flujoCaja.ts` · 92 asserts | ✅ |
+| 2 | Capa de tipos: curva, forma, nominal/real, diferencial de crédito | `lib/tipos.ts` · 44 asserts | ✅ |
+| 3 | Comprobación previa del ensayo 345 | `research/precheck_credito.mjs` | ✅ **no se gasta** |
+| 4 | Capa soberana: las cifras de los vídeos, una a una | `research/soberano.mjs` | ✅ |
+| 5 | Chequeo del respaldo del oro | `research/oro_respaldo.mjs` | ✅ |
+
+## ⚠️ Las siete correcciones
+
+**1. `research/macro.mjs` llevaba un clasificador muerto que contestaba.** Corría sobre
+`BAMLH0A0HYM2`. Medido sobre 83 trimestres: 86 % con el dato en null, `credit_stress` clavado
+en 50,0 exacto, y octubre de 2008 y abril de 2020 saliendo los dos como «reflation». No lo
+importaba nadie, así que no contaminó ninguna cifra publicada. Retirado.
+
+**2. `highCSC > 55` no se activa ni una vez en 210 meses.** Sin las cuatro series de ICE BofA
+el CSC no sólo baja 5,8 puntos: **se aplana** (31,3-35,2 frente a 21,3-39,4). El régimen
+`neutral`/Transición es inalcanzable en todo el backtest histórico. La ruta viva ya lo
+resolvía en `regimeStationary.mjs`; lo que no existía era el **contrato de cobertura** que
+ahora vigila STLFSI4, que es el único sostén que queda.
+
+**3. El plan decía «media hora puede ahorrar el ensayo entero». Acertó.** ρ Spearman 0,769
+sobre un criterio de 0,70 escrito antes de mirar. Van 344 ensayos, no 345.
+
+**4. La afirmación central de los vídeos no sobrevive.** «El mercado de bonos huele el
+problema antes que el de acciones»: el aviso se encendió 397 días antes de Lehman —precioso—
+pero medido sobre 22 episodios independientes en 33 años, **p = 0,149** y **8 de 22 fueron
+seguidos de un año de más del +20 %**. Marzo de 2020 se enciende EN el suelo. El mecanismo es
+cierto; como señal, no. Por eso `avisoConTasaBase` obliga a publicar el booleano con su tasa
+base y el test falla si alguien le añade una recomendación.
+
+**5. El test sintético del Sankey pasaba y los datos reales no.** 84 asserts en verde porque
+en laboratorio el residuo es cero. Sobre el S&P 500, **16 de 60 diagramas no cerraban**: la
+variación que la empresa DECLARA casi nunca es la suma exacta de sus tres flujos. El arreglo
+no es tolerar el hueco ni escalar barras, sino **dibujarlo**. Ahora cierran 60/60.
+
+**6. Las dos premisas de la fase 5 eran falsas.** Los ETF de oro **no presentan N-PORT** —son
+fideicomisos de materias primas, 10-K— y en el XBRL de GLD **no hay un solo tag de onzas**. Y
+el control positivo que proponía el plan, DGL, **estaba liquidado desde marzo de 2023**: 1.254
+timestamps y 385 cierres. En la primera pasada el script se negó a publicar por eso.
+
+**7. Marqué como FALSA una afirmación midiendo otro instrumento.** `IRLTLT01JPM156N` es el
+tipo japonés a 10 años; el vídeo habla del JGB a 30, que no cotiza hasta 1999. Corregido a
+matiz. No se refuta una cifra midiendo otra serie.
+
+## Lo que sí quedó medido, y es publicable
+
+- El diferencial de crédito está hoy en **1,58 pp, percentil 11 de 41 años**: el crédito está
+  tranquilo, no ensanchándose. Contradice el tono de los vídeos con su propio indicador.
+- **DGP es una nota no garantizada del emisor cotizando junto a los ETF de oro** y desviándose
+  +13,79 pp/año. El vídeo acierta en que el papel sin metal existe y se equivoca en cuál es:
+  los ocho vehículos físicos se comportan como metal asignado dentro de 0,05 pp.
+- El dólar ha perdido el **87,8 %** desde 1971 y los intereses de la deuda superan al gasto en
+  defensa (**1,04x**). Las dos, ciertas.
+
+## Lo que sigue sin construirse, a propósito
+
+La espiral de deuda como señal, el calendario de la crisis, «Japón va diez años por delante»
+y «el oro no está listo». Está escrito dentro del propio artefacto para que no se cuele luego.
+
+**El único bloqueante de lanzamiento sigue siendo el abogado (§9).** Ninguna de estas cinco
+fases lo toca.
