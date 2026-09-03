@@ -74,8 +74,47 @@ export default function TrackRecordPage() {
           <Stat label="Total return" value={pct(G.strategy.totalReturn, 0)} color="var(--sr-text)" sub={`S&P ${pct(G.spy.totalReturn, 0)}`} />
         </div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>
-          The <strong>{G.strategy.label}</strong>, measured through the exact production path, {G.months} months net of costs. It <strong style={{ color: "var(--sr-pos)" }}>beats the S&amp;P 500 on every risk-adjusted metric</strong> — Sharpe, Sortino, Calmar, Jensen alpha, and half the tail risk (VaR/CVaR) — at <strong>a third of the drawdown</strong>.
+          The <strong>{G.strategy.label}</strong>, measured through the exact production path, {G.months} months net of costs. Over this window it <strong style={{ color: "var(--sr-pos)" }}>came out ahead on every risk-adjusted metric</strong> — Sharpe, Sortino, Calmar, Jensen alpha, and half the tail risk (VaR/CVaR) — at <strong>a third of the drawdown</strong>. <em>Came out ahead</em> is deliberate: the gap is real in this sample but does not reach statistical significance, and the panel below says by how much.
           It does <strong>not</strong> beat the index on raw total return (+{G.strategy.totalReturn.toFixed(0)}% vs +{G.spy.totalReturn.toFixed(0)}%), and we never pretend it does — <strong>no leverage, ever</strong>. Nothing unlevered beat the S&amp;P over this run. For context, beating it on raw return is rare even among professionals: <strong>~90% of active US large-cap funds trail the S&amp;P 500 over 15 years</strong> (SPIVA U.S. Scorecard, S&amp;P Dow Jones Indices) — but that measures total return, not the risk-adjusted edge shown above. A conservative <strong>Defensive</strong> profile (risk-parity, {pct(A.strategy.maxDrawdown, 0)} drawdown) is one click away. Includes a small BTC diversifier (CAIA/Grayscale ~5%), carved from equities — never leverage.
+        </div>
+      </div>
+
+      {/* ── What these numbers do NOT say ──────────────────────────────────────────────
+          This block is the product, not a disclaimer. The positioning is "radical honesty
+          as a feature", and the three things below are exactly what a professional
+          evaluator checks and what a retail app never shows. Every figure comes from
+          lib/trackRecord.ts, which the golden test keeps in lock-step with the measurement. */}
+      <div className="section-label" style={{ color: "var(--sr-text-2)" }}>What these numbers do <em>not</em> say</div>
+      <div className="card" style={{ marginBottom: "var(--sr-sp-6)" }}>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.7 }}>
+          <p style={{ marginTop: 0 }}>
+            <strong>The Sharpe edge is not statistically significant.</strong> Over {G.months} months the
+            difference against the S&amp;P 500 gives <strong>t&nbsp;=&nbsp;{G.significacion.tVsSpy}</strong> and
+            against a static 60/40 <strong>t&nbsp;=&nbsp;{G.significacion.tVsBench6040}</strong> (Jobson-Korkie
+            with Memmel&rsquo;s correction). Two decades of data are not enough to prove a Sharpe gap this
+            size — reaching t&nbsp;=&nbsp;2 would take roughly <strong>17 more years</strong>. We publish the
+            statistic instead of the adjective.
+          </p>
+          <p>
+            <strong>The drawdown is a different kind of claim.</strong> {pct(G.strategy.maxDrawdown, 0)} against{" "}
+            {pct(G.spy.maxDrawdown, 0)} is not an estimate that needs a confidence interval: it is the
+            worst case that actually happened. The same goes for the capture ratios — the strategy took
+            part in about two thirds of the index&rsquo;s up months and under half of its down months.
+            Those are descriptions, and they are the ones we stand behind.
+          </p>
+          <p>
+            <strong>Returns are not normally distributed, and the Sharpe ratio assumes they are.</strong>{" "}
+            Excess kurtosis is <strong>+{G.forma.curtosisExceso}</strong> — fatter tails, more extreme
+            months, than the ratio&rsquo;s own maths presumes. Skew is near zero ({G.forma.asimetria}); the
+            index&rsquo;s is negative ({G.forma.spyAsimetria}), which is the worse side to be on.
+          </p>
+          <p style={{ marginBottom: 0 }}>
+            <strong>Cash earns the T-bill rate here, not zero.</strong> Every ratio above uses the real
+            risk-free rate ({G.tasaLibreRiesgo.fuente}, {G.tasaLibreRiesgo.mediaAnual}% average over the
+            window). With the common shortcut of rf&nbsp;=&nbsp;0 the headline Sharpe would read{" "}
+            <strong>{G.tasaLibreRiesgo.sharpeConRf0}</strong> instead of {G.strategy.sharpe.toFixed(2)}. The
+            ranking between strategies is identical either way; the level is not, so we use the honest one.
+          </p>
         </div>
       </div>
 

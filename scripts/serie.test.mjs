@@ -82,8 +82,15 @@ for (const k of ESTRATEGIAS) {
   if (existsSync(agr)) {
     const a = JSON.parse(readFileSync(agr, "utf8"));
     ok(a.months === s.fechas.length, `los dos artefactos hablan de la misma ventana (${a.months} vs ${s.fechas.length})`);
+    // ⚠️ CON LA MISMA TASA LIBRE DE RIESGO QUE EL ARTEFACTO. Este test recalculaba con rf = 0, y al
+    // pasar las metricas publicadas a la tasa real (FRED TB3MS) fallo en 10 comprobaciones
+    // señalando una "inconsistencia" que era suya: comparaba dos convenios distintos sobre los
+    // mismos datos. Que lo cazara es exactamente su trabajo; el que estaba desalineado era el
+    // comprobador. Se lee del propio artefacto para que no puedan volver a separarse.
+    const RF = a.tasaLibreRiesgo?.mediaAnual ?? 0;
+    ok(RF > 0, `el artefacto declara la tasa libre de riesgo usada (${RF} %) — si fuera 0, las metricas estarian suponiendo que el efectivo no renta`);
     for (const k of ESTRATEGIAS) {
-      const r = riskReport(s.estrategias[k].rets, s.estrategias.spy.rets);
+      const r = riskReport(s.estrategias[k].rets, s.estrategias.spy.rets, RF);
       for (const campo of ["sharpe", "sortino", "calmar", "maxDrawdown"]) {
         ok(r[campo] === a.report[k][campo], `${k}.${campo}: la serie da ${r[campo]} y el agregado publica ${a.report[k][campo]}`);
       }

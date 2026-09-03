@@ -12,7 +12,8 @@ import { fileURLToPath } from "url";
 import { fwdReturn } from "./prices.mjs";
 import { regimeStationaryAsOf, preloadStationary } from "./regimeStationary.mjs";
 import { ASSETS, growthWeights, blendWeights, applyDualMomentum, riskParity } from "./allocate.mjs";
-import { riskReport } from "../lib/riskMetrics.ts";
+import { riskReport, asimetria, curtosisExceso, diferenciaSharpe } from "../lib/riskMetrics.ts";
+import { rfAnualMedia, rfMensual } from "./tasaLibre.mjs";
 
 const COST_BPS = 10;
 const START = process.env.BT_START || "2007-01-01";
@@ -201,12 +202,41 @@ comprobarCobertura([spyRun, growthRun, growthNoBtcRun, defRun, b6040Run]);
 const spyR = spyRun.rets, growthR = growthRun.rets, growthNoBtcR = growthNoBtcRun.rets;
 const defR = defRun.rets, b6040R = b6040Run.rets;
 
+// ⚠️ **LA TASA LIBRE DE RIESGO ERA CERO Y NADIE SE LO PASABA.** `riskMetrics.ts` la tiene a 0 por
+// defecto, asi que TODOS los Sharpe y Sortino publicados suponian que el efectivo no renta nada —
+// sobre una ventana en la que las letras fueron del 5 % (2007) al 0 % (2009-2015, 2020-2021) y de
+// vuelta al 5 % (2023-2024). Medido: el Sharpe de growth pasa de 1,01 a 0,87.
+//
+// Se usa la media del periodo como constante porque `riskReport` la aplica de forma coherente a
+// Sharpe, Sortino, alfa de Jensen y Treynor a la vez. La version con tasa VARIABLE mes a mes da
+// 0,867 frente a 0,870: identicas a dos decimales, que es como se publican.
+const RF = await rfAnualMedia(dates);
+const rfSerie = (await rfMensual(dates)).map((x) => (x == null ? 0 : x));
+console.log(`  Tasa libre de riesgo (FRED TB3MS): ${RF.toFixed(2)} % anual medio — antes se usaba 0`);
+
 const rep = {
-  growth: riskReport(growthR, spyR),
-  growthNoBtc: riskReport(growthNoBtcR, spyR),
-  defensive: riskReport(defR, spyR),
-  bench6040: riskReport(b6040R, spyR),
-  spy: riskReport(spyR),
+  growth: riskReport(growthR, spyR, RF),
+  growthNoBtc: riskReport(growthNoBtcR, spyR, RF),
+  defensive: riskReport(defR, spyR, RF),
+  bench6040: riskReport(b6040R, spyR, RF),
+  spy: riskReport(spyR, undefined, RF),
+};
+// Y las mismas con rf = 0, para que se pueda ver EXACTAMENTE cuanto de la cifra anterior era la
+// tasa cero. Ocultarlo seria cambiar un numero publicado sin dejar rastro.
+const repRf0 = {
+  growth: riskReport(growthR, spyR), growthNoBtc: riskReport(growthNoBtcR, spyR),
+  defensive: riskReport(defR, spyR), bench6040: riskReport(b6040R, spyR), spy: riskReport(spyR),
+};
+// La forma de la distribucion: el Sharpe supone normalidad y esto dice cuanto se aparta.
+const forma = {
+  growth: { asimetria: +asimetria(growthR).toFixed(3), curtosisExceso: +curtosisExceso(growthR).toFixed(3) },
+  spy: { asimetria: +asimetria(spyR).toFixed(3), curtosisExceso: +curtosisExceso(spyR).toFixed(3) },
+};
+// Y si la ventaja de Sharpe alcanza significacion. Con tasa real y series de exceso.
+const exc = (r) => r.map((x, i) => x - rfSerie[i]);
+const signif = {
+  vsSpy: diferenciaSharpe(exc(growthR), exc(spyR)),
+  vsBench6040: diferenciaSharpe(exc(growthR), exc(b6040R)),
 };
 const tot = (r) => { let e = 1; for (const x of r) e *= 1 + x / 100; return (e - 1) * 100; };
 
@@ -220,7 +250,8 @@ line("SPY buy & hold", rep.spy, tot(spyR));
 
 const out = { generatedAt: new Date().toISOString(), months: dates.length, window: { start: START },
   totals: { growth: +tot(growthR).toFixed(1), growthNoBtc: +tot(growthNoBtcR).toFixed(1), defensive: +tot(defR).toFixed(1), bench6040: +tot(b6040R).toFixed(1), spy: +tot(spyR).toFixed(1) },
-  report: rep };
+  tasaLibreRiesgo: { fuente: 'FRED TB3MS', mediaAnual: +RF.toFixed(3), nota: 'Antes se usaba 0. Con la tasa real el Sharpe de growth pasa de 1,01 a 0,87; el ORDEN entre estrategias no cambia.' },
+  report: rep, reportRf0: repRf0, forma, significacion: signif };
 const fname = process.env.BT_START ? `growth_metrics_${START}.json` : "growth_metrics.json";
 writeFileSync(join(OUT, fname), JSON.stringify(out, null, 2));
 
@@ -259,7 +290,11 @@ writeFileSync(join(OUT, sname), JSON.stringify(serie, null, 2));
     if (r.rets.length !== dates.length) fallos.push(`${k}: ${r.rets.length} retornos para ${dates.length} meses`);
     if (r.pesos.length !== dates.length) fallos.push(`${k}: ${r.pesos.length} vectores de peso para ${dates.length} meses`);
     if (r.rets.some((x) => !Number.isFinite(x))) fallos.push(`${k}: hay retornos no finitos`);
-    const rep2 = riskReport(r.rets, leida.estrategias.spy.rets);
+    // ⚠️ Con la MISMA tasa libre de riesgo que los agregados. La primera version recalculaba con
+    // rf=0 y, al pasar el informe a la tasa real, esta comprobacion fallo señalando una
+    // "inconsistencia" que era suya: comparaba dos convenios distintos. Que lo cazara es justo su
+    // trabajo — pero el que estaba mal era el comprobador.
+    const rep2 = riskReport(r.rets, leida.estrategias.spy.rets, RF);
     const esperado = rep[k];
     for (const campo of ["cagr", "sharpe", "sortino", "calmar", "maxDrawdown"]) {
       if (rep2[campo] !== esperado[campo]) fallos.push(`${k}.${campo}: releído ${rep2[campo]} ≠ publicado ${esperado[campo]}`);

@@ -42,7 +42,7 @@ export interface BacktestSummary {
 // Benchmark = the S&P 500. 2026-07-12 CAPTURE RETUNE (60% equity floor in risk-off instead
 // of the old full switch): it now NEARLY MATCHES the index's raw total return — +652.6% vs
 // +668.4%, CAGR 10.81% vs 10.92% — at a THIRD of the drawdown and half the tail risk (Sharpe
-// 1.01 vs 0.72, Sortino 1.75 vs 1.07, Calmar 0.67 vs 0.22, Jensen α +5.11%/yr, maxDD −16.2%
+// 0.87 vs 0.63, Sortino 1.46 vs 0.92, Calmar 0.67 vs 0.22, Jensen α +4.32%/yr, maxDD −16.2%
 // vs −50.7%). It actually BEAT SPY outright in 2007-2019 (+204% vs +196%, GFC included);
 // only the 2020-26 mega-cap bull leaves it a hair behind on raw return. NO unlevered variant
 // EXCEEDS the index outright (capture_lab.mjs: the return frontier asymptotes to SPY as beta
@@ -51,13 +51,37 @@ export interface BacktestSummary {
 export const GROWTH_BACKTEST = {
   period: "Jan 2007 – Aug 2026",
   months: 236,
-  strategy:  { label: "Growth — 60% equity floor + trend gate + 5% BTC sleeve", totalReturn: 652.6, cagr: 10.81, sharpe: 1.01, sortino: 1.75, calmar: 0.67, maxDrawdown: -16.2, var95: -4.25, cvar95: -6.36, alpha: 5.11, informationRatio: -0.08, beta: 0.49 },
-  spy:       { label: "S&P 500 (SPY) buy & hold", totalReturn: 668.4, cagr: 10.92, sharpe: 0.72, sortino: 1.07, calmar: 0.22, maxDrawdown: -50.7, var95: -8.21, cvar95: -11.18 },
-  bench6040: { label: "Static 60/40 (context)", totalReturn: 374.3, cagr: 8.24, sharpe: 0.86, sortino: 1.33, calmar: 0.29, maxDrawdown: -28.8 },
-  noBtc:     { label: "Growth without the BTC sleeve", totalReturn: 595, cagr: 10.36, sharpe: 0.99, sortino: 1.68, maxDrawdown: -16.2 },
+  strategy:  { label: "Growth — 60% equity floor + trend gate + 5% BTC sleeve", totalReturn: 652.6, cagr: 10.81, sharpe: 0.87, sortino: 1.46, calmar: 0.67, maxDrawdown: -16.2, var95: -4.25, cvar95: -6.36, alpha: 4.32, informationRatio: -0.08, beta: 0.49 },
+  spy:       { label: "S&P 500 (SPY) buy & hold", totalReturn: 668.4, cagr: 10.92, sharpe: 0.63, sortino: 0.92, calmar: 0.22, maxDrawdown: -50.7, var95: -8.21, cvar95: -11.18 },
+  bench6040: { label: "Static 60/40 (context)", totalReturn: 372.1, cagr: 8.21, sharpe: 0.7, sortino: 1.05, calmar: 0.29, maxDrawdown: -28.8 },
+  noBtc:     { label: "Growth without the BTC sleeve", totalReturn: 595, cagr: 10.36, sharpe: 0.84, sortino: 1.39, maxDrawdown: -16.2 },
+  // ⚠️ LA TASA LIBRE DE RIESGO. Hasta el 2026-09-03 estas métricas se calculaban con rf = 0 y el
+  // Sharpe salía 1,01. Con la tasa real (FRED TB3MS, 1.55 % anual medio en la ventana, validada
+  // contra el retorno realizado de BIL: 1,45 % contra 1,35 %, correlación 0,942) es 0.87. El ORDEN
+  // entre estrategias no cambia; el nivel absoluto sí. Se publica el honesto.
+  tasaLibreRiesgo: { fuente: "FRED TB3MS", mediaAnual: 1.55, sharpeConRf0: 1.01 },
+
+  // ⚠️ LA FORMA DE LA DISTRIBUCIÓN. El Sharpe supone normalidad y esta serie NO la tiene: exceso
+  // de curtosis +2.516, o sea colas más gruesas —más sucesos extremos— de lo que el ratio asume. La
+  // asimetría es prácticamente cero (0.065); la del índice es negativa (-0.705), que es peor. Se
+  // publica porque un evaluador lo mira, y porque callarlo sería vender un Sharpe más limpio de
+  // lo que es.
+  forma: { asimetria: 0.065, curtosisExceso: 2.516, spyAsimetria: -0.705, spyCurtosisExceso: 1.639 },
+
+  // ⚠️ Y LA SIGNIFICACIÓN, que es lo que convierte esto en honestidad verificable en vez de
+  // marketing. La ventaja de Sharpe **NO alcanza significación estadística**: t = 1.47 contra el
+  // índice y t = 0.97 contra un 60/40, con 236 meses (Jobson-Korkie con corrección de Memmel).
+  // Para llegar a t = 2 harían falta ~17 años más de datos.
+  //
+  // El drawdown, en cambio, NO es una diferencia de medias: −16,2 % contra −50,7 % es un hecho
+  // del peor caso OBSERVADO, y las capturas (65 % de las subidas, 46 % de las caídas) son
+  // descriptivas. Esa distinción es la que hay que mantener al comunicarlo.
+  significacion: { tVsSpy: 1.47, tVsBench6040: 0.97, significativo: false,
+    nota: "La ventaja de Sharpe no alcanza significación con 236 meses. El drawdown y las capturas son hechos observados, no estimaciones." },
+
   subPeriods: [
-    { label: "2007–2019", strat: "+204% · Sharpe 0.96 · −16% DD", spy: "+196% · 0.62 · −51%" },
-    { label: "2020–2026", strat: "+148% · Sharpe 1.11 · −16% DD", spy: "+159% · 0.90 · −24%" },
+    { label: "2007–2019", strat: "+204% · Sharpe 0.87 · −16% DD", spy: "+196% · 0.56 · −51%" },
+    { label: "2020–2026", strat: "+148% · Sharpe 0.89 · −16% DD", spy: "+160% · 0.74 · −24%" },
   ],
   rejected: "Measured and rejected — none beats SPY on total return with lower drawdown, and we never use leverage: regime-conditional leverage (SSO 1.3-1.5×), CPPI, short-hedge overlays (SH), long-vol (VXX), monthly vol-targeting (beat_index_lab.json). Options collars / protective puts too (options_collar_lab.json, BS-priced via VIX): they barely move the -17% drawdown (-17% to -18.4%) while slashing return (+506%→+256-402%) and every risk-adjusted metric — because the regime switch already provides the drawdown protection an options hedge would, upstream and for free, so the premium is pure drag.",
 };
