@@ -213,6 +213,14 @@ jobs:
       # 0 segundos —antes de ejecutar nada— por un caracter de control 0x08 en el YAML, y
       # nadie se entero porque test:all seguia verde en local. Un guardian que deja de
       # vigilar no falla: calla. Va el PRIMERO para que un YAML roto se vea antes que nada.
+      # Las cifras publicadas en los documentos, contra los artefactos que las sostienen. Existe
+      # porque unas cifras de Microsoft estaban publicadas sin ningun test que las guardara, y la
+      # pregunta «¿y las demas?» resulto ser: 194 cifras notables y la prosa nunca se comparaba
+      # con la evidencia. Al ponerlo cazo tres derivas reales, incluida una tabla con las cifras
+      # de una medicion ad-hoc anterior (-0,72 donde el artefacto dice -0,79).
+      - name: Las cifras publicadas siguen siendo ciertas
+        run: node --experimental-strip-types --no-warnings scripts/cifras_publicadas.test.mjs
+
       - name: Los workflows (que el CI siga vivo)
         run: node --experimental-strip-types --no-warnings scripts/workflows.test.mjs
 

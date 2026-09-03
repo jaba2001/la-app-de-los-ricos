@@ -17,7 +17,7 @@
 | **1 · «El año que importó fue 2006»** | La mecánica de la desaceleración, **exacta**. Backlog de Oracle **638 B$ y +363 %, las dos cifras**. Capex 149/224/379 B$ frente a sus 150/226/410 | «Morosidad récord en 2006» (medida sobre otra población). «El capex ya supera a toda la caja»: va en **0,66**, es una previsión |
 | **2 · Repaso semanal** | Casi todo: resultados de Uber, DoorDash, Airbnb y Berkshire son 10-Q auditables. Datos de empleo, en FRED | *Swing* por momentum y roturas de base: **auditado en este repo, −136 pp frente al SPY** |
 | **3 · Energía y los dos relojes** | La aritmética del capex. El mecanismo de la depreciación, **y se puede derivar sin que lo declaren** | La vida útil **no está etiquetada** en XBRL salvo Oracle. Y la métrica ingenua acusa a todo el mundo (ver §2) |
-| **4 · Oro y tipos reales** | Tipos reales → oro: **ρ = −0,34, y +2,46 %/mes frente a −0,72 %/mes**. Real y fuerte | «Caída media del 15 % del S&P»: medida, **−12,1 % de media y −7,6 % de mediana**. Manipulación del oro, élites, gamma de SpaceX: no falsable |
+| **4 · Oro y tipos reales** | Tipos reales → oro: **ρ = −0,34, y +2,46 %/mes frente a −0,79 %/mes**. Real y fuerte | «Caída media del 15 % del S&P»: medida, **−12,1 % de media y −7,6 % de mediana**. Manipulación del oro, élites, gamma de SpaceX: no falsable |
 
 ---
 
@@ -62,6 +62,15 @@ sesgo documentado. Encaja con las banderas que ya existen y no toca ninguna deci
 **Criterio:** cobertura ≥ 60 % del S&P 500 y que el listón de cordura se cumpla — si marca a
 más de un tercio del índice, el umbral describe el mercado y no señala nada.
 
+**RESULTADO (medido, no estimado):** cobertura del **62 %**, con el **7 %** alargando la vida
+útil y el **5 %** acortándola. Las dos por debajo del tercio, así que el listón de cordura se
+cumple: la métrica señala excepciones y no describe el auge de capex. El módulo acabó en
+`lib/vidaUtil.ts` y no en `flujoCaja.ts`, que es donde el plan lo situaba.
+
+⚠️ Este párrafo lo añadió la auditoría del 03-09-2026. El plan declaraba el criterio y **nunca
+recogía si se había cumplido ni con qué número** — un criterio sin resultado escrito es un
+criterio que nadie puede comprobar.
+
 ### 🟢 Fase B · El precio de recompra como valor razonable revelado *(nuevo, nadie lo enseña)*
 Del vídeo 2: Berkshire recompró a 487 $ con la acción a 521. No es la opinión de un analista,
 es la directiva **poniendo su dinero** en una banda concreta. Se deriva de
@@ -71,6 +80,10 @@ es la directiva **poniendo su dinero** en una banda concreta. Se deriva de
 **69 %** tiene los dos tags. Pero al construirlo resultó que lo publicable de verdad —con el
 importe del MISMO ejercicio, un hecho no rancio y una serie de precios con la que comprobarlo—
 es el **55 %**. (Y con 4 nombres salía 25 %: n=4 no es una medición de cobertura.)
+
+**RESULTADO (medido):** de los que tienen precio de recompra, el **88 %** cae dentro del rango en
+que la acción cotizó de verdad y el **9 %** sale IMPOSIBLE — que es el confundidor de las
+retenciones fiscales apareciendo en los datos reales, no en la teoría. Ésos no se publican.
 
 ⚠️ Corregido en la auditoría del 03-09-2026: este documento publicaba el 69 % como si fuera la
 cifra utilizable. Lo era de «tiene los dos tags», no de «se puede publicar».
@@ -93,10 +106,17 @@ construible es si eso **generaliza**.
 ### 🟡 Fase D · Los tipos reales, como capa explicativa
 **MEDIDO, 260 meses desde 2004:**
 
-| | ρ(Δ tipo real, retorno) | meses con real BAJANDO | meses con real SUBIENDO |
-|---|---:|---:|---:|
-| **Oro (GLD)** | **−0,336** | **+2,46 %/mes** | −0,72 %/mes |
-| S&P 500 (SPY) | −0,123 | +1,09 %/mes | +0,63 %/mes |
+| | ρ contemporáneo | ρ **predictivo** | real BAJANDO | real SUBIENDO |
+|---|---:|---:|---:|---:|
+| **Oro (GLD)** | **−0,339** | −0,078 | **+2,46 %/mes** | −0,79 %/mes |
+| Plata (SLV) | −0,304 | −0,083 | +3,37 %/mes | −1,89 %/mes |
+| S&P 500 (SPY) | −0,115 | −0,108 | +1,11 %/mes | +0,69 %/mes |
+| Bitcoin | −0,113 | −0,167 | +4,54 %/mes | +1,14 %/mes |
+
+⚠️ Las cifras de esta tabla son las de `research/out/tipos_reales.json`. La primera versión del
+documento traía las de una medición ad-hoc con otra rejilla de meses (−0,336 y −0,72) y **nadie
+las comparaba con el artefacto**: la deriva la cazó `scripts/cifras_publicadas.test.mjs` el
+03-09-2026, que existe justamente para eso.
 
 La relación es **fuerte en el oro y floja en las acciones** — una distinción que ninguno de los
 dos vídeos hace.
