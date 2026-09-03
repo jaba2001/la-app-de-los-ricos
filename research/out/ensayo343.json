@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-03T17:45:38.015Z",
+  "generatedAt": "2026-09-03T18:13:15.112Z",
   "preregistro": "PREREGISTRO_ENSAYO_343.md",
   "universo": 206,
   "top": 20,
@@ -12,14 +12,20 @@
       "nombre": "Score actual (referencia)",
       "ventanas": {
         "2011-2018": {
-          "sharpe": -0.2,
+          "sharpe": 0.941,
           "meses": 95,
-          "total": -5.8
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 168.6
         },
         "2019-2026": {
-          "sharpe": 0.874,
+          "sharpe": 0.876,
           "meses": 89,
-          "total": 206.4
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 207.1
         }
       }
     },
@@ -28,14 +34,20 @@
       "nombre": "Conversión a caja",
       "ventanas": {
         "2011-2018": {
-          "sharpe": -0.132,
+          "sharpe": 0.855,
           "meses": 95,
-          "total": -3.9
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 141.1
         },
         "2019-2026": {
-          "sharpe": 0.847,
+          "sharpe": 0.839,
           "meses": 89,
-          "total": 197.1
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 194.1
         }
       }
     },
@@ -44,14 +56,20 @@
       "nombre": "Banderas rojas de caja",
       "ventanas": {
         "2011-2018": {
-          "sharpe": -0.088,
+          "sharpe": 0.907,
           "meses": 95,
-          "total": -2.2
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 158
         },
         "2019-2026": {
-          "sharpe": 0.769,
+          "sharpe": 0.782,
           "meses": 89,
-          "total": 162.3
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 166.8
         }
       }
     },
@@ -60,14 +78,20 @@
       "nombre": "Vida útil implícita",
       "ventanas": {
         "2011-2018": {
-          "sharpe": -0.106,
+          "sharpe": 0.962,
           "meses": 95,
-          "total": -2.9
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 176
         },
         "2019-2026": {
-          "sharpe": 0.78,
+          "sharpe": 0.781,
           "meses": 89,
-          "total": 171.5
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 172
         }
       }
     },
@@ -76,14 +100,20 @@
       "nombre": "Retorno desde la recompra",
       "ventanas": {
         "2011-2018": {
-          "sharpe": -0.189,
+          "sharpe": 0.966,
           "meses": 95,
-          "total": -5.5
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 173.7
         },
         "2019-2026": {
-          "sharpe": 0.805,
+          "sharpe": 0.801,
           "meses": 89,
-          "total": 175.1
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 172.9
         }
       }
     }
@@ -92,33 +122,41 @@
     {
       "medida": "conversion",
       "nombre": "Conversión a caja",
+      "evaluable": true,
+      "ventanasValidas": 2,
       "mejoraAmbasVentanas": false,
-      "dsr": 0.283,
-      "tDiferencia": -0.44,
+      "dsr": 0.276,
+      "tDiferencia": -0.65,
       "pasa": false
     },
     {
       "medida": "banderas",
       "nombre": "Banderas rojas de caja",
+      "evaluable": true,
+      "ventanasValidas": 2,
       "mejoraAmbasVentanas": false,
-      "dsr": 0.215,
-      "tDiferencia": -1.71,
+      "dsr": 0.225,
+      "tDiferencia": -1.53,
       "pasa": false
     },
     {
       "medida": "vidaUtil",
       "nombre": "Vida útil implícita",
+      "evaluable": true,
+      "ventanasValidas": 2,
       "mejoraAmbasVentanas": false,
-      "dsr": 0.221,
-      "tDiferencia": -1.56,
+      "dsr": 0.223,
+      "tDiferencia": -1.58,
       "pasa": false
     },
     {
       "medida": "recompra",
       "nombre": "Retorno desde la recompra",
+      "evaluable": true,
+      "ventanasValidas": 2,
       "mejoraAmbasVentanas": false,
-      "dsr": 0.245,
-      "tDiferencia": -1.53,
+      "dsr": 0.242,
+      "tDiferencia": -1.74,
       "pasa": false
     }
   ],

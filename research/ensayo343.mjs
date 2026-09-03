@@ -93,12 +93,25 @@ for (const fecha of todas) {
 }
 console.log(`  panel: ${[...panel.values()].reduce((s, a) => s + a.length, 0)} filas\n`);
 
-/** Serie mensual de la cartera top-N con (opcionalmente) la medida nueva al 10 %. */
+/**
+ * Serie mensual de la cartera top-N con (opcionalmente) la medida nueva al 10 %.
+ *
+ * ⚠️ DEVUELVE TAMBIÉN LA COBERTURA, y esto no es cosmético: es el arreglo del fallo que
+ * invalidó la primera corrida de este mismo ensayo. Los meses sin universo suficiente se
+ * anotaban como 0 % y seguían adelante en silencio. En la ventana 2011-2018 eso fue el **93 %
+ * de los meses** —89 de 96— porque la caché de precios arrancaba en 2018-06 por el defecto de
+ * `PX_FROM`. El Sharpe de −0,200 que publiqué salió de SIETE meses reales y ochenta y nueve
+ * ceros, y encima construí encima una interpretación sobre «sesgo de calidad» que era el
+ * artefacto de una ventana vacía.
+ *
+ * Una serie con ceros de relleno no es una serie corta: es una serie FALSA, porque los ceros
+ * bajan la volatilidad y el Sharpe sale de una distribución que no existió.
+ */
 async function serie(fechas, medida) {
-  const rets = []; let antes = new Set();
+  const rets = []; let antes = new Set(); let vacios = 0;
   for (let i = 0; i < fechas.length - 1; i++) {
     const filas = panel.get(fechas[i]) ?? [];
-    if (filas.length < TOP * 2) { rets.push(0); continue; }
+    if (filas.length < TOP * 2) { rets.push(0); vacios++; continue; }
     let orden;
     if (!medida) orden = filas.map((r) => ({ t: r.ticker, s: r.scores.total }));
     else {
@@ -123,7 +136,7 @@ async function serie(fechas, medida) {
     rets.push(k ? suma / k - coste : 0);
     antes = ahora;
   }
-  return rets;
+  return { rets, vacios, cobertura: 1 - vacios / Math.max(1, rets.length) };
 }
 
 const spySerie = async (fechas) => {
@@ -140,11 +153,16 @@ for (const m of [null, ...MEDIDAS]) {
   const fila = { medida: m?.id ?? "BASE", nombre: m?.nombre ?? "Score actual (referencia)", ventanas: {} };
   for (const [nombreV, d0, d1] of VENTANAS) {
     const f = meses(d0, d1);
-    const r = await serie(f, m);
+    const { rets: r, vacios, cobertura } = await serie(f, m);
     const sh = sharpeDe(r);   // sharpe() ya anualiza internamente (PERIODS=12)
-    fila.ventanas[nombreV] = { sharpe: sh == null ? null : +sh.toFixed(3), meses: r.length,
-      total: +((r.reduce((a, b) => a * (1 + b), 1) - 1) * 100).toFixed(1) };
-    fila[`rets_${nombreV}`] = r;
+    // ⚠️ EL LISTON: por debajo del 70 % de meses con universo suficiente la ventana NO se
+    // publica. No se publica «con reservas»: no se publica. Un Sharpe calculado sobre ceros de
+    // relleno se lee como un resultado y no lo es.
+    const valida = cobertura >= 0.70;
+    fila.ventanas[nombreV] = { sharpe: valida ? (sh == null ? null : +sh.toFixed(3)) : null,
+      meses: r.length, mesesVacios: vacios, cobertura: +(cobertura * 100).toFixed(0), valida,
+      total: valida ? +((r.reduce((a, b) => a * (1 + b), 1) - 1) * 100).toFixed(1) : null };
+    fila[`rets_${nombreV}`] = valida ? r : null;
   }
   resultados.push(fila);
 }
@@ -154,7 +172,7 @@ console.log(`  medida                          ${VENTANAS.map(([v]) => v.padEnd(
 for (const r of resultados) {
   const cols = VENTANAS.map(([v]) => {
     const x = r.ventanas[v];
-    return `Sharpe ${String(x.sharpe ?? "—").padStart(6)}  ${String(x.total).padStart(7)} %`.padEnd(22);
+    return (x.valida ? `Sharpe ${String(x.sharpe ?? "—").padStart(6)}  ${String(x.total).padStart(7)} %` : `SIN DATOS (${x.cobertura} % cobertura)`).padEnd(26);
   }).join("");
   console.log(`  ${r.nombre.padEnd(32)}${cols}`);
 }
@@ -162,21 +180,26 @@ for (const r of resultados) {
 console.log(`\n  ¿CUMPLE EL CRITERIO PREESCRITO?`);
 const veredictos = [];
 for (const r of resultados.slice(1)) {
-  const mejoraAmbas = VENTANAS.every(([v]) => (r.ventanas[v].sharpe ?? -9) > (base.ventanas[v].sharpe ?? 9));
+  // Si una ventana no es valida, el criterio 1 NO se puede evaluar: no se da por cumplido ni
+  // por incumplido, se declara imposible. Eso es distinto de un «no».
+  const ventanasValidas = VENTANAS.filter(([v]) => r.ventanas[v].valida && base.ventanas[v].valida);
+  const evaluable = ventanasValidas.length === VENTANAS.length;
+  const mejoraAmbas = evaluable && VENTANAS.every(([v]) => r.ventanas[v].sharpe > base.ventanas[v].sharpe);
   // Sharpe deflactado sobre la ventana larga, con M = 343 ensayos.
-  const rets = r[`rets_${VENTANAS[1][0]}`];
+  const rets = r[`rets_${VENTANAS[1][0]}`] ?? [];
   // ⚠️ `sharpeDeflactado` espera el Sharpe POR PERIODO (no anualizado) y los momentos, no el
   // vector: mi primera version le pasaba `rets` donde va la asimetria. Bailey y Lopez de Prado
   // deflactan sobre la distribucion de los ensayos, y el ajuste depende de asimetria y curtosis.
   const shAnual = sharpeDe(rets);
-  const shPeriodo = shAnual / Math.sqrt(12);
-  const dsr = sharpeDeflactado(shPeriodo, rets.length, M_ENSAYOS, asimetria(rets), curtosisExceso(rets) + 3);
+  const shPeriodo = rets.length ? shAnual / Math.sqrt(12) : null;
+  const dsr = shPeriodo == null ? null : sharpeDeflactado(shPeriodo, rets.length, M_ENSAYOS, asimetria(rets), curtosisExceso(rets) + 3);
   // Diferencia de Sharpe contra la base, test de Jobson-Korkie/Memmel.
-  const dif = diferenciaSharpe(rets, base[`rets_${VENTANAS[1][0]}`]);
-  const pasa = mejoraAmbas && dsr != null && dsr.dsr > 0.5;
-  veredictos.push({ medida: r.medida, nombre: r.nombre, mejoraAmbasVentanas: mejoraAmbas,
+  const bb = base[`rets_${VENTANAS[1][0]}`] ?? [];
+  const dif = rets.length && bb.length ? diferenciaSharpe(rets, bb) : null;
+  const pasa = evaluable && mejoraAmbas && dsr != null && dsr.dsr > 0.5;
+  veredictos.push({ medida: r.medida, nombre: r.nombre, evaluable, ventanasValidas: ventanasValidas.length, mejoraAmbasVentanas: mejoraAmbas,
     dsr: dsr == null ? null : +dsr.dsr.toFixed(3), tDiferencia: dif?.t == null ? null : +dif.t.toFixed(2), pasa });
-  console.log(`  ${r.nombre.padEnd(32)}mejora ambas: ${mejoraAmbas ? "SÍ " : "no "}  DSR ${String(dsr == null ? "—" : dsr.dsr.toFixed(3)).padStart(6)}  t vs base ${String(dif?.t == null ? "—" : dif.t.toFixed(2)).padStart(6)}   ${pasa ? "⇒ ENTRA" : "⇒ NO entra"}`);
+  console.log(`  ${r.nombre.padEnd(32)}mejora ambas: ${mejoraAmbas ? "SÍ " : "no "}  DSR ${String(dsr == null ? "—" : dsr.dsr.toFixed(3)).padStart(6)}  t vs base ${String(dif?.t == null ? "—" : dif.t.toFixed(2)).padStart(6)}   ${pasa ? "⇒ ENTRA" : evaluable ? "⇒ NO entra" : "⇒ NO EVALUABLE"}`);
 }
 
 const entran = veredictos.filter((v) => v.pasa);
