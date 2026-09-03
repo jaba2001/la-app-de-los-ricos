@@ -205,6 +205,12 @@ jobs:
       # repartir dividendo con FCF negativo (su modelo es endeudarse para construir).
       - name: La capa de caja
         run: node --experimental-strip-types --no-warnings scripts/flujocaja.test.mjs
+
+      # La capa de tipos. Lo que fija no es la resta 10a-2a sino que un percentil no se de
+      # sobre una muestra que no lo sostiene — el error real fue tratar 786 obs desde 2023
+      # de la serie de ICE BofA como si fueran 41 anos de historia.
+      - name: La capa de tipos
+        run: node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
       # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
       # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
       # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números

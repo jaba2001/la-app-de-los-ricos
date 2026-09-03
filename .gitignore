@@ -43,6 +43,10 @@ research/out/*
 # Calidad de la caja: el diagnostico y las banderas rojas por empresa. Es la evidencia de que los
 # umbrales no marcan a medio indice, que es el listado de cordura de esa capa.
 !research/out/calidad_caja.json
+# La curva, el reparto nominal/real y el diferencial de credito con su percentil a 41 anos.
+# Lleva dentro el bloque de COBERTURA: es la prueba de que el percentil sale de la muestra
+# que dice, y no de una serie truncada que contesta igual.
+!research/out/tipos.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
