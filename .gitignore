@@ -96,6 +96,9 @@ research/out/*
 # La FORMA de la superficie alrededor del ajuste actual del asignador. No es un barrido: mide si
 # el umbral de produccion (50) es el pico de su rejilla —firma de parametro ajustado— o la meseta.
 !research/out/sensibilidad_asignador.json
+# La cadencia y la ventana de la puerta de tendencia: LAS DOS son el maximo de su rejilla, con
+# dispersiones del 33 % y el 57 %. Es la fragilidad mas grande encontrada en las cifras publicadas.
+!research/out/sensibilidad_cadencia.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
