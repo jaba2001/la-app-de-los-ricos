@@ -200,7 +200,7 @@ sobre un criterio de 0,70 escrito antes de mirar. Van 344 ensayos, no 345.
 
 **4. La afirmación central de los vídeos no sobrevive.** «El mercado de bonos huele el
 problema antes que el de acciones»: el aviso se encendió 397 días antes de Lehman —precioso—
-pero medido sobre 22 episodios independientes en 33 años, **p = 0,149** y **8 de 22 fueron
+pero medido sobre 22 episodios independientes en 33 años, **p = 0,146** y **8 de 22 fueron
 seguidos de un año de más del +20 %**. Marzo de 2020 se enciende EN el suelo. El mecanismo es
 cierto; como señal, no. Por eso `avisoConTasaBase` obliga a publicar el booleano con su tasa
 base y el test falla si alguien le añade una recomendación.

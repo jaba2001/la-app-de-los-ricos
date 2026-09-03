@@ -69,6 +69,10 @@ research/out/*
 # La sensibilidad al tipo real, con la columna PREDICTIVA al lado de la contemporanea. Es la
 # prueba de que la relacion explica y no anticipa: |rho| medio 0,312 -> 0,098.
 !research/out/tipos_reales.json
+# Las cifras de los videos, REPRODUCIDAS. Existe porque la auditoria encontro que tres de las
+# publicadas —el adelanto del Case-Shiller, el backlog de Oracle y la serie de capex— salieron
+# de invocaciones sueltas y no dejaron script detras: bien medidas e irreproducibles.
+!research/out/verificacion_videos.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

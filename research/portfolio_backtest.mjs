@@ -153,12 +153,26 @@ function treynorMazuy(port, spy, rf = 0) {
   return { alpha: sol[0], beta: sol[1], timing: sol[2] };
 }
 // Block bootstrap CI for the annualized Sharpe.
+//
+// ⚠️ SEMILLA FIJA. Esto usaba `Math.random()` sin sembrar, y el intervalo de confianza que
+// produce SE PUBLICA: sale en `research/out/portfolio_backtest.json`, que está versionado. O
+// sea, un intervalo estadístico que cambiaba en cada corrida y ensuciaba el repo cada vez que
+// alguien reejecutaba el backtest. Un número que se cita y no se reproduce exactamente no es
+// evidencia: es una cifra que salió una vez. Mismo defecto y mismo arreglo que en
+// `aviso_credito_base.mjs`, encontrado auditando el 2026-09-03.
 function bootstrapSharpe(port, block = 6, iters = 2000) {
   const n = port.length; if (n < block * 2) return null;
+  let semilla = 20260903;
+  const azar = () => {
+    semilla |= 0; semilla = (semilla + 0x6D2B79F5) | 0;
+    let t = Math.imul(semilla ^ (semilla >>> 15), 1 | semilla);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
   const sh = [];
   for (let it = 0; it < iters; it++) {
     const s = [];
-    while (s.length < n) { const start = Math.floor(Math.random() * (n - block)); for (let k = 0; k < block && s.length < n; k++) s.push(port[start + k]); }
+    while (s.length < n) { const start = Math.floor(azar() * (n - block)); for (let k = 0; k < block && s.length < n; k++) s.push(port[start + k]); }
     sh.push(sharpe(s));
   }
   sh.sort((a, b) => a - b);

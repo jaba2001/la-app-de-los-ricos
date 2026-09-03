@@ -149,7 +149,9 @@ export function credito(serie: { date: string; v: number }[], hasta: string):
  * de acciones»*. Medido sobre 33 años y 22 episodios independientes (`aviso_credito_base.mjs`):
  *
  *   · tras un aviso, la peor caída del año siguiente es −16,4 % frente al −14,3 % de un mes
- *     cualquiera. La diferencia existe, pero **p = 0,149 en permutación: no se distingue del azar.**
+ *     cualquiera. La diferencia existe, pero **p = 0,146 en permutación: no se distingue del azar.**
+ *     (Con `Math.random()` sin sembrar salía 0,149 y cambiaba en cada corrida; la permutación
+ *     lleva semilla fija desde entonces, así que la cifra citada se reproduce exactamente.)
  *   · **8 de los 22 avisos fueron seguidos de un año de más del +20 %.** Marzo de 2020 es el
  *     caso de manual: el aviso se enciende EN el suelo, no antes.
  *

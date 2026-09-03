@@ -99,7 +99,7 @@ if (cr) {
   console.log(`    percentil        ${cr.percentil == null ? "— (" + cr.motivoPercentil + ")" : cr.percentil.toFixed(0) + " %  de " + S.BAA10Y.length + " obs desde " + S.BAA10Y[0].date}`);
   console.log(`    hace 90 días     ${cr.hace90d == null ? "—" : cr.hace90d.toFixed(2)} pp   delta ${cr.delta == null ? "—" : (cr.delta > 0 ? "+" : "") + cr.delta.toFixed(2)}`);
   console.log(`    ensanchándose    ${cr.ensanchando ? "SÍ" : "no"}   (corte declarado: ${UMBRALES_TIPOS.ensancheMinimo} pp en ${UMBRALES_TIPOS.ventanaEnsanche} días)`);
-  // ⚠️ El booleano NUNCA sale solo: medido sobre 22 episodios, p = 0,149. Es contexto.
+  // ⚠️ El booleano NUNCA sale solo: medido sobre 22 episodios, p = 0,146. Es contexto.
   console.log(`
     ${avisoConTasaBase(cr.ensanchando)}`);
 }

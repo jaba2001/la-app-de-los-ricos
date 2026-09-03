@@ -136,6 +136,20 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
   cerca(orcl.vidaCorregida, 12.2, 0.4, "y corregida ≈ 12,2");
   ok(doc.includes("15,4") && doc.includes("12,2"), "y el documento publica esas dos cifras");
   ok(orcl.vidaIngenua - orcl.vidaCorregida > 3, "el sesgo de Oracle pasa de 3 años: no es un matiz");
+
+  // ⚠️ MICROSOFT ES EL CASO QUE CAMBIA DE SENTIDO, y el documento lo publica sin nada que lo
+  // guardara hasta esta auditoría. Con la fórmula ingenua su vida útil parece estable; con la
+  // corrección BAJA. Es la prueba de que la corrección no sólo atenúa: puede invertir la lectura.
+  // MSFT 2025: dep 22,0 B$, bruto 299 B$ al cierre y 212 al inicio.
+  const msft = vidaUtil({ depreciacion: 22.0e9, brutoFin: 299e9, brutoIni: 212e9 });
+  cerca(msft.vidaIngenua, 13.6, 0.2, "MSFT 2025 ingenua ≈ 13,6 años, como dice el documento");
+  cerca(msft.vidaCorregida, 11.6, 0.2, "y corregida ≈ 11,6");
+  ok(doc.includes("13,6") && doc.includes("11,6"), "y el documento publica esas dos");
+  // MSFT 2023: dep 11,0 B$, bruto 164 fin y 134 inicio → ingenua 14,9 · corregida 13,5.
+  const msft23 = vidaUtil({ depreciacion: 11.0e9, brutoFin: 164e9, brutoIni: 134e9 });
+  cerca(msft23.vidaCorregida, 13.5, 0.2, "MSFT 2023 corregida ≈ 13,5");
+  ok(msft.vidaCorregida < msft23.vidaCorregida,
+     "y de 2023 a 2025 la vida corregida de Microsoft BAJA — lo contrario de «todos están alargando»");
 }
 
 console.log(pass && !fail ? `\n✓ vidaUtil: ${pass} passed, 0 failed\n` : `\n✖ vidaUtil: ${pass} passed, ${fail} failed\n`);

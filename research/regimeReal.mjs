@@ -20,7 +20,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function history(id) {
   if (mem.has(id)) return mem.get(id);
-  const path = join(DIR, id + ".json");
+  // ⚠️ LA UNIDAD VA EN EL NOMBRE DEL FICHERO, y no es cosmética. `.cache/fredfull/` la
+  // comparten DIEZ scripts. CSUSHPINSA se pedía con `units=pc1` —variación interanual— y se
+  // guardaba como `CSUSHPINSA.json`, así que cualquier otro consumidor lo leía como si fuera el
+  // ÍNDICE Case-Shiller. No falla: son números plausibles. `verificacion_videos.mjs` calculó el
+  // interanual de un interanual y publicó «crecimiento de la vivienda +2.464 %» sin que nada
+  // protestara. Con el sufijo, un fichero en otras unidades no se puede confundir con el crudo.
+  const path = join(DIR, id + (YOY.has(id) ? ".pc1" : "") + ".json");
   let obs = null;
   if (existsSync(path)) { try { obs = JSON.parse(readFileSync(path, "utf8")); } catch { obs = null; } }
   if (!obs) {

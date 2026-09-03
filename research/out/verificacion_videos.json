@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-09-03T12:54:17.800Z",
+  "comprobaciones": [
+    {
+      "que": "El crecimiento de la vivienda hizo pico ANTES que el nivel",
+      "medido": "crecimiento 2005-09 (14.5 %) · nivel 2006-07 (184.6) → 10 meses de adelanto",
+      "afirmado": "«los precios no cayeron en 2006, estaban en máximos: sólo dejaron de subir tan rápido»",
+      "coincide": true,
+      "nota": null
+    },
+    {
+      "que": "Morosidad hipotecaria en 2006",
+      "medido": "1.62 % en 2006-04, frente a un mínimo de 1.41 % en 2004-10",
+      "afirmado": "«los prestatarios empezaron a fallar en cifras récord»",
+      "coincide": false,
+      "nota": "Sube, pero sigue en mínimos históricos. Y DRSFRMACBS cubre TODA la hipoteca residencial, no el subprime del que habla: no se refuta ni se confirma su cifra midiendo otra población"
+    },
+    {
+      "que": "Backlog de Oracle (RevenueRemainingPerformanceObligation)",
+      "medido": "638 B$ a 2026-05-31 (10-K), +363 % interanual",
+      "afirmado": "638 B$, +363 %",
+      "coincide": true,
+      "nota": null
+    },
+    {
+      "que": "Capex de los cinco grandes (2023 / 2024 / 2025)",
+      "medido": "149 / 224 / 379 B$",
+      "afirmado": "150 / 226 / 410 B$",
+      "coincide": true,
+      "nota": null
+    },
+    {
+      "que": "«El capex ya supera a toda la caja que ingresan»",
+      "medido": "capex/flujo operativo = 0.66 en 2025 (379 frente a 577 B$)",
+      "afirmado": "«cada dólar adicional de construcción se financia con deuda»",
+      "coincide": false,
+      "nota": "Es una afirmación sobre el PLAN de 2026 (725 B$), no un hecho observable en los estados. Plausible: con el flujo operativo creciendo ~20 % anual llegaría a ~690 B$ y ahí sí cruzaría"
+    }
+  ],
+  "nota": "Reproduce las cifras publicadas en ANALISIS_VIDEO_IA_2006.md y PLAN_CUATRO_VIDEOS.md, que hasta la auditoria del 2026-09-03 no tenian script detras: estaban bien medidas y eran irreproducibles."
+}

@@ -67,8 +67,13 @@ Del vídeo 2: Berkshire recompró a 487 $ con la acción a 521. No es la opinió
 es la directiva **poniendo su dinero** en una banda concreta. Se deriva de
 `PaymentsForRepurchaseOfCommonStock ÷ TreasuryStockSharesAcquired`.
 
-**Cobertura MEDIDA sobre 45 nombres del S&P 500: 69 %** — comparable al 78 % del FCF con el que
-ya corre la capa de caja. (Con 4 nombres salía 25 %: n=4 no es una medición de cobertura.)
+**Cobertura MEDIDA, y la cifra buena no fue la primera.** Sobre 45 nombres del S&P 500, el
+**69 %** tiene los dos tags. Pero al construirlo resultó que lo publicable de verdad —con el
+importe del MISMO ejercicio, un hecho no rancio y una serie de precios con la que comprobarlo—
+es el **55 %**. (Y con 4 nombres salía 25 %: n=4 no es una medición de cobertura.)
+
+⚠️ Corregido en la auditoría del 03-09-2026: este documento publicaba el 69 % como si fuera la
+cifra utilizable. Lo era de «tiene los dos tags», no de «se puede publicar».
 
 **Criterio:** publicable como capa explicativa desde el principio. Como SEÑAL exige tasa base
 —¿compran barato de verdad?— y ahí el listón es el de siempre.
@@ -147,3 +152,82 @@ competidor minorista enseña**, que es donde este producto ha encontrado su huec
 **La C es la única que puede mover el motor**, y con 344 ensayos gastados no se abre sin
 comprobación previa. El precedente está reciente: media hora de comprobación ahorró el 345
 entero.
+
+---
+
+# EJECUTADO Y AUDITADO · 2026-09-03
+
+Las cuatro fases están construidas, medidas y en remoto. Esta sección la escribe la auditoría
+posterior, no el plan: recoge **lo que el propio plan afirmaba y la ejecución corrigió**, que es
+la parte que sirve para el siguiente.
+
+## Lo construido
+
+| fase | qué | dónde | asserts |
+|---|---|---|---|
+| A | Vida útil implícita, con corrección por crecimiento | `lib/vidaUtil.ts` | 38 → 44 |
+| B | Precio de recompra como valor razonable revelado | `lib/recompras.ts` | 46 |
+| C | Comprobación previa de la aceleración | `research/precheck_aceleracion.mjs` | — |
+| D | Tipo real → activos, con la columna predictiva | `research/tipos_reales.mjs` | 12 |
+
+## ⚠️ Ocho correcciones, y ninguna se veía sin ejecutar
+
+**1. El tag muerto que contestaba.** Amazon publica dos tags de capex y el histórico murió en
+2016. Con «el primero que tenga datos gana» su capex salía 5 B$ en vez de 132, y estuve a punto
+de escribir que el vídeo exageraba. Se elige por **recencia del hecho**.
+
+**2. La cobertura sobre cuatro nombres.** El precio de recompra parecía inviable (1 de 4). Sobre
+45 es el 69 % con los dos tags — y **55 % publicable de verdad**. Las dos cifras estaban mal
+usadas en este documento hasta la auditoría.
+
+**3. La amortización de intangibles hunde la vida útil.** Amgen 2025: D&A total 5,17 B$, de los
+que 4,30 son amortización de adquisiciones. Daba **2,92 años** para una farmacéutica con
+plantas; con `Depreciation` a secas, **23,57**. Tres vías en orden de limpieza.
+
+**4. El crecimiento del activo la infla sola.** Oracle 2025: 15,4 años ingenua contra 12,2
+corregida. **Microsoft baja** con la corrección — la corrección no atenúa, puede invertir.
+
+**5. Un hecho de recompra viejo no es un valor revelado.** 11 de 33 publicaban datos anteriores
+a 2024, dos de 2013. Axon comparaba una recompra de 2016 con el precio de hoy: **+2.922 %**.
+
+**6. Dos medidas independientes compartiendo ancla.** La recompra colgaba del ejercicio de la
+depreciación: la cobertura caía del 58 % al 28 % y nada fallaba.
+
+**7. El precio «actual» era el del final del periodo de recompra**, no el de hoy. Para AbbVie,
+cuyo último hecho es de 2017, el retorno se medía hasta entonces.
+
+**8. Y una que encontró la auditoría, no la construcción:** tres de las cifras publicadas en
+estos documentos —el adelanto del Case-Shiller, el backlog de Oracle y la serie de capex—
+salieron de invocaciones sueltas de `node -e` y **no dejaron script detrás**. Estaban bien
+medidas y eran **irreproducibles**. En un repo cuyo criterio es «una cifra que no se reproduce
+no es evidencia», eso es un defecto aunque los números estén bien. Lo cierra
+`research/verificacion_videos.mjs`.
+
+## Lo que la auditoría encontró fuera de estas fases
+
+**Un bootstrap sin sembrar en código preexistente.** `research/portfolio_backtest.mjs` calculaba
+el **intervalo de confianza al 95 % del Sharpe** con 2.000 iteraciones y `Math.random()` sin
+semilla, y ese intervalo **se publica** en `portfolio_backtest.json`, que está versionado. Un
+intervalo estadístico que cambiaba en cada corrida y ensuciaba el repo. Mismo defecto y mismo
+arreglo que en `aviso_credito_base.mjs`.
+
+**Tres referencias a un p-valor obsoleto.** `lib/tipos.ts`, `research/tipos.mjs` y
+`PLAN_TRES_CAPAS.md` seguían citando **p = 0,149** cuando el valor reproducible con semilla fija
+es **0,146**. La constante estaba bien; la prosa alrededor, no.
+
+## Veredicto de C, y su matiz
+
+    PUERTA 1  aceleración del precio vs momentum 12m     ρ 0,681   abierta
+    PUERTA 2  aceleración de liquidez vs impulso a 6m    ρ 0,705   CERRADA
+
+**El ensayo 345 no se gasta.** Pero el margen es de **cinco milésimas**, y presentar eso como un
+veredicto limpio sería el mismo sobreajuste a un umbral que este repo evita. Lo que decide no es
+de qué lado cae cada puerta sino que **las dos están cerca**: la aceleración comparte el 46 % de
+su varianza con el momentum —auditado, −136 pp— y el 50 % con el impulso de liquidez del
+régimen. La conclusión aguanta entre 0,60 y 0,75; con 0,80 no.
+
+## Lo que sigue sin construirse, a propósito
+
+Análisis técnico (taza con asa, roturas de base, media de 200), posicionamiento de opciones,
+manipulación del oro y el calendario de la ruptura. **El único bloqueante de lanzamiento sigue
+siendo el abogado.**
