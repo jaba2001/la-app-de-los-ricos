@@ -230,7 +230,16 @@ writeFileSync(join(AQUI, "out", "calidad_contable.json"), JSON.stringify({
 {
   const slim = {};
   for (const f of ok) {
-    const tieneVida = f.vida?.corregida != null && !f.vida.fuera;
+    // ⚠️ LAS CONTAMINADAS NO SALEN A LA WEB, y esto se decidió DIAGNOSTICANDO, no en teoría.
+    // 21 empresas no separan la depreciación de la amortización de intangibles en sus cuentas, y
+    // el artefacto las marcaba `total_contaminado` y las publicaba igual con un aviso. Al mirarlas
+    // una a una: **BlackRock salía a 2,49 años** —una gestora de activos, cuyo D&A es casi todo
+    // amortización de adquisiciones— y **Netflix a 8,42**, que es amortización de CONTENIDO. Eso
+    // no es «la vida útil de su inmovilizado»: es otra cosa con el mismo nombre.
+    //
+    // Un aviso al pie no arregla una cifra que mide otra cosa. En el artefacto se quedan, marcadas,
+    // porque son el material del diagnóstico; a la pantalla no llegan.
+    const tieneVida = f.vida?.corregida != null && !f.vida.fuera && f.viaDep !== "total_contaminado";
     const tieneRec = f.recompra?.precioMedio != null && f.recompra.creible !== false;
     if (!tieneVida && !tieneRec) continue;
     slim[f.ticker] = {

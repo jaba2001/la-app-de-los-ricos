@@ -51,7 +51,7 @@ research/out/*
 # depreciacion y el control de cordura del precio. Es la evidencia de que las cifras salen de
 # donde se dice y no de un tag muerto.
 !research/out/calidad_contable.json
-# La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,149, 8 falsas alarmas. Es lo
+# La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,146 (semilla fija), 8 falsas alarmas. Es lo
 # que impide publicar el booleano como si fuera una alerta.
 !research/out/aviso_credito_base.json
 # Las cuatro cifras de los videos comprobadas una a una, con lo que NO se construye escrito
@@ -73,6 +73,9 @@ research/out/*
 # publicadas —el adelanto del Case-Shiller, el backlog de Oracle y la serie de capex— salieron
 # de invocaciones sueltas y no dejaron script detras: bien medidas e irreproducibles.
 !research/out/verificacion_videos.json
+# La concentracion del indice, medida como DINAMICA (SPY frente al equiponderado RSP) porque el
+# peso del top-10 no se puede calcular: 5 de las 15 mayores no publican acciones utilizables.
+!research/out/concentracion.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

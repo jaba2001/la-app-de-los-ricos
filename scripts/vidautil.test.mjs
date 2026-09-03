@@ -187,6 +187,18 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
     return f?.vida?.fuera === true && datos[t].vidaCorregida != null;
   });
   ok(fuera.length === 0, `${fuera.length} vidas fuera de banda se colaron al fichero de la web`);
+  // ⚠️ NI LAS CONTAMINADAS, y esto se decidio diagnosticando: 21 empresas no separan la
+  // depreciacion de la amortizacion de intangibles, y publicaban vidas que miden OTRA COSA.
+  // BlackRock salia a 2,49 años —una gestora de activos— y Netflix a 8,42, que es amortizacion
+  // de CONTENIDO. Un aviso al pie no arregla una cifra que mide otra cosa.
+  const contaminadas = tickers.filter((t) => {
+    const f = art.filas.find((x) => x.ticker === t);
+    return f?.viaDep === "total_contaminado" && datos[t].vidaCorregida != null;
+  });
+  ok(contaminadas.length === 0, `${contaminadas.length} vidas con depreciacion contaminada se colaron a la web (${contaminadas.slice(0, 5).join(", ")})`);
+  ok(!("BLK" in datos) || datos.BLK.vidaCorregida == null,
+     "BlackRock NO publica vida util en la web: su D&A es amortizacion de adquisiciones");
+
   const noCreibles = tickers.filter((t) => {
     const f = art.filas.find((x) => x.ticker === t);
     return f?.recompra?.creible === false && datos[t].precioRecompra != null;
