@@ -1,0 +1,58 @@
+{
+  "generatedAt": "2026-09-03T19:26:52.159Z",
+  "factorB": 1.821,
+  "volObjetivo": 0.1629,
+  "tope": 2,
+  "equilibrioB_pp": 7.17,
+  "equilibrioC_pp": 6.87,
+  "vias": [
+    {
+      "via": "Box spread (opciones SPX)",
+      "spreadPp": 0.3,
+      "totalB": 1668.5,
+      "totalC": 1306.5,
+      "bateB": true,
+      "bateC": true,
+      "nota": "financiación sintética; requiere permiso de opciones y entenderlo"
+    },
+    {
+      "via": "Bróker de bajo coste (tramo alto)",
+      "spreadPp": 1,
+      "totalB": 1527.5,
+      "totalC": 1218.9,
+      "bateB": true,
+      "bateC": true,
+      "nota": "el diferencial baja con el saldo; a saldos pequeños es mayor"
+    },
+    {
+      "via": "Bróker de bajo coste (tramo bajo)",
+      "spreadPp": 2.5,
+      "totalB": 1261.8,
+      "totalC": 1049,
+      "bateB": true,
+      "bateC": true,
+      "nota": "lo que paga una cuenta pequeña de verdad"
+    },
+    {
+      "via": "Bróker minorista tradicional",
+      "spreadPp": 6,
+      "totalB": 798,
+      "totalC": 732.5,
+      "bateB": true,
+      "bateC": true,
+      "nota": "el rango habitual va del 8 % al 12 % nominal"
+    },
+    {
+      "via": "ETF apalancado 2x",
+      "spreadPp": 1,
+      "totalB": 1527.5,
+      "totalC": 1218.9,
+      "bateB": true,
+      "bateC": true,
+      "nota": "NO APLICA a una cartera propia: sólo existe sobre índices, y con decaimiento diario"
+    }
+  ],
+  "spyTotal": 668.4,
+  "spyTotalDesdeCorte": 681.3,
+  "nota": "Los diferenciales son ordenes de magnitud publicos, no cotizaciones. El ETF apalancado NO aplica a una cartera propia: solo existe sobre indices."
+}

@@ -86,6 +86,9 @@ research/out/*
 # La via que SI bate al indice: convertir la ventaja de riesgo en ventaja de retorno. Con
 # volatilidad objetivo da 1.345,8 %% frente a 668,4 %% del SPY, y con la MITAD de su caida maxima.
 !research/out/apalancamiento.json
+# El punto de equilibrio del coste de financiacion: +7,2 pp para B y +6,9 para C. Es lo que dice
+# que el coste NO es el cuello de botella — lo son la llamada de margen y el hueco.
+!research/out/apalancamiento_coste.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json
