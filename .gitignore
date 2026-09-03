@@ -76,6 +76,10 @@ research/out/*
 # La concentracion del indice, medida como DINAMICA (SPY frente al equiponderado RSP) porque el
 # peso del top-10 no se puede calcular: 5 de las 15 mayores no publican acciones utilizables.
 !research/out/concentracion.json
+# ¿Aportan las capas nuevas informacion que el score no tenga? Las cuatro salen ortogonales:
+# los pilares explican entre el 1 % y el 8 % de ellas. Es la condicion NECESARIA para gastar un
+# ensayo, no la suficiente.
+!research/out/precheck_capas.json
 !research/out/backtest_assets_summary.json
 !research/out/regime_factor_validate.json
 !research/out/portfolio_backtest.json

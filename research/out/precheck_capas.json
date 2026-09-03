@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-09-03T17:29:02.468Z",
+  "asOf": "2026-06-30",
+  "puntuadas": 248,
+  "criterioRho": 0.7,
+  "criterioR2": 0.5,
+  "resultados": [
+    {
+      "campo": "conversion",
+      "nombre": "Conversión a caja (CFO/beneficio)",
+      "n": 220,
+      "rhos": {
+        "total": -0.019,
+        "value": 0.097,
+        "health": -0.038,
+        "momentum": -0.065,
+        "growth": -0.009
+      },
+      "mejorPilar": "value",
+      "mejorRho": 0.097,
+      "r2": 0.012,
+      "pilaresUsados": [
+        "value",
+        "health",
+        "momentum",
+        "growth"
+      ],
+      "yaDentro": false
+    },
+    {
+      "campo": "banderas",
+      "nombre": "Nº de banderas rojas de caja",
+      "n": 222,
+      "rhos": {
+        "total": -0.197,
+        "value": -0.124,
+        "health": -0.155,
+        "momentum": 0.016,
+        "growth": -0.1
+      },
+      "mejorPilar": "total",
+      "mejorRho": -0.197,
+      "r2": 0.048,
+      "pilaresUsados": [
+        "value",
+        "health",
+        "momentum",
+        "growth"
+      ],
+      "yaDentro": false
+    },
+    {
+      "campo": "vidaUtil",
+      "nombre": "Vida útil implícita",
+      "n": 140,
+      "rhos": {
+        "total": -0.13,
+        "value": -0.013,
+        "health": -0.143,
+        "momentum": -0.009,
+        "growth": -0.05
+      },
+      "mejorPilar": "health",
+      "mejorRho": -0.143,
+      "r2": 0.023,
+      "pilaresUsados": [
+        "value",
+        "health",
+        "momentum",
+        "growth"
+      ],
+      "yaDentro": false
+    },
+    {
+      "campo": "recompra",
+      "nombre": "Retorno desde el precio de recompra",
+      "n": 119,
+      "rhos": {
+        "total": 0.018,
+        "value": -0.237,
+        "health": 0.032,
+        "momentum": 0.08,
+        "growth": 0.153
+      },
+      "mejorPilar": "value",
+      "mejorRho": -0.237,
+      "r2": 0.077,
+      "pilaresUsados": [
+        "value",
+        "health",
+        "momentum",
+        "growth"
+      ],
+      "yaDentro": false
+    }
+  ],
+  "nota": "El motor ya lleva fcfYield, capexToRevenue, fcfGrowthYoy y grossProfitability en sus ScoreInputs: parte de la capa de caja ya estaba dentro. Esto mide si las medidas NUEVAS son redundantes con el score de produccion, no si predicen retornos."
+}
