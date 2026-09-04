@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-09-04T09:17:26.868Z",
+  "fuente": "research/rotacion_anatomia.mjs",
+  "meses": 236,
+  "anos": 19.58,
+  "rotacionTotal": 67.6,
+  "rotacionAnual": 3.45,
+  "porActivo": {
+    "SPY": {
+      "rotacion": 27.3,
+      "pct": 40.4
+    },
+    "BIL": {
+      "rotacion": 21.6,
+      "pct": 32
+    },
+    "GLD": {
+      "rotacion": 7.2,
+      "pct": 10.7
+    },
+    "TLT": {
+      "rotacion": 6.6,
+      "pct": 9.8
+    },
+    "IEF": {
+      "rotacion": 4,
+      "pct": 5.9
+    },
+    "BTCUSD": {
+      "rotacion": 0.9,
+      "pct": 1.3
+    },
+    "DBC": {
+      "rotacion": 0,
+      "pct": 0
+    }
+  },
+  "ajustes": 269,
+  "porBanda": [
+    {
+      "banda": 0.005,
+      "n": 0,
+      "rotacion": 0,
+      "pct": 0,
+      "pbAno": 0
+    },
+    {
+      "banda": 0.01,
+      "n": 0,
+      "rotacion": 0,
+      "pct": 0,
+      "pbAno": 0
+    },
+    {
+      "banda": 0.02,
+      "n": 0,
+      "rotacion": 0,
+      "pct": 0,
+      "pbAno": 0
+    },
+    {
+      "banda": 0.05,
+      "n": 0,
+      "rotacion": 0,
+      "pct": 0,
+      "pbAno": 0
+    },
+    {
+      "banda": 0.1,
+      "n": 21,
+      "rotacion": 1.05,
+      "pct": 1.6,
+      "pbAno": 0.5
+    }
+  ],
+  "movimientosGrandes": 248,
+  "pctRotacionDeGrandes": 98.4,
+  "brechaPbAno": 11.8,
+  "nota": "Esto MIDE la distribucion de tamaños; no elige una banda ni vuelve a correr la estrategia con ella. Elegir una banda y remedir SI seria un ensayo del presupuesto. Los movimientos grandes son cambios de regimen y no se pueden evitar sin cambiar la estrategia."
+}
