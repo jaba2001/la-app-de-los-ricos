@@ -84,7 +84,8 @@ export interface StockData {
   spyHistory: Record<string, unknown>[];
   sectorEtfHistory: Record<string, unknown>[];
   sectorEtfSymbol: string;
-  congressTrades: Record<string, unknown>[];
+  /** `null` = las fuentes no contestaron. `[]` = contestaron y no hay operaciones. NO son lo mismo. */
+  congressTrades: Record<string, unknown>[] | null;
   houseDisclosures: Record<string, unknown>[];
   annualIncome: Record<string, unknown>[];
   sharesFloat: Record<string, unknown>[];
@@ -489,7 +490,10 @@ export default function StockTickerPage() {
         spyHistory:           spyRes.status === "fulfilled" ? (spyRes.value as Record<string,unknown>[]) ?? [] : [],
         sectorEtfHistory,
         sectorEtfSymbol,
-        congressTrades:       congressRes.status === "fulfilled" ? (congressRes.value as Record<string,unknown>[]) ?? [] : [],
+        // Un fallo se propaga como `null`, no como lista vacia: los volcados del STOCK Act
+        // dejaron de ser publicos (403 desde el 2026-09-04) y aplanarlo a [] hacia que el panel
+        // enseñara «0B / 0S congress» —una afirmacion sobre datos que no tenemos—.
+        congressTrades:       congressRes.status === "fulfilled" ? (congressRes.value as Record<string,unknown>[]) ?? [] : null,
         houseDisclosures:     houseRes.status    === "fulfilled" ? (houseRes.value    as Record<string,unknown>[]) ?? [] : [],
         annualIncome:         mergedAnnualIncome,
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],

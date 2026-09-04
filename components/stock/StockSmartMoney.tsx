@@ -38,6 +38,11 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
 
   const insiders  = data?.insiderTrades        ?? [];
   const holders   = data?.institutionalHolders  ?? [];
+  // ⚠️ `null` significa que las fuentes del STOCK Act NO CONTESTARON, y eso no es «cero
+  // operaciones». Los dos volcados publicos dejaron de serlo (403 desde el 2026-09-04), asi que
+  // este es hoy el caso normal, no el raro. Enseñar «0B / 0S congress» seria afirmar algo sobre
+  // unos datos que no tenemos.
+  const congresoCaido = data?.congressTrades == null;
   const congress  = data?.congressTrades        ?? [];
   const house     = data?.houseDisclosures      ?? [];
   const allCongress = [...congress, ...house].sort((a, b) =>
@@ -71,7 +76,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap" }}>
           <div className="section-label" style={{ margin: 0 }}>Smart Money Signal — {ticker}</div>
-          <span className="sr-hint">Insider · 13-F · Congress · free data</span>
+          <span className="sr-hint">{congresoCaido ? "Insider · 13-F · free data (congress no disponible)" : "Insider · 13-F · Congress · free data"}</span>
         </div>
         {loading ? <Sk w="100%" h={120} /> : (
           <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 240px) 1fr", gap: "var(--sr-sp-5)", alignItems: "stretch" }}>
@@ -84,7 +89,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                 <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-3)", color: "var(--sr-text-2)", fontWeight: 600 }}>{signal.conviction} conviction</span>
               </div>
               <div className="sr-hint" style={{ marginTop: 4 }}>
-                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider · {signal.congress.buyCount}B / {signal.congress.sellCount}S congress
+                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider · {congresoCaido ? "congress no disponible" : `${signal.congress.buyCount}B / ${signal.congress.sellCount}S congress`}
                 {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? ` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M` : ""}
               </div>
             </div>
