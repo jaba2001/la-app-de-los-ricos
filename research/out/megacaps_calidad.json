@@ -1,0 +1,2932 @@
+{
+  "generatedAt": "2026-09-04T07:54:00.407Z",
+  "pregunta": "¿la señal de calidad de Scora puntúa bajo a las megacaps que impulsaron el índice?",
+  "top": 10,
+  "entrada": 0.8,
+  "fuenteTamano": "dei:EntityPublicFloat (companyfacts, point-in-time por `filed`), escalado por precio crudo hasta la fecha de corte",
+  "ventanas": {
+    "2011-2018": {
+      "cortes": [
+        {
+          "fecha": "2011-01-03",
+          "miembros": 497,
+          "conSenal": 200,
+          "conFlotante": 363,
+          "pctlMedioTop": 0.6649,
+          "pctlMedioResto": 0.494,
+          "elegibles": 2,
+          "sinSenal": 5,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 14299984.87,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 9.1,
+              "pctl": 0.5319,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "APOL",
+              "flotanteB": 9900,
+              "flotanteReportadoB": 9900,
+              "escalado": false,
+              "floatEnd": "2010-02-28",
+              "floatFiled": "2010-03-29",
+              "mesesRancio": 10.2,
+              "pctl": 0.8656,
+              "elegible": true
+            },
+            {
+              "rank": 3,
+              "ticker": "SHW",
+              "flotanteB": 9825.51,
+              "flotanteReportadoB": 6231.52,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2010-02-24",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "XOM",
+              "flotanteB": 357.23,
+              "flotanteReportadoB": 335,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2010-02-26",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "AAPL",
+              "flotanteB": 297.69,
+              "flotanteReportadoB": 208.56,
+              "escalado": true,
+              "floatEnd": "2010-03-27",
+              "floatFiled": "2010-10-27",
+              "mesesRancio": 9.3,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "T",
+              "flotanteB": 237.1,
+              "flotanteReportadoB": 198.5,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2009-08-05",
+              "mesesRancio": 18.1,
+              "pctl": 0.4155,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "COP",
+              "flotanteB": 216.69,
+              "flotanteReportadoB": 143.4,
+              "escalado": true,
+              "floatEnd": "2009-09-30",
+              "floatFiled": "2009-11-03",
+              "mesesRancio": 15.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "MSFT",
+              "flotanteB": 215.95,
+              "flotanteReportadoB": 235.24,
+              "escalado": true,
+              "floatEnd": "2009-12-31",
+              "floatFiled": "2010-07-30",
+              "mesesRancio": 12.1,
+              "pctl": 0.927,
+              "elegible": true
+            },
+            {
+              "rank": 9,
+              "ticker": "IBM",
+              "flotanteB": 193.21,
+              "flotanteReportadoB": 136.8,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2010-02-23",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "PG",
+              "flotanteB": 188.02,
+              "flotanteReportadoB": 176,
+              "escalado": true,
+              "floatEnd": "2009-12-31",
+              "floatFiled": "2010-08-13",
+              "mesesRancio": 12.1,
+              "pctl": 0.5844,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2012-01-03",
+          "miembros": 497,
+          "conSenal": 279,
+          "conFlotante": 420,
+          "pctlMedioTop": 0.5355,
+          "pctlMedioResto": 0.4995,
+          "elegibles": 0,
+          "sinSenal": 7,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "QCOM",
+              "flotanteB": 90805347.8,
+              "flotanteReportadoB": 86665135.82,
+              "escalado": true,
+              "floatEnd": "2011-03-27",
+              "floatFiled": "2011-11-02",
+              "mesesRancio": 9.3,
+              "pctl": 0.7006,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "NEM",
+              "flotanteB": 30533443.22,
+              "flotanteReportadoB": 30366217.47,
+              "escalado": true,
+              "floatEnd": "2010-06-30",
+              "floatFiled": "2011-02-24",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "VIAB",
+              "flotanteB": 16495284.06,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 21.1,
+              "pctl": 0.5504,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "HBAN",
+              "flotanteB": 5195.68,
+              "flotanteReportadoB": 3857.54,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2011-02-18",
+              "mesesRancio": 30.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "XOM",
+              "flotanteB": 437.01,
+              "flotanteReportadoB": 290,
+              "escalado": true,
+              "floatEnd": "2010-06-30",
+              "floatFiled": "2011-02-25",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "AAPL",
+              "flotanteB": 377.75,
+              "flotanteReportadoB": 322.92,
+              "escalado": true,
+              "floatEnd": "2011-03-25",
+              "floatFiled": "2011-10-26",
+              "mesesRancio": 9.3,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "T",
+              "flotanteB": 242.77,
+              "flotanteReportadoB": 198.5,
+              "escalado": true,
+              "floatEnd": "2009-06-30",
+              "floatFiled": "2009-08-05",
+              "mesesRancio": 30.1,
+              "pctl": 0.3554,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "IBM",
+              "flotanteB": 234.91,
+              "flotanteReportadoB": 155.7,
+              "escalado": true,
+              "floatEnd": "2010-06-30",
+              "floatFiled": "2011-02-22",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "CVX",
+              "flotanteB": 221.91,
+              "flotanteReportadoB": 136.44,
+              "escalado": true,
+              "floatEnd": "2010-06-30",
+              "floatFiled": "2011-02-24",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "GE",
+              "flotanteB": 202.95,
+              "flotanteReportadoB": 159.4,
+              "escalado": true,
+              "floatEnd": "2010-06-30",
+              "floatFiled": "2011-02-25",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2013-01-02",
+          "miembros": 497,
+          "conSenal": 301,
+          "conFlotante": 432,
+          "pctlMedioTop": 0.3931,
+          "pctlMedioResto": 0.4936,
+          "elegibles": 1,
+          "sinSenal": 5,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "QEP",
+              "flotanteB": 732010518.77,
+              "flotanteReportadoB": 1000000000,
+              "escalado": true,
+              "floatEnd": "2011-06-30",
+              "floatFiled": "2012-02-24",
+              "mesesRancio": 18.1,
+              "pctl": 0.0613,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "VIAB",
+              "flotanteB": 20124174.69,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 33.1,
+              "pctl": 0.5965,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "LNC",
+              "flotanteB": 12420597.2,
+              "flotanteReportadoB": 8800000,
+              "escalado": true,
+              "floatEnd": "2011-12-31",
+              "floatFiled": "2012-02-23",
+              "mesesRancio": 12.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "WHR",
+              "flotanteB": 194698.78,
+              "flotanteReportadoB": 111111.11,
+              "escalado": true,
+              "floatEnd": "2012-06-30",
+              "floatFiled": "2012-07-24",
+              "mesesRancio": 6.1,
+              "pctl": 0.277,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "AAPL",
+              "flotanteB": 513.14,
+              "flotanteReportadoB": 560.36,
+              "escalado": true,
+              "floatEnd": "2012-03-30",
+              "floatFiled": "2012-10-31",
+              "mesesRancio": 9.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "XOM",
+              "flotanteB": 430.58,
+              "flotanteReportadoB": 395,
+              "escalado": true,
+              "floatEnd": "2011-06-30",
+              "floatFiled": "2012-02-24",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "IBM",
+              "flotanteB": 234.41,
+              "flotanteReportadoB": 204.8,
+              "escalado": true,
+              "floatEnd": "2011-06-30",
+              "floatFiled": "2012-02-28",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "CVX",
+              "flotanteB": 221.11,
+              "flotanteReportadoB": 205.99,
+              "escalado": true,
+              "floatEnd": "2011-06-30",
+              "floatFiled": "2012-02-23",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "MSFT",
+              "flotanteB": 207.82,
+              "flotanteReportadoB": 195.33,
+              "escalado": true,
+              "floatEnd": "2011-12-31",
+              "floatFiled": "2012-07-26",
+              "mesesRancio": 12.1,
+              "pctl": 0.8103,
+              "elegible": true
+            },
+            {
+              "rank": 10,
+              "ticker": "T",
+              "flotanteB": 207.37,
+              "flotanteReportadoB": 186.1,
+              "escalado": true,
+              "floatEnd": "2011-06-30",
+              "floatFiled": "2012-02-24",
+              "mesesRancio": 18.1,
+              "pctl": 0.2202,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2014-01-02",
+          "miembros": 497,
+          "conSenal": 309,
+          "conFlotante": 441,
+          "pctlMedioTop": 0.5821,
+          "pctlMedioResto": 0.4919,
+          "elegibles": 2,
+          "sinSenal": 4,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 31240796.1,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 45.1,
+              "pctl": 0.5408,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "WHR",
+              "flotanteB": 283464.14,
+              "flotanteReportadoB": 111111.11,
+              "escalado": true,
+              "floatEnd": "2012-06-30",
+              "floatFiled": "2012-07-24",
+              "mesesRancio": 18.1,
+              "pctl": 0.3778,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "AAPL",
+              "flotanteB": 519.82,
+              "flotanteReportadoB": 416,
+              "escalado": true,
+              "floatEnd": "2013-03-29",
+              "floatFiled": "2013-10-30",
+              "mesesRancio": 9.2,
+              "pctl": 0.8137,
+              "elegible": true
+            },
+            {
+              "rank": 4,
+              "ticker": "XOM",
+              "flotanteB": 459.29,
+              "flotanteReportadoB": 394,
+              "escalado": true,
+              "floatEnd": "2012-06-30",
+              "floatFiled": "2013-02-27",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "GE",
+              "flotanteB": 287.4,
+              "flotanteReportadoB": 217.8,
+              "escalado": true,
+              "floatEnd": "2012-06-30",
+              "floatFiled": "2013-02-26",
+              "mesesRancio": 18.1,
+              "pctl": 0.1512,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "MSFT",
+              "flotanteB": 282.35,
+              "flotanteReportadoB": 202.95,
+              "escalado": true,
+              "floatEnd": "2012-12-31",
+              "floatFiled": "2013-07-30",
+              "mesesRancio": 12.1,
+              "pctl": 0.8459,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "JNJ",
+              "flotanteB": 250.62,
+              "flotanteReportadoB": 186,
+              "escalado": true,
+              "floatEnd": "2012-07-01",
+              "floatFiled": "2013-02-22",
+              "mesesRancio": 18.1,
+              "pctl": 0.7629,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "CVX",
+              "flotanteB": 243.58,
+              "flotanteReportadoB": 207.01,
+              "escalado": true,
+              "floatEnd": "2012-06-29",
+              "floatFiled": "2013-02-22",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "WFC",
+              "flotanteB": 236.14,
+              "flotanteReportadoB": 175.4,
+              "escalado": true,
+              "floatEnd": "2012-06-30",
+              "floatFiled": "2013-02-27",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "PFE",
+              "flotanteB": 227.79,
+              "flotanteReportadoB": 172,
+              "escalado": true,
+              "floatEnd": "2012-06-29",
+              "floatFiled": "2013-02-28",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2015-01-02",
+          "miembros": 499,
+          "conSenal": 324,
+          "conFlotante": 448,
+          "pctlMedioTop": 0.6052,
+          "pctlMedioResto": 0.4948,
+          "elegibles": 0,
+          "sinSenal": 4,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 27090926.12,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 57.1,
+              "pctl": 0.5521,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 659.34,
+              "flotanteReportadoB": 462.52,
+              "escalado": true,
+              "floatEnd": "2014-03-28",
+              "floatFiled": "2014-10-27",
+              "mesesRancio": 9.2,
+              "pctl": 0.7822,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "XOM",
+              "flotanteB": 407.9,
+              "flotanteReportadoB": 397,
+              "escalado": true,
+              "floatEnd": "2013-06-28",
+              "floatFiled": "2014-02-26",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "MSFT",
+              "flotanteB": 355.66,
+              "flotanteReportadoB": 284.54,
+              "escalado": true,
+              "floatEnd": "2013-12-31",
+              "floatFiled": "2014-07-31",
+              "mesesRancio": 12.1,
+              "pctl": 0.7767,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "JNJ",
+              "flotanteB": 294.59,
+              "flotanteReportadoB": 242,
+              "escalado": true,
+              "floatEnd": "2013-06-28",
+              "floatFiled": "2014-02-21",
+              "mesesRancio": 18.2,
+              "pctl": 0.7852,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "WFC",
+              "flotanteB": 288.41,
+              "flotanteReportadoB": 217.6,
+              "escalado": true,
+              "floatEnd": "2013-06-30",
+              "floatFiled": "2014-02-26",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "BRK.B",
+              "flotanteB": 273.42,
+              "flotanteReportadoB": 205.15,
+              "escalado": true,
+              "floatEnd": "2013-06-30",
+              "floatFiled": "2014-03-03",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "GE",
+              "flotanteB": 252.65,
+              "flotanteReportadoB": 233.8,
+              "escalado": true,
+              "floatEnd": "2013-06-30",
+              "floatFiled": "2014-02-27",
+              "mesesRancio": 18.1,
+              "pctl": 0.1717,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "PG",
+              "flotanteB": 245.51,
+              "flotanteReportadoB": 221,
+              "escalado": true,
+              "floatEnd": "2013-12-31",
+              "floatFiled": "2014-08-08",
+              "mesesRancio": 12.1,
+              "pctl": 0.5636,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "JPM",
+              "flotanteB": 234.3,
+              "flotanteReportadoB": 197.93,
+              "escalado": true,
+              "floatEnd": "2013-06-30",
+              "floatFiled": "2014-02-20",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2016-01-04",
+          "miembros": 504,
+          "conSenal": 327,
+          "conFlotante": 453,
+          "pctlMedioTop": 0.6543,
+          "pctlMedioResto": 0.4928,
+          "elegibles": 2,
+          "sinSenal": 5,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 14666466.9,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 69.2,
+              "pctl": 0.5293,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 606.82,
+              "flotanteReportadoB": 709.92,
+              "escalado": true,
+              "floatEnd": "2015-03-27",
+              "floatFiled": "2015-10-28",
+              "mesesRancio": 9.3,
+              "pctl": 0.8158,
+              "elegible": true
+            },
+            {
+              "rank": 3,
+              "ticker": "MSFT",
+              "flotanteB": 430.98,
+              "flotanteReportadoB": 365.31,
+              "escalado": true,
+              "floatEnd": "2014-12-31",
+              "floatFiled": "2015-07-31",
+              "mesesRancio": 12.1,
+              "pctl": 0.6474,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "XOM",
+              "flotanteB": 330.06,
+              "flotanteReportadoB": 429,
+              "escalado": true,
+              "floatEnd": "2014-06-30",
+              "floatFiled": "2015-02-25",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "GE",
+              "flotanteB": 317.94,
+              "flotanteReportadoB": 261.1,
+              "escalado": true,
+              "floatEnd": "2015-09-30",
+              "floatFiled": "2015-11-02",
+              "mesesRancio": 3.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "JNJ",
+              "flotanteB": 283.28,
+              "flotanteReportadoB": 296,
+              "escalado": true,
+              "floatEnd": "2014-06-29",
+              "floatFiled": "2015-02-24",
+              "mesesRancio": 18.2,
+              "pctl": 0.8174,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "WFC",
+              "flotanteB": 276.63,
+              "flotanteReportadoB": 274.8,
+              "escalado": true,
+              "floatEnd": "2014-06-30",
+              "floatFiled": "2015-02-25",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "BRK.B",
+              "flotanteB": 242.96,
+              "flotanteReportadoB": 235.18,
+              "escalado": true,
+              "floatEnd": "2014-06-30",
+              "floatFiled": "2015-03-02",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "AMZN",
+              "flotanteB": 240.48,
+              "flotanteReportadoB": 122.61,
+              "escalado": true,
+              "floatEnd": "2014-06-30",
+              "floatFiled": "2015-01-30",
+              "mesesRancio": 18.2,
+              "pctl": 0.4618,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "JPM",
+              "flotanteB": 238.03,
+              "flotanteReportadoB": 215.58,
+              "escalado": true,
+              "floatEnd": "2014-06-30",
+              "floatFiled": "2015-02-24",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2017-01-03",
+          "miembros": 506,
+          "conSenal": 349,
+          "conFlotante": 465,
+          "pctlMedioTop": 0.606,
+          "pctlMedioResto": 0.4902,
+          "elegibles": 0,
+          "sinSenal": 7,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 12898730.08,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 81.1,
+              "pctl": 0.4605,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "JEF",
+              "flotanteB": 7865.58,
+              "flotanteReportadoB": 8196.41,
+              "escalado": true,
+              "floatEnd": "2015-06-30",
+              "floatFiled": "2016-02-19",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "GRMN",
+              "flotanteB": 6082.02,
+              "flotanteReportadoB": 5634.43,
+              "escalado": true,
+              "floatEnd": "2015-06-27",
+              "floatFiled": "2016-02-17",
+              "mesesRancio": 18.3,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "AAPL",
+              "flotanteB": 636.21,
+              "flotanteReportadoB": 578.81,
+              "escalado": true,
+              "floatEnd": "2016-03-25",
+              "floatFiled": "2016-10-26",
+              "mesesRancio": 9.3,
+              "pctl": 0.7607,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "MSFT",
+              "flotanteB": 478.82,
+              "flotanteReportadoB": 424.5,
+              "escalado": true,
+              "floatEnd": "2015-12-31",
+              "floatFiled": "2016-07-28",
+              "mesesRancio": 12.1,
+              "pctl": 0.5968,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "XOM",
+              "flotanteB": 377.98,
+              "flotanteReportadoB": 346,
+              "escalado": true,
+              "floatEnd": "2015-06-30",
+              "floatFiled": "2016-02-24",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "GE",
+              "flotanteB": 328.08,
+              "flotanteReportadoB": 261.1,
+              "escalado": true,
+              "floatEnd": "2015-09-30",
+              "floatFiled": "2015-11-02",
+              "mesesRancio": 15.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "JNJ",
+              "flotanteB": 320.87,
+              "flotanteReportadoB": 276,
+              "escalado": true,
+              "floatEnd": "2015-06-28",
+              "floatFiled": "2016-02-24",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "JPM",
+              "flotanteB": 320.81,
+              "flotanteReportadoB": 249.2,
+              "escalado": true,
+              "floatEnd": "2015-06-30",
+              "floatFiled": "2016-02-23",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "BRK.B",
+              "flotanteB": 309.76,
+              "flotanteReportadoB": 257.35,
+              "escalado": true,
+              "floatEnd": "2015-06-30",
+              "floatFiled": "2016-02-29",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2018-01-02",
+          "miembros": 505,
+          "conSenal": 348,
+          "conFlotante": 470,
+          "pctlMedioTop": 0.6312,
+          "pctlMedioResto": 0.4886,
+          "elegibles": 1,
+          "sinSenal": 4,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "VIAB",
+              "flotanteB": 11206445.43,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 93.1,
+              "pctl": 0.4497,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 896.32,
+              "flotanteReportadoB": 747.51,
+              "escalado": true,
+              "floatEnd": "2017-03-31",
+              "floatFiled": "2017-11-03",
+              "mesesRancio": 9.1,
+              "pctl": 0.728,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "MSFT",
+              "flotanteB": 645.25,
+              "flotanteReportadoB": 466.5,
+              "escalado": true,
+              "floatEnd": "2016-12-31",
+              "floatFiled": "2017-08-02",
+              "mesesRancio": 12.1,
+              "pctl": 0.5706,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 636.75,
+              "flotanteReportadoB": 413.8,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.7227,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "AMZN",
+              "flotanteB": 465.44,
+              "flotanteReportadoB": 280.13,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-10",
+              "mesesRancio": 18.1,
+              "pctl": 0.4302,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "FB",
+              "flotanteB": 434.98,
+              "flotanteReportadoB": 274,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.8861,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "JPM",
+              "flotanteB": 387.65,
+              "flotanteReportadoB": 223.14,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-28",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "JNJ",
+              "flotanteB": 381.11,
+              "flotanteReportadoB": 332,
+              "escalado": true,
+              "floatEnd": "2016-07-03",
+              "floatFiled": "2017-02-27",
+              "mesesRancio": 18,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "BRK.B",
+              "flotanteB": 378.74,
+              "flotanteReportadoB": 278.05,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-27",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "XOM",
+              "flotanteB": 351.95,
+              "flotanteReportadoB": 388,
+              "escalado": true,
+              "floatEnd": "2016-06-30",
+              "floatFiled": "2017-02-22",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        }
+      ],
+      "resumen": {
+        "plazas": 80,
+        "elegibles": 8,
+        "pctElegibles": 10,
+        "sinSenal": 41,
+        "pctlMedioTop": 0.5871,
+        "pctlMedianoTop": 0.5844,
+        "pctlMedioResto": 0.493,
+        "brecha": 0.0941
+      },
+      "nombres": [
+        {
+          "ticker": "AAPL",
+          "veces": 8,
+          "pctlMedio": 0.7801,
+          "vecesElegible": 2,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "VIAB",
+          "veces": 8,
+          "pctlMedio": 0.5264,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "XOM",
+          "veces": 8,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 8
+        },
+        {
+          "ticker": "MSFT",
+          "veces": 7,
+          "pctlMedio": 0.7392,
+          "vecesElegible": 3,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "JNJ",
+          "veces": 5,
+          "pctlMedio": 0.7885,
+          "vecesElegible": 1,
+          "sinSenal": 2
+        },
+        {
+          "ticker": "GE",
+          "veces": 5,
+          "pctlMedio": 0.1614,
+          "vecesElegible": 0,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "BRK.B",
+          "veces": 4,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 4
+        },
+        {
+          "ticker": "JPM",
+          "veces": 4,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 4
+        },
+        {
+          "ticker": "T",
+          "veces": 3,
+          "pctlMedio": 0.3304,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "IBM",
+          "veces": 3,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "CVX",
+          "veces": 3,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "WFC",
+          "veces": 3,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "PG",
+          "veces": 2,
+          "pctlMedio": 0.574,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "AMZN",
+          "veces": 2,
+          "pctlMedio": 0.446,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "WHR",
+          "veces": 2,
+          "pctlMedio": 0.3274,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "FB",
+          "veces": 1,
+          "pctlMedio": 0.8861,
+          "vecesElegible": 1,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "APOL",
+          "veces": 1,
+          "pctlMedio": 0.8656,
+          "vecesElegible": 1,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "GOOG",
+          "veces": 1,
+          "pctlMedio": 0.7227,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "QCOM",
+          "veces": 1,
+          "pctlMedio": 0.7006,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "QEP",
+          "veces": 1,
+          "pctlMedio": 0.0613,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "SHW",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "COP",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "NEM",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "HBAN",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "LNC",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "PFE",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "JEF",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "GRMN",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        }
+      ],
+      "comprados": {
+        "fuente": "picks_rules_backtest_oos.json",
+        "posiciones": 93,
+        "distintos": 74,
+        "megacapsComprados": [
+          "AAPL",
+          "MSFT",
+          "JNJ",
+          "FB",
+          "APOL",
+          "SHW"
+        ],
+        "megacapsNoComprados": [
+          "VIAB",
+          "XOM",
+          "GE",
+          "BRK.B",
+          "JPM",
+          "T",
+          "IBM",
+          "CVX",
+          "WFC",
+          "PG",
+          "AMZN",
+          "WHR",
+          "GOOG",
+          "QCOM",
+          "QEP",
+          "COP",
+          "NEM",
+          "HBAN",
+          "LNC",
+          "PFE",
+          "JEF",
+          "GRMN"
+        ]
+      },
+      "rankingSinEscalar": [
+        {
+          "fecha": "2011-01-03",
+          "nombres": [
+            "VIAB",
+            "APOL",
+            "SHW",
+            "XOM",
+            "MSFT",
+            "AAPL",
+            "T",
+            "PG",
+            "JNJ",
+            "COP"
+          ],
+          "pctlMedio": 0.6649,
+          "elegibles": 2
+        },
+        {
+          "fecha": "2012-01-03",
+          "nombres": [
+            "QCOM",
+            "NEM",
+            "VIAB",
+            "HBAN",
+            "AAPL",
+            "XOM",
+            "MSFT",
+            "T",
+            "PG",
+            "JNJ"
+          ],
+          "pctlMedio": 0.6074,
+          "elegibles": 1
+        },
+        {
+          "fecha": "2013-01-02",
+          "nombres": [
+            "QEP",
+            "VIAB",
+            "LNC",
+            "WHR",
+            "AAPL",
+            "XOM",
+            "CVX",
+            "IBM",
+            "MSFT",
+            "T"
+          ],
+          "pctlMedio": 0.3931,
+          "elegibles": 1
+        },
+        {
+          "fecha": "2014-01-02",
+          "nombres": [
+            "VIAB",
+            "WHR",
+            "AAPL",
+            "XOM",
+            "IBM",
+            "GE",
+            "CVX",
+            "T",
+            "MSFT",
+            "JNJ"
+          ],
+          "pctlMedio": 0.5369,
+          "elegibles": 2
+        },
+        {
+          "fecha": "2015-01-02",
+          "nombres": [
+            "VIAB",
+            "AAPL",
+            "XOM",
+            "MSFT",
+            "JNJ",
+            "GE",
+            "CVX",
+            "PG",
+            "WFC",
+            "IBM"
+          ],
+          "pctlMedio": 0.6052,
+          "elegibles": 0
+        },
+        {
+          "fecha": "2016-01-04",
+          "nombres": [
+            "VIAB",
+            "AAPL",
+            "XOM",
+            "MSFT",
+            "JNJ",
+            "WFC",
+            "GE",
+            "CVX",
+            "PG",
+            "BRK.B"
+          ],
+          "pctlMedio": 0.6808,
+          "elegibles": 2
+        },
+        {
+          "fecha": "2017-01-03",
+          "nombres": [
+            "VIAB",
+            "JEF",
+            "GRMN",
+            "AAPL",
+            "MSFT",
+            "XOM",
+            "WFC",
+            "JNJ",
+            "GE",
+            "BRK.B"
+          ],
+          "pctlMedio": 0.606,
+          "elegibles": 0
+        },
+        {
+          "fecha": "2018-01-02",
+          "nombres": [
+            "VIAB",
+            "AAPL",
+            "MSFT",
+            "GOOG",
+            "XOM",
+            "JNJ",
+            "AMZN",
+            "BRK.B",
+            "FB",
+            "T"
+          ],
+          "pctlMedio": 0.5944,
+          "elegibles": 1
+        }
+      ]
+    },
+    "2019-2026": {
+      "cortes": [
+        {
+          "fecha": "2019-01-02",
+          "miembros": 505,
+          "conSenal": 354,
+          "conFlotante": 478,
+          "pctlMedioTop": 0.5985,
+          "pctlMedioResto": 0.4901,
+          "elegibles": 1,
+          "sinSenal": 3,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "IQV",
+              "flotanteB": 15567886.8,
+              "flotanteReportadoB": 12189011.44,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-16",
+              "mesesRancio": 18.1,
+              "pctl": 0.1069,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "VIAB",
+              "flotanteB": 9611170.74,
+              "flotanteReportadoB": 12352600,
+              "escalado": true,
+              "floatEnd": "2010-03-31",
+              "floatFiled": "2010-04-29",
+              "mesesRancio": 105.1,
+              "pctl": 0.454,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "GRMN",
+              "flotanteB": 7509.56,
+              "flotanteReportadoB": 6129.44,
+              "escalado": true,
+              "floatEnd": "2017-07-01",
+              "floatFiled": "2018-02-21",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "AAPL",
+              "flotanteB": 780.17,
+              "flotanteReportadoB": 828.88,
+              "escalado": true,
+              "floatEnd": "2018-03-30",
+              "floatFiled": "2018-11-05",
+              "mesesRancio": 9.1,
+              "pctl": 0.7452,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "MSFT",
+              "flotanteB": 768.51,
+              "flotanteReportadoB": 650.1,
+              "escalado": true,
+              "floatEnd": "2017-12-31",
+              "floatFiled": "2018-08-03",
+              "mesesRancio": 12.1,
+              "pctl": 0.7013,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 637.94,
+              "flotanteReportadoB": 554.3,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-06",
+              "mesesRancio": 18.1,
+              "pctl": 0.6738,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "AMZN",
+              "flotanteB": 615.86,
+              "flotanteReportadoB": 387.33,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-02",
+              "mesesRancio": 18.1,
+              "pctl": 0.5971,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "BRK.B",
+              "flotanteB": 392.62,
+              "flotanteReportadoB": 327.9,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-26",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "JPM",
+              "flotanteB": 347.37,
+              "flotanteReportadoB": 319.7,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-27",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "FB",
+              "flotanteB": 334.3,
+              "flotanteReportadoB": 372,
+              "escalado": true,
+              "floatEnd": "2017-06-30",
+              "floatFiled": "2018-02-01",
+              "mesesRancio": 18.1,
+              "pctl": 0.9109,
+              "elegible": true
+            }
+          ]
+        },
+        {
+          "fecha": "2020-01-02",
+          "miembros": 505,
+          "conSenal": 371,
+          "conFlotante": 484,
+          "pctlMedioTop": 0.7248,
+          "pctlMedioResto": 0.4888,
+          "elegibles": 1,
+          "sinSenal": 4,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "HST",
+              "flotanteB": 13279119.12,
+              "flotanteReportadoB": 15347835.59,
+              "escalado": true,
+              "floatEnd": "2018-06-29",
+              "floatFiled": "2019-02-26",
+              "mesesRancio": 18.1,
+              "pctl": 0.5424,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "GRMN",
+              "flotanteB": 12499.66,
+              "flotanteReportadoB": 7753.5,
+              "escalado": true,
+              "floatEnd": "2018-06-30",
+              "floatFiled": "2019-02-20",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "AAPL",
+              "flotanteB": 1383.08,
+              "flotanteReportadoB": 874.7,
+              "escalado": true,
+              "floatEnd": "2019-03-29",
+              "floatFiled": "2019-10-31",
+              "mesesRancio": 9.2,
+              "pctl": 0.7597,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "MSFT",
+              "flotanteB": 1217.02,
+              "flotanteReportadoB": 769.6,
+              "escalado": true,
+              "floatEnd": "2018-12-31",
+              "floatFiled": "2019-08-01",
+              "mesesRancio": 12.1,
+              "pctl": 0.7833,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 833.43,
+              "flotanteReportadoB": 680,
+              "escalado": true,
+              "floatEnd": "2018-06-29",
+              "floatFiled": "2019-02-05",
+              "mesesRancio": 18.1,
+              "pctl": 0.7277,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "AMZN",
+              "flotanteB": 774.81,
+              "flotanteReportadoB": 693.89,
+              "escalado": true,
+              "floatEnd": "2018-06-30",
+              "floatFiled": "2019-02-01",
+              "mesesRancio": 18.1,
+              "pctl": 0.6431,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "FB",
+              "flotanteB": 524.67,
+              "flotanteReportadoB": 486,
+              "escalado": true,
+              "floatEnd": "2018-06-29",
+              "floatFiled": "2019-01-31",
+              "mesesRancio": 18.1,
+              "pctl": 0.8925,
+              "elegible": true
+            },
+            {
+              "rank": 8,
+              "ticker": "JPM",
+              "flotanteB": 471.15,
+              "flotanteReportadoB": 347.96,
+              "escalado": true,
+              "floatEnd": "2018-06-30",
+              "floatFiled": "2019-02-26",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "BRK.B",
+              "flotanteB": 449.08,
+              "flotanteReportadoB": 367.01,
+              "escalado": true,
+              "floatEnd": "2018-06-30",
+              "floatFiled": "2019-02-25",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "JNJ",
+              "flotanteB": 390.97,
+              "flotanteReportadoB": 325,
+              "escalado": true,
+              "floatEnd": "2018-07-01",
+              "floatFiled": "2019-02-20",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2021-01-04",
+          "miembros": 505,
+          "conSenal": 371,
+          "conFlotante": 485,
+          "pctlMedioTop": 0.6467,
+          "pctlMedioResto": 0.49,
+          "elegibles": 2,
+          "sinSenal": 3,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "HST",
+              "flotanteB": 10201592.85,
+              "flotanteReportadoB": 13135902.46,
+              "escalado": true,
+              "floatEnd": "2019-06-28",
+              "floatFiled": "2020-02-25",
+              "mesesRancio": 18.3,
+              "pctl": 0.2957,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 2237.03,
+              "flotanteReportadoB": 1070.63,
+              "escalado": true,
+              "floatEnd": "2020-03-27",
+              "floatFiled": "2020-10-30",
+              "mesesRancio": 9.3,
+              "pctl": 0.7996,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "MSFT",
+              "flotanteB": 1656.49,
+              "flotanteReportadoB": 1200,
+              "escalado": true,
+              "floatEnd": "2019-12-31",
+              "floatFiled": "2020-07-30",
+              "mesesRancio": 12.2,
+              "pctl": 0.8475,
+              "elegible": true
+            },
+            {
+              "rank": 4,
+              "ticker": "AMZN",
+              "flotanteB": 1323.17,
+              "flotanteReportadoB": 786.28,
+              "escalado": true,
+              "floatEnd": "2019-06-30",
+              "floatFiled": "2020-01-31",
+              "mesesRancio": 18.2,
+              "pctl": 0.6859,
+              "elegible": false
+            },
+            {
+              "rank": 5,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 1060.05,
+              "flotanteReportadoB": 663,
+              "escalado": true,
+              "floatEnd": "2019-06-28",
+              "floatFiled": "2020-02-04",
+              "mesesRancio": 18.3,
+              "pctl": 0.7476,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "FB",
+              "flotanteB": 666.08,
+              "flotanteReportadoB": 478,
+              "escalado": true,
+              "floatEnd": "2019-06-28",
+              "floatFiled": "2020-01-30",
+              "mesesRancio": 18.3,
+              "pctl": 0.9203,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "TSLA",
+              "flotanteB": 515.01,
+              "flotanteReportadoB": 31.54,
+              "escalado": true,
+              "floatEnd": "2019-06-30",
+              "floatFiled": "2020-02-13",
+              "mesesRancio": 18.2,
+              "pctl": 0.2304,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "BRK.B",
+              "flotanteB": 447.21,
+              "flotanteReportadoB": 417.3,
+              "escalado": true,
+              "floatEnd": "2019-06-30",
+              "floatFiled": "2020-02-24",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "JNJ",
+              "flotanteB": 413.5,
+              "flotanteReportadoB": 368,
+              "escalado": true,
+              "floatEnd": "2019-06-30",
+              "floatFiled": "2020-02-18",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "JPM",
+              "flotanteB": 399.66,
+              "flotanteReportadoB": 354.99,
+              "escalado": true,
+              "floatEnd": "2019-06-30",
+              "floatFiled": "2020-02-25",
+              "mesesRancio": 18.2,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2022-01-03",
+          "miembros": 505,
+          "conSenal": 373,
+          "conFlotante": 487,
+          "pctlMedioTop": 0.6557,
+          "pctlMedioResto": 0.4907,
+          "elegibles": 3,
+          "sinSenal": 3,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "ZBH",
+              "flotanteB": 26695248.51,
+              "flotanteReportadoB": 24675479.72,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-02-22",
+              "mesesRancio": 18.1,
+              "pctl": 0.2723,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 3035.29,
+              "flotanteReportadoB": 2021.36,
+              "escalado": true,
+              "floatEnd": "2021-03-26",
+              "floatFiled": "2021-10-29",
+              "mesesRancio": 9.3,
+              "pctl": 0.8486,
+              "elegible": true
+            },
+            {
+              "rank": 3,
+              "ticker": "MSFT",
+              "flotanteB": 2558.56,
+              "flotanteReportadoB": 1700,
+              "escalado": true,
+              "floatEnd": "2020-12-31",
+              "floatFiled": "2021-07-29",
+              "mesesRancio": 12.1,
+              "pctl": 0.8439,
+              "elegible": true
+            },
+            {
+              "rank": 4,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 1744.04,
+              "flotanteReportadoB": 849.7,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.8409,
+              "elegible": true
+            },
+            {
+              "rank": 5,
+              "ticker": "AMZN",
+              "flotanteB": 1450.75,
+              "flotanteReportadoB": 1174.37,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.6247,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "TSLA",
+              "flotanteB": 892.05,
+              "flotanteReportadoB": 160.57,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-02-08",
+              "mesesRancio": 18.1,
+              "pctl": 0.3686,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "FB",
+              "flotanteB": 839.38,
+              "flotanteReportadoB": 563,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-01-28",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "NVDA",
+              "flotanteB": 712.69,
+              "flotanteReportadoB": 241.21,
+              "escalado": true,
+              "floatEnd": "2020-07-24",
+              "floatFiled": "2021-02-26",
+              "mesesRancio": 17.3,
+              "pctl": 0.7906,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "JPM",
+              "flotanteB": 660.06,
+              "flotanteReportadoB": 383.95,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-02-23",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "BRK.B",
+              "flotanteB": 567,
+              "flotanteReportadoB": 336.5,
+              "escalado": true,
+              "floatEnd": "2020-06-30",
+              "floatFiled": "2021-03-01",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2023-01-03",
+          "miembros": 503,
+          "conSenal": 370,
+          "conFlotante": 490,
+          "pctlMedioTop": 0.6615,
+          "pctlMedioResto": 0.4884,
+          "elegibles": 3,
+          "sinSenal": 4,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "ZBH",
+              "flotanteB": 27336247.04,
+              "flotanteReportadoB": 33533707.32,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-25",
+              "mesesRancio": 18.1,
+              "pctl": 0.2801,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "AAPL",
+              "flotanteB": 2025.85,
+              "flotanteReportadoB": 2830.07,
+              "escalado": true,
+              "floatEnd": "2022-03-25",
+              "floatFiled": "2022-10-28",
+              "mesesRancio": 9.3,
+              "pctl": 0.8649,
+              "elegible": true
+            },
+            {
+              "rank": 3,
+              "ticker": "MSFT",
+              "flotanteB": 1780.89,
+              "flotanteReportadoB": 2500,
+              "escalado": true,
+              "floatEnd": "2021-12-31",
+              "floatFiled": "2022-07-28",
+              "mesesRancio": 12.1,
+              "pctl": 0.8512,
+              "elegible": true
+            },
+            {
+              "rank": 4,
+              "ticker": "GOOGL",
+              "hermanos": [
+                "GOOG"
+              ],
+              "flotanteB": 1059.24,
+              "flotanteReportadoB": 1451.1,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-02",
+              "mesesRancio": 18.1,
+              "pctl": 0.8472,
+              "elegible": true
+            },
+            {
+              "rank": 5,
+              "ticker": "AMZN",
+              "flotanteB": 752.07,
+              "flotanteReportadoB": 1507.36,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-04",
+              "mesesRancio": 18.1,
+              "pctl": 0.4427,
+              "elegible": false
+            },
+            {
+              "rank": 6,
+              "ticker": "BRK.B",
+              "flotanteB": 561.57,
+              "flotanteReportadoB": 503.6,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-28",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 7,
+              "ticker": "UNH",
+              "flotanteB": 487.2,
+              "flotanteReportadoB": 376.16,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-15",
+              "mesesRancio": 18.1,
+              "pctl": 0.6828,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "JNJ",
+              "flotanteB": 469.25,
+              "flotanteReportadoB": 445,
+              "escalado": true,
+              "floatEnd": "2021-07-04",
+              "floatFiled": "2022-02-17",
+              "mesesRancio": 18,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "XOM",
+              "flotanteB": 450.83,
+              "flotanteReportadoB": 267,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-23",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "JPM",
+              "flotanteB": 400.6,
+              "flotanteReportadoB": 461.14,
+              "escalado": true,
+              "floatEnd": "2021-06-30",
+              "floatFiled": "2022-02-22",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2024-01-02",
+          "miembros": 503,
+          "conSenal": 368,
+          "conFlotante": 489,
+          "pctlMedioTop": 0.7739,
+          "pctlMedioResto": 0.4878,
+          "elegibles": 5,
+          "sinSenal": 2,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "MTB",
+              "flotanteB": 23816343.28,
+              "flotanteReportadoB": 27304085.27,
+              "escalado": true,
+              "floatEnd": "2022-06-30",
+              "floatFiled": "2023-02-22",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "WAT",
+              "flotanteB": 19713.37,
+              "flotanteReportadoB": 20209.47,
+              "escalado": true,
+              "floatEnd": "2022-07-01",
+              "floatFiled": "2023-02-27",
+              "mesesRancio": 18.1,
+              "pctl": 0.7351,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "DPZ",
+              "flotanteB": 14750.05,
+              "flotanteReportadoB": 13537.24,
+              "escalado": true,
+              "floatEnd": "2022-06-19",
+              "floatFiled": "2023-02-23",
+              "mesesRancio": 18.5,
+              "pctl": 0.5835,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "AAPL",
+              "flotanteB": 2917.06,
+              "flotanteReportadoB": 2591.16,
+              "escalado": true,
+              "floatEnd": "2023-03-31",
+              "floatFiled": "2023-11-03",
+              "mesesRancio": 9.1,
+              "pctl": 0.8677,
+              "elegible": true
+            },
+            {
+              "rank": 5,
+              "ticker": "MSFT",
+              "flotanteB": 2783.61,
+              "flotanteReportadoB": 1800,
+              "escalado": true,
+              "floatEnd": "2022-12-31",
+              "floatFiled": "2023-07-27",
+              "mesesRancio": 12.1,
+              "pctl": 0.8463,
+              "elegible": true
+            },
+            {
+              "rank": 6,
+              "ticker": "GOOG",
+              "hermanos": [
+                "GOOGL"
+              ],
+              "flotanteB": 1602.79,
+              "flotanteReportadoB": 1256.1,
+              "escalado": true,
+              "floatEnd": "2022-06-30",
+              "floatFiled": "2023-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.8398,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "AMZN",
+              "flotanteB": 1333.64,
+              "flotanteReportadoB": 944.74,
+              "escalado": true,
+              "floatEnd": "2022-06-30",
+              "floatFiled": "2023-02-03",
+              "mesesRancio": 18.1,
+              "pctl": 0.5531,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "NVDA",
+              "flotanteB": 1151.94,
+              "flotanteReportadoB": 434.37,
+              "escalado": true,
+              "floatEnd": "2022-07-29",
+              "floatFiled": "2023-02-24",
+              "mesesRancio": 17.1,
+              "pctl": 0.9284,
+              "elegible": true
+            },
+            {
+              "rank": 9,
+              "ticker": "META",
+              "flotanteB": 811.77,
+              "flotanteReportadoB": 378,
+              "escalado": true,
+              "floatEnd": "2022-06-30",
+              "floatFiled": "2023-02-02",
+              "mesesRancio": 18.1,
+              "pctl": 0.8372,
+              "elegible": true
+            },
+            {
+              "rank": 10,
+              "ticker": "BRK.B",
+              "flotanteB": 663.8,
+              "flotanteReportadoB": 500,
+              "escalado": true,
+              "floatEnd": "2022-06-30",
+              "floatFiled": "2023-02-27",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2025-01-02",
+          "miembros": 503,
+          "conSenal": 367,
+          "conFlotante": 491,
+          "pctlMedioTop": 0.7349,
+          "pctlMedioResto": 0.489,
+          "elegibles": 5,
+          "sinSenal": 1,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "MTB",
+              "flotanteB": 30346252.67,
+              "flotanteReportadoB": 19900658.49,
+              "escalado": true,
+              "floatEnd": "2023-06-30",
+              "floatFiled": "2024-02-21",
+              "mesesRancio": 18.1,
+              "pctl": null,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "DPZ",
+              "flotanteB": 15183.66,
+              "flotanteReportadoB": 11569.72,
+              "escalado": true,
+              "floatEnd": "2023-06-18",
+              "floatFiled": "2024-02-26",
+              "mesesRancio": 18.5,
+              "pctl": 0.595,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "AAPL",
+              "flotanteB": 3737.89,
+              "flotanteReportadoB": 2628.55,
+              "escalado": true,
+              "floatEnd": "2024-03-29",
+              "floatFiled": "2024-11-01",
+              "mesesRancio": 9.2,
+              "pctl": 0.8799,
+              "elegible": true
+            },
+            {
+              "rank": 4,
+              "ticker": "NVDA",
+              "flotanteB": 3254.35,
+              "flotanteReportadoB": 1100,
+              "escalado": true,
+              "floatEnd": "2023-07-28",
+              "floatFiled": "2024-02-21",
+              "mesesRancio": 17.2,
+              "pctl": 0.9667,
+              "elegible": true
+            },
+            {
+              "rank": 5,
+              "ticker": "MSFT",
+              "flotanteB": 3116.75,
+              "flotanteReportadoB": 2800,
+              "escalado": true,
+              "floatEnd": "2023-12-31",
+              "floatFiled": "2024-07-30",
+              "mesesRancio": 12.1,
+              "pctl": 0.8524,
+              "elegible": true
+            },
+            {
+              "rank": 6,
+              "ticker": "GOOGL",
+              "hermanos": [
+                "GOOG"
+              ],
+              "flotanteB": 2106.68,
+              "flotanteReportadoB": 1331.2,
+              "escalado": true,
+              "floatEnd": "2023-06-30",
+              "floatFiled": "2024-01-31",
+              "mesesRancio": 18.1,
+              "pctl": 0.8853,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "AMZN",
+              "flotanteB": 1999.62,
+              "flotanteReportadoB": 1183.68,
+              "escalado": true,
+              "floatEnd": "2023-06-30",
+              "floatFiled": "2024-02-02",
+              "mesesRancio": 18.1,
+              "pctl": 0.7018,
+              "elegible": false
+            },
+            {
+              "rank": 8,
+              "ticker": "META",
+              "flotanteB": 1330.11,
+              "flotanteReportadoB": 637,
+              "escalado": true,
+              "floatEnd": "2023-06-30",
+              "floatFiled": "2024-02-02",
+              "mesesRancio": 18.1,
+              "pctl": 0.9024,
+              "elegible": true
+            },
+            {
+              "rank": 9,
+              "ticker": "AVGO",
+              "flotanteB": 1058.34,
+              "flotanteReportadoB": 583.1,
+              "escalado": true,
+              "floatEnd": "2024-05-03",
+              "floatFiled": "2024-12-20",
+              "mesesRancio": 8,
+              "pctl": 0.4308,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "TSLA",
+              "flotanteB": 1046.86,
+              "flotanteReportadoB": 722.52,
+              "escalado": true,
+              "floatEnd": "2023-06-30",
+              "floatFiled": "2024-01-29",
+              "mesesRancio": 18.1,
+              "pctl": 0.3995,
+              "elegible": false
+            }
+          ]
+        },
+        {
+          "fecha": "2026-01-02",
+          "miembros": 503,
+          "conSenal": 364,
+          "conFlotante": 492,
+          "pctlMedioTop": 0.7415,
+          "pctlMedioResto": 0.491,
+          "elegibles": 5,
+          "sinSenal": 0,
+          "top": [
+            {
+              "rank": 1,
+              "ticker": "PKG",
+              "flotanteB": 18647201.69,
+              "flotanteReportadoB": 16124636.1,
+              "escalado": true,
+              "floatEnd": "2024-06-30",
+              "floatFiled": "2025-02-27",
+              "mesesRancio": 18.1,
+              "pctl": 0.4141,
+              "elegible": false
+            },
+            {
+              "rank": 2,
+              "ticker": "WAT",
+              "flotanteB": 22670.34,
+              "flotanteReportadoB": 17219.39,
+              "escalado": true,
+              "floatEnd": "2024-06-29",
+              "floatFiled": "2025-02-25",
+              "mesesRancio": 18.1,
+              "pctl": 0.7287,
+              "elegible": false
+            },
+            {
+              "rank": 3,
+              "ticker": "TKO",
+              "flotanteB": 16299.91,
+              "flotanteReportadoB": 8505.98,
+              "escalado": true,
+              "floatEnd": "2024-06-30",
+              "floatFiled": "2025-02-26",
+              "mesesRancio": 18.1,
+              "pctl": 0.5805,
+              "elegible": false
+            },
+            {
+              "rank": 4,
+              "ticker": "NVDA",
+              "flotanteB": 4509.95,
+              "flotanteReportadoB": 2700,
+              "escalado": true,
+              "floatEnd": "2024-07-26",
+              "floatFiled": "2025-02-26",
+              "mesesRancio": 17.2,
+              "pctl": 0.9613,
+              "elegible": true
+            },
+            {
+              "rank": 5,
+              "ticker": "AAPL",
+              "flotanteB": 4046.41,
+              "flotanteReportadoB": 3253.43,
+              "escalado": true,
+              "floatEnd": "2025-03-28",
+              "floatFiled": "2025-10-31",
+              "mesesRancio": 9.2,
+              "pctl": 0.8897,
+              "elegible": true
+            },
+            {
+              "rank": 6,
+              "ticker": "MSFT",
+              "flotanteB": 3478.33,
+              "flotanteReportadoB": 3100,
+              "escalado": true,
+              "floatEnd": "2024-12-31",
+              "floatFiled": "2025-07-30",
+              "mesesRancio": 12.1,
+              "pctl": 0.8141,
+              "elegible": true
+            },
+            {
+              "rank": 7,
+              "ticker": "GOOGL",
+              "hermanos": [
+                "GOOG"
+              ],
+              "flotanteB": 3460.33,
+              "flotanteReportadoB": 2000,
+              "escalado": true,
+              "floatEnd": "2024-06-28",
+              "floatFiled": "2025-02-05",
+              "mesesRancio": 18.2,
+              "pctl": 0.8281,
+              "elegible": true
+            },
+            {
+              "rank": 8,
+              "ticker": "AMZN",
+              "flotanteB": 2127.3,
+              "flotanteReportadoB": 1815.01,
+              "escalado": true,
+              "floatEnd": "2024-06-30",
+              "floatFiled": "2025-02-07",
+              "mesesRancio": 18.1,
+              "pctl": 0.6613,
+              "elegible": false
+            },
+            {
+              "rank": 9,
+              "ticker": "AVGO",
+              "flotanteB": 1603.24,
+              "flotanteReportadoB": 939.2,
+              "escalado": true,
+              "floatEnd": "2025-05-02",
+              "floatFiled": "2025-12-18",
+              "mesesRancio": 8,
+              "pctl": 0.6317,
+              "elegible": false
+            },
+            {
+              "rank": 10,
+              "ticker": "META",
+              "flotanteB": 1422.8,
+              "flotanteReportadoB": 1103,
+              "escalado": true,
+              "floatEnd": "2024-06-30",
+              "floatFiled": "2025-01-30",
+              "mesesRancio": 18.1,
+              "pctl": 0.9053,
+              "elegible": true
+            }
+          ]
+        }
+      ],
+      "resumen": {
+        "plazas": 80,
+        "elegibles": 25,
+        "pctElegibles": 31.25,
+        "sinSenal": 20,
+        "pctlMedioTop": 0.6974,
+        "pctlMedianoTop": 0.7464,
+        "pctlMedioResto": 0.4895,
+        "brecha": 0.2079
+      },
+      "nombres": [
+        {
+          "ticker": "AAPL",
+          "veces": 8,
+          "pctlMedio": 0.8319,
+          "vecesElegible": 5,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "MSFT",
+          "veces": 8,
+          "pctlMedio": 0.8175,
+          "vecesElegible": 6,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "AMZN",
+          "veces": 8,
+          "pctlMedio": 0.6137,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "BRK.B",
+          "veces": 6,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 6
+        },
+        {
+          "ticker": "GOOG",
+          "veces": 5,
+          "pctlMedio": 0.766,
+          "vecesElegible": 2,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "JPM",
+          "veces": 5,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 5
+        },
+        {
+          "ticker": "NVDA",
+          "veces": 4,
+          "pctlMedio": 0.9117,
+          "vecesElegible": 3,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "FB",
+          "veces": 4,
+          "pctlMedio": 0.9079,
+          "vecesElegible": 3,
+          "sinSenal": 1
+        },
+        {
+          "ticker": "META",
+          "veces": 3,
+          "pctlMedio": 0.8816,
+          "vecesElegible": 3,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "GOOGL",
+          "veces": 3,
+          "pctlMedio": 0.8535,
+          "vecesElegible": 3,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "TSLA",
+          "veces": 3,
+          "pctlMedio": 0.3328,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "JNJ",
+          "veces": 3,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 3
+        },
+        {
+          "ticker": "WAT",
+          "veces": 2,
+          "pctlMedio": 0.7319,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "DPZ",
+          "veces": 2,
+          "pctlMedio": 0.5893,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "AVGO",
+          "veces": 2,
+          "pctlMedio": 0.5313,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "HST",
+          "veces": 2,
+          "pctlMedio": 0.4191,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "ZBH",
+          "veces": 2,
+          "pctlMedio": 0.2762,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "GRMN",
+          "veces": 2,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 2
+        },
+        {
+          "ticker": "MTB",
+          "veces": 2,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 2
+        },
+        {
+          "ticker": "UNH",
+          "veces": 1,
+          "pctlMedio": 0.6828,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "TKO",
+          "veces": 1,
+          "pctlMedio": 0.5805,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "VIAB",
+          "veces": 1,
+          "pctlMedio": 0.454,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "PKG",
+          "veces": 1,
+          "pctlMedio": 0.4141,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "IQV",
+          "veces": 1,
+          "pctlMedio": 0.1069,
+          "vecesElegible": 0,
+          "sinSenal": 0
+        },
+        {
+          "ticker": "XOM",
+          "veces": 1,
+          "pctlMedio": null,
+          "vecesElegible": 0,
+          "sinSenal": 1
+        }
+      ],
+      "comprados": {
+        "fuente": "picks_rules_backtest.json",
+        "posiciones": 98,
+        "distintos": 79,
+        "megacapsComprados": [
+          "AAPL",
+          "MSFT",
+          "GOOG",
+          "NVDA",
+          "FB",
+          "META",
+          "WAT"
+        ],
+        "megacapsNoComprados": [
+          "AMZN",
+          "BRK.B",
+          "JPM",
+          "GOOGL",
+          "TSLA",
+          "JNJ",
+          "DPZ",
+          "AVGO",
+          "HST",
+          "ZBH",
+          "GRMN",
+          "MTB",
+          "UNH",
+          "TKO",
+          "VIAB",
+          "PKG",
+          "IQV",
+          "XOM"
+        ]
+      },
+      "rankingSinEscalar": [
+        {
+          "fecha": "2019-01-02",
+          "nombres": [
+            "VIAB",
+            "IQV",
+            "GRMN",
+            "AAPL",
+            "MSFT",
+            "GOOG",
+            "AMZN",
+            "FB",
+            "XOM",
+            "JNJ"
+          ],
+          "pctlMedio": 0.5985,
+          "elegibles": 1
+        },
+        {
+          "fecha": "2020-01-02",
+          "nombres": [
+            "HST",
+            "GRMN",
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "GOOG",
+            "FB",
+            "BRK.B",
+            "XOM",
+            "JPM"
+          ],
+          "pctlMedio": 0.7248,
+          "elegibles": 1
+        },
+        {
+          "fecha": "2021-01-04",
+          "nombres": [
+            "HST",
+            "MSFT",
+            "AAPL",
+            "AMZN",
+            "GOOG",
+            "FB",
+            "BRK.B",
+            "JNJ",
+            "JPM",
+            "XOM"
+          ],
+          "pctlMedio": 0.7161,
+          "elegibles": 2
+        },
+        {
+          "fecha": "2022-01-03",
+          "nombres": [
+            "ZBH",
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "GOOG",
+            "FB",
+            "JPM",
+            "JNJ",
+            "V",
+            "DIS"
+          ],
+          "pctlMedio": 0.6522,
+          "elegibles": 4
+        },
+        {
+          "fecha": "2023-01-03",
+          "nombres": [
+            "ZBH",
+            "AAPL",
+            "MSFT",
+            "AMZN",
+            "GOOG",
+            "META",
+            "TSLA",
+            "BRK.B",
+            "NVDA",
+            "JPM"
+          ],
+          "pctlMedio": 0.6885,
+          "elegibles": 4
+        },
+        {
+          "fecha": "2024-01-02",
+          "nombres": [
+            "MTB",
+            "WAT",
+            "DPZ",
+            "AAPL",
+            "MSFT",
+            "GOOG",
+            "AMZN",
+            "TSLA",
+            "BRK.B",
+            "UNH"
+          ],
+          "pctlMedio": 0.7078,
+          "elegibles": 3
+        },
+        {
+          "fecha": "2025-01-02",
+          "nombres": [
+            "MTB",
+            "DPZ",
+            "MSFT",
+            "AAPL",
+            "GOOG",
+            "AMZN",
+            "NVDA",
+            "TSLA",
+            "META",
+            "BRK.B"
+          ],
+          "pctlMedio": 0.7729,
+          "elegibles": 5
+        },
+        {
+          "fecha": "2026-01-02",
+          "nombres": [
+            "PKG",
+            "WAT",
+            "TKO",
+            "AAPL",
+            "MSFT",
+            "NVDA",
+            "GOOG",
+            "AMZN",
+            "META",
+            "AVGO"
+          ],
+          "pctlMedio": 0.7415,
+          "elegibles": 5
+        }
+      ]
+    }
+  },
+  "controles": {
+    "2011-2018/tamano": {
+      "pctlMedioTop": 0.9896,
+      "pctlMedioResto": 0.4885,
+      "pctElegibles": 100
+    },
+    "2011-2018/barajado": {
+      "pctlMedioTop": 0.4966,
+      "pctlMedioResto": 0.4944,
+      "pctElegibles": 5
+    },
+    "2019-2026/tamano": {
+      "pctlMedioTop": 0.9907,
+      "pctlMedioResto": 0.4897,
+      "pctElegibles": 100
+    },
+    "2019-2026/barajado": {
+      "pctlMedioTop": 0.4704,
+      "pctlMedioResto": 0.4942,
+      "pctElegibles": 2.5
+    },
+    "veredicto": {
+      "ok": true,
+      "nota": "el cruce tamaño↔señal detecta una asociación cuando la hay (control `tamano`) y la pierde cuando se rompe (control `barajado`)"
+    }
+  },
+  "asertosPointInTime": 14822,
+  "limitaciones": [
+    "El flotante lo declara la empresa en portada de 10-K/10-Q: se mide el último día hábil del 2.º trimestre fiscal y se publica meses después. Point-in-time se respeta por `filed`, pero el dato usado es rancio (ver `mesesRancio`) y por eso se escala por precio.",
+    "`dei:EntityPublicFloat` es capitalización AJUSTADA POR FLOTANTE, que es la que pondera el S&P 500 — no la capitalización bruta. Berkshire, Walmart o Meta salen por debajo de su valor total de mercado, igual que en el índice.",
+    "El escalado usa el cierre CRUDO (ajustado por split, no por dividendo) y supone recuento de acciones constante entre `end` y el corte: ignora recompras y emisiones de ese tramo.",
+    "`sp500_historical_components.csv` está congelado desde 2025-08-23: en los cortes posteriores la membresía es la de esa foto.",
+    "Los cortes anuales del mismo panel NO son observaciones independientes (la señal es lenta y los miembros se repiten). Por eso se publican medias y recuentos, y NO se calcula ningún p-valor."
+  ]
+}
