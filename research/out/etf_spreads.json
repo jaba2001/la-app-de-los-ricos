@@ -44,11 +44,25 @@
     "BTCUSD": {
       "spreadPct": null,
       "spreadBps": null,
-      "nota": "no es un ETF; su coste no sale de esta fuente",
-      "rotacionPct": 1.3
+      "nota": "FUERA DEL REGIMEN 6c-11: no es un ETF, se tiene el activo. Sin comision de gestion y sin dato publicado de diferencial. Supuesto conservador de 10 pb, DECLARADO — usar cero seria regalarle el coste al activo mas caro de operar de la cesta.",
+      "rotacionPct": 1.3,
+      "supuestoDeclaradoBps": 10,
+      "terPct": 0.0,
+      "terOrigen": "Cero POR CONSTRUCCION, no por falta de dato: se tiene el activo, no un fondo que cobre comision de gestion."
+    },
+    "DBC": {
+      "spreadPct": null,
+      "spreadBps": null,
+      "supuestoDeclaradoBps": 10,
+      "nota": "FUERA DEL REGIMEN 6c-11 POR ESTRUCTURA: DBC no es un ETF registrado del 40-Act sino un fondo estatutario de Delaware sobre futuros de materias primas (commodity pool). La regla no le obliga a publicar la mediana del diferencial, y no la publica. Se le deja el supuesto conservador de 10 pb, DECLARADO. Impacto minimo: DBC recibe peso CERO en el perfil de crecimiento (atribucion_activos.json) y en el paper fund solo aparecio en el primer rebalanceo.",
+      "rotacionPct": 0.0,
+      "emisor": "Invesco",
+      "terPct": 0.85,
+      "terOrigen": "Fuentes secundarias concordantes (Yahoo Finance, etfdb, mutualfunds.com, dividend.com, cbonds), consultadas el 2026-09-04: 0,85 % neto — 0,75 % de comision de gestion mas gastos. NO viene de la web del emisor bajo 6c-11 porque DBC no esta sujeto a esa regla."
     }
   },
   "cobertura": "98,8 % de la rotacion medida",
   "spreadPonderadoBps": 0.78,
-  "nota": "Ponderado por rotacion real (rotacion_anatomia.json): 0,404x0,5 + (0,320+0,107+0,098+0,059)x1,0 = 0,78 pb, frente al supuesto uniforme de 10."
+  "nota": "Ponderado por rotacion real (rotacion_anatomia.json): 0,404x0,5 + (0,320+0,107+0,098+0,059)x1,0 = 0,78 pb, frente al supuesto uniforme de 10.",
+  "alcanceDeLaRegla": "La regla 6c-11 obliga a los ETF REGISTRADOS del 40-Act. Quedan fuera los commodity pools (DBC) y los activos que no son fondos (BTC). Para esos dos el coste es un supuesto declarado, no una medicion — y se dice."
 }

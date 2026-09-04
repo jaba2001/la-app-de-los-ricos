@@ -6,7 +6,12 @@
 // row to sl_paper_fund_track (a NAV history). No hindsight — only sealed decisions.
 // Run: SUPABASE_SERVICE_KEY=… node --experimental-strip-types --no-warnings research/paperfund_measure.mjs
 // ─────────────────────────────────────────────────────────────────────────────
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 import { priceAsOf } from "./prices.mjs";
+
+const AQUI = dirname(fileURLToPath(import.meta.url));
 
 const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
@@ -60,7 +65,49 @@ console.log(`\n  PAPER FUND measure · inception ${inception} · ${grid.length -
 const px = {};
 async function P(a, d) { const k = a + d; if (k in px) return px[k]; const v = await priceAsOf(a, d); px[k] = v; return v; }
 
+/**
+ * COSTES REALES POR ACTIVO — Y POR QUE ESTO NO ES «AJUSTAR PARA GANAR».
+ *
+ * Hasta ahora este guion no cobraba NADA: ni diferencial ni comision de gestion, ni al fondo ni
+ * a sus referencias. Parece simetrico y no lo es, por dos motivos:
+ *   · el fondo ROTA y el indice comprado y quieto no, asi que solo uno paga diferenciales;
+ *   · el fondo lleva oro al 0,40 % de comision y el SPY cuesta 0,0945 %.
+ * Cobrar cero a los dos favorecia al fondo en las dos direcciones.
+ *
+ * Los diferenciales NO son un supuesto: los publica cada emisor a diario POR OBLIGACION LEGAL
+ * (regla 6c-11 de la SEC, mediana de los ultimos 30 dias sobre el NBBO). Ver `etf_spreads.json`.
+ *
+ * ⚠️ Y por eso esto se aplica AQUI y no al backtest historico: el dato es el de HOY. El registro
+ * vivo va hacia delante, asi que usarlo es correcto en el tiempo. Aplicarlo a una serie que
+ * empieza en 2007 seria anacronico —los diferenciales eran mucho mas anchos— y con 5,1 pp de
+ * retorno por punto basico es la forma exacta de batir al indice con una hoja de calculo.
+ *
+ * CONVENIO: cruzar el diferencial cuesta LA MITAD de la horquilla, y `rot` ya cuenta las dos
+ * patas de cada trasvase (vender A y comprar B suman |Δw| cada una). Asi que el coste es
+ * Σ|Δw_i| × spread_i / 2. El backtest historico cobra `Σ|Δw| × 10 pb`, que equivale a una
+ * horquilla de 20 pb de ida y vuelta: mas conservador todavia de lo que parecia.
+ */
+const COSTES = JSON.parse(readFileSync(join(AQUI, "out", "etf_spreads.json"), "utf8"));
+const spreadBps = (a) => {
+  const x = COSTES.activos?.[a];
+  if (!x) throw new Error(`spreadBps(${a}): no hay entrada en etf_spreads.json — anadela antes de medir`);
+  if (Number.isFinite(x.spreadBps)) return x.spreadBps;             // medido bajo 6c-11
+  if (Number.isFinite(x.supuestoDeclaradoBps)) return x.supuestoDeclaradoBps;  // fuera del regimen
+  throw new Error(`spreadBps(${a}): ni medicion ni supuesto declarado — no se inventa un coste`);
+};
+// Igual que el diferencial: una comision ausente NO vale cero. DBC cobra 0,85 % —el activo mas
+// caro de la cesta con diferencia— y devolver 0 por no encontrarlo lo habria regalado.
+const terPct = (a) => {
+  const x = COSTES.activos?.[a];
+  if (!x) throw new Error(`terPct(${a}): no hay entrada en etf_spreads.json`);
+  if (Number.isFinite(x.terPct)) return x.terPct;
+  throw new Error(`terPct(${a}): sin comision declarada — cero no es un valor por defecto valido`);
+};
+const TER_SPY = terPct("SPY"), TER_IEF = terPct("IEF");
+
 let nav = 100, spyNav = 100, b6040Nav = 100, peak = 100, maxDD = 0;
+let costeTotalPb = 0, comisionTotalPb = 0;
+let pesosPrevios = null;
 const rets = [], diasDeCadaTramo = [];
 for (let i = 1; i < grid.length; i++) {
   const d0 = grid[i - 1], d1 = grid[i];
@@ -77,12 +124,31 @@ for (let i = 1; i < grid.length; i++) {
   // the same construction the GROWTH_BACKTEST claim is measured against.
   const i0 = await P("IEF", d0), i1 = await P("IEF", d1);
   const iefRet = i0 != null && i1 != null && i0 > 0 ? i1 / i0 - 1 : 0;
-  if (ok) {
-    nav *= 1 + portRet; rets.push(portRet);
-    diasDeCadaTramo.push((new Date(d1 + "T00:00:00Z") - new Date(d0 + "T00:00:00Z")) / 86400000);
+  const dias = (new Date(d1 + "T00:00:00Z") - new Date(d0 + "T00:00:00Z")) / 86400000;
+  const anos = dias / 365.25;
+
+  // Diferencial: solo se paga sobre lo que CAMBIA de manos, y solo media horquilla por pata.
+  let coste = 0;
+  if (pesosPrevios) {
+    for (const a of ASSETS) {
+      const d = Math.abs((Number(w[a]) || 0) - (Number(pesosPrevios[a]) || 0));
+      if (d > 1e-9) coste += d * (spreadBps(a) / 10000) / 2;
+    }
   }
-  spyNav *= 1 + spyRet;
-  b6040Nav *= 1 + (0.6 * spyRet + 0.4 * iefRet);
+  // Comision de gestion: prorrateada por el tiempo que se tiene cada activo.
+  let comision = 0;
+  for (const a of ASSETS) comision += (Number(w[a]) || 0) * (terPct(a) / 100) * anos;
+
+  if (ok) {
+    nav *= 1 + portRet - coste - comision; rets.push(portRet - coste - comision);
+    diasDeCadaTramo.push(dias);
+    costeTotalPb += coste * 10000; comisionTotalPb += comision * 10000;
+  }
+  pesosPrevios = { ...w };
+  // Las referencias pagan SU comision: tener SPY tampoco es gratis. Sin esto la comparacion
+  // enfrenta una cartera con costes contra una serie de precios que no los tiene.
+  spyNav *= 1 + spyRet - (TER_SPY / 100) * anos;
+  b6040Nav *= 1 + (0.6 * spyRet + 0.4 * iefRet) - ((0.6 * TER_SPY + 0.4 * TER_IEF) / 100) * anos;
   peak = Math.max(peak, nav);
   maxDD = Math.min(maxDD, nav / peak - 1);
 }
@@ -109,9 +175,18 @@ const row = {
   bench6040_nav: +b6040Nav.toFixed(2), bench6040_ret: +(b6040TotalRet * 100).toFixed(2),
   total_ret: +(totalRet * 100).toFixed(2), spy_ret: +(spyTotalRet * 100).toFixed(2),
   max_dd: +(maxDD * 100).toFixed(2), sharpe: +sharpe.toFixed(2), grade,
+  coste_spread_pb: +costeTotalPb.toFixed(2), coste_comision_pb: +comisionTotalPb.toFixed(2),
   updated_at: new Date().toISOString(), // refresh on re-measure (PostgREST won't touch it otherwise)
 };
 console.log(`  NAV ${row.nav} (${row.total_ret >= 0 ? "+" : ""}${row.total_ret}%) vs 60/40 ${row.bench6040_nav} (${row.bench6040_ret}%) vs SPY ${row.spy_nav} (${row.spy_ret}%) · maxDD ${row.max_dd}% · Sharpe ${row.sharpe} · grade ${grade}`);
+
+// Los costes, a la vista. Si no se ven, nadie comprueba que se estan cobrando.
+console.log(`
+  COSTES COBRADOS (antes se cobraba CERO, a la cartera y a sus referencias)`);
+console.log(`     diferencial acumulado : ${costeTotalPb.toFixed(2)} pb   (media horquilla por pata, solo sobre lo que rota)`);
+console.log(`     comision de gestion   : ${comisionTotalPb.toFixed(2)} pb   (prorrateada por tiempo de tenencia)`);
+console.log(`     y las referencias pagan la suya: SPY ${TER_SPY} %/año · 60/40 ${(0.6 * TER_SPY + 0.4 * TER_IEF).toFixed(4)} %/año`);
+console.log(`     origen de los diferenciales: ${COSTES.fuente.slice(0, 96)}…`);
 
 if (SB_KEY) {
   const resp = await fetch(`${SB_URL}/rest/v1/sl_paper_fund_track?on_conflict=as_of`, {

@@ -107,5 +107,63 @@ const pesosEnAntiguo = (rebs, date) => { let w = rebs[0].weights; for (const r o
 comprobar("CONTROL POSITIVO · la versión antigua inventaba pesos antes del inicio (por eso el fallo)",
   pesosEnAntiguo(REBS, "2026-07-01").SPY === 0.4228);
 
+// ── COSTES: que se cobren, y que ninguno se cuele sin origen ────────────────────────────
+//
+// El fondo publicaba su NAV **sin cobrar nada**: ni diferencial ni comision, ni a el ni a sus
+// referencias. Parece simetrico y no lo es — el fondo ROTA y el indice comprado y quieto no, y
+// ademas lleva oro al 0,40 % frente al 0,0945 % del SPY. Cobrar cero favorecia al fondo por los
+// dos lados.
+//
+// Lo que esta guarda impide no es que los costes cambien: es que **vuelvan a ser cero en
+// silencio**, o que un activo nuevo se cuele con un coste inventado.
+{
+  const COSTES = JSON.parse(readFileSync(new URL("../research/out/etf_spreads.json", import.meta.url), "utf8"));
+  const SRC = readFileSync(new URL("../research/paperfund_measure.mjs", import.meta.url), "utf8");
+
+  const ACTIVOS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"];
+  for (const a of ACTIVOS) {
+    const x = COSTES.activos?.[a];
+    const tiene = x && (Number.isFinite(x.spreadBps) || Number.isFinite(x.supuestoDeclaradoBps));
+    comprobar(`${a} tiene coste con origen (medido o supuesto declarado)`, !!tiene);
+  }
+
+  // Los cinco que SI estan bajo la regla tienen que estar MEDIDOS, no supuestos.
+  for (const a of ["SPY", "TLT", "IEF", "GLD", "BIL"])
+    comprobar(`${a} esta MEDIDO bajo 6c-11, no supuesto`, Number.isFinite(COSTES.activos?.[a]?.spreadBps));
+
+  // Y los dos que quedan fuera del regimen tienen que decirlo, no disimularlo.
+  for (const a of ["DBC", "BTCUSD"]) {
+    comprobar(`${a} declara su supuesto`, Number.isFinite(COSTES.activos?.[a]?.supuestoDeclaradoBps));
+    comprobar(`${a} explica POR QUE esta fuera del regimen`, /6c-11/.test(COSTES.activos?.[a]?.nota ?? ""));
+  }
+
+  // El codigo: que no se pueda caer a un coste por defecto en silencio.
+  comprobar("el buscador de coste LANZA si un activo no tiene entrada", /throw new Error\(`spreadBps/.test(SRC));
+  comprobar("y tambien si no tiene ni medicion ni supuesto", /ni medicion ni supuesto/.test(SRC));
+  // Lo mismo para la comision: DBC cobra 0,85 % y devolver cero por no encontrarlo la regalaba.
+  comprobar("la comision tampoco cae a cero en silencio", /cero no es un valor por defecto valido/.test(SRC));
+  for (const a of ACTIVOS)
+    comprobar(`${a} tiene comision declarada (aunque sea cero por construccion)`, Number.isFinite(COSTES.activos?.[a]?.terPct));
+  comprobar("DBC no cotiza su comision como cero", (COSTES.activos?.DBC?.terPct ?? 0) > 0.5);
+
+  // Que se cobre de verdad, y a las TRES series.
+  // ⚠️ ANCLADO A LA LINEA DEL NAV, no a la subcadena suelta. Nacio buscando
+  // `portRet - coste - comision`, que TAMBIEN aparece en `rets.push(...)`: al quitar el cobro
+  // del NAV la guarda seguia verde. Cuarta vez hoy con este mismo defecto de subcadena.
+  comprobar("se cobra diferencial y comision AL NAV", /nav \*= 1 \+ portRet - coste - comision/.test(SRC));
+  comprobar("y la serie de retornos tambien va neta", /rets\.push\(portRet - coste - comision\)/.test(SRC));
+  comprobar("se cobra comision al SPY de referencia", /spyNav \*= 1 \+ spyRet - \(TER_SPY/.test(SRC));
+  comprobar("y al 60\/40", /b6040Nav[\s\S]{0,120}TER_SPY \+ 0\.4 \* TER_IEF/.test(SRC));
+  // Media horquilla por pata: cobrar la horquilla entera contaria el coste dos veces.
+  comprobar("el diferencial se cobra a MEDIA horquilla por pata", /spreadBps\(a\) \/ 10000\) \/ 2/.test(SRC));
+  // La comision se prorratea por tiempo, no se cobra entera cada tramo.
+  comprobar("la comision se prorratea por el tiempo de tenencia", /terPct\(a\) \/ 100\) \* anos/.test(SRC));
+
+  // CONTROL POSITIVO: el fichero de costes NO puede estar vacio de medidas.
+  const medidos = ACTIVOS.filter((a) => Number.isFinite(COSTES.activos?.[a]?.spreadBps)).length;
+  comprobar(`CONTROL POSITIVO · hay mediciones reales, no solo supuestos (${medidos} de ${ACTIVOS.length})`, medidos >= 5);
+}
+
+
 console.log(`\n  ${ok} comprobaciones OK${fallos ? ` · ${fallos} FALLOS` : ""}\n`);
 process.exit(fallos ? 1 : 0);
