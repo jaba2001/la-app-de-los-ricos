@@ -91,6 +91,15 @@ jobs:
       - name: Los guardianes, vigilados
         run: node --experimental-strip-types --no-warnings scripts/guardianes.test.mjs
 
+      # El paper fund publico durante semanas un exceso de +0,59 pp sobre el indice que era
+      # ENTERAMENTE un artefacto: la rejilla de medicion hacia `setUTCDate(1)`, asi que con un
+      # inicio el 09-jul arrancaba el 01-jul —ocho dias en los que el fondo no existia—, y en
+      # ese tramo fantasma `weightsAsOf` devolvia los pesos del primer rebalanceo: una cartera
+      # multiactivo que el fondo tuvo UN SOLO DIA antes de irse a 100 % SPY. Con las decisiones
+      # tal y como se sellaron, el fondo iba POR DETRAS. No habia ninguna prueba que lo cazara.
+      - name: El fondo no se mide antes de existir
+        run: node --experimental-strip-types --no-warnings scripts/paperfund.test.mjs
+
       - name: Guardián de la capa de datos
         run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
 

@@ -15,6 +15,25 @@ const UA = "Scora Research contact@scora.app";
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
 const mem = new Map();
+
+// ⚠️ CACHÉ DE COMPANYFACTS, ACOTADA A PROPÓSITO — Y ESTE LÍMITE NO ES DECORATIVO.
+//
+// Antes los companyfacts se guardaban en `mem`, que no tiene límite ni expulsa nada. Mientras
+// el universo de picks fueron 43 nombres congelados, cabía. El 2026-09-01, con la foto de
+// miembros ya al día, el cron corrió sobre 503 y el runner murió: «Reached heap limit
+// Allocation failed», exit 134, sin escribir la fila. Fue la ÚNICA fecha de decisión que ha
+// existido, y se perdió.
+//
+// La cuenta, medida sobre la caché de disco y no estimada: 3,7 MB de media por empresa y
+// 8,2 MB la mayor. 503 × 3,7 MB ≈ 1,9 GB de texto JSON, que parseado a objetos se multiplica
+// por tres o más. No cabe en ningún montón razonable, y por eso el límite se cuenta en piezas.
+//
+// 64 × 3,7 MB ≈ 240 MB de texto (~700 MB parseados), que sí cabe. Un backtest que recorra
+// fechas por fuera y tickers por dentro fallará más veces de las que acierte, pero fallar aquí
+// es releer de DISCO —`getJSON` ya cachea ahí—, no volver a pedirle nada a la SEC. Si algún
+// script necesita más, `SCORA_FACTS_CACHE` lo sube.
+const MAX_FACTS = Math.max(1, Number(process.env.SCORA_FACTS_CACHE) || 64);
+const memFacts = new Map();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function getJSON(url, cacheFile, ttlDays = 30) {
@@ -215,7 +234,10 @@ function fusionarFacts(nuevo, viejo) {
 
 async function companyFacts(cik) {
   const key = `facts_${cik}`;
-  if (mem.has(key)) return mem.get(key);
+  if (memFacts.has(key)) {
+    // LRU: al acertar, se renueva reinsertando (Map conserva el orden de inserción).
+    const j = memFacts.get(key); memFacts.delete(key); memFacts.set(key, j); return j;
+  }
   let j = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik}.json`, `CIK${cik}.json`);
   const previo = CIK_PREDECESOR[cik];
   if (previo && j) {
@@ -224,7 +246,8 @@ async function companyFacts(cik) {
     const viejo = await getJSON(`https://data.sec.gov/api/xbrl/companyfacts/CIK${previo}.json`, `CIK${previo}.json`);
     if (viejo) j = fusionarFacts(j, viejo);
   }
-  mem.set(key, j);
+  memFacts.set(key, j);
+  while (memFacts.size > MAX_FACTS) memFacts.delete(memFacts.keys().next().value);
   return j;
 }
 

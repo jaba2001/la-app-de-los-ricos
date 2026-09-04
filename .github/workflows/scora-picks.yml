@@ -36,4 +36,10 @@ jobs:
         env:
           TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # opcional — cobertura de deslistados
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        # El arreglo de verdad del OOM del 2026-09-01 es la caché acotada de companyfacts
+        # (`research/edgar.mjs`), que limita la memoria por construcción. Esto es SÓLO un
+        # seguro: una fecha de decisión ocurre cada dos semanas y, si el proceso muere, se
+        # pierde para siempre y no hay recuperación. La holgura no sustituye al arreglo.
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
         run: node --experimental-strip-types --no-warnings research/cron-picks.mjs
