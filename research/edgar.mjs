@@ -821,6 +821,9 @@ const OI = ["OperatingIncomeLoss"];
  * otra cosa es exactamente la forma de error que este fichero lleva toda la vida cazando.
  */
 const OPEX = ["OperatingExpenses"];
+// Total de la seccion de explotacion. Lo etiquetan empresas que NO etiquetan ni
+// `OperatingIncomeLoss` ni `OperatingExpenses` — CVX, BRK.B, GE, DE, BMY, HCA…
+const CYE = ["CostsAndExpenses"];
 const DA = ["DepreciationDepletionAndAmortization", "DepreciationAmortizationAndAccretionNet", "DepreciationAndAmortization"];
 const INT = ["InterestExpense", "InterestExpenseDebt", "InterestAndDebtExpense"];
 const OCF = ["NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"];
@@ -1151,6 +1154,28 @@ export async function fundamentalsAsOf(cik, asOf) {
         oi = { val: rev.val - cost.val - opex.val, latestEnd: rev.latestEnd };
         oiFuente = "ingresos-menos-coste-menos-opex";
       }
+    }
+  }
+  /**
+   * CUARTA VÍA · `Ingresos − CostesYGastos`.
+   *
+   * Va la última a propósito: sólo actúa sobre quien no etiqueta NI el resultado de explotación
+   * NI los gastos de explotación, que es justo donde las tres anteriores no llegan. Se descubrió
+   * mirando qué etiquetan de verdad los que quedaban fuera: XOM, CVX, BRK.B, GE, DE, BMY, HCA…
+   * publican `CostsAndExpenses`, el total de la sección de explotación.
+   *
+   * Se distingue de la vía pretax RECHAZADA en lo único que importaba: **se queda dentro de la
+   * sección de explotación**, así que no arrastra ingresos financieros ni impuestos. Medida
+   * sobre las 146 empresas que publican ambas cosas, con el MISMO criterio que rechazó aquélla
+   * y sin cambiarle un número: desvío mediano **0,0 %**, dispersión sectorial **0 pp** (los diez
+   * sectores a cero), 89 % dentro del ±5 %. Rescata 24 nombres.
+   * Ver `research/ebit_costes_gastos.mjs`.
+   */
+  if (oi == null && rev != null && rev.latestEnd != null) {
+    const cye = F(T(CYE, "CYE"));
+    if (cye != null && cye.latestEnd === rev.latestEnd) {
+      oi = { val: rev.val - cye.val, latestEnd: rev.latestEnd };
+      oiFuente = "ingresos-menos-costes-y-gastos";
     }
   }
   const da = F(T(DA, "DA")), intp = F(T(INT, "INT"));

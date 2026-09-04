@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-09-04T09:21:17.666Z",
+  "fuente": "research/ebit_costes_gastos.mjs",
+  "asOf": "2026-06-30",
+  "criterio": {
+    "medianaAbsMax": 5,
+    "dispersionSectorialMax": 5,
+    "escritoAntesDeMirar": true
+  },
+  "veredicto": "PASA",
+  "validacion": {
+    "n": 146,
+    "medianaAbs": 0,
+    "dentroDel5": 130,
+    "dispersionSectorial": 0,
+    "porSector": [
+      {
+        "sector": "(sin sector)",
+        "n": 13,
+        "mediana": 0
+      },
+      {
+        "sector": "Healthcare",
+        "n": 12,
+        "mediana": 0
+      },
+      {
+        "sector": "Technology",
+        "n": 30,
+        "mediana": 0
+      },
+      {
+        "sector": "Utilities",
+        "n": 20,
+        "mediana": 0
+      },
+      {
+        "sector": "Real Estate",
+        "n": 11,
+        "mediana": 0
+      },
+      {
+        "sector": "Consumer Cyclical",
+        "n": 18,
+        "mediana": 0
+      },
+      {
+        "sector": "Financial Services",
+        "n": 9,
+        "mediana": 0
+      },
+      {
+        "sector": "Industrials",
+        "n": 14,
+        "mediana": 0
+      },
+      {
+        "sector": "Communication Services",
+        "n": 10,
+        "mediana": 0
+      },
+      {
+        "sector": "Energy",
+        "n": 7,
+        "mediana": 0
+      }
+    ]
+  },
+  "rescataria": 24,
+  "rescatables": [
+    {
+      "t": "ADP",
+      "sector": "Technology",
+      "cierre": "2026-06-30"
+    },
+    {
+      "t": "AJG",
+      "sector": "Financial Services",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "AMP",
+      "sector": "Financial Services",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "ARE",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "BIIB",
+      "sector": "Healthcare",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "BMY",
+      "sector": "Healthcare",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "BRK.B",
+      "sector": "Financial Services",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "BX",
+      "sector": "Financial Services",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "BXP",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "COHR",
+      "sector": "(sin sector)",
+      "cierre": "2026-06-30"
+    },
+    {
+      "t": "CVX",
+      "sector": "Energy",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "DE",
+      "sector": "Industrials",
+      "cierre": "2025-11-02"
+    },
+    {
+      "t": "DOC",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "GE",
+      "sector": "(sin sector)",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "HCA",
+      "sector": "Healthcare",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "INVH",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "LEN",
+      "sector": "Consumer Cyclical",
+      "cierre": "2025-11-30"
+    },
+    {
+      "t": "NEM",
+      "sector": "Materials",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "O",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "PSA",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "SWK",
+      "sector": "Industrials",
+      "cierre": "2026-01-03"
+    },
+    {
+      "t": "VTR",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "WELL",
+      "sector": "Real Estate",
+      "cierre": "2025-12-31"
+    },
+    {
+      "t": "XOM",
+      "sector": "Energy",
+      "cierre": "2025-12-31"
+    }
+  ],
+  "nota": "Cuarta via. Se distingue de la via pretax RECHAZADA en que se queda DENTRO de la seccion de explotacion: no arrastra ingresos financieros ni impuestos. El criterio es el mismo que rechazo aquella, sin cambiar un numero."
+}
