@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T16:57:23.069Z",
+  "generatedAt": "2026-09-04T11:03:02.907Z",
   "window": "2011-2018",
   "huella": {
     "sha": "b25f3ea712a3601a",
@@ -10,11 +10,11 @@
     },
     "versionReglas": 5,
     "miembros": {
-      "fecha": "2026-09-01",
+      "fecha": "2026-09-04",
       "n": 503,
       "sha": "29038a215ef7"
     },
-    "ultimaFotoMiembros": "2026-09-01"
+    "ultimaFotoMiembros": "2026-09-04"
   },
   "rules": {
     "entry": 0.8,
@@ -182,6 +182,13 @@
       "cagr": 7.16,
       "sharpe": 0.68,
       "maxDD": -17.2
+    },
+    "conIndice": {
+      "total": 130.1,
+      "cagr": 11.06,
+      "sharpe": 0.74,
+      "maxDD": -18.2,
+      "nota": "Modelo C (H4): la parte no invertida se mantiene en SPY en vez de en caja al 0 %. NO cambia ninguna decisión de compra."
     }
   },
   "mecanica": {

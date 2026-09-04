@@ -182,5 +182,38 @@ ok(V && CC && TR && PA && PC && AC, "los artefactos que sostienen las cifras exi
   }
 }
 
+/**
+ * LA VENTAJA DE SELECCION, CRUZADA CONTRA SUS DOS ARTEFACTOS.
+ *
+ * ⚠️ ESTA COMPROBACION NACE DE UN HUECO REAL. El 2026-09-04 un arreglo de cobertura movio la
+ * ventaja de la ventana moderna de +37,2 a +30,1 pp: 21 nombres nuevos en el universo, ninguno
+ * elegido, asi que subio la REFERENCIA y no la cartera. La cifra estaba publicada en prosa y
+ * **este fichero paso en verde** porque no la cubria — justo lo que existe para impedir.
+ *
+ * Se calcula desde los artefactos en vez de fijarla a mano: si alguien reejecuta un backtest y
+ * la ventaja cambia, esto obliga a actualizar el texto.
+ */
+{
+  const M = art("picks_rules_backtest"), A = art("picks_rules_backtest_oos");
+  const d = doc("../SCORA_PICKS_REGLAS.md");
+  if (M && A && d) {
+    const ventaja = (j) => +(j.carteras.soloPicks.total - j.benchmarks.universoEW.total).toFixed(1);
+    const vM = ventaja(M), vA = ventaja(A);
+    // ⚠️ NO vale buscar el numero EN TODO EL DOCUMENTO: nacio asi y su sabotaje no salto, porque
+    // la cifra correcta tambien aparece en el parrafo que explica el cambio. Hay que mirar LA FILA.
+    const fila = (ano) => (d.split(/\r?\n/).find((l) => l.trim().startsWith(`| ${ano} |`) && l.includes("%")) ?? "");
+    const fM = fila("2019-2026"), fA = fila("2011-2018");
+    ok(fM !== "" && fA !== "", "las dos filas de la tabla de ventaja existen en el documento");
+    ok(citado(fM, vM), `la FILA de 2019-2026 cita la ventaja del artefacto (${vM} pp)`);
+    ok(citado(fA, vA), `la FILA de 2011-2018 cita la ventaja del artefacto (${vA} pp)`);
+    ok(citado(fM, M.benchmarks.universoEW.total), `y su universo equiponderado (${M.benchmarks.universoEW.total} %)`);
+    // Las dos ventanas TIENEN que compartir huella de datos: si no, compararlas no significa nada.
+    ok(M.huella?.sha === A.huella?.sha,
+       `las dos ventanas comparten huella de datos — sin eso la comparacion entre ellas no vale`);
+    // Y la conclusion que sostiene el documento: la ventana antigua no se distingue de cero.
+    ok(vA < 5, `la ventana antigua sigue sin distinguirse de cero (${vA} pp)`);
+  } else ok(false, "no se pueden leer los dos backtests de picks y el documento de reglas");
+}
+
 console.log(pass && !fail ? `\n✓ cifras publicadas: ${pass} passed, 0 failed\n` : `\n✖ cifras publicadas: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);

@@ -1,5 +1,14 @@
 # H4 · El precio de la rampa
 
+> ⚠️ **Cifras del 2026-09-01.** El 2026-09-04 un arreglo de cobertura —la cuarta vía de
+> reconstrucción del resultado de explotación— metió 21 nombres más en el universo elegible.
+> Los números de abajo **NO se han reescrito a propósito**: son el registro de lo que se midió
+> entonces, y cambiarlos falsearía qué evidencia sostuvo esta decisión. Lo que hoy vale:
+> el universo equiponderado reciente pasa de 172,5 a 179,6 %, SPY de 237,3 a 238,5 %, el
+> modelo A de 126,0 a 135,9 %, y la selección de +37,2 a **+30,1 pp**. La conclusión de este
+> documento —que la rampa sube el beta y no el alfa— **no cambia de signo** con esos números.
+
+
 **Preespecificada el 2026-09-02, ANTES de correr nada.** Se escribe primero para que ni la
 predicción ni el criterio de éxito se puedan mover después de ver el resultado. Ensayo nº 343 del
 presupuesto.
