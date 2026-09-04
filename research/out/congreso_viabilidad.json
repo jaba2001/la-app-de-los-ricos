@@ -19,15 +19,21 @@
   "porQueNoSeEmpieza": "La medicion sigue sin estar justificada: NUNCA se ha comprobado si las operaciones del Congreso predicen algo, y las cuatro ultimas señales nuevas del proyecto fallaron. Sigue siendo un PROYECTO —terminar el extractor, ~6.000 descargas, normalizacion y un ensayo del presupuesto—. Lo que ha cambiado es que ya NO depende de añadir una libreria.",
   "siSeRetoma": "Fijar la hipotesis ANTES: usar FilingDate, nunca la fecha de transaccion; medir horizontes preespecificados; y registrar el ensayo. Ver el precedente de rdcf_ortogonalidad.mjs, que se paro a tiempo con motivo medido.",
   "sinDependencias": {
-    "probado": "2026-09-04, prueba de concepto ejecutada",
-    "hallazgo": "El descifrado se puede hacer con lo que Node trae de serie. `crypto` da MD5, `zlib` da inflate, y RC4 son veinte lineas. La derivacion de clave es el algoritmo 2 del estandar PDF desde contraseña VACIA.",
-    "resultado": "8 de 10 flujos descifran y descomprimen correctamente. Parametros leidos bien del diccionario de cifrado (/V 2, /R 3, /Length 128, /P -1849, /O en hexadecimal).",
-    "loQueNoSeLogro": "Sacar texto legible. Dos objetos (14 y 19) siguen dando «incorrect header check», y son probablemente los de contenido. Es depuracion de formato, no un muro — pero NO esta hecho.",
-    "tresErroresQueCostaron": [
-      "Buscar /P en todo el fichero capturaba un 22 de otro objeto: hay que leer DENTRO del diccionario de cifrado.",
-      "/O es una cadena HEXADECIMAL <...>, no literal (...).",
-      "Emparejar `obj` con `stream` hacia delante asignaba el numero de un objeto al flujo de otro cuando habia objetos sin flujo. Hay que buscar la cabecera HACIA ATRAS y quedarse con la ULTIMA."
+    "probado": "2026-09-04, ejecutado sobre un PTR real (DocID 20032062)",
+    "veredicto": "El descifrado FUNCIONA sin ninguna dependencia. Falta UNA capa mas, identificada con precision.",
+    "loQueYaFunciona": [
+      "RC4 propio, validado contra el vector conocido RC4('Key','Plaintext') = BBF316E8D940AF0AD3",
+      "Derivacion de clave: algoritmo 2 del estandar desde contraseña VACIA. Confirmada por fuerza bruta.",
+      "Localizacion de objetos por la TABLA DE REFERENCIAS CRUZADAS, no por expresiones regulares",
+      "El flujo de contenido (objeto 21, XObject de formulario) descomprime a 32.040 bytes con 94 % de caracteres legibles: operadores PDF validos"
     ],
-    "consecuencia": "La objecion de la dependencia CAE. No hay que añadir nada al stack de 16 paquetes. Queda trabajo de formato, no una decision de arquitectura."
+    "loQueFalta": "El texto va en cadenas HEXADECIMALES que son INDICES DE GLIFO (0033, 0287, 0294...), no ASCII ni UTF-16. Hay 199 operadores Tj y cero parentesis. Para convertirlos a letras hace falta el mapa /ToUnicode de cada fuente subconjunto (F5 y F6 en este documento), que es otro flujo del MISMO fichero: alcanzable, ~40-60 lineas mas.",
+    "cuatroErroresQueCostaron": [
+      "Buscar /P en todo el fichero capturaba un 22 de otro objeto: hay que leer DENTRO del diccionario de cifrado",
+      "/O es cadena HEXADECIMAL, no literal",
+      "Emparejar `obj` con `stream` por expresion regular asigna el numero de un objeto al flujo de otro cuando hay objetos sin flujo. Cazado por fuerza bruta: el flujo que yo leia como del objeto 6 descifraba con la clave del 11. La solucion es la tabla de referencias cruzadas.",
+      "Un XObject de IMAGEN tiene parentesis por todas partes en su JPEG y ensuciaba la extraccion: hay que saltarlo por /Subtype"
+    ],
+    "codigo": "research/congreso_pdf.mjs — funciona hasta la capa de glifos"
   }
 }
