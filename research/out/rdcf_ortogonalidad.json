@@ -1,0 +1,137 @@
+{
+  "generatedAt": "2026-09-04T11:21:15.093Z",
+  "fuente": "research/rdcf_ortogonalidad.mjs",
+  "asOf": "2026-06-30",
+  "hipotesis": "El crecimiento implicito es informacion de valoracion ortogonal a los multiplos clasicos. Direccion esperada: crecimiento implicito BAJO = mejor retorno futuro.",
+  "rfRate": 4.44,
+  "universo": 503,
+  "calculados": 449,
+  "descartes": {
+    "sinCik": 1,
+    "sinFundamentales": 0,
+    "sinPrecio": 2,
+    "sinBeta": 2,
+    "sinAcciones": 4,
+    "sinIngresos": 2,
+    "dcfNulo": 43
+  },
+  "censura": {
+    "enSuelo": 61,
+    "enTecho": 2,
+    "pctSuelo": 13.6,
+    "pctTecho": 0.4,
+    "limites": [
+      -5,
+      80
+    ],
+    "decil": 45
+  },
+  "distribucion": {
+    "p10": -5,
+    "mediana": 9.1,
+    "p90": 33.9,
+    "min": -5,
+    "max": 80
+  },
+  "r2PorFactor": [
+    {
+      "metrica": "pfcf",
+      "n": 381,
+      "r2": 0.1824
+    },
+    {
+      "metrica": "evEbitda",
+      "n": 289,
+      "r2": 0.1674
+    },
+    {
+      "metrica": "pe",
+      "n": 428,
+      "r2": 0.1648
+    },
+    {
+      "metrica": "revenueGrowth",
+      "n": 449,
+      "r2": 0.0727
+    },
+    {
+      "metrica": "currentRatio",
+      "n": 378,
+      "r2": 0.069
+    },
+    {
+      "metrica": "capexToRevenue",
+      "n": 381,
+      "r2": 0.0599
+    },
+    {
+      "metrica": "roa",
+      "n": 449,
+      "r2": 0.022
+    },
+    {
+      "metrica": "pb",
+      "n": 417,
+      "r2": 0.0195
+    },
+    {
+      "metrica": "interestCoverage",
+      "n": 148,
+      "r2": 0.009
+    },
+    {
+      "metrica": "fcfYield",
+      "n": 381,
+      "r2": 0.007
+    },
+    {
+      "metrica": "netDebtEbitda",
+      "n": 289,
+      "r2": 0.0069
+    },
+    {
+      "metrica": "netMargin",
+      "n": 449,
+      "r2": 0.0063
+    },
+    {
+      "metrica": "debtEquity",
+      "n": 381,
+      "r2": 0.0051
+    },
+    {
+      "metrica": "grossProfitability",
+      "n": 279,
+      "r2": 0.0023
+    },
+    {
+      "metrica": "roe",
+      "n": 417,
+      "r2": 0.002
+    },
+    {
+      "metrica": "operatingMargin",
+      "n": 370,
+      "r2": 0.0005
+    },
+    {
+      "metrica": "grossMargin",
+      "n": 279,
+      "r2": 0.0004
+    },
+    {
+      "metrica": "roic",
+      "n": 340,
+      "r2": 0.0001
+    },
+    {
+      "metrica": "epsGrowth",
+      "n": 427,
+      "r2": 0
+    }
+  ],
+  "r2Maximo": 0.1824,
+  "umbralOrtogonal": 0.5,
+  "veredicto": "ORTOGONAL",
+  "nota": "PRE-COMPROBACION, no mide retornos. Ortogonal NO implica util: las cuatro medidas de la sesion anterior eran ortogonales (R2 0,012-0,077) y no mejoraron nada. Un R2 bajo aqui es permiso para medir, no un hallazgo."
+}
