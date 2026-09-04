@@ -29,6 +29,8 @@ let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
 
 const DIR = ".github/workflows";
+// Construido con RegExp para que ningun escape tenga que sobrevivir a un heredoc.
+const NUEVA_LINEA = new RegExp(String.fromCharCode(92) + "r?" + String.fromCharCode(92) + "n");
 const ficheros = readdirSync(DIR).filter((f) => /\.ya?ml$/.test(f));
 ok(ficheros.length > 0, "hay workflows que vigilar");
 
@@ -81,6 +83,42 @@ for (const f of ficheros) {
   for (const ruta of new Set(ci.match(/scripts\/[\w.-]+\.mjs/g) ?? []))
     ok(existsSync(ruta), `el CI ejecuta ${ruta}, que NO existe en disco`);
 }
+
+/**
+ * CLAVES DUPLICADAS DENTRO DE UN MISMO PASO.
+ *
+ * ⚠️ NACE DE UN FALLO MIO DE HOY. Añadi un bloque `env:` a un paso de `scora-picks.yml` que YA
+ * TENIA otro, con las credenciales dentro. YAML generico se lo traga en silencio quedandose
+ * con el ultimo, asi que el fichero «parseaba»; GitHub lo rechaza y el run muere en 0 segundos,
+ * que es la firma que ya nos costo cinco dias de CI en rojo. Y de haberlo aceptado seria PEOR:
+ * el segundo `env` habria sustituido al primero, dejando el cron sin `SUPABASE_SERVICE_KEY`.
+ * O sea, un «seguro» que rompia justo lo que venia a proteger.
+ *
+ * Estos 159 asertos no lo vieron. Por eso este.
+ */
+for (const f of ficheros) {
+  const lineas = readFileSync(`${DIR}/${f}`, "utf8").split(NUEVA_LINEA);
+  // Un paso empieza en `- name:` o `- uses:`; dentro de el, ninguna clave de primer nivel
+  // (misma sangria) puede repetirse.
+  let sangriaPaso = null, vistas = new Map(), paso = "?", dupes = [];
+  const cerrar = () => { vistas = new Map(); };
+  for (let n = 0; n < lineas.length; n++) {
+    const l = lineas[n];
+    if (!l.trim() || l.trim().startsWith("#")) continue;
+    const sangria = l.length - l.trimStart().length;
+    const inicio = l.trim().match(/^-\s+(name|uses):\s*(.*)$/);
+    if (inicio) { cerrar(); sangriaPaso = sangria + 2; paso = inicio[2].slice(0, 40) || inicio[1]; continue; }
+    if (sangriaPaso == null) continue;
+    if (sangria < sangriaPaso) { cerrar(); sangriaPaso = null; continue; }
+    if (sangria !== sangriaPaso) continue;
+    const clave = l.trim().match(/^([A-Za-z_][\w-]*):/);
+    if (!clave) continue;
+    if (vistas.has(clave[1])) dupes.push(`${f}: «${paso}» repite «${clave[1]}» (lineas ${vistas.get(clave[1])} y ${n + 1})`);
+    else vistas.set(clave[1], n + 1);
+  }
+  ok(dupes.length === 0, dupes.join(" · ") || `${f} sin claves duplicadas en ningun paso`);
+}
+
 
 console.log(pass && !fail ? `\n✓ workflows: ${pass} passed, 0 failed\n` : `\n✖ workflows: ${pass} passed, ${fail} failed\n`);
 process.exit(fail ? 1 : 0);
