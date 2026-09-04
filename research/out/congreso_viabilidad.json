@@ -12,10 +12,22 @@
     "patronDeUrlDelPdf": "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{AAAA}/{DocID}.pdf — probado con 4 identificadores, 4 de 4 HTTP 200",
     "formatoDelPdf": "TEXTO, no escaneo: 15 fuentes declaradas. Cifrado con manejador estandar V2/R3 (RC4 128) y contraseña vacia — el cifrado solo fija permisos, cualquier libreria lo abre."
   },
-  "loQueFalta": "UNICO paso no resuelto: la extraccion de texto necesita una libreria PDF. El proyecto no tiene ninguna y su stack es deliberadamente magro (16 paquetes). Seria una devDependency —no llega al bundle del usuario— pero es una decision de dependencia, no un detalle.",
+  "loQueFalta": "La extraccion de texto. PERO ya NO hace falta una libreria: ver `sinDependencias`.",
   "volumen": "~515 declaraciones/año; ~6.000 PDF para doce años de historia",
   "senado": "efdsearch.senate.gov responde 302: publico pero detras de una pagina de aceptacion. Empezar solo por la Camara.",
   "alternativasDeTerceros": "Existen con capa gratuita, pero la mejor da SOLO 90 dias y exige clave. Sirve para enseñar en vivo; inutil para medir. Y añade una dependencia de terceros que ya se murio una vez (house-stock-watcher: 403, repo sin tocar desde mediados de 2025).",
-  "porQueNoSeEmpieza": "La medicion todavia no esta justificada: NUNCA se ha comprobado si las operaciones del Congreso predicen algo, y las cuatro ultimas señales nuevas del proyecto fallaron. Es un PROYECTO —libreria, ~6.000 descargas, normalizacion, y un ensayo del presupuesto— no una tarea. Empezarlo a medias es peor que dejarlo escrito.",
-  "siSeRetoma": "Fijar la hipotesis ANTES: usar FilingDate, nunca la fecha de transaccion; medir horizontes preespecificados; y registrar el ensayo. Ver el precedente de rdcf_ortogonalidad.mjs, que se paro a tiempo con motivo medido."
+  "porQueNoSeEmpieza": "La medicion sigue sin estar justificada: NUNCA se ha comprobado si las operaciones del Congreso predicen algo, y las cuatro ultimas señales nuevas del proyecto fallaron. Sigue siendo un PROYECTO —terminar el extractor, ~6.000 descargas, normalizacion y un ensayo del presupuesto—. Lo que ha cambiado es que ya NO depende de añadir una libreria.",
+  "siSeRetoma": "Fijar la hipotesis ANTES: usar FilingDate, nunca la fecha de transaccion; medir horizontes preespecificados; y registrar el ensayo. Ver el precedente de rdcf_ortogonalidad.mjs, que se paro a tiempo con motivo medido.",
+  "sinDependencias": {
+    "probado": "2026-09-04, prueba de concepto ejecutada",
+    "hallazgo": "El descifrado se puede hacer con lo que Node trae de serie. `crypto` da MD5, `zlib` da inflate, y RC4 son veinte lineas. La derivacion de clave es el algoritmo 2 del estandar PDF desde contraseña VACIA.",
+    "resultado": "8 de 10 flujos descifran y descomprimen correctamente. Parametros leidos bien del diccionario de cifrado (/V 2, /R 3, /Length 128, /P -1849, /O en hexadecimal).",
+    "loQueNoSeLogro": "Sacar texto legible. Dos objetos (14 y 19) siguen dando «incorrect header check», y son probablemente los de contenido. Es depuracion de formato, no un muro — pero NO esta hecho.",
+    "tresErroresQueCostaron": [
+      "Buscar /P en todo el fichero capturaba un 22 de otro objeto: hay que leer DENTRO del diccionario de cifrado.",
+      "/O es una cadena HEXADECIMAL <...>, no literal (...).",
+      "Emparejar `obj` con `stream` hacia delante asignaba el numero de un objeto al flujo de otro cuando habia objetos sin flujo. Hay que buscar la cabecera HACIA ATRAS y quedarse con la ULTIMA."
+    ],
+    "consecuencia": "La objecion de la dependencia CAE. No hay que añadir nada al stack de 16 paquetes. Queda trabajo de formato, no una decision de arquitectura."
+  }
 }
