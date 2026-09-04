@@ -97,6 +97,16 @@ jobs:
       # ese tramo fantasma `weightsAsOf` devolvia los pesos del primer rebalanceo: una cartera
       # multiactivo que el fondo tuvo UN SOLO DIA antes de irse a 100 % SPY. Con las decisiones
       # tal y como se sellaron, el fondo iba POR DETRAS. No habia ninguna prueba que lo cazara.
+      # Cuatro vias se han evaluado para rellenar `oiTTM`, del que cuelgan cuatro de las cinco
+      # metricas de calidad. El criterio —desvio mediano < 5 % y dispersion sectorial < 5 pp—
+      # se escribio ANTES de mirar ningun resultado, y con el se RECHAZO la via pretax (7,6 % y
+      # 36,1 pp). Esta guarda no vigila que el codigo exista: vigila QUE EL LISTON NO SE MUEVA,
+      # que es la forma mas facil de aprobar una via que no deberia entrar. Y vigila el rechazo
+      # tanto como la aprobacion: colar la via pretax convertiria un hueco conocido en una
+      # cobertura sesgada por sector, que es peor.
+      - name: El liston de las reconstrucciones no se mueve
+        run: node --experimental-strip-types --no-warnings scripts/reconstruccion_ebit.test.mjs
+
       - name: El fondo no se mide antes de existir
         run: node --experimental-strip-types --no-warnings scripts/paperfund.test.mjs
 
