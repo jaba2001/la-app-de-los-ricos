@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-09-04T09:15:28.547Z",
+  "fuente": "research/coste_friccion.mjs",
+  "meses": 236,
+  "anos": 19.58,
+  "rotacionTotal": 67.6,
+  "rotacionAnual": 3.45,
+  "costeAnualPbA10": 34.5,
+  "spyBruto": 654.2,
+  "spyNetoDeComision": 640.5,
+  "terSpyPb": 9.45,
+  "sensibilidad": [
+    {
+      "costeBps": 0,
+      "total": 687.4,
+      "sharpe": 1.034,
+      "maxDD": -17.2,
+      "vsSpyBruto": 33.2,
+      "vsSpyNeto": 46.9
+    },
+    {
+      "costeBps": 1,
+      "total": 682.2,
+      "sharpe": 1.031,
+      "maxDD": -17.2,
+      "vsSpyBruto": 27.9,
+      "vsSpyNeto": 41.7
+    },
+    {
+      "costeBps": 2,
+      "total": 677,
+      "sharpe": 1.028,
+      "maxDD": -17.2,
+      "vsSpyBruto": 22.7,
+      "vsSpyNeto": 36.5
+    },
+    {
+      "costeBps": 3,
+      "total": 671.8,
+      "sharpe": 1.025,
+      "maxDD": -17.2,
+      "vsSpyBruto": 17.6,
+      "vsSpyNeto": 31.3
+    },
+    {
+      "costeBps": 5,
+      "total": 661.6,
+      "sharpe": 1.019,
+      "maxDD": -17.2,
+      "vsSpyBruto": 7.3,
+      "vsSpyNeto": 21.1
+    },
+    {
+      "costeBps": 10,
+      "total": 636.6,
+      "sharpe": 1.003,
+      "maxDD": -17.2,
+      "vsSpyBruto": -17.6,
+      "vsSpyNeto": -3.9
+    },
+    {
+      "costeBps": 15,
+      "total": 612.4,
+      "sharpe": 0.988,
+      "maxDD": -17.2,
+      "vsSpyBruto": -41.8,
+      "vsSpyNeto": -28.1
+    },
+    {
+      "costeBps": 20,
+      "total": 589,
+      "sharpe": 0.973,
+      "maxDD": -17.2,
+      "vsSpyBruto": -65.2,
+      "vsSpyNeto": -51.5
+    }
+  ],
+  "ppPorPuntoBasico": 5.1,
+  "costeQueCerrariaLaBrecha": 6.5,
+  "nota": "NO propone un coste nuevo. Mide cuanto depende el veredicto de un supuesto uniforme de 10 pb que nadie ha contrastado con el diferencial real de SPY/TLT/IEF/GLD, que son de los ETF mas liquidos del mundo (1-3 pb tipicos). La comparacion honesta es la columna 'vs SPY neto de comision': mantener el indice tambien cuesta."
+}

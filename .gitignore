@@ -30,6 +30,7 @@ research/out/*
 !research/out/growth_metrics.json
 !research/out/megacaps_calidad.json
 !research/out/cobertura_techo.json
+!research/out/coste_friccion.json
 # La SERIE mensual del allocator (236 meses x 5 estrategias x 7 activos). Es la entrada de
 # `scripts/serie.test.mjs`, que sin ella no puede correr en un checkout limpio — y ese test es
 # el unico que caza el incidente del 2026-09-01: el cache de SPY truncado a 2018-06 convirtio
