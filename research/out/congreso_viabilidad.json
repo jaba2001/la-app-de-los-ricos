@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-09-04T14:11:49.881528+00:00",
+  "fuente": "research/out/congreso_viabilidad.json — evaluacion, no medicion",
+  "asOf": "2026-09-04",
+  "pregunta": "¿Se puede reconstruir la serie de operaciones del Congreso sin depender de terceros?",
+  "veredicto": "SI, y esta enteramente verificado salvo un paso",
+  "verificado": {
+    "indiceOficial": "https://disclosures-clerk.house.gov/public_disc/financial-pdfs/{AAAA}FD.zip — HTTP 200 en 2014, 2016, 2018, 2020, 2022, 2024, 2025 y 2026",
+    "contenidoDelIndice": "TXT y XML. Columnas: Prefix, Last, First, Suffix, FilingType, StateDst, Year, FilingDate, DocID. 2.916 filas en 2025.",
+    "declaracionesDeOperaciones": "515 de 2.916 en 2025 son tipo P (Periodic Transaction Report), que son las que traen operaciones",
+    "fechaDePublicacion": "FilingDate viene en el indice — es la fecha que hace honesto el estudio; la de transaccion esta dentro del PDF y usarla seria mirar al futuro",
+    "patronDeUrlDelPdf": "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{AAAA}/{DocID}.pdf — probado con 4 identificadores, 4 de 4 HTTP 200",
+    "formatoDelPdf": "TEXTO, no escaneo: 15 fuentes declaradas. Cifrado con manejador estandar V2/R3 (RC4 128) y contraseña vacia — el cifrado solo fija permisos, cualquier libreria lo abre."
+  },
+  "loQueFalta": "UNICO paso no resuelto: la extraccion de texto necesita una libreria PDF. El proyecto no tiene ninguna y su stack es deliberadamente magro (16 paquetes). Seria una devDependency —no llega al bundle del usuario— pero es una decision de dependencia, no un detalle.",
+  "volumen": "~515 declaraciones/año; ~6.000 PDF para doce años de historia",
+  "senado": "efdsearch.senate.gov responde 302: publico pero detras de una pagina de aceptacion. Empezar solo por la Camara.",
+  "alternativasDeTerceros": "Existen con capa gratuita, pero la mejor da SOLO 90 dias y exige clave. Sirve para enseñar en vivo; inutil para medir. Y añade una dependencia de terceros que ya se murio una vez (house-stock-watcher: 403, repo sin tocar desde mediados de 2025).",
+  "porQueNoSeEmpieza": "La medicion todavia no esta justificada: NUNCA se ha comprobado si las operaciones del Congreso predicen algo, y las cuatro ultimas señales nuevas del proyecto fallaron. Es un PROYECTO —libreria, ~6.000 descargas, normalizacion, y un ensayo del presupuesto— no una tarea. Empezarlo a medias es peor que dejarlo escrito.",
+  "siSeRetoma": "Fijar la hipotesis ANTES: usar FilingDate, nunca la fecha de transaccion; medir horizontes preespecificados; y registrar el ensayo. Ver el precedente de rdcf_ortogonalidad.mjs, que se paro a tiempo con motivo medido."
+}
