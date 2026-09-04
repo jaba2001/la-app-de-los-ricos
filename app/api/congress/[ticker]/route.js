@@ -121,6 +121,27 @@ export async function GET(request, { params }) {
     (houseRes.status === 'fulfilled' && houseRes.value.ok);
   if (anySourceOk) await cacheSet(key, { status: 200, body }, CONGRESS_TTL);
 
+  // ⚠️ SI NINGUNA CAMARA CONTESTO, ESTO NO ES «NO HAY OPERACIONES»: ES UN APAGON.
+  //
+  // Antes se devolvia 200 con una lista vacia en los dos casos, asi que quien consume no podia
+  // distinguirlos — y `computeSmartMoneySignal` trata la lista vacia como aportacion CERO. El
+  // resultado es un score compuesto al que se le muere una de sus tres patas sin que nadie lo
+  // note. Es el mismo defecto que costo una fecha de decision: «no se sabe» leido como «no hay».
+  //
+  // Los dos volcados dejaron de ser publicos: los buckets se movieron de `us-east-2` a
+  // `us-west-2` Y pasaron a devolver 403. Comprobado el 2026-09-04. Asi que este camino no es
+  // hipotetico: hoy es el unico que se recorre.
+  if (!anySourceOk) {
+    return new Response(JSON.stringify({ error: 'congress_sources_unavailable', trades: [] }), {
+      status: 503,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store',
+        'X-Scora-Sources': 'none',
+      }),
+    });
+  }
+
   return new Response(body, {
     status: 200,
     headers: corsHeaders(request, {
