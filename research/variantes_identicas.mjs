@@ -107,6 +107,15 @@ const TOLERADOS = new Map([
   ["momentum_lab.json :: ic.mom12_1 == ic.rs_spy",
    "Igual: identidad algebraica, no coincidencia."],
 
+  // ── El balance completo falta en las MISMAS empresas ──────────────────────────────────────
+  // `assets` y `equity` salen del mismo estado financiero: la empresa que no ha presentado uno
+  // tampoco ha presentado el otro. Verificado nombre a nombre el 2026-09-04: las dos ausencias
+  // son **FDXF y HONA**, las mismas dos, que son cotizaciones nuevas sin cuentas todavia. Y las
+  // dos rescatan cero porque las metricas que dependen de ellas (`gprof`, `roic`) necesitan
+  // ademas otro campo que tampoco esta. Coincidencia del mundo, no parametro ignorado.
+  ["cobertura_techo.json :: porCampo.assets == porCampo.equity",
+   "Mismo balance y mismas dos empresas (FDXF, HONA): quien no presenta activos tampoco presenta patrimonio. Verificado nombre a nombre."],
+
   // ── Coincidencias de denominador pequeño o marcador perfecto ──────────────────────────────
   ["desfase_periodos.json :: parejas.ocf|cfi == parejas.ni|ocf",
    "Las dos parejas puntúan PERFECTO (497 de 497, cero desalineados). Cuando dos medidas tocan su tope no hay nada que las distinga; eso es el resultado, no un empate sospechoso."],
