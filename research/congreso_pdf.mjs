@@ -9,6 +9,25 @@
 //
 // LA SOLUCION es dejar de adivinar: el PDF trae una TABLA DE REFERENCIAS CRUZADAS con el
 // desplazamiento EXACTO en bytes de cada objeto. `startxref` al final dice donde empieza.
+//
+// ⚠️ ESTADO: LLEGA HASTA LA CAPA DE GLIFOS, NO HASTA EL TEXTO.
+//
+// Lo que YA funciona, probado sobre un PTR real (DocID 20032062):
+//   · descifrado completo sin dependencias — RC4 propio validado contra el vector conocido
+//     RC4("Key","Plaintext") = BBF316E8D940AF0AD3
+//   · el flujo de contenido descomprime a 32.040 bytes con 94 % de caracteres legibles
+//
+// Lo que FALTA: el texto va en cadenas HEXADECIMALES que son INDICES DE GLIFO (0033, 0287,
+// 0294...), no ASCII ni UTF-16 — hay 199 operadores Tj y CERO parentesis. Convertirlos a
+// letras necesita el mapa /ToUnicode de cada fuente subconjunto, que es otro flujo del MISMO
+// fichero. Alcanzable, ~40-60 lineas mas.
+//
+// ⚠️ Y ESTA APARCADO A PROPOSITO, no por dificultad. Todo lo medido dice que la ventaja de
+// Scora esta en la ASIGNACION, no en la seleccion: Brinson 96/4, IC 0,007, y una ventaja de
+// seleccion que pasa de +30,1 pp en una ventana a +1,3 en la otra. Añadir otra señal de
+// seleccion mejora el eje que no aporta. Se retoma si el registro vivo llega a mostrar que
+// esa capa funciona, o si se quiere enseñar las operaciones como DATO EN PANTALLA, que no
+// exige medir nada ni gastar ensayo del presupuesto.
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFileSync } from "fs";
 import { createHash } from "crypto";
@@ -113,12 +132,6 @@ export function leerPTR(buf) {
     // ensuciaba la extraccion. Se salta por subtipo, no por adivinar.
     if (/\/Subtype\s*\/Image/.test(o.dic)) return;
     // Las cadenas literales de los operadores de texto.
-    if (num === 21) { const t=o.flujo;
-      const hx=[...t.matchAll(/<([0-9A-Fa-f]+)>\s*Tj/g)].slice(0,6).map(m=>m[1]);
-      console.log('    [21] primeras cadenas hex: '+hx.join(' | '));
-      console.log('    [21] como ASCII: '+hx.map(h=>Buffer.from(h,'hex').toString('latin1')).join(' | '));
-      console.log('    [21] como UTF-16BE: '+hx.map(h=>Buffer.from(h,'hex').toString('utf16le')).join(' | '));
-    }
     for (const g of o.flujo.matchAll(/\(((?:\\.|[^()\\])*)\)/g)) partes.push(g[1]);
     // Un contenido puede dibujar otro XObject: se sigue la cadena.
     for (const m of o.dic.matchAll(/\/X\w*\s+(\d+)\s+\d+\s+R/g)) recoger(+m[1], prof + 1);
