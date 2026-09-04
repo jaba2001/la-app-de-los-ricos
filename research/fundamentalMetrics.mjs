@@ -53,7 +53,12 @@ export function metricsOf(f, raw, mom) {
   // `netDebtEbitda` negativo (caja neta) y un ROIC inflado. Eran 136 de 497 nombres, y
   // `netDebtEbitda` es una de las cinco métricas de la señal: un cuarto del universo cobraba
   // esa nota gratis. Sin dato de deuda no hay ratio de deuda.
-  const ev = mcap != null && f.debt != null ? mcap + f.debt - (f.cash ?? 0) : null;
+  // ⚠️ Y LA CAJA, EXACTAMENTE IGUAL. Quedaba un `f.cash ?? 0` que trataba «no hay dato» como
+  // «no tiene caja», inflando el valor de empresa y la deuda neta. Son pocas —4 de 502 el
+  // 2026-06-30, y dos son cotizaciones nuevas sin cuentas: quedan PCAR y SLB— pero son dos
+  // empresas reales con caja de verdad, y `evEbitda` SI se usa como factor. Un numero
+  // equivocado es peor que uno ausente; es la misma leccion que la deuda de arriba.
+  const ev = mcap != null && f.debt != null && f.cash != null ? mcap + f.debt - f.cash : null;
   const fcf = f.ocfTTM != null && f.capexTTM != null ? f.ocfTTM - f.capexTTM : null;
   const ebitda = f.oiTTM != null && f.daTTM != null ? f.oiTTM + f.daTTM : null;
   const invested = f.equity != null && f.debt != null ? f.equity + f.debt : null;
@@ -81,7 +86,7 @@ export function metricsOf(f, raw, mom) {
     debtEquity: pos(f.equity) && f.debt != null ? f.debt / f.equity : null,
     currentRatio: pos(f.curL) && f.curA != null ? f.curA / f.curL : null,
     interestCoverage: pos(f.interestTTM) && f.oiTTM != null ? f.oiTTM / f.interestTTM : null,
-    netDebtEbitda: pos(ebitda) && f.debt != null ? (f.debt - (f.cash ?? 0)) / ebitda : null,
+    netDebtEbitda: pos(ebitda) && f.debt != null && f.cash != null ? (f.debt - f.cash) / ebitda : null,
     // Crecimiento (porcentaje)
     revenueGrowth: pos(f.revPrevTTM) && f.revTTM != null ? (f.revTTM / f.revPrevTTM - 1) * 100 : null,
     epsGrowth: pos(f.niPrevTTM) && f.niTTM != null ? (f.niTTM / f.niPrevTTM - 1) * 100 : null,
