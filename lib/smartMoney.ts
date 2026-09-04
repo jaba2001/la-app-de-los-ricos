@@ -120,14 +120,33 @@ export function computeSmartMoneySignal(insiders: Row[], congress: Row[]): Smart
     if (clusterBuy) insiderRaw += 20;
     if (sawPrice) insiderRaw += Math.sign(netUsd) * 10;
   }
-  const congressTotal = cBuy + cSell;
-  const congressRaw = congressTotal > 0 ? ((cBuy - cSell) / congressTotal) * 35 : 0;
-  const netScore = Math.round(clamp(insiderRaw + congressRaw, -100, 100));
+
+  /**
+   * ⚠️ EL COMPONENTE DEL CONGRESO ESTA RETIRADO DEL SCORE — 2026-09-04.
+   *
+   * Valia hasta ±35 de los 100 puntos, y llevaba en CERO desde que los dos volcados publicos
+   * del STOCK Act dejaron de serlo (los buckets se movieron de region y pasaron a 403). El
+   * score seguia anunciando tres fuentes y entregando una: cero permanente no es «no hay
+   * actividad», y presentarlo como tal es afirmar algo sobre datos que no tenemos.
+   *
+   * NO SE REESCALA A 100, Y ES DELIBERADO. Multiplicar los insiders por 100/85 haria que una
+   * señal MAS DEBIL puntuara como la combinada, y moveria acciones de «Neutral» a «Bullish»
+   * sin que hubiera cambiado ni un dato —los umbrales de etiqueta (±25) y conviccion (±40)
+   * estan fijados contra esta escala—. Hemos perdido informacion; el alcance del score debe
+   * reflejarlo. **Maximo alcanzable: ±85** (55 del neto + 20 por racimo + 10 por importe).
+   *
+   * Los recuentos del Congreso SI se siguen devolviendo: el panel los muestra aparte, y cuando
+   * la fuente no contesta lo dice en vez de enseñar «0B / 0S». Para devolverle peso al score
+   * hace falta antes MEDIR si predice algo, cosa que nunca se ha hecho.
+   */
+  const netScore = Math.round(clamp(insiderRaw, -100, 100));
 
   const label: SmartMoneySignal["label"] = netScore >= 25 ? "Bullish" : netScore <= -25 ? "Bearish" : "Neutral";
   const color = netScore >= 25 ? "var(--sr-pos)" : netScore <= -25 ? "var(--sr-neg)" : "var(--sr-text-3)";
 
-  const sampleSize = insiderTotal + congressTotal;
+  // El tamaño de muestra cuenta lo que PUNTUA. Sumarle las del Congreso daria conviccion
+  // «High» apoyada en operaciones que ya no entran en la nota.
+  const sampleSize = insiderTotal;
   const conviction: SmartMoneySignal["conviction"] =
     sampleSize >= 8 && Math.abs(netScore) >= 40 ? "High" :
     sampleSize >= 3 && Math.abs(netScore) >= 20 ? "Medium" : "Low";

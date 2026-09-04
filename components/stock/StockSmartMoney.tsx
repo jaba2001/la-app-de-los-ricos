@@ -76,7 +76,11 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap" }}>
           <div className="section-label" style={{ margin: 0 }}>Smart Money Signal — {ticker}</div>
-          <span className="sr-hint">{congresoCaido ? "Insider · 13-F · free data (congress no disponible)" : "Insider · 13-F · Congress · free data"}</span>
+          {/* El rotulo nombra lo que ENTRA EN LA NOTA, no lo que se ve en el panel. El 13-F se
+              muestra mas abajo como contexto pero nunca puntuo —la funcion recibe insiders y
+              Congreso, no carteras—, y el Congreso quedo retirado el 2026-09-04. Prometer tres
+              fuentes y usar una era una afirmacion sin respaldo. */}
+          <span className="sr-hint">Insider · datos gratuitos · 13-F y Congress, como contexto</span>
         </div>
         {loading ? <Sk w="100%" h={120} /> : (
           <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 240px) 1fr", gap: "var(--sr-sp-5)", alignItems: "stretch" }}>
@@ -89,7 +93,13 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                 <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-3)", color: "var(--sr-text-2)", fontWeight: 600 }}>{signal.conviction} conviction</span>
               </div>
               <div className="sr-hint" style={{ marginTop: 4 }}>
-                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider · {congresoCaido ? "congress no disponible" : `${signal.congress.buyCount}B / ${signal.congress.sellCount}S congress`}
+                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider{signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? "" : ""}
+                {/* El Congreso va DETRAS del separador y con su propia etiqueta: desde el
+                    2026-09-04 no puntua, asi que ponerlo al lado de los insiders sugeriria que
+                    aporta a la nota. Y si la fuente no contesta se dice, en vez de «0B / 0S». */}
+                {congresoCaido
+                  ? <span style={{ opacity: .7 }}> · congress: fuente no disponible</span>
+                  : <span style={{ opacity: .7 }}> · congress (no puntúa): {signal.congress.buyCount}B / {signal.congress.sellCount}S</span>}
                 {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? ` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M` : ""}
               </div>
             </div>

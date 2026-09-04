@@ -104,6 +104,15 @@ jobs:
       # que es la forma mas facil de aprobar una via que no deberia entrar. Y vigila el rechazo
       # tanto como la aprobacion: colar la via pretax convertiria un hueco conocido en una
       # cobertura sesgada por sector, que es peor.
+      # El score de dinero inteligente anunciaba «Insider · 13-F · Congress» y entregaba UNA
+      # fuente: el 13-F nunca puntuo, y el Congreso valia ±35 de 100 pero llevaba en cero desde
+      # que los volcados del STOCK Act dejaron de ser publicos. Retirado el 2026-09-04.
+      # Lo que esta guarda protege sobre todo es que NADIE LO REESCALE A 100: los insiders solos
+      # llegan a 85, y multiplicarlos haria que una señal mas debil puntuara como la combinada,
+      # moviendo acciones de «Neutral» a «Bullish» sin que hubiera cambiado ni un dato.
+      - name: El Congreso no puntua, y el score no se reescala
+        run: node --experimental-strip-types --no-warnings scripts/smartmoney.test.mjs
+
       - name: El liston de las reconstrucciones no se mueve
         run: node --experimental-strip-types --no-warnings scripts/reconstruccion_ebit.test.mjs
 
