@@ -51,7 +51,7 @@ async function callProvider(name, prompt, maxTokens) {
 }
 
 export async function POST(request) {
-  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const { user, error: authErr } = await requireUser(request, { strict: true }); if (authErr) return authErr;
   const rl = await checkRateLimit('llm', user.id, 5, 60, request); if (rl) return rl;
   // Segunda dimensión por IP: el límite por usuario no acota el gasto porque
   // registrarse es gratis. Aquí los proveedores son gratuitos, pero tienen cuota y

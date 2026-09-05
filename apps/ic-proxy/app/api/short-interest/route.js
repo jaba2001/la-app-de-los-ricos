@@ -10,6 +10,7 @@
 // Returns {} on total failure so the caller shows "—" exactly as before (no regression).
 import { requireUser } from '../../../lib/auth.js';
 import { checkRateLimit } from '../../../lib/ratelimit.js';
+import { cacheKey, cacheGet, cacheSet } from '../../../lib/cache.js';
 import { corsHeaders, preflight } from '../../../lib/cors.js';
 
 export const runtime = 'edge';
@@ -63,6 +64,9 @@ function json(request, obj, status, ttl) {
   });
 }
 
+// 6h; short interest only updates bi-monthly so this is very safe.
+const TTL = 21600;
+
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
   const rl = await checkRateLimit('shortint', user.id, 20, 60, request); if (rl) return rl;
@@ -71,11 +75,31 @@ export async function GET(request) {
   const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
   if (!symbol || !/^[A-Z.\-]{1,10}$/.test(symbol)) return json(request, { error: 'Invalid symbol' }, 400, 0);
 
+  // El interés corto se publica dos veces al mes, así que la misma respuesta vale para
+  // todo el mundo durante horas. Sin esta caché, cada usuario que abría un ticker pagaba
+  // hasta DOS viajes (Nasdaq y, si falla, FINRA) para obtener un dato idéntico.
+  const key = cacheKey('shortint', symbol, new URLSearchParams());
+  const hit = await cacheGet(key);
+  if (hit) {
+    return new Response(hit.body, {
+      status: hit.status,
+      headers: corsHeaders(request, {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${TTL}, s-maxage=${TTL}`,
+        'X-Scora-Cache': 'HIT',
+      }),
+    });
+  }
+
   let data = null;
   try { data = await fromNasdaq(symbol); } catch { /* fall through to FINRA */ }
   if (!data) { try { data = await fromFinra(symbol); } catch { /* give up gracefully */ } }
-  // 6h cache; short interest only updates bi-monthly so this is very safe.
-  return json(request, data ?? {}, 200, 21600);
+
+  // SOLO se cachea cuando hay dato. Un `{}` viene de que los DOS proveedores han fallado, y
+  // guardar eso 6 h convertiría una caída pasajera de Nasdaq+FINRA en seis horas de "este
+  // ticker no tiene interés corto" — un dato erróneo, indistinguible del correcto.
+  if (data) await cacheSet(key, { status: 200, body: JSON.stringify(data) }, TTL);
+  return json(request, data ?? {}, 200, data ? TTL : 0);
 }
 
 export async function OPTIONS(request) {

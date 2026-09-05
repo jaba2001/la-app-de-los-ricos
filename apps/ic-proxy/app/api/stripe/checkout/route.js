@@ -41,7 +41,7 @@ export async function POST(request) {
     return json({ error: 'Payments are not enabled yet.' }, 503);
   }
 
-  const { user, error: authErr } = await requireUser(request);
+  const { user, error: authErr } = await requireUser(request, { strict: true });
   if (authErr) return authErr;
 
   // Cada llamada crea una sesión en Stripe. Un límite bajo basta: nadie necesita abrir
