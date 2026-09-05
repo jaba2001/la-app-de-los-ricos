@@ -14,6 +14,7 @@ import RegimeRadar from "@/components/macro/RegimeRadar";
 import SecularClock from "@/components/macro/SecularClock";
 import SectorRotation from "@/components/macro/SectorRotation";
 import ScoraBrief from "@/components/macro/ScoraBrief";
+import { latestAnalyses } from "@/lib/latestAnalyses";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -155,14 +156,8 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       .then(({ data: wlData, error: wlErr }) => {
         if (wlErr || !wlData || wlData.length === 0) { setLoadingData(false); return; }
         const tickers = (wlData as { ticker: string }[]).map(w => w.ticker);
-        supabase.from("sl_analyses")
-          .select("*")
-          .in("ticker", tickers)
-          .order("analysis_date", { ascending: false })
-          .then(({ data: anlData, error: anlErr }) => {
-            if (anlErr || !anlData) { setLoadingData(false); return; }
-            const latest: Record<string, StockAnalysis> = {};
-            (anlData as StockAnalysis[]).forEach(a => { if (!latest[a.ticker]) latest[a.ticker] = a; });
+        latestAnalyses(tickers)
+          .then((latest) => {
 
             const result: PortfolioEntry[] = tickers
               .filter(t => latest[t])

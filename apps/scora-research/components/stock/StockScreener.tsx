@@ -13,6 +13,7 @@ import { track } from "@/lib/analytics";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import { latestAnalyses } from "@/lib/latestAnalyses";
 
 // Data Explorer — optional metric columns the user can toggle on/off over the watchlist
 // (TIKR-style). Every metric is already computed & stored in sl_analyses; no new fetch.
@@ -45,15 +46,8 @@ export default function StockScreener() {
 
   useEffect(() => {
     if (!watchlist.length) return;
-    supabase.from("sl_analyses").select("*")
-      .in("ticker", watchlist.map(w => w.ticker))
-      .order("analysis_date", { ascending: false })
-      .then(({ data }) => {
-        if (!data) return;
-        const map: Record<string, StockAnalysis> = {};
-        (data as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
-        setAnalyses(map);
-      });
+    latestAnalyses(watchlist.map(w => w.ticker))
+      .then((map) => { setAnalyses(map); });
   }, [watchlist]);
 
   async function quickAnalyze(ticker: string) {

@@ -20,7 +20,12 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const FRED = process.env.FRED_KEY || "89002273b3b4289f0869a5e5318b7277";
+// La clave sale SOLO del entorno. Estaba embebida como respaldo, lo que la dejaba en el
+// codigo y en el historial de git de un repo compartido. Es gratuita y de bajo impacto,
+// pero un respaldo silencioso tambien significa que el script parece funcionar cuando el
+// entorno esta mal puesto — y entonces se descubre en produccion, no aqui.
+const FRED = process.env.FRED_KEY;
+if (!FRED) throw new Error("Falta FRED_KEY. Consiguela gratis en https://fred.stlouisfed.org/docs/api/api_key.html y exportala antes de ejecutar.");
 const DIR = join(dirname(fileURLToPath(import.meta.url)), ".cache", "fredfull");
 if (!existsSync(DIR)) mkdirSync(DIR, { recursive: true });
 

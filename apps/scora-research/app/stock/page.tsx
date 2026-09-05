@@ -7,6 +7,7 @@ import { authedFetch } from "@/lib/proxy";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
 import { Sk } from "@/components/ui/Skeleton";
+import { latestAnalyses } from "@/lib/latestAnalyses";
 
 interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
 
@@ -55,15 +56,8 @@ export default function StockPage() {
   useEffect(() => {
     if (!watchlist.length) return;
     const tickers = watchlist.map(w => w.ticker);
-    supabase
-      .from("sl_analyses")
-      .select("*")
-      .in("ticker", tickers)
-      .order("analysis_date", { ascending: false })
-      .then(({ data }) => {
-        if (!data) return;
-        const map: Record<string, StockAnalysis> = {};
-        (data as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
+    latestAnalyses(tickers)
+      .then((map) => {
         setAnalyses(map);
       });
   }, [watchlist]);

@@ -131,7 +131,9 @@ export default function StockTickerPage() {
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
   const [failedApis, setFailedApis] = useState(0);
-  const TOTAL_SOURCES = 32;
+  // 2 siempre frescas (macro + quote) + 31 del lote. La ranura del ETF sectorial cuenta
+  // aunque no se adivine, para que este numero no dependa de si es la primera visita.
+  const TOTAL_SOURCES = 33;
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
   const [autoChecked, setAutoChecked] = useState(false);
@@ -228,14 +230,31 @@ export default function StockTickerPage() {
         freshQuote.changesPercentage = freshQuote.changePercentage;
       }
 
-      // ── 24h snapshot check ────────────────────────────────────────
-      const { data: snap } = await supabase
-        .from("stock_snapshot")
-        .select("data")
-        .eq("ticker", ticker.toUpperCase())
-        .eq("snapshot_date", today)
-        .eq("user_id", session.user.id)
-        .maybeSingle();
+      // ── 24h snapshot check + sector conocido ──────────────────────
+      // El sector se busca A LA VEZ que el snapshot, no después: es otra consulta a
+      // Supabase y en paralelo no cuesta ni un milisegundo más. Sirve para ADIVINAR el ETF
+      // sectorial y poder pedirlo dentro del lote (ver más abajo); el sector real sigue
+      // saliendo del `profile`, así que adivinar mal no ensucia nada.
+      const [snapRes, lastSectorRes] = await Promise.all([
+        supabase
+          .from("stock_snapshot")
+          .select("data")
+          .eq("ticker", ticker.toUpperCase())
+          .eq("snapshot_date", today)
+          .eq("user_id", session.user.id)
+          .maybeSingle(),
+        supabase
+          .from("sl_analyses")
+          .select("sector")
+          .eq("ticker", ticker.toUpperCase())
+          .not("sector", "is", null)
+          .order("analysis_date", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      const snap = snapRes.data;
+      // El ETF que CREEMOS que toca. Null la primera vez que se mira un ticker.
+      const etfAdivinado = SECTOR_ETF[(lastSectorRes.data?.sector as string) ?? ""] ?? null;
 
       if (!live()) return;
       let stockData: StockData;
@@ -258,6 +277,7 @@ export default function StockTickerPage() {
         edgarRes,
         simfinRes,
         finvizRes,
+        etfAdivinadoRes,
         shortIntRes,
       ] = await Promise.allSettled([
         track(authedFetch<unknown[]>(`/api/fmp/profile?symbol=${ticker}`)),
@@ -297,6 +317,15 @@ export default function StockTickerPage() {
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin?symbol=${ticker}`)),
         // Phase 8 — Finviz short/sentiment/ownership data (free, edge-scraped, 6h cache)
         track(authedFetch<FinvizData>(`/api/finviz/quote?symbol=${ticker}`)),
+        // ETF sectorial, pedido A CIEGAS con el sector de la última vez. Va en este mismo
+        // array a propósito: el agrupador de lib/proxy.ts junta todo lo del mismo tick en un
+        // lote, así que esta llamada viaja gratis. Antes se pedía DESPUÉS de que resolviera
+        // todo esto —porque el sector sale del `profile`— y era un viaje en serie extra en
+        // el camino crítico de casi todas las acciones que no son del sector de SPY.
+        // Si el sector real no coincide con el adivinado, se pide el bueno más abajo.
+        track(etfAdivinado && etfAdivinado !== "SPY"
+          ? authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=${etfAdivinado}`)
+          : Promise.resolve(null)),
         // Short interest / short float — free (NASDAQ official + FINRA fallback)
         track(authedFetch<{sharesShort?:number; daysToCover?:number; settlementDate?:string; shortVolumeRatio?:number}>(`/api/short-interest?symbol=${ticker}`)),
       ]);
@@ -417,7 +446,14 @@ export default function StockTickerPage() {
       let sectorEtfHistory: Record<string, unknown>[] = [];
       if (sectorEtfSymbol === "SPY") {
         sectorEtfHistory = spyRes.status === "fulfilled" ? (spyRes.value as Record<string,unknown>[]) ?? [] : [];
+      } else if (sectorEtfSymbol === etfAdivinado && etfAdivinadoRes.status === "fulfilled" && Array.isArray(etfAdivinadoRes.value)) {
+        // Acertamos: el ETF ya vino en el lote y no hay viaje que hacer. Es el caso normal,
+        // porque el sector de una empresa no cambia entre dos visitas.
+        sectorEtfHistory = etfAdivinadoRes.value as Record<string,unknown>[];
       } else {
+        // Fallamos, o es la primera vez que se mira este ticker. Se pide el bueno: exactamente
+        // el comportamiento de antes, que sigue siendo correcto — solo que ahora es la
+        // excepcion y no la regla.
         try {
           const etfRes = await authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=${sectorEtfSymbol}`);
           sectorEtfHistory = Array.isArray(etfRes) ? etfRes as Record<string,unknown>[] : [];
