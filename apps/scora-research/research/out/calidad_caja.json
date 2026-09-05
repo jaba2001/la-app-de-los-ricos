@@ -1,0 +1,669 @@
+{
+  "generatedAt": "2026-09-03T10:21:31.150Z",
+  "asOf": "2026-06-30",
+  "umbrales": {
+    "cashConversionMala": 0.8,
+    "exceso": 0.15,
+    "retribucionSobreFCF": 1,
+    "capexAlto": 0.2
+  },
+  "resumen": {
+    "leidos": 20,
+    "deCuantos": 20,
+    "financieras": 4,
+    "destinoCuadra": 17,
+    "puenteSuficiente": 4,
+    "conBandera": 3,
+    "sankeyCompleto": 15,
+    "sankeyPublicable": 17,
+    "sankeyAbierto": 0,
+    "tasaBanderas": 0.15
+  },
+  "porClave": {
+    "cobros_disparados": 1,
+    "retribucion_no_autofinanciada": 1,
+    "retribucion_con_fcf_negativo": 2
+  },
+  "filas": [
+    {
+      "ticker": "A",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "",
+      "diagnostico": {
+        "cashConversion": 1.027,
+        "margenCFO": 0.2008,
+        "fcf": 1087000000,
+        "margenFCF": 0.1503,
+        "capexSobreVentas": 0.0505,
+        "crecimientoCFO": -0.0839
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 7,
+        "sinExplicar": -140000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AAPL",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.144,
+        "margenCFO": 0.3106,
+        "fcf": 129174000000,
+        "margenFCF": 0.2861,
+        "capexSobreVentas": 0.0245,
+        "crecimientoCFO": 0.2799
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 7,
+        "sinExplicar": -3755000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ABBV",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Healthcare",
+      "diagnostico": {
+        "cashConversion": 5.839,
+        "margenCFO": 0.3379,
+        "fcf": 19980000000,
+        "margenFCF": 0.3181,
+        "capexSobreVentas": 0.0198,
+        "crecimientoCFO": 0.2941
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 17125000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ABNB",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "",
+      "diagnostico": {
+        "cashConversion": 1.814,
+        "margenCFO": 0.361,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": 0.0413
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 5,
+        "sinExplicar": 393000000,
+        "suficiente": true
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ABT",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Healthcare",
+      "diagnostico": {
+        "cashConversion": 1.508,
+        "margenCFO": 0.2097,
+        "fcf": 7378000000,
+        "margenFCF": 0.1635,
+        "capexSobreVentas": 0.0462,
+        "crecimientoCFO": 0.0574
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 3729000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 24000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ACGL",
+      "estado": "ok",
+      "financiera": true,
+      "sector": "Financial Services",
+      "diagnostico": {
+        "cashConversion": 1.211,
+        "margenCFO": 0.2984,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": -0.1013
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 4,
+        "sinExplicar": 874000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ACN",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.692,
+        "margenCFO": 0.1803,
+        "fcf": 12581688000,
+        "margenFCF": 0.1721,
+        "capexSobreVentas": 0.0082,
+        "crecimientoCFO": 0.2039
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 5,
+        "sinExplicar": 4182494000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ADBE",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.45,
+        "margenCFO": 0.4159,
+        "fcf": 10280000000,
+        "margenFCF": 0.408,
+        "capexSobreVentas": 0.008,
+        "crecimientoCFO": 0.0901
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 722000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ADI",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.541,
+        "margenCFO": 0.4008,
+        "fcf": 4565150000,
+        "margenFCF": 0.3583,
+        "capexSobreVentas": 0.0425,
+        "crecimientoCFO": 0.3256
+      },
+      "banderas": [
+        {
+          "clave": "cobros_disparados",
+          "gravedad": "alerta",
+          "texto": "Las cuentas por cobrar crecen 48 % y las ventas 30 %: se está vendiendo más rápido de lo que se cobra.",
+          "evidencia": {
+            "crecimientoCobros": 0.484,
+            "crecimientoVentas": 0.298
+          }
+        },
+        {
+          "clave": "retribucion_no_autofinanciada",
+          "gravedad": "alerta",
+          "texto": "Recompras y dividendos suman 5.0 B$ frente a un flujo de caja libre de 4.6 B$: se está devolviendo más de lo que el negocio genera.",
+          "evidencia": {
+            "retribucion": 5042797000,
+            "fcf": 4565150000,
+            "veces": 1.1
+          }
+        }
+      ],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 2447364000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ADM",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Consumer Defensive",
+      "diagnostico": {
+        "cashConversion": 5.499,
+        "margenCFO": 0.0738,
+        "fcf": 4793000000,
+        "margenFCF": 0.0595,
+        "capexSobreVentas": 0.0143,
+        "crecimientoCFO": 2.4005
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 7,
+        "sinExplicar": 3056000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ADP",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.255,
+        "margenCFO": 0.2524,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": 0.1357
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 297200000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "ADSK",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 1.901,
+        "margenCFO": 0.3705,
+        "fcf": 2729000000,
+        "margenFCF": 0.3635,
+        "capexSobreVentas": 0.0069,
+        "crecimientoCFO": 0.6583
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 492000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AEE",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Utilities",
+      "diagnostico": {
+        "cashConversion": 2.186,
+        "margenCFO": 0.3765,
+        "fcf": -1295000000,
+        "margenFCF": -0.1459,
+        "capexSobreVentas": 0.5224,
+        "crecimientoCFO": 0.2372
+      },
+      "banderas": [
+        {
+          "clave": "retribucion_con_fcf_negativo",
+          "gravedad": "aviso",
+          "texto": "Se reparten 0.8 B$ entre recompras y dividendos con un flujo de caja libre NEGATIVO (-1.3 B$). En un negocio regulado e intensivo en capital esto es habitual: la inversión se financia con deuda y el dividendo sale del retorno regulado.",
+          "evidencia": {
+            "retribucion": 785000000,
+            "fcf": -1295000000
+          }
+        }
+      ],
+      "puente": {
+        "pasos": 7,
+        "sinExplicar": 251000000,
+        "suficiente": true
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AEP",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Utilities",
+      "diagnostico": {
+        "cashConversion": 1.847,
+        "margenCFO": 0.3126,
+        "fcf": 2595000000,
+        "margenFCF": 0.1157,
+        "capexSobreVentas": 0.1969,
+        "crecimientoCFO": 0.0295
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 190000000,
+        "suficiente": true
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 6,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AES",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Utilities",
+      "diagnostico": {
+        "cashConversion": 3.673,
+        "margenCFO": 0.3974,
+        "fcf": -1479000000,
+        "margenFCF": -0.1184,
+        "capexSobreVentas": 0.5158,
+        "crecimientoCFO": 0.6485
+      },
+      "banderas": [
+        {
+          "clave": "retribucion_con_fcf_negativo",
+          "gravedad": "aviso",
+          "texto": "Se reparten 0.5 B$ entre recompras y dividendos con un flujo de caja libre NEGATIVO (-1.5 B$). En un negocio regulado e intensivo en capital esto es habitual: la inversión se financia con deuda y el dividendo sale del retorno regulado.",
+          "evidencia": {
+            "retribucion": 501000000,
+            "fcf": -1479000000
+          }
+        }
+      ],
+      "puente": {
+        "pasos": 7,
+        "sinExplicar": 5106000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": false,
+        "residuo": 131000000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": false,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AFL",
+      "estado": "ok",
+      "financiera": true,
+      "sector": "Financial Services",
+      "diagnostico": {
+        "cashConversion": 0.633,
+        "margenCFO": 0.162,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": 0.199
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 4,
+        "sinExplicar": -1738000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": false,
+        "residuo": -105000000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": false,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AIG",
+      "estado": "ok",
+      "financiera": true,
+      "sector": "Financial Services",
+      "diagnostico": {
+        "cashConversion": 1.115,
+        "margenCFO": 0.1323,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": 0.3075
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 5,
+        "sinExplicar": -3281000000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AIZ",
+      "estado": "ok",
+      "financiera": true,
+      "sector": "Financial Services",
+      "diagnostico": {
+        "cashConversion": 1.681,
+        "margenCFO": 0.1278,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": 0.0239
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 5,
+        "sinExplicar": 333600000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 6900000
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 8,
+        "cuadra": true,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AJG",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Financial Services",
+      "diagnostico": {
+        "cashConversion": 1.25,
+        "margenCFO": 0.1346,
+        "fcf": null,
+        "margenFCF": null,
+        "capexSobreVentas": null,
+        "crecimientoCFO": -0.2441
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 584800000,
+        "suficiente": false
+      },
+      "destino": {
+        "cuadra": false,
+        "residuo": 184000000
+      },
+      "sankey": {
+        "nivel": "minimo",
+        "flujos": 6,
+        "cuadra": false,
+        "cierre": 0
+      }
+    },
+    {
+      "ticker": "AKAM",
+      "estado": "ok",
+      "financiera": false,
+      "sector": "Technology",
+      "diagnostico": {
+        "cashConversion": 3.631,
+        "margenCFO": 0.3703,
+        "fcf": 1088377000,
+        "margenFCF": 0.2551,
+        "capexSobreVentas": 0.1152,
+        "crecimientoCFO": 0.1139
+      },
+      "banderas": [],
+      "puente": {
+        "pasos": 6,
+        "sinExplicar": 72087000,
+        "suficiente": true
+      },
+      "destino": {
+        "cuadra": true,
+        "residuo": 0
+      },
+      "sankey": {
+        "nivel": "completo",
+        "flujos": 7,
+        "cuadra": true,
+        "cierre": 0
+      }
+    }
+  ]
+}

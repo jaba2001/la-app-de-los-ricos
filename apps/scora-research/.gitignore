@@ -1,0 +1,178 @@
+.next/
+node_modules/
+.env.local
+.vercel/
+
+.vercel
+
+# next-pwa generated service workers (rebuilt on every `next build`)
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/swe-worker-*.js
+
+# TypeScript incremental build cache
+tsconfig.tsbuildinfo
+
+# research pipeline caches/outputs (regenerable)
+research/.cache/
+research/out/*
+
+# …salvo los ARTEFACTOS DE EVIDENCIA. No son "regenerables" en el sentido que importa:
+# son la justificación de constantes que van en el código (ENSEMBLE_WEIGHTS,
+# GROWTH_BACKTEST, ALLOCATOR_BACKTEST…) y la entrada de los guardianes anti-deriva del
+# golden test. Mientras estuvieron ignorados, esos guardianes se saltaban en SILENCIO en
+# cada checkout limpio y los pesos derivaron meses sin que nadie lo viera. Un guardián que
+# se salta solo es peor que no tener guardián: da la señal verde sin haber mirado.
+# Son ficheros de 1-254 KB. Versionarlos es el precio de que la evidencia sea reproducible.
+!research/out/signals_ic.json
+!research/out/growth_metrics.json
+!research/out/megacaps_calidad.json
+!research/out/cobertura_techo.json
+!research/out/coste_friccion.json
+!research/out/rotacion_anatomia.json
+!research/out/ebit_costes_gastos.json
+!research/out/rdcf_ortogonalidad.json
+!research/out/etf_spreads.json
+!research/out/congreso_viabilidad.json
+# La SERIE mensual del allocator (236 meses x 5 estrategias x 7 activos). Es la entrada de
+# `scripts/serie.test.mjs`, que sin ella no puede correr en un checkout limpio — y ese test es
+# el unico que caza el incidente del 2026-09-01: el cache de SPY truncado a 2018-06 convirtio
+# los 36 meses de la crisis de 2008 en meses planos, y TODO lo demas seguia cuadrando.
+!research/out/growth_series.json
+# El informe de gestion activa: metricas con tasa real, tests de temporizacion y atribucion de
+# Brinson. Es la evidencia del claim ajustado al riesgo — lo que un evaluador (o un abogado)
+# pediria ver — y la entrada de cualquier guardian que se escriba encima.
+!research/out/informe_gestion_activa.json
+# Rotacion, capacidad, deflacion y robustez del drawdown: la evidencia de que el «tercio del
+# drawdown» depende de 2008, que es lo que un evaluador va a comprobar primero.
+!research/out/informe_capacidad.json
+# Calidad de la caja: el diagnostico y las banderas rojas por empresa. Es la evidencia de que los
+# umbrales no marcan a medio indice, que es el listado de cordura de esa capa.
+!research/out/calidad_caja.json
+# La curva, el reparto nominal/real y el diferencial de credito con su percentil a 41 anos.
+# Lleva dentro el bloque de COBERTURA: es la prueba de que el percentil sale de la muestra
+# que dice, y no de una serie truncada que contesta igual.
+!research/out/tipos.json
+# La vida util implicita y el precio de recompra por empresa, con las tres vias de la
+# depreciacion y el control de cordura del precio. Es la evidencia de que las cifras salen de
+# donde se dice y no de un tag muerto.
+!research/out/calidad_contable.json
+# La tasa base del aviso de ensanchamiento: 22 episodios, p = 0,146 (semilla fija), 8 falsas alarmas. Es lo
+# que impide publicar el booleano como si fuera una alerta.
+!research/out/aviso_credito_base.json
+# Las cuatro cifras de los videos comprobadas una a una, con lo que NO se construye escrito
+# dentro del propio artefacto.
+!research/out/soberano.json
+# El chequeo del oro: 8 fondos fisicos y 4 controles positivos (DGP es una NOTA sin garantia
+# cotizando como oro). Sin los controles cazados el script no publica veredicto.
+!research/out/oro_respaldo.json
+# La comprobacion previa que AHORRO el ensayo 345: rho 0,769 sobre un criterio de 0,70 escrito
+# antes de mirar. Es la evidencia de que la regla no se ajusto al resultado.
+!research/out/precheck_credito.json
+# La comprobacion previa de la fase C, con el criterio escrito antes y el MARGEN reportado:
+# 0,681 y 0,705 alrededor de 0,70. Decidir sobre cinco milesimas no es decidir, y eso consta.
+!research/out/precheck_aceleracion.json
+# La sensibilidad al tipo real, con la columna PREDICTIVA al lado de la contemporanea. Es la
+# prueba de que la relacion explica y no anticipa: |rho| medio 0,312 -> 0,098.
+!research/out/tipos_reales.json
+# Las cifras de los videos, REPRODUCIDAS. Existe porque la auditoria encontro que tres de las
+# publicadas —el adelanto del Case-Shiller, el backlog de Oracle y la serie de capex— salieron
+# de invocaciones sueltas y no dejaron script detras: bien medidas e irreproducibles.
+!research/out/verificacion_videos.json
+# La concentracion del indice, medida como DINAMICA (SPY frente al equiponderado RSP) porque el
+# peso del top-10 no se puede calcular: 5 de las 15 mayores no publican acciones utilizables.
+!research/out/concentracion.json
+# ¿Aportan las capas nuevas informacion que el score no tenga? Las cuatro salen ortogonales:
+# los pilares explican entre el 1 % y el 8 % de ellas. Es la condicion NECESARIA para gastar un
+# ensayo, no la suficiente.
+!research/out/precheck_capas.json
+# EL ENSAYO 343, con su preregistro escrito antes. Las cuatro medidas FALLAN el criterio: mejoran
+# 2011-2018 y empeoran 2019-2026. Se versiona porque un ensayo fallido que no se guarda se repite.
+!research/out/ensayo343.json
+# La via que SI bate al indice: convertir la ventaja de riesgo en ventaja de retorno. Con
+# volatilidad objetivo da 1.345,8 %% frente a 668,4 %% del SPY, y con la MITAD de su caida maxima.
+!research/out/apalancamiento.json
+# El punto de equilibrio del coste de financiacion: +7,2 pp para B y +6,9 para C. Es lo que dice
+# que el coste NO es el cuello de botella — lo son la llamada de margen y el hueco.
+!research/out/apalancamiento_coste.json
+# FASE 1: la llamada de margen simulada DIA A DIA sobre la serie reconstruida. Cero llamadas a
+# 1,82x incluso con mantenimiento del 35 %, y por una razon aritmetica: la cartera cae -17,2 %
+# como mucho y el disparo esta en -30,7 %. Control positivo a 4x: 5 y 13 llamadas.
+!research/out/margen_fase1.json
+# La FORMA de la superficie alrededor del ajuste actual del asignador. No es un barrido: mide si
+# el umbral de produccion (50) es el pico de su rejilla —firma de parametro ajustado— o la meseta.
+!research/out/sensibilidad_asignador.json
+# La cadencia y la ventana de la puerta de tendencia: LAS DOS son el maximo de su rejilla, con
+# dispersiones del 33 % y el 57 %. Es la fragilidad mas grande encontrada en las cifras publicadas.
+!research/out/sensibilidad_cadencia.json
+# ¿Sobrevive la optimalidad de los parametros al partir la muestra? NO: el argmax baila en las
+# TRES palancas. Pero calibrar sobre el pasado tampoco habria ayudado (3 de 6, cara o cruz).
+!research/out/estabilidad_parametros.json
+# Dejar-fuera-uno por activo. DBC aporta EXACTAMENTE cero al perfil de crecimiento porque nunca
+# recibe peso ahi; GLD es el que mas aporta. SPY y BIL no son comparables: son estructurales.
+!research/out/atribucion_activos.json
+!research/out/backtest_assets_summary.json
+!research/out/regime_factor_validate.json
+!research/out/portfolio_backtest.json
+!research/out/capture_lab.json
+!research/out/allocator_lab.json
+!research/out/backtest_summary.json
+!research/out/trials_ledger.json
+!research/out/factor_lab.json
+# Evidencia de Scora Picks: los números de SCORA_PICKS_REGLAS.md §3 y §6 salen de aquí.
+# El documento es un PRE-REGISTRO — si la evidencia que lo respalda no está versionada,
+# nadie puede comprobar mañana que los números publicados son los que se midieron.
+!research/out/quality_lowvol_lab.json
+!research/out/quality_lowvol_lab_oos.json
+# Evidencia de decisiones que ya viven en el código o en un plan:
+!research/out/score_v2_validate.json
+!research/out/momentum_lab.json
+!research/out/momentum_audit.json
+!research/out/momentum_audit_long.json
+# Evidencia del backtest de las REGLAS (§6bis) y de la refutación de la dilución.
+# Los paneles de señal (`picks_signal_panel_*`) NO: son 0,6-0,9 MB regenerables y no
+# sostienen ninguna afirmación por sí solos.
+# El informe de cobertura: es lo unico que hace juzgable un arreglo de extraccion, y
+# los suelos de datos.test.mjs lo leen. Si se pierde, los guardianes se quedan sin nada
+# que vigilar y no lo dicen.
+!research/out/cobertura_metricas.json
+# La medicion que RECHAZO la via pretax: si se pierde, el proximo la reintentara.
+!research/out/ebit_reconstruccion.json
+!research/out/picks_rules_backtest.json
+!research/out/picks_rules_backtest_oos.json
+# La banda de estabilidad: cuanto se mueve la cifra publicada si falta UN nombre del
+# universo. Sostiene la advertencia de que +216,6 % es el centro de un rango y no un punto,
+# asi que va versionada por el mismo motivo que el resto — una cifra con incertidumbre
+# declarada necesita que la incertidumbre sea reproducible.
+!research/out/estabilidad.json
+!research/out/estabilidad_oos.json
+!research/out/pillar_dilution_lab.json
+!research/out/pillar_dilution_lab_oos.json
+!research/out/health_scale_lab.json
+!research/out/health_scale_lab_oos.json
+!research/out/articulacion_lab.json
+!research/out/desfase_periodos.json
+!research/out/banca_cobertura.json
+!research/out/lideres_lab.json
+!research/out/forense_lab.json
+!research/out/forense_lab_oos.json
+!research/out/forense_veredicto.json
+!research/out/sanidad_metricas.json
+!research/out/forense_solapamiento.json
+!research/out/bab_lab.json
+!research/out/bab_lab_oos.json
+!research/out/resolucion_cik.json
+!research/out/simbolos_reutilizados.json
+!research/out/float_publico.json
+
+# Temporales de las escrituras atómicas a research/data/ (temporal + rename). Si una
+# ejecución se corta puede quedar uno suelto; no debe entrar en git ni confundirse con el bueno.
+research/data/*.tmp
+!research/out/cuantizacion.json
+!research/out/integridad_precios.json
+!research/out/movimientos.json
+!research/out/insiders.json
+!research/out/sankey_universo.json
+!research/data/cusip_ticker.json

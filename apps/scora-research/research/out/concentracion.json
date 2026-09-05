@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-09-03T16:47:28.228Z",
+  "sesiones": 5874,
+  "desde": "2003-05-01",
+  "hasta": "2026-09-03",
+  "anualizado": {
+    "spy": 11.56,
+    "rsp": 11.36,
+    "diferencia": 0.2
+  },
+  "porTramo": [
+    {
+      "tramo": "2003-2009",
+      "spy": 4.99,
+      "rsp": 8.2,
+      "diferencia": -3.21
+    },
+    {
+      "tramo": "2010-2014",
+      "spy": 14.99,
+      "rsp": 16.57,
+      "diferencia": -1.58
+    },
+    {
+      "tramo": "2015-2019",
+      "spy": 11.59,
+      "rsp": 9.45,
+      "diferencia": 2.14
+    },
+    {
+      "tramo": "2020-2026",
+      "spy": 15.48,
+      "rsp": 11.93,
+      "diferencia": 3.54
+    }
+  ],
+  "cociente": 1.0432,
+  "percentil": 97.8,
+  "impulso12m": 1.48,
+  "limitacion": "Mide la DINAMICA de la concentracion (ponderado por capitalizacion frente a equiponderado), no el peso del top-10. Ese peso necesita capitalizaciones y CINCO de las quince mayores no se pueden calcular con datos gratis: Alphabet, GOOG y Meta no etiquetan EntityCommonStockSharesOutstanding, Berkshire devuelve un dato de 2011 con el recuento de la clase A, y Visa uno de 2010. Los fallos son silenciosos y plausibles, que es lo que los hace peligrosos."
+}

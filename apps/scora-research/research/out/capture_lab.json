@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-07-12T15:50:17.491Z",
+  "months": 234,
+  "window": {
+    "start": "2007-01-01"
+  },
+  "results": {
+    "SPY buy & hold": {
+      "total": 652.2,
+      "cagr": 10.9,
+      "sharpe": 0.72,
+      "sortino": 1.07,
+      "maxDrawdown": -50.7,
+      "beta": 1,
+      "alpha": 0,
+      "informationRatio": 0,
+      "var95": -8.21,
+      "cvar95": -11.18
+    },
+    "Growth (production, β~0.32)": {
+      "total": 506.1,
+      "cagr": 9.68,
+      "sharpe": 0.99,
+      "sortino": 1.79,
+      "maxDrawdown": -17.3,
+      "beta": 0.32,
+      "alpha": 5.96,
+      "informationRatio": -0.14,
+      "var95": -4.11,
+      "cvar95": -5.6
+    },
+    "C1 Trend-only (no regime)": {
+      "total": 622.4,
+      "cagr": 10.67,
+      "sharpe": 0.84,
+      "sortino": 1.35,
+      "maxDrawdown": -23.1,
+      "beta": 0.65,
+      "alpha": 3.46,
+      "informationRatio": -0.07,
+      "var95": -5.31,
+      "cvar95": -8.5
+    },
+    "C2 Tail-cut (regime<25)": {
+      "total": 350.4,
+      "cagr": 8.02,
+      "sharpe": 0.68,
+      "sortino": 1.05,
+      "maxDrawdown": -23.4,
+      "beta": 0.54,
+      "alpha": 2.21,
+      "informationRatio": -0.27,
+      "var95": -5.31,
+      "cvar95": -8.32
+    },
+    "C2b Tail-cut + 5% BTC": {
+      "total": 401.4,
+      "cagr": 8.62,
+      "sharpe": 0.71,
+      "sortino": 1.12,
+      "maxDrawdown": -23.4,
+      "beta": 0.55,
+      "alpha": 2.7,
+      "informationRatio": -0.22,
+      "var95": -5.34,
+      "cvar95": -8.35
+    },
+    "C3 High-floor 60%": {
+      "total": 580.4,
+      "cagr": 10.33,
+      "sharpe": 0.98,
+      "sortino": 1.67,
+      "maxDrawdown": -16.2,
+      "beta": 0.49,
+      "alpha": 4.73,
+      "informationRatio": -0.12,
+      "var95": -4.21,
+      "cvar95": -6.36
+    },
+    "C4 Linear scale 50-100%": {
+      "total": 454,
+      "cagr": 9.18,
+      "sharpe": 0.95,
+      "sortino": 1.56,
+      "maxDrawdown": -15.4,
+      "beta": 0.46,
+      "alpha": 3.85,
+      "informationRatio": -0.23,
+      "var95": -4.01,
+      "cvar95": -6
+    }
+  },
+  "spy": {
+    "total": 652.2,
+    "maxDrawdown": -50.7
+  },
+  "verdict": "NOT beaten on total return — but check the risk-adjusted + drawdown tradeoff per variant (the honest sale is still risk-adjusted)."
+}

@@ -1,0 +1,72 @@
+{
+  "generatedAt": "2026-08-18T17:36:09.852Z",
+  "hypothesis": "IC(friccion alta) > IC(friccion baja) — Shleifer-Vishny (1997) + Pontiff (2006). Preespecificada: 1 ensayo, no un barrido.",
+  "hypothesis2": "IC menor en meses de estres de capital alto — la prediccion TEMPORAL de Shleifer-Vishny. Segunda hipotesis preespecificada.",
+  "stressGate": {
+    "buckets": {
+      "calmo": {
+        "ic": 0.020949981686234947,
+        "months": 27,
+        "mde": 0.11854925527360315,
+        "detectable": false
+      },
+      "medio": {
+        "ic": -0.0290083241068507,
+        "months": 23,
+        "mde": 0.12844487905915805,
+        "detectable": false
+      },
+      "tenso": {
+        "ic": 0.0535659841895093,
+        "months": 26,
+        "mde": 0.12080753924512137,
+        "detectable": false
+      }
+    },
+    "spread": 0.03261600250327436,
+    "spreadMde": 0.16925834533158907,
+    "verdict": "NO CONCLUYENTE — diferencial 0.033 con MDE de contraste 0.169. La muestra no puede decidirlo; ampliar ventana, no probar más variantes.",
+    "proxy": "composite credit_stress de regimeAsOf"
+  },
+  "mode": "full-sp500-pit",
+  "universe": 120,
+  "months": 76,
+  "nameMonths": 8903,
+  "fwdMonths": 3,
+  "volWindowSessions": 250,
+  "icStdDevAssumed": 0.22,
+  "results": {
+    "baja": {
+      "ic": 0.03747099292216608,
+      "months": 76,
+      "mde": 0.07066004603213302,
+      "avgIdioVol": 18.796609260616965,
+      "detectable": false
+    },
+    "media": {
+      "ic": 0.0343312087277652,
+      "months": 76,
+      "mde": 0.07066004603213302,
+      "avgIdioVol": 23.51101003252362,
+      "detectable": false
+    },
+    "alta": {
+      "ic": -0.008211856896620165,
+      "months": 76,
+      "mde": 0.07066004603213302,
+      "avgIdioVol": 34.168936929600385,
+      "detectable": false
+    }
+  },
+  "spread": -0.045682849818786245,
+  "spreadMde": 0.09992839541654973,
+  "verdict": "NO CONCLUYENTE — el diferencial alta−baja es -0.046 con un MDE de contraste de 0.100. Con esta muestra la hipótesis no se puede aprobar ni descartar; no es \"no funciona\", es \"no se puede saber\". Haría falta ampliar el universo o la ventana, no probar más variantes.",
+  "caveats": [
+    "membresía point-in-time del S&P 500",
+    "vol idiosincrática = residuo de un modelo de mercado de 1 factor sobre 250 sesiones que terminan en la fecha as-of",
+    "terciles transversales dentro de cada mes, no sobre toda la muestra",
+    "el MDE del contraste es mayor que el de cada tercil: son dos medias, no una",
+    "H2 usa el composite credit_stress como PROXY del estres de capital de arbitraje: regimeAsOf no expone hy_oas/vix/nfci en crudo, asi que mide condiciones de credito, que es la mitad del fenomeno",
+    "dos hipotesis preespecificadas, no un barrido: suman al libro de ensayos lo que corresponde y nada mas"
+  ]
+}

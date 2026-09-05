@@ -1,0 +1,1228 @@
+{
+  "generatedAt": "2026-09-04T11:03:02.907Z",
+  "window": "2011-2018",
+  "huella": {
+    "sha": "b25f3ea712a3601a",
+    "ficheros": {
+      "cik_historicos.json": "05c0e7cb1a7b",
+      "alias_ticker.json": "42bb32f09d68",
+      "simbolos_reutilizados.json": "ae8ad5b911fb"
+    },
+    "versionReglas": 5,
+    "miembros": {
+      "fecha": "2026-09-04",
+      "n": 503,
+      "sha": "29038a215ef7"
+    },
+    "ultimaFotoMiembros": "2026-09-04"
+  },
+  "rules": {
+    "entry": 0.8,
+    "exit": 0.5,
+    "topN": 40,
+    "comprasPorFecha": 1,
+    "persistenciaDias": 60,
+    "dias180": 180,
+    "cuarentenaMeses": 12,
+    "costBps": 10
+  },
+  "span": {
+    "from": "2011-01-03",
+    "to": "2018-12-17",
+    "decisiones": 192,
+    "diasMercado": 2003
+  },
+  "cobertura": {
+    "posicionesNoValoradas": {
+      "sinPanel": [
+        "BMC",
+        "APOL"
+      ],
+      "sinRetornos": 2,
+      "total": 4,
+      "deCuantas": 93
+    },
+    "membresiaCongelada": {
+      "ultimaFotoReal": "2026-06-30",
+      "fechasAfectadas": 0,
+      "de": 192,
+      "pct": 0,
+      "nota": "Para estas fechas la membresía es la de ultimaFotoReal: las altas posteriores del índice no aparecen y las bajas siguen dentro."
+    },
+    "universoEWFuera": {
+      "sinPanel": [
+        "AKS",
+        "APOL",
+        "BMC",
+        "CBS",
+        "CHK",
+        "COG",
+        "DISCA",
+        "DTV",
+        "EMC",
+        "GENZ",
+        "GR",
+        "HAR",
+        "HOT",
+        "IGT",
+        "JCP",
+        "MON",
+        "NFX",
+        "NYX",
+        "SPLS",
+        "WIN",
+        "BRCM",
+        "CCE",
+        "CEPH",
+        "DNB",
+        "FTR",
+        "LSI",
+        "SHLD",
+        "BIG",
+        "NSM",
+        "MOLX",
+        "PLL",
+        "CBE",
+        "CVC",
+        "BBBY",
+        "PCP",
+        "MNK",
+        "ENDP",
+        "CPGX",
+        "HFC",
+        "WRK"
+      ],
+      "empiezaTarde": 31,
+      "saltosImposibles": [],
+      "deCuantos": 478
+    },
+    "universoEWSinFinancierosFuera": {
+      "sinPanel": [
+        "AKS",
+        "APOL",
+        "BMC",
+        "CBS",
+        "CHK",
+        "COG",
+        "DISCA",
+        "DTV",
+        "EMC",
+        "GENZ",
+        "GR",
+        "HAR",
+        "HOT",
+        "IGT",
+        "JCP",
+        "MON",
+        "NFX",
+        "SPLS",
+        "WIN",
+        "BRCM",
+        "CCE",
+        "CEPH",
+        "FTR",
+        "LSI",
+        "SHLD",
+        "BIG",
+        "NSM",
+        "MOLX",
+        "PLL",
+        "CBE",
+        "CVC",
+        "BBBY",
+        "PCP",
+        "MNK",
+        "ENDP",
+        "CPGX",
+        "HFC",
+        "WRK"
+      ],
+      "empiezaTarde": 31,
+      "saltosImposibles": [],
+      "deCuantos": 427
+    },
+    "nota": "Si `posicionesNoValoradas.total` pasa del 5 % del libro, este resultado no es comparable con uno calculado sobre el libro completo."
+  },
+  "benchmarks": {
+    "spy": {
+      "total": 134.9,
+      "cagr": 11.35,
+      "sharpe": 0.82,
+      "maxDD": -18.6
+    },
+    "rsp": {
+      "total": 120.9,
+      "sharpe": 0.73,
+      "maxDD": -22.9
+    },
+    "universoEW": {
+      "total": 153.5,
+      "cagr": 12.41,
+      "sharpe": 0.87,
+      "maxDD": -21
+    },
+    "universoEWSinFinancieros": {
+      "total": 150.4,
+      "cagr": 12.24,
+      "sharpe": 0.86,
+      "maxDD": -20.5,
+      "financierosExcluidos": 51,
+      "nota": "Misma referencia sin financieros ni inmobiliario. Separa la selección del sesgo sectorial (§11)."
+    }
+  },
+  "carteras": {
+    "soloPicks": {
+      "total": 154.8,
+      "cagr": 12.49,
+      "sharpe": 0.78,
+      "maxDD": -20.1
+    },
+    "conCaja": {
+      "total": 73.3,
+      "cagr": 7.16,
+      "sharpe": 0.68,
+      "maxDD": -17.2
+    },
+    "conIndice": {
+      "total": 130.1,
+      "cagr": 11.06,
+      "sharpe": 0.74,
+      "maxDD": -18.2,
+      "nota": "Modelo C (H4): la parte no invertida se mantiene en SPY en vez de en caja al 0 %. NO cambia ninguna decisión de compra."
+    }
+  },
+  "mecanica": {
+    "posiciones": 93,
+    "mesesHastaLlenar": null,
+    "posicionesMedias": 23.4,
+    "fechasSinCompra": 99,
+    "permanenciaMesesMedia": 23.4,
+    "aciertosPct": 71.2,
+    "motivos": {
+      "fuera del universo": 9,
+      "180 días sin recuperar": 50,
+      "señal bajo umbral 2 evaluaciones": 4,
+      "abierta al cierre": 30
+    }
+  },
+  "operaciones": [
+    {
+      "t": "MA",
+      "desde": "2011-02-01",
+      "hasta": "2012-08-01",
+      "motivo": "fuera del universo",
+      "dias": 547,
+      "retorno": 80
+    },
+    {
+      "t": "TPR",
+      "desde": "2011-02-15",
+      "hasta": "2016-02-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 1812,
+      "retorno": -26.1
+    },
+    {
+      "t": "MSFT",
+      "desde": "2011-03-01",
+      "hasta": "2015-01-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 1416,
+      "retorno": 93.1
+    },
+    {
+      "t": "BEN",
+      "desde": "2011-03-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 2834,
+      "retorno": 0.3
+    },
+    {
+      "t": "GILD",
+      "desde": "2011-04-01",
+      "hasta": "2012-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 502,
+      "retorno": 35.9
+    },
+    {
+      "t": "INTC",
+      "desde": "2011-04-15",
+      "hasta": "2013-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 914,
+      "retorno": 29.6
+    },
+    {
+      "t": "BMC",
+      "desde": "2011-05-02",
+      "hasta": "2012-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": null,
+      "retorno": null
+    },
+    {
+      "t": "V",
+      "desde": "2011-05-16",
+      "hasta": "2012-12-03",
+      "motivo": "fuera del universo",
+      "dias": 567,
+      "retorno": 88.5
+    },
+    {
+      "t": "MCO",
+      "desde": "2011-06-01",
+      "hasta": "2017-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 2267,
+      "retorno": 266.1
+    },
+    {
+      "t": "SNI",
+      "desde": "2011-06-15",
+      "hasta": "2013-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 792,
+      "retorno": 64
+    },
+    {
+      "t": "APOL",
+      "desde": "2011-07-01",
+      "hasta": "2013-07-01",
+      "motivo": "fuera del universo",
+      "dias": null,
+      "retorno": null
+    },
+    {
+      "t": "BKNG",
+      "desde": "2011-07-15",
+      "hasta": "2016-02-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 1662,
+      "retorno": 107.6
+    },
+    {
+      "t": "INTU",
+      "desde": "2011-08-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 2695,
+      "retorno": 363.2
+    },
+    {
+      "t": "VAR",
+      "desde": "2011-08-15",
+      "hasta": "2014-05-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 1004,
+      "retorno": 42.6
+    },
+    {
+      "t": "SPGI",
+      "desde": "2011-09-01",
+      "hasta": "2015-03-02",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 1278,
+      "retorno": 178.4
+    },
+    {
+      "t": "CL",
+      "desde": "2011-09-15",
+      "hasta": "2014-09-02",
+      "motivo": "180 días sin recuperar",
+      "dias": 1083,
+      "retorno": 49.6
+    },
+    {
+      "t": "SBUX",
+      "desde": "2011-10-03",
+      "hasta": "2013-12-16",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 805,
+      "retorno": 118
+    },
+    {
+      "t": "ATGE",
+      "desde": "2011-10-17",
+      "hasta": "2012-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 289,
+      "retorno": -53.3
+    },
+    {
+      "t": "LLTC",
+      "desde": "2011-11-01",
+      "hasta": "2012-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": null,
+      "retorno": null
+    },
+    {
+      "t": "ACN",
+      "desde": "2011-11-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 2589,
+      "retorno": 204.4
+    },
+    {
+      "t": "BIIB",
+      "desde": "2012-02-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 2511,
+      "retorno": 158.2
+    },
+    {
+      "t": "TDC",
+      "desde": "2012-04-16",
+      "hasta": "2015-11-02",
+      "motivo": "180 días sin recuperar",
+      "dias": 1295,
+      "retorno": -56.8
+    },
+    {
+      "t": "TRIP",
+      "desde": "2012-05-01",
+      "hasta": "2016-01-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 1354,
+      "retorno": 93.3
+    },
+    {
+      "t": "FOSL",
+      "desde": "2012-06-15",
+      "hasta": "2015-08-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 1158,
+      "retorno": -17.3
+    },
+    {
+      "t": "HP",
+      "desde": "2012-09-17",
+      "hasta": "2016-05-16",
+      "motivo": "180 días sin recuperar",
+      "dias": 1337,
+      "retorno": 33.9
+    },
+    {
+      "t": "CF",
+      "desde": "2012-10-01",
+      "hasta": "2013-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 379,
+      "retorno": -7.9
+    },
+    {
+      "t": "BF.B",
+      "desde": "2012-10-15",
+      "hasta": "2013-09-03",
+      "motivo": "180 días sin recuperar",
+      "dias": 323,
+      "retorno": 1.7
+    },
+    {
+      "t": "CERN",
+      "desde": "2012-11-01",
+      "hasta": "2014-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 713,
+      "retorno": 47.5
+    },
+    {
+      "t": "ORCL",
+      "desde": "2012-12-03",
+      "hasta": "2014-12-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 742,
+      "retorno": 30.5
+    },
+    {
+      "t": "ALXN",
+      "desde": "2012-12-17",
+      "hasta": "2015-08-17",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 973,
+      "retorno": 100.9
+    },
+    {
+      "t": "STX",
+      "desde": "2013-01-02",
+      "hasta": "2013-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 303,
+      "retorno": 56.9
+    },
+    {
+      "t": "WU",
+      "desde": "2013-04-01",
+      "hasta": "2013-08-15",
+      "motivo": "fuera del universo",
+      "dias": 136,
+      "retorno": 25.1
+    },
+    {
+      "t": "RL",
+      "desde": "2013-04-15",
+      "hasta": "2015-04-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 730,
+      "retorno": -17.5
+    },
+    {
+      "t": "SIAL",
+      "desde": "2013-05-01",
+      "hasta": "2014-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 471,
+      "retorno": 33.4
+    },
+    {
+      "t": "REGN",
+      "desde": "2013-07-01",
+      "hasta": "2017-05-15",
+      "motivo": "fuera del universo",
+      "dias": 1414,
+      "retorno": 95.7
+    },
+    {
+      "t": "GPS",
+      "desde": "2013-09-03",
+      "hasta": "2014-10-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 407,
+      "retorno": -9.4
+    },
+    {
+      "t": "EL",
+      "desde": "2013-10-15",
+      "hasta": "2017-02-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 1219,
+      "retorno": 23.4
+    },
+    {
+      "t": "GWW",
+      "desde": "2013-12-16",
+      "hasta": "2015-01-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 395,
+      "retorno": -4.7
+    },
+    {
+      "t": "ABT",
+      "desde": "2014-01-02",
+      "hasta": "2014-03-17",
+      "motivo": "señal bajo umbral 2 evaluaciones",
+      "dias": 74,
+      "retorno": 3.9
+    },
+    {
+      "t": "AAPL",
+      "desde": "2014-01-15",
+      "hasta": "2015-01-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 365,
+      "retorno": 37
+    },
+    {
+      "t": "FAST",
+      "desde": "2014-04-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 1707,
+      "retorno": 20.4
+    },
+    {
+      "t": "ABBV",
+      "desde": "2014-05-01",
+      "hasta": "2015-05-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 379,
+      "retorno": 31.9
+    },
+    {
+      "t": "MA",
+      "desde": "2014-06-16",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 1645,
+      "retorno": 161.5
+    },
+    {
+      "t": "FB",
+      "desde": "2014-07-01",
+      "hasta": "2015-07-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 379,
+      "retorno": 31.9
+    },
+    {
+      "t": "SWN",
+      "desde": "2014-07-15",
+      "hasta": "2015-04-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 274,
+      "retorno": -37.1
+    },
+    {
+      "t": "SNI",
+      "desde": "2014-08-15",
+      "hasta": "2015-08-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 367,
+      "retorno": -25.9
+    },
+    {
+      "t": "UNP",
+      "desde": "2014-09-15",
+      "hasta": "2016-10-03",
+      "motivo": "180 días sin recuperar",
+      "dias": 749,
+      "retorno": -4.7
+    },
+    {
+      "t": "BF.B",
+      "desde": "2014-10-01",
+      "hasta": "2017-12-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 1157,
+      "retorno": 42.8
+    },
+    {
+      "t": "LLTC",
+      "desde": "2014-10-15",
+      "hasta": "2015-11-16",
+      "motivo": "fuera del universo",
+      "dias": null,
+      "retorno": null
+    },
+    {
+      "t": "SBUX",
+      "desde": "2015-01-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 1432,
+      "retorno": 73.6
+    },
+    {
+      "t": "GILD",
+      "desde": "2015-04-01",
+      "hasta": "2018-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 1232,
+      "retorno": -17.2
+    },
+    {
+      "t": "HSY",
+      "desde": "2015-05-01",
+      "hasta": "2016-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 472,
+      "retorno": 23.3
+    },
+    {
+      "t": "TXN",
+      "desde": "2015-05-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 1312,
+      "retorno": 80.9
+    },
+    {
+      "t": "TJX",
+      "desde": "2015-06-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 1295,
+      "retorno": 43.5
+    },
+    {
+      "t": "MMM",
+      "desde": "2015-06-15",
+      "hasta": "2016-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 505,
+      "retorno": 9
+    },
+    {
+      "t": "JNJ",
+      "desde": "2015-07-15",
+      "hasta": "2016-08-15",
+      "motivo": "fuera del universo",
+      "dias": 397,
+      "retorno": 25.4
+    },
+    {
+      "t": "CL",
+      "desde": "2015-09-15",
+      "hasta": "2016-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 335,
+      "retorno": 22.4
+    },
+    {
+      "t": "EA",
+      "desde": "2015-10-15",
+      "hasta": "2016-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 291,
+      "retorno": 8
+    },
+    {
+      "t": "HRB",
+      "desde": "2015-11-02",
+      "hasta": "2015-12-15",
+      "motivo": "fuera del universo",
+      "dias": 43,
+      "retorno": -12.3
+    },
+    {
+      "t": "LUV",
+      "desde": "2015-12-15",
+      "hasta": "2018-05-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 882,
+      "retorno": 19.2
+    },
+    {
+      "t": "CTSH",
+      "desde": "2016-01-04",
+      "hasta": "2017-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 575,
+      "retorno": 19.9
+    },
+    {
+      "t": "AAPL",
+      "desde": "2016-01-15",
+      "hasta": "2016-10-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 276,
+      "retorno": 23.1
+    },
+    {
+      "t": "ORLY",
+      "desde": "2016-02-01",
+      "hasta": "2018-05-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 820,
+      "retorno": -2.4
+    },
+    {
+      "t": "CPRI",
+      "desde": "2016-02-16",
+      "hasta": "2018-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 897,
+      "retorno": 29.6
+    },
+    {
+      "t": "V",
+      "desde": "2016-04-01",
+      "hasta": "2017-01-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 291,
+      "retorno": 5.3
+    },
+    {
+      "t": "SPGI",
+      "desde": "2016-04-15",
+      "hasta": "2016-10-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 185,
+      "retorno": 23.6
+    },
+    {
+      "t": "SHW",
+      "desde": "2016-05-02",
+      "hasta": "2018-01-16",
+      "motivo": "180 días sin recuperar",
+      "dias": 624,
+      "retorno": 49.2
+    },
+    {
+      "t": "FL",
+      "desde": "2016-06-01",
+      "hasta": "2018-09-17",
+      "motivo": "180 días sin recuperar",
+      "dias": 838,
+      "retorno": -10.1
+    },
+    {
+      "t": "CERN",
+      "desde": "2016-06-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 915,
+      "retorno": -0.4
+    },
+    {
+      "t": "ALK",
+      "desde": "2016-07-15",
+      "hasta": "2017-08-15",
+      "motivo": "180 días sin recuperar",
+      "dias": 396,
+      "retorno": 30.9
+    },
+    {
+      "t": "TSCO",
+      "desde": "2016-08-01",
+      "hasta": "2017-11-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 457,
+      "retorno": -33.7
+    },
+    {
+      "t": "FB",
+      "desde": "2016-09-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 823,
+      "retorno": 9.2
+    },
+    {
+      "t": "PAYX",
+      "desde": "2016-11-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 762,
+      "retorno": 24.4
+    },
+    {
+      "t": "NVDA",
+      "desde": "2017-04-17",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 609,
+      "retorno": 45.5
+    },
+    {
+      "t": "BLK",
+      "desde": "2017-05-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 595,
+      "retorno": 3
+    },
+    {
+      "t": "EA",
+      "desde": "2017-08-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 503,
+      "retorno": -32.2
+    },
+    {
+      "t": "CL",
+      "desde": "2017-08-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 489,
+      "retorno": -9.7
+    },
+    {
+      "t": "ANSS",
+      "desde": "2017-09-01",
+      "hasta": "2018-05-15",
+      "motivo": "fuera del universo",
+      "dias": 256,
+      "retorno": 29.2
+    },
+    {
+      "t": "AMAT",
+      "desde": "2017-10-16",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 427,
+      "retorno": -39.6
+    },
+    {
+      "t": "SPGI",
+      "desde": "2017-11-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 411,
+      "retorno": 7.6
+    },
+    {
+      "t": "ADBE",
+      "desde": "2017-11-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 397,
+      "retorno": 22.9
+    },
+    {
+      "t": "MMM",
+      "desde": "2017-12-01",
+      "hasta": "2018-08-01",
+      "motivo": "180 días sin recuperar",
+      "dias": 243,
+      "retorno": -13
+    },
+    {
+      "t": "IDXX",
+      "desde": "2018-01-02",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 349,
+      "retorno": 16.5
+    },
+    {
+      "t": "V",
+      "desde": "2018-02-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 319,
+      "retorno": 5.2
+    },
+    {
+      "t": "IPGP",
+      "desde": "2018-05-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 230,
+      "retorno": -49.8
+    },
+    {
+      "t": "MU",
+      "desde": "2018-05-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 216,
+      "retorno": -37.3
+    },
+    {
+      "t": "AOS",
+      "desde": "2018-06-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 199,
+      "retorno": -32.7
+    },
+    {
+      "t": "LRCX",
+      "desde": "2018-07-02",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 168,
+      "retorno": -20.5
+    },
+    {
+      "t": "BKNG",
+      "desde": "2018-07-16",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 154,
+      "retorno": -13.9
+    },
+    {
+      "t": "CTSH",
+      "desde": "2018-08-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 138,
+      "retorno": -20.8
+    },
+    {
+      "t": "NKTR",
+      "desde": "2018-10-01",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 77,
+      "retorno": -39.7
+    },
+    {
+      "t": "NTAP",
+      "desde": "2018-10-15",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 63,
+      "retorno": -20.9
+    },
+    {
+      "t": "CPRT",
+      "desde": "2018-12-03",
+      "hasta": "2018-12-17",
+      "motivo": "abierta al cierre",
+      "dias": 14,
+      "retorno": -7
+    }
+  ],
+  "barridoUmbrales": [
+    {
+      "entry": 70,
+      "exit": 40,
+      "soloPicks": 177.9,
+      "conCaja": 131.4,
+      "sharpe": 0.87,
+      "maxDD": -16.1,
+      "vsEW": -22,
+      "posiciones": 83,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 70,
+      "exit": 50,
+      "soloPicks": 180,
+      "conCaja": 133.8,
+      "sharpe": 0.87,
+      "maxDD": -16.9,
+      "vsEW": -19.6,
+      "posiciones": 84,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 70,
+      "exit": 60,
+      "soloPicks": 174.3,
+      "conCaja": 129.9,
+      "sharpe": 0.85,
+      "maxDD": -17.4,
+      "vsEW": -23.5,
+      "posiciones": 87,
+      "pctInvertido": 86
+    },
+    {
+      "entry": 75,
+      "exit": 40,
+      "soloPicks": 165.2,
+      "conCaja": 122.2,
+      "sharpe": 0.81,
+      "maxDD": -18.1,
+      "vsEW": -31.3,
+      "posiciones": 100,
+      "pctInvertido": 85
+    },
+    {
+      "entry": 75,
+      "exit": 50,
+      "soloPicks": 168.8,
+      "conCaja": 124.8,
+      "sharpe": 0.83,
+      "maxDD": -17.1,
+      "vsEW": -28.7,
+      "posiciones": 102,
+      "pctInvertido": 85
+    },
+    {
+      "entry": 75,
+      "exit": 60,
+      "soloPicks": 167.5,
+      "conCaja": 123.8,
+      "sharpe": 0.82,
+      "maxDD": -17.1,
+      "vsEW": -29.7,
+      "posiciones": 104,
+      "pctInvertido": 85
+    },
+    {
+      "entry": 80,
+      "exit": 40,
+      "soloPicks": 154.5,
+      "conCaja": 73.4,
+      "sharpe": 0.68,
+      "maxDD": -17.3,
+      "vsEW": -80.1,
+      "posiciones": 92,
+      "pctInvertido": 59
+    },
+    {
+      "entry": 80,
+      "exit": 50,
+      "soloPicks": 154.8,
+      "conCaja": 73.3,
+      "sharpe": 0.68,
+      "maxDD": -17.2,
+      "vsEW": -80.2,
+      "posiciones": 93,
+      "pctInvertido": 58
+    },
+    {
+      "entry": 80,
+      "exit": 60,
+      "soloPicks": 152.1,
+      "conCaja": 71,
+      "sharpe": 0.67,
+      "maxDD": -17.3,
+      "vsEW": -82.5,
+      "posiciones": 93,
+      "pctInvertido": 58
+    },
+    {
+      "entry": 85,
+      "exit": 40,
+      "soloPicks": 159.4,
+      "conCaja": 32.6,
+      "sharpe": 0.59,
+      "maxDD": -8.8,
+      "vsEW": -120.9,
+      "posiciones": 49,
+      "pctInvertido": 28
+    },
+    {
+      "entry": 85,
+      "exit": 50,
+      "soloPicks": 160.4,
+      "conCaja": 33.2,
+      "sharpe": 0.61,
+      "maxDD": -8.8,
+      "vsEW": -120.2,
+      "posiciones": 49,
+      "pctInvertido": 27
+    },
+    {
+      "entry": 85,
+      "exit": 60,
+      "soloPicks": 157.8,
+      "conCaja": 32.5,
+      "sharpe": 0.6,
+      "maxDD": -8.8,
+      "vsEW": -121,
+      "posiciones": 49,
+      "pctInvertido": 27
+    },
+    {
+      "entry": 90,
+      "exit": 40,
+      "soloPicks": 102.7,
+      "conCaja": 7.2,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -146.3,
+      "posiciones": 19,
+      "pctInvertido": 11
+    },
+    {
+      "entry": 90,
+      "exit": 50,
+      "soloPicks": 102.7,
+      "conCaja": 7.2,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -146.3,
+      "posiciones": 19,
+      "pctInvertido": 11
+    },
+    {
+      "entry": 90,
+      "exit": 60,
+      "soloPicks": 102.7,
+      "conCaja": 7.2,
+      "sharpe": 0.32,
+      "maxDD": -5.4,
+      "vsEW": -146.3,
+      "posiciones": 19,
+      "pctInvertido": 11
+    }
+  ],
+  "ablacionReglas": {
+    "reglas completas (§2-§6)": {
+      "soloPicks": 154.8,
+      "conCaja": 73.3,
+      "sharpe": 0.68,
+      "maxDD": -17.2,
+      "vsEW": -80.2,
+      "posiciones": 93,
+      "pctInvertido": 58
+    },
+    "sin la regla de 180 días": {
+      "soloPicks": 194.7,
+      "conCaja": 112.7,
+      "sharpe": 0.8,
+      "maxDD": -19.3,
+      "vsEW": -40.8,
+      "posiciones": 67,
+      "pctInvertido": 78
+    },
+    "sin deduplicar (como la v2)": {
+      "soloPicks": 154.8,
+      "conCaja": 73.3,
+      "sharpe": 0.68,
+      "maxDD": -17.2,
+      "vsEW": -80.2,
+      "posiciones": 93,
+      "pctInvertido": 58
+    },
+    "sin cuarentena de 12 meses": {
+      "soloPicks": 164.3,
+      "conCaja": 78.9,
+      "sharpe": 0.71,
+      "maxDD": -17.4,
+      "vsEW": -74.6,
+      "posiciones": 94,
+      "pctInvertido": 60
+    },
+    "sin persistencia de 60 días": {
+      "soloPicks": 166.4,
+      "conCaja": 80.5,
+      "sharpe": 0.7,
+      "maxDD": -17.8,
+      "vsEW": -73,
+      "posiciones": 102,
+      "pctInvertido": 63
+    },
+    "2/fecha = 4 al mes": {
+      "soloPicks": 148.5,
+      "conCaja": 76.8,
+      "sharpe": 0.68,
+      "maxDD": -17.1,
+      "vsEW": -76.6,
+      "posiciones": 99,
+      "pctInvertido": 61
+    },
+    "4/fecha = 8 al mes": {
+      "soloPicks": 141.4,
+      "conCaja": 78.6,
+      "sharpe": 0.68,
+      "maxDD": -17.1,
+      "vsEW": -74.8,
+      "posiciones": 101,
+      "pctInvertido": 62
+    },
+    "sin 180d + 4 al mes": {
+      "soloPicks": 182.2,
+      "conCaja": 125.4,
+      "sharpe": 0.82,
+      "maxDD": -19.5,
+      "vsEW": -28.1,
+      "posiciones": 71,
+      "pctInvertido": 83
+    },
+    "sin 180d + 8 al mes": {
+      "soloPicks": 173.9,
+      "conCaja": 125.4,
+      "sharpe": 0.8,
+      "maxDD": -20.4,
+      "vsEW": -28.1,
+      "posiciones": 70,
+      "pctInvertido": 86
+    },
+    "v2 · p70 · 4 al mes · sin180d": {
+      "soloPicks": 169.6,
+      "conCaja": 140,
+      "sharpe": 0.81,
+      "maxDD": -18.8,
+      "vsEW": -13.5,
+      "posiciones": 72,
+      "pctInvertido": 91
+    },
+    "v2 · p70 · 8 al mes · sin180d": {
+      "soloPicks": 154.3,
+      "conCaja": 140.4,
+      "sharpe": 0.78,
+      "maxDD": -21,
+      "vsEW": -13.1,
+      "posiciones": 76,
+      "pctInvertido": 95
+    }
+  },
+  "criterios": {
+    "H1_reglasNoDestruyenSeñal": true,
+    "H1_refTrimestral": 146.9,
+    "H2_bateUniversoEW": false,
+    "H3_precioDeLaRampaPp": 81.5
+  }
+}

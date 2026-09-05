@@ -1,0 +1,867 @@
+{
+ "generatedAt": "2026-08-23T17:37:49.722Z",
+ "asOf": "2026-08-01",
+ "universo": 503,
+ "medidos": 497,
+ "sinCik": 6,
+ "sinFundamentales": 0,
+ "tolerancias": {
+  "balance": 0.01,
+  "caja": 0.01,
+  "patrimonio": 0.25,
+  "margen": 0.01
+ },
+ "identidades": {
+  "balance": {
+   "comprobables": 333,
+   "pasan": 323,
+   "pctPasan": 97
+  },
+  "caja": {
+   "comprobables": 487,
+   "pasan": 483,
+   "pctPasan": 99.2
+  },
+  "patrimonio": {
+   "comprobables": 468,
+   "pasan": 428,
+   "pctPasan": 91.5
+  },
+  "margen": {
+   "comprobables": 284,
+   "pasan": 277,
+   "pctPasan": 97.5
+  }
+ },
+ "confianza": {
+  "alta": 438,
+  "media": 48,
+  "baja": 11
+ },
+ "porSector": {
+  "sin sector": {
+   "n": 157,
+   "baja": 5,
+   "fallos": {
+    "patrimonio": 12,
+    "balance": 5,
+    "caja": 3,
+    "margen": 2
+   }
+  },
+  "Technology": {
+   "n": 66,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 12
+   }
+  },
+  "Healthcare": {
+   "n": 22,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 1
+   }
+  },
+  "Financial Services": {
+   "n": 67,
+   "baja": 2,
+   "fallos": {
+    "balance": 2,
+    "patrimonio": 4,
+    "margen": 1
+   }
+  },
+  "Consumer Defensive": {
+   "n": 24,
+   "baja": 3,
+   "fallos": {
+    "margen": 4,
+    "patrimonio": 1,
+    "balance": 2
+   }
+  },
+  "Utilities": {
+   "n": 37,
+   "baja": 1,
+   "fallos": {
+    "patrimonio": 2,
+    "balance": 1
+   }
+  },
+  "Materials": {
+   "n": 20,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 3
+   }
+  },
+  "Consumer Cyclical": {
+   "n": 42,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 2,
+    "caja": 1
+   }
+  },
+  "Energy": {
+   "n": 15,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 1
+   }
+  },
+  "Industrials": {
+   "n": 36,
+   "baja": 0,
+   "fallos": {
+    "patrimonio": 2
+   }
+  },
+  "Real Estate": {
+   "n": 2,
+   "baja": 0,
+   "fallos": {}
+  },
+  "Communication Services": {
+   "n": 9,
+   "baja": 0,
+   "fallos": {}
+  }
+ },
+ "excepciones": [
+  {
+   "ticker": "URI",
+   "sector": "sin sector",
+   "comprobacion": "margen",
+   "desvioPct": 198.1,
+   "izq": 6257000000,
+   "der": -6377000000,
+   "motivo": "desvía 198.1 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "IT",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 150.8,
+   "izq": 63384000,
+   "der": -124853000,
+   "motivo": "desvía 150.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "SBAC",
+   "sector": "sin sector",
+   "comprobacion": "margen",
+   "desvioPct": 121.7,
+   "izq": 2145687000,
+   "der": -464894000,
+   "motivo": "desvía 121.7 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BA",
+   "sector": "Consumer Cyclical",
+   "comprobacion": "patrimonio",
+   "desvioPct": 119.8,
+   "izq": 6100000000,
+   "der": -1205000000,
+   "motivo": "desvía 119.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "ADM",
+   "sector": "Consumer Defensive",
+   "comprobacion": "margen",
+   "desvioPct": 110,
+   "izq": 5075000000,
+   "der": -50560000000,
+   "motivo": "desvía 110.0 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MTD",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 110,
+   "izq": 12823000,
+   "der": -128180000,
+   "motivo": "desvía 110.0 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BG",
+   "sector": "Consumer Defensive",
+   "comprobacion": "margen",
+   "desvioPct": 106.1,
+   "izq": 3578000000,
+   "der": -59028000000,
+   "motivo": "desvía 106.1 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "GDDY",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 101.3,
+   "izq": 6700000,
+   "der": -523800000,
+   "motivo": "desvía 101.3 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "EXPE",
+   "sector": "Industrials",
+   "comprobacion": "patrimonio",
+   "desvioPct": 95.5,
+   "izq": 576000000,
+   "der": 26000000,
+   "motivo": "desvía 95.5 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "OMC",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 94.9,
+   "izq": 9437100000,
+   "der": 481700000,
+   "motivo": "desvía 94.9 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CNC",
+   "sector": "Financial Services",
+   "comprobacion": "margen",
+   "desvioPct": 90.8,
+   "izq": 16170000000,
+   "der": 175893000000,
+   "motivo": "desvía 90.8 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "WAT",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 84.3,
+   "izq": 15292000000,
+   "der": 2399359000,
+   "motivo": "desvía 84.3 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "HPQ",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 83.8,
+   "izq": -144000000,
+   "der": -891000000,
+   "motivo": "desvía 83.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CL",
+   "sector": "Materials",
+   "comprobacion": "patrimonio",
+   "desvioPct": 83.7,
+   "izq": 236000000,
+   "der": 1449000000,
+   "motivo": "desvía 83.7 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "DVA",
+   "sector": "Healthcare",
+   "comprobacion": "patrimonio",
+   "desvioPct": 80.4,
+   "izq": -755496000,
+   "der": -148348000,
+   "motivo": "desvía 80.4 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "NRG",
+   "sector": "Utilities",
+   "comprobacion": "patrimonio",
+   "desvioPct": 76.9,
+   "izq": 4874000000,
+   "der": 1127000000,
+   "motivo": "desvía 76.9 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "PANW",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 74.4,
+   "izq": 27668000000,
+   "der": 7073400000,
+   "motivo": "desvía 74.4 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "AMCR",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 71.3,
+   "izq": 11651000000,
+   "der": 3339000000,
+   "motivo": "desvía 71.3 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "SNPS",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 65.8,
+   "izq": 30478131000,
+   "der": 10426486000,
+   "motivo": "desvía 65.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "LYV",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 62.1,
+   "izq": 82330000,
+   "der": 217164000,
+   "motivo": "desvía 62.1 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "LVS",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 59,
+   "izq": 581000000,
+   "der": 238000000,
+   "motivo": "desvía 59.0 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CLX",
+   "sector": "Materials",
+   "comprobacion": "patrimonio",
+   "desvioPct": 55.3,
+   "izq": -67000000,
+   "der": -150000000,
+   "motivo": "desvía 55.3 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "PAYC",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 54.4,
+   "izq": 811700000,
+   "der": 1780000000,
+   "motivo": "desvía 54.4 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CEG",
+   "sector": "Utilities",
+   "comprobacion": "patrimonio",
+   "desvioPct": 52.7,
+   "izq": 33483000000,
+   "der": 15828000000,
+   "motivo": "desvía 52.7 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "TTWO",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 47.6,
+   "izq": 3510900000,
+   "der": 1839500000,
+   "motivo": "desvía 47.6 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "anual",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "WYNN",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 46.8,
+   "izq": -211822000,
+   "der": -398493000,
+   "motivo": "desvía 46.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MMM",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 43.1,
+   "izq": 2952000000,
+   "der": 1681000000,
+   "motivo": "desvía 43.1 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BX",
+   "sector": "Financial Services",
+   "comprobacion": "patrimonio",
+   "desvioPct": 40.8,
+   "izq": 8370770000,
+   "der": 4959435000,
+   "motivo": "desvía 40.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MTCH",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 39.9,
+   "izq": -218117000,
+   "der": -362875000,
+   "motivo": "desvía 39.9 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "DD",
+   "sector": "Materials",
+   "comprobacion": "patrimonio",
+   "desvioPct": 39.4,
+   "izq": 14040000000,
+   "der": 23165000000,
+   "motivo": "desvía 39.4 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "FITB",
+   "sector": "Financial Services",
+   "comprobacion": "patrimonio",
+   "desvioPct": 38.1,
+   "izq": 34106000000,
+   "der": 21101000000,
+   "motivo": "desvía 38.1 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MAS",
+   "sector": "Industrials",
+   "comprobacion": "patrimonio",
+   "desvioPct": 38,
+   "izq": -242000000,
+   "der": -150000000,
+   "motivo": "desvía 38.0 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "SPG",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 38,
+   "izq": 4858757000,
+   "der": 7833544000,
+   "motivo": "desvía 38.0 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BG",
+   "sector": "Consumer Defensive",
+   "comprobacion": "patrimonio",
+   "desvioPct": 36.4,
+   "izq": 16045000000,
+   "der": 10206000000,
+   "motivo": "desvía 36.4 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MCD",
+   "sector": "Consumer Cyclical",
+   "comprobacion": "patrimonio",
+   "desvioPct": 33.1,
+   "izq": -1286000000,
+   "der": -1923000000,
+   "motivo": "desvía 33.1 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "TKO",
+   "sector": "sin sector",
+   "comprobacion": "balance",
+   "desvioPct": 31.9,
+   "izq": 16022802000,
+   "der": 10906669000,
+   "motivo": "desvía 31.9 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "HBAN",
+   "sector": "Financial Services",
+   "comprobacion": "patrimonio",
+   "desvioPct": 31.8,
+   "izq": 32535000000,
+   "der": 22205000000,
+   "motivo": "desvía 31.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "FTV",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 31.6,
+   "izq": 6083100000,
+   "der": 8888200000,
+   "motivo": "desvía 31.6 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "TAP",
+   "sector": "Consumer Defensive",
+   "comprobacion": "margen",
+   "desvioPct": 30.8,
+   "izq": 4274600000,
+   "der": 6174100000,
+   "motivo": "desvía 30.8 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "anual",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "COIN",
+   "sector": "Financial Services",
+   "comprobacion": "patrimonio",
+   "desvioPct": 30.3,
+   "izq": 13079665000,
+   "der": 9113113000,
+   "motivo": "desvía 30.3 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "ANET",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 29.5,
+   "izq": 13487100000,
+   "der": 9512203511,
+   "motivo": "desvía 29.5 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "NTAP",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 29.5,
+   "izq": 1351000000,
+   "der": 953000000,
+   "motivo": "desvía 29.5 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "anual",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "NOW",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 26.5,
+   "izq": 12516000000,
+   "der": 9196000000,
+   "motivo": "desvía 26.5 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CRWD",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 26.2,
+   "izq": 4633877000,
+   "der": 3421750000,
+   "motivo": "desvía 26.2 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "CVX",
+   "sector": "Energy",
+   "comprobacion": "patrimonio",
+   "desvioPct": 25.8,
+   "izq": 183715000000,
+   "der": 136227000000,
+   "motivo": "desvía 25.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "VTR",
+   "sector": "sin sector",
+   "comprobacion": "patrimonio",
+   "desvioPct": 25.8,
+   "izq": 14649399000,
+   "der": 10874747000,
+   "motivo": "desvía 25.8 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "ORCL",
+   "sector": "Technology",
+   "comprobacion": "patrimonio",
+   "desvioPct": 25.5,
+   "izq": 42508000000,
+   "der": 31656000000,
+   "motivo": "desvía 25.5 % (tolerancia 25 %)",
+   "moneda": "USD",
+   "periodicidad": "anual",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BX",
+   "sector": "Financial Services",
+   "comprobacion": "balance",
+   "desvioPct": 24.1,
+   "izq": 48326982000,
+   "der": 36681460000,
+   "motivo": "desvía 24.1 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MO",
+   "sector": "Consumer Defensive",
+   "comprobacion": "margen",
+   "desvioPct": 16.9,
+   "izq": 14769000000,
+   "der": 17782000000,
+   "motivo": "desvía 16.9 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "JCI",
+   "sector": "sin sector",
+   "comprobacion": "caja",
+   "desvioPct": 12.4,
+   "izq": -105000000,
+   "der": -4864000000,
+   "motivo": "desvía 12.4 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BXP",
+   "sector": "sin sector",
+   "comprobacion": "balance",
+   "desvioPct": 10.2,
+   "izq": 25102250000,
+   "der": 22536042000,
+   "motivo": "desvía 10.2 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "KDP",
+   "sector": "Consumer Defensive",
+   "comprobacion": "balance",
+   "desvioPct": 6,
+   "izq": 73140000000,
+   "der": 68722000000,
+   "motivo": "desvía 6.0 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "EXR",
+   "sector": "sin sector",
+   "comprobacion": "balance",
+   "desvioPct": 3.1,
+   "izq": 29660493000,
+   "der": 28741054000,
+   "motivo": "desvía 3.1 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "BLK",
+   "sector": "Financial Services",
+   "comprobacion": "balance",
+   "desvioPct": 2.4,
+   "izq": 170237000000,
+   "der": 166122000000,
+   "motivo": "desvía 2.4 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "NWS",
+   "sector": "sin sector",
+   "comprobacion": "caja",
+   "desvioPct": 2,
+   "izq": -51000000,
+   "der": -362000000,
+   "motivo": "desvía 2.0 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "NWSA",
+   "sector": "sin sector",
+   "comprobacion": "caja",
+   "desvioPct": 2,
+   "izq": -51000000,
+   "der": -362000000,
+   "motivo": "desvía 2.0 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "EIX",
+   "sector": "Utilities",
+   "comprobacion": "balance",
+   "desvioPct": 1.7,
+   "izq": 94475000000,
+   "der": 92911000000,
+   "motivo": "desvía 1.7 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "DLTR",
+   "sector": "Consumer Cyclical",
+   "comprobacion": "caja",
+   "desvioPct": 1.5,
+   "izq": -260500000,
+   "der": -464900000,
+   "motivo": "desvía 1.5 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "UBER",
+   "sector": "sin sector",
+   "comprobacion": "balance",
+   "desvioPct": 1.5,
+   "izq": 59885000000,
+   "der": 58995000000,
+   "motivo": "desvía 1.5 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "STZ",
+   "sector": "Consumer Defensive",
+   "comprobacion": "balance",
+   "desvioPct": 1.3,
+   "izq": 22108700000,
+   "der": 21814500000,
+   "motivo": "desvía 1.3 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  },
+  {
+   "ticker": "MAA",
+   "sector": "sin sector",
+   "comprobacion": "balance",
+   "desvioPct": 1.2,
+   "izq": 11994502000,
+   "der": 11844830000,
+   "motivo": "desvía 1.2 % (tolerancia 1 %)",
+   "moneda": "USD",
+   "periodicidad": "ttm",
+   "taxonomia": "us-gaap"
+  }
+ ],
+ "nota": "Control de calidad del DATO, no una señal. Un nombre que no articula no es una mala empresa: es una empresa cuyos ratios no son fiables."
+}

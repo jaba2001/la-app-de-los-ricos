@@ -1,0 +1,298 @@
+{
+ "generatedAt": "2026-08-29T01:08:49.515Z",
+ "fuente": "research/cobertura_metricas.mjs",
+ "asOf": "2026-06-30",
+ "minMetricas": 3,
+ "miembros": 503,
+ "conCik": 503,
+ "sinCik": [],
+ "campos": {
+  "assets": {
+   "n": 503,
+   "pct": 100,
+   "usadoPor": [
+    "gprof"
+   ]
+  },
+  "daTTM": {
+   "n": 432,
+   "pct": 85.9,
+   "usadoPor": [
+    "lev"
+   ]
+  },
+  "debt": {
+   "n": 466,
+   "pct": 92.6,
+   "usadoPor": [
+    "roic",
+    "lev"
+   ]
+  },
+  "equity": {
+   "n": 503,
+   "pct": 100,
+   "usadoPor": [
+    "roic"
+   ]
+  },
+  "gpTTM": {
+   "n": 302,
+   "pct": 60,
+   "usadoPor": [
+    "gprof"
+   ]
+  },
+  "interestTTM": {
+   "n": 205,
+   "pct": 40.8,
+   "usadoPor": [
+    "icov"
+   ]
+  },
+  "oiTTM": {
+   "n": 392,
+   "pct": 77.9,
+   "usadoPor": [
+    "roic",
+    "opm",
+    "icov",
+    "lev"
+   ]
+  },
+  "revTTM": {
+   "n": 501,
+   "pct": 99.6,
+   "usadoPor": [
+    "opm"
+   ]
+  }
+ },
+ "metricas": {
+  "gprof": {
+   "n": 302,
+   "pct": 60
+  },
+  "roic": {
+   "n": 363,
+   "pct": 72.2
+  },
+  "opm": {
+   "n": 391,
+   "pct": 77.7
+  },
+  "icov": {
+   "n": 150,
+   "pct": 29.8
+  },
+  "lev": {
+   "n": 310,
+   "pct": 61.6
+  }
+ },
+ "conSenal": 359,
+ "bajoMinimo": 144,
+ "pctBajoMinimo": 28.6,
+ "culpables": {
+  "daTTM": 29,
+  "debt": 35,
+  "gpTTM": 86,
+  "oiTTM": 111,
+  "interestTTM": 88,
+  "revTTM": 1
+ },
+ "porSector": {
+  "Financial Services": [
+   "ACGL",
+   "AFL",
+   "AIG",
+   "AIZ",
+   "AJG",
+   "ALL",
+   "AMP",
+   "AON",
+   "APO",
+   "AXP",
+   "BAC",
+   "BK",
+   "BRK.B",
+   "BRO",
+   "BX",
+   "C",
+   "CB",
+   "CFG",
+   "CINF",
+   "COF",
+   "EG",
+   "ERIE",
+   "FITB",
+   "GL",
+   "GS",
+   "HBAN",
+   "HIG",
+   "IVZ",
+   "JPM",
+   "KEY",
+   "KKR",
+   "L",
+   "MS",
+   "MTB",
+   "NTRS",
+   "PFG",
+   "PGR",
+   "PNC",
+   "PRU",
+   "RJF",
+   "SCHW",
+   "STT",
+   "SYF",
+   "TFC",
+   "TROW",
+   "TRV",
+   "USB",
+   "WFC",
+   "WRB"
+  ],
+  "Consumer Defensive": [
+   "ADM",
+   "BG",
+   "CTVA"
+  ],
+  "Technology": [
+   "ADP",
+   "ANET",
+   "CDNS",
+   "DASH",
+   "DDOG",
+   "FFIV",
+   "FI",
+   "IBM",
+   "MPWR",
+   "NOW",
+   "PLTR",
+   "TTD"
+  ],
+  "Utilities": [
+   "AES",
+   "FE",
+   "PCG",
+   "SRE"
+  ],
+  "Healthcare": [
+   "ALGN",
+   "BIIB",
+   "BMY",
+   "HCA",
+   "ISRG",
+   "JNJ",
+   "LLY",
+   "MRK",
+   "PFE",
+   "VRTX",
+   "ZTS"
+  ],
+  "Real Estate": [
+   "ARE",
+   "BXP",
+   "CPT",
+   "DOC",
+   "INVH",
+   "MAA",
+   "O",
+   "PSA",
+   "VICI",
+   "VTR",
+   "WELL"
+  ],
+  "Materials": [
+   "AVY",
+   "CLX",
+   "DD",
+   "DOW",
+   "EMN",
+   "IP",
+   "NEM",
+   "NUE",
+   "PPG"
+  ],
+  "Industrials": [
+   "BALL",
+   "BKR",
+   "DE",
+   "EXPD",
+   "GRMN",
+   "LKQ",
+   "SWK",
+   "UNP"
+  ],
+  "Energy": [
+   "COP",
+   "CVX",
+   "DVN",
+   "OXY",
+   "PSX",
+   "SLB",
+   "TPL",
+   "XOM"
+  ],
+  "Consumer Cyclical": [
+   "CPRT",
+   "DECK",
+   "DHI",
+   "F",
+   "GM",
+   "KMX",
+   "LEN",
+   "MAR",
+   "NKE",
+   "NVR",
+   "PCAR",
+   "PHM",
+   "SHW",
+   "TJX",
+   "TXT",
+   "WSM"
+  ],
+  "(sin sector)": [
+   "EMR",
+   "ETN",
+   "GE",
+   "INCY",
+   "JCI",
+   "KLAC",
+   "MTD",
+   "TMO"
+  ],
+  "Communication Services": [
+   "FOX",
+   "FOXA",
+   "NWS",
+   "NWSA",
+   "PSKY"
+  ]
+ },
+ "dependeDe": {
+  "gprof": [
+   "assets",
+   "gpTTM"
+  ],
+  "roic": [
+   "equity",
+   "debt",
+   "oiTTM"
+  ],
+  "opm": [
+   "revTTM",
+   "oiTTM"
+  ],
+  "icov": [
+   "interestTTM",
+   "oiTTM"
+  ],
+  "lev": [
+   "oiTTM",
+   "daTTM",
+   "debt"
+  ]
+ }
+}

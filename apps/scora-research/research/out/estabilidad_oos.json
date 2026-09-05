@@ -1,0 +1,607 @@
+{
+  "generatedAt": "2026-09-01T16:57:22.344Z",
+  "window": "2011-2018",
+  "base": 154.79446624065994,
+  "mediana": 154.8,
+  "min": 133.4,
+  "max": 168.4,
+  "amplitud": 35,
+  "p25": 152.2,
+  "p75": 156.8,
+  "nombresProbados": 74,
+  "nota": "Cada corrida quita UNO de los nombres comprados y rehace la simulación entera. Mide dependencia del camino, no error de estimación.",
+  "resultados": [
+    {
+      "sin": "AAPL",
+      "soloPicks": 151.9,
+      "conCaja": 71.6,
+      "sharpe": 0.67,
+      "vsEW": -1.5,
+      "posiciones": 91
+    },
+    {
+      "sin": "ABBV",
+      "soloPicks": 153,
+      "conCaja": 72.1,
+      "sharpe": 0.68,
+      "vsEW": -0.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "ABT",
+      "soloPicks": 154.9,
+      "conCaja": 73.2,
+      "sharpe": 0.68,
+      "vsEW": 1.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "ACN",
+      "soloPicks": 149.2,
+      "conCaja": 68.1,
+      "sharpe": 0.66,
+      "vsEW": -4.2,
+      "posiciones": 93
+    },
+    {
+      "sin": "ADBE",
+      "soloPicks": 152.4,
+      "conCaja": 72.6,
+      "sharpe": 0.68,
+      "vsEW": -1.1,
+      "posiciones": 92
+    },
+    {
+      "sin": "ALK",
+      "soloPicks": 152.9,
+      "conCaja": 72.2,
+      "sharpe": 0.68,
+      "vsEW": -0.6,
+      "posiciones": 92
+    },
+    {
+      "sin": "ALXN",
+      "soloPicks": 152.2,
+      "conCaja": 70.9,
+      "sharpe": 0.67,
+      "vsEW": -1.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "AMAT",
+      "soloPicks": 158.9,
+      "conCaja": 75.1,
+      "sharpe": 0.7,
+      "vsEW": 5.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "ANSS",
+      "soloPicks": 153.8,
+      "conCaja": 72.1,
+      "sharpe": 0.68,
+      "vsEW": 0.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "AOS",
+      "soloPicks": 156.7,
+      "conCaja": 74.9,
+      "sharpe": 0.69,
+      "vsEW": 3.2,
+      "posiciones": 92
+    },
+    {
+      "sin": "APOL",
+      "soloPicks": 151.3,
+      "conCaja": 73.2,
+      "sharpe": 0.68,
+      "vsEW": -2.2,
+      "posiciones": 93
+    },
+    {
+      "sin": "ATGE",
+      "soloPicks": 164.5,
+      "conCaja": 75,
+      "sharpe": 0.7,
+      "vsEW": 11,
+      "posiciones": 93
+    },
+    {
+      "sin": "BEN",
+      "soloPicks": 163.6,
+      "conCaja": 74.4,
+      "sharpe": 0.7,
+      "vsEW": 10.1,
+      "posiciones": 93
+    },
+    {
+      "sin": "BF.B",
+      "soloPicks": 156.6,
+      "conCaja": 72,
+      "sharpe": 0.68,
+      "vsEW": 3.1,
+      "posiciones": 91
+    },
+    {
+      "sin": "BIIB",
+      "soloPicks": 149.8,
+      "conCaja": 68.5,
+      "sharpe": 0.68,
+      "vsEW": -3.7,
+      "posiciones": 92
+    },
+    {
+      "sin": "BKNG",
+      "soloPicks": 146.3,
+      "conCaja": 70.7,
+      "sharpe": 0.68,
+      "vsEW": -7.2,
+      "posiciones": 92
+    },
+    {
+      "sin": "BLK",
+      "soloPicks": 154.8,
+      "conCaja": 73.3,
+      "sharpe": 0.69,
+      "vsEW": 1.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "BMC",
+      "soloPicks": 152.8,
+      "conCaja": 74.1,
+      "sharpe": 0.68,
+      "vsEW": -0.7,
+      "posiciones": 93
+    },
+    {
+      "sin": "CERN",
+      "soloPicks": 155.6,
+      "conCaja": 71.9,
+      "sharpe": 0.68,
+      "vsEW": 2.2,
+      "posiciones": 91
+    },
+    {
+      "sin": "CF",
+      "soloPicks": 158.4,
+      "conCaja": 73.6,
+      "sharpe": 0.69,
+      "vsEW": 4.9,
+      "posiciones": 92
+    },
+    {
+      "sin": "CL",
+      "soloPicks": 156.2,
+      "conCaja": 72,
+      "sharpe": 0.68,
+      "vsEW": 2.8,
+      "posiciones": 91
+    },
+    {
+      "sin": "CPRI",
+      "soloPicks": 155.3,
+      "conCaja": 72.3,
+      "sharpe": 0.68,
+      "vsEW": 1.9,
+      "posiciones": 92
+    },
+    {
+      "sin": "CPRT",
+      "soloPicks": 154.5,
+      "conCaja": 73.6,
+      "sharpe": 0.68,
+      "vsEW": 1,
+      "posiciones": 92
+    },
+    {
+      "sin": "CTSH",
+      "soloPicks": 155.8,
+      "conCaja": 73.9,
+      "sharpe": 0.69,
+      "vsEW": 2.3,
+      "posiciones": 91
+    },
+    {
+      "sin": "EA",
+      "soloPicks": 158.2,
+      "conCaja": 74.4,
+      "sharpe": 0.7,
+      "vsEW": 4.7,
+      "posiciones": 91
+    },
+    {
+      "sin": "EL",
+      "soloPicks": 155.1,
+      "conCaja": 72.5,
+      "sharpe": 0.68,
+      "vsEW": 1.6,
+      "posiciones": 92
+    },
+    {
+      "sin": "FAST",
+      "soloPicks": 154.8,
+      "conCaja": 72.7,
+      "sharpe": 0.69,
+      "vsEW": 1.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "FB",
+      "soloPicks": 152,
+      "conCaja": 71.7,
+      "sharpe": 0.68,
+      "vsEW": -1.5,
+      "posiciones": 91
+    },
+    {
+      "sin": "FL",
+      "soloPicks": 157.9,
+      "conCaja": 73.7,
+      "sharpe": 0.69,
+      "vsEW": 4.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "FOSL",
+      "soloPicks": 159.7,
+      "conCaja": 73.6,
+      "sharpe": 0.69,
+      "vsEW": 6.2,
+      "posiciones": 92
+    },
+    {
+      "sin": "GILD",
+      "soloPicks": 157.9,
+      "conCaja": 73.8,
+      "sharpe": 0.69,
+      "vsEW": 4.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "GPS",
+      "soloPicks": 157,
+      "conCaja": 73.6,
+      "sharpe": 0.69,
+      "vsEW": 3.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "GWW",
+      "soloPicks": 155.4,
+      "conCaja": 73.4,
+      "sharpe": 0.69,
+      "vsEW": 2,
+      "posiciones": 92
+    },
+    {
+      "sin": "HP",
+      "soloPicks": 154.8,
+      "conCaja": 72.5,
+      "sharpe": 0.69,
+      "vsEW": 1.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "HRB",
+      "soloPicks": 155.8,
+      "conCaja": 73.8,
+      "sharpe": 0.69,
+      "vsEW": 2.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "HSY",
+      "soloPicks": 152.6,
+      "conCaja": 72.3,
+      "sharpe": 0.68,
+      "vsEW": -0.8,
+      "posiciones": 92
+    },
+    {
+      "sin": "IDXX",
+      "soloPicks": 152.1,
+      "conCaja": 72.6,
+      "sharpe": 0.68,
+      "vsEW": -1.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "INTC",
+      "soloPicks": 152.2,
+      "conCaja": 73.3,
+      "sharpe": 0.68,
+      "vsEW": -1.3,
+      "posiciones": 93
+    },
+    {
+      "sin": "INTU",
+      "soloPicks": 145.2,
+      "conCaja": 64.6,
+      "sharpe": 0.64,
+      "vsEW": -8.3,
+      "posiciones": 93
+    },
+    {
+      "sin": "IPGP",
+      "soloPicks": 158.9,
+      "conCaja": 75.8,
+      "sharpe": 0.7,
+      "vsEW": 5.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "JNJ",
+      "soloPicks": 152.7,
+      "conCaja": 72.3,
+      "sharpe": 0.68,
+      "vsEW": -0.7,
+      "posiciones": 92
+    },
+    {
+      "sin": "LLTC",
+      "soloPicks": 152.9,
+      "conCaja": 73.4,
+      "sharpe": 0.68,
+      "vsEW": -0.6,
+      "posiciones": 92
+    },
+    {
+      "sin": "LRCX",
+      "soloPicks": 154.8,
+      "conCaja": 74.3,
+      "sharpe": 0.69,
+      "vsEW": 1.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "LUV",
+      "soloPicks": 155.6,
+      "conCaja": 72.6,
+      "sharpe": 0.68,
+      "vsEW": 2.1,
+      "posiciones": 92
+    },
+    {
+      "sin": "MA",
+      "soloPicks": 133.4,
+      "conCaja": 66.2,
+      "sharpe": 0.65,
+      "vsEW": -20,
+      "posiciones": 92
+    },
+    {
+      "sin": "MCO",
+      "soloPicks": 147.1,
+      "conCaja": 66.7,
+      "sharpe": 0.65,
+      "vsEW": -6.4,
+      "posiciones": 93
+    },
+    {
+      "sin": "MMM",
+      "soloPicks": 156,
+      "conCaja": 73.5,
+      "sharpe": 0.69,
+      "vsEW": 2.5,
+      "posiciones": 91
+    },
+    {
+      "sin": "MSFT",
+      "soloPicks": 155,
+      "conCaja": 71.8,
+      "sharpe": 0.67,
+      "vsEW": 1.6,
+      "posiciones": 93
+    },
+    {
+      "sin": "MU",
+      "soloPicks": 157,
+      "conCaja": 75.2,
+      "sharpe": 0.7,
+      "vsEW": 3.6,
+      "posiciones": 92
+    },
+    {
+      "sin": "NKTR",
+      "soloPicks": 157.4,
+      "conCaja": 75.3,
+      "sharpe": 0.7,
+      "vsEW": 3.9,
+      "posiciones": 92
+    },
+    {
+      "sin": "NTAP",
+      "soloPicks": 155.9,
+      "conCaja": 74.3,
+      "sharpe": 0.69,
+      "vsEW": 2.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "NVDA",
+      "soloPicks": 149.9,
+      "conCaja": 71.8,
+      "sharpe": 0.69,
+      "vsEW": -3.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "ORCL",
+      "soloPicks": 155.7,
+      "conCaja": 72.4,
+      "sharpe": 0.68,
+      "vsEW": 2.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "ORLY",
+      "soloPicks": 158.4,
+      "conCaja": 73.4,
+      "sharpe": 0.69,
+      "vsEW": 5,
+      "posiciones": 92
+    },
+    {
+      "sin": "PAYX",
+      "soloPicks": 153.9,
+      "conCaja": 72.4,
+      "sharpe": 0.68,
+      "vsEW": 0.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "REGN",
+      "soloPicks": 150.5,
+      "conCaja": 70.2,
+      "sharpe": 0.68,
+      "vsEW": -3,
+      "posiciones": 92
+    },
+    {
+      "sin": "RL",
+      "soloPicks": 160.5,
+      "conCaja": 74.1,
+      "sharpe": 0.69,
+      "vsEW": 7.1,
+      "posiciones": 92
+    },
+    {
+      "sin": "SBUX",
+      "soloPicks": 146.9,
+      "conCaja": 68.2,
+      "sharpe": 0.65,
+      "vsEW": -6.6,
+      "posiciones": 92
+    },
+    {
+      "sin": "SHW",
+      "soloPicks": 153.5,
+      "conCaja": 71.9,
+      "sharpe": 0.67,
+      "vsEW": 0,
+      "posiciones": 92
+    },
+    {
+      "sin": "SIAL",
+      "soloPicks": 154.5,
+      "conCaja": 72.2,
+      "sharpe": 0.68,
+      "vsEW": 1.1,
+      "posiciones": 92
+    },
+    {
+      "sin": "SNI",
+      "soloPicks": 155.3,
+      "conCaja": 73,
+      "sharpe": 0.68,
+      "vsEW": 1.9,
+      "posiciones": 92
+    },
+    {
+      "sin": "SPGI",
+      "soloPicks": 146.6,
+      "conCaja": 68.1,
+      "sharpe": 0.65,
+      "vsEW": -6.9,
+      "posiciones": 91
+    },
+    {
+      "sin": "STX",
+      "soloPicks": 152.1,
+      "conCaja": 71.5,
+      "sharpe": 0.67,
+      "vsEW": -1.3,
+      "posiciones": 92
+    },
+    {
+      "sin": "SWN",
+      "soloPicks": 159.5,
+      "conCaja": 74.8,
+      "sharpe": 0.69,
+      "vsEW": 6,
+      "posiciones": 92
+    },
+    {
+      "sin": "TDC",
+      "soloPicks": 168.4,
+      "conCaja": 74.8,
+      "sharpe": 0.7,
+      "vsEW": 15,
+      "posiciones": 93
+    },
+    {
+      "sin": "TJX",
+      "soloPicks": 152.3,
+      "conCaja": 71.6,
+      "sharpe": 0.68,
+      "vsEW": -1.1,
+      "posiciones": 92
+    },
+    {
+      "sin": "TPR",
+      "soloPicks": 162.3,
+      "conCaja": 74.9,
+      "sharpe": 0.7,
+      "vsEW": 8.8,
+      "posiciones": 93
+    },
+    {
+      "sin": "TRIP",
+      "soloPicks": 146.2,
+      "conCaja": 69.6,
+      "sharpe": 0.67,
+      "vsEW": -7.3,
+      "posiciones": 93
+    },
+    {
+      "sin": "TSCO",
+      "soloPicks": 160,
+      "conCaja": 74.6,
+      "sharpe": 0.69,
+      "vsEW": 6.5,
+      "posiciones": 92
+    },
+    {
+      "sin": "TXN",
+      "soloPicks": 149.7,
+      "conCaja": 70.2,
+      "sharpe": 0.67,
+      "vsEW": -3.7,
+      "posiciones": 92
+    },
+    {
+      "sin": "UNP",
+      "soloPicks": 155.9,
+      "conCaja": 73.4,
+      "sharpe": 0.69,
+      "vsEW": 2.4,
+      "posiciones": 92
+    },
+    {
+      "sin": "V",
+      "soloPicks": 143.2,
+      "conCaja": 70.8,
+      "sharpe": 0.67,
+      "vsEW": -10.2,
+      "posiciones": 91
+    },
+    {
+      "sin": "VAR",
+      "soloPicks": 156.8,
+      "conCaja": 72.9,
+      "sharpe": 0.68,
+      "vsEW": 3.4,
+      "posiciones": 93
+    },
+    {
+      "sin": "WU",
+      "soloPicks": 153.5,
+      "conCaja": 72.5,
+      "sharpe": 0.68,
+      "vsEW": 0.1,
+      "posiciones": 92
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "generatedAt": "2026-09-01T17:42:27.326Z",
+  "totalTrials": 342,
+  "artifacts": 39,
+  "isLowerBound": true,
+  "note": "COTA INFERIOR del número de ensayos evaluados sobre la misma historia de mercado. Solo cuenta variantes que dejaron artefacto en research/out/. Las exploradas y descartadas sin guardar no aparecen, así que el M real es mayor y el listón de significancia (SR0 del Sharpe deflactado) es MÁS ALTO que el que se deriva de aquí.",
+  "sharpeSamples": 137,
+  "sharpeMeanMonthly": 0.20422,
+  "sharpeStdDevMonthly": 0.11409,
+  "entries": [
+    {
+      "file": "signals_ic.json",
+      "lab": "signals_ic",
+      "note": "IC por factor y régimen",
+      "trials": 27,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T17:35:33.320Z"
+    },
+    {
+      "file": "picks_rules_backtest_oos.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
+      "trials": 26,
+      "sharpesFound": 0,
+      "generatedAt": "2026-09-01T16:57:23.069Z"
+    },
+    {
+      "file": "picks_rules_backtest.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
+      "trials": 26,
+      "sharpesFound": 0,
+      "generatedAt": "2026-09-01T08:37:56.989Z"
+    },
+    {
+      "file": "picks_rules_backtest_smoke.json",
+      "lab": "picks_rules_backtest",
+      "note": "Ablación de las reglas de Scora Picks",
+      "trials": 25,
+      "sharpesFound": 0,
+      "generatedAt": "2026-09-01T07:12:45.754Z"
+    },
+    {
+      "file": "quality_lowvol_lab_oos.json",
+      "lab": "quality_lowvol_lab",
+      "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
+      "trials": 14,
+      "sharpesFound": 4,
+      "generatedAt": "2026-08-24T16:22:39.003Z"
+    },
+    {
+      "file": "quality_lowvol_lab.json",
+      "lab": "quality_lowvol_lab",
+      "note": "Señales de Picks: calidad, baja volatilidad y sus combinaciones",
+      "trials": 14,
+      "sharpesFound": 4,
+      "generatedAt": "2026-08-24T16:20:42.956Z"
+    },
+    {
+      "file": "beat_index_lab_2018-07-01.json",
+      "lab": "beat_index_lab",
+      "note": "Intentos de batir al índice",
+      "trials": 11,
+      "sharpesFound": 11,
+      "generatedAt": "2026-07-11T10:31:14.193Z"
+    },
+    {
+      "file": "momentum_audit_long.json",
+      "lab": "momentum_audit",
+      "note": "Auditoría de momentum",
+      "trials": 11,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T11:40:10.650Z"
+    },
+    {
+      "file": "sector_tilt_validate.json",
+      "lab": "sector_tilt_validate",
+      "note": "Validación del tilt sectorial",
+      "trials": 11,
+      "sharpesFound": 11,
+      "generatedAt": "2026-07-11T16:58:03.133Z"
+    },
+    {
+      "file": "aggressive_lab.json",
+      "lab": "aggressive_lab",
+      "note": "Apalancamiento, coberturas cortas, long-vol, CPPI",
+      "trials": 10,
+      "sharpesFound": 10,
+      "generatedAt": "2026-07-10T22:55:36.708Z"
+    },
+    {
+      "file": "pillar_dilution_lab_oos.json",
+      "lab": "pillar_dilution_lab",
+      "note": "Pilares del score solos y en pares",
+      "trials": 10,
+      "sharpesFound": 1,
+      "generatedAt": "2026-08-24T16:27:49.188Z"
+    },
+    {
+      "file": "pillar_dilution_lab.json",
+      "lab": "pillar_dilution_lab",
+      "note": "Pilares del score solos y en pares",
+      "trials": 10,
+      "sharpesFound": 1,
+      "generatedAt": "2026-08-24T16:25:59.006Z"
+    },
+    {
+      "file": "regime_sector_lab.json",
+      "lab": "regime_sector_lab",
+      "note": "Rotación sectorial y de factores por régimen",
+      "trials": 10,
+      "sharpesFound": 0,
+      "generatedAt": "2026-07-11T15:58:12.932Z"
+    },
+    {
+      "file": "momentum_audit.json",
+      "lab": "momentum_audit",
+      "note": "Auditoría de momentum",
+      "trials": 9,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T02:48:48.357Z"
+    },
+    {
+      "file": "qgv_lab_2016-01-01_2020-01-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:55:45.132Z"
+    },
+    {
+      "file": "qgv_lab_2021-01-01_2023-06-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:55:51.638Z"
+    },
+    {
+      "file": "qgv_lab_2022-01-01_2023-06-01.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 9,
+      "sharpesFound": 9,
+      "generatedAt": "2026-07-13T19:53:41.313Z"
+    },
+    {
+      "file": "backtest_assets_summary.json",
+      "lab": "backtest_assets_summary",
+      "note": "Políticas multi-activo",
+      "trials": 8,
+      "sharpesFound": 8,
+      "generatedAt": "2026-07-10T12:35:56.976Z"
+    },
+    {
+      "file": "beat_index_lab.json",
+      "lab": "beat_index_lab",
+      "note": "Intentos de batir al índice",
+      "trials": 8,
+      "sharpesFound": 8,
+      "generatedAt": "2026-07-11T10:30:06.740Z"
+    },
+    {
+      "file": "capture_lab.json",
+      "lab": "capture_lab",
+      "note": "Variantes de captura (beta alta) vs SPY",
+      "trials": 7,
+      "sharpesFound": 7,
+      "generatedAt": "2026-07-12T15:50:17.491Z"
+    },
+    {
+      "file": "multitimeframe_lab_full.json",
+      "lab": "multitimeframe_lab",
+      "note": "Momentum por horizonte y confluencia",
+      "trials": 7,
+      "sharpesFound": 0,
+      "generatedAt": "2026-07-11T15:25:36.818Z"
+    },
+    {
+      "file": "qgv_lab.json",
+      "lab": "qgv_lab",
+      "note": "Combinaciones calidad/crecimiento/valor",
+      "trials": 7,
+      "sharpesFound": 7,
+      "generatedAt": "2026-07-13T19:48:56.758Z"
+    },
+    {
+      "file": "allocator_lab.json",
+      "lab": "allocator_lab",
+      "note": "Políticas de asignación del curso vs C3",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-26T07:24:03.041Z"
+    },
+    {
+      "file": "ls_lab.json",
+      "lab": "ls_lab",
+      "note": "Long/short por factor con puertas de correlación",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-12T15:59:47.306Z"
+    },
+    {
+      "file": "options_collar_lab.json",
+      "lab": "options_collar_lab",
+      "note": "Collars y overlays de opciones",
+      "trials": 6,
+      "sharpesFound": 6,
+      "generatedAt": "2026-07-11T14:48:59.296Z"
+    },
+    {
+      "file": "growth_metrics_2007-01-01.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T16:01:25.446Z"
+    },
+    {
+      "file": "growth_metrics_2020-01-01.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T16:01:26.218Z"
+    },
+    {
+      "file": "growth_metrics.json",
+      "lab": "growth_metrics",
+      "note": "Perfiles del asignador por la vía de producción",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-12T15:59:06.943Z"
+    },
+    {
+      "file": "regime_factor_validate.json",
+      "lab": "regime_factor_validate",
+      "note": "Validación de la rotación growth/value",
+      "trials": 5,
+      "sharpesFound": 5,
+      "generatedAt": "2026-07-11T16:21:37.750Z"
+    },
+    {
+      "file": "momentum_lab.json",
+      "lab": "momentum_lab",
+      "note": "Señales de momentum (sesión 2026-08-17)",
+      "trials": 4,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T02:56:18.874Z"
+    },
+    {
+      "file": "bab_lab_oos.json",
+      "lab": "bab_lab",
+      "note": "Betting-against-beta en forma long-only top-N",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T20:16:27.441Z"
+    },
+    {
+      "file": "bab_lab.json",
+      "lab": "bab_lab",
+      "note": "Betting-against-beta en forma long-only top-N",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T20:16:50.823Z"
+    },
+    {
+      "file": "factor_lab.json",
+      "lab": "factor_lab",
+      "note": "Hipótesis de fricción: ¿la IC es mayor donde el arbitraje es caro?",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T17:36:09.852Z"
+    },
+    {
+      "file": "forense_lab_oos.json",
+      "lab": "forense_lab",
+      "note": "Veto forense: devengos, Beneish y Piotroski",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T17:11:48.059Z"
+    },
+    {
+      "file": "forense_lab.json",
+      "lab": "forense_lab",
+      "note": "Veto forense: devengos, Beneish y Piotroski",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-24T17:07:43.186Z"
+    },
+    {
+      "file": "momentum_lab_smoke.json",
+      "lab": "momentum_lab",
+      "note": "Señales de momentum (sesión 2026-08-17)",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-17T23:47:13.656Z"
+    },
+    {
+      "file": "portfolio_backtest.json",
+      "lab": "portfolio_backtest",
+      "note": "Barrido de N de la cartera de selección",
+      "trials": 3,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-18T17:37:37.622Z"
+    },
+    {
+      "file": "lideres_lab.json",
+      "lab": "lideres_lab",
+      "note": "¿Repiten los mejores del año al siguiente?",
+      "trials": 1,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-23T17:54:53.635Z"
+    },
+    {
+      "file": "factor_dist.json",
+      "lab": "factor_dist",
+      "note": "Distribuciones de factores",
+      "trials": 0,
+      "sharpesFound": 0,
+      "generatedAt": "2026-08-20T17:14:26.653Z"
+    }
+  ],
+  "uncounted": [
+    {
+      "file": "factor_dist_history.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "health_scale_lab.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "health_scale_lab_oos.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "picks_rules_backtest_oos_parcial.json",
+      "reason": "forma no reconocida"
+    },
+    {
+      "file": "picks_rules_backtest_parcial.json",
+      "reason": "forma no reconocida"
+    }
+  ]
+}

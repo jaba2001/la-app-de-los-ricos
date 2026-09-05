@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scora Research — Architecture & Data Flow</title>
+<style>
+:root {
+  --bg: #070E1A; --s1: #0D1B2E; --s2: #122540; --s3: #1A3055;
+  --border: #1E3A5F; --text: #F0F4F8; --t2: #94A3B8; --t3: #4A6A8A;
+  --amber: #F59E0B; --amber-d: rgba(245,158,11,.13);
+  --pos: #10B981; --neg: #EF4444; --warn: #F97316;
+  --cyan: #06B6D4; --purple: #8B5CF6; --blue: #3B82F6;
+  --r: 8px; --r2: 14px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'SF Pro Display','Segoe UI',system-ui,sans-serif;font-size:14px;overflow:hidden}
+
+/* LAYOUT */
+#app{display:flex;height:100vh}
+#sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 0}
+#main{flex:1;overflow:auto;padding:32px}
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--border);margin-bottom:12px}
+.logo-title{font-size:16px;font-weight:700;color:var(--amber);letter-spacing:-0.3px}
+.logo-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .15s;border-left:3px solid transparent;white-space:nowrap}
+.nav-item:hover{background:var(--s2);color:var(--text)}
+.nav-item.active{background:var(--amber-d);color:var(--amber);border-left-color:var(--amber)}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+
+/* SECTIONS */
+.section{display:none}
+.section.active{display:block}
+.page-title{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-0.5px}
+.page-sub{font-size:13px;color:var(--t2);margin-bottom:28px}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:16px}
+.card-title{font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+
+/* GRID LAYOUTS */
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-auto{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+
+/* NODE BOXES */
+.node{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;transition:all .2s;cursor:pointer}
+.node:hover{border-color:var(--amber);background:var(--s3)}
+.node.highlight{border-color:var(--amber);background:var(--amber-d)}
+.node-label{font-size:12px;font-weight:600;margin-bottom:4px}
+.node-desc{font-size:11px;color:var(--t2);line-height:1.5}
+.node-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;margin-top:6px}
+.badge-amber{background:var(--amber-d);color:var(--amber)}
+.badge-cyan{background:rgba(6,182,212,.13);color:var(--cyan)}
+.badge-purple{background:rgba(139,92,246,.13);color:var(--purple)}
+.badge-pos{background:rgba(16,185,129,.12);color:var(--pos)}
+.badge-neg{background:rgba(239,68,68,.12);color:var(--neg)}
+.badge-blue{background:rgba(59,130,246,.12);color:var(--blue)}
+
+/* FLOW DIAGRAM */
+.flow-wrap{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px}
+.flow-col{min-width:180px;max-width:220px}
+.flow-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:12px;padding:0 4px}
+.flow-node{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.flow-node:hover,.flow-node.lit{border-color:var(--amber);background:var(--amber-d)}
+.flow-node.lit .flow-node-name{color:var(--amber)}
+.flow-node-name{font-size:12px;font-weight:600}
+.flow-node-hint{font-size:10px;color:var(--t3);margin-top:3px}
+.arrow-col{display:flex;align-items:center;justify-content:center;width:36px;flex-shrink:0;padding-top:28px}
+.arrow{color:var(--border);font-size:20px;line-height:1}
+.arrow.lit{color:var(--amber)}
+
+/* DETAIL PANEL */
+#detail-panel{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-top:16px;min-height:80px;transition:all .3s}
+#detail-panel.hidden{opacity:0}
+.detail-title{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--amber)}
+.detail-body{font-size:13px;color:var(--t2);line-height:1.7}
+.detail-body b{color:var(--text)}
+.tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:var(--s3);color:var(--t2);border:1px solid var(--border)}
+.tag.amber{background:var(--amber-d);color:var(--amber);border-color:rgba(245,158,11,.3)}
+.tag.cyan{background:rgba(6,182,212,.1);color:var(--cyan);border-color:rgba(6,182,212,.3)}
+.tag.pos{background:rgba(16,185,129,.1);color:var(--pos);border-color:rgba(16,185,129,.3)}
+.tag.neg{background:rgba(239,68,68,.1);color:var(--neg);border-color:rgba(239,68,68,.3)}
+.tag.purple{background:rgba(139,92,246,.1);color:var(--purple);border-color:rgba(139,92,246,.3)}
+
+/* SCORE BARS */
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.score-label{width:120px;font-size:12px;color:var(--t2);flex-shrink:0}
+.score-track{flex:1;height:8px;background:var(--s3);border-radius:4px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.score-val{width:32px;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--text)}
+.score-max{font-size:10px;color:var(--t3);width:30px}
+
+/* TILT TREE */
+.tilt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.tilt-box{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center;cursor:pointer;transition:all .2s}
+.tilt-box:hover{border-color:var(--amber)}
+.tilt-regime{font-size:12px;font-weight:700;margin-bottom:6px}
+.tilt-val{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.tilt-val.pos{color:var(--pos)}
+.tilt-val.neg{color:var(--neg)}
+.tilt-val.warn{color:var(--warn)}
+.adj-list{display:flex;flex-direction:column;gap:8px}
+.adj-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r)}
+.adj-label{font-size:12px;color:var(--t2)}
+.adj-condition{font-size:11px;color:var(--t3);margin-top:2px}
+.adj-delta{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* FORMULA BOX */
+.formula{background:var(--s3);border:1px solid var(--border);border-radius:var(--r);padding:16px;font-family:'SF Mono','Fira Code',monospace;font-size:13px;line-height:1.7;margin:12px 0;overflow-x:auto;white-space:pre}
+.formula .k{color:var(--cyan)}
+.formula .v{color:var(--amber)}
+.formula .c{color:var(--t3)}
+.formula .p{color:var(--pos)}
+.formula .n{color:var(--neg)}
+
+/* PULSE ANIMATION */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.pulse{animation:pulse 1.8s ease-in-out infinite}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* TOOLTIP */
+.tooltip{position:fixed;background:var(--s1);border:1px solid var(--amber);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--text);pointer-events:none;z-index:100;max-width:240px;line-height:1.6;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;transition:opacity .15s}
+.tooltip.show{opacity:1}
+
+/* ANIMATED FLOW */
+@keyframes flow-pulse{0%{background-position:0% 50%}100%{background-position:100% 50%}}
+.flow-active{background:linear-gradient(90deg,var(--amber-d),rgba(245,158,11,.3),var(--amber-d));background-size:200%;animation:flow-pulse .8s linear infinite}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:12px}
+.data-table th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);border-bottom:1px solid var(--border)}
+.data-table td{padding:8px 12px;border-bottom:1px solid rgba(30,58,95,.5);color:var(--t2)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table td:first-child{color:var(--text);font-weight:600}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <polyline points="3,17 9,11 13,15 21,7" stroke="#F59E0B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="21" cy="7" r="2" fill="#F59E0B"/>
+      </svg>
+      <span class="logo-title">Scora Research</span>
+    </div>
+    <div class="logo-sub">Architecture & Data Flow</div>
+  </div>
+  <nav>
+    <div class="nav-item active" data-section="overview">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Architecture
+    </div>
+    <div class="nav-item" data-section="macro">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l3-9 4 18 3-9h6"/></svg>
+      Macro Pipeline
+    </div>
+    <div class="nav-item" data-section="stock">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+      Stock Pipeline
+    </div>
+    <div class="nav-item" data-section="scoring">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Scoring Engine
+    </div>
+    <div class="nav-item" data-section="integration">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Macro↔Stock
+    </div>
+  </nav>
+  <div style="margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)">
+    <div style="font-size:11px;color:var(--t3);line-height:1.6">Click any node<br>for details</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: ARCHITECTURE OVERVIEW
+═══════════════════════════════════════════ -->
+<section class="section active" id="sec-overview">
+  <div class="page-title">System Architecture</div>
+  <div class="page-sub">How all components connect — click any node to see details</div>
+
+  <div style="display:grid;grid-template-columns:220px 40px 1fr 40px 220px;gap:0;align-items:start">
+
+    <!-- Col 1: External APIs -->
+    <div>
+      <div class="flow-col-title">External APIs</div>
+      <div class="flow-node" data-key="fred">
+        <div class="flow-node-name">🏛 FRED API</div>
+        <div class="flow-node-hint">43 series • daily cron</div>
+      </div>
+      <div class="flow-node" data-key="fmp">
+        <div class="flow-node-name">📊 FMP API</div>
+        <div class="flow-node-hint">Fundamentals, quotes, DCF</div>
+      </div>
+      <div class="flow-node" data-key="finnhub">
+        <div class="flow-node-name">📈 Finnhub API</div>
+        <div class="flow-node-hint">Earnings, insider trades</div>
+      </div>
+      <div class="flow-node" data-key="claude-api">
+        <div class="flow-node-name">✦ Claude AI API</div>
+        <div class="flow-node-hint">Sonnet 4.6 • on-demand</div>
+      </div>
+    </div>
+
+    <!-- Arrow 1 -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:30px;gap:16px">
+      <div style="color:var(--border);font-size:18px;margin-bottom:4px">→</div>
+      <div style="color:var(--border);font-size:18px">→</div>
+      <div style="color:var(--border);font-size:18px">→</div>
+      <div style="color:var(--border);font-size:18px">→</div>
+    </div>
+
+    <!-- Col 2: Backend/DB -->
+    <div>
+      <div class="flow-col-title">Backend Layer</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="flow-node" data-key="ic-proxy" style="grid-column:1/-1">
+          <div class="flow-node-name">⚙ ic-proxy (Vercel)</div>
+          <div class="flow-node-hint">Serverless proxy · adds auth · rate limiting · CORS bypass</div>
+        </div>
+        <div class="flow-node" data-key="ic-datalayer">
+          <div class="flow-node-name">🔄 IC DataLayer</div>
+          <div class="flow-node-hint">Daily cron → computes macro_state</div>
+        </div>
+        <div class="flow-node" data-key="supabase">
+          <div class="flow-node-name">🗄 Supabase</div>
+          <div class="flow-node-hint">PostgreSQL · auth · realtime</div>
+        </div>
+        <div class="flow-node" data-key="macro-state-table">
+          <div class="flow-node-name">📋 macro_state</div>
+          <div class="flow-node-hint">id=1 singleton · 70+ fields</div>
+        </div>
+        <div class="flow-node" data-key="sl-analyses-table">
+          <div class="flow-node-name">📋 sl_analyses</div>
+          <div class="flow-node-hint">Per-ticker analysis cache</div>
+        </div>
+        <div class="flow-node" data-key="sl-watchlist-table" style="grid-column:1/-1">
+          <div class="flow-node-name">📋 sl_watchlist + smart_money_top_buyers</div>
+          <div class="flow-node-hint">User watchlists · institutional flows</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow 2 -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:30px;gap:16px">
+      <div style="color:var(--border);font-size:18px">→</div>
+      <div style="color:var(--border);font-size:18px">→</div>
+    </div>
+
+    <!-- Col 3: Frontend -->
+    <div>
+      <div class="flow-col-title">Scora Research</div>
+      <div class="flow-node" data-key="auth">
+        <div class="flow-node-name">🔐 Auth (Magic Link)</div>
+        <div class="flow-node-hint">Supabase OTP · no password</div>
+      </div>
+      <div class="flow-node" data-key="macro-tab">
+        <div class="flow-node-name">📡 MACRO Tab</div>
+        <div class="flow-node-hint">6 sub-tabs · reads macro_state</div>
+      </div>
+      <div class="flow-node" data-key="stock-tab">
+        <div class="flow-node-name">📈 STOCKS Tab</div>
+        <div class="flow-node-hint">8 sub-tabs · ticker analysis</div>
+      </div>
+      <div class="flow-node" data-key="scoring-engine">
+        <div class="flow-node-name">🧮 Scoring Engine</div>
+        <div class="flow-node-hint">calcScores() + getMacroTilt()</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail panel -->
+  <div id="detail-panel" class="hidden">
+    <div class="detail-title" id="detail-title">—</div>
+    <div class="detail-body" id="detail-body">Click a node above</div>
+  </div>
+
+  <!-- Key flows -->
+  <div class="card" style="margin-top:24px">
+    <div class="card-title">Key Data Flows (animated trace)</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="tag amber" onclick="animateFlow('macro-flow')" style="cursor:pointer">▶ Macro State Update</button>
+      <button class="tag cyan" onclick="animateFlow('stock-flow')" style="cursor:pointer">▶ Stock Analysis</button>
+      <button class="tag pos" onclick="animateFlow('ai-flow')" style="cursor:pointer">▶ AI Synthesis</button>
+    </div>
+    <div id="flow-status" style="font-size:13px;color:var(--t2);padding:12px 16px;background:var(--s2);border-radius:var(--r);border:1px solid var(--border);min-height:46px;line-height:1.7">
+      Click a flow above to trace it step-by-step through the system.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: MACRO PIPELINE
+═══════════════════════════════════════════ -->
+<section class="section" id="sec-macro">
+  <div class="page-title">Macro Pipeline</div>
+  <div class="page-sub">How IC DataLayer builds macro_state daily — the foundation of all macro analysis</div>
+
+  <div class="grid-2">
+    <!-- Inputs -->
+    <div class="card">
+      <div class="card-title">Inputs — 43 FRED Series (grouped)</div>
+      <table class="data-table">
+        <thead><tr><th>Group</th><th>Series (count)</th><th>Examples</th></tr></thead>
+        <tbody>
+          <tr><td>Rates & Curve</td><td>8</td><td>DGS2, DGS10, DGS30, T10Y2Y, TERM PREMIUM</td></tr>
+          <tr><td>Credit & Stress</td><td>7</td><td>BAMLH0A0HYM2, BAMLC0A0CM, MOVE, SOFR</td></tr>
+          <tr><td>Liquidity</td><td>6</td><td>WRESBAL, WALCL (Fed BS), M2SL, RRPONTSYD</td></tr>
+          <tr><td>Macro & Inflation</td><td>8</td><td>PCEPILFE, CPIAUCSL, UNRATE, PAYEMS</td></tr>
+          <tr><td>Commodities</td><td>5</td><td>DCOILWTICO (WTI), GOLDAMGBD228NLBM</td></tr>
+          <tr><td>Market Valuation</td><td>5</td><td>Buffett Indicator (GDP/MktCap), Shiller CAPE</td></tr>
+          <tr><td>Debt & Credit</td><td>4</td><td>NCBEILQ027S, MDSP, THREEFYTP10</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px">
+        <div class="card-title" style="margin-bottom:8px">+ ETF Price Inputs</div>
+        <div class="tag-row">
+          <span class="tag">SPY</span><span class="tag">QQQ</span><span class="tag">IWM</span><span class="tag">EFA</span><span class="tag">EEM</span>
+          <span class="tag">AGG</span><span class="tag">HYG</span><span class="tag">LQD</span><span class="tag">TLT</span>
+          <span class="tag">GLD</span><span class="tag">DBC</span><span class="tag">XLK</span><span class="tag">XLE</span><span class="tag">VNQ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Computations -->
+    <div class="card">
+      <div class="card-title">Computation Steps (ic-compute.js)</div>
+      <div class="adj-list">
+        <div class="adj-row" style="cursor:pointer" onclick="showMacroDetail('lcc')">
+          <div>
+            <div class="adj-label" style="color:var(--cyan)">① LCC — Liquidity & Credit Cycle</div>
+            <div class="adj-condition">WRESBAL + M2 growth + HYG spread + SOFR</div>
+          </div>
+          <span class="node-badge badge-cyan">0–100</span>
+        </div>
+        <div class="adj-row" style="cursor:pointer" onclick="showMacroDetail('rpc')">
+          <div>
+            <div class="adj-label" style="color:var(--neg)">② RPC — Recession Probability</div>
+            <div class="adj-condition">Sahm Rule + yield curve + PAYEMS + leading indicators</div>
+          </div>
+          <span class="node-badge badge-neg">0–100</span>
+        </div>
+        <div class="adj-row" style="cursor:pointer" onclick="showMacroDetail('csc')">
+          <div>
+            <div class="adj-label" style="color:var(--warn)">③ CSC — Commodity Supercycle</div>
+            <div class="adj-condition">WTI level + momentum + Gold signal + DBC trend</div>
+          </div>
+          <span class="node-badge" style="background:rgba(249,115,22,.12);color:var(--warn)">0–100</span>
+        </div>
+        <div class="adj-row" style="cursor:pointer" onclick="showMacroDetail('grc')">
+          <div>
+            <div class="adj-label" style="color:var(--amber)">④ GRC — Global Risk Climate</div>
+            <div class="adj-condition">VIX + MOVE + Put/Call + Fear&Greed</div>
+          </div>
+          <span class="node-badge badge-amber">0–100</span>
+        </div>
+        <div class="adj-row" style="cursor:pointer" onclick="showMacroDetail('hsc')">
+          <div>
+            <div class="adj-label" style="color:var(--purple)">⑤ HSC — Housing & Structural Credit</div>
+            <div class="adj-condition">Mortgage spreads + HPI trend + consumer debt</div>
+          </div>
+          <span class="node-badge badge-purple">0–100</span>
+        </div>
+        <div class="adj-row" onclick="showMacroDetail('ic_score')">
+          <div>
+            <div class="adj-label" style="color:var(--amber);font-weight:700">⑥ IC Score (composite)</div>
+            <div class="adj-condition">Weighted average of LCC, RPC, CSC, GRC, HSC</div>
+          </div>
+          <span class="node-badge badge-amber">0–100</span>
+        </div>
+        <div class="adj-row" onclick="showMacroDetail('regime')">
+          <div>
+            <div class="adj-label">⑦ Regime Classification</div>
+            <div class="adj-condition">IC Score + growth/inflation quadrant → regime_id</div>
+          </div>
+          <span class="node-badge badge-pos">4 states</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Macro State Output -->
+  <div class="card">
+    <div class="card-title">Output — macro_state Fields (70+ columns, id=1 singleton in Supabase)</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;margin-bottom:8px">Composites</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span class="tag cyan">ic_score</span><span class="tag cyan">liquidity_cycle</span>
+          <span class="tag cyan">recession_prob</span><span class="tag cyan">credit_stress</span>
+          <span class="tag cyan">commodity_score</span><span class="tag cyan">risk_climate</span>
+          <span class="tag cyan">housing_score</span><span class="tag cyan">meltup_score</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">Regime</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span class="tag amber">regime_id</span><span class="tag amber">regime_label</span>
+          <span class="tag amber">cartera_quadrant</span><span class="tag amber">net_liquidity_dir</span>
+          <span class="tag amber">global_liquidity_dir</span><span class="tag amber">liquidity_dir_label</span>
+          <span class="tag amber">fed_room</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin-bottom:8px">Rates</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span class="tag">dgs2</span><span class="tag">dgs10</span><span class="tag">dgs30</span>
+          <span class="tag">term_premium_10y</span><span class="tag">curve_steepener</span>
+          <span class="tag">net_liquidity_t</span><span class="tag">sofr_rate</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;margin-bottom:8px">Macro</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span class="tag">core_pce_yoy</span><span class="tag">unrate</span>
+          <span class="tag">wti_level</span><span class="tag">wti_chg_1m</span>
+          <span class="tag">buffett_indicator</span><span class="tag">fear_greed</span>
+          <span class="tag">put_call_ratio</span><span class="tag">expected_return_10y</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;margin-bottom:8px">Monitors</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <span class="tag purple">bubble_debt</span><span class="tag purple">bubble_ai</span>
+          <span class="tag purple">dalio_stage</span><span class="tag purple">dalio_usd_share</span>
+          <span class="tag purple">move_index</span><span class="tag purple">oil_shock</span>
+          <span class="tag purple">snapshot_date</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Macro detail panel -->
+  <div id="macro-detail" class="card" style="display:none">
+    <div class="detail-title" id="macro-detail-title"></div>
+    <div class="detail-body" id="macro-detail-body"></div>
+  </div>
+
+  <!-- How Scora reads it -->
+  <div class="card">
+    <div class="card-title">How Scora Research reads macro_state</div>
+    <div class="formula"><span class="c">// app/macro/page.tsx — on mount</span>
+<span class="k">const</span> { data } = <span class="k">await</span> supabase
+  .from(<span class="v">"macro_state"</span>)
+  .select(<span class="v">"*"</span>)
+  .eq(<span class="v">"id"</span>, <span class="v">1</span>)
+  .single();
+
+<span class="c">// passes macro object to all 6 sub-tab components</span>
+<span class="c">// MacroOverview | MacroIndicators | MacroMarkets | MacroMonitors | MacroNews | MacroAI</span>
+
+<span class="c">// Also used by Stock pipeline to get rfRate and for getMacroTilt()</span>
+<span class="k">const</span> rfRate = macro.<span class="v">dgs10</span> ?? <span class="v">4.2</span>;  <span class="c">// live risk-free rate for DCF WACC</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: STOCK PIPELINE
+═══════════════════════════════════════════ -->
+<section class="section" id="sec-stock">
+  <div class="page-title">Stock Analysis Pipeline</div>
+  <div class="page-sub">What happens when you open a ticker — 16 parallel API calls → scoring → macro integration → save</div>
+
+  <!-- Step 1: API Calls -->
+  <div class="card">
+    <div class="card-title">Step 1 — 16 Parallel API Calls (Promise.allSettled)</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;margin-bottom:8px">Market Data</div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="quote">
+          <div class="flow-node-name">quote</div>
+          <div class="flow-node-hint">Price, 52W, change%</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="historical">
+          <div class="flow-node-name">historical-price-eod</div>
+          <div class="flow-node-hint">OHLCV for charts + EMA</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="price-target">
+          <div class="flow-node-name">price-target</div>
+          <div class="flow-node-hint">Analyst consensus</div>
+        </div>
+        <div class="flow-node" data-stock-key="peers">
+          <div class="flow-node-name">peers</div>
+          <div class="flow-node-hint">Similar tickers list</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:8px">Fundamentals</div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="profile">
+          <div class="flow-node-name">profile</div>
+          <div class="flow-node-hint">Name, sector, description</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="metrics">
+          <div class="flow-node-name">key-metrics-ttm</div>
+          <div class="flow-node-hint">ROIC, EV/EBITDA, P/FCF…</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="ratios">
+          <div class="flow-node-name">ratios-ttm</div>
+          <div class="flow-node-hint">P/E, D/E, margins, growth</div>
+        </div>
+        <div class="flow-node" data-stock-key="dcf">
+          <div class="flow-node-name">dcf (FMP model)</div>
+          <div class="flow-node-hint">Intrinsic value estimate</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--pos);text-transform:uppercase;margin-bottom:8px">Financials</div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="income">
+          <div class="flow-node-name">income-statement</div>
+          <div class="flow-node-hint">Revenue, EPS, margins</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="balance">
+          <div class="flow-node-name">balance-sheet</div>
+          <div class="flow-node-hint">Debt, equity, cash</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="cashflow">
+          <div class="flow-node-name">cash-flow</div>
+          <div class="flow-node-hint">Operating/Free CF</div>
+        </div>
+        <div class="flow-node" data-stock-key="analyst">
+          <div class="flow-node-name">analyst-estimates</div>
+          <div class="flow-node-hint">EPS/Rev consensus</div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;margin-bottom:8px">Smart Money</div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="institutional">
+          <div class="flow-node-name">institutional-holder</div>
+          <div class="flow-node-hint">13-F institutional holders</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="earnings">
+          <div class="flow-node-name">finnhub/earnings</div>
+          <div class="flow-node-hint">EPS surprise history</div>
+        </div>
+        <div class="flow-node" style="margin-bottom:6px" data-stock-key="insider">
+          <div class="flow-node-name">finnhub/insider-transactions</div>
+          <div class="flow-node-hint">Insider buy/sell activity</div>
+        </div>
+        <div class="flow-node" data-stock-key="macro-read">
+          <div class="flow-node-name">Supabase macro_state</div>
+          <div class="flow-node-hint">For tilt + rfRate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Steps 2-4 -->
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Step 2 — calcScores(inputs)</div>
+      <div class="adj-list">
+        <div class="adj-row">
+          <div><div class="adj-label">Value Score</div><div class="adj-condition">P/E, P/FCF, EV/EBITDA, P/B, Yield</div></div>
+          <span class="adj-delta" style="color:var(--cyan)">/25</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Health Score</div><div class="adj-condition">D/E, Current Ratio, Coverage, ROIC</div></div>
+          <span class="adj-delta" style="color:var(--cyan)">/25</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Momentum Score</div><div class="adj-condition">vs EMA50, RSI, Rev growth, EPS growth</div></div>
+          <span class="adj-delta" style="color:var(--cyan)">/20</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Growth Score</div><div class="adj-condition">Revenue CAGR, EPS growth rate</div></div>
+          <span class="adj-delta" style="color:var(--cyan)">/15</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Quality Score</div><div class="adj-condition">Gross margin, Net margin, FCF/share</div></div>
+          <span class="adj-delta" style="color:var(--cyan)">/15</span>
+        </div>
+        <div class="adj-row" style="border-color:var(--amber)">
+          <div><div class="adj-label" style="color:var(--amber)">Base Score</div><div class="adj-condition">Sum of all sub-scores</div></div>
+          <span class="adj-delta" style="color:var(--amber)">/100</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Step 3 — getMacroTilt(macro, sector)</div>
+      <div class="adj-list">
+        <div class="adj-row" style="border-color:var(--amber)">
+          <div><div class="adj-label" style="color:var(--amber)">Regime base tilt</div><div class="adj-condition">expansion / reflation / stagflation / contraction</div></div>
+          <span class="adj-delta" style="color:var(--amber)">±12</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Recession penalty</div><div class="adj-condition">recession_prob > 60</div></div>
+          <span class="adj-delta" style="color:var(--neg)">−5</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Credit stress penalty</div><div class="adj-condition">credit_stress > 70</div></div>
+          <span class="adj-delta" style="color:var(--neg)">−3</span>
+        </div>
+        <div class="adj-row">
+          <div><div class="adj-label">Sector modifier</div><div class="adj-condition">Growth sector gets ±4; Defensive gets offset</div></div>
+          <span class="adj-delta" style="color:var(--pos)">±4</span>
+        </div>
+        <div class="adj-row" style="border-color:var(--pos)">
+          <div><div class="adj-label" style="color:var(--pos)">Final tilt range</div><div class="adj-condition">Clamped output</div></div>
+          <span class="adj-delta" style="color:var(--pos)">−20/+20</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Step 4 — Upsert & Display</div>
+      <div class="formula" style="font-size:11px"><span class="c">// Final Scora Score</span>
+<span class="k">const</span> scoraScore =
+  baseScore + macroTilt;
+
+<span class="c">// Upsert to Supabase</span>
+supabase.from(<span class="v">"sl_analyses"</span>)
+  .upsert({
+    ticker,
+    score_total,   <span class="c">// base</span>
+    macro_tilt,    <span class="c">// ±20</span>
+    score_val,
+    score_hlth,
+    score_mom,
+    score_growth,
+    score_quality,
+    sector,
+    analysis_date
+  });</div>
+      <div style="margin-top:12px">
+        <div class="card-title" style="margin-bottom:8px">8 Sub-tabs Receive Data</div>
+        <div class="tag-row">
+          <span class="tag amber">Overview</span><span class="tag">Fundamentals</span>
+          <span class="tag">Valuation</span><span class="tag">Chart</span>
+          <span class="tag">Research</span><span class="tag">Smart Money</span>
+          <span class="tag">Screener</span><span class="tag">Compare</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock detail panel -->
+  <div id="stock-detail" class="card" style="display:none">
+    <div class="detail-title" id="stock-detail-title"></div>
+    <div class="detail-body" id="stock-detail-body"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: SCORING ENGINE
+═══════════════════════════════════════════ -->
+<section class="section" id="sec-scoring">
+  <div class="page-title">Scoring Engine</div>
+  <div class="page-sub">How calcScores() turns raw financial data into a 0–100 base score</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Score Weights Breakdown</div>
+      <div id="score-bars" style="margin-top:4px">
+        <div class="score-row">
+          <div class="score-label">Value</div>
+          <div class="score-track"><div class="score-fill" style="width:25%;background:var(--cyan)"></div></div>
+          <div class="score-val">25</div><div class="score-max">/100</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Health</div>
+          <div class="score-track"><div class="score-fill" style="width:25%;background:var(--pos)"></div></div>
+          <div class="score-val">25</div><div class="score-max">/100</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Momentum</div>
+          <div class="score-track"><div class="score-fill" style="width:20%;background:var(--amber)"></div></div>
+          <div class="score-val">20</div><div class="score-max">/100</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Growth</div>
+          <div class="score-track"><div class="score-fill" style="width:15%;background:var(--purple)"></div></div>
+          <div class="score-val">15</div><div class="score-max">/100</div>
+        </div>
+        <div class="score-row">
+          <div class="score-label">Quality</div>
+          <div class="score-track"><div class="score-fill" style="width:15%;background:var(--blue)"></div></div>
+          <div class="score-val">15</div><div class="score-max">/100</div>
+        </div>
+        <div style="border-top:1px solid var(--border);margin:12px 0;padding-top:12px">
+          <div class="score-row">
+            <div class="score-label" style="font-weight:700;color:var(--amber)">Base Score</div>
+            <div class="score-track"><div class="score-fill" style="width:100%;background:linear-gradient(90deg,var(--cyan),var(--amber))"></div></div>
+            <div class="score-val" style="color:var(--amber)">100</div><div class="score-max"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="card-title" style="margin-bottom:8px">Rating Thresholds</div>
+        <div class="adj-list">
+          <div class="adj-row"><div class="adj-label" style="color:var(--pos)">Strong Buy</div><div class="adj-condition">Scora ≥ 75</div><span class="adj-delta" style="color:var(--pos)">≥75</span></div>
+          <div class="adj-row"><div class="adj-label" style="color:var(--pos)">Buy</div><div class="adj-condition">Scora 65–74</div><span class="adj-delta" style="color:var(--pos)">65–74</span></div>
+          <div class="adj-row"><div class="adj-label" style="color:var(--amber)">Neutral</div><div class="adj-condition">Scora 50–64</div><span class="adj-delta" style="color:var(--amber)">50–64</span></div>
+          <div class="adj-row"><div class="adj-label" style="color:var(--neg)">Sell</div><div class="adj-condition">Scora &lt; 50</div><span class="adj-delta" style="color:var(--neg)">&lt;50</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Input Fields per Sub-Score (click to expand)</div>
+      <div id="score-detail-list">
+        <div class="adj-row score-expandable" data-score="value" style="cursor:pointer;margin-bottom:8px">
+          <div><div class="adj-label" style="color:var(--cyan)">▶ Value (25 pts)</div><div class="adj-condition">P/E, P/FCF, EV/EBITDA, P/B, Dividend Yield</div></div>
+          <span class="node-badge badge-cyan">5 inputs</span>
+        </div>
+        <div class="score-content" id="value-content" style="display:none;margin-bottom:8px">
+          <div class="formula" style="font-size:11px"><span class="c">// Each capped at 5 pts</span>
+pe        → <span class="p">+5</span> if &lt;15, <span class="n">0</span> if &gt;30
+pfcf      → <span class="p">+5</span> if &lt;20, <span class="n">0</span> if &gt;40
+evEbitda  → <span class="p">+5</span> if &lt;12, <span class="n">0</span> if &gt;25
+pb        → <span class="p">+5</span> if &lt;2,  <span class="n">0</span> if &gt;5
+divYield  → <span class="p">+5</span> if &gt;3%, <span class="n">0</span> if 0%</div>
+        </div>
+
+        <div class="adj-row score-expandable" data-score="health" style="cursor:pointer;margin-bottom:8px">
+          <div><div class="adj-label" style="color:var(--pos)">▶ Health (25 pts)</div><div class="adj-condition">Debt/Equity, Current Ratio, Interest Coverage, NetDebt/EBITDA, ROIC</div></div>
+          <span class="node-badge badge-pos">5 inputs</span>
+        </div>
+        <div class="score-content" id="health-content" style="display:none;margin-bottom:8px">
+          <div class="formula" style="font-size:11px"><span class="c">// Balance sheet quality</span>
+debtEquity   → <span class="p">+5</span> if &lt;0.5, <span class="n">0</span> if &gt;2
+currentRatio → <span class="p">+5</span> if &gt;2,  <span class="n">0</span> if &lt;1
+intCoverage  → <span class="p">+5</span> if &gt;10, <span class="n">0</span> if &lt;2
+netDebtEbitda→ <span class="p">+5</span> if &lt;1,  <span class="n">0</span> if &gt;4
+roic(%)      → <span class="p">+5</span> if &gt;15, <span class="n">0</span> if &lt;5</div>
+        </div>
+
+        <div class="adj-row score-expandable" data-score="momentum" style="cursor:pointer;margin-bottom:8px">
+          <div><div class="adj-label" style="color:var(--amber)">▶ Momentum (20 pts)</div><div class="adj-condition">Price vs EMA50, RSI zone, Revenue growth, EPS growth</div></div>
+          <span class="node-badge badge-amber">4 inputs</span>
+        </div>
+        <div class="score-content" id="momentum-content" style="display:none;margin-bottom:8px">
+          <div class="formula" style="font-size:11px"><span class="c">// Price momentum signals</span>
+vsEMA50(%)   → <span class="p">+5</span> if &gt;+5%,  <span class="n">0</span> if &lt;-10%
+rsi          → <span class="p">+5</span> if 45-65, <span class="n">0</span> if &lt;30 or &gt;80
+revGrowth(%) → <span class="p">+5</span> if &gt;20%,  <span class="n">0</span> if &lt;0%
+epsGrowth(%) → <span class="p">+5</span> if &gt;15%,  <span class="n">0</span> if &lt;-5%</div>
+        </div>
+
+        <div class="adj-row score-expandable" data-score="growth" style="cursor:pointer;margin-bottom:8px">
+          <div><div class="adj-label" style="color:var(--purple)">▶ Growth (15 pts)</div><div class="adj-condition">Revenue CAGR (3yr), EPS growth trend</div></div>
+          <span class="node-badge badge-purple">2 inputs</span>
+        </div>
+        <div class="score-content" id="growth-content" style="display:none;margin-bottom:8px">
+          <div class="formula" style="font-size:11px">revCAGR(%)   → <span class="p">+7.5</span> if &gt;25%, <span class="n">0</span> if &lt;0%
+epsCAGR(%)   → <span class="p">+7.5</span> if &gt;20%, <span class="n">0</span> if &lt;0%</div>
+        </div>
+
+        <div class="adj-row score-expandable" data-score="quality" style="cursor:pointer;margin-bottom:8px">
+          <div><div class="adj-label" style="color:var(--blue)">▶ Quality (15 pts)</div><div class="adj-condition">Gross Margin, Net Margin, FCF/share, Operating Margin</div></div>
+          <span class="node-badge badge-blue">3 inputs</span>
+        </div>
+        <div class="score-content" id="quality-content" style="display:none;margin-bottom:8px">
+          <div class="formula" style="font-size:11px">grossMargin(%) → <span class="p">+5</span> if &gt;60%, <span class="n">0</span> if &lt;20%
+netMargin(%)   → <span class="p">+5</span> if &gt;20%, <span class="n">0</span> if &lt;5%
+fcfPerShare    → <span class="p">+5</span> if positive &amp; growing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Research prompt -->
+  <div class="card">
+    <div class="card-title">How AI Research Prompt Is Built (StockResearch.tsx)</div>
+    <div class="formula" style="font-size:12px"><span class="c">// Claude receives ALL of this context in a single prompt:</span>
+
+<span class="k">Ticker:</span> <span class="v">AAPL</span>  |  <span class="k">Scora Score:</span> <span class="v">74</span> (Base: <span class="v">68</span> + Macro Tilt: <span class="v">+6</span>)
+<span class="k">Regime:</span> <span class="v">Expansion</span>  |  <span class="k">Recession Prob:</span> <span class="v">22%</span>  |  <span class="k">Credit Stress:</span> <span class="v">31</span>
+
+<span class="k">Scores →</span>  Value: <span class="v">18/25</span>  |  Health: <span class="v">22/25</span>  |  Momentum: <span class="v">14/20</span>  |  Growth: <span class="v">8/15</span>  |  Quality: <span class="v">6/15</span>
+
+<span class="k">Fundamentals:</span>  P/E <span class="v">28</span>  |  EV/EBITDA <span class="v">22</span>  |  ROIC <span class="v">38%</span>  |  D/E <span class="v">1.2</span>  |  Rev Growth <span class="v">+6%</span>
+<span class="k">Macro Context:</span> DGS10 <span class="v">4.3%</span>  |  Core PCE <span class="v">2.8%</span>  |  WTI <span class="v">$78</span>  |  Sector: <span class="v">Tech (growth)</span>
+
+<span class="c">// Claude returns: Verdict | Bull case | Bear case | Moat Scorecard (4 pillars×25pts)</span></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: MACRO↔STOCK INTEGRATION
+═══════════════════════════════════════════ -->
+<section class="section" id="sec-integration">
+  <div class="page-title">Macro ↔ Stock Integration</div>
+  <div class="page-sub">How getMacroTilt() bridges the macro world and individual stock scoring — the core differentiator of Scora Research</div>
+
+  <!-- Regime boxes -->
+  <div class="card">
+    <div class="card-title">Step 1 — Regime → Base Tilt (click a regime to see implications)</div>
+    <div class="tilt-grid">
+      <div class="tilt-box" onclick="showTiltDetail('expansion')">
+        <div class="tilt-regime" style="color:var(--pos)">Expansion</div>
+        <div class="tilt-val pos">+8</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:6px">Growth ↑, Inflation stable</div>
+      </div>
+      <div class="tilt-box" onclick="showTiltDetail('reflation')">
+        <div class="tilt-regime" style="color:var(--amber)">Reflation</div>
+        <div class="tilt-val warn">+3</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:6px">Growth ↑, Inflation ↑</div>
+      </div>
+      <div class="tilt-box" onclick="showTiltDetail('stagflation')">
+        <div class="tilt-regime" style="color:var(--warn)">Stagflation</div>
+        <div class="tilt-val neg">−8</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:6px">Growth ↓, Inflation ↑</div>
+      </div>
+      <div class="tilt-box" onclick="showTiltDetail('contraction')">
+        <div class="tilt-regime" style="color:var(--neg)">Contraction</div>
+        <div class="tilt-val neg">−12</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:6px">Growth ↓, Inflation ↓</div>
+      </div>
+    </div>
+    <div id="regime-detail" class="card" style="display:none;margin-top:0">
+      <div class="detail-title" id="regime-detail-title"></div>
+      <div class="detail-body" id="regime-detail-body"></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Adjustments -->
+    <div class="card">
+      <div class="card-title">Step 2 — Conditional Adjustments</div>
+      <div class="adj-list">
+        <div class="adj-row">
+          <div>
+            <div class="adj-label" style="color:var(--neg)">Recession Penalty</div>
+            <div class="adj-condition">if recession_prob ≥ 60 → −5 pts</div>
+          </div>
+          <span class="adj-delta" style="color:var(--neg)">−5</span>
+        </div>
+        <div class="adj-row">
+          <div>
+            <div class="adj-label" style="color:var(--neg)">Credit Stress Penalty</div>
+            <div class="adj-condition">if credit_stress ≥ 70 → −3 pts</div>
+          </div>
+          <span class="adj-delta" style="color:var(--neg)">−3</span>
+        </div>
+        <div class="adj-row">
+          <div>
+            <div class="adj-label" style="color:var(--pos)">Sector Bonus (Growth)</div>
+            <div class="adj-condition">Tech, Comm, Consumer Disc in expansion → +4</div>
+          </div>
+          <span class="adj-delta" style="color:var(--pos)">+4</span>
+        </div>
+        <div class="adj-row">
+          <div>
+            <div class="adj-label" style="color:var(--amber)">Sector Offset (Defensive)</div>
+            <div class="adj-condition">Utilities, Staples, Healthcare in contraction → partial reverse</div>
+          </div>
+          <span class="adj-delta" style="color:var(--amber)">partial</span>
+        </div>
+        <div class="adj-row" style="border-color:var(--amber)">
+          <div>
+            <div class="adj-label" style="color:var(--amber);font-weight:700">Final tilt = clamp(sum, −20, +20)</div>
+            <div class="adj-condition">Capped so macro never overwhelms fundamental score</div>
+          </div>
+          <span class="adj-delta" style="color:var(--amber)">±20</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Example calculation -->
+    <div class="card">
+      <div class="card-title">Interactive Example — Change Scenario</div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">Regime:</label>
+        <select id="ex-regime" style="background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:6px 10px;font-size:12px;width:100%">
+          <option value="expansion">Expansion (+8)</option>
+          <option value="reflation">Reflation (+3)</option>
+          <option value="stagflation">Stagflation (−8)</option>
+          <option value="contraction">Contraction (−12)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">Sector:</label>
+        <select id="ex-sector" style="background:var(--s2);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:6px 10px;font-size:12px;width:100%">
+          <option value="Technology">Technology (growth)</option>
+          <option value="Communication Services">Comm Services (growth)</option>
+          <option value="Consumer Discretionary">Consumer Disc (growth)</option>
+          <option value="Utilities">Utilities (defensive)</option>
+          <option value="Consumer Staples">Consumer Staples (defensive)</option>
+          <option value="Healthcare">Healthcare (defensive)</option>
+          <option value="Financials">Financials (neutral)</option>
+          <option value="Energy">Energy (commodity)</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1">
+          <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">Recession Prob:</label>
+          <input id="ex-rec" type="range" min="0" max="100" value="25" style="width:100%;accent-color:var(--amber)">
+          <div style="font-size:11px;color:var(--t3);text-align:right" id="ex-rec-val">25%</div>
+        </div>
+        <div style="flex:1">
+          <label style="font-size:12px;color:var(--t2);display:block;margin-bottom:6px">Credit Stress:</label>
+          <input id="ex-cred" type="range" min="0" max="100" value="30" style="width:100%;accent-color:var(--amber)">
+          <div style="font-size:11px;color:var(--t3);text-align:right" id="ex-cred-val">30</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px">
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;margin-bottom:4px">Base Score</div>
+          <div id="ex-base" style="font-size:24px;font-weight:800;color:var(--text)">68</div>
+        </div>
+        <div style="font-size:20px;color:var(--t3)">+</div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;margin-bottom:4px">Macro Tilt</div>
+          <div id="ex-tilt" style="font-size:24px;font-weight:800">+8</div>
+        </div>
+        <div style="font-size:20px;color:var(--t3)">=</div>
+        <div style="text-align:center;flex:1">
+          <div style="font-size:10px;color:var(--t3);text-transform:uppercase;margin-bottom:4px">Scora Score</div>
+          <div id="ex-scora" style="font-size:24px;font-weight:800;color:var(--amber)">76</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Where tilt is shown in the UI -->
+  <div class="card">
+    <div class="card-title">Where Macro Tilt Appears in the UI</div>
+    <div class="grid-3">
+      <div class="node">
+        <div class="node-label" style="color:var(--amber)">Stock Overview Tab</div>
+        <div class="node-desc">Macro Context Panel at the top — shows regime pill, tilt label + color, reason tags, bidirectional tilt bar (center-anchored −20 to +20), macro KPIs (IC Score, Rec. Prob, DGS10)</div>
+        <span class="node-badge badge-amber">Primary UI</span>
+      </div>
+      <div class="node">
+        <div class="node-label" style="color:var(--cyan)">Screener Tab</div>
+        <div class="node-desc">Watchlist table shows Base Score, Macro Tilt, and Scora Score columns side by side. Sort by any column to rank holdings by macro-adjusted attractiveness.</div>
+        <span class="node-badge badge-cyan">Sort column</span>
+      </div>
+      <div class="node">
+        <div class="node-label" style="color:var(--purple)">Compare Tab</div>
+        <div class="node-desc">Side-by-side comparison table of up to 4 tickers shows Macro Tilt as its own row. Best tilt highlighted in amber. Allows macro-aware relative valuation.</div>
+        <span class="node-badge badge-purple">Comparison row</span>
+      </div>
+      <div class="node">
+        <div class="node-label" style="color:var(--pos)">Research Tab (AI)</div>
+        <div class="node-desc">AI prompt includes macro regime, recession prob, credit stress, and computed tilt. Claude uses this to bias its Bull/Bear case and Moat assessment.</div>
+        <span class="node-badge badge-pos">AI context</span>
+      </div>
+      <div class="node">
+        <div class="node-label">Valuation Tab (DCF)</div>
+        <div class="node-desc">rfRate (WACC base) pulled live from macro_state.dgs10. Higher rates → lower DCF → lower intrinsic value. The link between macro and equity valuation.</div>
+        <span class="node-badge badge-amber">rfRate = dgs10</span>
+      </div>
+      <div class="node">
+        <div class="node-label">Scoring Engine</div>
+        <div class="node-desc">Base score (0–100) is pure fundamentals. Scora Score = Base + Tilt. Rating thresholds (Strong Buy/Buy/Neutral/Sell) are applied to Scora Score, not base.</div>
+        <span class="node-badge badge-pos">Final rating</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full code -->
+  <div class="card">
+    <div class="card-title">getMacroTilt() — Full Logic</div>
+    <div class="formula" style="font-size:11px"><span class="k">function</span> getMacroTilt(macro, sector) {
+  <span class="c">// 1. Regime base tilt</span>
+  <span class="k">const</span> baseTilts = {
+    expansion:   <span class="p">+8</span>,
+    reflation:   <span class="p">+3</span>,
+    stagflation: <span class="n">-8</span>,
+    contraction: <span class="n">-12</span>,
+  };
+  <span class="k">let</span> tilt = baseTilts[macro.regime_id] ?? <span class="v">0</span>;
+
+  <span class="c">// 2. Recession penalty</span>
+  <span class="k">if</span> (macro.recession_prob >= <span class="v">60</span>) tilt -= <span class="n">5</span>;
+
+  <span class="c">// 3. Credit stress penalty</span>
+  <span class="k">if</span> (macro.credit_stress >= <span class="v">70</span>) tilt -= <span class="n">3</span>;
+
+  <span class="c">// 4. Sector modifier</span>
+  <span class="k">const</span> growthSectors = [<span class="v">"Technology"</span>, <span class="v">"Comm Services"</span>, <span class="v">"Consumer Disc"</span>];
+  <span class="k">const</span> defensiveSectors = [<span class="v">"Utilities"</span>, <span class="v">"Consumer Staples"</span>, <span class="v">"Healthcare"</span>];
+
+  <span class="k">if</span> (growthSectors.includes(sector)) tilt += (tilt > <span class="v">0</span> ? <span class="p">+4</span> : <span class="n">-4</span>);
+  <span class="k">if</span> (defensiveSectors.includes(sector)) tilt = Math.round(tilt * <span class="v">0.5</span>);
+
+  <span class="c">// 5. Clamp and return</span>
+  tilt = Math.max(<span class="n">-20</span>, Math.min(<span class="p">+20</span>, Math.round(tilt)));
+  <span class="k">return</span> { tilt, label, color, reasons };
+}</div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// ── NAV ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById('sec-' + item.dataset.section).classList.add('active');
+  });
+});
+
+// ── OVERVIEW NODE DETAILS ────────────────────────────────────────────
+const nodeData = {
+  'fred': {
+    title: 'FRED API (Federal Reserve Economic Data)',
+    body: '<b>What:</b> St. Louis Fed database of 800k+ economic series.<br><b>Used for:</b> 43 series pulled daily by IC DataLayer — rates, inflation, labor market, housing, credit, liquidity.<br><b>How:</b> IC DataLayer cron job runs nightly, fetches each series, computes composites, writes to macro_state.<br><b>Key series:</b> DGS2/10/30, T10Y2Y, PCEPILFE, UNRATE, PAYEMS, WRESBAL, M2SL, BAMLH0A0HYM2.',
+    tags: ['43 series', 'daily cron', 'free tier', 'FRED API key in ic-proxy']
+  },
+  'fmp': {
+    title: 'Financial Modeling Prep (FMP) API',
+    body: '<b>What:</b> Primary source for all stock fundamentals, financials, and market data.<br><b>Used for:</b> 13 of the 16 parallel calls per ticker analysis — quote, profile, financials, ratios, DCF, institutional holders, etc.<br><b>How:</b> All calls go through ic-proxy at <code>https://ic-proxy-psi.vercel.app/api/fmp/...</code> — proxy adds the API key, avoids CORS, and handles rate limiting.<br><b>Cost:</b> FMP paid plan required for premium endpoints.',
+    tags: ['13/16 calls', 'via ic-proxy', 'paid plan', 'REST JSON']
+  },
+  'finnhub': {
+    title: 'Finnhub API',
+    body: '<b>What:</b> Real-time and alternative financial data provider.<br><b>Used for:</b> 2 calls per ticker — earnings surprises history and insider transaction feed.<br><b>How:</b> Via ic-proxy at <code>/api/finnhub/...</code><br><b>Data:</b> Earnings: actual vs. estimate EPS by quarter. Insider: buy/sell transactions with volume and price.',
+    tags: ['2/16 calls', 'earnings surprises', 'insider transactions', 'via ic-proxy']
+  },
+  'claude-api': {
+    title: 'Claude AI API (Anthropic)',
+    body: '<b>What:</b> Sonnet 4.6 model powers all AI synthesis in Scora Research.<br><b>Used for:</b> (1) Macro AI Synthesis — full macro_state context → 3-4 paragraph market analysis. (2) Stock Research — scores + macro + fundamentals → Verdict + Bull/Bear case + Moat Scorecard.<br><b>How:</b> POST to ic-proxy <code>/api/ai/analyze</code> with a structured prompt. ic-proxy adds the Anthropic key.<br><b>When:</b> On-demand only (user clicks "Generate Analysis") — not on every page load.',
+    tags: ['claude-sonnet-4-6', 'on-demand', 'macro synthesis', 'stock research', 'moat scoring']
+  },
+  'ic-proxy': {
+    title: 'ic-proxy — Serverless Proxy (Vercel)',
+    body: '<b>What:</b> Node.js/Express backend deployed on Vercel at <code>https://ic-proxy-psi.vercel.app</code>.<br><b>Purpose:</b> (1) Stores all API keys server-side so they never reach the browser. (2) Adds auth headers. (3) Bypasses CORS for FMP/Finnhub/FRED. (4) Handles rate limiting and error normalization.<br><b>Routes:</b> <code>/api/fmp/*</code>, <code>/api/finnhub/*</code>, <code>/api/fred/*</code>, <code>/api/ai/analyze</code>.<br><b>Critical:</b> Scora Research never calls external APIs directly — everything goes through this proxy.',
+    tags: ['https://ic-proxy-psi.vercel.app', 'stores API keys', 'CORS bypass', 'rate limiting', 'unchanged']
+  },
+  'ic-datalayer': {
+    title: 'IC DataLayer (separate Vercel app)',
+    body: '<b>What:</b> Separate React/Vite app at <code>https://ic-datalayer-app.vercel.app</code> that the user uses to manually trigger macro state updates.<br><b>Role in Scora:</b> Acts as the "data engine" — it writes to Supabase macro_state, which Scora Research then reads.<br><b>Cron:</b> Also has a daily automated job that refreshes macro_state via ic-proxy/lib/macro.js.<br><b>Important:</b> Scora Research does NOT modify IC DataLayer.',
+    tags: ['separate app', 'writes macro_state', 'daily cron', 'not modified by Scora']
+  },
+  'supabase': {
+    title: 'Supabase (PostgreSQL + Auth + Realtime)',
+    body: '<b>Project:</b> <code>acxaosesbsprrusdvgop</code> — shared across IC DataLayer, StockLens, and Scora Research.<br><b>Auth:</b> Magic link (OTP email). No passwords. Session stored in browser localStorage.<br><b>Tables:</b> macro_state (id=1 singleton), sl_analyses (per-ticker cache), sl_watchlist (user watchlists), smart_money_top_buyers (market-wide institutional flows).<br><b>Client:</b> Lazy singleton pattern in lib/supabase.ts to avoid SSR build crashes.',
+    tags: ['shared instance', 'magic link auth', '4 tables used', 'lazy singleton']
+  },
+  'macro-state-table': {
+    title: 'Table: macro_state',
+    body: '<b>Structure:</b> Single row, id=1 (singleton). Updated daily by IC DataLayer.<br><b>Fields:</b> 70+ columns including all 5 composites (LCC/RPC/CSC/GRC/HSC), ic_score, regime fields, all raw FRED values, bubble/dalio monitors.<br><b>Read by Scora:</b> On every Macro tab load and every stock analysis (for getMacroTilt + rfRate).<br><b>Key usage:</b> getMacroTilt() reads regime_id, recession_prob, credit_stress. DCF reads dgs10 for risk-free rate.',
+    tags: ['id=1 singleton', '70+ fields', 'daily writes', 'read by macro + stock']
+  },
+  'sl-analyses-table': {
+    title: 'Table: sl_analyses',
+    body: '<b>Structure:</b> One row per ticker. Upserted on every stock analysis (ON CONFLICT ticker DO UPDATE).<br><b>Fields:</b> ticker, score_total (base), macro_tilt, score_val/hlth/mom/growth/quality, sector, dcf data, reverse_dcf, analysis_date.<br><b>Used by:</b> Screener (watchlist table with scores), Compare (side-by-side), historical reference.<br><b>Cache behavior:</b> Each time user opens a ticker page, the row is re-computed and overwritten.',
+    tags: ['per-ticker', 'upsert on conflict', 'scores + tilt', 'screener + compare']
+  },
+  'auth': {
+    title: 'Authentication — Supabase Magic Link',
+    body: '<b>Flow:</b> User enters email → Supabase sends OTP link → user clicks → session established in browser.<br><b>No passwords</b> — purely email-based.<br><b>Implementation:</b> lib/auth.tsx provides AuthContext with session state. Nav shows sign-out. All pages redirect to /login if no session.<br><b>Security:</b> Supabase anon key is public (safe for frontend) — Row Level Security (RLS) enforces per-user data isolation.',
+    tags: ['magic link OTP', 'no passwords', 'AuthContext', 'RLS in Supabase']
+  },
+  'macro-tab': {
+    title: 'MACRO Tab — 6 Sub-tabs',
+    body: '<b>Data source:</b> Single Supabase read of macro_state on mount — shared across all sub-tabs.<br><b>Sub-tabs:</b><br>• <b>Overview</b> — IC Score ring, Regime card, 5 composite bars, rates/fed/commodities grid<br>• <b>Indicators</b> — 43 FRED series grouped (Rates, Macro, Sentiment)<br>• <b>Markets</b> — Live ETF quotes via ic-proxy for 14 tickers<br>• <b>Monitors</b> — Meltup, Bubble (debt+AI), Recession, Dalio 5-stage<br>• <b>News</b> — 6 category tabs from FMP news endpoint<br>• <b>AI Synthesis</b> — Claude analysis on demand + tripwire alerts',
+    tags: ['single DB read', '6 sub-tabs', 'live ETF quotes', 'AI on-demand']
+  },
+  'stock-tab': {
+    title: 'STOCKS Tab — 8 Sub-tabs',
+    body: '<b>Entry:</b> User types a ticker → navigates to /stock/[ticker].<br><b>Data load:</b> 16 parallel API calls via Promise.allSettled on mount.<br><b>Sub-tabs:</b><br>• <b>Overview</b> — Macro Context Panel + Scora Score + key metrics<br>• <b>Fundamentals</b> — Income statement, balance sheet, cash flow<br>• <b>Valuation</b> — DCF sliders + sensitivity table + Reverse DCF<br>• <b>Chart</b> — Recharts price chart + EMA20/50<br>• <b>Research</b> — AI verdict + moat scorecard<br>• <b>Smart Money</b> — 13-F holders + insider transactions<br>• <b>Screener</b> — Watchlist management table<br>• <b>Compare</b> — Multi-ticker side-by-side',
+    tags: ['16 parallel calls', '8 sub-tabs', 'Promise.allSettled', 'upserts to sl_analyses']
+  },
+  'scoring-engine': {
+    title: 'Scoring Engine (lib/scoring.ts)',
+    body: '<b>Two functions:</b><br>• <b>calcScores(inputs)</b> — takes normalized financial inputs, returns 5 sub-scores + base total (0–100)<br>• <b>getMacroTilt(macro, sector)</b> — reads macro_state, returns −20 to +20 adjustment<br><b>Output:</b> Scora Score = base + tilt. This is the number that drives the rating (Strong Buy/Buy/Neutral/Sell).<br><b>Key insight:</b> The same stock can have a different Scora Score depending on the macro regime. A base score of 68 becomes 76 in expansion but 56 in contraction.',
+    tags: ['calcScores()', 'getMacroTilt()', 'lib/scoring.ts', 'pure TypeScript', 'no API calls']
+  }
+};
+
+document.querySelectorAll('[data-key]').forEach(node => {
+  node.addEventListener('click', () => {
+    const key = node.dataset.key;
+    const d = nodeData[key];
+    if (!d) return;
+    document.querySelectorAll('[data-key]').forEach(n => n.classList.remove('lit'));
+    node.classList.add('lit');
+    const panel = document.getElementById('detail-panel');
+    document.getElementById('detail-title').textContent = d.title;
+    let body = d.body;
+    if (d.tags) body += '<div class="tag-row">' + d.tags.map(t => `<span class="tag">${t}</span>`).join('') + '</div>';
+    document.getElementById('detail-body').innerHTML = body;
+    panel.classList.remove('hidden');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+});
+
+// ── FLOW ANIMATIONS ──────────────────────────────────────────────────
+const flows = {
+  'macro-flow': [
+    '① <b>IC DataLayer cron</b> triggers (nightly) — fetches 43 FRED series via ic-proxy → FRED API',
+    '② Fetches ETF prices for 14 tickers (SPY, QQQ, GLD…) via ic-proxy → FMP API',
+    '③ <b>ic-compute.js</b> runs — calculates LCC, RPC, CSC, GRC, HSC composites from raw data',
+    '④ Derives <b>ic_score</b> (weighted average) + <b>regime_id</b> classification (expansion/reflation/stagflation/contraction)',
+    '⑤ Computes Meltup/Bubble/Dalio monitors + Buffett Indicator + Fear&Greed + Expected Return 10Y',
+    '⑥ <b>Upserts macro_state id=1</b> in Supabase with all 70+ fields updated',
+    '⑦ Scora Research reads macro_state on next Macro tab open → all 6 sub-tabs refresh automatically',
+    '✓ <b>Complete.</b> Macro data is now live in Scora Research.'
+  ],
+  'stock-flow': [
+    '① User types ticker (e.g. AAPL) → navigates to <b>/stock/AAPL</b>',
+    '② Page fires <b>16 parallel requests</b> via Promise.allSettled — 13 to FMP, 2 to Finnhub, 1 to Supabase',
+    '③ Supabase query fetches current <b>macro_state</b> (id=1) in parallel with market data',
+    '④ All responses arrive → <b>calcScores(inputs)</b> computes 5 sub-scores (Value/Health/Momentum/Growth/Quality) → base score 0–100',
+    '⑤ <b>getMacroTilt(macro, sector)</b> reads regime_id, recession_prob, credit_stress → returns tilt −20 to +20',
+    '⑥ <b>Scora Score = base + tilt</b> → Rating assigned (Strong Buy/Buy/Neutral/Sell)',
+    '⑦ Row <b>upserted to sl_analyses</b> (ticker as primary key) → persisted for Screener + Compare',
+    '⑧ All 8 sub-tabs receive data — user can explore Overview, Chart, AI Research, etc.',
+    '✓ <b>Complete.</b> Full analysis with macro context integrated.'
+  ],
+  'ai-flow': [
+    '① User clicks <b>"✦ Generate Analysis"</b> in Stock Research tab (or Macro AI tab)',
+    '② App assembles a <b>structured prompt</b> with: ticker, all 5 sub-scores, macro_tilt, macro_state fields (regime, recession_prob, DGS10, WTI, PCE…)',
+    '③ POST to <b>ic-proxy /api/anthropic/messages</b> with the raw Anthropic body (model + messages + max_tokens)',
+    '④ ic-proxy forwards to <b>Anthropic Claude Haiku 4.5 API</b> with server-side key (Sonnet 4.6 available as a "deep" tier)',
+    '⑤ Claude returns: Verdict + Bull case + Bear case + Moat Scorecard (4 pillars × 25 pts)',
+    '⑥ Response streamed back through ic-proxy → displayed in Research tab',
+    '✓ <b>Complete.</b> AI analysis aware of both fundamental scores AND macro regime.'
+  ]
+};
+
+let flowInterval = null;
+function animateFlow(key) {
+  if (flowInterval) clearInterval(flowInterval);
+  const steps = flows[key];
+  let i = 0;
+  const el = document.getElementById('flow-status');
+  el.innerHTML = steps[0];
+  flowInterval = setInterval(() => {
+    i++;
+    if (i >= steps.length) { clearInterval(flowInterval); flowInterval = null; return; }
+    el.innerHTML = steps[i];
+  }, 1800);
+}
+
+// ── MACRO DETAIL ─────────────────────────────────────────────────────
+const macroDetails = {
+  lcc: {
+    title: 'LCC — Liquidity & Credit Cycle (0–100)',
+    body: '<b>What it measures:</b> The overall tightness/looseness of financial conditions — how much "fuel" is in the system.<br><br><b>Inputs:</b> Federal Reserve bank reserves (WRESBAL), M2 money supply growth rate, HYG high-yield bond spread, SOFR short-term rate, global liquidity direction.<br><br><b>Interpretation:</b> High LCC (>60) = abundant liquidity, easy credit → bullish environment. Low LCC (<40) = tight conditions, credit stress → risk-off.',
+  },
+  rpc: {
+    title: 'RPC — Recession Probability Composite (0–100)',
+    body: '<b>What it measures:</b> Probability of entering or being in a recession in the next 6–12 months.<br><br><b>Inputs:</b> Sahm Rule indicator, yield curve inversion depth (T10Y2Y), PAYEMS job growth, leading economic indicators, FRED recession probability model.<br><br><b>Interpretation:</b> >60 = high recession risk → getMacroTilt() applies −5 penalty to all stock scores.',
+  },
+  csc: {
+    title: 'CSC — Commodity Supercycle Score (0–100)',
+    body: '<b>What it measures:</b> Whether we are in a commodity supercycle (bull trend for raw materials).<br><br><b>Inputs:</b> WTI oil price level and 1-month momentum, Gold price trend, DBC commodity index trend, energy sector strength.<br><br><b>Interpretation:</b> High CSC → inflationary environment → favorable for Energy/Materials, negative for growth stocks.',
+  },
+  grc: {
+    title: 'GRC — Global Risk Climate (0–100)',
+    body: '<b>What it measures:</b> Investor risk appetite and fear level in global markets.<br><br><b>Inputs:</b> VIX (equity volatility), MOVE index (bond volatility), Put/Call ratio, Fear & Greed Index, Buffett Indicator.<br><br><b>Interpretation:</b> Low GRC (<40) = high fear (VIX >35, Fear&Greed extreme fear) → tripwire signals fire. High GRC (>70) = greed/complacency → potential bubble risk.',
+  },
+  hsc: {
+    title: 'HSC — Housing & Structural Credit (0–100)',
+    body: '<b>What it measures:</b> Health of the structural/long-cycle credit system — housing, consumer debt, corporate leverage.<br><br><b>Inputs:</b> Mortgage spread, HPI trend, consumer debt service ratio (MDSP), corporate credit spreads (LQD), non-financial corporate debt (NCBEILQ027S).<br><br><b>Interpretation:</b> Low HSC signals structural credit weakness — a leading indicator of deeper downturns (cf. 2007–08).',
+  },
+  ic_score: {
+    title: 'IC Score — Composite Index (0–100)',
+    body: '<b>What it measures:</b> Overall health of the macro investment climate.<br><br><b>Formula:</b> Weighted average of LCC (30%), RPC inverted (25%), CSC (15%), GRC (20%), HSC (10%).<br><br><b>Interpretation:</b> >60 = constructive environment (expansion/reflation). 40–60 = neutral/mixed. <40 = risk-off (stagflation/contraction). Displayed as large ring gauge in Macro Overview.',
+  },
+  regime: {
+    title: 'Regime Classification (4 states)',
+    body: '<b>How determined:</b> IC Score + growth/inflation quadrant (where is growth vs inflation heading).<br><br><b>4 Regimes:</b><br>• <b>Expansion</b> — Growth ↑, Inflation stable. IC >55. Best for risk assets.<br>• <b>Reflation</b> — Growth ↑, Inflation ↑. IC 45–60. Good for cyclicals/commodities.<br>• <b>Stagflation</b> — Growth ↓, Inflation ↑. Worst environment for most assets.<br>• <b>Contraction</b> — Growth ↓, Inflation ↓. Defensive assets outperform.<br><br><b>Impact:</b> regime_id directly drives getMacroTilt() — the regime determines the base score adjustment for every stock.',
+  }
+};
+
+function showMacroDetail(key) {
+  const d = macroDetails[key];
+  if (!d) return;
+  const el = document.getElementById('macro-detail');
+  document.getElementById('macro-detail-title').textContent = d.title;
+  document.getElementById('macro-detail-body').innerHTML = d.body;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── STOCK DETAIL ─────────────────────────────────────────────────────
+const stockDetails = {
+  quote: { title: 'FMP: /api/fmp/quote/{ticker}', body: '<b>Returns:</b> Current price, previous close, change%, 52-week high/low, market cap, PE ratio, volume.<br><b>Used in:</b> Overview (price header, 52W range slider), Screener (current price column).' },
+  historical: { title: 'FMP: /api/fmp/historical-price-eod/{ticker}', body: '<b>Returns:</b> Daily OHLCV data for up to 5 years.<br><b>Used in:</b> Chart tab — Recharts LineChart with amber price line. EMA20 and EMA50 computed client-side from this data. Period selector: 1M/3M/6M/1Y/5Y.' },
+  profile: { title: 'FMP: /api/fmp/profile/{ticker}', body: '<b>Returns:</b> Company name, sector, industry, description, CEO, employees, website, country, exchange.<br><b>Used in:</b> Overview header (company name), About card (description), getMacroTilt() (sector field for sector modifier).' },
+  metrics: { title: 'FMP: /api/fmp/key-metrics-ttm/{ticker}', body: '<b>Returns:</b> Trailing twelve months: EV/EBITDA, P/FCF, ROIC, Net Debt/EBITDA, FCF per share, Dividend Yield.<br><b>Used in:</b> calcScores() for Health + Value + Quality sub-scores. Fundamentals tab grid.' },
+  ratios: { title: 'FMP: /api/fmp/ratios-ttm/{ticker}', body: '<b>Returns:</b> P/E, P/B, Debt/Equity, Current Ratio, Interest Coverage, Revenue Growth TTM, EPS Growth TTM, Gross/Net/Operating margins.<br><b>Used in:</b> calcScores() for all 5 sub-scores. Fundamentals tab.' },
+  dcf: { title: 'FMP: /api/fmp/dcf/{ticker}', body: '<b>Returns:</b> FMP\'s own DCF intrinsic value estimate.<br><b>Used in:</b> Valuation tab as reference point alongside the user\'s custom DCF model (which uses live rfRate from macro_state.dgs10).' },
+  income: { title: 'FMP: /api/fmp/income-statement/{ticker}', body: '<b>Returns:</b> Annual + quarterly P&L: Revenue, COGS, Gross Profit, R&D, Operating Income, Net Income, EPS.<br><b>Used in:</b> Fundamentals tab (income section), Research tab (historical trend context for AI prompt).' },
+  balance: { title: 'FMP: /api/fmp/balance-sheet/{ticker}', body: '<b>Returns:</b> Total Assets, Liabilities, Equity, Cash, Debt, Goodwill.<br><b>Used in:</b> Fundamentals tab (balance section). Debt/equity extracted for Health score.' },
+  cashflow: { title: 'FMP: /api/fmp/cash-flow/{ticker}', body: '<b>Returns:</b> Operating CF, CapEx, Free Cash Flow, Dividends, Stock Buybacks.<br><b>Used in:</b> Fundamentals tab (CF section). FCF per share used in Quality score.' },
+  analyst: { title: 'FMP: /api/fmp/analyst-estimates/{ticker}', body: '<b>Returns:</b> Consensus EPS and Revenue estimates for next 4 quarters.<br><b>Used in:</b> Research tab (analyst estimates table, displayed below AI verdict).' },
+  'price-target': { title: 'FMP: /api/fmp/price-target/{ticker}', body: '<b>Returns:</b> Analyst consensus price target (low/mean/high) and analyst count.<br><b>Used in:</b> Research tab. Upside/downside % vs current price calculated and displayed.' },
+  peers: { title: 'FMP: /api/fmp/stock-peers/{ticker}', body: '<b>Returns:</b> List of similar tickers (sector/industry peers).<br><b>Used in:</b> Research tab (peer comparison context). Future: auto-populate Compare tab with peers.' },
+  institutional: { title: 'FMP: /api/fmp/institutional-holder/{ticker}', body: '<b>Returns:</b> Top institutional holders with % ownership and share count from 13-F filings.<br><b>Used in:</b> Smart Money tab (13-F holders table). Displayed alongside insider transactions.' },
+  earnings: { title: 'Finnhub: /api/finnhub/stock/earnings', body: '<b>Returns:</b> EPS surprise history — actual vs. estimate by quarter, surprise % and amount.<br><b>Used in:</b> Research tab (Earnings Surprises section). Consistent beats → positive moat signal for AI analysis.' },
+  insider: { title: 'Finnhub: /api/finnhub/stock/insider-transactions', body: '<b>Returns:</b> Insider buy/sell transactions with name, role, date, shares, price, transaction value.<br><b>Used in:</b> Smart Money tab (insider transactions table). Net insider buying/selling is a contrarian signal.' },
+  'macro-read': { title: 'Supabase: macro_state (id=1)', body: '<b>Returns:</b> Full macro_state row with 70+ fields.<br><b>Used for:</b> (1) getMacroTilt() — needs regime_id, recession_prob, credit_stress, sector. (2) DCF Valuation — rfRate = macro_state.dgs10 (live 10Y Treasury yield as risk-free rate for WACC). (3) Research AI prompt — includes macro context.' },
+};
+
+document.querySelectorAll('[data-stock-key]').forEach(node => {
+  node.addEventListener('click', () => {
+    const key = node.dataset.stockKey;
+    const d = stockDetails[key];
+    if (!d) return;
+    document.querySelectorAll('[data-stock-key]').forEach(n => n.classList.remove('lit'));
+    node.classList.add('lit');
+    const panel = document.getElementById('stock-detail');
+    document.getElementById('stock-detail-title').textContent = d.title;
+    document.getElementById('stock-detail-body').innerHTML = d.body;
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+});
+
+// ── SCORING EXPANDABLE ───────────────────────────────────────────────
+document.querySelectorAll('.score-expandable').forEach(row => {
+  row.addEventListener('click', () => {
+    const score = row.dataset.score;
+    const content = document.getElementById(score + '-content');
+    if (!content) return;
+    const isOpen = content.style.display === 'block';
+    document.querySelectorAll('.score-content').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.score-expandable .adj-label').forEach(l => {
+      if (!l.textContent.startsWith('▼')) l.textContent = l.textContent.replace(/^▼ /, '▶ ');
+    });
+    if (!isOpen) {
+      content.style.display = 'block';
+      const label = row.querySelector('.adj-label');
+      label.textContent = label.textContent.replace('▶', '▼');
+    }
+  });
+});
+
+// ── TILT DETAIL ──────────────────────────────────────────────────────
+const tiltDetails = {
+  expansion: {
+    title: 'Expansion Regime → +8 base tilt',
+    body: '<b>Macro conditions:</b> GDP growth accelerating, inflation stable (2–3%), employment rising, corporate earnings growing.<br><br><b>Effect on stocks:</b> All stocks get +8 base tilt. Growth/Tech sectors get +4 additional (+12 total). Defensive sectors get partial offset (+4).<br><br><b>IC DataLayer signals:</b> IC Score >55, LCC >60, RPC <30, net liquidity expanding, yield curve positive.<br><br><b>Example:</b> AAPL (Tech, expansion) → base 68 + 8 regime + 4 sector = +12 tilt → Scora Score 80 = Strong Buy'
+  },
+  reflation: {
+    title: 'Reflation Regime → +3 base tilt',
+    body: '<b>Macro conditions:</b> Growth picking up but inflation rising too (>3%). Fed may tighten. Commodities strong.<br><br><b>Effect on stocks:</b> Modest positive tilt (+3). Growth sectors lose bonus (inflation hurts multiples). Energy/Materials benefit from CSC.<br><br><b>IC DataLayer signals:</b> IC Score 45–60, LCC moderate, CSC rising, inflation data hot.<br><br><b>Example:</b> XOM (Energy, reflation) → base 65 + 3 regime → Scora Score 68 = Buy (commodity context adds qualitative weight in AI analysis)'
+  },
+  stagflation: {
+    title: 'Stagflation Regime → −8 base tilt',
+    body: '<b>Macro conditions:</b> Growth slowing but inflation remains high. Central bank dilemma — can\'t cut rates to stimulate. Worst macro environment for equities.<br><br><b>Effect on stocks:</b> −8 base tilt for all stocks. Growth/Tech get −12 total. Defensive get partial offset (−4).<br><br><b>IC DataLayer signals:</b> IC Score 35–50, LCC falling, RPC rising, PCE >3.5%, negative real rates.<br><br><b>Example:</b> MSFT (Tech, stagflation) → base 72 − 8 regime − 4 sector = −12 tilt → Scora Score 60 = Neutral (vs 80 in expansion)'
+  },
+  contraction: {
+    title: 'Contraction Regime → −12 base tilt',
+    body: '<b>Macro conditions:</b> GDP contracting, unemployment rising, credit tightening, deflation risk. Recession confirmed or imminent.<br><br><b>Effect on stocks:</b> −12 base tilt. Growth stocks get −16 to −20. Defensives get partial protection (−6).<br><br><b>IC DataLayer signals:</b> IC Score <40, RPC >60 (recession penalty −5 on top), credit_stress >70 (−3 more), LCC <35.<br><br><b>Max negative scenario:</b> Contraction + rec prob >60 + credit stress >70 + growth sector = −12 −5 −3 −4 = −24 → clamped to −20'
+  }
+};
+
+function showTiltDetail(regime) {
+  const d = tiltDetails[regime];
+  const el = document.getElementById('regime-detail');
+  document.getElementById('regime-detail-title').textContent = d.title;
+  document.getElementById('regime-detail-body').innerHTML = d.body;
+  el.style.display = 'block';
+}
+
+// ── INTERACTIVE TILT CALCULATOR ──────────────────────────────────────
+const regimeBase = { expansion: 8, reflation: 3, stagflation: -8, contraction: -12 };
+const growthSectors = ['Technology', 'Communication Services', 'Consumer Discretionary'];
+const defensiveSectors = ['Utilities', 'Consumer Staples', 'Healthcare'];
+
+function calcTilt() {
+  const regime = document.getElementById('ex-regime').value;
+  const sector = document.getElementById('ex-sector').value;
+  const recProb = parseInt(document.getElementById('ex-rec').value);
+  const creditStress = parseInt(document.getElementById('ex-cred').value);
+
+  document.getElementById('ex-rec-val').textContent = recProb + '%';
+  document.getElementById('ex-cred-val').textContent = creditStress;
+
+  let tilt = regimeBase[regime] || 0;
+  if (recProb >= 60) tilt -= 5;
+  if (creditStress >= 70) tilt -= 3;
+  if (growthSectors.includes(sector)) tilt += (tilt > 0 ? 4 : -4);
+  if (defensiveSectors.includes(sector)) tilt = Math.round(tilt * 0.5);
+  tilt = Math.max(-20, Math.min(20, Math.round(tilt)));
+
+  const base = 68;
+  const scora = base + tilt;
+  const tiltEl = document.getElementById('ex-tilt');
+  tiltEl.textContent = (tilt > 0 ? '+' : '') + tilt;
+  tiltEl.style.color = tilt > 0 ? 'var(--pos)' : tilt < 0 ? 'var(--neg)' : 'var(--t3)';
+  document.getElementById('ex-scora').textContent = scora;
+  const ratingColor = scora >= 75 ? 'var(--pos)' : scora >= 65 ? 'var(--pos)' : scora >= 50 ? 'var(--amber)' : 'var(--neg)';
+  document.getElementById('ex-scora').style.color = ratingColor;
+}
+
+['ex-regime','ex-sector','ex-rec','ex-cred'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calcTilt);
+  document.getElementById(id).addEventListener('change', calcTilt);
+});
+calcTilt();
+</script>
+</body>
+</html>

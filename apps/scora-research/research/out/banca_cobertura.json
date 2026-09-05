@@ -1,0 +1,659 @@
+{
+ "generatedAt": "2026-08-31T22:33:48.384Z",
+ "asOf": "2026-08-31",
+ "vivoDesde": "2024-08-31",
+ "empresas": 134,
+ "porSubsector": {
+  "Mercados de capitales": 28,
+  "Seguros": 37,
+  "Banca comercial": 25,
+  "Holdings / fondos": 38,
+  "Banca / otros": 3,
+  "Inmobiliario": 3
+ },
+ "metricas": {
+  "Cartera de crédito": {
+   "Mercados de capitales": {
+    "con": 6,
+    "de": 28,
+    "pct": 21
+   },
+   "Seguros": {
+    "con": 10,
+    "de": 37,
+    "pct": 27
+   },
+   "Banca comercial": {
+    "con": 19,
+    "de": 25,
+    "pct": 76
+   },
+   "Holdings / fondos": {
+    "con": 10,
+    "de": 38,
+    "pct": 26
+   },
+   "Banca / otros": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Provisión acumulada": {
+   "Mercados de capitales": {
+    "con": 8,
+    "de": 28,
+    "pct": 29
+   },
+   "Seguros": {
+    "con": 12,
+    "de": 37,
+    "pct": 32
+   },
+   "Banca comercial": {
+    "con": 20,
+    "de": 25,
+    "pct": 80
+   },
+   "Holdings / fondos": {
+    "con": 10,
+    "de": 38,
+    "pct": 26
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Dotación del periodo": {
+   "Mercados de capitales": {
+    "con": 3,
+    "de": 28,
+    "pct": 11
+   },
+   "Seguros": {
+    "con": 1,
+    "de": 37,
+    "pct": 3
+   },
+   "Banca comercial": {
+    "con": 10,
+    "de": 25,
+    "pct": 40
+   },
+   "Holdings / fondos": {
+    "con": 3,
+    "de": 38,
+    "pct": 8
+   },
+   "Banca / otros": {
+    "con": 2,
+    "de": 3,
+    "pct": 67
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Morosos": {
+   "Mercados de capitales": {
+    "con": 3,
+    "de": 28,
+    "pct": 11
+   },
+   "Seguros": {
+    "con": 6,
+    "de": 37,
+    "pct": 16
+   },
+   "Banca comercial": {
+    "con": 7,
+    "de": 25,
+    "pct": 28
+   },
+   "Holdings / fondos": {
+    "con": 1,
+    "de": 38,
+    "pct": 3
+   },
+   "Banca / otros": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Margen de intereses": {
+   "Mercados de capitales": {
+    "con": 9,
+    "de": 28,
+    "pct": 32
+   },
+   "Seguros": {
+    "con": 1,
+    "de": 37,
+    "pct": 3
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 3,
+    "de": 38,
+    "pct": 8
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   }
+  },
+  "Ingresos por intereses": {
+   "Mercados de capitales": {
+    "con": 9,
+    "de": 28,
+    "pct": 32
+   },
+   "Seguros": {
+    "con": 3,
+    "de": 37,
+    "pct": 8
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 4,
+    "de": 38,
+    "pct": 11
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Gastos por intereses": {
+   "Mercados de capitales": {
+    "con": 9,
+    "de": 28,
+    "pct": 32
+   },
+   "Seguros": {
+    "con": 16,
+    "de": 37,
+    "pct": 43
+   },
+   "Banca comercial": {
+    "con": 20,
+    "de": 25,
+    "pct": 80
+   },
+   "Holdings / fondos": {
+    "con": 18,
+    "de": 38,
+    "pct": 47
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Comisiones": {
+   "Mercados de capitales": {
+    "con": 7,
+    "de": 28,
+    "pct": 25
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 2,
+    "de": 3,
+    "pct": 67
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Gastos de explotación": {
+   "Mercados de capitales": {
+    "con": 10,
+    "de": 28,
+    "pct": 36
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Depósitos": {
+   "Mercados de capitales": {
+    "con": 7,
+    "de": 28,
+    "pct": 25
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 3,
+    "de": 3,
+    "pct": 100
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Capital nivel 1 (%)": {
+   "Mercados de capitales": {
+    "con": 3,
+    "de": 28,
+    "pct": 11
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 6,
+    "de": 25,
+    "pct": 24
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Capital CET1 (%)": {
+   "Mercados de capitales": {
+    "con": 0,
+    "de": 28,
+    "pct": 0
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 0,
+    "de": 25,
+    "pct": 0
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Primas devengadas": {
+   "Mercados de capitales": {
+    "con": 2,
+    "de": 28,
+    "pct": 7
+   },
+   "Seguros": {
+    "con": 27,
+    "de": 37,
+    "pct": 73
+   },
+   "Banca comercial": {
+    "con": 0,
+    "de": 25,
+    "pct": 0
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Siniestralidad": {
+   "Mercados de capitales": {
+    "con": 3,
+    "de": 28,
+    "pct": 11
+   },
+   "Seguros": {
+    "con": 28,
+    "de": 37,
+    "pct": 76
+   },
+   "Banca comercial": {
+    "con": 1,
+    "de": 25,
+    "pct": 4
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Gastos de adquisición": {
+   "Mercados de capitales": {
+    "con": 2,
+    "de": 28,
+    "pct": 7
+   },
+   "Seguros": {
+    "con": 20,
+    "de": 37,
+    "pct": 54
+   },
+   "Banca comercial": {
+    "con": 0,
+    "de": 25,
+    "pct": 0
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  }
+ },
+ "modelos": {
+  "Calidad del crédito": {
+   "Mercados de capitales": {
+    "con": 1,
+    "de": 28,
+    "pct": 4
+   },
+   "Seguros": {
+    "con": 1,
+    "de": 37,
+    "pct": 3
+   },
+   "Banca comercial": {
+    "con": 9,
+    "de": 25,
+    "pct": 36
+   },
+   "Holdings / fondos": {
+    "con": 1,
+    "de": 38,
+    "pct": 3
+   },
+   "Banca / otros": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Rentabilidad bancaria": {
+   "Mercados de capitales": {
+    "con": 7,
+    "de": 28,
+    "pct": 25
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 2,
+    "de": 3,
+    "pct": 67
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Ratio de eficiencia": {
+   "Mercados de capitales": {
+    "con": 7,
+    "de": 28,
+    "pct": 25
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 21,
+    "de": 25,
+    "pct": 84
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 2,
+    "de": 3,
+    "pct": 67
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Solvencia regulatoria": {
+   "Mercados de capitales": {
+    "con": 3,
+    "de": 28,
+    "pct": 11
+   },
+   "Seguros": {
+    "con": 0,
+    "de": 37,
+    "pct": 0
+   },
+   "Banca comercial": {
+    "con": 6,
+    "de": 25,
+    "pct": 24
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 1,
+    "de": 3,
+    "pct": 33
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  },
+  "Seguros · siniestralidad": {
+   "Mercados de capitales": {
+    "con": 2,
+    "de": 28,
+    "pct": 7
+   },
+   "Seguros": {
+    "con": 27,
+    "de": 37,
+    "pct": 73
+   },
+   "Banca comercial": {
+    "con": 0,
+    "de": 25,
+    "pct": 0
+   },
+   "Holdings / fondos": {
+    "con": 0,
+    "de": 38,
+    "pct": 0
+   },
+   "Banca / otros": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   },
+   "Inmobiliario": {
+    "con": 0,
+    "de": 3,
+    "pct": 0
+   }
+  }
+ },
+ "nota": "Sólo cobertura de datos. No mide ninguna capacidad predictiva y no autoriza a construir nada por sí solo."
+}

@@ -1,0 +1,27 @@
+name: Scora — weekly filing ingestion
+
+# Pulls each seed name's latest 10-K from SEC EDGAR (free, no key), splits Business /
+# Risk Factors / MD&A, and upserts them to kb_docs so the grounded AI thesis can cite the
+# real filing. Idempotent (on_conflict=id); a re-run just refreshes to the newest 10-K.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday, 06:00 UTC (before the discovery run)
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: "Optional space-separated tickers to ingest (defaults to the seed list)"
+        required: false
+        default: ""
+
+jobs:
+  filings:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Ingest latest 10-Ks → kb_docs
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/ingest_filings.mjs ${{ github.event.inputs.tickers }}

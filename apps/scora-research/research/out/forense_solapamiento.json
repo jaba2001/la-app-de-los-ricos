@@ -1,0 +1,54 @@
+{
+ "generatedAt": "2026-08-24T17:12:15.851Z",
+ "asOf": "2026-08-01",
+ "universo": 503,
+ "conFundamentales": 495,
+ "conSenal": 352,
+ "correlaciones": {
+  "devengos (Sloan, negados)": {
+   "rho": -0.064,
+   "n": 352,
+   "lectura": "información DISTINTA"
+  },
+  "Beneish M (negado)": {
+   "rho": -0.193,
+   "n": 125,
+   "lectura": "información DISTINTA"
+  },
+  "Piotroski F": {
+   "rho": 0.407,
+   "n": 207,
+   "lectura": "solapa bastante"
+  },
+  "Altman Z''": {
+   "rho": 0.444,
+   "n": 352,
+   "lectura": "solapa bastante"
+  },
+  "devengos (Sloan, negados) ↔ Beneish M (negado)": {
+   "rho": 0.594,
+   "n": 125
+  },
+  "devengos (Sloan, negados) ↔ Piotroski F": {
+   "rho": -0.053,
+   "n": 207
+  },
+  "devengos (Sloan, negados) ↔ Altman Z''": {
+   "rho": -0.139,
+   "n": 352
+  },
+  "Beneish M (negado) ↔ Piotroski F": {
+   "rho": -0.04,
+   "n": 124
+  },
+  "Beneish M (negado) ↔ Altman Z''": {
+   "rho": 0.032,
+   "n": 125
+  },
+  "Piotroski F ↔ Altman Z''": {
+   "rho": 0.158,
+   "n": 207
+  }
+ },
+ "nota": "Mide si la señal forense APORTA información distinta, no si PREDICE. Lo segundo está en forense_veredicto.json y salió que no."
+}

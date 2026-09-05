@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-09-03T22:32:33.317Z",
+  "meses": 236,
+  "completo": {
+    "total": 636.6,
+    "sharpe": 1.003,
+    "maxDD": -17.2
+  },
+  "sinCadaUno": [
+    {
+      "activo": "SPY",
+      "total": 585.6,
+      "deltaTotal": -51,
+      "sharpe": 0.49,
+      "deltaSharpe": -0.513,
+      "maxDD": -53,
+      "aparte": "es el 100 % de la cesta de riesgo-on: quitarlo destruye la estrategia, no mide su aporte"
+    },
+    {
+      "activo": "TLT",
+      "total": 671,
+      "deltaTotal": 34.4,
+      "sharpe": 0.975,
+      "deltaSharpe": -0.029,
+      "maxDD": -19,
+      "aparte": null
+    },
+    {
+      "activo": "IEF",
+      "total": 660.3,
+      "deltaTotal": 23.7,
+      "sharpe": 0.99,
+      "deltaSharpe": -0.014,
+      "maxDD": -17.5,
+      "aparte": null
+    },
+    {
+      "activo": "GLD",
+      "total": 617.4,
+      "deltaTotal": -19.2,
+      "sharpe": 0.956,
+      "deltaSharpe": -0.047,
+      "maxDD": -17.7,
+      "aparte": null
+    },
+    {
+      "activo": "DBC",
+      "total": 636.6,
+      "deltaTotal": 0,
+      "sharpe": 1.003,
+      "deltaSharpe": 0,
+      "maxDD": -17.2,
+      "aparte": null
+    },
+    {
+      "activo": "BIL",
+      "total": 616.4,
+      "deltaTotal": -20.2,
+      "sharpe": 0.962,
+      "deltaSharpe": -0.042,
+      "maxDD": -17.2,
+      "aparte": "es adonde la puerta de tendencia manda lo que corta: sin él se mide la PUERTA, no el activo"
+    },
+    {
+      "activo": "BTCUSD",
+      "total": 582.2,
+      "deltaTotal": -54.4,
+      "sharpe": 0.979,
+      "deltaSharpe": -0.024,
+      "maxDD": -17.2,
+      "aparte": null
+    }
+  ],
+  "noAportanSharpe": [
+    "DBC"
+  ],
+  "masImporta": "GLD",
+  "nota": "Dejar-fuera-uno es ATRIBUCION, no barrido: no busca el mejor menu. SPY y BIL no son comparables con los demas (SPY es toda la cesta de riesgo-on; BIL es el destino de la puerta de tendencia). Un activo que no aporta en esta muestra puede ser el que salve la proxima crisis."
+}

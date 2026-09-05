@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-09-01T08:07:50.842Z",
+  "window": "2019-2026",
+  "sinCuantizar": {
+    "soloPicks": 209.7,
+    "conCaja": 126,
+    "sharpe": 0.72,
+    "posiciones": 98
+  },
+  "conCuantizar": {
+    "soloPicks": 207.6,
+    "conCaja": 120.5,
+    "sharpe": 0.71,
+    "posiciones": 101
+  },
+  "entradasQueCambian": {
+    "salen": [
+      "FB|2019-04-01",
+      "CSCO|2020-06-15",
+      "EA|2020-07-15",
+      "INTU|2019-03-15",
+      "CL|2020-08-03",
+      "ITW|2024-03-01",
+      "CME|2024-04-15",
+      "CTAS|2026-03-16",
+      "TER|2026-06-01",
+      "MU|2026-07-01",
+      "STX|2026-07-15"
+    ],
+    "entran": [
+      "FB|2019-03-15",
+      "EA|2020-08-03",
+      "CSCO|2020-07-15",
+      "INTU|2019-04-01",
+      "CL|2020-06-15",
+      "APA|2022-11-01",
+      "ITW|2023-10-02",
+      "CME|2023-10-16",
+      "META|2024-11-01",
+      "CTAS|2026-04-01",
+      "TER|2026-05-01",
+      "MU|2026-06-01",
+      "STX|2026-07-01",
+      "FICO|2026-07-15"
+    ]
+  },
+  "estabilidadConCuantizar": {
+    "p25": 209.1588800718653,
+    "p75": 216.13483096357177,
+    "iqr": 7,
+    "min": 186.62980896387995,
+    "max": 226.46990177033098,
+    "n": 81
+  },
+  "nota": "La decisión no la toma el retorno sino el intercuartil: si no se estrecha, cuantizar es un cambio de estrategia sin premio."
+}

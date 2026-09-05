@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-09-03T19:14:54.388Z",
+  "meses": 236,
+  "desde": "2007-01-01",
+  "hasta": "2026-08-01",
+  "factorExPost": 1.513,
+  "factorInSample5a": 1.821,
+  "volObjetivo": 0.163,
+  "tope": 2,
+  "filas": [
+    {
+      "nombre": "Scora (como está)",
+      "total": 652.6,
+      "cagr": 10.81,
+      "sharpe": 1.01,
+      "vol": 0.108,
+      "maxDD": -17.2
+    },
+    {
+      "nombre": "S&P 500 (SPY)",
+      "total": 668.4,
+      "cagr": 10.92,
+      "sharpe": 0.722,
+      "vol": 0.163,
+      "maxDD": -65
+    },
+    {
+      "nombre": "A · fijo 1.51x (ex-post, MIRA EL FUTURO)",
+      "total": 1557.1,
+      "cagr": 15.35,
+      "sharpe": 0.962,
+      "vol": 0.163,
+      "maxDD": -26
+    },
+    {
+      "nombre": "B · fijo 1.82x elegido con 5 años",
+      "total": 1927.5,
+      "cagr": 22.78,
+      "sharpe": 1.159,
+      "vol": 0.194,
+      "maxDD": -30.9
+    },
+    {
+      "nombre": "C · volatilidad objetivo, tope 2x",
+      "total": 1345.8,
+      "cagr": 14.55,
+      "sharpe": 0.907,
+      "vol": 0.166,
+      "maxDD": -31.2
+    }
+  ],
+  "veredicto": {
+    "A": {
+      "bate": true,
+      "nota": "MIRA EL FUTURO: es la cota superior de lo que el Sharpe permite, no una estrategia"
+    },
+    "B": {
+      "bate": true,
+      "nota": "sin mirar el futuro: el factor sale de los primeros 5 años"
+    },
+    "C": {
+      "bate": true,
+      "nota": "volatilidad objetivo con ventana movil, tope declarado"
+    }
+  },
+  "limitacion": "El apalancamiento no crea retorno: convierte ventaja de riesgo en ventaja de retorno. Multiplica la caida maxima por el mismo factor y no protege de los huecos. La financiacion usada es la letra a 3 meses real, que es el suelo de lo que paga un minorista."
+}

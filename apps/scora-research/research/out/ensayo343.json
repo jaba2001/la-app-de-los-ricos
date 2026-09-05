@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-09-03T18:13:15.112Z",
+  "preregistro": "PREREGISTRO_ENSAYO_343.md",
+  "universo": 206,
+  "top": 20,
+  "pesoNuevo": 0.1,
+  "costeBps": 10,
+  "M": 343,
+  "resultados": [
+    {
+      "medida": "BASE",
+      "nombre": "Score actual (referencia)",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": 0.941,
+          "meses": 95,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 168.6
+        },
+        "2019-2026": {
+          "sharpe": 0.876,
+          "meses": 89,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 207.1
+        }
+      }
+    },
+    {
+      "medida": "conversion",
+      "nombre": "Conversión a caja",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": 0.855,
+          "meses": 95,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 141.1
+        },
+        "2019-2026": {
+          "sharpe": 0.839,
+          "meses": 89,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 194.1
+        }
+      }
+    },
+    {
+      "medida": "banderas",
+      "nombre": "Banderas rojas de caja",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": 0.907,
+          "meses": 95,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 158
+        },
+        "2019-2026": {
+          "sharpe": 0.782,
+          "meses": 89,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 166.8
+        }
+      }
+    },
+    {
+      "medida": "vidaUtil",
+      "nombre": "Vida útil implícita",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": 0.962,
+          "meses": 95,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 176
+        },
+        "2019-2026": {
+          "sharpe": 0.781,
+          "meses": 89,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 172
+        }
+      }
+    },
+    {
+      "medida": "recompra",
+      "nombre": "Retorno desde la recompra",
+      "ventanas": {
+        "2011-2018": {
+          "sharpe": 0.966,
+          "meses": 95,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 173.7
+        },
+        "2019-2026": {
+          "sharpe": 0.801,
+          "meses": 89,
+          "mesesVacios": 0,
+          "cobertura": 100,
+          "valida": true,
+          "total": 172.9
+        }
+      }
+    }
+  ],
+  "veredictos": [
+    {
+      "medida": "conversion",
+      "nombre": "Conversión a caja",
+      "evaluable": true,
+      "ventanasValidas": 2,
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.276,
+      "tDiferencia": -0.65,
+      "pasa": false
+    },
+    {
+      "medida": "banderas",
+      "nombre": "Banderas rojas de caja",
+      "evaluable": true,
+      "ventanasValidas": 2,
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.225,
+      "tDiferencia": -1.53,
+      "pasa": false
+    },
+    {
+      "medida": "vidaUtil",
+      "nombre": "Vida útil implícita",
+      "evaluable": true,
+      "ventanasValidas": 2,
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.223,
+      "tDiferencia": -1.58,
+      "pasa": false
+    },
+    {
+      "medida": "recompra",
+      "nombre": "Retorno desde la recompra",
+      "evaluable": true,
+      "ventanasValidas": 2,
+      "mejoraAmbasVentanas": false,
+      "dsr": 0.242,
+      "tDiferencia": -1.74,
+      "pasa": false
+    }
+  ],
+  "entran": 0,
+  "patron": "Las cuatro medidas MEJORAN 2011-2018 (donde el score base tiene Sharpe negativo) y EMPEORAN 2019-2026. No es ruido: es un sesgo de calidad, y 2019-2026 es la ventana en la que el tamaño batio a la calidad por 3,54 pp/año. Es una HIPOTESIS para otro ensayo con su propio preregistro, no un permiso para este."
+}

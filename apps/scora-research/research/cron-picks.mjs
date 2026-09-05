@@ -1,0 +1,414 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// SCORA PICKS — el cron quincenal que aplica las reglas (SCORA_PICKS_REGLAS.md v2)
+//
+// Corre el día 1 y el día 15 de cada mes (o el hábil siguiente). Calcula la señal, aplica
+// §3-§5 y escribe la decisión. NO decide nada por su cuenta: la lógica está en
+// `lib/picks.ts` y la señal en `research/picksSignal.mjs`, las mismas piezas que ejecuta el
+// backtest. Este fichero sólo hace de fontanería entre la base de datos y el motor.
+//
+// ═══ SIN ESTADO OCULTO ═══
+// Todo el estado del motor se DERIVA de lo que hay en la base:
+//   · cartera            ← sl_picks_position con closed_on nulo
+//   · cuarentenas        ← posiciones cerradas, closed_on + 12 meses
+//   · contador de salida ← los paneles de señal guardados en sl_picks_run
+//   · persistencia       ← esos mismos paneles, los de los últimos 60 días
+// No hay ningún contador en memoria ni columna auxiliar que pueda desincronizarse. Si la
+// base dice una cosa, el motor decide eso; no hay una segunda fuente de verdad.
+//
+// ═══ ESCRIBE SIEMPRE ═══
+// Aunque no compre nada. §4 dice que un hueco vacío es un resultado legítimo y §7 que se
+// publica cada decisión: sin la fila, un día sin compras sería indistinguible de un cron
+// que no llegó a correr. Esa ambigüedad es justo por donde se cuela un track record
+// maquillado.
+//
+//   node --experimental-strip-types --no-warnings research/cron-picks.mjs [--dry] [--date YYYY-MM-DD] [--force]
+//
+// Env: SUPABASE_URL (opcional), SUPABASE_SERVICE_KEY (obligatoria para escribir)
+// ─────────────────────────────────────────────────────────────────────────────
+// CURATED NO se importa a propósito: es el universo de laboratorio y no puede acabar
+// decidiendo en producción ni por accidente. Ver el guardián de §3.
+import { loadSP500Historical, membersAsOf, snapshotDate } from "./universe.mjs";
+import { señalAt } from "./picksSignal.mjs";
+import { rawPriceAsOf, lastBarDate } from "./prices.mjs";
+import { tickerToCik } from "./edgar.mjs";
+import { loadPanel } from "./momentumSignals.mjs";
+import {
+  decide, emptyState, addMonths, daysBetween, cotizaEn,
+  PICKS_RULES_VERSION, ENTRY_PCTL, EXIT_PCTL, EXIT_CONSECUTIVE,
+  TARGET_POSITIONS, BUYS_PER_DATE, PERSISTENCE_DAYS, QUARANTINE_MONTHS,
+} from "../lib/picks.ts";
+
+// ⚠️ ANTES DE NADA: la caché de precios de `prices.mjs` NO CADUCA — está pensada para
+// backtests reproducibles. Un proceso en vivo que la leyera se quedaría clavado en la última
+// fecha descargada, decidiría "hoy no toca" para siempre y NO FALLARÍA. Este cron descarga
+// de nuevo. `--no-refresh` existe sólo para iterar en desarrollo.
+if (!process.argv.includes("--no-refresh")) process.env.PX_REFRESH = "1";
+
+const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : d; };
+const DRY = process.argv.includes("--dry");
+const FORCE = process.argv.includes("--force");
+const HOY = arg("--date", new Date().toISOString().slice(0, 10));
+const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
+const KEY = process.env.SUPABASE_SERVICE_KEY;
+
+const sb = async (path, init = {}) => {
+  const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      apikey: KEY, Authorization: `Bearer ${KEY}`,
+      ...(init.headers ?? {}),
+    },
+  });
+  if (!r.ok) throw new Error(`supabase ${path}: ${r.status} ${await r.text()}`);
+  return r.status === 204 ? null : r.json();
+};
+
+console.log(`\n  SCORA PICKS · cron · ${HOY} · reglas v${PICKS_RULES_VERSION}${DRY ? "  (DRY RUN)" : ""}`);
+
+// ── 1 · ¿Toca hoy? ──────────────────────────────────────────────────────────────────────
+// El calendario hábil sale de las fechas reales de cotización del SPY: si el mercado estuvo
+// cerrado, no se pudo comprar. Un calendario teórico de "días laborables" se equivocaría en
+// Acción de Gracias y en cada festivo.
+const spy = await loadPanel("SPY", undefined);
+if (!spy) { console.error("  ✖ sin calendario de mercado (panel de SPY)"); process.exit(1); }
+// Un cron verde puede estar muerto. Si el calendario no llega a hoy, los datos están
+// rancios y CUALQUIER conclusión sería falsa — incluida "hoy no es fecha de decisión", que
+// es la que se tomaría en silencio. Se falla en alto, que es lo que hay que hacer.
+{
+  const ultimo = spy.dates.at(-1);
+  const retraso = daysBetween(ultimo, HOY);
+  if (retraso > 5) {
+    console.error(`  ✖ el calendario de mercado termina el ${ultimo}, ${retraso} días antes de ${HOY}.`);
+    console.error(`    Los precios están rancios. Se aborta en vez de decidir con datos viejos.`);
+    process.exit(1);
+  }
+}
+const siguienteHabil = (f) => spy.dates.find((d) => d >= f) ?? null;
+const nominales = ["01", "15"].map((d) => `${HOY.slice(0, 8)}${d}`);
+const objetivos = nominales.map(siguienteHabil);
+
+// ⚠️ «NO SE SABE» NO ES «HOY NO TOCA», y confundirlos pierde una decisión para siempre.
+//
+// `siguienteHabil` busca el primer día de cotización a partir del 1 o del 15. Si el calendario
+// NO LLEGA a esa fecha —porque la barra de hoy aún no está publicada, o porque el proveedor se
+// retrasó— devuelve null, y la línea de abajo lo leía como «hoy no es fecha de decisión» y salía
+// con código 0. En silencio, y en la fecha exacta en que había que decidir.
+//
+// Y no se recupera solo. Al día siguiente el objetivo ya resuelve al día 1, que nunca volverá a
+// ser igual a HOY: la decisión no se retrasa, se pierde. El guardián de rancidez de más abajo
+// tampoco lo caza, porque un calendario que termina AYER está perfectamente fresco.
+//
+// Probado el 2026-09-01: el panel terminaba el 2026-08-31, hoy era día 1, y el cron dijo
+// «hoy no es fecha de decisión (las de este mes: )» — con la lista vacía, que era la pista.
+{
+  const ciegas = nominales.filter((f, i) => objetivos[i] == null && f <= HOY);
+  if (ciegas.length) {
+    console.error(`
+  ✖ No se puede saber si hoy toca decidir: el calendario de mercado termina el ${spy.dates.at(-1)}
+    y no alcanza a ${ciegas.join(" ni a ")}.`);
+    console.error(`    Eso NO es "hoy no toca": es "no se sabe", y callarse pierde la decisión para siempre —`);
+    console.error(`    mañana el objetivo ya resolverá a una fecha pasada y nunca coincidirá con hoy.`);
+    console.error(`    Causa habitual: se ha lanzado ANTES del cierre de EE. UU. (el cron va a las 21:30 UTC),`);
+    console.error(`    o el proveedor aún no ha publicado la barra de hoy. Reintenta después del cierre.\n`);
+    // Con --force hay una persona delante que ya ha aceptado el riesgo, y este banderín existe
+    // precisamente para poder probar los días conflictivos. Se avisa y se sigue; sin él, se para.
+    if (!FORCE) process.exit(1);
+    console.error("  ⚠ --force: se continúa de todas formas.");
+  }
+}
+
+if (!objetivos.includes(HOY)) {
+  console.log(`  hoy no es fecha de decisión (las de este mes: ${objetivos.filter(Boolean).join(", ")})`);
+  if (!FORCE) { console.log(`  → nada que hacer. Usa --force para saltarte el calendario.\n`); process.exit(0); }
+  console.log(`  ⚠ --force: se ejecuta igualmente. Esto rompe la disciplina de fecha fija (§4) — sólo para pruebas.`);
+}
+
+// ── 2 · Reconstruir el estado desde la base ─────────────────────────────────────────────
+let abiertas = [], cerradas = [], runs = [];
+if (KEY) {
+  const v = `rules_version=eq.${PICKS_RULES_VERSION}`;
+  abiertas = await sb(`sl_picks_position?${v}&closed_on=is.null&select=ticker,opened_on,open_pctl&order=opened_on.asc`);
+  cerradas = await sb(`sl_picks_position?${v}&closed_on=not.is.null&select=ticker,closed_on&order=closed_on.desc&limit=500`);
+  // Sólo hacen falta los paneles recientes: los de la ventana de persistencia y los que
+  // alimentan el contador de salida. Se piden de sobra y se filtran abajo.
+  runs = await sb(`sl_picks_run?${v}&decision_date=lt.${HOY}&select=decision_date,signal&order=decision_date.desc&limit=12`);
+  // IDEMPOTENCIA. El workflow corre todos los días laborables y se puede relanzar a mano;
+  // un reintento no puede volver a decidir. Sin esto, una segunda ejecución el mismo día
+  // podría comprar nombres DISTINTOS (el estado ya habría cambiado) y duplicar posiciones.
+  // La fila de `sl_picks_run` es la marca de "esta fecha ya está decidida".
+  const yaHecho = await sb(`sl_picks_run?${v}&decision_date=eq.${HOY}&select=decision_date,bought_count,sold_count`);
+  if (yaHecho.length && !DRY) {
+    console.log(`  la decisión del ${HOY} ya está registrada (${yaHecho[0].bought_count} compras · ${yaHecho[0].sold_count} ventas).`);
+    console.log(`  → nada que hacer. Una fecha de decisión se decide UNA vez.
+`);
+    process.exit(0);
+  }
+} else {
+  console.log(`  ⚠ SUPABASE_SERVICE_KEY no definida — se asume cartera vacía (sólo tiene sentido con --dry).`);
+}
+
+const previos = [...runs].reverse();   // cronológico
+
+// Cuarentena: 12 meses desde el cierre. Si un ticker se vendió varias veces, manda el
+// cierre MÁS RECIENTE, que es el que impone la espera más larga.
+const quarantineUntil = {};
+for (const c of cerradas) {
+  const hasta = addMonths(c.closed_on, QUARANTINE_MONTHS);
+  if (hasta > HOY && (!quarantineUntil[c.ticker] || hasta > quarantineUntil[c.ticker])) quarantineUntil[c.ticker] = hasta;
+}
+
+// Contador de salida: evaluaciones consecutivas por debajo del umbral, contadas hacia atrás
+// desde la última decisión. Derivado de los paneles guardados, no almacenado.
+const belowExitCount = {};
+for (const p of abiertas) {
+  let n = 0;
+  for (let i = previos.length - 1; i >= 0; i--) {
+    const s = previos[i].signal?.[p.ticker];
+    if (s != null && s < EXIT_PCTL) n++; else break;
+    if (n >= EXIT_CONSECUTIVE) break;
+  }
+  if (n > 0) belowExitCount[p.ticker] = n;
+}
+
+const state = {
+  holdings: abiertas.map((p) => ({ ticker: p.ticker, since: p.opened_on })),
+  quarantineUntil, belowExitCount,
+};
+console.log(`  estado: ${state.holdings.length} posiciones abiertas · ${Object.keys(quarantineUntil).length} en cuarentena · ${previos.length} decisiones previas cargadas`);
+
+// ── 3 · La señal de hoy ─────────────────────────────────────────────────────────────────
+const table = await loadSP500Historical();
+// ⚠️ SIN TABLA NO SE DECIDE. Antes se caía a `CURATED`, y eso es inaceptable en producción:
+// son 43 megacaps supervivientes elegidas a mano, así que el sistema habría publicado como
+// "el mejor del S&P 500" el mejor de una lista que no es el S&P 500. Lo tapaba, por pura
+// casualidad, el guardián de cobertura de abajo —CURATED tiene 43 nombres y el umbral son
+// 50—, y una protección que depende de la longitud de una constante de laboratorio no es una
+// protección. Se aborta aquí, nombrando la causa real.
+if (!table) {
+  console.error(`  ✖ no se pudo cargar la tabla histórica de miembros del S&P 500 (red + caché local).`);
+  console.error(`    Sin universo no hay decisión. Se aborta SIN escribir fila: es preferible una fecha`);
+  console.error(`    ausente y visible a una decisión tomada sobre el universo equivocado.`);
+  process.exit(1);
+}
+// ⚠️ Nunca truncar: `membersAsOf` devuelve los tickers en orden alfabético.
+const miembros = [...new Set(membersAsOf(table, HOY) || [])];
+// La foto de miembros no es de hoy: la fuente (hanshof/sp500_constituents, gratuita) dejó de
+// actualizarse el 2025-08-23. Se DECLARA en cada decisión y se guarda en la fila, porque el
+// universo sobre el que se eligió es parte de la decisión — no un detalle de infraestructura.
+const universeAsOf = snapshotDate(table);
+const universeLagDays = daysBetween(universeAsOf, HOY);
+console.log(`  universo: foto del ${universeAsOf} (${universeLagDays} días de antigüedad) · ${miembros.length} miembros`);
+if (universeLagDays > 45) {
+  console.log(`  ⚠ la foto de miembros tiene más de 45 días: las altas y bajas del índice desde entonces`);
+  console.log(`    NO se están viendo. Queda registrada en universe_asof y publicada en /picks.`);
+}
+process.stdout.write(`  calculando señal sobre ${miembros.length} miembros del índice…\r`);
+const señalCruda = await señalAt(miembros, HOY);
+
+// ── 3bis · Sólo entra lo que se puede COMPRAR hoy ───────────────────────────────────────
+// §2 exige "sin cotización suspendida", y esto es lo que significa en código. La señal sale
+// de EDGAR y EDGAR no sabe de tickers: un valor puede tener fundamentales impecables y no
+// tener precio, o —peor— tener el precio de OTRA empresa.
+//
+// El caso que obligó a escribir esto es real y está vivo: BNY Mellon cotiza hoy como `BNY`,
+// pero la foto de miembros congelada en 2025-08-23 todavía dice `BK`. `tickerToCik("BK")`
+// resuelve al CIK correcto, así que la señal de BK se calcula PERFECTAMENTE; su precio, en
+// cambio, es el de otro instrumento a 14,79 $. Sin este filtro, un BK en el top 40 se habría
+// registrado como una compra a 14,79 $ en un track record público, y nada habría fallado.
+//
+// `hasPriceAt` no vale aquí: usa `idxOnOrBefore`, así que una serie muerta en 2019 devuelve
+// `true` en 2026 con el precio de 2019. La pregunta correcta es si la serie LLEGA A HOY.
+const signal = {}, sinCotizar = [];
+for (const [t, v] of Object.entries(señalCruda)) {
+  let ultima = null;
+  try { ultima = await lastBarDate(t); } catch { /* se trata como sin precio */ }
+  if (cotizaEn(ultima, HOY)) signal[t] = v;
+  else sinCotizar.push({ t, ultima });
+}
+const universeSize = Object.keys(signal).length;
+console.log(`  señal: ${universeSize} nombres con datos suficientes Y precio de hoy (de ${miembros.length} miembros)          `);
+if (sinCotizar.length) {
+  console.log(`  ⚠ ${sinCotizar.length} con fundamentales pero SIN cotización vigente — excluidos de §2:`);
+  console.log(`    ${sinCotizar.slice(0, 12).map((x) => `${x.t}(${x.ultima ?? "sin serie"})`).join(" · ")}${sinCotizar.length > 12 ? " …" : ""}`);
+}
+// Que unos pocos nombres pierdan la cotización es normal (cambios de ticker, OPAs). Que la
+// pierda un tercio del universo no es un evento de mercado: es la fuente de precios caída. La
+// diferencia importa porque el primer caso debe seguir adelante y el segundo NO.
+const excluidos = sinCotizar.length / Math.max(1, sinCotizar.length + universeSize);
+if (excluidos > 0.20) {
+  console.error(`\n  ✖ el ${(excluidos * 100).toFixed(0)}% del universo se ha quedado sin precio vigente.`);
+  console.error(`    Eso no es rotación del índice, es la fuente de precios fallando. Se aborta en vez de`);
+  console.error(`    decidir sobre los que sí tienen precio: sería seleccionar por quién respondió al servidor.`);
+  process.exit(1);
+}
+if (universeSize < 50) { console.error(`  ✖ cobertura insuficiente (${universeSize} nombres). No se decide a ciegas.`); process.exit(1); }
+
+// ── 4 · Decidir ─────────────────────────────────────────────────────────────────────────
+const history = previos
+  .filter((r) => daysBetween(r.decision_date, HOY) <= PERSISTENCE_DAYS)
+  .map((r) => ({ date: r.decision_date, signal: r.signal ?? {} }));
+
+// ── §2quater · quién es el emisor de cada ticker ────────────────────────────────────────
+//
+// La v3 no compra dos clases de la misma empresa, y para eso el motor necesita saber quién
+// emite cada ticker. Se resuelve sobre el universo con señal, que son unos cientos de nombres
+// y va contra la caché de EDGAR.
+//
+// ⚠️ Un ticker que no resuelva NO se da por «no duplicado»: se cuenta y se avisa. Dar por bueno
+// lo que no se ha podido comprobar es el error que costó un artefacto entero esta semana. Con
+// el emisor desconocido el motor no puede bloquearlo —no sabe que duplique— así que lo único
+// honesto es decirlo en alto.
+const emisor = {};
+const sinEmisor = [];
+{
+  const candidatos = Object.keys(signal);
+  let hechos = 0;
+  for (const t of candidatos) {
+    process.stdout.write(`  emisores ${++hechos}/${candidatos.length}\r`);
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    if (cik) emisor[t] = cik; else sinEmisor.push(t);
+  }
+  process.stdout.write("                         \r");
+  console.log(`  §2quater · ${Object.keys(emisor).length} de ${candidatos.length} tickers con emisor conocido`);
+  if (sinEmisor.length) {
+    console.log(`  ⚠ sin emisor (no se puede saber si duplican): ${sinEmisor.join(" ")}`);
+    console.log(`::warning title=Tickers sin CIK en el universo::${sinEmisor.join(" ")}`);
+  }
+}
+
+const d = decide({ date: HOY, signal, history, state, issuer: emisor });
+
+console.log(`\n  ── DECISIÓN ──`);
+console.log(`  Ventas   ${d.sells.length ? "" : "— ninguna"}`);
+for (const s of d.sells) console.log(`     ${s.ticker.padEnd(6)} desde ${s.since}   motivo: ${s.reason}`);
+console.log(`  Compras  ${d.buys.length ? "" : "— ninguna (hueco vacío: es un resultado legítimo, §4)"}`);
+for (const b of d.buys) console.log(`     ${b.ticker.padEnd(6)} percentil ${(b.pctl * 100).toFixed(1)}`);
+console.log(`  Elegibles que no cupieron: ${d.eligibleNotBought.length}`);
+if (d.eligibleNotBought.length) {
+  console.log(`     ${d.eligibleNotBought.slice(0, 8).map((e) => `${e.ticker} ${(e.pctl * 100).toFixed(0)}`).join(" · ")}${d.eligibleNotBought.length > 8 ? " …" : ""}`);
+}
+console.log(`  Cartera resultante: ${d.nextState.holdings.length}/${TARGET_POSITIONS}`);
+
+if (history.length < 3 && d.buys.length === 0) {
+  console.log(`\n  ℹ Sin 3 decisiones previas dentro de ${PERSISTENCE_DAYS} días no se puede comprobar la persistencia, así que el motor NO compra.`);
+  console.log(`    Es lo correcto al arrancar: las primeras ~6 semanas la cartera se queda vacía a propósito.`);
+}
+
+// ── 4bis · ¿HAY LA MISMA EMPRESA DOS VECES? ─────────────────────────────────────────────
+//
+// ⚠️ ESTO YA PASÓ, y estuvo casi cinco años sin que nadie lo viera. El backtest tiene GOOG y
+// GOOGL a la vez desde el 2021-10-01: 1.748 días con DOS posiciones en Alphabet. En una cartera
+// que promete 40 nombres diversificados eso es un 5 % en una empresa donde el diseño implica
+// 2,5 %. Medido, valía SIETE PUNTOS de la ventaja publicada (+44,3 pp → +37,5 pp).
+//
+// No es un fallo de datos: los dos tickers existen, cotizan y puntúan. Es que la regla cuenta
+// POSICIONES y el diseño quiere decir EMPRESAS.
+//
+// DESDE LA v3 ESTO NO DEBERÍA SALTAR NUNCA: el motor ya no compra la segunda clase. Se queda
+// igualmente, y a propósito — es la comprobación INDEPENDIENTE de que la regla funciona. Un
+// guardián que sólo protege de lo que aún no se ha arreglado deja de ser útil el día que se
+// arregla; éste sirve para que, si alguien rompe la regla, se vea en la primera decisión.
+//
+// Sigue sin bloquear: si algún día saltara, abortar la decisión del día sería peor que
+// publicarla con el aviso puesto.
+{
+  const cartera = d.nextState.holdings.map((h) => h.ticker);
+  const porCik = new Map();
+  const sinResolver = [];
+  for (const t of cartera) {
+    let cik = null;
+    try { cik = await tickerToCik(t); } catch { /* se cuenta abajo */ }
+    // Un fallo de resolución NO se convierte en «no es duplicado»: dar por bueno lo que no se ha
+    // podido comprobar es justo el error que costó un artefacto entero el 2026-09-01.
+    if (!cik) { sinResolver.push(t); continue; }
+    if (!porCik.has(cik)) porCik.set(cik, []);
+    porCik.get(cik).push(t);
+  }
+  const dobles = [...porCik.entries()].filter(([, ts]) => ts.length > 1);
+
+  if (dobles.length) {
+    const detalle = dobles.map(([cik, ts]) => `${ts.join("+")} (CIK ${cik})`).join(" · ");
+    console.error(`
+  ⛔ LA MISMA EMPRESA ESTÁ DOS VECES EN LA CARTERA: ${detalle}`);
+    console.error(`     Son ${dobles.length * 2} posiciones sobre ${cartera.length} en ${dobles.length} empresa(s): el peso real es el doble del que dice el diseño.`);
+    console.error(`     NO se bloquea la decisión — deduplicar es un cambio de reglas. Ver PLAN_FALLOS_PENDIENTES.md §1.`);
+    // Anotación de GitHub Actions: sale en el resumen de la ejecución, no enterrada en el log.
+    console.log(`::warning title=Empresa duplicada en la cartera::${detalle}`);
+  } else if (cartera.length) {
+    console.log(`  ✓ sin empresas duplicadas (${porCik.size} emisores para ${cartera.length} posiciones${sinResolver.length ? `, ${sinResolver.length} sin CIK: ${sinResolver.join(" ")}` : ""})`);
+  }
+  if (sinResolver.length) {
+    console.log(`::warning title=Tickers sin CIK en la cartera::${sinResolver.join(" ")} — no se ha podido comprobar si duplican a otro`);
+  }
+}
+
+// ── 5 · Precios de ejecución ────────────────────────────────────────────────────────────
+// El precio CRUDO, no el ajustado: es el que se habría pagado. El ajustado cambia hacia
+// atrás cada vez que hay un dividendo o un split, y un registro de operación no puede
+// cambiar después.
+//
+// ⚠️ ESTE CRON TIENE QUE CORRER DESPUÉS DEL CIERRE DE EE. UU. `rawPriceAsOf` coge la última
+// barra disponible: con el mercado abierto, la barra de hoy aún no existe y registraría EL
+// PRECIO DE AYER como precio de ejecución, sin fallar. Se comprueba justo debajo.
+const precio = {};
+for (const t of [...d.buys.map((b) => b.ticker), ...d.sells.map((s) => s.ticker)]) {
+  try { precio[t] = await rawPriceAsOf(t, HOY); } catch { precio[t] = null; }
+}
+const sinPrecio = Object.entries(precio).filter(([, p]) => p == null).map(([t]) => t);
+if (sinPrecio.length) console.log(`\n  ⚠ sin precio para: ${sinPrecio.join(", ")} — se registran con precio nulo, no se omiten.`);
+
+// Si la barra de hoy no existe todavía, los precios serían los de la sesión anterior. Es
+// preferible no decidir a decidir registrando un precio falso.
+if ((d.buys.length || d.sells.length) && spy.dates.at(-1) !== HOY && !FORCE) {
+  console.error(`
+  ✖ la última barra de mercado es ${spy.dates.at(-1)}, no ${HOY}: el cierre de hoy aún no está publicado.`);
+  console.error(`    Registrar ahora pondría el precio de la sesión anterior como precio de ejecución. Se aborta.`);
+  console.error(`    Este cron debe ejecutarse DESPUÉS del cierre de EE. UU.`);
+  process.exit(1);
+}
+
+// ── 6 · Escribir ────────────────────────────────────────────────────────────────────────
+const runRow = {
+  decision_date: HOY, rules_version: PICKS_RULES_VERSION,
+  universe_asof: universeAsOf,
+  universe_size: universeSize, eligible_count: d.buys.length + d.eligibleNotBought.length,
+  bought_count: d.buys.length, sold_count: d.sells.length,
+  positions_after: d.nextState.holdings.length,
+  not_bought: d.eligibleNotBought.map((e) => ({ ticker: e.ticker, pctl: e.pctl })),
+  signal,
+};
+
+if (DRY || !KEY) {
+  console.log(`\n  ${DRY ? "DRY RUN" : "SIN SUPABASE_SERVICE_KEY"} — no se escribe nada.`);
+  console.log(`  La fila de sl_picks_run que se habría escrito: universo ${runRow.universe_size} (foto del ${runRow.universe_asof}) · elegibles ${runRow.eligible_count} · compras ${runRow.bought_count} · ventas ${runRow.sold_count} · cartera ${runRow.positions_after}\n`);
+  process.exit(0);
+}
+
+// Las ventas primero: si el proceso muere entre medias, es preferible una posición cerrada
+// sin su compra correspondiente que dos posiciones abiertas del mismo ticker (que el índice
+// único parcial rechazaría, dejando el cron atascado en cada ejecución).
+for (const s of d.sells) {
+  await sb(`sl_picks_position?rules_version=eq.${PICKS_RULES_VERSION}&ticker=eq.${encodeURIComponent(s.ticker)}&closed_on=is.null`, {
+    method: "PATCH",
+    body: JSON.stringify({ closed_on: HOY, close_price: precio[s.ticker], close_reason: s.reason }),
+  });
+}
+if (d.buys.length) {
+  await sb(`sl_picks_position`, {
+    method: "POST",
+    body: JSON.stringify(d.buys.map((b) => ({
+      ticker: b.ticker, rules_version: PICKS_RULES_VERSION,
+      opened_on: HOY, open_pctl: b.pctl, open_price: precio[b.ticker],
+    }))),
+  });
+}
+// La fila de la decisión, al final: es la que certifica que el ciclo se completó.
+await sb(`sl_picks_run?on_conflict=decision_date,rules_version`, {
+  method: "POST",
+  headers: { Prefer: "resolution=merge-duplicates" },
+  body: JSON.stringify([runRow]),
+});
+
+console.log(`\n  ✓ escrito: ${d.sells.length} ventas · ${d.buys.length} compras · cartera ${d.nextState.holdings.length}/${TARGET_POSITIONS}\n`);

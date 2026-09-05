@@ -1,0 +1,229 @@
+{
+  "generatedAt": "2026-08-18T02:56:18.874Z",
+  "universe": 399,
+  "requested": 400,
+  "full": true,
+  "window": {
+    "start": "2019-07-01",
+    "end": "2026-06-01",
+    "months": 84
+  },
+  "nameMonths": 33436,
+  "costBps": 10,
+  "decile": 10,
+  "weights": {
+    "mom12_1_ra": 0.3,
+    "mom6_1_ra": 0.2,
+    "rs_ibd": 0.15,
+    "rs_spy": 0.1,
+    "dist52w": 0.1,
+    "resid_mom": 0.1,
+    "fip_neg": 0.05
+  },
+  "corrTerciles": {
+    "low": 0.1884,
+    "high": 0.2926
+  },
+  "ic": {
+    "mom12_1": {
+      "fwd1": -0.0052,
+      "fwd3": -0.0167,
+      "hitRate": 0.548,
+      "months": 84
+    },
+    "mom12_1_ra": {
+      "fwd1": -0.0007,
+      "fwd3": -0.0077,
+      "hitRate": 0.56,
+      "months": 84
+    },
+    "mom6_1_ra": {
+      "fwd1": -0.0096,
+      "fwd3": -0.0032,
+      "hitRate": 0.536,
+      "months": 84
+    },
+    "rs_ibd": {
+      "fwd1": -0.0025,
+      "fwd3": -0.0092,
+      "hitRate": 0.524,
+      "months": 84
+    },
+    "rs_spy": {
+      "fwd1": -0.0052,
+      "fwd3": -0.0167,
+      "hitRate": 0.548,
+      "months": 84
+    },
+    "dist52w": {
+      "fwd1": -0.014,
+      "fwd3": -0.0449,
+      "hitRate": 0.571,
+      "months": 84
+    },
+    "resid_mom": {
+      "fwd1": -0.0022,
+      "fwd3": 0.0116,
+      "hitRate": 0.536,
+      "months": 84
+    },
+    "fip_neg": {
+      "fwd1": 0.0142,
+      "fwd3": 0.0104,
+      "hitRate": 0.548,
+      "months": 84
+    },
+    "rev1m_neg": {
+      "fwd1": -0.0087,
+      "fwd3": 0.0215,
+      "hitRate": 0.512,
+      "months": 84
+    },
+    "COMPOSITE": {
+      "fwd1": -0.0049,
+      "fwd3": -0.0104,
+      "hitRate": 0.5,
+      "months": 84
+    }
+  },
+  "icByRegime": {
+    "corr baja": {
+      "composite": 0.057,
+      "mom12_1": 0.054,
+      "months": 29
+    },
+    "corr media": {
+      "composite": -0.022,
+      "mom12_1": -0.0262,
+      "months": 27
+    },
+    "corr alta": {
+      "composite": -0.0525,
+      "mom12_1": -0.0462,
+      "months": 28
+    },
+    "SPY > 200dma": {
+      "composite": -0.0035,
+      "mom12_1": -0.007,
+      "months": 69
+    },
+    "SPY < 200dma": {
+      "composite": -0.0113,
+      "mom12_1": 0.0035,
+      "months": 15
+    }
+  },
+  "icWalkForward": {
+    "firstHalf": -0.0249,
+    "secondHalf": 0.0152,
+    "byYear": {
+      "2019": -0.106,
+      "2020": -0.0138,
+      "2021": -0.0433,
+      "2022": 0.0228,
+      "2023": -0.0324,
+      "2024": 0.0628,
+      "2025": -0.0098,
+      "2026": 0.065
+    }
+  },
+  "portfolios": {
+    "spy": {
+      "total": 179.4,
+      "cagr": 15.81,
+      "sharpe": 0.94,
+      "maxDD": -23.9
+    },
+    "mom12_1_top": {
+      "total": 219.9,
+      "cagr": 18.07,
+      "sharpe": 0.93,
+      "maxDD": -22.7
+    },
+    "composite_top": {
+      "total": 129.4,
+      "cagr": 12.59,
+      "sharpe": 0.75,
+      "maxDD": -26
+    },
+    "composite_top_gated_spy": {
+      "total": 215.7,
+      "cagr": 17.85,
+      "sharpe": 0.98,
+      "maxDD": -22.7
+    },
+    "composite_top_gated_cash": {
+      "total": 66.3,
+      "cagr": 7.54,
+      "sharpe": 0.64,
+      "maxDD": -19.9
+    }
+  },
+  "spreadTopMinusBottom": {
+    "meanPPPerMonth": -0.008,
+    "months": 84
+  },
+  "gate": {
+    "openMonths": 54,
+    "totalMonths": 84,
+    "maxDDImprovementPctToSpy": 12.4,
+    "maxDDImprovementPctToCash": 23.4
+  },
+  "diagnostics": {
+    "bestSingleComponent": "fip_neg",
+    "bestSingleIC": 0.0142,
+    "compositeBeatsBestSingle": false,
+    "componentRanking": [
+      {
+        "component": "fip_neg",
+        "ic": 0.0142
+      },
+      {
+        "component": "mom12_1_ra",
+        "ic": -0.0007
+      },
+      {
+        "component": "resid_mom",
+        "ic": -0.0022
+      },
+      {
+        "component": "rs_ibd",
+        "ic": -0.0025
+      },
+      {
+        "component": "mom12_1",
+        "ic": -0.0052
+      },
+      {
+        "component": "rs_spy",
+        "ic": -0.0052
+      },
+      {
+        "component": "rev1m_neg",
+        "ic": -0.0087
+      },
+      {
+        "component": "mom6_1_ra",
+        "ic": -0.0096
+      },
+      {
+        "component": "dist52w",
+        "ic": -0.014
+      }
+    ]
+  },
+  "caveats": [
+    "universo = miembros del S&P 500 point-in-time (membresía histórica)",
+    "confirmación por volumen NO medida (prices.mjs no cachea volumen)",
+    "z-scores sector-relativos NO aplicados: F0 combina por percentil de universo",
+    "deciles sobre un universo pequeño = cestas de pocos nombres → ruido alto"
+  ],
+  "criteria": {
+    "compuesto bate al 12-1m simple (IC)": true,
+    "IC > 0.03 en ambas mitades": false,
+    "spread de deciles positivo y curva ≥ 12-1m tras costes": false,
+    "el gate recorta el maxDD ≥20%": false
+  },
+  "passed": 1,
+  "verdict": "NO CONSTRUIR el compuesto — recortar a percentiles sectoriales + revisiones de EPS + /momentum como contexto de mercado. El 12-1m actual se queda como está."
+}

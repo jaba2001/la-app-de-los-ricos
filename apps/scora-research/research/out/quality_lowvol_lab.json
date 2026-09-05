@@ -1,0 +1,137 @@
+{
+  "generatedAt": "2026-08-24T16:20:42.956Z",
+  "window": "2019-2026",
+  "quarters": 28,
+  "topN": 40,
+  "universeEW": {
+    "total": 130.6,
+    "cagr": 12.68,
+    "sharpe": 0.69,
+    "maxDD": -29.6
+  },
+  "benchmarks": {
+    "spy": {
+      "total": 179.4,
+      "sharpe": 0.87,
+      "maxDD": -23.9
+    },
+    "rsp": {
+      "total": 122,
+      "sharpe": 0.66,
+      "maxDD": -30.3
+    }
+  },
+  "sizeSweep": {
+    "10": {
+      "total": 127.5,
+      "cagr": 12.46,
+      "sharpe": 0.67,
+      "maxDD": -25.9,
+      "vsEW": -3.1
+    },
+    "15": {
+      "total": 176.4,
+      "cagr": 15.63,
+      "sharpe": 0.79,
+      "maxDD": -31.2,
+      "vsEW": 45.8
+    },
+    "20": {
+      "total": 181.8,
+      "cagr": 15.95,
+      "sharpe": 0.81,
+      "maxDD": -30.4,
+      "vsEW": 51.2
+    },
+    "25": {
+      "total": 179.2,
+      "cagr": 15.8,
+      "sharpe": 0.8,
+      "maxDD": -29.8,
+      "vsEW": 48.6
+    },
+    "30": {
+      "total": 183.8,
+      "cagr": 16.07,
+      "sharpe": 0.83,
+      "maxDD": -29.5,
+      "vsEW": 53.2
+    },
+    "40": {
+      "total": 160.6,
+      "cagr": 14.66,
+      "sharpe": 0.77,
+      "maxDD": -29.8,
+      "vsEW": 30
+    },
+    "50": {
+      "total": 175.6,
+      "cagr": 15.58,
+      "sharpe": 0.81,
+      "maxDD": -26.9,
+      "vsEW": 45
+    },
+    "75": {
+      "total": 162.7,
+      "cagr": 14.8,
+      "sharpe": 0.78,
+      "maxDD": -26.4,
+      "vsEW": 32.1
+    },
+    "100": {
+      "total": 134.5,
+      "cagr": 12.95,
+      "sharpe": 0.71,
+      "maxDD": -28.2,
+      "vsEW": 3.9
+    },
+    "150": {
+      "total": 122.7,
+      "cagr": 12.12,
+      "sharpe": 0.68,
+      "maxDD": -26.6,
+      "vsEW": -7.9
+    }
+  },
+  "avgUniverseSize": 466,
+  "results": {
+    "Calidad": {
+      "ic": 0.0159,
+      "total": 160.6,
+      "cagr": 14.66,
+      "sharpe": 0.77,
+      "maxDD": -29.8,
+      "vsEW": 30
+    },
+    "Baja volatilidad": {
+      "ic": -0.0534,
+      "total": 62.7,
+      "cagr": 7.2,
+      "sharpe": 0.54,
+      "maxDD": -23.4,
+      "vsEW": -67.9
+    },
+    "Calidad + baja vol": {
+      "ic": -0.0381,
+      "total": 75.3,
+      "cagr": 8.35,
+      "sharpe": 0.57,
+      "maxDD": -24,
+      "vsEW": -55.3
+    },
+    "Score v1 (actual)": {
+      "ic": -0.0063,
+      "total": 138.8,
+      "cagr": 13.24,
+      "sharpe": 0.71,
+      "maxDD": -29.1,
+      "vsEW": 8.2
+    }
+  },
+  "criteria": {
+    "sharpeAboveEW": false,
+    "drawdownBelowEW": true,
+    "returnNotFarBelow": false,
+    "passed": 1
+  }
+}

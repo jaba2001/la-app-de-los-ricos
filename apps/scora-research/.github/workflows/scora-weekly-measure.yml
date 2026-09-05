@@ -1,0 +1,23 @@
+name: Scora — weekly track-record measurement
+
+# Marks every immutable cohort to today's price, computes realized alpha vs SPY,
+# and refreshes sl_track_summary so the Track Record page updates weekly even
+# though new cohorts only form monthly.
+on:
+  schedule:
+    - cron: "0 14 * * 1" # every Monday, 14:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Measure cohorts → sl_track_summary
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # optional — enables delisted coverage
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/cron-measure.mjs

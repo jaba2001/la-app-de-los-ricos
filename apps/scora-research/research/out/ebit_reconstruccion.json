@@ -1,0 +1,4425 @@
+{
+ "generatedAt": "2026-08-26T00:53:44.079Z",
+ "fuente": "research/ebit_reconstruccion.mjs",
+ "asOf": "2026-06-30",
+ "criterio": {
+  "medianaAbsMax": 5,
+  "dispersionSectorialMax": 5,
+  "escritoAntesDeMirar": true
+ },
+ "resumen": {
+  "viaPretax": {
+   "n": 406,
+   "medianaAbs": 7.6,
+   "dentroDel5": 41,
+   "dispersionSectorial": 36.1,
+   "porSector": [
+    {
+     "sector": "Consumer Defensive",
+     "n": 22,
+     "mediana": 3.8
+    },
+    {
+     "sector": "Energy",
+     "n": 11,
+     "mediana": 5.1
+    },
+    {
+     "sector": "(sin sector)",
+     "n": 135,
+     "mediana": 5.9
+    },
+    {
+     "sector": "Consumer Cyclical",
+     "n": 39,
+     "mediana": 6.1
+    },
+    {
+     "sector": "Industrials",
+     "n": 35,
+     "mediana": 6.2
+    },
+    {
+     "sector": "Materials",
+     "n": 16,
+     "mediana": 6.9
+    },
+    {
+     "sector": "Technology",
+     "n": 64,
+     "mediana": 8.1
+    },
+    {
+     "sector": "Healthcare",
+     "n": 15,
+     "mediana": 11.3
+    },
+    {
+     "sector": "Financial Services",
+     "n": 28,
+     "mediana": 12.5
+    },
+    {
+     "sector": "Utilities",
+     "n": 33,
+     "mediana": 14.4
+    },
+    {
+     "sector": "Communication Services",
+     "n": 7,
+     "mediana": 39.9
+    }
+   ],
+   "peores": [
+    {
+     "t": "RF",
+     "d": 5075.5
+    },
+    {
+     "t": "HAS",
+     "d": 453.2
+    },
+    {
+     "t": "DDOG",
+     "d": 411.2
+    },
+    {
+     "t": "WBD",
+     "d": 404.6
+    },
+    {
+     "t": "HPE",
+     "d": 286
+    },
+    {
+     "t": "AXON",
+     "d": 282.4
+    },
+    {
+     "t": "VICI",
+     "d": 275.6
+    },
+    {
+     "t": "INTC",
+     "d": 219.6
+    }
+   ]
+  },
+  "viaBruto": {
+   "n": 70,
+   "medianaAbs": 0,
+   "dentroDel5": 96,
+   "dispersionSectorial": 0,
+   "porSector": [
+    {
+     "sector": "Technology",
+     "n": 36,
+     "mediana": 0
+    },
+    {
+     "sector": "(sin sector)",
+     "n": 21,
+     "mediana": 0
+    }
+   ],
+   "peores": [
+    {
+     "t": "FTV",
+     "d": 533.4
+    },
+    {
+     "t": "COR",
+     "d": 70.7
+    },
+    {
+     "t": "GPC",
+     "d": -27.6
+    },
+    {
+     "t": "NXPI",
+     "d": -0.4
+    },
+    {
+     "t": "AAPL",
+     "d": 0
+    },
+    {
+     "t": "ADBE",
+     "d": 0
+    },
+    {
+     "t": "ADI",
+     "d": 0
+    },
+    {
+     "t": "ADSK",
+     "d": 0
+    }
+   ]
+  },
+  "viaIngresos": {
+   "n": 69,
+   "medianaAbs": 0,
+   "dentroDel5": 91,
+   "dispersionSectorial": 0,
+   "porSector": [
+    {
+     "sector": "Technology",
+     "n": 36,
+     "mediana": 0
+    },
+    {
+     "sector": "(sin sector)",
+     "n": 21,
+     "mediana": 0
+    }
+   ],
+   "peores": [
+    {
+     "t": "IPG",
+     "d": -862.4
+    },
+    {
+     "t": "FTV",
+     "d": 533.4
+    },
+    {
+     "t": "COR",
+     "d": 70.7
+    },
+    {
+     "t": "HOLX",
+     "d": 53.6
+    },
+    {
+     "t": "GPC",
+     "d": -27.6
+    },
+    {
+     "t": "VRSN",
+     "d": -17.5
+    },
+    {
+     "t": "VTRS",
+     "d": -1.9
+    },
+    {
+     "t": "NXPI",
+     "d": -0.4
+    }
+   ]
+  }
+ },
+ "filas": [
+  {
+   "t": "A",
+   "sector": null,
+   "ejercicio": "2025-10-31",
+   "real": 1479000000,
+   "viaPretax": 1547000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AAPL",
+   "sector": "Technology",
+   "ejercicio": "2025-09-27",
+   "real": 133050000000,
+   "viaPretax": 132729000000,
+   "teniaIntereses": false,
+   "viaBruto": 133050000000,
+   "viaIngresos": 133050000000
+  },
+  {
+   "t": "ABBV",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 15075000000,
+   "viaPretax": 9490000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ABNB",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2544000000,
+   "viaPretax": 3137000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ABT",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 8053000000,
+   "viaPretax": 8959000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ACN",
+   "sector": null,
+   "ejercicio": "2025-08-31",
+   "real": 10225664000,
+   "viaPretax": 10498948000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ADBE",
+   "sector": "Technology",
+   "ejercicio": "2025-11-28",
+   "real": 8706000000,
+   "viaPretax": 8997000000,
+   "teniaIntereses": true,
+   "viaBruto": 8706000000,
+   "viaIngresos": 8706000000
+  },
+  {
+   "t": "ADI",
+   "sector": "Technology",
+   "ejercicio": "2025-11-01",
+   "real": 2932496000,
+   "viaPretax": 3029828000,
+   "teniaIntereses": true,
+   "viaBruto": 2932496000,
+   "viaIngresos": 2932496000
+  },
+  {
+   "t": "ADSK",
+   "sector": "Technology",
+   "ejercicio": "2026-01-31",
+   "real": 1578000000,
+   "viaPretax": 1683000000,
+   "teniaIntereses": true,
+   "viaBruto": 1578000000,
+   "viaIngresos": 1578000000
+  },
+  {
+   "t": "AEE",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2026000000,
+   "viaPretax": 2373000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AEP",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 5319000000,
+   "viaPretax": 5851000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AFL",
+   "sector": "Financial Services",
+   "ejercicio": "2022-12-31",
+   "real": 4157000000,
+   "viaPretax": 5095000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AKAM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 566944000,
+   "viaPretax": 633164000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ALB",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": -367084000,
+   "viaPretax": -344422000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ALGN",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 545755000,
+   "viaPretax": 585287000,
+   "teniaIntereses": false,
+   "viaBruto": 545755000,
+   "viaIngresos": 545755000
+  },
+  {
+   "t": "ALLE",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 859500000,
+   "viaPretax": 869400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AMAT",
+   "sector": "Technology",
+   "ejercicio": "2025-10-26",
+   "real": 8289000000,
+   "viaPretax": 9540000000,
+   "teniaIntereses": true,
+   "viaBruto": 8289000000,
+   "viaIngresos": 8289000000
+  },
+  {
+   "t": "AMCR",
+   "sector": null,
+   "ejercicio": "2026-06-30",
+   "real": 1899000000,
+   "viaPretax": 1958000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AMD",
+   "sector": "Technology",
+   "ejercicio": "2025-12-27",
+   "real": 3694000000,
+   "viaPretax": 4297000000,
+   "teniaIntereses": true,
+   "viaBruto": 3694000000,
+   "viaIngresos": 3694000000
+  },
+  {
+   "t": "AME",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1910317000,
+   "viaPretax": 1879593000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AMGN",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 9080000000,
+   "viaPretax": 11731000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AMT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4845800000,
+   "viaPretax": 4403600000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AMZN",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 79975000000,
+   "viaPretax": 99585000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ANET",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 3856100000,
+   "viaPretax": 4249700000,
+   "teniaIntereses": false,
+   "viaBruto": 3856100000,
+   "viaIngresos": 3856100000
+  },
+  {
+   "t": "AON",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 4344000000,
+   "viaPretax": 5574000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AOS",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 728600000,
+   "viaPretax": 728600000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "APA",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 3087000000,
+   "viaPretax": 3114000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "APD",
+   "sector": "Materials",
+   "ejercicio": "2025-09-30",
+   "real": -877000000,
+   "viaPretax": -226700000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "APH",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 5868600000,
+   "viaPretax": 5968500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "APTV",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 1184000000,
+   "viaPretax": 1280000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ATO",
+   "sector": "Utilities",
+   "ejercicio": "2025-09-30",
+   "real": 1559971000,
+   "viaPretax": 1649712000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AVB",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2020949000,
+   "viaPretax": 1314645000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AVGO",
+   "sector": "Technology",
+   "ejercicio": "2025-11-02",
+   "real": 25484000000,
+   "viaPretax": 25939000000,
+   "teniaIntereses": true,
+   "viaBruto": 25484000000,
+   "viaIngresos": 25484000000
+  },
+  {
+   "t": "AWK",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1879000000,
+   "viaPretax": 2037000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AXON",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": -62076000,
+   "viaPretax": 113212000,
+   "teniaIntereses": true,
+   "viaBruto": -62076000,
+   "viaIngresos": -62076000
+  },
+  {
+   "t": "AXP",
+   "sector": "Financial Services",
+   "ejercicio": "2009-12-31",
+   "real": 2841000000,
+   "viaPretax": 5048000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "AZO",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-08-30",
+   "real": 3610156000,
+   "viaPretax": 3624357000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BA",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 4281000000,
+   "viaPretax": 5406000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BALL",
+   "sector": "Industrials",
+   "ejercicio": "2023-12-31",
+   "real": 1273000000,
+   "viaPretax": 1074000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BAX",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": -308000000,
+   "viaPretax": -215000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BBY",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 1389000000,
+   "viaPretax": 1451000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BDX",
+   "sector": null,
+   "ejercicio": "2025-09-30",
+   "real": 2579000000,
+   "viaPretax": 2494000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BEN",
+   "sector": "Financial Services",
+   "ejercicio": "2025-09-30",
+   "real": 604100000,
+   "viaPretax": 881700000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BF-B",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-04-30",
+   "real": 1001000000,
+   "viaPretax": 988000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BIIB",
+   "sector": "Healthcare",
+   "ejercicio": "2021-12-31",
+   "real": 2840700000,
+   "viaPretax": 1998800000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BKNG",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 8825000000,
+   "viaPretax": 8449000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BKR",
+   "sector": "Industrials",
+   "ejercicio": "2024-12-31",
+   "real": 3081000000,
+   "viaPretax": 3265000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BLDR",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 786276000,
+   "viaPretax": 512382000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BLK",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 7045000000,
+   "viaPretax": 8233000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BR",
+   "sector": null,
+   "ejercicio": "2026-06-30",
+   "real": 1300600000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BRK.B",
+   "sector": "Financial Services",
+   "ejercicio": "2012-12-31",
+   "real": 20079000000,
+   "viaPretax": 22236000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "BSX",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 3613000000,
+   "viaPretax": 3734000000,
+   "teniaIntereses": true,
+   "viaBruto": 3613000000,
+   "viaIngresos": 3612000000
+  },
+  {
+   "t": "BXP",
+   "sector": null,
+   "ejercicio": "2017-12-31",
+   "real": 908110000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CAG",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-05-31",
+   "real": -1628400000,
+   "viaPretax": -1824400000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CAH",
+   "sector": null,
+   "ejercicio": "2026-06-30",
+   "real": 2613000000,
+   "viaPretax": 2522000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CARR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2172000000,
+   "viaPretax": 2256000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CAT",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 11151000000,
+   "viaPretax": 11541000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CBOE",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 1467100000,
+   "viaPretax": 1618900000,
+   "teniaIntereses": true,
+   "viaBruto": 1467100000,
+   "viaIngresos": null
+  },
+  {
+   "t": "CBRE",
+   "sector": "Real Estate",
+   "ejercicio": "2025-12-31",
+   "real": 1753000000,
+   "viaPretax": 1594000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CCI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2075000000,
+   "viaPretax": 2091000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CCL",
+   "sector": "Industrials",
+   "ejercicio": "2025-11-30",
+   "real": 4483000000,
+   "viaPretax": 4121000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CDNS",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1492042000,
+   "viaPretax": 1638584000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CDW",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 1655600000,
+   "viaPretax": 1427400000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CEG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 3086000000,
+   "viaPretax": 4022000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CF",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 2300000000,
+   "viaPretax": 2394000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CHD",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 1077600000,
+   "viaPretax": 1052100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CHRW",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 794961000,
+   "viaPretax": 722457000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CHTR",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 12908000000,
+   "viaPretax": 7458000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CI",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 9200000000,
+   "viaPretax": 9181000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CL",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 3306000000,
+   "viaPretax": 3326000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CMCSA",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 20672000000,
+   "viaPretax": 30175000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CME",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 4229500000,
+   "viaPretax": 5503900000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CMG",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 1935798000,
+   "viaPretax": 2009519000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CMI",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4025000000,
+   "viaPretax": 4292000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CMS",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1727000000,
+   "viaPretax": 2046000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CNC",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": -7623000000,
+   "viaPretax": -6050000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CNP",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2110000000,
+   "viaPretax": 2150000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "COIN",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 1435441000,
+   "viaPretax": 1607478000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "COO",
+   "sector": null,
+   "ejercicio": "2025-10-31",
+   "real": 682900000,
+   "viaPretax": 666500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "COR",
+   "sector": null,
+   "ejercicio": "2025-09-30",
+   "real": 2628601000,
+   "viaPretax": 2258336000,
+   "teniaIntereses": false,
+   "viaBruto": 4486650000,
+   "viaIngresos": 4486650000
+  },
+  {
+   "t": "COST",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-08-31",
+   "real": 10383000000,
+   "viaPretax": 10972000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CPAY",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1994108000,
+   "viaPretax": 1945527000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CPB",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-08-03",
+   "real": 1124000000,
+   "viaPretax": 1141000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CPRT",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-07-31",
+   "real": 1696714000,
+   "viaPretax": 1895581000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CRL",
+   "sector": null,
+   "ejercicio": "2025-12-27",
+   "real": 25162000,
+   "viaPretax": 7526000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CRM",
+   "sector": "Technology",
+   "ejercicio": "2026-01-31",
+   "real": 8331000000,
+   "viaPretax": 9844000000,
+   "teniaIntereses": true,
+   "viaBruto": 8331000000,
+   "viaIngresos": 8331000000
+  },
+  {
+   "t": "CRWD",
+   "sector": "Technology",
+   "ejercicio": "2026-01-31",
+   "real": -293292000,
+   "viaPretax": -98968000,
+   "teniaIntereses": true,
+   "viaBruto": -293292000,
+   "viaIngresos": null
+  },
+  {
+   "t": "CSCO",
+   "sector": "Technology",
+   "ejercicio": "2025-07-26",
+   "real": 11760000000,
+   "viaPretax": 12693000000,
+   "teniaIntereses": true,
+   "viaBruto": 11760000000,
+   "viaIngresos": 11760000000
+  },
+  {
+   "t": "CSGP",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": -72000000,
+   "viaPretax": 58000000,
+   "teniaIntereses": true,
+   "viaBruto": -72000000,
+   "viaIngresos": -72000000
+  },
+  {
+   "t": "CSX",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4521000000,
+   "viaPretax": 4613000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CTAS",
+   "sector": null,
+   "ejercicio": "2025-05-31",
+   "real": 2359726000,
+   "viaPretax": 2365310000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CTRA",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 2452000000,
+   "viaPretax": 2468000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CTSH",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 3389000000,
+   "viaPretax": 3516000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CVS",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 4660000000,
+   "viaPretax": 5255000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "CZR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1858000000,
+   "viaPretax": 1881000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "D",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 4414000000,
+   "viaPretax": 5633000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DAL",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 5822000000,
+   "viaPretax": 6185000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DASH",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 723000000,
+   "viaPretax": 939000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DAY",
+   "sector": "Technology",
+   "ejercicio": "2024-12-31",
+   "real": 104100000,
+   "viaPretax": 78200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DDOG",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": -44373000,
+   "viaPretax": 138080000,
+   "teniaIntereses": true,
+   "viaBruto": -44373000,
+   "viaIngresos": -44373000
+  },
+  {
+   "t": "DE",
+   "sector": "Industrials",
+   "ejercicio": "2024-10-27",
+   "real": 9039000000,
+   "viaPretax": 12554000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DECK",
+   "sector": null,
+   "ejercicio": "2026-03-31",
+   "real": 1262903000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DELL",
+   "sector": "Technology",
+   "ejercicio": "2026-01-30",
+   "real": 8149000000,
+   "viaPretax": 8823000000,
+   "teniaIntereses": true,
+   "viaBruto": 8149000000,
+   "viaIngresos": 8149000000
+  },
+  {
+   "t": "DG",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-30",
+   "real": 2203668000,
+   "viaPretax": 1964592000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DGX",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 1556000000,
+   "viaPretax": 1318000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DHR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4690000000,
+   "viaPretax": 4498000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DIS",
+   "sector": null,
+   "ejercicio": "2025-09-27",
+   "real": 17551000000,
+   "viaPretax": 10191000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DLR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 658492000,
+   "viaPretax": 1783154000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DLTR",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 1653100000,
+   "viaPretax": 1629500000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DOV",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1373361000,
+   "viaPretax": 1484024000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DPZ",
+   "sector": null,
+   "ejercicio": "2025-12-28",
+   "real": 953974000,
+   "viaPretax": 966310000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DRI",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-05-31",
+   "real": 1582800000,
+   "viaPretax": 1515100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DTE",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2374000000,
+   "viaPretax": 2606000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DUK",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 8626000000,
+   "viaPretax": 9346000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DVA",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 2043615000,
+   "viaPretax": 1886747000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DVN",
+   "sector": "Energy",
+   "ejercicio": "2016-12-31",
+   "real": -2895000000,
+   "viaPretax": 55000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "DXCM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 911800000,
+   "viaPretax": 1102700000,
+   "teniaIntereses": true,
+   "viaBruto": 911800000,
+   "viaIngresos": 911800000
+  },
+  {
+   "t": "EA",
+   "sector": "Technology",
+   "ejercicio": "2026-03-31",
+   "real": 1162000000,
+   "viaPretax": 1233000000,
+   "teniaIntereses": true,
+   "viaBruto": 1162000000,
+   "viaIngresos": 1162000000
+  },
+  {
+   "t": "EBAY",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2277000000,
+   "viaPretax": 2553000000,
+   "teniaIntereses": true,
+   "viaBruto": 2277000000,
+   "viaIngresos": 2277000000
+  },
+  {
+   "t": "ECL",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 2737600000,
+   "viaPretax": 2854100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ED",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2935000000,
+   "viaPretax": 3830000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EFX",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1095200000,
+   "viaPretax": 1107200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EIX",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 7093000000,
+   "viaPretax": 7531000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EL",
+   "sector": "Materials",
+   "ejercicio": "2025-06-30",
+   "real": -785000000,
+   "viaPretax": -683000000,
+   "teniaIntereses": true,
+   "viaBruto": -785000000,
+   "viaIngresos": -785000000
+  },
+  {
+   "t": "ELV",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 7199000000,
+   "viaPretax": 8112000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EMN",
+   "sector": "Materials",
+   "ejercicio": "2017-12-31",
+   "real": 1532000000,
+   "viaPretax": 1289000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ENPH",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 157526000,
+   "viaPretax": 209335000,
+   "teniaIntereses": true,
+   "viaBruto": 157526000,
+   "viaIngresos": 157526000
+  },
+  {
+   "t": "EOG",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 6385000000,
+   "viaPretax": 6597000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EPAM",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 520003000,
+   "viaPretax": 505624000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EQIX",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1848000000,
+   "viaPretax": 2035000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EQR",
+   "sector": null,
+   "ejercicio": "2009-12-31",
+   "real": 529390000,
+   "viaPretax": 526793000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EQT",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 3249619000,
+   "viaPretax": 3416237000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ERIE",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 717184000,
+   "viaPretax": 710603000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ES",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2988589000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ESS",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 899316000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ETN",
+   "sector": null,
+   "ejercicio": "2019-12-31",
+   "real": 3675000000,
+   "viaPretax": 2790000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ETR",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 3202278000,
+   "viaPretax": 3684235000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EVRG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1532900000,
+   "viaPretax": 1507300000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EW",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1264200000,
+   "viaPretax": 1293300000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EXC",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 5148000000,
+   "viaPretax": 3291000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EXE",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 2471000000,
+   "viaPretax": 2517000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EXPD",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1052546000,
+   "viaPretax": 1094063000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EXPE",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1871000000,
+   "viaPretax": 1890000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "EXR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1412691000,
+   "viaPretax": 940761000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "F",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": -9169000000,
+   "viaPretax": -10576000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FANG",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 1266000000,
+   "viaPretax": 2118000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FAST",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 1655700000,
+   "viaPretax": 1661200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FCX",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 6518000000,
+   "viaPretax": 6372000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FDS",
+   "sector": "Technology",
+   "ejercicio": "2025-08-31",
+   "real": 748303000,
+   "viaPretax": 778707000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FDX",
+   "sector": "Industrials",
+   "ejercicio": "2026-05-31",
+   "real": 5463000000,
+   "viaPretax": 6763000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FE",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2206000000,
+   "viaPretax": 2776000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FFIV",
+   "sector": "Technology",
+   "ejercicio": "2025-09-30",
+   "real": 765949000,
+   "viaPretax": 808336000,
+   "teniaIntereses": false,
+   "viaBruto": 765949000,
+   "viaIngresos": 765949000
+  },
+  {
+   "t": "FI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 5818000000,
+   "viaPretax": 5795000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FICO",
+   "sector": null,
+   "ejercicio": "2025-09-30",
+   "real": 924850000,
+   "viaPretax": 936242000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FIS",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1741000000,
+   "viaPretax": 1567000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FRT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 602199000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "FSLR",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1596864000,
+   "viaPretax": 1625044000,
+   "teniaIntereses": true,
+   "viaBruto": 1596864000,
+   "viaIngresos": 1596864000
+  },
+  {
+   "t": "FTNT",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 2084700000,
+   "viaPretax": 2302300000,
+   "teniaIntereses": true,
+   "viaBruto": 2084700000,
+   "viaIngresos": 2084700000
+  },
+  {
+   "t": "FTV",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 720200000,
+   "viaPretax": 481700000,
+   "teniaIntereses": true,
+   "viaBruto": 4562000000,
+   "viaIngresos": 4562000000
+  },
+  {
+   "t": "GD",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 5356000000,
+   "viaPretax": 5103000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GDDY",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1127300000,
+   "viaPretax": 1171000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GE",
+   "sector": null,
+   "ejercicio": "2012-12-31",
+   "real": 22887000000,
+   "viaPretax": 29889000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GEHC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2763000000,
+   "viaPretax": 3208000000,
+   "teniaIntereses": true,
+   "viaBruto": 2763000000,
+   "viaIngresos": null
+  },
+  {
+   "t": "GEN",
+   "sector": "Technology",
+   "ejercicio": "2026-04-03",
+   "real": 2120000000,
+   "viaPretax": 2080000000,
+   "teniaIntereses": true,
+   "viaBruto": 2120000000,
+   "viaIngresos": 2120000000
+  },
+  {
+   "t": "GEV",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1388000000,
+   "viaPretax": 2828000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GILD",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 10022000000,
+   "viaPretax": 10820000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GIS",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-05-31",
+   "real": 885800000,
+   "viaPretax": 405500000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GL",
+   "sector": "Financial Services",
+   "ejercicio": "2023-12-31",
+   "real": 1265012000,
+   "viaPretax": 1296582000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GLW",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2279000000,
+   "viaPretax": 2388000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GM",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 2909000000,
+   "viaPretax": 3117000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GNRC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 289191000,
+   "viaPretax": 269757000,
+   "teniaIntereses": true,
+   "viaBruto": 289191000,
+   "viaIngresos": 289191000
+  },
+  {
+   "t": "GOOG",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 129039000000,
+   "viaPretax": 159562000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GOOGL",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 129039000000,
+   "viaPretax": 159562000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GPC",
+   "sector": null,
+   "ejercicio": "2018-12-31",
+   "real": 1430505000,
+   "viaPretax": 1096434000,
+   "teniaIntereses": true,
+   "viaBruto": 1035039000,
+   "viaIngresos": 1035039000
+  },
+  {
+   "t": "GPN",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1754624000,
+   "viaPretax": 1893619000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "GRMN",
+   "sector": null,
+   "ejercicio": "2025-12-27",
+   "real": 1876076000,
+   "viaPretax": 2014535000,
+   "teniaIntereses": false,
+   "viaBruto": 1876076000,
+   "viaIngresos": 1876076000
+  },
+  {
+   "t": "GWW",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2495000000,
+   "viaPretax": 2511000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HAL",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 2260000000,
+   "viaPretax": 1771000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HAS",
+   "sector": null,
+   "ejercicio": "2025-12-28",
+   "real": 11100000,
+   "viaPretax": 61400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HD",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-02-01",
+   "real": 20890000000,
+   "viaPretax": 21014000000,
+   "teniaIntereses": true,
+   "viaBruto": 20890000000,
+   "viaIngresos": 20890000000
+  },
+  {
+   "t": "HIG",
+   "sector": "Financial Services",
+   "ejercicio": "2009-12-31",
+   "real": -1728000000,
+   "viaPretax": -1245000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HII",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 657000000,
+   "viaPretax": 882000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HLT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2693000000,
+   "viaPretax": 2692000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HOLX",
+   "sector": null,
+   "ejercicio": "2025-09-27",
+   "real": 714300000,
+   "viaPretax": 798300000,
+   "teniaIntereses": true,
+   "viaBruto": 714300000,
+   "viaIngresos": 1097500000
+  },
+  {
+   "t": "HON",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 8127000000,
+   "viaPretax": 6820000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HPE",
+   "sector": "Technology",
+   "ejercicio": "2025-10-31",
+   "real": -437000000,
+   "viaPretax": 813000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HPQ",
+   "sector": "Technology",
+   "ejercicio": "2025-10-31",
+   "real": 3174000000,
+   "viaPretax": 3098000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HRL",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-10-26",
+   "real": 718603000,
+   "viaPretax": 741487000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HSIC",
+   "sector": null,
+   "ejercicio": "2025-12-27",
+   "real": 653000000,
+   "viaPretax": 683000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HST",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 855000000,
+   "viaPretax": 1053000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HSY",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 1441528000,
+   "viaPretax": 1439014000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HUBB",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1208800000,
+   "viaPretax": 1119100000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HUM",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 2704000000,
+   "viaPretax": 2069000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "HWM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2046000000,
+   "viaPretax": 2016000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ICE",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 4929000000,
+   "viaPretax": 5149000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IDXX",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 1360031000,
+   "viaPretax": 1363041000,
+   "teniaIntereses": true,
+   "viaBruto": 1360031000,
+   "viaIngresos": 1360031000
+  },
+  {
+   "t": "IEX",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 699300000,
+   "viaPretax": 632600000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IFF",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": -382000000,
+   "viaPretax": -183000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "INCY",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1514859000,
+   "viaPretax": 1666879000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "INTC",
+   "sector": "Technology",
+   "ejercicio": "2025-12-27",
+   "real": -2214000000,
+   "viaPretax": 2648000000,
+   "teniaIntereses": true,
+   "viaBruto": -2214000000,
+   "viaIngresos": -2214000000
+  },
+  {
+   "t": "INTU",
+   "sector": "Technology",
+   "ejercicio": "2025-07-31",
+   "real": 4923000000,
+   "viaPretax": 5081000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "INVH",
+   "sector": "Real Estate",
+   "ejercicio": "2017-12-31",
+   "real": 118207000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IP",
+   "sector": null,
+   "ejercicio": "2015-12-31",
+   "real": 2361000000,
+   "viaPretax": 1776000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IPG",
+   "sector": null,
+   "ejercicio": "2024-12-31",
+   "real": 1203200000,
+   "viaPretax": 1279000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": -9172900000
+  },
+  {
+   "t": "IQV",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2182000000,
+   "viaPretax": 2320000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IR",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1144600000,
+   "viaPretax": 1189200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IRM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1163822000,
+   "viaPretax": 1040523000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ISRG",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2945500000,
+   "viaPretax": 3311400000,
+   "teniaIntereses": false,
+   "viaBruto": 2945500000,
+   "viaIngresos": 2945500000
+  },
+  {
+   "t": "IT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1025711000,
+   "viaPretax": 1093395000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ITW",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4216000000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "IVZ",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": -695700000,
+   "viaPretax": -296900000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "J",
+   "sector": null,
+   "ejercicio": "2025-09-26",
+   "real": 863634000,
+   "viaPretax": 689265000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "JBHT",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 865069000,
+   "viaPretax": 869318000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "JBL",
+   "sector": "Technology",
+   "ejercicio": "2025-08-31",
+   "real": 1182000000,
+   "viaPretax": 892000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "JCI",
+   "sector": null,
+   "ejercicio": "2015-09-25",
+   "real": 884000000,
+   "viaPretax": 817000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "JKHY",
+   "sector": "Technology",
+   "ejercicio": "2025-06-30",
+   "real": 568715000,
+   "viaPretax": 586036000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "JNJ",
+   "sector": "Healthcare",
+   "ejercicio": "2014-12-28",
+   "real": 21590000000,
+   "viaPretax": 21096000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "K",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2024-12-28",
+   "real": 1873000000,
+   "viaPretax": 1965000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KDP",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 3575000000,
+   "viaPretax": 2687000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KEYS",
+   "sector": null,
+   "ejercicio": "2025-10-31",
+   "real": 876000000,
+   "viaPretax": 1178000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KHC",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-27",
+   "real": -4669000000,
+   "viaPretax": -4498000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KIM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 770823000,
+   "viaPretax": 823831000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KLAC",
+   "sector": null,
+   "ejercicio": "2014-06-30",
+   "real": 772070000,
+   "viaPretax": 788273000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KMB",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2351000000,
+   "viaPretax": 2308000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KMI",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 4724000000,
+   "viaPretax": 3992000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KO",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 13762000000,
+   "viaPretax": 17652000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KR",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-01-31",
+   "real": 1890000000,
+   "viaPretax": 1200000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "KVUE",
+   "sector": "Materials",
+   "ejercicio": "2025-12-28",
+   "real": 2414000000,
+   "viaPretax": 2429000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LDOS",
+   "sector": "Technology",
+   "ejercicio": "2026-01-02",
+   "real": 2109000000,
+   "viaPretax": 1909000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LEN",
+   "sector": null,
+   "ejercicio": "2020-11-30",
+   "real": 3482206000,
+   "viaPretax": 3123788000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LH",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 1384700000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LHX",
+   "sector": null,
+   "ejercicio": "2026-01-02",
+   "real": 2110000000,
+   "viaPretax": 1932000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LII",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1041500000,
+   "viaPretax": 1037700000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LIN",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 8923000000,
+   "viaPretax": 9472000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LKQ",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 993000000,
+   "viaPretax": 576000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LMT",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 7731000000,
+   "viaPretax": 7040000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LNT",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1025000000,
+   "viaPretax": 1173000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LOW",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-30",
+   "real": 10153000000,
+   "viaPretax": 8747000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LRCX",
+   "sector": "Industrials",
+   "ejercicio": "2026-06-28",
+   "real": 8199795000,
+   "viaPretax": 8418376000,
+   "teniaIntereses": true,
+   "viaBruto": 8199795000,
+   "viaIngresos": 8199795000
+  },
+  {
+   "t": "LULU",
+   "sector": null,
+   "ejercicio": "2026-02-01",
+   "real": 2210615000,
+   "viaPretax": 2238967000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LUV",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 428000000,
+   "viaPretax": 730000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LVS",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2818000000,
+   "viaPretax": 2959000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LW",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-05-31",
+   "real": 591100000,
+   "viaPretax": 418100000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LYB",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": -420000000,
+   "viaPretax": -228000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "LYV",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1251217000,
+   "viaPretax": 1346560000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MA",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 18897000000,
+   "viaPretax": 19258000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MAA",
+   "sector": null,
+   "ejercicio": "2012-12-31",
+   "real": 130276000,
+   "viaPretax": 126539000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MAR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4141000000,
+   "viaPretax": 4203000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MAS",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1248000000,
+   "viaPretax": 1236000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MCD",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 12393000000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MCHP",
+   "sector": "Technology",
+   "ejercicio": "2026-03-31",
+   "real": 490100000,
+   "viaPretax": 494800000,
+   "teniaIntereses": true,
+   "viaBruto": 490100000,
+   "viaIngresos": 490100000
+  },
+  {
+   "t": "MCK",
+   "sector": null,
+   "ejercicio": "2026-03-31",
+   "real": 6212000000,
+   "viaPretax": 6448000000,
+   "teniaIntereses": true,
+   "viaBruto": 6212000000,
+   "viaIngresos": 6212000000
+  },
+  {
+   "t": "MCO",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 3351000000,
+   "viaPretax": 3130000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MDLZ",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 3548000000,
+   "viaPretax": 3613000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MDT",
+   "sector": null,
+   "ejercicio": "2026-04-24",
+   "real": 6467000000,
+   "viaPretax": 6851000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MET",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 6137000000,
+   "viaPretax": 5385000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "META",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 83276000000,
+   "viaPretax": 87022000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MGM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1001780000,
+   "viaPretax": 699821000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MHK",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 489800000,
+   "viaPretax": 486500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MKC",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-11-30",
+   "real": 1070800000,
+   "viaPretax": 1109200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MKTX",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 341838000,
+   "viaPretax": 368482000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MLM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1437000000,
+   "viaPretax": 1456000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MMC",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 6223000000,
+   "viaPretax": 6499000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MMM",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4629000000,
+   "viaPretax": 4661000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MNST",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 2419354000,
+   "viaPretax": 2482529000,
+   "teniaIntereses": false,
+   "viaBruto": 2419354000,
+   "viaIngresos": 2419354000
+  },
+  {
+   "t": "MO",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 9899000000,
+   "viaPretax": 10566000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MOH",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 781000000,
+   "viaPretax": 781000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MOS",
+   "sector": "Materials",
+   "ejercicio": "2025-12-31",
+   "real": 821500000,
+   "viaPretax": 1454400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MPC",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 8291000000,
+   "viaPretax": 8504000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MPWR",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 728636000,
+   "viaPretax": 766216000,
+   "teniaIntereses": false,
+   "viaBruto": 728636000,
+   "viaIngresos": 728636000
+  },
+  {
+   "t": "MRNA",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": -3074000000,
+   "viaPretax": -2768000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MSCI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1713567000,
+   "viaPretax": 1704145000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MSFT",
+   "sector": "Technology",
+   "ejercicio": "2026-06-30",
+   "real": 155237000000,
+   "viaPretax": 168985000000,
+   "teniaIntereses": true,
+   "viaBruto": 155237000000,
+   "viaIngresos": 155237000000
+  },
+  {
+   "t": "MSI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2988000000,
+   "viaPretax": 3172000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MTCH",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 872529000,
+   "viaPretax": 893554000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "MU",
+   "sector": "Technology",
+   "ejercicio": "2025-08-28",
+   "real": 9770000000,
+   "viaPretax": 10131000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NCLH",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1560868000,
+   "viaPretax": 428721000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NDAQ",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 2331000000,
+   "viaPretax": 2512000000,
+   "teniaIntereses": true,
+   "viaBruto": 2331000000,
+   "viaIngresos": 2331000000
+  },
+  {
+   "t": "NDSN",
+   "sector": "Industrials",
+   "ejercicio": "2025-10-31",
+   "real": 711725000,
+   "viaPretax": 701804000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NEE",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 8280000000,
+   "viaPretax": 4530000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NFLX",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 13326603000,
+   "viaPretax": 13499062000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NI",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1835300000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NOC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4511000000,
+   "viaPretax": 5733000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NOW",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1824000000,
+   "viaPretax": 2261000000,
+   "teniaIntereses": false,
+   "viaBruto": 1824000000,
+   "viaIngresos": 1824000000
+  },
+  {
+   "t": "NRG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1845000000,
+   "viaPretax": 1875000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NSC",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4356000000,
+   "viaPretax": 4457000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "NTAP",
+   "sector": "Technology",
+   "ejercicio": "2026-04-24",
+   "real": 1674000000,
+   "viaPretax": 1757000000,
+   "teniaIntereses": true,
+   "viaBruto": 1674000000,
+   "viaIngresos": 1674000000
+  },
+  {
+   "t": "NVDA",
+   "sector": "Technology",
+   "ejercicio": "2026-01-25",
+   "real": 130387000000,
+   "viaPretax": 141709000000,
+   "teniaIntereses": true,
+   "viaBruto": 130387000000,
+   "viaIngresos": 130387000000
+  },
+  {
+   "t": "NXPI",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 3047000000,
+   "viaPretax": 3129000000,
+   "teniaIntereses": true,
+   "viaBruto": 3035000000,
+   "viaIngresos": 3035000000
+  },
+  {
+   "t": "ODFL",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1361045000,
+   "viaPretax": 1361604000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "OKE",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 5741000000,
+   "viaPretax": 6273000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "OMC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 444700000,
+   "viaPretax": 541600000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ON",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 84200000,
+   "viaPretax": 202200000,
+   "teniaIntereses": true,
+   "viaBruto": 84200000,
+   "viaIngresos": 84200000
+  },
+  {
+   "t": "ORCL",
+   "sector": "Technology",
+   "ejercicio": "2026-05-31",
+   "real": 20606000000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ORLY",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 3460612000,
+   "viaPretax": 3475235000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "OTIS",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2133000000,
+   "viaPretax": 2151000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PANW",
+   "sector": "Technology",
+   "ejercicio": "2025-07-31",
+   "real": 1242900000,
+   "viaPretax": 1598700000,
+   "teniaIntereses": true,
+   "viaBruto": 1242900000,
+   "viaIngresos": 1242900000
+  },
+  {
+   "t": "PAYC",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 567200000,
+   "viaPretax": 622800000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PAYX",
+   "sector": null,
+   "ejercicio": "2026-05-31",
+   "real": 2510500000,
+   "viaPretax": 2580400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PCG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 4749000000,
+   "viaPretax": 5451000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PEG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2980000000,
+   "viaPretax": 3379000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PEP",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-27",
+   "real": 11498000000,
+   "viaPretax": 11365000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PG",
+   "sector": "Materials",
+   "ejercicio": "2026-06-30",
+   "real": 19748000000,
+   "viaPretax": 21254000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PH",
+   "sector": "Industrials",
+   "ejercicio": "2025-06-30",
+   "real": 4347000000,
+   "viaPretax": 4516000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PKG",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1107000000,
+   "viaPretax": 1027800000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PLD",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4357864000,
+   "viaPretax": 4771660000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PLTR",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1414015000,
+   "viaPretax": 1657368000,
+   "teniaIntereses": false,
+   "viaBruto": 1414015000,
+   "viaIngresos": 1414015000
+  },
+  {
+   "t": "PM",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": 14892000000,
+   "viaPretax": 15467000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PNR",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 857500000,
+   "viaPretax": 756500000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PNW",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1067630000,
+   "viaPretax": 1160337000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PODD",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 473800000,
+   "viaPretax": 398900000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "POOL",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 580204000,
+   "viaPretax": 533434000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PPG",
+   "sector": "Materials",
+   "ejercicio": "2023-12-31",
+   "real": 2675000000,
+   "viaPretax": 1937000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PPL",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2129000000,
+   "viaPretax": 2280000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PSA",
+   "sector": null,
+   "ejercicio": "2017-12-31",
+   "real": 1423142000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PSKY",
+   "sector": "Communication Services",
+   "ejercicio": "2024-12-31",
+   "real": -5269000000,
+   "viaPretax": -5317000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PTC",
+   "sector": "Technology",
+   "ejercicio": "2025-09-30",
+   "real": 982385000,
+   "viaPretax": 997196000,
+   "teniaIntereses": true,
+   "viaBruto": 982385000,
+   "viaIngresos": 982385000
+  },
+  {
+   "t": "PWR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1611509000,
+   "viaPretax": 1650950000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "PYPL",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 6065000000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "QCOM",
+   "sector": null,
+   "ejercicio": "2025-09-28",
+   "real": 12355000000,
+   "viaPretax": 13327000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RCL",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4910000000,
+   "viaPretax": 5365000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "REG",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1123441000,
+   "viaPretax": 407452000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "REGN",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 3577900000,
+   "viaPretax": 5274500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RF",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 53000000,
+   "viaPretax": 2743000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RL",
+   "sector": null,
+   "ejercicio": "2026-03-28",
+   "real": 1179200000,
+   "viaPretax": 1231900000,
+   "teniaIntereses": true,
+   "viaBruto": 1179200000,
+   "viaIngresos": 1179200000
+  },
+  {
+   "t": "RMD",
+   "sector": null,
+   "ejercicio": "2026-06-30",
+   "real": 1886715000,
+   "viaPretax": 1919416000,
+   "teniaIntereses": false,
+   "viaBruto": 1886715000,
+   "viaIngresos": 1886715000
+  },
+  {
+   "t": "ROK",
+   "sector": null,
+   "ejercicio": "2025-09-30",
+   "real": 1703000000,
+   "viaPretax": 1073000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ROL",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 726068000,
+   "viaPretax": 729484000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ROP",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2235400000,
+   "viaPretax": 2261100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ROST",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 2707357000,
+   "viaPretax": 2842157000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RSG",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 3302000000,
+   "viaPretax": 3168000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RTX",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 9300000000,
+   "viaPretax": 8733000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "RVTY",
+   "sector": null,
+   "ejercicio": "2025-12-28",
+   "real": 356635000,
+   "viaPretax": 360462000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SBAC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1342786000,
+   "viaPretax": 1242038000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SBUX",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-09-28",
+   "real": 2936600000,
+   "viaPretax": 3049900000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SHW",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2023-12-31",
+   "real": 4161700000,
+   "viaPretax": 3527400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SJM",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-04-30",
+   "real": 360200000,
+   "viaPretax": -62400000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SLB",
+   "sector": "Energy",
+   "ejercicio": "2023-12-31",
+   "real": 6523000000,
+   "viaPretax": 5785000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SMCI",
+   "sector": "Technology",
+   "ejercicio": "2025-06-30",
+   "real": 1252994000,
+   "viaPretax": 1271489000,
+   "teniaIntereses": true,
+   "viaBruto": 1252994000,
+   "viaIngresos": 1252994000
+  },
+  {
+   "t": "SNA",
+   "sector": "Industrials",
+   "ejercicio": "2026-01-03",
+   "real": 1327700000,
+   "viaPretax": 1386400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SNPS",
+   "sector": "Technology",
+   "ejercicio": "2025-10-31",
+   "real": 914927000,
+   "viaPretax": 1839871000,
+   "teniaIntereses": true,
+   "viaBruto": 914927000,
+   "viaIngresos": 914927000
+  },
+  {
+   "t": "SO",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 7285000000,
+   "viaPretax": 8237000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SOLV",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 2181000000,
+   "viaPretax": 1713000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SPG",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 3175396000,
+   "viaPretax": null,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SPGI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 6478000000,
+   "viaPretax": 6514000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "STE",
+   "sector": null,
+   "ejercicio": "2026-03-31",
+   "real": 1101800000,
+   "viaPretax": 1108000000,
+   "teniaIntereses": true,
+   "viaBruto": 1101800000,
+   "viaIngresos": 1101800000
+  },
+  {
+   "t": "STLD",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1475986000,
+   "viaPretax": 1563014000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "STX",
+   "sector": "Technology",
+   "ejercicio": "2026-07-03",
+   "real": 4094000000,
+   "viaPretax": 3974000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "STZ",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2026-02-28",
+   "real": 2721400000,
+   "viaPretax": 2739400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SW",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1719000000,
+   "viaPretax": 1799000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SWK",
+   "sector": "Industrials",
+   "ejercicio": "2021-01-02",
+   "real": 2176000000,
+   "viaPretax": 1406400000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "SWKS",
+   "sector": "Technology",
+   "ejercicio": "2025-10-03",
+   "real": 500000000,
+   "viaPretax": 553800000,
+   "teniaIntereses": true,
+   "viaBruto": 500000000,
+   "viaIngresos": 500000000
+  },
+  {
+   "t": "SYK",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 4889000000,
+   "viaPretax": 5096000000,
+   "teniaIntereses": true,
+   "viaBruto": 4889000000,
+   "viaIngresos": 4889000000
+  },
+  {
+   "t": "SYY",
+   "sector": null,
+   "ejercicio": "2025-06-28",
+   "real": 3088000000,
+   "viaPretax": 2415000000,
+   "teniaIntereses": false,
+   "viaBruto": 3088000000,
+   "viaIngresos": 3088000000
+  },
+  {
+   "t": "T",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 24162000000,
+   "viaPretax": 33811000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TAP",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-12-31",
+   "real": -2336900000,
+   "viaPretax": -2270100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TDG",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-09-30",
+   "real": 4165000000,
+   "viaPretax": 2629000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TDY",
+   "sector": null,
+   "ejercicio": "2025-12-28",
+   "real": 1149800000,
+   "viaPretax": 1154100000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TECH",
+   "sector": "Healthcare",
+   "ejercicio": "2025-06-30",
+   "real": 102255000,
+   "viaPretax": 106972000,
+   "teniaIntereses": true,
+   "viaBruto": 102255000,
+   "viaIngresos": 102255000
+  },
+  {
+   "t": "TEL",
+   "sector": null,
+   "ejercicio": "2025-09-26",
+   "real": 3211000000,
+   "viaPretax": 3281000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TER",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 650051000,
+   "viaPretax": 660106000,
+   "teniaIntereses": true,
+   "viaBruto": 650051000,
+   "viaIngresos": 650051000
+  },
+  {
+   "t": "TGT",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 5117000000,
+   "viaPretax": 5212000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TJX",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2019-02-02",
+   "real": 4763227000,
+   "viaPretax": 4242313000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TKO",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 835015000,
+   "viaPretax": 809348000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TMO",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 7746000000,
+   "viaPretax": 8727000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TMUS",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 18279000000,
+   "viaPretax": 14281000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TPL",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 592161000,
+   "viaPretax": 611019000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TPR",
+   "sector": null,
+   "ejercicio": "2026-06-27",
+   "real": 1914400000,
+   "viaPretax": 1979900000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TRGP",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 3331200000,
+   "viaPretax": 2486400000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TRMB",
+   "sector": null,
+   "ejercicio": "2026-01-02",
+   "real": 592000000,
+   "viaPretax": 583800000,
+   "teniaIntereses": true,
+   "viaBruto": 592000000,
+   "viaIngresos": 592000000
+  },
+  {
+   "t": "TROW",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 2188800000,
+   "viaPretax": 2875500000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TRV",
+   "sector": "Financial Services",
+   "ejercicio": "2014-12-31",
+   "real": 3641000000,
+   "viaPretax": 5458000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TSCO",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-27",
+   "real": 1467389000,
+   "viaPretax": 1467389000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TSLA",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 4355000000,
+   "viaPretax": 5616000000,
+   "teniaIntereses": true,
+   "viaBruto": 4355000000,
+   "viaIngresos": 4355000000
+  },
+  {
+   "t": "TSN",
+   "sector": "Consumer Defensive",
+   "ejercicio": "2025-09-27",
+   "real": 1098000000,
+   "viaPretax": 1218000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 3967400000,
+   "viaPretax": 3905300000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TTD",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 589321000,
+   "viaPretax": 660545000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TTWO",
+   "sector": "Technology",
+   "ejercicio": "2026-03-31",
+   "real": -104200000,
+   "viaPretax": -54900000,
+   "teniaIntereses": true,
+   "viaBruto": -104200000,
+   "viaIngresos": -104200000
+  },
+  {
+   "t": "TXN",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 6023000000,
+   "viaPretax": 6253000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "TYL",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 357676000,
+   "viaPretax": 395313000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UAL",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 4713000000,
+   "viaPretax": 5679000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UBER",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 5565000000,
+   "viaPretax": 6240000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UDR",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 553606000,
+   "viaPretax": 601169000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UHS",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 1994015000,
+   "viaPretax": 2128209000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ULTA",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 1532992000,
+   "viaPretax": 1531205000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UNH",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 18964000000,
+   "viaPretax": 18699000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UNP",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 9846000000,
+   "viaPretax": 10475000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "UPS",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 7867000000,
+   "viaPretax": 8181000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "URI",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 3973000000,
+   "viaPretax": 3338000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "V",
+   "sector": null,
+   "ejercicio": "2025-09-30",
+   "real": 23994000000,
+   "viaPretax": 24783000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VICI",
+   "sector": null,
+   "ejercicio": "2020-12-31",
+   "real": 321018000,
+   "viaPretax": 1205644000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VLO",
+   "sector": "Energy",
+   "ejercicio": "2025-12-31",
+   "real": 3181000000,
+   "viaPretax": 3561000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VLTO",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1277000000,
+   "viaPretax": 1269000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VMC",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1619600000,
+   "viaPretax": 1629800000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VRSK",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1343900000,
+   "viaPretax": 1342200000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VRSN",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1121000000,
+   "viaPretax": 1145500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": 924700000
+  },
+  {
+   "t": "VRTX",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": 4173300000,
+   "viaPretax": 4656500000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VST",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 1906000000,
+   "viaPretax": 2302000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "VTRS",
+   "sector": "Healthcare",
+   "ejercicio": "2025-12-31",
+   "real": -2663100000,
+   "viaPretax": -3193700000,
+   "teniaIntereses": true,
+   "viaBruto": -2663100000,
+   "viaIngresos": -2712600000
+  },
+  {
+   "t": "VZ",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 29259000000,
+   "viaPretax": 29366000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WAB",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 1793000000,
+   "viaPretax": 1817000000,
+   "teniaIntereses": true,
+   "viaBruto": 1793000000,
+   "viaIngresos": 1793000000
+  },
+  {
+   "t": "WAT",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 802588000,
+   "viaPretax": 824426000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WBA",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2024-08-31",
+   "real": -14076000000,
+   "viaPretax": -13737000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WBD",
+   "sector": "Communication Services",
+   "ejercicio": "2025-12-31",
+   "real": 738000000,
+   "viaPretax": 3724000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WDAY",
+   "sector": "Technology",
+   "ejercicio": "2026-01-31",
+   "real": 721000000,
+   "viaPretax": 1123000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WDC",
+   "sector": "Technology",
+   "ejercicio": "2026-07-03",
+   "real": 4453000000,
+   "viaPretax": 10070000000,
+   "teniaIntereses": true,
+   "viaBruto": 4453000000,
+   "viaIngresos": 4453000000
+  },
+  {
+   "t": "WEC",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2244900000,
+   "viaPretax": 2568600000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WM",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 4308000000,
+   "viaPretax": 3426000000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WMB",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 4196000000,
+   "viaPretax": 5067000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WMT",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-01-31",
+   "real": 29825000000,
+   "viaPretax": 31787000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WSM",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2026-02-01",
+   "real": 1415722000,
+   "viaPretax": 1452560000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WST",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 584900000,
+   "viaPretax": 616000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WTW",
+   "sector": "Financial Services",
+   "ejercicio": "2025-12-31",
+   "real": 2234000000,
+   "viaPretax": 2213000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WY",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 731000000,
+   "viaPretax": 533000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "WYNN",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1118384000,
+   "viaPretax": 1139696000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "XEL",
+   "sector": "Utilities",
+   "ejercicio": "2025-12-31",
+   "real": 2583000000,
+   "viaPretax": 3241000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "XYL",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 1223000000,
+   "viaPretax": 1210000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "XYZ",
+   "sector": "Technology",
+   "ejercicio": "2025-12-31",
+   "real": 1708406000,
+   "viaPretax": 1946311000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "YUM",
+   "sector": "Consumer Cyclical",
+   "ejercicio": "2025-12-31",
+   "real": 2574000000,
+   "viaPretax": 2621000000,
+   "teniaIntereses": true,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ZBH",
+   "sector": null,
+   "ejercicio": "2025-12-31",
+   "real": 1098100000,
+   "viaPretax": 830800000,
+   "teniaIntereses": false,
+   "viaBruto": null,
+   "viaIngresos": null
+  },
+  {
+   "t": "ZBRA",
+   "sector": "Industrials",
+   "ejercicio": "2025-12-31",
+   "real": 700000000,
+   "viaPretax": 560000000,
+   "teniaIntereses": false,
+   "viaBruto": 700000000,
+   "viaIngresos": 700000000
+  }
+ ]
+}

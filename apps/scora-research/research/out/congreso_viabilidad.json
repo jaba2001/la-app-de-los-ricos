@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-09-04T14:11:49.881528+00:00",
+  "fuente": "research/out/congreso_viabilidad.json — evaluacion, no medicion",
+  "asOf": "2026-09-04",
+  "pregunta": "¿Se puede reconstruir la serie de operaciones del Congreso sin depender de terceros?",
+  "veredicto": "SI, y esta enteramente verificado salvo un paso",
+  "verificado": {
+    "indiceOficial": "https://disclosures-clerk.house.gov/public_disc/financial-pdfs/{AAAA}FD.zip — HTTP 200 en 2014, 2016, 2018, 2020, 2022, 2024, 2025 y 2026",
+    "contenidoDelIndice": "TXT y XML. Columnas: Prefix, Last, First, Suffix, FilingType, StateDst, Year, FilingDate, DocID. 2.916 filas en 2025.",
+    "declaracionesDeOperaciones": "515 de 2.916 en 2025 son tipo P (Periodic Transaction Report), que son las que traen operaciones",
+    "fechaDePublicacion": "FilingDate viene en el indice — es la fecha que hace honesto el estudio; la de transaccion esta dentro del PDF y usarla seria mirar al futuro",
+    "patronDeUrlDelPdf": "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{AAAA}/{DocID}.pdf — probado con 4 identificadores, 4 de 4 HTTP 200",
+    "formatoDelPdf": "TEXTO, no escaneo: 15 fuentes declaradas. Cifrado con manejador estandar V2/R3 (RC4 128) y contraseña vacia — el cifrado solo fija permisos, cualquier libreria lo abre."
+  },
+  "loQueFalta": "La extraccion de texto. PERO ya NO hace falta una libreria: ver `sinDependencias`.",
+  "volumen": "~515 declaraciones/año; ~6.000 PDF para doce años de historia",
+  "senado": "efdsearch.senate.gov responde 302: publico pero detras de una pagina de aceptacion. Empezar solo por la Camara.",
+  "alternativasDeTerceros": "Existen con capa gratuita, pero la mejor da SOLO 90 dias y exige clave. Sirve para enseñar en vivo; inutil para medir. Y añade una dependencia de terceros que ya se murio una vez (house-stock-watcher: 403, repo sin tocar desde mediados de 2025).",
+  "porQueNoSeEmpieza": "La medicion sigue sin estar justificada: NUNCA se ha comprobado si las operaciones del Congreso predicen algo, y las cuatro ultimas señales nuevas del proyecto fallaron. Sigue siendo un PROYECTO —terminar el extractor, ~6.000 descargas, normalizacion y un ensayo del presupuesto—. Lo que ha cambiado es que ya NO depende de añadir una libreria.",
+  "siSeRetoma": "Fijar la hipotesis ANTES: usar FilingDate, nunca la fecha de transaccion; medir horizontes preespecificados; y registrar el ensayo. Ver el precedente de rdcf_ortogonalidad.mjs, que se paro a tiempo con motivo medido.",
+  "sinDependencias": {
+    "probado": "2026-09-04, ejecutado sobre un PTR real (DocID 20032062)",
+    "veredicto": "El descifrado FUNCIONA sin ninguna dependencia. Falta UNA capa mas, identificada con precision.",
+    "loQueYaFunciona": [
+      "RC4 propio, validado contra el vector conocido RC4('Key','Plaintext') = BBF316E8D940AF0AD3",
+      "Derivacion de clave: algoritmo 2 del estandar desde contraseña VACIA. Confirmada por fuerza bruta.",
+      "Localizacion de objetos por la TABLA DE REFERENCIAS CRUZADAS, no por expresiones regulares",
+      "El flujo de contenido (objeto 21, XObject de formulario) descomprime a 32.040 bytes con 94 % de caracteres legibles: operadores PDF validos"
+    ],
+    "loQueFalta": "El texto va en cadenas HEXADECIMALES que son INDICES DE GLIFO (0033, 0287, 0294...), no ASCII ni UTF-16. Hay 199 operadores Tj y cero parentesis. Para convertirlos a letras hace falta el mapa /ToUnicode de cada fuente subconjunto (F5 y F6 en este documento), que es otro flujo del MISMO fichero: alcanzable, ~40-60 lineas mas.",
+    "cuatroErroresQueCostaron": [
+      "Buscar /P en todo el fichero capturaba un 22 de otro objeto: hay que leer DENTRO del diccionario de cifrado",
+      "/O es cadena HEXADECIMAL, no literal",
+      "Emparejar `obj` con `stream` por expresion regular asigna el numero de un objeto al flujo de otro cuando hay objetos sin flujo. Cazado por fuerza bruta: el flujo que yo leia como del objeto 6 descifraba con la clave del 11. La solucion es la tabla de referencias cruzadas.",
+      "Un XObject de IMAGEN tiene parentesis por todas partes en su JPEG y ensuciaba la extraccion: hay que saltarlo por /Subtype"
+    ],
+    "codigo": "research/congreso_pdf.mjs — funciona hasta la capa de glifos"
+  }
+}

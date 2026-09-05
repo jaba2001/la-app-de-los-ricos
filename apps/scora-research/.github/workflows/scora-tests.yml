@@ -1,0 +1,295 @@
+name: Scora — tests (golden + red-team + build)
+
+# Continuous verification of the guarantees that must never silently regress:
+#  1. the pure calculation core (golden.test.mjs) — the math behind every score,
+#  2. the AI grounding gate (redteam_grounding.mjs) — "the AI can't hallucinate figures",
+#  3. the Scora Picks rules engine and the accounting-integrity layer,
+#  4. type safety, the CSS system, and that the app actually builds.
+#
+# ⚠️ TODOS los pasos van DESPUÉS de `npm ci`, y esto se corrigió el 2026-08-24.
+#
+# El golden test y el red-team estaban antes, con el comentario «no necesitan dependencias».
+# Dejó de ser cierto en algún momento: `lib/horizon.ts` ganó un store compartido con
+# `useSyncExternalStore`, y el golden lo importa por sus exports NO-React. El import de
+# `react` se ejecuta igual, así que el paso moría con ERR_MODULE_NOT_FOUND en 11 segundos.
+#
+# **El CI llevaba al menos doce ejecuciones seguidas en rojo por esto**, o sea que las
+# garantías que este fichero dice proteger no se estaban comprobando. Un CI en rojo permanente
+# es un CI que nadie lee — y entonces da igual lo que verifique.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Semanal aunque nadie toque el código. Lo aprendido el 2026-08-24: las fuentes cambian
+  # solas. El CSV de miembros del índice dejó de actualizarse aguas arriba y nadie se enteró
+  # en 366 días; la SEC empezó a mezclar cifras de un `DEF 14A` con las del 10-K. Un CI que
+  # sólo corre en los commits no ve nada de eso, porque el commit que lo rompe no existe.
+  schedule:
+    - cron: "0 6 * * 1" # lunes 06:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Golden tests (calculation core)
+        run: node --experimental-strip-types --no-warnings scripts/golden.test.mjs
+      - name: Red-team the grounding gate
+        run: node --experimental-strip-types --no-warnings research/redteam_grounding.mjs
+
+      - name: P2 maths self-tests
+        run: node --experimental-strip-types --no-warnings scripts/p2.test.mjs
+      # Los módulos teóricos (PLAN_TEORIA_FINANCIERA_SCORA.md): CAPM/APT, Ledoit-Wolf,
+      # Black-Litterman, límites al arbitraje, costes de agencia y la medición con BSM.
+      # Incluye dos invariantes que no pueden romperse en silencio: la descomposición de
+      # varianza del modelo factorial debe sumar R², y Black-Litterman con confianza 0 debe
+      # devolver EXACTAMENTE los pesos de mercado (es la honestidad hecha aritmética).
+      - name: Theory module tests
+        run: node --experimental-strip-types --no-warnings scripts/theory.test.mjs
+      # Guards the filing-grounding path: chunking that loses no text, and a prompt budget
+      # that caps the whole block instead of re-truncating each passage (the original bug).
+      - name: Retrieval tests
+        run: node --experimental-strip-types --no-warnings scripts/retrieval.test.mjs
+      # Las reglas de Scora Picks (§3-§5 de SCORA_PICKS_REGLAS.md) más la partida doble como
+      # test de datos, el cálculo del TTM y la señal forense. Un cambio de regla sin abrir una
+      # `rules_version` nueva tiene que gritar aquí: el track record de dos versiones no se
+      # mezcla jamás.
+      - name: Scora Picks — motor de reglas y capa contable
+        run: node --experimental-strip-types --no-warnings scripts/picks.test.mjs
+      - name: Percentiles sector-relativos
+        run: node --experimental-strip-types --no-warnings scripts/percentile.test.mjs
+      - name: Roadmap (F3+F4+F5)
+        run: node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs
+      # ── LA CAPA DE DATOS ──────────────────────────────────────────────────────────────
+      # Los cinco defectos encontrados el 2026-08-23/24 vivieron MESES sin que nada fallara:
+      # el TTM que no eran doce meses, magnitudes congeladas en 2009, la deuda ausente escrita
+      # como cero, los REIT puntuando con una rebanada de sus ingresos y un `DEF 14A` metiendo
+      # el resultado de FedEx en millones. Ninguno rompía — todos devolvían un número creíble.
+      #
+      # Dos partes. La primera pone SUELOS sobre los artefactos versionados: cobertura por
+      # métrica, tasas de las cuatro identidades contables y CERO desfases de más de tres años.
+      # Si un commit degrada la extracción, salta aquí antes de que nadie publique encima.
+      # La segunda es un humo contra la SEC de verdad con seis nombres, uno por defecto; si la
+      # SEC no responde, avisa y se salta en vez de romper el build.
+      # El contrato del proxy: 39 rutas. Hasta el 2026-09-02 esto sólo corría en local, así que
+      # una ruta rota llegaba a main sin que nada la viera.
+      - name: Contrato del proxy (39 rutas)
+        run: node scripts/smoke-proxy.mjs
+
+      # Y los guardianes, vigilados. Un guardián que deja de vigilar no falla: contesta que todo
+      # va bien. Fija que `variantes_identicas` distingue registros de variantes SIN quedarse
+      # ciego al no-op de §11, y que esta lista y `npm run test:all` son la misma.
+      - name: Los guardianes, vigilados
+        run: node --experimental-strip-types --no-warnings scripts/guardianes.test.mjs
+
+      # El paper fund publico durante semanas un exceso de +0,59 pp sobre el indice que era
+      # ENTERAMENTE un artefacto: la rejilla de medicion hacia `setUTCDate(1)`, asi que con un
+      # inicio el 09-jul arrancaba el 01-jul —ocho dias en los que el fondo no existia—, y en
+      # ese tramo fantasma `weightsAsOf` devolvia los pesos del primer rebalanceo: una cartera
+      # multiactivo que el fondo tuvo UN SOLO DIA antes de irse a 100 % SPY. Con las decisiones
+      # tal y como se sellaron, el fondo iba POR DETRAS. No habia ninguna prueba que lo cazara.
+      # Cuatro vias se han evaluado para rellenar `oiTTM`, del que cuelgan cuatro de las cinco
+      # metricas de calidad. El criterio —desvio mediano < 5 % y dispersion sectorial < 5 pp—
+      # se escribio ANTES de mirar ningun resultado, y con el se RECHAZO la via pretax (7,6 % y
+      # 36,1 pp). Esta guarda no vigila que el codigo exista: vigila QUE EL LISTON NO SE MUEVA,
+      # que es la forma mas facil de aprobar una via que no deberia entrar. Y vigila el rechazo
+      # tanto como la aprobacion: colar la via pretax convertiria un hueco conocido en una
+      # cobertura sesgada por sector, que es peor.
+      # El score de dinero inteligente anunciaba «Insider · 13-F · Congress» y entregaba UNA
+      # fuente: el 13-F nunca puntuo, y el Congreso valia ±35 de 100 pero llevaba en cero desde
+      # que los volcados del STOCK Act dejaron de ser publicos. Retirado el 2026-09-04.
+      # Lo que esta guarda protege sobre todo es que NADIE LO REESCALE A 100: los insiders solos
+      # llegan a 85, y multiplicarlos haria que una señal mas debil puntuara como la combinada,
+      # moviendo acciones de «Neutral» a «Bullish» sin que hubiera cambiado ni un dato.
+      - name: El Congreso no puntua, y el score no se reescala
+        run: node --experimental-strip-types --no-warnings scripts/smartmoney.test.mjs
+
+      - name: El liston de las reconstrucciones no se mueve
+        run: node --experimental-strip-types --no-warnings scripts/reconstruccion_ebit.test.mjs
+
+      - name: El fondo no se mide antes de existir
+        run: node --experimental-strip-types --no-warnings scripts/paperfund.test.mjs
+
+      - name: Guardián de la capa de datos
+        run: node --experimental-strip-types --no-warnings scripts/datos.test.mjs
+
+      # Un parámetro que entra en una función y no se usa nunca es la firma de un defecto que
+      # no rompe: la función acepta una pregunta y responde otra. El 2026-09-01 se encontró
+      # que `universoEW(eje, excluir)` ignoraba `excluir`, así que la referencia «universo
+      # equiponderado SIN financieros» era el MISMO cálculo que la de con ellos — cuatro
+      # números idénticos al decimal con 56 nombres supuestamente fuera. Durante meses eso
+      # contestó que los financieros no aportaban nada a la referencia, que es justo la
+      # pregunta de §11 y la que decide si merece la pena meter bancos en el universo.
+      - name: Parámetros que entran y no se usan
+        run: node --experimental-strip-types --no-warnings research/parametros_muertos.mjs
+
+      # Y la otra firma del mismo fallo: dos variantes de un cálculo que dan EXACTAMENTE lo
+      # mismo. Fue la única señal visible de que la referencia «sin financieros» era la de con
+      # financieros — cuatro números idénticos al decimal con 56 nombres supuestamente fuera.
+      - name: Variantes que dan exactamente lo mismo
+        run: node --experimental-strip-types --no-warnings research/variantes_identicas.mjs
+      # Lo que se enseña en una pagina publica no lleva los umbrales del backtest. Alli GME
+      # +135 % es real y tirarlo sesgaria la referencia; aqui un +177 % hay que marcarlo aunque
+      # sea cierto, porque sale con el logo de la empresa al lado. Dos umbrales, dos funciones.
+      - name: Integridad de lo que se publica con precios
+        run: node --experimental-strip-types --no-warnings scripts/integridad.test.mjs
+      # Las ventanas de un ranking van por FECHA y no por numero de sesiones — no porque
+      # protejan de un dato roto (se comprobo que no: parten el mismo artefacto) sino porque
+      # el borde es reproducible. Y `base` es el cierre de REFERENCIA, no el primer dia.
+      - name: Ventanas de los rankings de precios
+        run: node --experimental-strip-types --no-warnings scripts/ventanas.test.mjs
+      # El Form 4 tiene cuatro trampas que hunden un titular: una TENENCIA no es una operacion,
+      # el codigo M es un ejercicio de opciones y no una venta, el plan 10b5-1 se declara en el
+      # documento, y la direccion la da A/D y no el codigo. Cada test dice que titular romperia.
+      - name: Parser de Form 4 (movimientos de directivos)
+        run: node --experimental-strip-types --no-warnings scripts/form4.test.mjs
+      # El diagrama de «cómo gana dinero X» SIEMPRE cierra, y lo que no se puede atribuir se
+      # dibuja como bloque «No desglosado» con su tamaño real. Escalar las barras para que
+      # encajen queda bonito y miente; dejar el diagrama abierto esconde el hueco.
+      - name: Diagrama de flujo (cómo gana dinero X)
+        run: node --experimental-strip-types --no-warnings scripts/sankey.test.mjs
+      # El pie de una tabla de movimientos deriva HECHOS de las filas ya publicadas: no escribe
+      # prosa, no infiere causas, y sobre todo NO elige qué filas enseñar. Un resumen que
+      # seleccionara sería una selección disfrazada. Los tests fijan que no se afirme una
+      # concentración sectorial cuando faltan sectores, y que una coincidencia entre sectores
+      # distintos no se venda como patrón.
+      - name: Los hechos del pie de la tabla
+        run: node --experimental-strip-types --no-warnings scripts/narrativa.test.mjs
+      # El 13F tiene cinco trampas medidas sobre declarantes reales. La peor: los espacios de
+      # nombres son OPCIONALES, y buscando `<infoTable>` sin prefijo Bridgewater daba 0
+      # posiciones teniendo 997 — y cero se lee como «no tiene nada», no como «no sé leerlo».
+      - name: Parser de 13F (carteras institucionales)
+        run: node --experimental-strip-types --no-warnings scripts/parse13f.test.mjs
+
+      # El emparejamiento CUSIP -> ticker. Cada caso salio de un fallo real medido contra la SEC:
+      # el apostrofo (la SEC escribe LOWES, no LOWE'S), la barra desnuda de `AMETEK INC/`, el
+      # `N.V.` que se parte en dos fichas, y el falso amigo del guion — BRK-A es una CLASE, no una
+      # preferente, y tratarla como tal borraria a Berkshire del mapa.
+      - name: Emparejamiento CUSIP → ticker
+        run: node --experimental-strip-types --no-warnings scripts/mapacusip.test.mjs
+
+      # Ingresos por segmento (fase 6). `companyfacts` NO trae ejes dimensionales, asi que esto
+      # sale del XBRL de la propia presentacion. Cada caso del test es un fallo real medido:
+      # padre e hijos conviviendo en el mismo eje (NVIDIA sumaba 1,90 veces su total), el mismo
+      # hecho publicado dos veces (Apple), y el total y el desglose con etiquetas distintas.
+      - name: Ingresos por segmento
+        run: node --experimental-strip-types --no-warnings scripts/segmentos.test.mjs
+
+      # La compuerta de la prosa (fase 5b). El modelo REDACTA, no aporta datos: si su texto trae
+      # un numero, una causa o un pronostico que no esta en los hechos, NO se publica y se cae al
+      # texto determinista de 5a. Ojo con dos cosas que ya mordieron: `checkAdvice` de
+      # grounding.ts es SOLO INGLES, y `\b` no existe detras de una vocal acentuada.
+      - name: La compuerta de la prosa (5b)
+        run: node --experimental-strip-types --no-warnings scripts/narrativallm.test.mjs
+
+      # La serie mensual del allocator. Existe por un incidente que NINGUN test habria cazado: el
+      # cache de precios de SPY se trunco a 2018-06 y los 36 meses de la crisis de 2008 se
+      # volvieron meses planos. Todo era coherente consigo mismo —los agregados cuadraban con la
+      # serie— y lo unico que delataba el fallo era saber que un maxDD de -23,9 % para el S&P 500
+      # en una ventana que incluye 2008 es IMPOSIBLE. Eso es lo que este test fija.
+      - name: La serie mensual del allocator
+        run: node --experimental-strip-types --no-warnings scripts/serie.test.mjs
+
+      # Metricas de la fase 1: M2, captura alcista/bajista, forma de la distribucion y la
+      # significacion de una diferencia de Sharpe. El punto critico esta en esta ultima:
+      # Jobson-Korkie va con los Sharpe POR PERIODO y T = observaciones, NO con los anualizados
+      # y T en años — no son equivalentes y la version mal daba t=1,62 donde la buena da 1,92.
+      - name: Metricas ajustadas al riesgo (fase 1)
+        run: node --experimental-strip-types --no-warnings scripts/riesgo.test.mjs
+
+      # Tests de temporizacion (Merton-Henriksson / Treynor-Mazuy) con errores robustos. Lo que
+      # fijan no es que funcionen sino que NO den falso positivo: la sonda con errores OLS
+      # clasicos daba gamma con t=2,58 y parecia evidencia de habilidad; con errores robustos
+      # cae a 1,42. Lo que la destruyo fue la HETEROCEDASTICIDAD, no la autocorrelacion.
+      - name: Tests de temporizacion
+        run: node --experimental-strip-types --no-warnings scripts/temporizacion.test.mjs
+
+      # Atribucion de Brinson, validada contra el ejemplo resuelto del temario: -4 % + 0,3 % =
+      # -3,7 %. El criterio es el CUADRE — si las contribuciones no suman el retorno activo, la
+      # atribucion esta mal y no se publica.
+      - name: Atribucion de Brinson
+        run: node --experimental-strip-types --no-warnings scripts/brinson.test.mjs
+
+      # Sharpe deflactado (Bailey & Lopez de Prado). El repo llevaba deflactando a ojo contra
+      # raiz(2 ln N); esto lo hace bien y añade la correccion por asimetria y curtosis. El control
+      # que importa: colas MAS gruesas tienen que BAJAR la probabilidad, no subirla — si subiera,
+      # la deflacion estaria premiando el riesgo de cola.
+      - name: Sharpe deflactado
+        run: node --experimental-strip-types --no-warnings scripts/deflacion.test.mjs
+
+      # La capa de caja: 'lo que no es caja, no vale'. Lo que este test fija no son los ratios
+      # —eso es aritmetica— sino que no se lea el estado financiero de un banco ni de una utility
+      # regulada con la plantilla de una industrial. Ejecutandolo aparecieron los dos falsos
+      # positivos: JPMorgan con conversion -1,83 (prestar ES su operacion) y AEE/AWK/ATO por
+      # repartir dividendo con FCF negativo (su modelo es endeudarse para construir).
+      - name: La capa de caja
+        run: node --experimental-strip-types --no-warnings scripts/flujocaja.test.mjs
+
+      # La capa de tipos. Lo que fija no es la resta 10a-2a sino que un percentil no se de
+      # sobre una muestra que no lo sostiene — el error real fue tratar 786 obs desde 2023
+      # de la serie de ICE BofA como si fueran 41 anos de historia.
+      # LOS GUARDIANES SE VIGILAN ENTRE SI. Este workflow estuvo ROJO cinco dias fallando en
+      # 0 segundos —antes de ejecutar nada— por un caracter de control 0x08 en el YAML, y
+      # nadie se entero porque test:all seguia verde en local. Un guardian que deja de
+      # vigilar no falla: calla. Va el PRIMERO para que un YAML roto se vea antes que nada.
+      # Las cifras publicadas en los documentos, contra los artefactos que las sostienen. Existe
+      # porque unas cifras de Microsoft estaban publicadas sin ningun test que las guardara, y la
+      # pregunta «¿y las demas?» resulto ser: 194 cifras notables y la prosa nunca se comparaba
+      # con la evidencia. Al ponerlo cazo tres derivas reales, incluida una tabla con las cifras
+      # de una medicion ad-hoc anterior (-0,72 donde el artefacto dice -0,79).
+      - name: Las cifras publicadas siguen siendo ciertas
+        run: node --experimental-strip-types --no-warnings scripts/cifras_publicadas.test.mjs
+
+      - name: Los workflows (que el CI siga vivo)
+        run: node --experimental-strip-types --no-warnings scripts/workflows.test.mjs
+
+      # La vida util implicita y el precio de recompra. Lo que fijan no es la division sino los
+      # confundidores: que el crecimiento del activo infla la vida util sola (la mitad del
+      # aparente alargamiento de Oracle era artefacto), que la amortizacion de intangibles la
+      # hunde (Amgen daba 2,92 años para una farmaceutica con plantas), y que un hecho de
+      # recompra de 2016 comparado con el precio de hoy da +2.922 % y no significa nada.
+      - name: La calidad contable (vida util y recompras)
+        run: node --experimental-strip-types --no-warnings scripts/vidautil.test.mjs && node --experimental-strip-types --no-warnings scripts/recompras.test.mjs
+
+      - name: La capa de tipos
+        run: node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
+      # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
+      # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
+      # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
+      # publicados siguieron siendo los del día anterior sin que nada lo dijera.
+      - name: Frescura de los artefactos publicados
+        run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: CSS regression guard
+        run: node scripts/css-lint.mjs
+
+      # The 10-K section parser is pure heuristics over documents we don't control, so its
+      # failures are silent: you get a thesis grounded in the wrong paragraph, not an error.
+      # This runs the current parser and a frozen copy of the pre-2026-08-10 one over the
+      # same real filings and fails if the change lost ground.
+      #
+      # Six tickers, not all 28, because each one is an SEC download: NVDA (the over-broad
+      # NAV filter), AMAT (colon separator), DELL (em-dash separator), AMD (why a plain
+      # hyphen must NOT be a separator), CSCO (citation-aware terminator) and STX
+      # (earliest-wins selection). Between them they exercise every fix. If SEC is
+      # unreachable the harness skips those tickers and says so rather than failing the
+      # build. Run the full 28 locally before changing the parser.
+      - name: 10-K parser regression (subset)
+        run: node --experimental-strip-types --no-warnings research/parser_regression.mjs NVDA AMAT DELL AMD CSCO STX
+
+      # No secrets: lib/supabase.ts falls back to placeholder credentials and every
+      # integration (PostHog, Sentry, push, Resend) no-ops when its env var is absent.
+      # A build that needs secrets to compile would be the actual bug.
+      - name: Build
+        run: npx next build

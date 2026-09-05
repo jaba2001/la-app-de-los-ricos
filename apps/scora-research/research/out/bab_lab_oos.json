@@ -1,0 +1,96 @@
+{
+ "generatedAt": "2026-08-24T20:16:27.441Z",
+ "window": "2011-2018",
+ "topN": 40,
+ "fechas": 192,
+ "puerta": {
+  "rhoMedio": -0.8106249999999999,
+  "umbral": 0.85,
+  "mismaSenal": false,
+  "porFecha": [
+   {
+    "fecha": "2011-01-03",
+    "rho": -0.863,
+    "n": 335
+   },
+   {
+    "fecha": "2012-01-03",
+    "rho": -0.893,
+    "n": 342
+   },
+   {
+    "fecha": "2013-01-02",
+    "rho": -0.9,
+    "n": 349
+   },
+   {
+    "fecha": "2014-01-02",
+    "rho": -0.802,
+    "n": 355
+   },
+   {
+    "fecha": "2015-01-02",
+    "rho": -0.792,
+    "n": 363
+   },
+   {
+    "fecha": "2016-01-04",
+    "rho": -0.71,
+    "n": 377
+   },
+   {
+    "fecha": "2017-01-03",
+    "rho": -0.778,
+    "n": 397
+   },
+   {
+    "fecha": "2018-01-02",
+    "rho": -0.747,
+    "n": 412
+   }
+  ],
+  "nota": "Si |rho| > 0,85, beta y `lowvol` ordenan igual y la hipótesis se retira sin gastar ensayo."
+ },
+ "HB3": {
+  "bruto": -2.279074154072203,
+  "seBruto": 2.717748601743168,
+  "neutral": -1.6055321933574043,
+  "seNeutral": 1.631423245943846,
+  "mde": 7.60969608488087,
+  "fechas": 168,
+  "veredicto": "vacío",
+  "pasa": false,
+  "sectoresTop": {
+   "Utilities": 34,
+   "Consumer Defensive": 25.5,
+   "Consumer Cyclical": 11.4,
+   "sin sector": 10.7,
+   "Materials": 7.2
+  }
+ },
+ "HB1": {
+  "spread": -2.3434083725228407,
+  "se": 2.814335824685483,
+  "mde": 7.880140309119351,
+  "t": -0.8326683517894419,
+  "fechas": 168,
+  "significativo": false
+ },
+ "HB2": {
+  "vsCalidad": {
+   "m": 0.9067518042669999,
+   "se": 2.0146463567403714
+  },
+  "vsBeta": {
+   "m": 2.0062535677356785,
+   "se": 1.8232800672118248
+  },
+  "vsEW": {
+   "m": -0.3295614435460385,
+   "se": 2.106929454502088
+  },
+  "fechas": 168,
+  "bateAAmbas": false
+ },
+ "nota": "Long-only top-N, que es la forma del producto. NO es el factor BAB del artículo, que es largo-corto y neutralizado en beta."
+}

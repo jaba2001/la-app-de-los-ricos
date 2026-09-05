@@ -1,0 +1,146 @@
+{
+  "generatedAt": "2026-09-03T07:27:47.569Z",
+  "ventana": {
+    "desde": "2007-01-01",
+    "hasta": "2026-08-01",
+    "meses": 236
+  },
+  "rotacion": {
+    "growth": {
+      "anualPct": 174,
+      "mesMaximoPct": 100,
+      "mesesSinMover": 150
+    },
+    "defensive": {
+      "anualPct": 130,
+      "mesMaximoPct": 50,
+      "mesesSinMover": 4
+    },
+    "bench6040": {
+      "anualPct": 3,
+      "mesMaximoPct": 50,
+      "mesesSinMover": 235
+    }
+  },
+  "capacidad": {
+    "volumenDiarioMedidoEl": "2026-09-03",
+    "metodo": "mediana de ~90 sesiones, 10 % del volumen diario",
+    "advDolares": {
+      "SPY": 34710000000,
+      "TLT": 2140000000,
+      "IEF": 530000000,
+      "GLD": 3200000000,
+      "DBC": 20000000,
+      "BIL": 800000000
+    },
+    "peorMovimientoMensual": {
+      "SPY": 1,
+      "TLT": 0.15,
+      "IEF": 0.1,
+      "GLD": 0.15,
+      "DBC": 0,
+      "BIL": 1
+    },
+    "porActivoMillones": {
+      "SPY": 3471,
+      "TLT": 1427,
+      "IEF": 530,
+      "GLD": 2133,
+      "DBC": null,
+      "BIL": 80
+    },
+    "limiteConBil": 80,
+    "limiteSinBil": 530,
+    "nota": "BIL es el proxy de caja; a escala se tienen letras, no el ETF. La restriccion real es IEF. Y solo importa si hay un vehiculo de inversion: Scora es software."
+  },
+  "deflacion": {
+    "sharpeMensual": 0.2503,
+    "asimetria": 0.065,
+    "curtosisTotal": 5.516,
+    "porEnsayos": {
+      "1": {
+        "umbral": 0.0338,
+        "dsr": 0.9994,
+        "supera": true
+      },
+      "50": {
+        "umbral": 0.1482,
+        "dsr": 0.9363,
+        "supera": false
+      },
+      "344": {
+        "umbral": 0.1913,
+        "dsr": 0.8109,
+        "supera": false
+      },
+      "1000": {
+        "umbral": 0.2119,
+        "dsr": 0.7167,
+        "supera": false
+      }
+    },
+    "nota": "Con 1 ensayo el Sharpe seria significativo (DSR 99,9 %). Con los 344 gastados no llega (81,1 %)."
+  },
+  "robustezDrawdown": {
+    "ventanas": [
+      {
+        "desde": "2007-01",
+        "meses": 236,
+        "allocator": -16.2,
+        "spy": -50.7,
+        "ratio": 0.32
+      },
+      {
+        "desde": "2008-01",
+        "meses": 224,
+        "allocator": -16.2,
+        "spy": -48.2,
+        "ratio": 0.34
+      },
+      {
+        "desde": "2009-01",
+        "meses": 212,
+        "allocator": -16.2,
+        "spy": -23.9,
+        "ratio": 0.68
+      },
+      {
+        "desde": "2010-01",
+        "meses": 200,
+        "allocator": -16.2,
+        "spy": -23.9,
+        "ratio": 0.68
+      },
+      {
+        "desde": "2012-01",
+        "meses": 176,
+        "allocator": -15.8,
+        "spy": -23.9,
+        "ratio": 0.66
+      },
+      {
+        "desde": "2015-01",
+        "meses": 140,
+        "allocator": -15.8,
+        "spy": -23.9,
+        "ratio": 0.66
+      },
+      {
+        "desde": "2018-01",
+        "meses": 104,
+        "allocator": -15.8,
+        "spy": -23.9,
+        "ratio": 0.66
+      },
+      {
+        "desde": "2020-01",
+        "meses": 80,
+        "allocator": -15.8,
+        "spy": -23.9,
+        "ratio": 0.66
+      }
+    ],
+    "estable": true,
+    "nota": "El drawdown del allocator no se mueve (-15,8 a -16,2 % en ocho ventanas). El RATIO si: 0,32 con 2008 dentro, 0,66-0,68 sin la crisis financiera."
+  }
+}

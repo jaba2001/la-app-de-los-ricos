@@ -1,0 +1,100 @@
+{
+ "generatedAt": "2026-08-24T16:16:17.474Z",
+ "asOf": "2026-08-24",
+ "filas": 498,
+ "totalAnomalias": 5,
+ "anomalias": {
+  "margen bruto > 100 %": {
+   "n": 0,
+   "causaProbable": "ingresos y coste de conceptos distintos",
+   "tickers": []
+  },
+  "margen bruto < −50 %": {
+   "n": 0,
+   "causaProbable": "ídem, con el componente al revés",
+   "tickers": []
+  },
+  "margen operativo > 100 %": {
+   "n": 0,
+   "causaProbable": "resultado de explotación mayor que los ingresos",
+   "tickers": []
+  },
+  "margen neto > 200 %": {
+   "n": 0,
+   "causaProbable": "ingresos truncados a un componente",
+   "tickers": []
+  },
+  "ROIC > 500 %": {
+   "n": 0,
+   "causaProbable": "capital invertido casi nulo (¿falta la deuda?)",
+   "tickers": []
+  },
+  "ROE > 1000 %": {
+   "n": 2,
+   "causaProbable": "patrimonio casi nulo — suele ser REAL (recompras)",
+   "tickers": [
+    "GDDY",
+    "MTD"
+   ]
+  },
+  "rent. bruta s/activos > 200 %": {
+   "n": 0,
+   "causaProbable": "margen bruto y activo de periodos distintos",
+   "tickers": []
+  },
+  "PER > 5000": {
+   "n": 0,
+   "causaProbable": "beneficio residual o acciones mal contadas",
+   "tickers": []
+  },
+  "cobertura intereses > 1e5": {
+   "n": 0,
+   "causaProbable": "gasto financiero casi nulo",
+   "tickers": []
+  },
+  "crecim. ingresos > 1000 %": {
+   "n": 0,
+   "causaProbable": "el TTM anterior es de otro concepto",
+   "tickers": []
+  },
+  "capex/ventas > 200 %": {
+   "n": 0,
+   "causaProbable": "ingresos truncados",
+   "tickers": []
+  },
+  "deuda/patrimonio > 100": {
+   "n": 3,
+   "causaProbable": "patrimonio residual",
+   "tickers": [
+    "GDDY",
+    "LYV",
+    "MTD"
+   ]
+  }
+ },
+ "cobertura": {
+  "pe": 467,
+  "pb": 463,
+  "evEbitda": 297,
+  "pfcf": 386,
+  "roe": 465,
+  "roa": 498,
+  "roic": 352,
+  "grossMargin": 298,
+  "netMargin": 498,
+  "grossProfitability": 298,
+  "operatingMargin": 383,
+  "capexToRevenue": 429,
+  "fcfYield": 427,
+  "debtEquity": 425,
+  "currentRatio": 420,
+  "interestCoverage": 141,
+  "netDebtEbitda": 298,
+  "revenueGrowth": 498,
+  "epsGrowth": 472,
+  "priceChange1M": 497,
+  "priceChange3M": 497,
+  "priceChange6M": 497
+ },
+ "nota": "Busca valores IMPOSIBLES, no incorrectos. No debe dar cero: debe dar pocas y explicables. Las que quedan hoy son patrimonios casi nulos por recompras, que son reales."
+}

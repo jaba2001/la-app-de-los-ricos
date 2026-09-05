@@ -1,0 +1,1098 @@
+{
+ "generatedAt": "2026-08-25T05:12:07.628Z",
+ "criterio": "dei:EntityPublicFloat de la SEC. Un miembro del S&P 500 tiene capital flotante; una filial que sólo emite deuda presenta los mismos documentos que su matriz pero no declara flotante.",
+ "comprobados": 121,
+ "sinFlotante": 0,
+ "menoresDe1000M": 1,
+ "detalle": [
+  {
+   "ticker": "ABC",
+   "cik": "0001140859",
+   "nombre": "Cencora, Inc.",
+   "evidencia": "A",
+   "floatMax": 20845049311,
+   "observaciones": 35,
+   "enPeriodo": 28
+  },
+  {
+   "ticker": "ABMD",
+   "cik": "0000815094",
+   "nombre": "ABIOMED INC",
+   "evidencia": "A",
+   "floatMax": 19419916261,
+   "observaciones": 11,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "ADS",
+   "cik": "0001101215",
+   "nombre": "BREAD FINANCIAL HOLDINGS, INC.",
+   "evidencia": "A",
+   "floatMax": 17600000000,
+   "observaciones": 19,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "AET",
+   "cik": "0001122304",
+   "nombre": "AETNA INC /PA/",
+   "evidencia": "A",
+   "floatMax": 49200000000,
+   "observaciones": 21,
+   "enPeriodo": 17
+  },
+  {
+   "ticker": "ALXN",
+   "cik": "0000899866",
+   "nombre": "ALEXION PHARMACEUTICALS, INC.",
+   "evidencia": "A",
+   "floatMax": 39491560848,
+   "observaciones": 13,
+   "enPeriodo": 11
+  },
+  {
+   "ticker": "ANSS",
+   "cik": "0001013462",
+   "nombre": "ANSYS INC",
+   "evidencia": "A",
+   "floatMax": 25434000000,
+   "observaciones": 15,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "ANTM",
+   "cik": "0001156039",
+   "nombre": "Elevance Health, Inc.",
+   "evidencia": "A",
+   "floatMax": 93007966095,
+   "observaciones": 18,
+   "enPeriodo": 12
+  },
+  {
+   "ticker": "APOL",
+   "cik": "0000929887",
+   "nombre": "APOLLO EDUCATION GROUP INC",
+   "evidencia": "C",
+   "floatMax": 9900000000000,
+   "observaciones": 10,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "ARG",
+   "cik": "0000804212",
+   "nombre": "AIRGAS INC",
+   "evidencia": "C",
+   "floatMax": 7400000000,
+   "observaciones": 6,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "ATGE",
+   "cik": "0000730464",
+   "nombre": "Covista Inc.",
+   "evidencia": "B",
+   "floatMax": 3965876075,
+   "observaciones": 19,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "ATVI",
+   "cik": "0000718877",
+   "nombre": "Activision Blizzard, Inc.",
+   "evidencia": "A",
+   "floatMax": 73721746854,
+   "observaciones": 17,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "BF.B",
+   "cik": "0000014693",
+   "nombre": "BROWN FORMAN CORP",
+   "evidencia": "fuente",
+   "floatMax": 19400000000,
+   "observaciones": 22,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "BIG",
+   "cik": "0000768835",
+   "nombre": "FORMER BL STORES INC",
+   "evidencia": "B",
+   "floatMax": 2707259542,
+   "observaciones": 17,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "BLL",
+   "cik": "0000009389",
+   "nombre": "BALL Corp",
+   "evidencia": "A",
+   "floatMax": 26500000000,
+   "observaciones": 19,
+   "enPeriodo": 14
+  },
+  {
+   "ticker": "BMS",
+   "cik": "0000011199",
+   "nombre": "Amcor Flexibles North America, Inc.",
+   "evidencia": "A",
+   "floatMax": 4061047083,
+   "observaciones": 9,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "CBS",
+   "cik": "0000813828",
+   "nombre": "Paramount Global",
+   "evidencia": "C",
+   "floatMax": 32764308589,
+   "observaciones": 16,
+   "enPeriodo": 9
+  },
+  {
+   "ticker": "CDAY",
+   "cik": "0001725057",
+   "nombre": "Dayforce, Inc.",
+   "evidencia": "A",
+   "floatMax": 10200000000,
+   "observaciones": 8,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "CELG",
+   "cik": "0000816284",
+   "nombre": "CELGENE CORP /DE/",
+   "evidencia": "A",
+   "floatMax": 101580696211,
+   "observaciones": 17,
+   "enPeriodo": 11
+  },
+  {
+   "ticker": "CEPH",
+   "cik": "0000873364",
+   "nombre": "CEPHALON INC",
+   "evidencia": "A",
+   "floatMax": 3100000000,
+   "observaciones": 1,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "CERN",
+   "cik": "0000804753",
+   "nombre": "CERNER Corp",
+   "evidencia": "A",
+   "floatMax": 21000000000,
+   "observaciones": 15,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "CMA",
+   "cik": "0000028412",
+   "nombre": "COMERICA INC",
+   "evidencia": "A",
+   "floatMax": 15300000000,
+   "observaciones": 15,
+   "enPeriodo": 14
+  },
+  {
+   "ticker": "COG",
+   "cik": "0000858470",
+   "nombre": "Coterra Energy Inc.",
+   "evidencia": "A",
+   "floatMax": 14900000000,
+   "observaciones": 22,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "COL",
+   "cik": "0001137411",
+   "nombre": "ROCKWELL COLLINS INC",
+   "evidencia": "A",
+   "floatMax": 22100000000,
+   "observaciones": 12,
+   "enPeriodo": 9
+  },
+  {
+   "ticker": "COV",
+   "cik": "0001385187",
+   "nombre": "Covidien plc",
+   "evidencia": "C",
+   "floatMax": 32604000000,
+   "observaciones": 8,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "CPGX",
+   "cik": "0001629995",
+   "nombre": "Columbia Pipeline Group, Inc.",
+   "evidencia": "C",
+   "floatMax": 0,
+   "observaciones": 3,
+   "enPeriodo": 0
+  },
+  {
+   "ticker": "CTL",
+   "cik": "0000018926",
+   "nombre": "Lumen Technologies, Inc.",
+   "evidencia": "A",
+   "floatMax": 24500000000,
+   "observaciones": 19,
+   "enPeriodo": 11
+  },
+  {
+   "ticker": "CTLT",
+   "cik": "0001596783",
+   "nombre": "Catalent, Inc.",
+   "evidencia": "A",
+   "floatMax": 21840000000,
+   "observaciones": 13,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "CTRA",
+   "cik": "0000858470",
+   "nombre": "Coterra Energy Inc.",
+   "evidencia": "A",
+   "floatMax": 20200000000,
+   "observaciones": 22,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "CTXS",
+   "cik": "0000877890",
+   "nombre": "CITRIX SYSTEMS INC",
+   "evidencia": "A",
+   "floatMax": 18003842231,
+   "observaciones": 15,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "CVC",
+   "cik": "0001053112",
+   "nombre": "CABLEVISION SYSTEMS CORP /NY",
+   "evidencia": "C",
+   "floatMax": 8031312425,
+   "observaciones": 15,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "CXO",
+   "cik": "0001358071",
+   "nombre": "CONCHO RESOURCES INC",
+   "evidencia": "A",
+   "floatMax": 20479372863,
+   "observaciones": 14,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "DISCA",
+   "cik": "0001437107",
+   "nombre": "Warner Bros. Discovery, Inc.",
+   "evidencia": "A",
+   "floatMax": 17000000000,
+   "observaciones": 20,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "DISCK",
+   "cik": "0001437107",
+   "nombre": "Warner Bros. Discovery, Inc.",
+   "evidencia": "A",
+   "floatMax": 15000000000,
+   "observaciones": 20,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "DISH",
+   "cik": "0001001082",
+   "nombre": "DISH Network CORP",
+   "evidencia": "A",
+   "floatMax": 13800000000,
+   "observaciones": 19,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "DNR",
+   "cik": "0000945764",
+   "nombre": "DENBURY INC",
+   "evidencia": "C",
+   "floatMax": 6990650460,
+   "observaciones": 17,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "DRE",
+   "cik": "0000783280",
+   "nombre": "DUKE REALTY CORP",
+   "evidencia": "A",
+   "floatMax": 18010000000,
+   "observaciones": 14,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "ENDP",
+   "cik": "0001593034",
+   "nombre": "Endo International plc",
+   "evidencia": "B",
+   "floatMax": 16572203055,
+   "observaciones": 11,
+   "enPeriodo": 2
+  },
+  {
+   "ticker": "ESRX",
+   "cik": "0001532063",
+   "nombre": "Express Scripts Holding Co.",
+   "evidencia": "C",
+   "floatMax": 59987373540,
+   "observaciones": 6,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "ESV",
+   "cik": "0000314808",
+   "nombre": "Valaris Ltd",
+   "evidencia": "A",
+   "floatMax": 11730723000,
+   "observaciones": 18,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "ETFC",
+   "cik": "0001015780",
+   "nombre": "E TRADE FINANCIAL CORP",
+   "evidencia": "A",
+   "floatMax": 12100000000,
+   "observaciones": 22,
+   "enPeriodo": 22
+  },
+  {
+   "ticker": "EVHC",
+   "cik": "0001678531",
+   "nombre": "Envision Healthcare Corp",
+   "evidencia": "C",
+   "floatMax": 7325596447,
+   "observaciones": 2,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "FB",
+   "cik": "0001326801",
+   "nombre": "Meta Platforms, Inc.",
+   "evidencia": "A",
+   "floatMax": 857000000000,
+   "observaciones": 14,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "FBHS",
+   "cik": "0001519751",
+   "nombre": "Fortune Brands Innovations, Inc.",
+   "evidencia": "A",
+   "floatMax": 13699604954,
+   "observaciones": 15,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "FDO",
+   "cik": "0000034408",
+   "nombre": "FAMILY DOLLAR STORES INC",
+   "evidencia": "A",
+   "floatMax": 6300000000,
+   "observaciones": 4,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "FII",
+   "cik": "0001056288",
+   "nombre": "FEDERATED HERMES, INC.",
+   "evidencia": "C",
+   "floatMax": 2200000000,
+   "observaciones": 16,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "FL",
+   "cik": "0000850209",
+   "nombre": "FOOT LOCKER, INC.",
+   "evidencia": "B",
+   "floatMax": 6029285940,
+   "observaciones": 15,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "FLIR",
+   "cik": "0000354908",
+   "nombre": "Teledyne FLIR, LLC",
+   "evidencia": "A",
+   "floatMax": 7286034534,
+   "observaciones": 20,
+   "enPeriodo": 18
+  },
+  {
+   "ticker": "FLT",
+   "cik": "0001175454",
+   "nombre": "CORPAY, INC.",
+   "evidencia": "A",
+   "floatMax": 23926076537,
+   "observaciones": 16,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "FTR",
+   "cik": "0000020520",
+   "nombre": "Frontier Communications Parent, Inc.",
+   "evidencia": "A",
+   "floatMax": 7996790000,
+   "observaciones": 20,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "GENZ",
+   "cik": "0000732485",
+   "nombre": "GENZYME CORP",
+   "evidencia": "A",
+   "floatMax": 12259385395,
+   "observaciones": 6,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "GMCR",
+   "cik": "0000909954",
+   "nombre": "KEURIG GREEN MOUNTAIN, INC.",
+   "evidencia": "A",
+   "floatMax": 17446088000,
+   "observaciones": 7,
+   "enPeriodo": 2
+  },
+  {
+   "ticker": "GPS",
+   "cik": "0000039911",
+   "nombre": "GAP INC",
+   "evidencia": "A",
+   "floatMax": 14000000000,
+   "observaciones": 18,
+   "enPeriodo": 12
+  },
+  {
+   "ticker": "HBI",
+   "cik": "0001359841",
+   "nombre": "Hanesbrands Inc.",
+   "evidencia": "A",
+   "floatMax": 13577320340,
+   "observaciones": 20,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "HFC",
+   "cik": "0000048039",
+   "nombre": "HollyFrontier Corp",
+   "evidencia": "A",
+   "floatMax": 11000000000,
+   "observaciones": 20,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "HNZ",
+   "cik": "0000046640",
+   "nombre": "Solo Cup CO",
+   "evidencia": "A",
+   "floatMax": 18300000000,
+   "observaciones": 18,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "HOLX",
+   "cik": "0000859737",
+   "nombre": "HOLOGIC INC",
+   "evidencia": "A",
+   "floatMax": 19637934479,
+   "observaciones": 19,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "HSP",
+   "cik": "0001274057",
+   "nombre": "HOSPIRA INC",
+   "evidencia": "A",
+   "floatMax": 9593700000,
+   "observaciones": 8,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "IGT",
+   "cik": "0000353944",
+   "nombre": "INTERNATIONAL GAME TECHNOLOGY",
+   "evidencia": "B",
+   "floatMax": 5500000000,
+   "observaciones": 11,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "IPG",
+   "cik": "0000051644",
+   "nombre": "INTERPUBLIC GROUP OF COMPANIES, INC.",
+   "evidencia": "A",
+   "floatMax": 14900000000,
+   "observaciones": 15,
+   "enPeriodo": 15
+  },
+  {
+   "ticker": "JCP",
+   "cik": "0001166126",
+   "nombre": "Old COPPER Company, Inc.",
+   "evidencia": "B",
+   "floatMax": 5616298853,
+   "observaciones": 15,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "JEC",
+   "cik": "0000052988",
+   "nombre": "JACOBS SOLUTIONS INC.",
+   "evidencia": "A",
+   "floatMax": 10200000000,
+   "observaciones": 18,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "JNPR",
+   "cik": "0001043604",
+   "nombre": "JUNIPER NETWORKS INC",
+   "evidencia": "A",
+   "floatMax": 11713000000,
+   "observaciones": 19,
+   "enPeriodo": 15
+  },
+  {
+   "ticker": "JWN",
+   "cik": "0000072333",
+   "nombre": "NORDSTROM INC",
+   "evidencia": "A",
+   "floatMax": 11700000000,
+   "observaciones": 17,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "KSU",
+   "cik": "0000054480",
+   "nombre": "KANSAS CITY SOUTHERN",
+   "evidencia": "A",
+   "floatMax": 25630000000,
+   "observaciones": 20,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "LLTC",
+   "cik": "0000791907",
+   "nombre": "LINEAR TECHNOLOGY CORP /CA/",
+   "evidencia": "A",
+   "floatMax": 7328000000,
+   "observaciones": 9,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "LSI",
+   "cik": "0000703360",
+   "nombre": "LIFE STORAGE, INC.",
+   "evidencia": "B",
+   "floatMax": 4100000000,
+   "observaciones": 9,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "LVLT",
+   "cik": "0000794323",
+   "nombre": "Level 3 Parent, LLC",
+   "evidencia": "A",
+   "floatMax": 17500000000,
+   "observaciones": 17,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "MDP",
+   "cik": "0000065011",
+   "nombre": "Hawkeye Acquisition, Inc.",
+   "evidencia": "A",
+   "floatMax": 1234000000,
+   "observaciones": 12,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "MOLX",
+   "cik": "0000067472",
+   "nombre": "MOLEX INC",
+   "evidencia": "C",
+   "floatMax": 2887336930,
+   "observaciones": 7,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "MRO",
+   "cik": "0000101778",
+   "nombre": "MARATHON OIL CORP",
+   "evidencia": "A",
+   "floatMax": 26831000000,
+   "observaciones": 27,
+   "enPeriodo": 21
+  },
+  {
+   "ticker": "MXIM",
+   "cik": "0000743316",
+   "nombre": "MAXIM INTEGRATED PRODUCTS INC",
+   "evidencia": "A",
+   "floatMax": 15055411611,
+   "observaciones": 12,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "MYL",
+   "cik": "0001623613",
+   "nombre": "Mylan II B.V.",
+   "evidencia": "A",
+   "floatMax": 33063308366,
+   "observaciones": 7,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "NBL",
+   "cik": "0000072207",
+   "nombre": "NOBLE ENERGY INC",
+   "evidencia": "A",
+   "floatMax": 28000000000,
+   "observaciones": 31,
+   "enPeriodo": 25
+  },
+  {
+   "ticker": "NFX",
+   "cik": "0000912750",
+   "nombre": "NEWFIELD EXPLORATION CO /DE/",
+   "evidencia": "A",
+   "floatMax": 10200000000000000,
+   "observaciones": 37,
+   "enPeriodo": 31
+  },
+  {
+   "ticker": "NLOK",
+   "cik": "0000849399",
+   "nombre": "Gen Digital Inc.",
+   "evidencia": "A",
+   "floatMax": 9832405362,
+   "observaciones": 18,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "NLSN",
+   "cik": "0001492633",
+   "nombre": "Nielsen Holdings plc",
+   "evidencia": "A",
+   "floatMax": 18497000000,
+   "observaciones": 13,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "NYX",
+   "cik": "0001368007",
+   "nombre": "NYSE Euronext",
+   "evidencia": "A",
+   "floatMax": 8900000000,
+   "observaciones": 12,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "ODP",
+   "cik": "0000800240",
+   "nombre": "ODP Corp",
+   "evidencia": "B",
+   "floatMax": 1254039687,
+   "observaciones": 16,
+   "enPeriodo": 2
+  },
+  {
+   "ticker": "PBCT",
+   "cik": "0001378946",
+   "nombre": "People's United Financial, Inc.",
+   "evidencia": "A",
+   "floatMax": 7330000000,
+   "observaciones": 15,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "PDCO",
+   "cik": "0000891024",
+   "nombre": "PATTERSON COMPANIES, INC.",
+   "evidencia": "B",
+   "floatMax": 4691000000,
+   "observaciones": 14,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "PEAK",
+   "cik": "0000765880",
+   "nombre": "HEALTHPEAK PROPERTIES, INC.",
+   "evidencia": "A",
+   "floatMax": 12800000000,
+   "observaciones": 19,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "PETM",
+   "cik": "0000863157",
+   "nombre": "PETSMART INC",
+   "evidencia": "A",
+   "floatMax": 7730027000,
+   "observaciones": 9,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "PKI",
+   "cik": "0000031791",
+   "nombre": "REVVITY, INC.",
+   "evidencia": "A",
+   "floatMax": 18089645853,
+   "observaciones": 16,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "PXD",
+   "cik": "0001038357",
+   "nombre": "PIONEER NATURAL RESOURCES CO",
+   "evidencia": "A",
+   "floatMax": 53223207626,
+   "observaciones": 17,
+   "enPeriodo": 15
+  },
+  {
+   "ticker": "QEP",
+   "cik": "0001108827",
+   "nombre": "QEP RESOURCES, INC.",
+   "evidencia": "B",
+   "floatMax": 1000000000000000000,
+   "observaciones": 13,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "QLGC",
+   "cik": "0000918386",
+   "nombre": "QLOGIC CORP",
+   "evidencia": "A",
+   "floatMax": 1798435000,
+   "observaciones": 11,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "RAI",
+   "cik": "0001275283",
+   "nombre": "REYNOLDS AMERICAN INC",
+   "evidencia": "C",
+   "floatMax": 44000000000,
+   "observaciones": 16,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "RDC",
+   "cik": "0000085408",
+   "nombre": "ROWAN COMPANIES PLC",
+   "evidencia": "C",
+   "floatMax": 4903000000,
+   "observaciones": 21,
+   "enPeriodo": 12
+  },
+  {
+   "ticker": "RE",
+   "cik": "0001095073",
+   "nombre": "EVEREST GROUP, LTD.",
+   "evidencia": "A",
+   "floatMax": 14800000000,
+   "observaciones": 16,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "RHT",
+   "cik": "0001087423",
+   "nombre": "RED HAT INC",
+   "evidencia": "C",
+   "floatMax": 23100000000,
+   "observaciones": 9,
+   "enPeriodo": 9
+  },
+  {
+   "ticker": "RRD",
+   "cik": "0000029669",
+   "nombre": "RR Donnelley & Sons Co",
+   "evidencia": "B",
+   "floatMax": 3662762507,
+   "observaciones": 16,
+   "enPeriodo": 3
+  },
+  {
+   "ticker": "RTN",
+   "cik": "0001047122",
+   "nombre": "RAYTHEON CO/",
+   "evidencia": "A",
+   "floatMax": 55000000000,
+   "observaciones": 13,
+   "enPeriodo": 11
+  },
+  {
+   "ticker": "SEE",
+   "cik": "0001012100",
+   "nombre": "SEALED AIR CORP/DE",
+   "evidencia": "A",
+   "floatMax": 10611000000,
+   "observaciones": 19,
+   "enPeriodo": 17
+  },
+  {
+   "ticker": "SIAL",
+   "cik": "0000090185",
+   "nombre": "SIGMA ALDRICH CORP",
+   "evidencia": "C",
+   "floatMax": 10494011992,
+   "observaciones": 7,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "SIVB",
+   "cik": "0000719739",
+   "nombre": "SVB FINANCIAL GROUP",
+   "evidencia": "A",
+   "floatMax": 30340662815,
+   "observaciones": 13,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "SNI",
+   "cik": "0001430602",
+   "nombre": "Scripps Networks Interactive, Inc.",
+   "evidencia": "C",
+   "floatMax": 6720000000,
+   "observaciones": 15,
+   "enPeriodo": 14
+  },
+  {
+   "ticker": "SPLS",
+   "cik": "0000791519",
+   "nombre": "STAPLES INC",
+   "evidencia": "A",
+   "floatMax": 14800000000,
+   "observaciones": 10,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "SRCL",
+   "cik": "0000861878",
+   "nombre": "STERICYCLE INC",
+   "evidencia": "B",
+   "floatMax": 11358678595,
+   "observaciones": 16,
+   "enPeriodo": 11
+  },
+  {
+   "ticker": "STJ",
+   "cik": "0000203077",
+   "nombre": "ST JUDE MEDICAL, LLC",
+   "evidencia": "C",
+   "floatMax": 20600000000,
+   "observaciones": 8,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "SVU",
+   "cik": "0000095521",
+   "nombre": "SUPERVALU INC",
+   "evidencia": "A",
+   "floatMax": 2241221551,
+   "observaciones": 16,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "SWN",
+   "cik": "0000007332",
+   "nombre": "SOUTHWESTERN ENERGY CO",
+   "evidencia": "B",
+   "floatMax": 15884399197,
+   "observaciones": 20,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "SWY",
+   "cik": "0000086144",
+   "nombre": "SAFEWAY INC",
+   "evidencia": "C",
+   "floatMax": 7900000000,
+   "observaciones": 8,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "SYMC",
+   "cik": "0000849399",
+   "nombre": "Gen Digital Inc.",
+   "evidencia": "A",
+   "floatMax": 17261356899,
+   "observaciones": 18,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "TGNA",
+   "cik": "0000039899",
+   "nombre": "TEGNA INC",
+   "evidencia": "A",
+   "floatMax": 7239422726,
+   "observaciones": 25,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "TIF",
+   "cik": "0000098246",
+   "nombre": "TIFFANY & CO",
+   "evidencia": "A",
+   "floatMax": 16707436188,
+   "observaciones": 15,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "TSS",
+   "cik": "0000721683",
+   "nombre": "TOTAL SYSTEM SERVICES INC",
+   "evidencia": "C",
+   "floatMax": 10573813000,
+   "observaciones": 12,
+   "enPeriodo": 10
+  },
+  {
+   "ticker": "TWC",
+   "cik": "0001377013",
+   "nombre": "Wendy's Co",
+   "evidencia": "C",
+   "floatMax": 50400000000,
+   "observaciones": 6,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "TWTR",
+   "cik": "0001418091",
+   "nombre": "TWITTER, INC.",
+   "evidencia": "A",
+   "floatMax": 53550000000,
+   "observaciones": 8,
+   "enPeriodo": 4
+  },
+  {
+   "ticker": "UTX",
+   "cik": "0000101829",
+   "nombre": "RTX Corp",
+   "evidencia": "A",
+   "floatMax": 112271798129,
+   "observaciones": 47,
+   "enPeriodo": 37
+  },
+  {
+   "ticker": "VIAB",
+   "cik": "0001339947",
+   "nombre": "Viacom Inc.",
+   "evidencia": "A",
+   "floatMax": 12352600000000000,
+   "observaciones": 4,
+   "enPeriodo": 1
+  },
+  {
+   "ticker": "VIAC",
+   "cik": "0000813828",
+   "nombre": "Paramount Global",
+   "evidencia": "A",
+   "floatMax": 26352596280,
+   "observaciones": 16,
+   "enPeriodo": 2
+  },
+  {
+   "ticker": "VMRK",
+   "cik": "0000906107",
+   "nombre": "VIVMARK RESIDENTIAL",
+   "evidencia": "fuente",
+   "floatMax": 28500000000,
+   "observaciones": 26,
+   "enPeriodo": 0
+  },
+  {
+   "ticker": "WBA",
+   "cik": "0001618921",
+   "nombre": "Walgreens Boots Alliance, Inc.",
+   "evidencia": "A",
+   "floatMax": 73000000000,
+   "observaciones": 13,
+   "enPeriodo": 13
+  },
+  {
+   "ticker": "WCG",
+   "cik": "0001279363",
+   "nombre": "WELLCARE HEALTH PLANS, INC.",
+   "evidencia": "A",
+   "floatMax": 1000000000000000000,
+   "observaciones": 10,
+   "enPeriodo": 0
+  },
+  {
+   "ticker": "WIN",
+   "cik": "0001282266",
+   "nombre": "WINDSTREAM HOLDINGS, INC.",
+   "evidencia": "A",
+   "floatMax": 6609145700,
+   "observaciones": 12,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "WLTW",
+   "cik": "0001140536",
+   "nombre": "WILLIS TOWERS WATSON PLC",
+   "evidencia": "A",
+   "floatMax": 29461050498,
+   "observaciones": 23,
+   "enPeriodo": 7
+  },
+  {
+   "ticker": "WPX",
+   "cik": "0001518832",
+   "nombre": "WPX ENERGY, INC.",
+   "evidencia": "B",
+   "floatMax": 3775544298,
+   "observaciones": 8,
+   "enPeriodo": 2
+  },
+  {
+   "ticker": "WRK",
+   "cik": "0001732845",
+   "nombre": "WestRock Co",
+   "evidencia": "A",
+   "floatMax": 16230000000,
+   "observaciones": 6,
+   "enPeriodo": 6
+  },
+  {
+   "ticker": "X",
+   "cik": "0001163302",
+   "nombre": "UNITED STATES STEEL CORP",
+   "evidencia": "B",
+   "floatMax": 6600000000,
+   "observaciones": 17,
+   "enPeriodo": 5
+  },
+  {
+   "ticker": "XEC",
+   "cik": "0001168054",
+   "nombre": "CIMAREX ENERGY CO",
+   "evidencia": "A",
+   "floatMax": 12300000000,
+   "observaciones": 18,
+   "enPeriodo": 8
+  },
+  {
+   "ticker": "XLNX",
+   "cik": "0000743988",
+   "nombre": "XILINX INC",
+   "evidencia": "A",
+   "floatMax": 20370129000,
+   "observaciones": 14,
+   "enPeriodo": 11
+  }
+ ]
+}

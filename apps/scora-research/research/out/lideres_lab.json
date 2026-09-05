@@ -1,0 +1,806 @@
+{
+ "generatedAt": "2026-08-23T17:54:53.635Z",
+ "desde": 2012,
+ "hasta": 2024,
+ "top": 10,
+ "anos": [
+  {
+   "ano": 2012,
+   "universo": 345,
+   "lideres": [
+    {
+     "t": "PHM",
+     "ret": 187.6,
+     "retSiguiente": 7
+    },
+    {
+     "t": "WHR",
+     "ret": 117.8,
+     "retSiguiente": 49.2
+    },
+    {
+     "t": "EXPE",
+     "ret": 109.1,
+     "retSiguiente": 9.4
+    },
+    {
+     "t": "BAC",
+     "ret": 103.3,
+     "retSiguiente": 30.9
+    },
+    {
+     "t": "LEN",
+     "ret": 95.9,
+     "retSiguiente": -1.9
+    },
+    {
+     "t": "MPC",
+     "ret": 92.3,
+     "retSiguiente": 42.4
+    },
+    {
+     "t": "BBBY",
+     "ret": 77.9,
+     "retSiguiente": 98.3
+    },
+    {
+     "t": "GILD",
+     "ret": 77.5,
+     "retSiguiente": 99.7
+    },
+    {
+     "t": "EMN",
+     "ret": 74.2,
+     "retSiguiente": 14
+    },
+    {
+     "t": "SHW",
+     "ret": 73.2,
+     "retSiguiente": 17.9
+    }
+   ],
+   "medioLideresAnoSiguiente": 36.7,
+   "medioUniversoAnoSiguiente": 33.5,
+   "diferencia": 3.2,
+   "medianaLideresAnoSiguiente": 30.9
+  },
+  {
+   "ano": 2013,
+   "universo": 356,
+   "lideres": [
+    {
+     "t": "NFLX",
+     "ret": 311.2,
+     "retSiguiente": -5.7
+    },
+    {
+     "t": "BBY",
+     "ret": 248.3,
+     "retSiguiente": -1.7
+    },
+    {
+     "t": "MU",
+     "ret": 229.1,
+     "retSiguiente": 61.2
+    },
+    {
+     "t": "PBI",
+     "ret": 126.5,
+     "retSiguiente": 10.8
+    },
+    {
+     "t": "GME",
+     "ret": 104.8,
+     "retSiguiente": -30.5
+    },
+    {
+     "t": "BSX",
+     "ret": 103.6,
+     "retSiguiente": 10.2
+    },
+    {
+     "t": "TMUS",
+     "ret": 100.3,
+     "retSiguiente": -20.1
+    },
+    {
+     "t": "GILD",
+     "ret": 99.7,
+     "retSiguiente": 21.4
+    },
+    {
+     "t": "BBBY",
+     "ret": 98.3,
+     "retSiguiente": -18
+    },
+    {
+     "t": "GNW",
+     "ret": 97.8,
+     "retSiguiente": -45.8
+    }
+   ],
+   "medioLideresAnoSiguiente": -1.8,
+   "medioUniversoAnoSiguiente": 17,
+   "diferencia": -18.9,
+   "medianaLideresAnoSiguiente": -1.7
+  },
+  {
+   "ano": 2014,
+   "universo": 360,
+   "lideres": [
+    {
+     "t": "LUV",
+     "ret": 122.3,
+     "retSiguiente": 3.5
+    },
+    {
+     "t": "EA",
+     "ret": 110.5,
+     "retSiguiente": 47.1
+    },
+    {
+     "t": "EW",
+     "ret": 98.3,
+     "retSiguiente": 24
+    },
+    {
+     "t": "DAL",
+     "ret": 74.9,
+     "retSiguiente": 7.3
+    },
+    {
+     "t": "MNST",
+     "ret": 68.6,
+     "retSiguiente": 37.6
+    },
+    {
+     "t": "KR",
+     "ret": 65.4,
+     "retSiguiente": 35.1
+    },
+    {
+     "t": "MAR",
+     "ret": 62,
+     "retSiguiente": -10.4
+    },
+    {
+     "t": "MU",
+     "ret": 61.2,
+     "retSiguiente": -58.3
+    },
+    {
+     "t": "KDP",
+     "ret": 58.4,
+     "retSiguiente": 34.4
+    },
+    {
+     "t": "IRM",
+     "ret": 56.3,
+     "retSiguiente": -25.4
+    }
+   ],
+   "medioLideresAnoSiguiente": 9.5,
+   "medioUniversoAnoSiguiente": -0.1,
+   "diferencia": 9.6,
+   "medianaLideresAnoSiguiente": 24
+  },
+  {
+   "ano": 2015,
+   "universo": 367,
+   "lideres": [
+    {
+     "t": "NFLX",
+     "ret": 135.4,
+     "retSiguiente": 9.8
+    },
+    {
+     "t": "AMZN",
+     "ret": 114.8,
+     "retSiguiente": 12.5
+    },
+    {
+     "t": "NVDA",
+     "ret": 67.5,
+     "retSiguiente": 236.3
+    },
+    {
+     "t": "HRL",
+     "ret": 57.4,
+     "retSiguiente": -9.3
+    },
+    {
+     "t": "VRSN",
+     "ret": 53.5,
+     "retSiguiente": -12.5
+    },
+    {
+     "t": "FSLR",
+     "ret": 50.2,
+     "retSiguiente": -50.6
+    },
+    {
+     "t": "SBUX",
+     "ret": 50,
+     "retSiguiente": -3.6
+    },
+    {
+     "t": "EXPE",
+     "ret": 48.6,
+     "retSiguiente": -7.6
+    },
+    {
+     "t": "AVGO",
+     "ret": 47.9,
+     "retSiguiente": 27.3
+    },
+    {
+     "t": "STZ",
+     "ret": 47.8,
+     "retSiguiente": 6.9
+    }
+   ],
+   "medioLideresAnoSiguiente": 20.9,
+   "medioUniversoAnoSiguiente": 17.8,
+   "diferencia": 3.1,
+   "medianaLideresAnoSiguiente": 6.9
+  },
+  {
+   "ano": 2016,
+   "universo": 382,
+   "lideres": [
+    {
+     "t": "NVDA",
+     "ret": 236.3,
+     "retSiguiente": 83.7
+    },
+    {
+     "t": "OKE",
+     "ret": 155.2,
+     "retSiguiente": -2.6
+    },
+    {
+     "t": "CNX",
+     "ret": 144,
+     "retSiguiente": -3.8
+    },
+    {
+     "t": "FCX",
+     "ret": 104,
+     "retSiguiente": 37.2
+    },
+    {
+     "t": "NEM",
+     "ret": 81.1,
+     "retSiguiente": 9.1
+    },
+    {
+     "t": "AMAT",
+     "ret": 79.1,
+     "retSiguiente": 62.8
+    },
+    {
+     "t": "DHR",
+     "ret": 75.3,
+     "retSiguiente": 20.7
+    },
+    {
+     "t": "PWR",
+     "ret": 71.9,
+     "retSiguiente": 13.1
+    },
+    {
+     "t": "MLM",
+     "ret": 66.3,
+     "retSiguiente": -4
+    },
+    {
+     "t": "MU",
+     "ret": 64.3,
+     "retSiguiente": 101.3
+    }
+   ],
+   "medioLideresAnoSiguiente": 31.7,
+   "medioUniversoAnoSiguiente": 22.1,
+   "diferencia": 9.6,
+   "medianaLideresAnoSiguiente": 20.7
+  },
+  {
+   "ano": 2017,
+   "universo": 402,
+   "lideres": [
+    {
+     "t": "BBBY",
+     "ret": 275.7,
+     "retSiguiente": -78.8
+    },
+    {
+     "t": "NRG",
+     "ret": 131.1,
+     "retSiguiente": 25.9
+    },
+    {
+     "t": "FSLR",
+     "ret": 114.6,
+     "retSiguiente": -44.3
+    },
+    {
+     "t": "VRTX",
+     "ret": 103.6,
+     "retSiguiente": -0.7
+    },
+    {
+     "t": "MU",
+     "ret": 101.3,
+     "retSiguiente": -33.5
+    },
+    {
+     "t": "WYNN",
+     "ret": 97.1,
+     "retSiguiente": -42.9
+    },
+    {
+     "t": "BA",
+     "ret": 94.8,
+     "retSiguiente": 1
+    },
+    {
+     "t": "DHI",
+     "ret": 88.2,
+     "retSiguiente": -34.6
+    },
+    {
+     "t": "PYPL",
+     "ret": 87.2,
+     "retSiguiente": 4.4
+    },
+    {
+     "t": "PHM",
+     "ret": 84.1,
+     "retSiguiente": -25
+    }
+   ],
+   "medioLideresAnoSiguiente": -22.9,
+   "medioUniversoAnoSiguiente": -13.1,
+   "diferencia": -9.7,
+   "medianaLideresAnoSiguiente": -25
+  },
+  {
+   "ano": 2018,
+   "universo": 415,
+   "lideres": [
+    {
+     "t": "KDP",
+     "ret": 62.6,
+     "retSiguiente": 15.9
+    },
+    {
+     "t": "AMD",
+     "ret": 51.6,
+     "retSiguiente": 147.2
+    },
+    {
+     "t": "TRIP",
+     "ret": 48.4,
+     "retSiguiente": -37.5
+    },
+    {
+     "t": "AAP",
+     "ret": 40.6,
+     "retSiguiente": 1.8
+    },
+    {
+     "t": "MKC",
+     "ret": 34.2,
+     "retSiguiente": 25.4
+    },
+    {
+     "t": "AES",
+     "ret": 32.3,
+     "retSiguiente": 43.9
+    },
+    {
+     "t": "CMG",
+     "ret": 31.7,
+     "retSiguiente": 87
+    },
+    {
+     "t": "ORLY",
+     "ret": 31.4,
+     "retSiguiente": 28.9
+    },
+    {
+     "t": "HCA",
+     "ret": 31.3,
+     "retSiguiente": 23
+    },
+    {
+     "t": "MRK",
+     "ret": 30.4,
+     "retSiguiente": 24.3
+    }
+   ],
+   "medioLideresAnoSiguiente": 36,
+   "medioUniversoAnoSiguiente": 29.5,
+   "diferencia": 6.5,
+   "medianaLideresAnoSiguiente": 25.4
+  },
+  {
+   "ano": 2019,
+   "universo": 427,
+   "lideres": [
+    {
+     "t": "AMD",
+     "ret": 147.2,
+     "retSiguiente": 87
+    },
+    {
+     "t": "LRCX",
+     "ret": 117.5,
+     "retSiguiente": 63.9
+    },
+    {
+     "t": "KLAC",
+     "ret": 100.7,
+     "retSiguiente": 44.5
+    },
+    {
+     "t": "TGT",
+     "ret": 99.6,
+     "retSiguiente": 41.8
+    },
+    {
+     "t": "QRVO",
+     "ret": 92.8,
+     "retSiguiente": 44.1
+    },
+    {
+     "t": "CPRT",
+     "ret": 90.7,
+     "retSiguiente": 32.3
+    },
+    {
+     "t": "XRX",
+     "ret": 90,
+     "retSiguiente": -36.2
+    },
+    {
+     "t": "AMAT",
+     "ret": 87.1,
+     "retSiguiente": 39
+    },
+    {
+     "t": "CMG",
+     "ret": 87,
+     "retSiguiente": 64.6
+    },
+    {
+     "t": "TDG",
+     "ret": 84.8,
+     "retSiguiente": 6.9
+    }
+   ],
+   "medioLideresAnoSiguiente": 38.8,
+   "medioUniversoAnoSiguiente": 7.4,
+   "diferencia": 31.4,
+   "medianaLideresAnoSiguiente": 44.1
+  },
+  {
+   "ano": 2020,
+   "universo": 440,
+   "lideres": [
+    {
+     "t": "NVDA",
+     "ret": 117,
+     "retSiguiente": 127.2
+    },
+    {
+     "t": "PYPL",
+     "ret": 115.5,
+     "retSiguiente": -18
+    },
+    {
+     "t": "ALB",
+     "ret": 109.6,
+     "retSiguiente": 55.7
+    },
+    {
+     "t": "NOW",
+     "ret": 90.2,
+     "retSiguiente": 17.8
+    },
+    {
+     "t": "FCX",
+     "ret": 88.5,
+     "retSiguiente": 59.1
+    },
+    {
+     "t": "IDXX",
+     "ret": 87.6,
+     "retSiguiente": 29
+    },
+    {
+     "t": "CDNS",
+     "ret": 87.6,
+     "retSiguiente": 37.4
+    },
+    {
+     "t": "AMD",
+     "ret": 87,
+     "retSiguiente": 59.4
+    },
+    {
+     "t": "ALGN",
+     "ret": 86.1,
+     "retSiguiente": 22.4
+    },
+    {
+     "t": "ROL",
+     "ret": 82,
+     "retSiguiente": -15.1
+    }
+   ],
+   "medioLideresAnoSiguiente": 37.5,
+   "medioUniversoAnoSiguiente": 27.5,
+   "diferencia": 10,
+   "medianaLideresAnoSiguiente": 37.4
+  },
+  {
+   "ano": 2021,
+   "universo": 451,
+   "lideres": [
+    {
+     "t": "DVN",
+     "ret": 182.5,
+     "retSiguiente": 53.3
+    },
+    {
+     "t": "FTNT",
+     "ret": 135,
+     "retSiguiente": -32.2
+    },
+    {
+     "t": "F",
+     "ret": 131.5,
+     "retSiguiente": -43.5
+    },
+    {
+     "t": "NVDA",
+     "ret": 127.2,
+     "retSiguiente": -48.2
+    },
+    {
+     "t": "FANG",
+     "ret": 123.5,
+     "retSiguiente": 35.6
+    },
+    {
+     "t": "NUE",
+     "ret": 117.8,
+     "retSiguiente": 20.7
+    },
+    {
+     "t": "IT",
+     "ret": 103.2,
+     "retSiguiente": 0.5
+    },
+    {
+     "t": "ANET",
+     "ret": 95.3,
+     "retSiguiente": -16.7
+    },
+    {
+     "t": "EXR",
+     "ret": 93.2,
+     "retSiguiente": -32.9
+    },
+    {
+     "t": "CF",
+     "ret": 91.2,
+     "retSiguiente": 30.2
+    }
+   ],
+   "medioLideresAnoSiguiente": -3.3,
+   "medioUniversoAnoSiguiente": -9.1,
+   "diferencia": 5.8,
+   "medianaLideresAnoSiguiente": 0.5
+  },
+  {
+   "ano": 2022,
+   "universo": 459,
+   "lideres": [
+    {
+     "t": "OXY",
+     "ret": 122.4,
+     "retSiguiente": -2.3
+    },
+    {
+     "t": "HES",
+     "ret": 93.9,
+     "retSiguiente": 4.6
+    },
+    {
+     "t": "XOM",
+     "ret": 84.7,
+     "retSiguiente": -4.5
+    },
+    {
+     "t": "MPC",
+     "ret": 84.6,
+     "retSiguiente": 32.7
+    },
+    {
+     "t": "SLB",
+     "ret": 79.6,
+     "retSiguiente": 1.2
+    },
+    {
+     "t": "APA",
+     "ret": 78.6,
+     "retSiguiente": -21.1
+    },
+    {
+     "t": "HAL",
+     "ret": 73.3,
+     "retSiguiente": -5.3
+    },
+    {
+     "t": "VLO",
+     "ret": 71.5,
+     "retSiguiente": 7.7
+    },
+    {
+     "t": "COP",
+     "ret": 70.3,
+     "retSiguiente": 3.4
+    },
+    {
+     "t": "ENPH",
+     "ret": 60.7,
+     "retSiguiente": -49.4
+    }
+   ],
+   "medioLideresAnoSiguiente": -3.3,
+   "medioUniversoAnoSiguiente": 15.1,
+   "diferencia": -18.4,
+   "medianaLideresAnoSiguiente": 1.2
+  },
+  {
+   "ano": 2023,
+   "universo": 475,
+   "lideres": [
+    {
+     "t": "NVDA",
+     "ret": 234.3,
+     "retSiguiente": 191.2
+    },
+    {
+     "t": "META",
+     "ret": 193.7,
+     "retSiguiente": 76.2
+    },
+    {
+     "t": "RCL",
+     "ret": 159.4,
+     "retSiguiente": 100.5
+    },
+    {
+     "t": "CCL",
+     "ret": 134.9,
+     "retSiguiente": 49.2
+    },
+    {
+     "t": "PHM",
+     "ret": 127,
+     "retSiguiente": 9.8
+    },
+    {
+     "t": "AMD",
+     "ret": 115.5,
+     "retSiguiente": -8.9
+    },
+    {
+     "t": "AVGO",
+     "ret": 105.2,
+     "retSiguiente": 123.8
+    },
+    {
+     "t": "TSLA",
+     "ret": 105,
+     "retSiguiente": 86.1
+    },
+    {
+     "t": "CRM",
+     "ret": 100.9,
+     "retSiguiente": 35.2
+    },
+    {
+     "t": "ANET",
+     "ret": 96.3,
+     "retSiguiente": 98
+    }
+   ],
+   "medioLideresAnoSiguiente": 76.1,
+   "medioUniversoAnoSiguiente": 14.6,
+   "diferencia": 61.5,
+   "medianaLideresAnoSiguiente": 86.1
+  },
+  {
+   "ano": 2024,
+   "universo": 488,
+   "lideres": [
+    {
+     "t": "NVDA",
+     "ret": 191.2,
+     "retSiguiente": 36.4
+    },
+    {
+     "t": "AXON",
+     "ret": 150.9,
+     "retSiguiente": -0.9
+    },
+    {
+     "t": "UAL",
+     "ret": 148.4,
+     "retSiguiente": 20.3
+    },
+    {
+     "t": "AVGO",
+     "ret": 123.8,
+     "retSiguiente": 52.3
+    },
+    {
+     "t": "TRGP",
+     "ret": 113.8,
+     "retSiguiente": 2.6
+    },
+    {
+     "t": "HWM",
+     "ret": 109.2,
+     "retSiguiente": 92
+    },
+    {
+     "t": "CEG",
+     "ret": 100.8,
+     "retSiguiente": 50.9
+    },
+    {
+     "t": "RCL",
+     "ret": 100.5,
+     "retSiguiente": 29.6
+    },
+    {
+     "t": "NFLX",
+     "ret": 99,
+     "retSiguiente": 5.6
+    },
+    {
+     "t": "ANET",
+     "ret": 98,
+     "retSiguiente": 17
+    }
+   ],
+   "medioLideresAnoSiguiente": 30.6,
+   "medioUniversoAnoSiguiente": 13,
+   "diferencia": 17.6,
+   "medianaLideresAnoSiguiente": 29.6
+  }
+ ],
+ "resumen": {
+  "diferenciaMediaPp": 8.56153846153846,
+  "se": 5.825997641667053,
+  "t": 1.4695403239278788,
+  "anosQueGanan": 10,
+  "anosMedidos": 13,
+  "significativo": false
+ },
+ "pruebaDeSignos": {
+  "gana": 10,
+  "de": 13,
+  "pUnaCola": 0.046142578125,
+  "pDosColas": 0.09228515625,
+  "significativo": false
+ },
+ "mdePp": 16.312793396667747,
+ "lectura": "INFRAPOTENCIADO. La estimación puntual es positiva y grande y los líderes ganan la mayoría de los años, pero con esta muestra anual no se puede afirmar ni que repitan ni que no. No es lo mismo que 'no predice nada'.",
+ "nota": "Clasificación EX POST. La tabla dice lo que ya subió, no lo que va a subir. Se publica como contexto y NO alimenta ninguna señal."
+}

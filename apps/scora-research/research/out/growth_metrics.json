@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-09-03T07:16:36.834Z",
+  "months": 236,
+  "window": {
+    "start": "2007-01-01"
+  },
+  "totals": {
+    "growth": 652.6,
+    "growthNoBtc": 595,
+    "defensive": 231,
+    "bench6040": 372.1,
+    "spy": 668.4
+  },
+  "tasaLibreRiesgo": {
+    "fuente": "FRED TB3MS",
+    "mediaAnual": 1.55,
+    "nota": "Antes se usaba 0. Con la tasa real el Sharpe de growth pasa de 1,01 a 0,87; el ORDEN entre estrategias no cambia."
+  },
+  "report": {
+    "growth": {
+      "cagr": 10.81,
+      "vol": 10.77,
+      "sharpe": 0.87,
+      "sortino": 1.46,
+      "calmar": 0.67,
+      "maxDrawdown": -16.2,
+      "var95": -4.25,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 4.32,
+      "informationRatio": -0.08,
+      "treynor": 19.01
+    },
+    "growthNoBtc": {
+      "cagr": 10.36,
+      "vol": 10.6,
+      "sharpe": 0.84,
+      "sortino": 1.39,
+      "calmar": 0.64,
+      "maxDrawdown": -16.2,
+      "var95": -4.21,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 3.94,
+      "informationRatio": -0.12,
+      "treynor": 18.32
+    },
+    "defensive": {
+      "cagr": 6.28,
+      "vol": 6.04,
+      "sharpe": 0.78,
+      "sortino": 1.24,
+      "calmar": 0.62,
+      "maxDrawdown": -10.1,
+      "var95": -2.42,
+      "cvar95": -3.65,
+      "beta": 0.22,
+      "alpha": 2.46,
+      "informationRatio": -0.4,
+      "treynor": 21.28
+    },
+    "bench6040": {
+      "cagr": 8.21,
+      "vol": 9.8,
+      "sharpe": 0.7,
+      "sortino": 1.05,
+      "calmar": 0.29,
+      "maxDrawdown": -28.8,
+      "var95": -4.44,
+      "cvar95": -6.46,
+      "beta": 0.58,
+      "alpha": 0.95,
+      "informationRatio": -0.45,
+      "treynor": 11.85
+    },
+    "spy": {
+      "cagr": 10.92,
+      "vol": 16.29,
+      "sharpe": 0.63,
+      "sortino": 0.92,
+      "calmar": 0.22,
+      "maxDrawdown": -50.7,
+      "var95": -8.21,
+      "cvar95": -11.18,
+      "beta": null,
+      "alpha": null,
+      "informationRatio": null,
+      "treynor": null
+    }
+  },
+  "reportRf0": {
+    "growth": {
+      "cagr": 10.81,
+      "vol": 10.77,
+      "sharpe": 1.01,
+      "sortino": 1.75,
+      "calmar": 0.67,
+      "maxDrawdown": -16.2,
+      "var95": -4.25,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 5.11,
+      "informationRatio": -0.08,
+      "treynor": 22.17
+    },
+    "growthNoBtc": {
+      "cagr": 10.36,
+      "vol": 10.6,
+      "sharpe": 0.99,
+      "sortino": 1.68,
+      "calmar": 0.64,
+      "maxDrawdown": -16.2,
+      "var95": -4.21,
+      "cvar95": -6.36,
+      "beta": 0.49,
+      "alpha": 4.74,
+      "informationRatio": -0.12,
+      "treynor": 21.51
+    },
+    "defensive": {
+      "cagr": 6.28,
+      "vol": 6.04,
+      "sharpe": 1.04,
+      "sortino": 1.74,
+      "calmar": 0.62,
+      "maxDrawdown": -10.1,
+      "var95": -2.42,
+      "cvar95": -3.65,
+      "beta": 0.22,
+      "alpha": 3.67,
+      "informationRatio": -0.4,
+      "treynor": 28.26
+    },
+    "bench6040": {
+      "cagr": 8.21,
+      "vol": 9.8,
+      "sharpe": 0.86,
+      "sortino": 1.33,
+      "calmar": 0.29,
+      "maxDrawdown": -28.8,
+      "var95": -4.44,
+      "cvar95": -6.46,
+      "beta": 0.58,
+      "alpha": 1.61,
+      "informationRatio": -0.45,
+      "treynor": 14.54
+    },
+    "spy": {
+      "cagr": 10.92,
+      "vol": 16.29,
+      "sharpe": 0.72,
+      "sortino": 1.07,
+      "calmar": 0.22,
+      "maxDrawdown": -50.7,
+      "var95": -8.21,
+      "cvar95": -11.18,
+      "beta": null,
+      "alpha": null,
+      "informationRatio": null,
+      "treynor": null
+    }
+  },
+  "forma": {
+    "growth": {
+      "asimetria": 0.065,
+      "curtosisExceso": 2.516
+    },
+    "spy": {
+      "asimetria": -0.705,
+      "curtosisExceso": 1.639
+    }
+  },
+  "significacion": {
+    "vsSpy": {
+      "sharpeA": 0.867,
+      "sharpeB": 0.626,
+      "diferencia": 0.241,
+      "rho": 0.743,
+      "errorTipico": 0.04732,
+      "t": 1.47,
+      "significativo": false,
+      "meses": 236
+    },
+    "vsBench6040": {
+      "sharpeA": 0.867,
+      "sharpeB": 0.698,
+      "diferencia": 0.169,
+      "rho": 0.712,
+      "errorTipico": 0.05005,
+      "t": 0.97,
+      "significativo": false,
+      "meses": 236
+    }
+  }
+}

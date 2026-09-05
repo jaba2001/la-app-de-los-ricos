@@ -1,0 +1,374 @@
+{
+ "ventana": "2019-2026",
+ "fechas": 158,
+ "horizonteMeses": 12,
+ "entrada": 0.7,
+ "HF3": {
+  "tasaTop": 0.13071895424836602,
+  "tasaResto": 0.10116892520947554,
+  "diferencia": 0.02955002903889048,
+  "se": 0.02621419182827429,
+  "mde": 0.07339973711916802,
+  "pasa": true,
+  "nTop": 1071,
+  "nResto": 9667,
+  "ganadoresVetados": [
+   {
+    "fecha": "2022-10-17",
+    "t": "NVDA",
+    "ret": 269.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-09-01",
+    "t": "NVDA",
+    "ret": 248.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-10-03",
+    "t": "NVDA",
+    "ret": 248,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-09-15",
+    "t": "NVDA",
+    "ret": 239.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-11-01",
+    "t": "NVDA",
+    "ret": 212.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-12-01",
+    "t": "NVDA",
+    "ret": 195.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-11-15",
+    "t": "NVDA",
+    "ret": 193.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-07-01",
+    "t": "NVDA",
+    "ret": 191.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-07-15",
+    "t": "NVDA",
+    "ret": 188.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2024-01-02",
+    "t": "NVDA",
+    "ret": 187.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-05-15",
+    "t": "MGM",
+    "ret": 182.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2023-12-15",
+    "t": "NVDA",
+    "ret": 174.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-05-01",
+    "t": "MGM",
+    "ret": 171.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-06-03",
+    "t": "NVDA",
+    "ret": 162.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-07-01",
+    "t": "MGM",
+    "ret": 159.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-06-15",
+    "t": "NVDA",
+    "ret": 158.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-08-01",
+    "t": "NVDA",
+    "ret": 158.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-06-17",
+    "t": "NVDA",
+    "ret": 155.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-08-01",
+    "t": "NVDA",
+    "ret": 152.4,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-09-15",
+    "t": "AMAT",
+    "ret": 149,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-07-15",
+    "t": "NVDA",
+    "ret": 145.2,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-06-01",
+    "t": "MGM",
+    "ret": 143.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2024-01-16",
+    "t": "NVDA",
+    "ret": 137,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-11-02",
+    "t": "AMAT",
+    "ret": 136,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-12-01",
+    "t": "NVDA",
+    "ret": 135,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2022-08-15",
+    "t": "NVDA",
+    "ret": 131.1,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-07-01",
+    "t": "NVDA",
+    "ret": 130,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-04-01",
+    "t": "SNA",
+    "ret": 128.8,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-12-15",
+    "t": "NVDA",
+    "ret": 128.2,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2021-01-04",
+    "t": "NVDA",
+    "ret": 123.6,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-04-15",
+    "t": "SNA",
+    "ret": 117.9,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-09-01",
+    "t": "AMAT",
+    "ret": 117.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-06-15",
+    "t": "MGM",
+    "ret": 117.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2022-06-01",
+    "t": "NVDA",
+    "ret": 117.3,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-07-15",
+    "t": "MGM",
+    "ret": 115.5,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-10-01",
+    "t": "AMAT",
+    "ret": 114.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2020-11-16",
+    "t": "AMAT",
+    "ret": 113.7,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2019-05-15",
+    "t": "NVDA",
+    "ret": 113.6,
+    "motivos": [
+     "devengos"
+    ]
+   },
+   {
+    "fecha": "2021-01-15",
+    "t": "NVDA",
+    "ret": 109.7,
+    "motivos": [
+     "beneish"
+    ]
+   },
+   {
+    "fecha": "2020-10-15",
+    "t": "AMAT",
+    "ret": 109,
+    "motivos": [
+     "devengos"
+    ]
+   }
+  ]
+ },
+ "HF1": {
+  "spread": -0.23255080903243822,
+  "se": 2.9092751119295257,
+  "mde": 8.145970313402671,
+  "t": -0.07993427918826246,
+  "fechas": 158,
+  "nObs": 10738,
+  "significativo": false,
+  "signo": "−"
+ },
+ "HF2": {
+  "marcadosEnTop40": 765,
+  "deTop40": 6320,
+  "pct": 12.1,
+  "nota": "sin potencia: comprobación, no evidencia"
+ },
+ "cobertura": {
+  "accruals": 10738,
+  "beneish": 5188,
+  "piotroski": 7495,
+  "total": 10738
+ },
+ "veredicto": {
+  "construir": false,
+  "motivo": "HF1 sin efecto y HF3 apunta en la dirección temida",
+  "nota": "El veto NO se enchufa a `PicksInput.disqualified` en producción. Los modelos quedan calculados y publicados como capa explicativa."
+ },
+ "generatedAt": "2026-08-24T17:07:43.186Z",
+ "parametros": {
+  "BENEISH_UMBRAL": -1.78,
+  "PIOTROSKI_MIN": 3,
+  "ACCRUALS_PCTL": 0.9,
+  "ENTRADA": 0.7,
+  "HORIZONTE_MESES": 12
+ },
+ "orden": "HF3 se ejecuta primero y manda: si el veto castiga a los ganadores, HF1 y HF2 son irrelevantes."
+}

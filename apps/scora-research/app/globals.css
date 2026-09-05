@@ -1,0 +1,430 @@
+@import "tailwindcss";
+
+/* ─── Scora Research — Design System ──────────────────────────────────────
+   Navy + Amber. Premium financial research terminal.
+   Inspired by Apple Finance × Bloomberg dark mode.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Core palette ── */
+  --sr-bg:         #070E1A;   /* Page background */
+  --sr-surface:    #0D1B2E;   /* Cards, panels */
+  --sr-surface-2:  #122540;   /* Elevated cards */
+  --sr-surface-3:  #1A3050;   /* Hover states, active rows */
+
+  /* ── Borders ── */
+  --sr-border:     #1E3A5F;
+  --sr-border-2:   #2A4F7A;
+
+  /* ── Text ── */
+  --sr-text:       #F0F4F8;   /* Primary */
+  --sr-text-2:     #94A3B8;   /* Secondary */
+  --sr-text-3:     #4A6080;   /* Tertiary / labels */
+  --sr-text-inv:   #070E1A;   /* On amber buttons */
+
+  /* ── Brand accent — Amber ── */
+  --sr-amber:      #F59E0B;
+  --sr-amber-dim:  color-mix(in srgb, #F59E0B 15%, transparent);
+  --sr-amber-mid:  color-mix(in srgb, #F59E0B 30%, transparent);
+
+  /* ── Semantic colors ── */
+  --sr-pos:        #10B981;   /* Green — positive, bullish */
+  --sr-neg:        #EF4444;   /* Red — negative, bearish */
+  --sr-warn:       #F59E0B;   /* Amber — caution */
+  --sr-info:       #3B82F6;   /* Blue — info */
+  --sr-neutral:    #6B7280;   /* Gray — neutral */
+
+  /* ── Composite score colors ── */
+  --sr-lcc:        #06B6D4;   /* Liquidity — Cyan */
+  --sr-rpc:        #EF4444;   /* Recession — Red */
+  --sr-csc:        #F97316;   /* Credit Stress — Orange */
+  --sr-grc:        #F59E0B;   /* Geopolitical — Amber */
+  --sr-hsc:        #8B5CF6;   /* Housing — Purple */
+
+  /* ── Typography scale ── */
+  --sr-t-xs:       0.625rem;  /* 10px — micro labels */
+  --sr-t-sm:       0.75rem;   /* 12px */
+  --sr-t-base:     0.875rem;  /* 14px */
+  --sr-t-md:       1rem;      /* 16px */
+  --sr-t-lg:       1.125rem;  /* 18px */
+  --sr-t-xl:       1.375rem;  /* 22px */
+  --sr-t-2xl:      1.75rem;   /* 28px */
+  --sr-t-3xl:      2.25rem;   /* 36px */
+  --sr-t-hero:     3rem;      /* 48px */
+
+  /* ── Spacing ── */
+  --sr-sp-1: 4px;
+  --sr-sp-2: 8px;
+  --sr-sp-3: 12px;
+  --sr-sp-4: 16px;
+  --sr-sp-5: 20px;
+  --sr-sp-6: 24px;
+  --sr-sp-8: 32px;
+  --sr-sp-10: 40px;
+  --sr-sp-12: 48px;
+
+  /* ── Radius ── */
+  --sr-radius-sm:  6px;
+  --sr-radius:     10px;
+  --sr-radius-lg:  14px;
+  --sr-radius-xl:  20px;
+  --sr-radius-pill: 999px;
+
+  /* ── Shadows ── */
+  --sr-shadow:     0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --sr-shadow-lg:  0 4px 20px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
+  --sr-shadow-amber: 0 0 20px color-mix(in srgb, #F59E0B 20%, transparent);
+
+  /* ── Nav heights ── */
+  --sr-nav-h:      56px;
+  --sr-subnav-h:   44px;
+}
+
+/* ─── Tailwind bridge ─────────────────────────────────────────────── */
+@theme inline {
+  --color-sr-bg:       var(--sr-bg);
+  --color-sr-surface:  var(--sr-surface);
+  --color-sr-amber:    var(--sr-amber);
+  --color-sr-pos:      var(--sr-pos);
+  --color-sr-neg:      var(--sr-neg);
+  --color-sr-warn:     var(--sr-warn);
+  --color-sr-info:     var(--sr-info);
+  --color-sr-text:     var(--sr-text);
+  --color-sr-text-2:   var(--sr-text-2);
+  --color-sr-border:   var(--sr-border);
+}
+
+/* ─── Base reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--sr-bg);
+  color: var(--sr-text);
+  font-family: var(--font-hanken), 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, textarea { font-family: inherit; }
+
+/* ─── Number display — tabular ────────────────────────────────────── */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  letter-spacing: -0.01em;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--sr-bg); }
+::-webkit-scrollbar-thumb { background: var(--sr-border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--sr-text-3); }
+
+/* ─── Animations ──────────────────────────────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.animate-fade-in { animation: fadeIn 240ms ease forwards; }
+
+/* ─── Skeleton ────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--sr-surface-2) 25%,
+    var(--sr-surface-3) 50%,
+    var(--sr-surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--sr-radius-sm);
+}
+
+/* ─── Cards ───────────────────────────────────────────────────────── */
+.card {
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius-lg);
+  padding: var(--sr-sp-5);
+}
+
+.card-sm {
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius);
+  padding: var(--sr-sp-3) var(--sr-sp-4);
+}
+
+/* ─── Tab pill buttons ────────────────────────────────────────────── */
+.tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sr-sp-1);
+  padding: 5px 14px;
+  border-radius: var(--sr-radius-pill);
+  font-size: var(--sr-t-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--sr-text-2);
+  transition: all 160ms ease;
+}
+
+.tab-pill:hover {
+  color: var(--sr-text);
+  background: var(--sr-surface-2);
+}
+
+.tab-pill.active {
+  background: var(--sr-amber-dim);
+  border-color: color-mix(in srgb, var(--sr-amber) 40%, transparent);
+  color: var(--sr-amber);
+}
+
+/* ─── Sub-tab row ─────────────────────────────────────────────────── */
+.subtab {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--sr-radius-pill);
+  font-size: var(--sr-t-sm);
+  font-weight: 500;
+  color: var(--sr-text-3);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.subtab:hover {
+  color: var(--sr-text-2);
+  background: var(--sr-surface-2);
+}
+
+.subtab.active {
+  color: var(--sr-text);
+  background: var(--sr-surface-2);
+  border-color: var(--sr-border-2);
+}
+
+/* ─── Score bar ───────────────────────────────────────────────────── */
+.score-bar-track {
+  height: 4px;
+  background: var(--sr-surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Pill badges ─────────────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--sr-radius-pill);
+  font-size: var(--sr-t-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─── Stat row (label + value) ────────────────────────────────────── */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--sr-border);
+}
+
+.stat-row:last-child { border-bottom: none; }
+
+/* ─── Table ───────────────────────────────────────────────────────── */
+.sr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sr-t-sm);
+}
+
+.sr-table th {
+  text-align: left;
+  font-size: var(--sr-t-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sr-text-3);
+  padding: var(--sr-sp-2) var(--sr-sp-3);
+  border-bottom: 1px solid var(--sr-border);
+}
+
+.sr-table td {
+  padding: var(--sr-sp-2) var(--sr-sp-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--sr-border) 50%, transparent);
+  color: var(--sr-text-2);
+}
+
+.sr-table tr:last-child td { border-bottom: none; }
+
+.sr-table tr:hover td {
+  background: var(--sr-surface-2);
+  color: var(--sr-text);
+}
+
+/* ─── Input ───────────────────────────────────────────────────────── */
+.sr-input {
+  background: var(--sr-surface-2);
+  border: 1px solid var(--sr-border-2);
+  border-radius: var(--sr-radius);
+  color: var(--sr-text);
+  font-size: var(--sr-t-base);
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 160ms;
+  width: 100%;
+}
+
+.sr-input::placeholder { color: var(--sr-text-3); }
+.sr-input:focus { border-color: var(--sr-amber); }
+
+/* ─── Button variants ─────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sr-sp-2);
+  padding: 10px 20px;
+  border-radius: var(--sr-radius);
+  font-size: var(--sr-t-base);
+  font-weight: 600;
+  background: var(--sr-amber);
+  color: var(--sr-text-inv);
+  border: none;
+  transition: opacity 160ms, transform 80ms;
+}
+.btn-primary:hover  { opacity: 0.92; }
+.btn-primary:active { transform: scale(0.98); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sr-sp-2);
+  padding: 8px 16px;
+  border-radius: var(--sr-radius);
+  font-size: var(--sr-t-sm);
+  font-weight: 500;
+  background: transparent;
+  color: var(--sr-text-2);
+  border: 1px solid var(--sr-border);
+  transition: all 160ms;
+}
+.btn-ghost:hover {
+  background: var(--sr-surface-2);
+  color: var(--sr-text);
+  border-color: var(--sr-border-2);
+}
+
+/* ─── Section header ──────────────────────────────────────────────── */
+.section-label {
+  font-size: var(--sr-t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sr-text-3);
+  margin-bottom: var(--sr-sp-3);
+}
+
+/* ─── Divider ─────────────────────────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--sr-border);
+  margin: var(--sr-sp-5) 0;
+}
+
+/* ─── Composable utilities ────────────────────────────────────────────
+   Extracted from the most-repeated inline style blocks so structure lives
+   in CSS and only *dynamic* values (signal colors, bar widths) stay inline.
+   Each class is byte-equivalent to the inline block it replaces — swapping
+   is a no-op visually. Combine freely: className="sr-tile sr-flex-between".
+   ───────────────────────────────────────────────────────────────────── */
+
+/* Elevated inner tile inside a .card (surface-2 + radius + padding) */
+.sr-tile {
+  background: var(--sr-surface-2);
+  border-radius: var(--sr-radius);
+  padding: var(--sr-sp-3);
+}
+
+/* Small caption above a tile value */
+.sr-tile-label {
+  font-size: var(--sr-t-xs);
+  color: var(--sr-text-3);
+  margin-bottom: 4px;
+}
+
+/* Micro hint / secondary label (10px == var(--sr-t-xs)) */
+.sr-hint {
+  font-size: var(--sr-t-xs);
+  color: var(--sr-text-3);
+}
+
+/* Primary action button (amber fill, full width).
+   Extraída al aparecer el segundo botón idéntico en /pricing: la tarjeta Pro alterna
+   entre "Notify me" y "Upgrade to Pro" según haya pagos activos, y mantener dos copias
+   del mismo bloque inline garantizaba que un retoque tocara solo una de las dos.
+   El color de texto es fijo a propósito: es el fondo ámbar quien pide un texto oscuro,
+   no el tema, así que no debe cambiar en modo claro. */
+.sr-btn-amber {
+  width: 100%;
+  border-radius: var(--sr-radius);
+  padding: 10px 0;
+  font-size: var(--sr-t-sm);
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--sr-amber);
+  color: #0a1120;
+  border: none;
+}
+.sr-btn-amber:disabled { cursor: default; }
+
+/* Header row: content left, value/action right */
+.sr-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Stat grids — gap fixed at sp-3 (the dominant case); use inline gap otherwise */
+.sr-grid-2, .sr-grid-3, .sr-grid-4, .sr-grid-5 {
+  display: grid;
+  gap: var(--sr-sp-3);
+}
+.sr-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.sr-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.sr-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.sr-grid-5 { grid-template-columns: repeat(5, 1fr); }

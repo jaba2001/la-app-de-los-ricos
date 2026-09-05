@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-19T13:57:25.547Z",
+  "quarters": 30,
+  "universeCap": 400,
+  "window": {
+    "start": "2019-01-01",
+    "end": "2026-04-01"
+  },
+  "ic": {
+    "v1": 0.0026,
+    "v1_t": 0.11,
+    "v2": -0.0185,
+    "v2_t": -0.92,
+    "pairedDiff": -0.021,
+    "pairedDiff_t": -1.4,
+    "pairedMDE": 0.0421,
+    "v2WinsQuarters": 12
+  },
+  "portfolios": {
+    "universeEW": {
+      "total": 179.5,
+      "sharpe": 0.78
+    },
+    "v1": {
+      "total": 226.9,
+      "sharpe": 0.84
+    },
+    "v2": {
+      "total": 142.4,
+      "sharpe": 0.68
+    }
+  },
+  "verdict": "v2 NO mejora a v1 contra retornos. Se sostiene sólo como mejora de coherencia interna, y hay que decirlo así.",
+  "beatsEqualWeight": false
+}

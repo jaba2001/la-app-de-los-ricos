@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-09-03T21:13:55.262Z",
+  "sesiones": 4946,
+  "desde": "2007-01-04",
+  "hasta": "2026-09-01",
+  "factorB": 1.82,
+  "volObjetivo": 0.1629,
+  "spyTotal": 670.5,
+  "disparoLlamada": {
+    "0.25": 39.9,
+    "0.3": 35.6,
+    "0.35": 30.7
+  },
+  "escenarios": [
+    {
+      "nombre": "B fijo 1,82x · +1",
+      "total": 1283.3,
+      "enTopePct": null,
+      "Lmedio": 1.82,
+      "sharpe": 0.852,
+      "vol": 17.5,
+      "maxDD": -32.9,
+      "llamadas": 0,
+      "primeras": []
+    },
+    {
+      "nombre": "B fijo 1,82x · +2.5",
+      "total": 1237,
+      "enTopePct": null,
+      "Lmedio": 1.82,
+      "sharpe": 0.815,
+      "vol": 18.3,
+      "maxDD": -34.7,
+      "llamadas": 0,
+      "primeras": []
+    },
+    {
+      "nombre": "C volatilidad objetivo · +1",
+      "total": 1145,
+      "enTopePct": 16,
+      "Lmedio": 1.45,
+      "sharpe": 0.792,
+      "vol": 18.3,
+      "maxDD": -51,
+      "llamadas": 0,
+      "primeras": []
+    },
+    {
+      "nombre": "C volatilidad objetivo · +2.5",
+      "total": 998.6,
+      "enTopePct": 16,
+      "Lmedio": 1.45,
+      "sharpe": 0.757,
+      "vol": 18.4,
+      "maxDD": -51.2,
+      "llamadas": 0,
+      "primeras": []
+    }
+  ],
+  "invariancia": [
+    {
+      "configuracion": "mantenimiento 25 %",
+      "total": 1283.3,
+      "llamadas": 0
+    },
+    {
+      "configuracion": "mantenimiento 30 %",
+      "total": 1283.3,
+      "llamadas": 0
+    },
+    {
+      "configuracion": "mantenimiento 35 %",
+      "total": 1283.3,
+      "llamadas": 0
+    },
+    {
+      "configuracion": "mant. 35 % + recorte intradía 5 %",
+      "total": 1283.3,
+      "llamadas": 0
+    },
+    {
+      "configuracion": "mant. 35 % + recorte intradía 15 %",
+      "total": 1283.3,
+      "llamadas": 0
+    }
+  ],
+  "controlPositivo": {
+    "apalancamiento": 4,
+    "llamadas": 5
+  },
+  "hallazgo": "La volatilidad objetivo (C) lleva MENOS apalancamiento medio que el fijo (1,45 frente a 1,82) y tiene PEOR caida maxima (-51 % frente a -32,9 %): se apalanca cuando la volatilidad esta baja, que es justo antes de los golpes. Invierte la recomendacion del roadmap, que decia preregistrar C.",
+  "baten": 4,
+  "spyDiario": {
+    "sharpe": 0.629,
+    "vol": 19.6,
+    "maxDD": -69.9
+  },
+  "limitacion": "Reconstruccion con CIERRES diarios: una llamada que salta a media sesion y se resuelve antes del cierre no se ve. El «recorte» modela ese hueco suponiendo que el minimo estuvo un 5 % por debajo del cierre en dias de caida. Sigue siendo una cota optimista, menos que la mensual."
+}

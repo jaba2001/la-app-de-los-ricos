@@ -1,0 +1,22 @@
+name: Scora — paper fund monthly rebalance
+
+# The autonomous paper fund rebalances once a month by the validated allocator (risk-on
+# tilt + absolute momentum) and seals an immutable target-weight snapshot to sl_paper_fund.
+on:
+  schedule:
+    - cron: "0 7 1 * *" # 1st of each month, 07:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  rebalance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Rebalance → sl_paper_fund
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/paperfund_rebalance.mjs

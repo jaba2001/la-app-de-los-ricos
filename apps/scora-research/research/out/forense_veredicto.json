@@ -1,0 +1,64 @@
+{
+ "generatedAt": "2026-08-24T17:11:48.613Z",
+ "ventanas": {
+  "reciente": "2019-2026",
+  "antigua": "2011-2018"
+ },
+ "HF1": {
+  "spread": {
+   "reciente": -0.23255080903243822,
+   "antigua": -0.15232474934978657
+  },
+  "t": {
+   "reciente": -0.07993427918826246,
+   "antigua": -0.06839211343262529
+  },
+  "mde": {
+   "reciente": 8.145970313402671,
+   "antigua": 6.236235097480456
+  },
+  "mismoSigno": true,
+  "ambosSuperanMDE": false,
+  "pasa": false
+ },
+ "HF3": {
+  "diferenciaPp": {
+   "reciente": 2.955002903889048,
+   "antigua": 5.564049687087868
+  },
+  "mdePp": {
+   "reciente": 7.339973711916802,
+   "antigua": 6.428140883669911
+  },
+  "ratioVetoGanadores": {
+   "reciente": 1.2920860232300146,
+   "antigua": 1.7568012297965856
+  },
+  "limpio": false,
+  "falla": false
+ },
+ "HF2": {
+  "nota": "sin potencia — 49 y 54 posiciones en quince años; se reporta como comprobación, no como evidencia",
+  "marcadosEnTop40Pct": {
+   "reciente": 12.1,
+   "antigua": 7.8
+  }
+ },
+ "cobertura": {
+  "reciente": {
+   "accruals": 10738,
+   "beneish": 5188,
+   "piotroski": 7495,
+   "total": 10738
+  },
+  "antigua": {
+   "accruals": 7381,
+   "beneish": 3126,
+   "piotroski": 4549,
+   "total": 7443
+  }
+ },
+ "construir": false,
+ "motivo": "HF3 apunta en la dirección temida",
+ "consecuencia": "El veto NO se enchufa a PicksInput.disqualified. Los modelos forenses se calculan y publican como capa explicativa."
+}

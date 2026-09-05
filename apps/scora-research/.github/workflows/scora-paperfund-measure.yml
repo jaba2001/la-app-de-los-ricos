@@ -1,0 +1,22 @@
+name: Scora — paper fund weekly measure
+
+# Replays the fund's sealed rebalances forward on free total-return prices → NAV vs SPY,
+# max drawdown, Sharpe, and an honest letter grade, upserted to sl_paper_fund_track.
+on:
+  schedule:
+    - cron: "0 8 * * 1" # every Monday, 08:00 UTC (after the discovery/filings runs)
+  workflow_dispatch: {}
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Measure → sl_paper_fund_track
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/paperfund_measure.mjs

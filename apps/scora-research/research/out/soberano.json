@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-09-03T10:21:28.431Z",
+  "cobertura": {
+    "DTWEXBGS": {
+      "obs": 5135,
+      "desde": "2006-01-02",
+      "que": "Indice del dolar (amplio)",
+      "min": 5000
+    },
+    "IRLTLT01JPM156N": {
+      "obs": 450,
+      "desde": "1989-01-01",
+      "que": "Tipo largo de Japon",
+      "min": 400
+    },
+    "GFDEBTN": {
+      "obs": 241,
+      "desde": "1966-01-01",
+      "que": "Deuda federal total",
+      "min": 230
+    },
+    "A091RC1Q027SBEA": {
+      "obs": 318,
+      "desde": "1947-01-01",
+      "que": "Intereses pagados por el Gobierno federal",
+      "min": 300
+    },
+    "FDEFX": {
+      "obs": 318,
+      "desde": "1947-01-01",
+      "que": "Gasto federal en defensa",
+      "min": 300
+    },
+    "CPIAUCSL": {
+      "obs": 954,
+      "desde": "1947-01-01",
+      "que": "IPC",
+      "min": 900
+    },
+    "GDP": {
+      "obs": 318,
+      "desde": "1947-01-01",
+      "que": "PIB nominal",
+      "min": 300
+    }
+  },
+  "afirmaciones": [
+    {
+      "afirma": "El dolar ha perdido el 87 % de su poder adquisitivo desde 1971",
+      "cierto": true,
+      "evidencia": "IPC 40.7 (1971-08-01) → 332.8 (2026-07-01): perdida del 87.8 %",
+      "matiz": null
+    },
+    {
+      "afirma": "Los intereses de la deuda superan al gasto en defensa",
+      "cierto": true,
+      "evidencia": "intereses 1.25 B$ frente a defensa 1.20 B$ (2026-04-01): ratio 1.04x",
+      "matiz": "ambas cifras son tasas anualizadas de las cuentas nacionales, no ejecucion presupuestaria"
+    },
+    {
+      "afirma": "La deuda federal sobre PIB esta en maximos",
+      "cierto": null,
+      "evidencia": "deuda/PIB 123 % (2026-01-01), frente al 104 % de hace diez años",
+      "matiz": "es un HECHO verificable. Que eso implique una crisis, y menos aun cuando, NO se publica: es el pronostico que los videos venden y que no se puede falsar"
+    },
+    {
+      "afirma": "El tipo largo japones esta en maximos historicos [medido sobre el 10 años, NO el 30 del video]",
+      "cierto": null,
+      "evidencia": "2.67 % (2026-06-01) = percentil 78 de 450 obs desde 1989. Maximo de la serie: 8.03 %",
+      "matiz": "NO refuta al video: el habla del JGB a 30 años, que no cotiza hasta 1999 y cuyo maximo historico es un liston mucho mas bajo. Lo que si queda medido es que el tipo LARGO japones, con historia completa desde 1989, no esta cerca de sus maximos: entonces pagaba 8.03 %"
+    }
+  ],
+  "dolar": {
+    "valor": 120.8866,
+    "fecha": "2026-06-26",
+    "percentil": 87.8,
+    "obs": 5135
+  },
+  "noSeConstruye": [
+    "la espiral de deuda como señal",
+    "el calendario de la crisis",
+    "«Japon va diez años por delante»",
+    "«el oro no esta listo»"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "generatedAt": "2026-09-04T09:23:24.539Z",
+  "fuente": "research/cobertura_techo.mjs",
+  "asOf": "2026-06-30",
+  "minMetricas": 3,
+  "miembros": 502,
+  "conSenal": 375,
+  "bajoMinimo": 127,
+  "porCampo": {
+    "assets": {
+      "ausenteEn": 2,
+      "rescata": 0,
+      "ratio": 0
+    },
+    "daTTM": {
+      "ausenteEn": 32,
+      "rescata": 8,
+      "ratio": 0.25
+    },
+    "debt": {
+      "ausenteEn": 39,
+      "rescata": 25,
+      "ratio": 0.64
+    },
+    "equity": {
+      "ausenteEn": 2,
+      "rescata": 0,
+      "ratio": 0
+    },
+    "gpTTM": {
+      "ausenteEn": 78,
+      "rescata": 10,
+      "ratio": 0.13
+    },
+    "interestTTM": {
+      "ausenteEn": 84,
+      "rescata": 24,
+      "ratio": 0.29
+    },
+    "oiTTM": {
+      "ausenteEn": 93,
+      "rescata": 74,
+      "ratio": 0.8
+    },
+    "revTTM": {
+      "ausenteEn": 3,
+      "rescata": 0,
+      "ratio": 0
+    }
+  },
+  "porPar": {
+    "oiTTM+gpTTM": 95,
+    "oiTTM+interestTTM": 107,
+    "oiTTM+daTTM": 88,
+    "oiTTM+debt": 108,
+    "gpTTM+interestTTM": 34
+  },
+  "techoAbsoluto": 127,
+  "viaAceptableCubre": 31,
+  "rescatablesPorOi": 74,
+  "porSector": {
+    "Financial Services": 49,
+    "Consumer Defensive": 3,
+    "Utilities": 4,
+    "Healthcare": 8,
+    "Technology": 13,
+    "Materials": 7,
+    "Industrials": 6,
+    "Consumer Cyclical": 16,
+    "Energy": 6,
+    "Real Estate": 4,
+    "(sin sector)": 7,
+    "Communication Services": 4
+  },
+  "nota": "RESCATA no es lo mismo que AUSENTE EN: a una empresa le pueden faltar tres campos, y arreglar uno la deja igual de fuera. La via de reconstruccion que paso el criterio preescrito (GrossProfit - OperatingExpenses) necesita gpTTM, que falta en la mayoria de los mismos nombres: ese solape es el que limita el rescate real."
+}

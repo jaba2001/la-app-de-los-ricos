@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-09-03T12:54:17.971Z",
+  "asOf": "2026-09-03",
+  "umbrales": {
+    "planaHasta": 0.25,
+    "minObsPercentil": 250,
+    "ventanaEnsanche": 90,
+    "ensancheMinimo": 0.25
+  },
+  "cobertura": {
+    "DGS3MO": {
+      "obs": 11250,
+      "desde": "1982-01-04",
+      "que": "Tesoro 3 meses",
+      "min": 9000
+    },
+    "DGS2": {
+      "obs": 12560,
+      "desde": "1976-06-01",
+      "que": "Tesoro 2 años",
+      "min": 11000
+    },
+    "DGS10": {
+      "obs": 16152,
+      "desde": "1962-01-02",
+      "que": "Tesoro 10 años",
+      "min": 15000
+    },
+    "DGS30": {
+      "obs": 12382,
+      "desde": "1977-02-15",
+      "que": "Tesoro 30 años",
+      "min": 11000
+    },
+    "DFII10": {
+      "obs": 5921,
+      "desde": "2003-01-02",
+      "que": "Tesoro 10 años REAL (TIPS)",
+      "min": 5000
+    },
+    "T5YIFR": {
+      "obs": 5922,
+      "desde": "2003-01-02",
+      "que": "Inflación esperada 5a dentro de 5a",
+      "min": 5000
+    },
+    "BAA10Y": {
+      "obs": 10167,
+      "desde": "1986-01-02",
+      "que": "Diferencial de crédito Baa − Tesoro 10a",
+      "min": 9000
+    },
+    "STLFSI4": {
+      "obs": 1696,
+      "desde": "1993-12-31",
+      "que": "Índice de estrés financiero (sostiene el CSC histórico)",
+      "min": 1500
+    }
+  },
+  "curva": {
+    "m3": 3.92,
+    "a2": 4.39,
+    "a10": 4.79,
+    "a30": 5.27
+  },
+  "forma": {
+    "forma": "normal",
+    "t10y2": 0.40000000000000036,
+    "t10y3m": 0.8700000000000001
+  },
+  "descomposicion": {
+    "nominal": 4.79,
+    "real": 2.44,
+    "breakeven": 2.35,
+    "expectativa5a5": 2.33
+  },
+  "credito": {
+    "valor": 1.58,
+    "fecha": "2026-09-01",
+    "percentil": 10.514409363627422,
+    "hace90d": 1.51,
+    "delta": 0.07000000000000006,
+    "ensanchando": false
+  },
+  "avisoTexto": "El diferencial de crédito no se está abriendo por encima del corte declarado.",
+  "tasaBaseAviso": {
+    "episodios": 22,
+    "desde": 1993,
+    "caidaTrasAviso": -16.4,
+    "caidaSinCondicionar": -14.3,
+    "p": 0.146,
+    "seguidosDeUnBuenAno": 8
+  },
+  "percentilNominal10a": 44.1,
+  "liston": "El Tesoro a 10 años paga 4.79 % sin riesgo de impago: cualquier activo con riesgo tiene que batir eso para compensar. Descontada la inflación esperada, el listón real es 2.44 %."
+}

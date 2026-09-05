@@ -1,0 +1,118 @@
+name: Scora — auditoría de símbolos reutilizados
+
+# Cierra la auditoría de símbolos reutilizados a base de tandas, y se apaga sola cuando acaba.
+#
+# POR QUÉ ES UN CRON Y NO UN COMANDO QUE SE LANZA UNA VEZ. Tiingo da ~50 peticiones por hora y
+# hay ~290 nombres que mirar, así que una auditoría completa necesita entre cuatro y seis pasadas
+# separadas por la ventana de cuota. Hacerlas a mano significa que alguien tiene que estar
+# delante durante cinco horas, y lo que pasa en la práctica es que se quedan a medias — con el
+# mapa de bloqueo incompleto, que es peor que no tenerlo porque parece completo.
+#
+# Y NO ES SÓLO PARA TERMINAR LA QUE HAY AHORA. La auditoría envejece sola: cada empresa que sale
+# del índice es un símbolo nuevo que otro instrumento puede heredar, y cada vez que se sube la
+# versión de las reglas hay que rehacerla entera. Con esto, ambas cosas se resuelven sin que
+# nadie se acuerde.
+#
+# SE APAGA SOLA: el primer paso es la puerta de §10.7. Si ya está abierta —todos los tickers
+# publicados con veredicto firme— el job termina sin gastar una sola petición. Así el cron puede
+# quedarse puesto para siempre sin coste cuando no hay nada que hacer.
+on:
+  schedule:
+    - cron: "23 * * * *" # cada hora, en el minuto 23 (fuera de las horas en punto, que están cargadas)
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# Dos tandas a la vez se pisarían el fichero de evidencia y se repartirían la misma cuota, así
+# que la segunda espera en vez de correr en paralelo.
+concurrency:
+  group: auditoria-simbolos
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # DOS CONDICIONES, y con una sola no basta.
+      #
+      # La puerta dice si todos los tickers publicados tienen veredicto firme. Pero un mapa
+      # COMPLETO puede estar OBSOLETO: si alguien sube `VERSION_REGLAS` porque una regla
+      # resultó equivocada, los veredictos siguen ahí y siguen siendo firmes — sólo que se
+      # tomaron con la regla vieja. La puerta los daría por buenos y el cron no haría nada,
+      # que es exactamente cómo un arreglo de reglas se queda sin aplicar para siempre.
+      #
+      # Por eso se compara también la versión del mapa con la del código. La auditoría está al
+      # día cuando se cumplen LAS DOS cosas.
+      - name: ¿Queda algo por auditar?
+        id: puerta
+        run: |
+          node -e "
+            const fs = require('fs');
+            const mapa = JSON.parse(fs.readFileSync('research/data/simbolos_reutilizados.json', 'utf8')).versionReglas ?? 0;
+            // Sin expresion regular a proposito: el escapado de la barra invertida no sobrevive
+            // al paso por YAML y por la shell, y un patron roto casaria siempre con cero.
+            const src = fs.readFileSync('research/simbolos_reutilizados.mjs', 'utf8');
+            const codigo = Number.parseInt(src.split('const VERSION_REGLAS = ')[1] ?? '0', 10);
+            console.log('mapa v' + mapa + ' · código v' + codigo);
+            process.exit(mapa === codigo ? 0 : 1);
+          " && VERSION_OK=si || VERSION_OK=no
+          if node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs && [ "$VERSION_OK" = "si" ]; then
+            echo "queda=no" >> "$GITHUB_OUTPUT"
+            echo "Auditoría al día: puerta abierta y mapa en la versión de reglas del código."
+          else
+            echo "queda=si" >> "$GITHUB_OUTPUT"
+          fi
+
+      # VARIAS TANDAS POR EJECUCIÓN, y no una, porque el cron NO es fiable.
+      #
+      # GitHub salta o retrasa los `schedule` cuando hay carga: con un cron horario puesto, el
+      # 2026-08-28 sólo hubo DOS ejecuciones en quince horas. Con una tanda por ejecución, cerrar
+      # una auditoría de ~290 nombres dependería de la suerte durante días.
+      #
+      # Un job puede correr hasta 6 h, así que aquí se encadenan hasta cinco tandas esperando la
+      # ventana de cuota entre ellas — que es la auditoría entera en UNA ejecución. Y se corta en
+      # cuanto la puerta abre, así que cuando no queda nada no cuesta nada.
+      - name: Tandas hasta cerrar (o hasta agotar el presupuesto de tiempo)
+        if: steps.puerta.outputs.queda == 'si'
+        timeout-minutes: 330
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
+        run: |
+          # ⚠️ EL COMMIT VA DENTRO DEL BUCLE, y no al final como paso aparte.
+          #
+          # Un job de cinco horas que publica sólo al terminar pierde las cinco si se corta —
+          # timeout, cancelación, runner reciclado. Publicando después de cada tanda, lo peor que
+          # puede pasar es perder la última.
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          for i in 1 2 3 4 5; do
+            echo "── tanda $i ──"
+            node --experimental-strip-types --no-warnings research/simbolos_reutilizados.mjs
+            if git diff --quiet research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json; then
+              echo "La tanda no ha avanzado (cuota agotada)."
+            else
+              git add research/data/simbolos_reutilizados.json research/out/simbolos_reutilizados.json
+              git commit -m "chore(auditoría): tanda de símbolos reutilizados al $(date -u +%Y-%m-%dT%H:%MZ)"
+              # Un push por tanda: si el job muere, lo publicado ya está a salvo. Con rebase por
+              # si alguien commiteó mientras tanto — cinco horas dan para eso.
+              git pull --rebase --autostash origin main && git push
+            fi
+            if node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs; then
+              echo "Puerta abierta tras $i tandas: no hace falta seguir."
+              break
+            fi
+            if [ "$i" -lt 5 ]; then
+              echo "Esperando 62 min a que Tiingo recupere cuota…"
+              sleep 3720
+            fi
+          done
+
+      - name: Estado tras la tanda
+        if: always()
+        run: node --experimental-strip-types --no-warnings research/puerta_rebuild.mjs || true

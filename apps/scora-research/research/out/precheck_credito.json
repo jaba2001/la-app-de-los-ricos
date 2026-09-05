@@ -1,0 +1,110 @@
+{
+  "generatedAt": "2026-09-03T10:21:24.226Z",
+  "criterioPreescrito": 0.7,
+  "lookbackMeses": 60,
+  "meses": 307,
+  "desde": "2000-12-03",
+  "hasta": "2026-06-03",
+  "pearson": 0.7905,
+  "spearman": 0.7693,
+  "r2": 0.6249,
+  "veredicto": "LA SEÑAL YA ESTÁ DENTRO — no se gasta el ensayo 345",
+  "mayoresDiscrepancias": [
+    {
+      "fecha": "2018-04-03",
+      "baaPct": 4.9,
+      "stlPct": 88.5,
+      "baa": 1.84,
+      "stl": 0.3377,
+      "gap": 83.6
+    },
+    {
+      "fecha": "2018-03-03",
+      "baaPct": 1.6,
+      "stlPct": 65.6,
+      "baa": 1.72,
+      "stl": -0.0719,
+      "gap": 64
+    },
+    {
+      "fecha": "2018-06-03",
+      "baaPct": 9.8,
+      "stlPct": 72.1,
+      "baa": 1.9,
+      "stl": 0.0604,
+      "gap": 62.3
+    },
+    {
+      "fecha": "2018-05-03",
+      "baaPct": 6.6,
+      "stlPct": 65.6,
+      "baa": 1.86,
+      "stl": -0.0298,
+      "gap": 59
+    },
+    {
+      "fecha": "2021-12-03",
+      "baaPct": 6.6,
+      "stlPct": 60.7,
+      "baa": 1.81,
+      "stl": -0.1643,
+      "gap": 54.1
+    },
+    {
+      "fecha": "2007-07-03",
+      "baaPct": 4.9,
+      "stlPct": 57.4,
+      "baa": 1.6,
+      "stl": -0.5553,
+      "gap": 52.5
+    },
+    {
+      "fecha": "2012-08-03",
+      "baaPct": 70.5,
+      "stlPct": 19.7,
+      "baa": 3.26,
+      "stl": -0.1331,
+      "gap": 50.8
+    },
+    {
+      "fecha": "2024-11-03",
+      "baaPct": 0,
+      "stlPct": 50.8,
+      "baa": 1.46,
+      "stl": -0.2907,
+      "gap": 50.8
+    },
+    {
+      "fecha": "2018-07-03",
+      "baaPct": 13.1,
+      "stlPct": 60.7,
+      "baa": 1.99,
+      "stl": -0.0623,
+      "gap": 47.6
+    },
+    {
+      "fecha": "2026-04-03",
+      "baaPct": 32.8,
+      "stlPct": 80.3,
+      "baa": 1.74,
+      "stl": -0.2358,
+      "gap": 47.5
+    },
+    {
+      "fecha": "2017-01-03",
+      "baaPct": 9.8,
+      "stlPct": 55.7,
+      "baa": 2.27,
+      "stl": -0.0508,
+      "gap": 45.9
+    },
+    {
+      "fecha": "2024-10-03",
+      "baaPct": 9.8,
+      "stlPct": 55.7,
+      "baa": 1.62,
+      "stl": -0.2664,
+      "gap": 45.9
+    }
+  ]
+}

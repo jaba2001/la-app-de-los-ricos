@@ -1,0 +1,24 @@
+name: Scora — monthly universe scoring
+
+# Forms one immutable cohort per month: scores the universe as of the run date
+# (point-in-time by construction) and appends to sl_cohort. This is the live,
+# systematic forward record — the analog of the historical backtest.
+on:
+  schedule:
+    - cron: "0 14 2 * *" # 2nd of each month, 14:00 UTC (after month-start filings settle)
+  workflow_dispatch: {} # allow manual runs
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Score universe → sl_cohort
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }} # optional — enables delisted coverage
+          FRED_KEY: ${{ secrets.FRED_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: node --experimental-strip-types --no-warnings research/cron-score.mjs

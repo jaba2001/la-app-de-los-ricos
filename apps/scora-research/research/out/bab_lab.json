@@ -1,0 +1,96 @@
+{
+ "generatedAt": "2026-08-24T20:16:50.823Z",
+ "window": "2019-2026",
+ "topN": 40,
+ "fechas": 182,
+ "puerta": {
+  "rhoMedio": -0.8003750000000001,
+  "umbral": 0.85,
+  "mismaSenal": false,
+  "porFecha": [
+   {
+    "fecha": "2019-01-02",
+    "rho": -0.681,
+    "n": 426
+   },
+   {
+    "fecha": "2019-12-16",
+    "rho": -0.773,
+    "n": 439
+   },
+   {
+    "fecha": "2020-12-01",
+    "rho": -0.877,
+    "n": 462
+   },
+   {
+    "fecha": "2021-11-15",
+    "rho": -0.818,
+    "n": 471
+   },
+   {
+    "fecha": "2022-11-01",
+    "rho": -0.841,
+    "n": 485
+   },
+   {
+    "fecha": "2023-10-16",
+    "rho": -0.832,
+    "n": 495
+   },
+   {
+    "fecha": "2024-10-01",
+    "rho": -0.801,
+    "n": 497
+   },
+   {
+    "fecha": "2025-09-15",
+    "rho": -0.78,
+    "n": 500
+   }
+  ],
+  "nota": "Si |rho| > 0,85, beta y `lowvol` ordenan igual y la hipótesis se retira sin gastar ensayo."
+ },
+ "HB3": {
+  "bruto": -8.270845793907545,
+  "seBruto": 3.9305240164597675,
+  "neutral": -4.992366412596236,
+  "seNeutral": 2.653318185823126,
+  "mde": 11.005467246087349,
+  "fechas": 158,
+  "veredicto": "vacío",
+  "pasa": false,
+  "sectoresTop": {
+   "Utilities": 26.8,
+   "Consumer Defensive": 24.1,
+   "sin sector": 15.4,
+   "Healthcare": 11,
+   "Materials": 9.9
+  }
+ },
+ "HB1": {
+  "spread": -6.308041673806145,
+  "se": 3.8171389014900297,
+  "mde": 10.687988924172082,
+  "t": -1.6525575402414059,
+  "fechas": 158,
+  "significativo": false
+ },
+ "HB2": {
+  "vsCalidad": {
+   "m": -5.497703092585351,
+   "se": 3.4143037607004785
+  },
+  "vsBeta": {
+   "m": 4.855101057619516,
+   "se": 1.8828632253102695
+  },
+  "vsEW": {
+   "m": -1.462191612636099,
+   "se": 2.329598311297338
+  },
+  "fechas": 158,
+  "bateAAmbas": false
+ },
+ "nota": "Long-only top-N, que es la forma del producto. NO es el factor BAB del artículo, que es largo-corto y neutralizado en beta."
+}
