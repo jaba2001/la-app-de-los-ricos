@@ -67,9 +67,7 @@ function json(request, obj, status, ttl) {
 // 6h; short interest only updates bi-monthly so this is very safe.
 const TTL = 21600;
 
-export async function GET(request) {
-  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('shortint', user.id, 20, 60, request); if (rl) return rl;
+export async function serve(request) {
 
   const url = new URL(request.url);
   const symbol = (url.searchParams.get('symbol') || '').toUpperCase();
@@ -100,6 +98,18 @@ export async function GET(request) {
   // ticker no tiene interés corto" — un dato erróneo, indistinguible del correcto.
   if (data) await cacheSet(key, { status: 200, body: JSON.stringify(data) }, TTL);
   return json(request, data ?? {}, 200, data ? TTL : 0);
+}
+
+
+// `serve` es todo lo que pasa DESPUÉS de identificar al usuario: validar, mirar la caché y
+// llamar al proveedor. Está separado de `GET` para que /api/batch pueda reutilizarlo sin
+// repetir la autenticación por sub-petición — y, sobre todo, para que NO PUEDA saltarse
+// nada: el lote entra por esta misma puerta, con las mismas listas blancas y la misma
+// caché. Una segunda implementación de la validación es justo lo que no queremos.
+export async function GET(request) {
+  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const rl = await checkRateLimit('shortint', user.id, 20, 60, request); if (rl) return rl;
+  return serve(request);
 }
 
 export async function OPTIONS(request) {

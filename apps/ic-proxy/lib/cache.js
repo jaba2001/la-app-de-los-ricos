@@ -18,13 +18,25 @@
 import { Redis } from '@upstash/redis';
 import * as Sentry from '@sentry/nextjs';
 
+// La caché puede vivir en SU PROPIA instancia de Upstash, separada de la del rate limiter.
+//
+// POR QUÉ: la instancia compartida está en `noeviction` — al llenarse no descarta lo viejo,
+// RECHAZA escrituras. Y el rate limiter escribe ahí mismo. Es decir: llenar la caché no la
+// degrada, se lleva por delante el control de coste de las rutas de pago. Rechazar los
+// parámetros desconocidos (ver cacheKey) sube mucho el listón, pero no cambia el hecho de
+// que dos sistemas con criticidad muy distinta compartan un recurso agotable.
+//
+// Con UPSTASH_CACHE_REST_URL/TOKEN puestos, la caché se va a su instancia y el peor caso de
+// una caché llena vuelve a ser lo que debería: caché llena. Sin poner nada, se usa la de
+// siempre y el comportamiento es idéntico al de hoy: separarlas es una decisión de
+// despliegue, no un cambio de código.
+function cacheUrl()   { return process.env.UPSTASH_CACHE_REST_URL   || process.env.UPSTASH_REDIS_REST_URL; }
+function cacheToken() { return process.env.UPSTASH_CACHE_REST_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN; }
+
 let _redis = null;
 function redis() {
   if (_redis) return _redis;
-  _redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  _redis = new Redis({ url: cacheUrl(), token: cacheToken() });
   return _redis;
 }
 
@@ -36,8 +48,8 @@ const PREFIX = 'c:v1:';
 function enabled() {
   return (
     process.env.CACHE_DISABLED !== '1' &&
-    !!process.env.UPSTASH_REDIS_REST_URL &&
-    !!process.env.UPSTASH_REDIS_REST_TOKEN
+    !!cacheUrl() &&
+    !!cacheToken()
   );
 }
 

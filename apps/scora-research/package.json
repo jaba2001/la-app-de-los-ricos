@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node --experimental-strip-types --no-warnings scripts/golden.test.mjs",
+    "test": "node --experimental-strip-types --no-warnings scripts/golden.test.mjs && node --experimental-strip-types --no-warnings scripts/batchqueue.test.mjs",
     "test:theory": "node --experimental-strip-types --no-warnings scripts/theory.test.mjs",
     "test:picks": "node --experimental-strip-types --no-warnings scripts/picks.test.mjs",
     "test:smoke": "node scripts/smoke-proxy.mjs",

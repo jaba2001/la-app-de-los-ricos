@@ -85,11 +85,7 @@ const findVal = (arr, date) => arr.find(f => f.end === date)?.val ?? null;
 
 const EMPTY = JSON.stringify({ income: [], balanceSheet: [], cashFlow: [], annualIncome: [] });
 
-export async function GET(request) {
-  const { user, error: authErr } = await requireUser(request);
-  if (authErr) return authErr;
-  const rl = await checkRateLimit('edgar', user.id, 5, 60, request);
-  if (rl) return rl;
+export async function serve(request) {
   const CORS = corsHeaders(request, { 'Content-Type': 'application/json' });
 
   const url = new URL(request.url);
@@ -230,6 +226,20 @@ export async function GET(request) {
       status: 502, headers: CORS,
     });
   }
+}
+
+
+// `serve` es todo lo que pasa DESPUÉS de identificar al usuario: validar, mirar la caché y
+// llamar al proveedor. Está separado de `GET` para que /api/batch pueda reutilizarlo sin
+// repetir la autenticación por sub-petición — y, sobre todo, para que NO PUEDA saltarse
+// nada: el lote entra por esta misma puerta, con las mismas listas blancas y la misma
+// caché. Una segunda implementación de la validación es justo lo que no queremos.
+export async function GET(request) {
+  const { user, error: authErr } = await requireUser(request);
+  if (authErr) return authErr;
+  const rl = await checkRateLimit('edgar', user.id, 5, 60, request);
+  if (rl) return rl;
+  return serve(request);
 }
 
 export async function OPTIONS(request) {

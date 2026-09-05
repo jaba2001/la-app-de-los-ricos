@@ -22,12 +22,7 @@ function normTicker(raw) {
   return String(raw || '').replace(/^[$]/, '').toUpperCase().trim();
 }
 
-export async function GET(request, { params }) {
-  const { user, error: authErr } = await requireUser(request);
-  if (authErr) return authErr;
-
-  const rl = await checkRateLimit('congress', user.id, 20, 60, request);
-  if (rl) return rl;
+export async function serve(request, { params }) {
 
   const ticker = (params.ticker || '').toUpperCase().replace(/[^A-Z.\-]/g, '');
   if (!ticker || ticker.length > 8) {
@@ -150,6 +145,21 @@ export async function GET(request, { params }) {
       'X-Scora-Cache': 'MISS',
     }),
   });
+}
+
+
+// `serve` es todo lo que pasa DESPUÉS de identificar al usuario: validar, mirar la caché y
+// llamar al proveedor. Está separado de `GET` para que /api/batch pueda reutilizarlo sin
+// repetir la autenticación por sub-petición — y, sobre todo, para que NO PUEDA saltarse
+// nada: el lote entra por esta misma puerta, con las mismas listas blancas y la misma
+// caché. Una segunda implementación de la validación es justo lo que no queremos.
+export async function GET(request, ctx) {
+  const { user, error: authErr } = await requireUser(request);
+  if (authErr) return authErr;
+
+  const rl = await checkRateLimit('congress', user.id, 20, 60, request);
+  if (rl) return rl;
+  return serve(request, ctx);
 }
 
 export async function OPTIONS(request) {
