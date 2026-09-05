@@ -132,3 +132,32 @@ export async function cacheSet(key, { status, body }, ttlSec) {
     warn('set', e);
   }
 }
+
+// ── Single-flight ────────────────────────────────────────────────────────────────────
+//
+// La caché evita el segundo viaje al proveedor, pero no evita el primero N VECES A LA VEZ:
+// si veinte peticiones piden AAPL con la entrada fría, las veinte ven un fallo de caché y
+// las veinte salen a FMP. Es el patrón de estampida, y es peor de lo que parece aquí,
+// porque las respuestas llegan a la vez y las veinte escriben la misma clave.
+//
+// `dedupe` hace que solo la primera trabaje: las demás esperan su resultado. El mapa vive
+// EN EL PROCESO, así que cubre lo que comparte isolate — que en el runtime edge es bastante,
+// y sobre todo cubre el caso de un lote y sus vecinos inmediatos. Deduplicar entre isolates
+// necesitaría un cerrojo en Redis: más viajes de red en el camino rápido para un caso que
+// hoy no se da (la app aún no tiene ese tráfico). Cuando lo tenga, este es el sitio.
+//
+// Nunca cachea el fallo: si la primera lanza, las que esperaban reciben el mismo error y la
+// siguiente petición vuelve a intentarlo de cero.
+const _inflight = new Map();
+
+export function dedupe(key, producer) {
+  if (!key) return producer();           // sin clave no hay identidad que compartir
+  const running = _inflight.get(key);
+  if (running) return running;
+  const p = (async () => { try { return await producer(); } finally { _inflight.delete(key); } })();
+  _inflight.set(key, p);
+  return p;
+}
+
+/** Solo para pruebas: cuántas producciones hay en vuelo. */
+export function _inflightSize() { return _inflight.size; }

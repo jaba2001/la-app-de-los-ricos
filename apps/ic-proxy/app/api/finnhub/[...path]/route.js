@@ -1,7 +1,7 @@
 import { requireUser } from '../../../../lib/auth.js';
 import { checkRateLimit } from '../../../../lib/ratelimit.js';
 import { corsHeaders, preflight } from '../../../../lib/cors.js';
-import { cacheKey, cacheGet, cacheSet } from '../../../../lib/cache.js';
+import { cacheKey, cacheGet, cacheSet, dedupe } from '../../../../lib/cache.js';
 
 export const runtime = 'edge';
 
@@ -84,13 +84,17 @@ export async function serve(request, { params }) {
   for (const [k,v] of url.searchParams) upstream.searchParams.set(k, v);
   upstream.searchParams.set('token', process.env.FINNHUB_KEY);
 
-  const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
-  const body = await res.text();
-
-  await cacheSet(key, { status: res.status, body }, CACHE_TTL);
+  // Single-flight: si otra petición ya está pidiendo esta misma clave, se espera a la suya
+  // en vez de salir otra vez al proveedor (ver `dedupe` en lib/cache.js).
+  const { status, body } = await dedupe(key, async () => {
+    const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
+    const text = await res.text();
+    await cacheSet(key, { status: res.status, body: text }, CACHE_TTL);
+    return { status: res.status, body: text };
+  });
 
   return new Response(body, {
-    status: res.status,
+    status,
     headers: corsHeaders(request, {
       'Content-Type': 'application/json',
       'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
