@@ -1,0 +1,3 @@
+# Scora
+
+Monorepo. Ver `apps/`.
