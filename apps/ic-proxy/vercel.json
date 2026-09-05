@@ -1,0 +1,12 @@
+{
+  "crons": [
+    { "path": "/api/cron/13f-refresh",      "schedule": "0 12 15 * *" },
+    { "path": "/api/cron/alerts-check",     "schedule": "0 13 * * *" },
+    { "path": "/api/cron/macro-refresh",    "schedule": "0 11 * * *" },
+    { "path": "/api/cron/insider-refresh",  "schedule": "0 10 * * 1" },
+    { "path": "/api/cron/push-alerts",      "schedule": "30 11 * * *" },
+    { "path": "/api/cron/ticker-alerts",    "schedule": "0 14 * * 1-5" },
+    { "path": "/api/cron/macro-brief",      "schedule": "0 12 * * 1" },
+    { "path": "/api/cron/daily-close",      "schedule": "30 21 * * 1-5" }
+  ]
+}
