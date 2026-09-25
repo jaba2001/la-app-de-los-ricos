@@ -16,6 +16,7 @@
 import { assertCron } from '../../../../lib/server/cron.js';
 import { buildBriefScript, monthlyChars } from '../../../../lib/server/brief.js';
 import { synthesize, uploadAudio } from '../../../../lib/server/tts.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
 export const runtime = 'nodejs';
 
@@ -24,7 +25,7 @@ const CADENCE = process.env.BRIEF_CADENCE === 'daily' ? 'daily' : 'weekly';
 const CHARS_PER_SEC = 15;
 
 const sb = (path, init = {}) =>
-  fetch(`${process.env.SUPABASE_URL}/rest/v1/${path}`, {
+  sbFetch(`${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',

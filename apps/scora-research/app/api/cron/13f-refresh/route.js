@@ -1,6 +1,11 @@
 import { assertCron } from '../../../../lib/server/cron.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const FUNDS = [
@@ -135,8 +140,7 @@ export async function GET(request) {
   const deduped = [...byKey.values()];
 
   // Upsert to Supabase using service role (bypasses RLS)
-  const sbResp = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/smart_money_13f?on_conflict=fund_cik,filing_date,ticker`,
+  const sbResp = await sbFetch(`smart_money_13f?on_conflict=fund_cik,filing_date,ticker`,
     {
       method: 'POST',
       headers: {

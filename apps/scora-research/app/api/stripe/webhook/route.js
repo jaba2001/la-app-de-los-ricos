@@ -17,8 +17,13 @@
 // vuelve. Por eso un fallo transitorio de Supabase responde 500 (que reintente) y un evento
 // que no sabemos manejar responde 200 (que no reintente eternamente algo que ignoramos).
 import { verifyWebhook, stripeApi, stripeEnabled } from '../../../../lib/server/stripe.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 
 const SB = () => process.env.SUPABASE_URL;
 const KEY = () => process.env.SUPABASE_SERVICE_KEY;
@@ -44,7 +49,7 @@ const iso = (unixSec) =>
  * esta tabla existe para evitar.
  */
 async function claimEvent(id, type) {
-  const res = await fetch(`${SB()}/rest/v1/sl_stripe_events`, {
+  const res = await sbFetch(`sl_stripe_events`, {
     method: 'POST',
     headers: sbHeaders({ Prefer: 'return=minimal' }),
     body: JSON.stringify({ event_id: id, type }),
@@ -65,7 +70,7 @@ async function claimEvent(id, type) {
  */
 async function releaseEvent(id) {
   try {
-    await fetch(`${SB()}/rest/v1/sl_stripe_events?event_id=eq.${encodeURIComponent(id)}`, {
+    await sbFetch(`sl_stripe_events?event_id=eq.${encodeURIComponent(id)}`, {
       method: 'DELETE',
       headers: sbHeaders({ Prefer: 'return=minimal' }),
     });
@@ -98,7 +103,7 @@ async function upsertSubscription(userId, customerId, sub, eventAt) {
     stripe_customer_id: customerId,
     ...subFields(sub, eventAt),
   };
-  const res = await fetch(`${SB()}/rest/v1/sl_subscriptions?on_conflict=user_id`, {
+  const res = await sbFetch(`sl_subscriptions?on_conflict=user_id`, {
     method: 'POST',
     headers: sbHeaders({ Prefer: 'resolution=merge-duplicates,return=minimal' }),
     body: JSON.stringify(row),
@@ -121,7 +126,7 @@ async function updateByCustomer(customerId, patch, eventAt) {
     stripe_customer_id: `eq.${customerId}`,
     or: `(last_event_at.is.null,last_event_at.lt.${eventAt})`,
   });
-  const res = await fetch(`${SB()}/rest/v1/sl_subscriptions?${q}`, {
+  const res = await sbFetch(`sl_subscriptions?${q}`, {
     method: 'PATCH',
     headers: sbHeaders({ Prefer: 'return=minimal' }),
     body: JSON.stringify(patch),

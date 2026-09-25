@@ -4,6 +4,7 @@
 // (insider-trading/latest = recent Form 4s across all issuers). FMP_KEY is
 // already configured in this project's Vercel env for the /api/fmp proxy.
 import { assertCron } from '../../../../lib/server/cron.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -75,8 +76,7 @@ export async function GET(request) {
     score: Math.min(100, Math.log10(r.usd) * 20),
   }));
 
-  const sbResp = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/smart_money_top_buyers?on_conflict=month,rank`,
+  const sbResp = await sbFetch(`smart_money_top_buyers?on_conflict=month,rank`,
     {
       method: 'POST',
       headers: {

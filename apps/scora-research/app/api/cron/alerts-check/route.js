@@ -6,8 +6,13 @@
 // alert_type si ya hay uno en las últimas 24h.
 import { sendEmail, alertEmailHtml } from '../../../../lib/server/email.js';
 import { assertCron, pgv } from '../../../../lib/server/cron.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const FRED = (s) =>
@@ -25,7 +30,7 @@ async function fetchObs(seriesId) {
 async function alreadyAlertedToday(alertType) {
   const since = new Date(Date.now() - 86400000).toISOString();
   const url = `${process.env.SUPABASE_URL}/rest/v1/alerts_log?alert_type=eq.${pgv(alertType)}&triggered_at=gte.${pgv(since)}&user_id=is.null&select=id&limit=1`;
-  const r = await fetch(url, {
+  const r = await sbFetch(url, {
     headers: {
       apikey: process.env.SUPABASE_SERVICE_KEY,
       Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
@@ -37,7 +42,7 @@ async function alreadyAlertedToday(alertType) {
 }
 
 async function insertAlert(row) {
-  const r = await fetch(`${process.env.SUPABASE_URL}/rest/v1/alerts_log`, {
+  const r = await sbFetch(`alerts_log`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -104,7 +109,7 @@ export async function GET(request) {
   // solo la leemos y emitimos alerta si está activa (0 fetches de mercado extra).
   try {
     const url = `${process.env.SUPABASE_URL}/rest/v1/macro_state?id=eq.1&select=credit_divergence,credit_private_proxy,credit_stress&limit=1`;
-    const r = await fetch(url, {
+    const r = await sbFetch(url, {
       headers: {
         apikey: process.env.SUPABASE_SERVICE_KEY,
         Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,

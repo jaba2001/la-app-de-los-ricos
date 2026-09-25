@@ -290,6 +290,11 @@ jobs:
       - name: El cliente de datos (reemplazo de supabase.from)
         run: node --experimental-strip-types --no-warnings scripts/datacliente.test.mjs
 
+      # El traductor de PostgREST a SQL: por el pasan las 34 llamadas de los crons, que
+      # deciden a quien se le manda una alerta. Se salta sin Postgres.
+      - name: Traductor PostgREST (se salta sin base)
+        run: node --experimental-strip-types --no-warnings scripts/postgrest.test.mjs
+
       # ── EL BACKEND ────────────────────────────────────────────────────────────────────
       # Estas 15 vivian en el repo ic-proxy con su propio `npm test`, y al fusionarlo todo en
       # una sola app se habrian quedado sin correr en ningun sitio. Lo cazo el guardian de

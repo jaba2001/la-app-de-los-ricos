@@ -14,6 +14,7 @@
 // Env: CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_KEY.
 import { assertCron, pgv } from '../../../../lib/server/cron.js';
 import { buildDailyClose, SECTOR_UNIVERSE, parseYahooQuote } from '../../../../lib/server/dailyClose.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -66,7 +67,7 @@ export async function GET(request) {
   // necesita lo dejaría muerto por una razón falsa.
 
   // 1 · los dos snapshots macro más recientes (el previo detecta el cambio de régimen)
-  const mRes = await fetch(`${SB}/rest/v1/macro_state?select=*&order=snapshot_date.desc&limit=2`, { headers: sbHeaders });
+  const mRes = await sbFetch(`macro_state?select=*&order=snapshot_date.desc&limit=2`, { headers: sbHeaders });
   const mRows = mRes.ok ? await mRes.json().catch(() => []) : [];
   const macro = Array.isArray(mRows) && mRows[0] ? mRows[0] : null;
   const prevMacro = Array.isArray(mRows) && mRows[1] ? mRows[1] : null;
@@ -90,7 +91,7 @@ export async function GET(request) {
   }
 
   // 4 · upsert idempotente por día — re-ejecutar el cron no duplica ni rompe.
-  const up = await fetch(`${SB}/rest/v1/sl_daily_close?on_conflict=close_date`, {
+  const up = await sbFetch(`sl_daily_close?on_conflict=close_date`, {
     method: 'POST',
     headers: { ...sbHeaders, Prefer: 'resolution=merge-duplicates,return=minimal' },
     body: JSON.stringify({ close_date: date, payload: report, updated_at: new Date().toISOString() }),

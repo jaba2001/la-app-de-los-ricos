@@ -14,6 +14,7 @@
 // Se consulta en CADA petición y no se cachea: una suscripción cancelada debe dejar de dar
 // acceso en el acto, y una lectura a Supabase no se nota al lado de una llamada al modelo.
 import { PRO_STATUSES } from './stripe.js';
+import { sbFetch } from "./data/postgrest.js";
 
 /**
  * @returns {Promise<boolean>} true solo si hay una suscripción vigente.
@@ -30,9 +31,9 @@ export async function isPro(userId) {
   if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return false;
 
   try {
-    const q = `${process.env.SUPABASE_URL}/rest/v1/sl_subscriptions` +
+    const q = `sl_subscriptions` +
       `?user_id=eq.${encodeURIComponent(userId)}&select=status,current_period_end`;
-    const res = await fetch(q, {
+    const res = await sbFetch(q, {
       headers: {
         apikey: process.env.SUPABASE_SERVICE_KEY,
         Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,

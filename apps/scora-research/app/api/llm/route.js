@@ -12,7 +12,10 @@ import { corsHeaders, preflight } from '../../../lib/server/cors.js';
 import { checkDailyQuota } from '../../../lib/server/quota.js';
 import { isPro } from '../../../lib/server/entitlements.js';
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta comprueba la suscripcion (lib/server/entitlements.js) y
+// eso ahora consulta Cloud SQL, cuyo driver necesita sockets de Node. Con Supabase la
+// comprobacion era una llamada HTTP, que edge si sabe hacer.
+export const runtime = 'nodejs';
 const MAX_BODY_BYTES = 50 * 1024;
 const DEFAULT_MODEL = { groq: 'llama-3.3-70b-versatile', gemini: 'gemini-2.0-flash' };
 
