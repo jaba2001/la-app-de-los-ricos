@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { computeSmartMoneySignal } from "@/lib/smartMoney";
 import { Sk } from "@/components/ui/Skeleton";
 
@@ -24,7 +24,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
   const [loadingTop, setLoadingTop] = useState(true);
 
   useEffect(() => {
-    supabase.from("smart_money_top_buyers")
+    datos.from("smart_money_top_buyers")
       .select("rank, ticker, sector, net_insider_buying_usd, num_insiders, month")
       .order("month", { ascending: false })
       .order("rank", { ascending: true })

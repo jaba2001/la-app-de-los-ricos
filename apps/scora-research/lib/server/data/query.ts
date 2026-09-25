@@ -11,10 +11,13 @@
 //      columnas raras. El identificador sale del token verificado en el servidor, nunca
 //      del cuerpo de la petición.
 
-import { policyFor, type Op, type TablePolicy } from "./policy.ts";
+import { policyFor, funcionPermitida, type Op, type TablePolicy } from "./policy.ts";
 
 export interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is"; val: unknown }
 export interface Peticion {
+  /** Llamada a funcion: `rpc` lleva el nombre y `args` los parametros. */
+  rpc?: string;
+  args?: Record<string, unknown>;
   table: string;
   op: Op;
   columns?: string;                 // lo que iría en .select("a,b,c")
@@ -34,6 +37,25 @@ export class RechazoPolitica extends Error {
 }
 
 const IDENT = /^[a-z_][a-z0-9_]*$/;
+
+/** Llamada a una funcion de la lista blanca. Los parametros van por NOMBRE (`p_ticker => $1`)
+ *  y solo los declarados: uno que no este se rechaza en vez de ignorarse, porque ignorarlo
+ *  significaria ejecutar la funcion con menos argumentos de los que el llamante cree. */
+function construirRpc(p: Peticion, userId: string | null): SqlListo {
+  const nombre = p.rpc!;
+  if (!IDENT.test(nombre)) throw new RechazoPolitica(`Funcion invalida: ${nombre}`);
+  const def = funcionPermitida(nombre);
+  if (!def) throw new RechazoPolitica(`Funcion no accesible: ${nombre}`);
+  if (def.scoped && !userId) throw new RechazoPolitica(`${nombre} requiere sesion`);
+
+  const vals: unknown[] = [];
+  const partes: string[] = [];
+  for (const [k, v] of Object.entries(p.args ?? {})) {
+    if (!def.params.includes(k)) throw new RechazoPolitica(`Parametro no permitido en ${nombre}: ${k}`);
+    partes.push(`${k} => $${vals.push(v)}`);
+  }
+  return { text: `SELECT * FROM "${nombre}"(${partes.join(", ")})`, values: vals };
+}
 
 /** Las columnas reales de cada tabla, leídas del esquema. Sin esto habría que confiar en que
  *  el cliente manda nombres válidos, y un nombre es lo único que no se puede parametrizar. */
@@ -61,6 +83,7 @@ function comprobar(p: Peticion, userId: string | null): { pol: TablePolicy; scop
 }
 
 export function construir(p: Peticion, userId: string | null, esquema: Esquema): SqlListo {
+  if (p.rpc) return construirRpc(p, userId);
   const { pol, scoped } = comprobar(p, userId);
   const cols = esquema[p.table];
   if (!cols) throw new RechazoPolitica(`Tabla desconocida en el esquema: ${p.table}`);

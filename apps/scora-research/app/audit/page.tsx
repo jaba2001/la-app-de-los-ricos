@@ -2,7 +2,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
 
 interface AuditRow {
@@ -28,7 +28,7 @@ export default function AuditPage() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("ai_audit_log").select("*").order("created_at", { ascending: false }).limit(100)
+    datos.from("ai_audit_log").select("*").order("created_at", { ascending: false }).limit(100)
       .then(({ data }) => { setRows((data as AuditRow[]) ?? []); setLoaded(true); });
   }, [session]);
 

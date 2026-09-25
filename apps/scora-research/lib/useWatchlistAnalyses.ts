@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "./supabase";
+import { datos } from "./dataClient";
 import { useAuth } from "./auth";
 import type { StockAnalysis, WatchlistItem } from "./types";
 import { latestAnalyses } from "./latestAnalyses";
@@ -31,7 +31,7 @@ export function useWatchlistAnalyses(extraTickers: string[] = []): WatchlistAnal
   const load = useCallback(async () => {
     if (!session) { setLoading(false); return; }
     setLoading(true);
-    const { data: wl } = await supabase
+    const { data: wl } = await datos
       .from("sl_watchlist")
       .select("*")
       .eq("user_id", session.user.id);

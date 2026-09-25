@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { ALLOC_ASSETS, ASSET_META, blendWeights, type Weights } from "@/lib/allocation";
 
 interface Track { as_of: string; inception: string; nav: number; spy_nav: number; bench6040_nav?: number | null; bench6040_ret?: number | null; total_ret: number; spy_ret: number; max_dd: number; sharpe: number; grade: string; }
@@ -20,8 +20,8 @@ export default function PaperFund() {
   useEffect(() => {
     (async () => {
       const [{ data: t }, { data: r }] = await Promise.all([
-        supabase.from("sl_paper_fund_track").select("*").order("as_of", { ascending: false }).limit(1).maybeSingle(),
-        supabase.from("sl_paper_fund").select("*").order("rebalance_date", { ascending: false }).limit(1).maybeSingle(),
+        datos.from("sl_paper_fund_track").select("*").order("as_of", { ascending: false }).limit(1).maybeSingle(),
+        datos.from("sl_paper_fund").select("*").order("rebalance_date", { ascending: false }).limit(1).maybeSingle(),
       ]);
       setTrack((t as Track) ?? null);
       setReb((r as Reb) ?? null);

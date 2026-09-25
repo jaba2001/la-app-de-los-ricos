@@ -83,6 +83,24 @@ export const NO_EXPUESTAS: Record<string, string> = {
   push_alert_state: "estado interno del cron de alertas",
 };
 
+/**
+ * Funciones de Postgres invocables desde el navegador, con sus parametros permitidos.
+ *
+ * Lista aparte y tambien de denegar por defecto. Una funcion es codigo que corre DENTRO de
+ * la base con los permisos del que la creo: dejar invocar cualquiera seria mas peligroso que
+ * dejar consultar cualquier tabla.
+ *
+ * `scoped` diria que la funcion recibe el usuario; search_kb_chunks no lo necesita porque
+ * kb_chunks es contenido compartido (informes publicos de la SEC).
+ */
+export const FUNCIONES: Record<string, { params: string[]; scoped: boolean }> = {
+  search_kb_chunks: { params: ["p_ticker", "p_query", "p_per_section"], scoped: false },
+};
+
+export function funcionPermitida(nombre: string) {
+  return Object.prototype.hasOwnProperty.call(FUNCIONES, nombre) ? FUNCIONES[nombre] : null;
+}
+
 export function policyFor(table: string): TablePolicy | null {
   return Object.prototype.hasOwnProperty.call(POLICY, table) ? POLICY[table] : null;
 }

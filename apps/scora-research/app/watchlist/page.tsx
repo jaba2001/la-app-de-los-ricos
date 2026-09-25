@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 
@@ -39,13 +39,13 @@ export default function WatchlistPage() {
   const loadItems = useCallback(async () => {
     if (!session) return;
     setLoadingList(true);
-    const { data, error } = await supabase
+    const { data, error } = await datos
       .from("sl_watchlist")
       .select("id,ticker,added_at")
       .eq("user_id", session.user.id)
       .order("added_at", { ascending: false });
     if (error) setError(error.message);
-    else setItems(data ?? []);
+    else setItems((data ?? []) as WatchlistItem[]);
     setLoadingList(false);
   }, [session]);
 
@@ -89,14 +89,14 @@ export default function WatchlistPage() {
     if (!t || !session) return;
     setAdding(true);
     setError("");
-    const { error } = await supabase.from("sl_watchlist").insert({ user_id: session.user.id, ticker: t });
+    const { error } = await datos.from("sl_watchlist").insert({ user_id: session.user.id, ticker: t });
     if (error) setError(error.message);
     else { setNewTicker(""); await loadItems(); }
     setAdding(false);
   }
 
   async function removeTicker(id: number) {
-    const { error } = await supabase.from("sl_watchlist").delete().eq("id", id);
+    const { error } = await datos.from("sl_watchlist").delete().eq("id", id);
     if (error) setError(error.message);
     else setItems(prev => prev.filter(i => i.id !== id));
   }

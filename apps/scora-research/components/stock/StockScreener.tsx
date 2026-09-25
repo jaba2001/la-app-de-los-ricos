@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, calcFactorTilts, getRating, getMacroTilt } from "@/lib/scoring";
@@ -38,7 +38,7 @@ export default function StockScreener() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_watchlist").select("*").eq("user_id", session.user.id).then(({ data }) => {
+    datos.from("sl_watchlist").select("*").eq("user_id", session.user.id).then(({ data }) => {
       if (data) setWatchlist(data as WatchlistItem[]);
       setLoading(false);
     });
@@ -126,7 +126,7 @@ export default function StockScreener() {
         fcf_yield: null,
       };
 
-      await supabase.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
+      await datos.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
       setAnalyses(prev => ({ ...prev, [ticker]: row as StockAnalysis }));
     } catch { /* fail silently — screener still shows the row */ }
     setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
@@ -136,7 +136,7 @@ export default function StockScreener() {
     e.preventDefault();
     const t = newTicker.trim().toUpperCase();
     if (!t || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await supabase.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
+    const { data } = await datos.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
     if (data) {
       setWatchlist(prev => [...prev, data as WatchlistItem]);
       setNewTicker("");
@@ -145,7 +145,7 @@ export default function StockScreener() {
   }
 
   async function removeTicker(t: string) {
-    await supabase.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 

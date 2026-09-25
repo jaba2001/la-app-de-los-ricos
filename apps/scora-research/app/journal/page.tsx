@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import { track } from "@/lib/analytics";
@@ -61,7 +61,7 @@ export default function JournalPage() {
   const load = useCallback(async () => {
     if (!session) return;
     setLoadingList(true);
-    const { data, error } = await supabase
+    const { data, error } = await datos
       .from("sl_journal")
       .select("*")
       .eq("user_id", session.user.id)
@@ -97,7 +97,7 @@ export default function JournalPage() {
     const price = Number(f.price);
     if (!ticker || !(shares > 0) || !(price >= 0)) { setError("Ticker, shares (>0) and price are required."); return; }
     setSaving(true); setError("");
-    const { error } = await supabase.from("sl_journal").insert({
+    const { error } = await datos.from("sl_journal").insert({
       user_id: session.user.id,
       ticker, side: f.side, shares, price,
       trade_date: f.trade_date || new Date().toISOString().slice(0, 10),
@@ -111,7 +111,7 @@ export default function JournalPage() {
   async function closeTrade(t: JournalTrade) {
     const mark = marks[t.ticker];
     if (mark == null) { setError(`No live price for ${t.ticker} yet — try again in a moment.`); return; }
-    const { error } = await supabase.from("sl_journal")
+    const { error } = await datos.from("sl_journal")
       .update({ status: "closed", exit_price: mark, exit_date: new Date().toISOString().slice(0, 10) })
       .eq("id", t.id);
     if (error) setError(error.message);
@@ -119,7 +119,7 @@ export default function JournalPage() {
   }
 
   async function removeTrade(id: number) {
-    const { error } = await supabase.from("sl_journal").delete().eq("id", id);
+    const { error } = await datos.from("sl_journal").delete().eq("id", id);
     if (error) setError(error.message);
     else setTrades(prev => prev.filter(t => t.id !== id));
   }

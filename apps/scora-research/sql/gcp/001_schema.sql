@@ -874,3 +874,57 @@ CREATE INDEX sl_subscriptions_customer_idx ON public.sl_subscriptions USING btre
 CREATE UNIQUE INDEX sl_waitlist_email_idx ON public.sl_waitlist USING btree (lower(email));
 
 
+
+
+-- ── Funciones ────────────────────────────────────────────────────────────────────────
+-- La app llama a search_kb_chunks por RPC (busqueda de texto completo sobre kb_chunks, que
+-- tiene 50.000 filas). Es la unica funcion que invoca el navegador, y por eso es la unica
+-- que se migra: lib/server/data/policy.ts lleva su lista blanca aparte.
+CREATE FUNCTION public.search_kb_chunks(p_ticker text, p_query text DEFAULT NULL::text, p_per_section integer DEFAULT 3) RETURNS TABLE(ticker text, form text, section text, chunk_idx integer, text text, filed_date date, fiscal_year integer, rank real)
+    LANGUAGE sql STABLE
+    SET search_path TO 'public', 'pg_temp'
+    AS $$
+  WITH q AS (
+    SELECT CASE
+             WHEN p_query IS NULL OR btrim(p_query) = '' THEN NULL
+             ELSE websearch_to_tsquery('english', p_query)
+           END AS tsq_and
+  ),
+  q2 AS (
+    SELECT
+      tsq_and,
+      CASE
+        WHEN tsq_and IS NULL THEN NULL
+        ELSE replace(tsq_and::text, ' & ', ' | ')::tsquery
+      END AS tsq_or
+    FROM q
+  ),
+  eff AS (
+    SELECT CASE
+             WHEN tsq_and IS NULL THEN NULL
+             WHEN EXISTS (
+               SELECT 1 FROM kb_chunks c
+                WHERE c.ticker = upper(p_ticker) AND c.tsv @@ tsq_and
+             ) THEN tsq_and
+             ELSE tsq_or
+           END AS tsq
+    FROM q2
+  ),
+  scored AS (
+    SELECT c.ticker, c.form, c.section, c.chunk_idx, c.text, c.filed_date, c.fiscal_year,
+           CASE WHEN e.tsq IS NULL THEN 0::real ELSE ts_rank(c.tsv, e.tsq) END AS rank,
+           ROW_NUMBER() OVER (
+             PARTITION BY c.section
+             ORDER BY CASE WHEN e.tsq IS NULL THEN 0::real ELSE ts_rank(c.tsv, e.tsq) END DESC,
+                      c.chunk_idx ASC
+           ) AS rn
+      FROM kb_chunks c CROSS JOIN eff e
+     WHERE c.ticker = upper(p_ticker)
+       AND (e.tsq IS NULL OR c.tsv @@ e.tsq)
+  )
+  SELECT ticker, form, section, chunk_idx, text, filed_date, fiscal_year, rank
+    FROM scored
+   WHERE rn <= GREATEST(p_per_section, 1)
+   ORDER BY CASE section WHEN 'Risk Factors' THEN 0 WHEN 'MD&A' THEN 1 ELSE 2 END,
+            rank DESC, chunk_idx ASC;
+$$;

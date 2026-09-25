@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { datos } from "./dataClient";
 import { checkGrounding, checkDirection } from "./grounding";
 import { track } from "./analytics";
 import { setQuota } from "./quotaState";
@@ -344,8 +345,8 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
       // sql/2026-07-29_ai_audit_log_usage.sql would make every insert fail on an unknown
       // column — and since audit writes are deliberately swallowed below, the audit trail
       // (the moat) would go silently empty. Order matters: never lose the row.
-      const { error } = await supabase.from("ai_audit_log").insert(withUsage);
-      if (error) await supabase.from("ai_audit_log").insert(base);
+      const { error } = await datos.from("ai_audit_log").insert(withUsage);
+      if (error) await datos.from("ai_audit_log").insert(base);
     }
   } catch { /* audit is best-effort — never block the user's answer */ }
   return { text, violations, grounded };

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
 import PaperFund from "@/components/macro/PaperFund";
 
@@ -37,9 +37,9 @@ export default function TrackRecordPage() {
   useEffect(() => {
     if (!session) return;
     (async () => {
-      const { data } = await supabase.from("sl_track_summary").select("*").eq("id", 1).maybeSingle();
+      const { data } = await datos.from("sl_track_summary").select("*").eq("id", 1).maybeSingle();
       setLive((data as LiveSummary) ?? null);
-      const { count } = await supabase.from("sl_cohort").select("id", { count: "exact", head: true });
+      const { count } = await datos.from("sl_cohort").select("id", { count: "exact", head: true });
       setCohortRows(count ?? 0);
       setLoaded(true);
     })();

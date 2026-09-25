@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useMacroContext } from "@/lib/MacroContext";
 import dynamic from "next/dynamic";
 import type { MacroState } from "@/lib/types";
@@ -65,7 +65,7 @@ export default function MacroPage() {
     if (!session) return;
     setLoading(true);
     setError("");
-    const { data, error: err } = await supabase
+    const { data, error: err } = await datos
       .from("macro_state")
       .select("*")
       .eq("id", 1)

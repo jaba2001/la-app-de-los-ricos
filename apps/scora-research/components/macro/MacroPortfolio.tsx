@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { getMacroTilt, getRating } from "@/lib/scoring";
 import { HISTORICAL_ANALOGS } from "@/lib/historicalAnalogs";
@@ -152,7 +152,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
     setLoadingData(true);
     const m = macro; // capture non-null macro for async closure
 
-    supabase.from("sl_watchlist").select("ticker").eq("user_id", session.user.id)
+    datos.from("sl_watchlist").select("ticker").eq("user_id", session.user.id)
       .then(({ data: wlData, error: wlErr }) => {
         if (wlErr || !wlData || wlData.length === 0) { setLoadingData(false); return; }
         const tickers = (wlData as { ticker: string }[]).map(w => w.ticker);

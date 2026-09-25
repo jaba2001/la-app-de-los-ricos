@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { track } from "@/lib/analytics";
 import { Sk } from "@/components/ui/Skeleton";
@@ -56,7 +56,7 @@ export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside, te
   const load = useCallback(async () => {
     if (!session) return;
     setLoading(true);
-    const { data, error } = await supabase.from("sl_alerts")
+    const { data, error } = await datos.from("sl_alerts")
       .select("id,ticker,kind,threshold,note,active,last_triggered_at,last_value,one_shot")
       .eq("user_id", session.user.id).eq("ticker", ticker.toUpperCase())
       .order("created_at", { ascending: false });
@@ -78,7 +78,7 @@ export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside, te
       setError("You already have that alert on this ticker."); return;
     }
     setError("");
-    const { error } = await supabase.from("sl_alerts").insert({
+    const { error } = await datos.from("sl_alerts").insert({
       user_id: session.user.id, ticker: ticker.toUpperCase(), kind, threshold: thr, active: true, one_shot: oneShot,
     });
     if (error) setError(error.message);
@@ -86,11 +86,11 @@ export default function AlertConfig({ ticker, price, ratingLabel, rdcfUpside, te
   }
 
   async function toggleActive(a: Alert) {
-    const { error } = await supabase.from("sl_alerts").update({ active: !a.active }).eq("id", a.id);
+    const { error } = await datos.from("sl_alerts").update({ active: !a.active }).eq("id", a.id);
     if (error) setError(error.message); else await load();
   }
   async function removeAlert(id: number) {
-    const { error } = await supabase.from("sl_alerts").delete().eq("id", id);
+    const { error } = await datos.from("sl_alerts").delete().eq("id", id);
     if (error) setError(error.message); else setAlerts(prev => prev.filter(a => a.id !== id));
   }
 

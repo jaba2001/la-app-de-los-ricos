@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import type { MacroState } from "@/lib/types";
 import { aiAnalyzeAudited } from "@/lib/proxy";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
@@ -20,7 +20,7 @@ function AlertSubscription() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_alert_prefs").select("macro_alerts").eq("user_id", session.user.id).maybeSingle()
+    datos.from("sl_alert_prefs").select("macro_alerts").eq("user_id", session.user.id).maybeSingle()
       .then(({ data }) => setEnabled(data ? Boolean((data as { macro_alerts: boolean }).macro_alerts) : false));
   }, [session]);
 
@@ -29,7 +29,7 @@ function AlertSubscription() {
     const next = !enabled;
     setSaving(true);
     setEnabled(next); // optimistic
-    const { error } = await supabase.from("sl_alert_prefs").upsert({
+    const { error } = await datos.from("sl_alert_prefs").upsert({
       user_id: session.user.id,
       email: session.user.email,
       macro_alerts: next,
@@ -265,7 +265,7 @@ export default function MacroAI({ macro, loading }: Props) {
     if (!synthesis || !macro) return;
     setSaving(true);
     // supabase-js returns { error } instead of throwing — a try/catch never fires
-    const { error } = await supabase.from("ic_briefs").insert({
+    const { error } = await datos.from("ic_briefs").insert({
       snapshot_date: new Date().toISOString().split("T")[0],
       ic_score: macro.ic_score,
       regime_id: macro.regime_id,
@@ -295,7 +295,7 @@ export default function MacroAI({ macro, loading }: Props) {
       };
     });
     // supabase-js returns { error } instead of throwing — check it explicitly
-    const { error } = await supabase.from("alerts_log").insert(rows);
+    const { error } = await datos.from("alerts_log").insert(rows);
     if (!error) setAlertsSaved(true);
   }
 

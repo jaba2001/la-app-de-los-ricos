@@ -6,7 +6,7 @@
 // data consensus. Retrieval is simple tag-matching (no embeddings needed for a curated
 // KB of a few dozen cards); accumulate cards over time and it still works.
 // ─────────────────────────────────────────────────────────────────────────────
-import { supabase } from "./supabase";
+import { datos } from "./dataClient";
 // Las partes PURAS del renderizado viven en ./filingRender para poder testearlas sin
 // arrastrar el cliente de Supabase (scripts/retrieval.test.mjs). Se reexportan aquí
 // para que los llamadores existentes no cambien.
@@ -18,7 +18,7 @@ export interface KbCard { id: string; topic: string; claim: string; source: stri
 
 /** Fetch the whole (small) knowledge base once. */
 export async function fetchKbCards(): Promise<KbCard[]> {
-  const { data } = await supabase.from("kb_cards").select("id,topic,claim,source,tags,weight");
+  const { data } = await datos.from("kb_cards").select("id,topic,claim,source,tags,weight");
   return (data as KbCard[]) ?? [];
 }
 
@@ -65,7 +65,7 @@ export async function fetchDocChunks(
   const rank: Record<string, number> = { "Risk Factors": 0, "MD&A": 1, "Business": 2 };
 
   try {
-    const { data, error } = await supabase.rpc("search_kb_chunks", {
+    const { data, error } = await datos.rpc("search_kb_chunks", {
       p_ticker: t,
       p_query: opts?.query ?? DEFAULT_FILING_QUERY,
       p_per_section: opts?.perSection ?? 3,
@@ -79,7 +79,7 @@ export async function fetchDocChunks(
     /* RPC missing or unreachable → fall through to kb_docs */
   }
 
-  const { data } = await supabase
+  const { data } = await datos
     .from("kb_docs")
     .select("ticker,form,section,text,filed_date,fiscal_year")
     .eq("ticker", t);

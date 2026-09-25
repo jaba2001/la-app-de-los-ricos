@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { authedFetch } from "@/lib/proxy";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
@@ -47,7 +47,7 @@ export default function StockPage() {
 
   useEffect(() => {
     if (!session) return;
-    supabase.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
+    datos.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
       if (data) setWatchlist(data as WatchlistItem[]);
       setLoadingWl(false);
     });
@@ -104,12 +104,12 @@ export default function StockPage() {
 
   async function addToWatchlist(t: string) {
     if (!session || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await supabase.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
+    const { data } = await datos.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
     if (data) setWatchlist(prev => [...prev, data as WatchlistItem]);
   }
 
   async function removeFromWatchlist(t: string) {
-    await supabase.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 

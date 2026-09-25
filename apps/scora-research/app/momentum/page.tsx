@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import type { MacroState } from "@/lib/types";
 import { marketMomentum, type MarketMomentum } from "@/lib/marketMomentum";
 import { stockPickingRegime } from "@/lib/microScore";
@@ -21,7 +21,7 @@ export default function MarketMomentumPage() {
     if (!session) return;
     let alive = true;
     (async () => {
-      const { data } = await supabase.from("macro_state").select("*").eq("id", 1).single();
+      const { data } = await datos.from("macro_state").select("*").eq("id", 1).single();
       if (!alive) return;
       const m = (data as MacroState) ?? null;
       setMacro(m);

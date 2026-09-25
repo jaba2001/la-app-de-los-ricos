@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { datos } from "./dataClient";
 import type { StockAnalysis } from "./types";
 import { porTicker } from "./porTicker";
 
@@ -18,7 +18,7 @@ import { porTicker } from "./porTicker";
 export async function latestAnalyses(tickers: string[]): Promise<Record<string, StockAnalysis>> {
   if (!tickers.length) return {};
 
-  const { data, error } = await supabase
+  const { data, error } = await datos
     .from("sl_analyses_latest")
     .select("*")
     .in("ticker", tickers);
@@ -26,7 +26,7 @@ export async function latestAnalyses(tickers: string[]): Promise<Record<string, 
   if (!error) return porTicker(data as StockAnalysis[] | null);
 
   // Respaldo: la tabla completa, como antes de existir la vista.
-  const { data: rows } = await supabase
+  const { data: rows } = await datos
     .from("sl_analyses")
     .select("*")
     .in("ticker", tickers)
