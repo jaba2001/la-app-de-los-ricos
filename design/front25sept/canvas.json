@@ -1,0 +1,219 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "AppNav.dc.html": {
+      "h": 56,
+      "title": "Componente: AppNav (barra superior)",
+      "w": 1280,
+      "x": 1360,
+      "y": 6440
+    },
+    "Audit.dc.html": {
+      "h": 900,
+      "title": "Audit — /audit",
+      "w": 1280,
+      "x": 5440,
+      "y": 4320
+    },
+    "Daily.dc.html": {
+      "h": 1300,
+      "title": "Daily — /daily",
+      "w": 1280,
+      "x": 0,
+      "y": 2300
+    },
+    "Demo.dc.html": {
+      "h": 1500,
+      "title": "/demo — live demo, no signup",
+      "w": 1280,
+      "x": 2720,
+      "y": 0
+    },
+    "Discovery.dc.html": {
+      "h": 1300,
+      "title": "Discovery — /discovery",
+      "w": 1280,
+      "x": 2720,
+      "y": 2300
+    },
+    "Evidence.dc.html": {
+      "h": 1700,
+      "title": "Evidence — /evidence",
+      "w": 1280,
+      "x": 4080,
+      "y": 4320
+    },
+    "Journal.dc.html": {
+      "h": 1150,
+      "title": "Journal — /journal",
+      "w": 1280,
+      "x": 1360,
+      "y": 4320
+    },
+    "Login.dc.html": {
+      "h": 800,
+      "title": "/login",
+      "w": 1280,
+      "x": 1360,
+      "y": 0
+    },
+    "Macro.dc.html": {
+      "h": 1600,
+      "title": "Macro — /macro (Overview)",
+      "w": 1280,
+      "x": 1360,
+      "y": 2300
+    },
+    "Main.dc.html": {
+      "h": 1880,
+      "title": "Landing (/) — logged out",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "Momentum.dc.html": {
+      "h": 1150,
+      "title": "Momentum — /momentum",
+      "w": 1280,
+      "x": 4080,
+      "y": 2300
+    },
+    "Picks.dc.html": {
+      "h": 1600,
+      "title": "Scora Picks — /picks (no está en el menú)",
+      "w": 1280,
+      "x": 6800,
+      "y": 4320
+    },
+    "Pricing.dc.html": {
+      "h": 1000,
+      "title": "/pricing",
+      "w": 1280,
+      "x": 4080,
+      "y": 0
+    },
+    "Sistema.dc.html": {
+      "h": 1500,
+      "title": "Design system + app nav",
+      "w": 1280,
+      "x": 0,
+      "y": 6440
+    },
+    "StockDetail.dc.html": {
+      "h": 1100,
+      "title": "Stock detail — /stock/[ticker]",
+      "w": 1280,
+      "x": 6800,
+      "y": 2300
+    },
+    "Stocks.dc.html": {
+      "h": 900,
+      "title": "Stocks — /stock",
+      "w": 1280,
+      "x": 5440,
+      "y": 2300
+    },
+    "TrackRecord.dc.html": {
+      "h": 1700,
+      "title": "Track Record — /track-record",
+      "w": 1280,
+      "x": 2720,
+      "y": 4320
+    },
+    "Watchlist.dc.html": {
+      "h": 700,
+      "title": "Watchlist — /watchlist",
+      "w": 1280,
+      "x": 0,
+      "y": 4320
+    },
+    "LandingV2.dc.html": {
+      "x": 0,
+      "y": -3950,
+      "w": 1280,
+      "h": 3320,
+      "title": "Landing v2 — propuesta (ink · paper · evergreen)"
+    },
+    "PaletaV2.dc.html": {
+      "x": 1360,
+      "y": -3950,
+      "w": 1280,
+      "h": 1100,
+      "title": "Paleta y tipografía v2"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-25T10:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "n1": {
+      "kind": "title1",
+      "maxW": 5360,
+      "text": "Público (sin sesión)",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "n2": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "App — pestañas (1/2)",
+      "w": 240,
+      "x": 0,
+      "y": 2000
+    },
+    "n3": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "App — pestañas (2/2) + Picks",
+      "w": 240,
+      "x": 0,
+      "y": 4020
+    },
+    "n4": {
+      "kind": "title1",
+      "maxW": 2640,
+      "text": "Sistema de diseño y componentes",
+      "w": 240,
+      "x": 0,
+      "y": 6140
+    },
+    "n5": {
+      "kind": "title1",
+      "maxW": 2640,
+      "text": "Propuesta v2 — rediseño",
+      "x": 0,
+      "y": -4250
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Login.dc.html",
+    "Demo.dc.html",
+    "Pricing.dc.html",
+    "Daily.dc.html",
+    "Macro.dc.html",
+    "Discovery.dc.html",
+    "Momentum.dc.html",
+    "Stocks.dc.html",
+    "StockDetail.dc.html",
+    "Watchlist.dc.html",
+    "Journal.dc.html",
+    "TrackRecord.dc.html",
+    "Evidence.dc.html",
+    "Audit.dc.html",
+    "Picks.dc.html",
+    "Sistema.dc.html",
+    "AppNav.dc.html",
+    "LandingV2.dc.html",
+    "PaletaV2.dc.html"
+  ],
+  "pages": [],
+  "title": "Scora Research — Front"
+}

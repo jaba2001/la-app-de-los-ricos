@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Watchlist</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 700px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Watchlist" hint-size="1280px,56px"></dc-import>
+<div style="width: 1000px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Watchlist</h1>
+<div style="display: flex; gap: 8px">
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ticker</span><input type="text" placeholder="AAPL, MSFT…" style="width: 180px; background: #122540; border: 1px solid #1E3A5F; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 12px"></label>
+<button type="button" style="padding: 8px 16px; border-radius: 10px; font-family: inherit; font-size: 12px; font-weight: 700; background: #F59E0B; color: #070E1A; border: none">Agregar</button>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 12px">
+<thead><tr>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">Ticker</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">Precio</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">Cambio %</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">P/E</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">Cap. Mercado</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 10px 14px; border-bottom: 1px solid #1E3A5F">Agregado</th>
+<th style="padding: 10px 14px; border-bottom: 1px solid #1E3A5F"></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="5">
+<tr><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; color: #F59E0B; font-weight: 700">[TICKER]</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F">$—</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; color: #10B981">+—%</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; color: #94A3B8">—</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; color: #94A3B8">—</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; color: #4A6080">DD mmm</td><td style="padding: 12px 14px; border-bottom: 1px solid #16304F; text-align: right"><button type="button" aria-label="Eliminar de watchlist" style="font-family: inherit; background: transparent; border: none; color: #4A6080; font-size: 14px">×</button></td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 10px; color: #4A6080">Estado vacío: «Tu watchlist está vacía — Agrega tickers arriba o usa el ★ en la página de análisis de cualquier stock.»</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":700}}'>
+class Component extends DCLogic {
+renderVals() { return { rows: [1,2,3,4,5] }; }
+}
+</script>
+</body>
+</html>

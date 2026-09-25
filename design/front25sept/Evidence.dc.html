@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Evidence ledger</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1700px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Evidence" hint-size="1280px,56px"></dc-import>
+<main style="width: 1080px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div><h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Evidence ledger</h1>
+<p style="margin: 6px 0 0; font-size: 12px; color: #94A3B8; max-width: 780px; line-height: 1.6">Every signal in this product, with what it actually measured — <strong style="color: #F0F4F8">including the ones that failed</strong>. Fama's joint-hypothesis problem says market efficiency can never be tested on its own … There is no clean test. The honest response isn't silence — it's showing the working.</p></div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">The headline: stock selection does not beat the index</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Information coefficient</div><div style="font-size: 22px; font-weight: 700">—</div><div style="font-size: 10px; color: #4A6080">score vs forward return · ~0 is no predictive power</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">PSR vs SPY</div><div style="font-size: 22px; font-weight: 700; color: #F87171">—%</div><div style="font-size: 10px; color: #4A6080">want &gt;95% · probability the true Sharpe beats SPY</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Top-minus-bottom decile</div><div style="font-size: 22px; font-weight: 700; color: #F87171">—%</div><div style="font-size: 10px; color: #4A6080">best decile minus worst — negative is backwards</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Universe</div><div style="font-size: 22px; font-weight: 700">— names</div><div style="font-size: 10px; color: #4A6080">— monthly rebalances · point-in-time membership</div></div>
+</div>
+<div style="font-size: 12px; margin-top: 12px"><strong>Verdict:</strong> <span style="color: #94A3B8">[portfolioBacktest.verdict]</span></div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">How hard we deflate for having searched</div>
+<p style="margin: 0 0 12px; font-size: 10px; color: #4A6080">Test 200 worthless strategies, keep the best, and it will show a healthy Sharpe by luck alone. The deflated Sharpe (Bailey &amp; López de Prado) asks: <em>is this better than the best you'd expect from M attempts at nothing?</em></p>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Trials in this script</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Trials on the same data</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Deflated Sharpe · optimistic</div><div style="font-size: 22px; font-weight: 700">—%</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Deflated Sharpe · conservative</div><div style="font-size: 22px; font-weight: 700; color: #F87171">—%</div></div>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Every factor, graded</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px">
+<thead><tr>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Factor</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Correlación baja</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Correlación media</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Correlación alta</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Best</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Grade</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr><td style="padding: 8px 12px; border-bottom: 1px solid #16304F">[Factor]</td><td style="padding: 8px 12px; text-align: right; color: #94A3B8; border-bottom: 1px solid #16304F">—</td><td style="padding: 8px 12px; text-align: right; color: #94A3B8; border-bottom: 1px solid #16304F">—</td><td style="padding: 8px 12px; text-align: right; color: #94A3B8; border-bottom: 1px solid #16304F">—</td><td style="padding: 8px 12px; text-align: right; font-weight: 700; border-bottom: 1px solid #16304F">—</td><td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid #16304F"><span style="font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #122540; color: #94A3B8">A–D</span></td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">What failed, and stayed failed</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Ensemble OOS IC</div><div style="font-size: 22px; font-weight: 700; color: #F87171">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Monolithic score OOS IC</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Test months</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Gate</div><div style="font-size: 22px; font-weight: 700; color: #F87171">PASSED / FAILED</div></div>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">How to read this page</div>
+<ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #94A3B8; display: flex; flex-direction: column; gap: 4px">
+<li>Every number comes from a committed artifact in research/out/.</li>
+<li>An information coefficient near zero means <em>no predictive power</em>.</li>
+<li>Benchmark caveat: the headline compares against SPY.</li>
+<li>Grades penalise multiplicity.</li>
+<li>Point-in-time universe — no survivorship bias.</li>
+<li>Past measurement is not a forecast. Nothing here is investment advice.</li>
+</ul>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() { return { rows: [1,2,3,4,5,6] }; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pricing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1000px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="None" hint-size="1280px,56px"></dc-import>
+<div style="width: 860px; box-sizing: border-box; padding: 40px 24px; display: flex; flex-direction: column">
+<h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em">Pricing</h1>
+<p style="margin: 8px 0 20px; font-size: 14px; color: #94A3B8; max-width: 620px">The engine runs entirely on free data, so the core is <strong style="color: #F0F4F8">free forever</strong>. A Pro tier will only add convenience (higher limits, alerts) — never the analysis itself.</p>
+<div style="padding: 10px 14px; border-radius: 10px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3); font-size: 12px; color: #93C5FD; margin-bottom: 20px">Stripe is in <strong>test mode</strong> — no real charges. Use card 4242 4242 4242 4242.</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 18px; font-weight: 700">Free</span><span style="font-size: 28px; font-weight: 800">€0</span></div>
+<div style="font-size: 12px; color: #94A3B8">The whole engine, forever.</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #94A3B8">
+<li><span style="color: #10B981; margin-right: 8px">✓</span>Macro regime + validated allocator</li>
+<li><span style="color: #10B981; margin-right: 8px">✓</span>Live track record &amp; AI audit trail</li>
+<li><span style="color: #10B981; margin-right: 8px">✓</span>Stock, bond &amp; instrument analysis</li>
+<li><span style="color: #10B981; margin-right: 8px">✓</span>[N] AI analyses / day</li>
+<li><span style="color: #10B981; margin-right: 8px">✓</span>Discovery screener (stocks + cross-asset)</li>
+</ul>
+<button type="button" style="margin-top: 8px; width: 100%; border-radius: 10px; padding: 10px 0; font-family: inherit; font-size: 12px; font-weight: 700; background: #122540; color: #F0F4F8; border: 1px solid #1E3A5F; min-height: 44px">Start free</button>
+</div>
+<div style="background: #13202E; border: 1px solid #6B5320; border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 18px; font-weight: 700; color: #F59E0B">Pro</span><span style="font-size: 28px; font-weight: 800">€0*</span></div>
+<div style="font-size: 12px; color: #94A3B8">For heavy users — when it exists.</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #94A3B8">
+<li><span style="color: #F59E0B; margin-right: 8px">✓</span>Everything in Free</li>
+<li><span style="color: #F59E0B; margin-right: 8px">✓</span>[N] AI analyses / day ([×] Free)</li>
+<li><span style="color: #F59E0B; margin-right: 8px">✓</span>Regime-change &amp; divergence alerts</li>
+<li><span style="color: #F59E0B; margin-right: 8px">✓</span>Watchlist signal notifications</li>
+<li><span style="color: #F59E0B; margin-right: 8px">✓</span>HTML research-note export</li>
+</ul>
+<form style="margin-top: 8px; display: flex; flex-direction: column; gap: 8px">
+<label for="wl-email" style="font-size: 10px; color: #4A6080">One email when Pro launches. No newsletter, no sharing.</label>
+<div style="display: flex; gap: 8px"><input id="wl-email" type="email" placeholder="your@email.com" style="flex-grow: 1; background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 10px 12px"><button type="submit" style="border-radius: 10px; padding: 0 16px; font-family: inherit; font-size: 12px; font-weight: 700; background: #F59E0B; color: #0a1120; border: none; min-height: 44px">Notify me</button></div>
+</form>
+</div>
+</div>
+<p style="margin: 20px 0 0; font-size: 10px; color: #4A6080; text-align: center">* No monthly cost to you. If a paid tier launches, any processor fee applies only to what you actually earn — never a fixed charge. Educational tool, not investment advice.</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

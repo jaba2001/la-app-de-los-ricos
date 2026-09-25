@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daily close</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1300px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Daily" hint-size="1280px,56px"></dc-import>
+<div style="width: 900px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 10px; padding: 10px 14px; font-size: 10px; color: #4A6080">&lt;DailyTracker /&gt; — tracking strip (latest / regime change)</div>
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div><h1 style="margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.02em">Daily close</h1><div style="font-size: 10px; color: #4A6080">[Day, date] · measured, not forecast</div></div>
+<nav aria-label="Previous closes" style="display: flex; gap: 6px">
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #F0F4F8; background: #122540; border: 1px solid #2A4F7A">MM-DD</a>
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080">MM-DD</a>
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080">MM-DD</a>
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080">MM-DD</a>
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080">MM-DD</a>
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080">MM-DD</a>
+</nav>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px"><span style="font-size: 36px; font-weight: 800; color: #4A6080">±—%</span><span style="font-size: 12px; color: #94A3B8">S&amp;P 500</span></div>
+<p style="margin: 0; font-size: 18px; font-weight: 700">[Headline generated from the measured close]</p>
+<p style="margin: 8px 0 0; font-size: 10px; color: #4A6080">[Context line]</p>
+<div style="margin-top: 12px; display: inline-flex; font-size: 10px; font-weight: 700; color: #F59E0B; padding: 4px 10px; border-radius: 999px; background: rgba(245,158,11,0.15)">Regime change: [prev] → [new]</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="display: flex; justify-content: space-between; margin-bottom: 12px"><div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080">What kind of day it was</div><span style="font-size: 10px; font-weight: 700; color: #94A3B8">[Breadth label]</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Sectors up / down</div><div style="font-size: 22px; font-weight: 700">—–—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Dispersion</div><div style="font-size: 22px; font-weight: 700">— pp</div><div style="font-size: 10px; color: #4A6080">spread between sectors</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Agreement</div><div style="font-size: 22px; font-weight: 700">—%</div><div style="font-size: 10px; color: #4A6080">on the same side</div></div>
+</div>
+<div style="font-size: 10px; color: #4A6080; margin-top: 12px">[Breadth note]</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Sectors</div>
+<div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px">
+<div style="display: grid; grid-template-columns: 160px 1fr 60px; gap: 12px; align-items: center"><span style="color: #94A3B8">[Sector]</span><div style="height: 8px; display: flex"><div style="width: 50%"></div><div style="width: 30%; background: #10B981; border-radius: 2px"></div></div><span style="text-align: right; color: #10B981">+—%</span></div>
+<div style="display: grid; grid-template-columns: 160px 1fr 60px; gap: 12px; align-items: center"><span style="color: #94A3B8">[Sector]</span><div style="height: 8px; display: flex"><div style="width: 50%"></div><div style="width: 18%; background: #10B981; border-radius: 2px"></div></div><span style="text-align: right; color: #10B981">+—%</span></div>
+<div style="display: grid; grid-template-columns: 160px 1fr 60px; gap: 12px; align-items: center"><span style="color: #94A3B8">[Sector]</span><div style="height: 8px; display: flex"><div style="width: 50%"></div><div style="width: 6%; background: #10B981; border-radius: 2px"></div></div><span style="text-align: right; color: #10B981">+—%</span></div>
+<div style="display: grid; grid-template-columns: 160px 1fr 60px; gap: 12px; align-items: center"><span style="color: #94A3B8">[Sector]</span><div style="height: 8px; display: flex; justify-content: flex-end; width: 50%"><div style="width: 20%; background: #EF4444; border-radius: 2px"></div></div><span style="text-align: right; color: #F87171">−—%</span></div>
+<div style="display: grid; grid-template-columns: 160px 1fr 60px; gap: 12px; align-items: center"><span style="color: #94A3B8">[Sector]</span><div style="height: 8px; display: flex; justify-content: flex-end; width: 50%"><div style="width: 45%; background: #EF4444; border-radius: 2px"></div></div><span style="text-align: right; color: #F87171">−—%</span></div>
+<div style="font-size: 10px; color: #4A6080">… 11 sector ETFs, bar centred on zero</div>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px; font-size: 10px; color: #4A6080; line-height: 1.6">Built from measured values by a deterministic template — no model writes these numbers, so none can be invented. See how the engine has actually done on <a href="#">the track record</a>, including the backtest we lost, or try the <a href="#">live demo</a> — no signup.</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

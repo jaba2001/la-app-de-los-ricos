@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Login</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; background: radial-gradient(ellipse 600px 300px at 50% 25%, rgba(245,158,11,0.06), transparent 70%), #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; display: flex; align-items: center; justify-content: center">
+<div style="width: 400px; display: flex; flex-direction: column">
+<div style="text-align: center; margin-bottom: 32px; display: flex; flex-direction: column; align-items: center">
+<div style="width: 48px; height: 48px; border-radius: 14px; background: #F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 16px">
+<svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><path d="M3 19L10 11L15 16L22 6" stroke="#070E1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="22" cy="6" r="2.5" fill="#070E1A"></circle></svg>
+</div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.03em">Scora Research</h1>
+<p style="margin: 6px 0 0; font-size: 14px; color: #4A6080">Macro + Stock intelligence platform</p>
+</div>
+<form style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column">
+<label for="login-email" style="display: block; margin-bottom: 8px; font-size: 12px; color: #94A3B8; font-weight: 500">Email</label>
+<input id="login-email" type="email" placeholder="your@email.com" style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 14px; padding: 10px 14px; margin-bottom: 16px">
+<button type="submit" style="padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 600; background: #F59E0B; color: #070E1A; border: none; min-height: 44px">Send magic link</button>
+</form>
+<p style="text-align: center; margin: 20px 0 0; font-size: 10px; color: #4A6080">No password needed — secure magic link authentication</p>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

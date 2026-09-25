@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Macro</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1600px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNav" active="Macro" hint-size="1280px,56px"></dc-import>
+<div style="height: 44px; box-sizing: border-box; padding: 0 24px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #1E3A5F">
+<a href="#" style="padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #F0F4F8; background: #122540; border: 1px solid #2A4F7A">Overview</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Indicators</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Markets</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Monitors</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Historical Analog</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Geopolitics</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Metals</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">ETF Lab</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Portfolio</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">News</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">AI Synthesis</a>
+<a href="#" style="padding: 4px 12px; font-size: 12px; font-weight: 500; color: #4A6080">Raw Data</a>
+<span style="margin-left: auto; font-size: 10px; color: #4A6080">Snapshot: —</span>
+<button type="button" style="font-family: inherit; font-size: 10px; padding: 4px 10px; border-radius: 6px; background: transparent; color: #94A3B8; border: 1px solid #1E3A5F">↻ Refresh</button>
+</div>
+<div style="padding: 20px 24px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 10px; padding: 12px 16px; font-size: 10px; color: #4A6080">&lt;MacroBrief /&gt; — AI daily brief</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 10px; padding: 12px 16px; font-size: 10px; color: #4A6080">&lt;RegimeAlert /&gt; — regime change banner</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 10px; padding: 12px 16px; font-size: 10px; color: #4A6080">&lt;PushToggle /&gt; · &lt;WelcomeBanner /&gt;</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">Market Stress Score</div>
+<div style="font-size: 48px; font-weight: 800; line-height: 1; color: #4A6080">—</div>
+<div style="margin-top: 8px; display: inline-flex; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 2px 10px; border-radius: 999px; color: #94A3B8; background: #122540">FAVORABLE · CAUTION · STRESS · RISK-OFF</div>
+<div style="font-size: 10px; color: #4A6080; margin-top: 8px">Updated —</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Current Regime</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Quadrant</div><div style="font-size: 18px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Net Liquidity</div><div style="font-size: 18px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">Fed Room</div><div style="font-size: 18px; font-weight: 700">—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080">IC Health Score</div><div style="font-size: 18px; font-weight: 700">—</div></div>
+</div>
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin: 16px 0 0">Signal Hierarchy — Druckenmiller Framework</div>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Composite Scores</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px; border-top: 3px solid #06B6D4"><div style="font-size: 10px; color: #4A6080">LCC · Liquidity Cycle</div><div style="font-size: 22px; font-weight: 700">—</div><div style="height: 4px; background: #1A3050; border-radius: 2px; margin-top: 6px"></div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px; border-top: 3px solid #EF4444"><div style="font-size: 10px; color: #4A6080">RPC · Recession Probability</div><div style="font-size: 22px; font-weight: 700">—</div><div style="height: 4px; background: #1A3050; border-radius: 2px; margin-top: 6px"></div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px; border-top: 3px solid #F97316"><div style="font-size: 10px; color: #4A6080">CSC · Credit Stress</div><div style="font-size: 22px; font-weight: 700">—</div><div style="height: 4px; background: #1A3050; border-radius: 2px; margin-top: 6px"></div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px; border-top: 3px solid #F59E0B"><div style="font-size: 10px; color: #4A6080">GRC · Geopolitical Risk</div><div style="font-size: 22px; font-weight: 700">—</div><div style="height: 4px; background: #1A3050; border-radius: 2px; margin-top: 6px"></div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px; border-top: 3px solid #8B5CF6"><div style="font-size: 10px; color: #4A6080">HSC · Housing Stress</div><div style="font-size: 22px; font-weight: 700">—</div><div style="height: 4px; background: #1A3050; border-radius: 2px; margin-top: 6px"></div></div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px; font-size: 12px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">Rates &amp; Curve</div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">2Y Treasury</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">10Y Treasury</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">30Y Treasury</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Term Premium 10Y</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0"><span style="color: #94A3B8">Curve Steepener</span><span>—</span></div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px; font-size: 12px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">Fed &amp; Macro</div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Core PCE YoY</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Unemployment</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Buffett Indicator</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Expected Return 10Y</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0"><span style="color: #94A3B8">Fed Room</span><span>—</span></div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px; font-size: 12px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 8px">Oil &amp; Sentiment</div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">WTI Oil</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">WTI Change 1M</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Fear &amp; Greed</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1E3A5F"><span style="color: #94A3B8">Put/Call</span><span>—</span></div>
+<div style="display: flex; justify-content: space-between; padding: 8px 0"><span style="color: #94A3B8">Global Liquidity</span><span>—</span></div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Portfolio Positioning</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; font-size: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 10px; border-left: 3px solid #10B981"><strong style="color: #10B981">Growth</strong><div style="font-size: 10px; color: #4A6080">QQQ · XLK · XLY · SCHG · VGT</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 10px; border-left: 3px solid #F59E0B"><strong style="color: #F59E0B">Inflation</strong><div style="font-size: 10px; color: #4A6080">GLD · USO · XLE · XLB · TIP · PDBC</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 10px; border-left: 3px solid #EF4444"><strong style="color: #F87171">Stagflation</strong><div style="font-size: 10px; color: #4A6080">GLD · XLP · XLU · TIP · BIL · SGOV</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 10px; border-left: 3px solid #8B5CF6"><strong style="color: #A78BFA">Defensive</strong><div style="font-size: 10px; color: #4A6080">TLT · IEF · XLP · XLV · XLU · BIL</div></div>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Top At Risk — Worst Macro Tilt</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px">
+<thead><tr><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Ticker</th><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Sector</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Score</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Macro Tilt</th></tr></thead>
+<tbody><tr><td colspan="4" style="padding: 16px 12px; color: #4A6080; font-size: 10px">Analyze stocks in the Stocks tab to populate this list.</td></tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
