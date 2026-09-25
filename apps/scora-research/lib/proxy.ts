@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { tokenActual } from "./auth";
 import { datos } from "./dataClient";
 import { checkGrounding, checkDirection } from "./grounding";
 import { track } from "./analytics";
@@ -49,12 +49,14 @@ async function singleFetch<T = unknown>(
   options?: RequestInit,
   timeoutMs = 30_000
 ): Promise<T> {
-  const { data: { session } } = await supabase.auth.getSession();
+  // Se pide en cada llamada, no se cachea: Identity Platform renueva el token solo y
+  // getIdToken() devuelve el vigente. Guardarlo daria 401 a la hora sin motivo aparente.
+  const token = await tokenActual();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options?.headers as Record<string, string>),
   };
-  if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   // A hung upstream must not hold the caller hostage — analyze() fires ~30 of these in
   // parallel and one stalled endpoint used to block the whole run. Callers can pass
@@ -320,10 +322,11 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
     est_cost_usd: costUsd,
   });
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { auth } = await import("./firebaseClient");
+    const user = auth().currentUser;
     if (user) {
       const base = {
-        user_id: user.id,
+        user_id: user.uid,
         ticker: opts.ticker ?? null,
         module: opts.module,
         model,

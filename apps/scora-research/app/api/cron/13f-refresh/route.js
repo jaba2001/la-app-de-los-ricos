@@ -160,8 +160,8 @@ export async function GET(request) {
       parsed: allRows.length,
       inserted: deduped.length,
       funds: fundCounts,
-      supabase_status: sbResp.status,
-      supabase_error: sbBody,
+      db_status: sbResp.status,
+      db_error: sbBody,
       errors: errors.length ? errors : undefined,
     }),
     { headers: { 'Content-Type': 'application/json' } }

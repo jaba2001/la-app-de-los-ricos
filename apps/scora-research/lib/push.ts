@@ -2,7 +2,7 @@
 // the subscription in Supabase (RLS: owner-only). El cron que las envia (app/api/cron/push-alerts) reads these and
 // pushes regime alerts. Needs NEXT_PUBLIC_VAPID_PUBLIC_KEY (the public half of a free VAPID
 // keypair); until it's set, enablePush() reports "not configured" and the UI stays hidden.
-import { supabase } from "./supabase";
+import { auth } from "./firebaseClient";
 import { datos } from "./dataClient";
 
 const VAPID_PUBLIC = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
@@ -39,10 +39,10 @@ export async function enablePush(): Promise<{ ok: boolean; error?: string }> {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC) as BufferSource });
     const json = sub.toJSON();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = auth().currentUser;
     if (!user || !json.endpoint || !json.keys) return { ok: false, error: "Couldn't save the subscription." };
     const { error } = await datos.from("push_subscriptions").upsert(
-      { endpoint: json.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth, user_id: user.id },
+      { endpoint: json.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth, user_id: user.uid },
       { onConflict: "endpoint" }
     );
     if (error) return { ok: false, error: error.message };

@@ -87,7 +87,7 @@ export async function POST(request) {
       success_url: `${origin}/pricing?checkout=success`,
       cancel_url: `${origin}/pricing?checkout=cancelled`,
       // Permite cancelar desde el portal sin escribirnos.
-      'subscription_data[metadata][supabase_user_id]': user.id,
+      'subscription_data[metadata][scora_user_id]': user.id,
       allow_promotion_codes: true,
     });
 

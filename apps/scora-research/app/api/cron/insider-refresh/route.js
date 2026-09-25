@@ -95,8 +95,8 @@ export async function GET(request) {
       source: 'fmp',
       pagesFetched,
       scraped: rows.length,
-      supabase_status: sbResp.status,
-      supabase_error: sbBody,
+      db_status: sbResp.status,
+      db_error: sbBody,
       fmp_error: fmpError,
     }),
     { headers: { 'Content-Type': 'application/json' } }
