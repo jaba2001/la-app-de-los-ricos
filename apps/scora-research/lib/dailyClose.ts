@@ -1,8 +1,8 @@
 // Tipos y lectura server-side del informe de cierre.
 //
-// El payload lo produce `ic-proxy/lib/dailyClose.js` (plantilla determinista, sin LLM) y
+// El payload lo produce `lib/server/dailyClose.js` (plantilla determinista, sin LLM) y
 // lo guarda el cron en `sl_daily_close`. Aquí solo se LEE — la interfaz de abajo es el
-// contrato entre los dos repos, y hay un test en `ic-proxy/scripts/dailyclose.test.mjs`
+// contrato entre servidor y cliente, y hay un test en `scripts/dailyclose.test.mjs`
 // que lo fija desde el otro lado para que un cambio en el backend no rompa esta página en
 // silencio.
 //

@@ -82,8 +82,14 @@ jobs:
       # SEC no responde, avisa y se salta en vez de romper el build.
       # El contrato del proxy: 39 rutas. Hasta el 2026-09-02 esto sólo corría en local, así que
       # una ruta rota llegaba a main sin que nada la viera.
+      #
+      # Desde la fusión en una sola app, las rutas viven aquí mismo y la comprobación útil es
+      # contra un despliegue real. Sin PROXY_URL se salta y lo dice en voz alta; en cuanto
+      # haya URL de Cloud Run, ponerla aquí y vuelve a vigilar.
       - name: Contrato del proxy (39 rutas)
         run: node scripts/smoke-proxy.mjs
+        env:
+          PROXY_URL: ${{ vars.PROXY_URL }}
 
       # Y los guardianes, vigilados. Un guardián que deja de vigilar no falla: contesta que todo
       # va bien. Fija que `variantes_identicas` distingue registros de variantes SIN quedarse
@@ -268,6 +274,32 @@ jobs:
       # publicados siguieron siendo los del día anterior sin que nada lo dijera.
       - name: Frescura de los artefactos publicados
         run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
+
+      # ── EL BACKEND ────────────────────────────────────────────────────────────────────
+      # Estas 15 vivian en el repo ic-proxy con su propio `npm test`, y al fusionarlo todo en
+      # una sola app se habrian quedado sin correr en ningun sitio. Lo cazo el guardian de
+      # scripts/guardianes.test.mjs, que compara `test:all` contra este fichero — exactamente
+      # el fallo que dice proteger, y la primera vez que salta de verdad.
+      - name: Autenticacion (verificacion local del token)
+        run: node --experimental-strip-types --no-warnings scripts/auth.test.mjs
+      - name: El lote de peticiones (enrutado y cuotas)
+        run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
+      - name: La cola de agrupacion (cliente)
+        run: node --experimental-strip-types --no-warnings scripts/batchqueue.test.mjs
+      - name: Claves de cache y single-flight
+        run: node --experimental-strip-types --no-warnings scripts/cachekey.test.mjs && node --experimental-strip-types --no-warnings scripts/dedupe.test.mjs
+      - name: CORS y segmentos de ruta
+        run: node --experimental-strip-types --no-warnings scripts/cors.test.mjs && node --experimental-strip-types --no-warnings scripts/segment.test.mjs
+      - name: El guardian de los crons
+        run: node --experimental-strip-types --no-warnings scripts/cron.test.mjs
+      - name: Cuota diaria de IA y suscripciones
+        run: node --experimental-strip-types --no-warnings scripts/quota.test.mjs && node --experimental-strip-types --no-warnings scripts/stripe.test.mjs
+      - name: Alertas (kinds, macro) y cierre diario
+        run: node --experimental-strip-types --no-warnings scripts/alertkinds.test.mjs && node --experimental-strip-types --no-warnings scripts/macroalerts.test.mjs && node --experimental-strip-types --no-warnings scripts/dailyclose.test.mjs
+      - name: El brief macro (guion determinista)
+        run: node --experimental-strip-types --no-warnings scripts/brief.test.mjs
+      - name: Una fila por ticker (vista sl_analyses_latest)
+        run: node --experimental-strip-types --no-warnings scripts/latestanalyses.test.mjs
 
       - name: Typecheck
         run: npx tsc --noEmit

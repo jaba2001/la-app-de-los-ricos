@@ -14,7 +14,7 @@
 | # | el plan v1 decía | lo que dice el archivo | fuente |
 |---|---|---|---|
 | 1 | El objetivo es **batir al índice**; el IR es «LA métrica» | El posicionamiento de Scora **elimina** las promesas de batir al mercado. El claim es **ajustado al riesgo** | `Capital/Scora/13_blue_ocean.md`, `06_value_proposition.md`, `BP_Scora.md` |
-| 2 | Information ratio como métrica principal | **El IR de la estrategia es −0,08.** Por esa métrica Scora *pierde*; por Sharpe, Sortino, Calmar y drawdown *gana con holgura* | `scora-research/lib/trackRecord.ts` |
+| 2 | Information ratio como métrica principal | **El IR de la estrategia es −0,08.** Por esa métrica Scora *pierde*; por Sharpe, Sortino, Calmar y drawdown *gana con holgura* | `lib/trackRecord.ts` |
 | 3 | Referencia = SPY | La estrategia tiene **beta 0,49**. Compararla sólo con un índice de beta 1,0 es el error que el propio curso advierte. **Ya existe `bench6040` en el código** | `trackRecord.ts`, `Otros varios/Alpha rO.pdf` |
 | 4 | Atribución Brinson **por sector**, bloqueada porque GICS está licenciado | El Brinson canónico del curso es **por categoría de activo** (monetario / renta fija / renta variable) — que es exactamente lo que hace el allocator, y **no necesita GICS** | `Gestión de activos y carteras/Medidas del comportamiento…pdf` |
 | 5 | No contemplaba la **habilidad de temporización** | Hay dos tests formales y publicados para justo eso: **Merton-Henriksson (1981)** y **Treynor-Mazuy (1966)** | mismo PDF |

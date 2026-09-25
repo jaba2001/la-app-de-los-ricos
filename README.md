@@ -1,7 +1,7 @@
-# Scora — monorepo
+# Scora
 
-**Este es el repositorio oficial.** Integra los dos repos que formaban el producto
-(`scora-research` + `ic-proxy`) en uno solo, con el historial completo de ambos.
+**El repositorio oficial.** Una sola aplicación Next.js que sirve la web y sus rutas de API
+desde el mismo sitio, con el historial completo de los dos repos que la formaban.
 
 Los repos originales de Alejandro Alvarado quedan como referencia de solo lectura
 (remotos `upstream-*`, con el push deshabilitado a propósito). El trabajo va aquí.
@@ -28,48 +28,56 @@ lo que permite el flujo de arriba.
 
 ## Estructura
 
+Una sola aplicación Next.js:
+
 ```
-apps/
-  scora-research/   Frontend. Next.js + TypeScript. 13 páginas de UI.
-  ic-proxy/         Backend. Next.js + JavaScript. 19 rutas API, 7 crons, 0 UI.
+apps/scora-research/
+  app/              18 páginas + 25 rutas /api/*  (la web y su backend)
+  components/       88 componentes
+  lib/              la lógica que también corre en el navegador
+  lib/server/       la que SOLO corre en el servidor — claves, caché, proveedores
+  research/         131 scripts de laboratorio y backtesting (GitHub Actions)
+  sql/              migraciones de Supabase
+  scripts/          47 suites de pruebas
+infra/              todo lo de Google Cloud (Terraform + scripts)
 ```
 
-`ic-proxy` guarda las API keys (FMP, FRED, Finnhub, EDGAR, Anthropic) para que
-nunca lleguen al navegador. `scora-research` lo consume por HTTP.
+`lib/` y `lib/server/` están separados a propósito: lo de `server/` toca claves de API y no
+debe acabar nunca en un bundle de navegador.
 
-## Cómo dependen entre sí
+## Un poco de historia
 
-1. **HTTP** — el frontend llama a `NEXT_PUBLIC_PROXY_URL`
-   (default `https://ic-proxy-psi.vercel.app`). Está en `lib/proxy.ts`,
-   `next.config.ts` (CSP `connect-src`) y `app/pricing/page.tsx`.
-2. **CORS** — `apps/ic-proxy/lib/cors.js` incluye a `scora-research.vercel.app`
-   por nombre. El proxy sirve además a `ic-suite`, `ic-datalayer-app` y
-   `stock-lens-app`, que **no** están en este monorepo.
-3. **Import de fichero** — `apps/scora-research/research/regimeReal.mjs`
-   importa `../../ic-proxy/lib/macro.js`. El layout `apps/` mantiene la relación
-   de hermandad, así que la ruta sigue resolviendo sin cambios.
-4. **Supabase compartido** — el cron del proxy escribe `macro_state`, la app lo lee.
-   Igual con la waitlist y las suscripciones push.
-5. **Lógica duplicada a mano** — hay fórmulas espejadas entre ambos lados
-   (`ic-proxy/lib/macro.js` ↔ `scora-research/research/regimeStationary.mjs`,
-   `MacroIndicators.tsx`, `lib/technicals.js`). Los propios comentarios lo dicen.
-   Si tocas una, toca la otra.
+Esto fueron **dos repos** —`scora-research` (la web) e `ic-proxy` (el backend)— y luego dos
+apps dentro de este monorepo. Se fusionaron en una sola el 25-09-2026 porque en realidad
+siempre fueron un producto partido en dos, acoplado por cinco vías distintas.
 
-`apps/scora-research/scripts/smoke-proxy.mjs` comprueba que cada ruta que llama
-el frontend existe en el proxy desplegado. Pásalo tras cambiar el contrato.
+La fusión eliminó tres cosas de golpe:
+
+- **el CORS entre dominios** — el navegador llama a su propio origen
+- **el salto de red** entre la app y su backend
+- **la dependencia circular del despliegue** — la imagen de la app ya no necesita saber la
+  URL del backend, porque es ella misma
+
+Los repos originales de Alejandro Alvarado siguen existiendo como referencia de solo lectura
+(remotos `upstream-*`, con el push deshabilitado).
+
+## Desplegar
+
+Ver [DEPLOY_GCP.md](DEPLOY_GCP.md). Resumen: una imagen, un servicio de Cloud Run, 8 crons
+en Cloud Scheduler.
 
 ## Historial
 
-Se preservó completo: 393 commits, el más antiguo del 19-05-2026.
+Se preservó completo al fusionar los repos: el commit más antiguo es del 19-05-2026.
 
-Los commits antiguos referencian las rutas **originales** (`lib/proxy.ts`), no
-las nuevas (`apps/scora-research/lib/proxy.ts`). Para ver el historial de un
-fichero hay que usar la ruta antigua y `--full-history`:
+Los commits anteriores a agosto de 2026 referencian las rutas **originales** (`lib/proxy.ts`),
+no las actuales (`apps/scora-research/lib/proxy.ts`). Para ver el historial de un fichero hay
+que usar la ruta antigua y `--full-history`:
 
 ```bash
 git log --full-history -- lib/proxy.ts
 ```
 
-Las 7 ramas de ambos repos quedaron guardadas como tags `legacy/<repo>/<rama>`.
-Incluye `legacy/ic-proxy/security/hardening-2026-08`, que ya fue borrada de
-GitHub y solo sobrevivía en un clon local.
+Las 7 ramas de los dos repos originales quedaron guardadas como tags `legacy/<repo>/<rama>`.
+Incluye `legacy/ic-proxy/security/hardening-2026-08`, que ya fue borrada de GitHub y solo
+sobrevivía en un clon local.

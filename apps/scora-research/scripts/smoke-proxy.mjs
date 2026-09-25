@@ -1,12 +1,28 @@
 // Proxy contract smoke test — verifies every route the frontend calls actually
-// exists on the deployed ic-proxy. No JWT needed: an existing protected route
+// exists on the deployed app. No JWT needed: an existing protected route
 // answers 401 (auth-first), a missing route answers 404, a disallowed FMP/Finnhub
 // path answers 403. This catches the class of bug where the frontend calls a path
 // the proxy never exposed (three AI/data features shipped broken for exactly this).
 //
 // Run: node scripts/smoke-proxy.mjs   (uses global fetch, Node 18+)
 
-const BASE = process.env.PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
+// Sin valor por defecto a proposito. Habia uno apuntando al despliegue de Vercel, y un
+// default obsoleto es peor que ninguno: la prueba pasa contra un sitio que ya no es el tuyo
+// y da un verde que no significa nada.
+// Sin valor por defecto a proposito. Habia uno apuntando al despliegue de Vercel, y un
+// default obsoleto es peor que ninguno: la prueba pasa contra un sitio que ya no es el tuyo
+// y devuelve un verde que no significa nada.
+//
+// Sin PROXY_URL se SALTA en vez de fallar, y lo dice en voz alta. El motivo es que ahora las
+// rutas viven en esta misma app: la comprobacion util es contra un despliegue real, y
+// mientras no exista, romper el CI por ello solo ensenaria a ignorarlo. En cuanto haya URL
+// en Cloud Run, ponerla en el workflow y esto vuelve a vigilar de verdad.
+const BASE = process.env.PROXY_URL;
+if (!BASE) {
+  console.log("\n○ contrato del proxy: SALTADO — no hay PROXY_URL.");
+  console.log("  Para ejecutarlo:  PROXY_URL=https://tu-servicio.run.app node scripts/smoke-proxy.mjs");
+  process.exit(0);
+}
 const SYM = "AAPL";
 const today = new Date().toISOString().slice(0, 10);
 const ago90 = new Date(Date.now() - 90 * 86400000).toISOString().slice(0, 10);

@@ -4,7 +4,14 @@ import { track } from "./analytics";
 import { setQuota } from "./quotaState";
 import { createBatcher } from "./batchQueue";
 
-const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
+// Vacío = mismo origen. Desde que el backend vive en esta misma app (app/api/*), las
+// llamadas son relativas y no hay que decirle a nadie dónde está: se acabó el CORS, se acabó
+// el salto entre dominios, y se acabó tener que reconstruir la imagen cuando cambia una URL.
+//
+// La variable sigue existiendo por si algún día hay que apuntar a un backend externo — por
+// ejemplo para depurar contra producción desde local. Todos los que llaman aquí son código
+// de navegador (comprobado), así que una URL relativa siempre resuelve.
+const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "";
 
 /**
  * Se ha agotado la cuota diaria de IA.
@@ -151,7 +158,7 @@ export function authedFetch<T = unknown>(
 }
 
 /**
- * Model tiers. Both are in ic-proxy's ALLOWED_MODELS (app/api/anthropic/messages/route.js).
+ * Model tiers. Both are in ALLOWED_MODELS del backend (app/api/anthropic/messages/route.js).
  * Default is Haiku 4.5 to keep the MVP's only paid dependency (Anthropic) at ~€10/month:
  * Haiku is $1/$5 per 1M in/out vs Sonnet's $3/$15 — 3× cheaper. Pass tier:"deep" only
  * for the flagship macro synthesis if you decide the quality is worth the extra spend.
@@ -183,10 +190,10 @@ export interface AiCompletion { text: string; usage: AiUsage | null; }
 // ── Pluggable provider seam (Phase 7 "ralph") ────────────────────────────────────────
 // aiAnalyze talks to a Provider, not to Anthropic directly, so the backend is swappable
 // behind one interface (Anthropic today; a local/OSS model or a different vendor later)
-// without touching any caller. Default = the Anthropic passthrough on ic-proxy.
+// without touching any caller. Default = el paso a Anthropic de app/api/anthropic.
 export interface AiProvider { name: string; complete(model: string, maxTokens: number, prompt: string): Promise<AiCompletion>; }
 
-// Both providers return Anthropic's { content:[{type:'text',text}] } shape — ic-proxy's
+// Both providers return Anthropic's { content:[{type:'text',text}] } shape — el backend
 // /api/llm normalizes any free provider (Groq/Gemini) to it — so parsing is shared.
 function parseAnthropic(res: AnthropicResponse): AiCompletion {
   const text = res.content?.filter((b) => b.type === "text" && typeof b.text === "string").map((b) => b.text).join("\n");
@@ -214,7 +221,7 @@ const anthropicProvider: AiProvider = {
   },
 };
 
-// Free-tier backend (Groq / Gemini) via ic-proxy /api/llm. The server picks the model, so
+// Free-tier backend (Groq / Gemini) via /api/llm. The server picks the model, so
 // the client-side model name is ignored here. Enabled with NEXT_PUBLIC_AI_PROVIDER=free.
 const freeLlmProvider: AiProvider = {
   name: "free",

@@ -2,7 +2,9 @@ import withPWA from "@ducanh2912/next-pwa";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
-const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
+// El backend es parte de esta app, así que `'self'` del connect-src ya lo cubre. La
+// variable sólo añade un origen al CSP si algún día se apunta a un backend externo.
+const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "";
 // Observability endpoints must be allowlisted in connect-src or the CSP below blocks
 // them SILENTLY — no console error the user would report, just zero events arriving.
 // Keep this default in sync with lib/analytics.ts.

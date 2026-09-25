@@ -7,7 +7,7 @@ export interface AnalogMatch {
   distance: number;   // raw weighted distance (sort key)
 }
 
-// Same weights as computeICHealthScore (lib/scoring.ts) / icScoreVal (ic-proxy/lib/macro.js)
+// Same weights as computeICHealthScore (lib/scoring.ts) / icScoreVal (lib/server/macro.js)
 // — reused verbatim for consistency across the app's independent implementations of this
 // Druckenmiller-hierarchy weighting (Liquidity > Credit > Recession > Geopolitical = Housing).
 const WEIGHTS = {

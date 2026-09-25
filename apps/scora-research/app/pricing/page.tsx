@@ -5,7 +5,8 @@ import { useAuth } from "@/lib/auth";
 import { useEntitlements } from "@/lib/entitlements";
 import { track } from "@/lib/analytics";
 
-const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
+// Mismo origen: el backend vive en app/api de esta misma app.
+const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "";
 
 interface StripeConfig {
   enabled: boolean;

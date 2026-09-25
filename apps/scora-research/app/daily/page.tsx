@@ -1,7 +1,7 @@
 // /daily — el cierre más reciente. Server component, público, sin registro.
 //
 // Es a la vez producto (la razón para volver cada día) y adquisición (compartible e
-// indexable). Lo genera el cron `daily-close` de ic-proxy con una plantilla determinista:
+// indexable). Lo genera el cron `daily-close` (app/api/cron) con una plantilla determinista:
 // no hay modelo en el bucle que pueda inventar una cifra.
 
 import type { Metadata } from "next";

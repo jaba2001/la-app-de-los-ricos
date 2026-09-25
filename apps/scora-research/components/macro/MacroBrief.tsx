@@ -7,7 +7,7 @@
 // nothing at all when there is no brief yet, rather than showing an empty shell.
 //
 // Every figure in the transcript comes from a macro_state snapshot via a deterministic
-// template (ic-proxy/lib/brief.js); there is no model in that path, which is why this can
+// template (lib/server/brief.js); there is no model in that path, which is why this can
 // be shown verbatim without passing the grounding gate.
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";

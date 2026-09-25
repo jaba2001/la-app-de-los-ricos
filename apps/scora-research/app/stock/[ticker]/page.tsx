@@ -313,7 +313,7 @@ export default function StockTickerPage() {
         track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
         // Phase 3 — SEC EDGAR income / balance sheet / cash flow (US stocks only; European returns empty)
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar?symbol=${ticker}`)),
-        // Phase 7 — SimFin financials for European stocks (requires SIMFIN_KEY in ic-proxy env)
+        // Phase 7 — SimFin financials for European stocks (requires SIMFIN_KEY en el entorno del servidor)
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/simfin?symbol=${ticker}`)),
         // Phase 8 — Finviz short/sentiment/ownership data (free, edge-scraped, 6h cache)
         track(authedFetch<FinvizData>(`/api/finviz/quote?symbol=${ticker}`)),

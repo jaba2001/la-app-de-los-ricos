@@ -212,7 +212,7 @@ async function upsert(table, rows, batch = 500) {
 if (SB_KEY && all.length) {
   await upsert("kb_docs", all);
   // kb_chunks is what the grounded thesis actually retrieves from now on. If this table
-  // doesn't exist yet, run ic-proxy/sql/2026-07-29_kb_chunks_fts.sql first — the app
+  // doesn't exist yet, run sql/2026-07-29_kb_chunks_fts.sql first — the app
   // falls back to kb_docs until then, so nothing breaks in the meantime.
   await upsert("kb_chunks", allChunks);
 } else {

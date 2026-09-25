@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // 0B · MULTI-ASSET OVERLAY BACKTEST — Layer 2. Monthly rebalance across SPY/TLT/IEF/
-// GLD/DBC/BIL by the PRODUCTION regime (regimeReal.mjs → ic-proxy/lib/macro.js), with
+// GLD/DBC/BIL by the PRODUCTION regime (regimeReal.mjs → lib/server/macro.js), with
 // Antonacci absolute-momentum gating. Measures whether regime-driven allocation beats
 // buy-and-hold SPY on return, Sharpe and drawdown — the "big alpha, free with ETFs"
 // thesis. Reports three curves so the momentum overlay's contribution is isolated:

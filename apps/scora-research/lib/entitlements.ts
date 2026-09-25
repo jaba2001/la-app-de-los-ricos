@@ -13,7 +13,7 @@
 // cualquiera puede saltárselo con las herramientas de desarrollo. Sirve para enseñar u
 // ocultar botones. Todo lo que cueste dinero de verdad (llamadas al modelo, envíos) tiene
 // que comprobarse otra vez en el servidor, contra la misma tabla — ver
-// ic-proxy/lib/entitlements.js. Aquí decidimos qué se ENSEÑA; allí, qué se PERMITE.
+// lib/server/entitlements.js. Aquí decidimos qué se ENSEÑA; allí, qué se PERMITE.
 "use client";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "./supabase";
@@ -27,7 +27,7 @@ export interface Subscription {
 }
 
 /**
- * Estados que dan acceso. Espejo de PRO_STATUSES en ic-proxy/lib/stripe.js — si cambia uno,
+ * Estados que dan acceso. Espejo de PRO_STATUSES en lib/server/stripe.js — si cambia uno,
  * cambia el otro, o el front y el servidor discreparán sobre quién ha pagado.
  *
  * `past_due` mantiene el acceso: Stripe reintenta el cobro durante días y cortar al primer

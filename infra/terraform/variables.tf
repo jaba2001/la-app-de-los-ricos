@@ -49,16 +49,26 @@ variable "image_tag" {
 
 variable "app_url" {
   description = <<-EOT
-    URL publica de la app. Alimenta dos cosas del backend: los enlaces de los correos y las
-    notificaciones (APP_URL) y la lista blanca de CORS (ALLOWED_ORIGINS).
+    URL publica de la app. Alimenta los enlaces de los correos y de las notificaciones push.
 
-    Huevo y gallina: Cloud Run no conoce la URL de un servicio hasta crearlo. El primer
-    `apply` va con el marcador de abajo y el runbook explica como fijarla despues (paso 6).
-    Mientras este mal, la app no podra llamar al backend desde el navegador: el CORS la
-    rechazara, en silencio salvo por la consola del navegador.
+    Ya NO es critica para que la app funcione: desde que las paginas y las rutas /api/* estan
+    en la misma app, el navegador llama al mismo origen y no hay CORS que acertar. Si esta
+    mal, lo unico que sale mal son los enlaces de los avisos.
   EOT
   type        = string
   default     = "https://PENDIENTE-tras-el-primer-apply"
+}
+
+variable "allowed_origins" {
+  description = <<-EOT
+    Origenes EXTERNOS que pueden llamar a /api/* desde un navegador, separados por comas.
+
+    La propia app no necesita estar aqui (mismo origen). Esto existe por las otras apps del
+    ecosistema que comparten estas rutas — ic-suite, ic-datalayer-app y stock-lens-app —, que
+    siguen viviendo fuera de este repo. Vaciarlo si dejan de usarse.
+  EOT
+  type        = string
+  default     = ""
 }
 
 variable "supabase_url" {

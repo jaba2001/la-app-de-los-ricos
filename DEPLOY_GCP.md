@@ -2,8 +2,11 @@
 
 Todo el código está listo. Esto es lo que hay que hacer cuando exista la cuenta.
 
-**Piezas:** Cloud Run (las dos apps), Artifact Registry (imágenes), Secret Manager
-(credenciales) y Cloud Scheduler (los 8 crons que antes corrían en Vercel).
+**Una sola app, un solo contenedor, un solo servicio.** Las páginas y las rutas `/api/*`
+son la misma aplicación Next, así que lo que se despliega es una cosa.
+
+**Piezas:** Cloud Run (la app), Artifact Registry (la imagen), Secret Manager (las claves)
+y Cloud Scheduler (los 8 crons que antes corrían en `vercel.json`).
 
 **Lo que NO se mueve:** Supabase, Upstash Redis, Stripe, Resend, Sentry y PostHog siguen
 donde están. Solo cambia dónde corre el código.
@@ -18,32 +21,14 @@ brew install terraform
 # Docker Desktop tiene que estar arrancado
 ```
 
-Y en Google Cloud: crear un proyecto y **activarle la facturación** (sin eso, Cloud Run
-ni siquiera aparece).
+En Google Cloud: crear un proyecto y **activarle la facturación** (sin eso, Cloud Run ni
+siquiera aparece).
 
 ```bash
 gcloud auth login
 gcloud auth application-default login     # el que usa Terraform, es otro distinto
 gcloud config set project TU-PROYECTO
 ```
-
----
-
-## El orden importa, y no es evidente
-
-Hay una dependencia circular: **la imagen del frontend lleva incrustada la URL del
-backend** (las `NEXT_PUBLIC_*` se sustituyen al compilar, no se leen al arrancar), y esa
-URL no existe hasta que el backend está desplegado.
-
-Por eso son tres `apply` y no uno:
-
-```
-1. registro + secretos  →  2. imagen del backend  →  3. desplegar backend (nace la URL)
-                        →  4. imagen del frontend con esa URL  →  5. desplegar todo
-```
-
-Saltarse el orden no da un error claro: la app arranca perfectamente y luego no encuentra
-el backend, sin un solo error en los logs del servidor porque el fallo está en el navegador.
 
 ---
 
@@ -62,8 +47,8 @@ simplemente desactiva esa función.
 reciben 401 y los datos macro dejan de actualizarse sin que nada avise.
 
 ```bash
-openssl rand -hex 32     # para CRON_SECRET
-npx web-push generate-vapid-keys   # para el par VAPID
+openssl rand -hex 32                 # para CRON_SECRET
+npx web-push generate-vapid-keys     # para el par VAPID
 ```
 
 Los dos ficheros están en `.gitignore`. Verificado.
@@ -76,112 +61,85 @@ terraform init
 terraform apply -target=google_project_service.enabled \
                 -target=google_artifact_registry_repository.docker \
                 -target=google_secret_manager_secret.backend
-```
-
-```bash
 cd ../.. && ./infra/set-secrets.sh
 ```
 
-Sube los valores a Secret Manager. Terraform crea los contenedores vacíos pero nunca los
-valores: si los gestionara él, cada clave quedaría en texto plano en el fichero de estado.
+Terraform crea los contenedores de los secretos; el script sube los valores. Esa separación
+es a propósito: si Terraform gestionara las versiones, cada clave quedaría en texto plano
+dentro del fichero de estado.
 
-## Paso 3 — Backend
-
-```bash
-./infra/build-and-push.sh latest ic-proxy
-cd infra/terraform && terraform apply -target=google_cloud_run_v2_service.ic_proxy
-terraform output url_backend
-```
-
-Comprobación rápida — tiene que responder **401**, que significa "la ruta existe y exige
-autenticación":
+## Paso 3 — Construir y desplegar
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" "$(terraform output -raw url_backend)/api/fmp/quote?symbol=AAPL"
-```
-
-## Paso 4 — Frontend
-
-```bash
-cd ../.. && ./infra/build-and-push.sh latest scora-research
-```
-
-El script lee la URL del backend de Cloud Run y la incrusta. No hace falta pasarla a mano.
-
-## Paso 5 — Todo lo demás
-
-```bash
+./infra/build-and-push.sh
 cd infra/terraform && terraform apply
+terraform output url
 ```
 
-Crea el servicio del frontend y los 8 trabajos de Cloud Scheduler.
+Esto crea el servicio y los 8 trabajos de Cloud Scheduler.
 
-## Paso 6 — Cerrar el círculo del CORS
+## Paso 4 — Los enlaces de los avisos
 
-Ahora ya se conoce la URL de la app, y el backend necesita saberla para dejarla entrar:
-
-```bash
-terraform output url_app
-```
-
-Poner ese valor en `app_url` dentro de `terraform.tfvars` y:
+Poner la URL que dio el paso anterior en `app_url` dentro de `terraform.tfvars` y:
 
 ```bash
 terraform apply
 ```
 
-Sin esto, el navegador recibe un error de CORS en cada llamada — y en la consola del
-navegador, no en los logs del servidor.
+Solo alimenta los enlaces de los correos y las notificaciones push. **La app funciona sin
+esto**: al ser una sola aplicación, el navegador llama a su propio origen y no hay ninguna
+URL que acertar.
 
-## Paso 7 — La migración de Supabase
+## Paso 5 — La migración de Supabase
 
-```sql
--- apps/scora-research/sql/2026-09-05_sl_analyses_latest.sql
-```
-
-Ejecutarla en el editor SQL de Supabase. Sin ella la app funciona igual, solo que las
-consultas siguen trayendo el historial entero en vez de una fila (hay un respaldo en el
-código que lo detecta).
+Ejecutar `apps/scora-research/sql/2026-09-05_sl_analyses_latest.sql` en el editor SQL de
+Supabase. Sin ella la app funciona igual, solo que las consultas siguen trayendo el
+historial entero en vez de una fila (hay un respaldo en el código que lo detecta).
 
 ---
 
 ## Comprobar que funciona
 
 ```bash
-# El contrato del backend: cada ruta que llama el frontend existe
-PROXY_URL="$(cd infra/terraform && terraform output -raw url_backend)" \
-  node apps/scora-research/scripts/smoke-proxy.mjs
+URL="$(cd infra/terraform && terraform output -raw url)"
+
+# Las páginas
+curl -s -o /dev/null -w "%{http_code}\n" "$URL"
+
+# El contrato de las rutas: cada una que llama el cliente existe
+PROXY_URL="$URL" node apps/scora-research/scripts/smoke-proxy.mjs
 
 # Un cron a mano
-curl -H "Authorization: Bearer $CRON_SECRET" \
-  "$(cd infra/terraform && terraform output -raw url_backend)/api/cron/macro-refresh"
+curl -H "Authorization: Bearer $CRON_SECRET" "$URL/api/cron/macro-refresh"
 ```
+
+Conviene además poner esa URL como variable `PROXY_URL` del repositorio en GitHub
+(Settings → Secrets and variables → Actions → Variables), para que el CI vuelva a
+comprobar el contrato en cada push. Sin ella ese paso se salta y lo dice.
 
 ---
 
 ## Cosas que conviene saber
 
 **Arranque en frío.** `min_instances = 0` significa que no se paga nada mientras nadie
-entra, a cambio de unos segundos en la primera petición. Cuando haya usuarios, subir a 1 el
-del backend: es quien responde al abrir un ticker y ahí el retraso se nota.
+entra, a cambio de unos segundos en la primera petición. Cuando haya usuarios, subirlo a 1.
 
-**Las rutas edge funcionan.** Las 20 rutas del backend declaran `runtime = 'edge'` y se
-ejecutan bien en el Node de Cloud Run — comprobado arrancando la salida standalone y
-llamándolas. No hubo que reescribir ninguna.
+**Las rutas edge funcionan.** Las 20 rutas declaran `runtime = 'edge'` y se ejecutan bien en
+el Node de Cloud Run — comprobado arrancando la salida standalone y llamándolas.
 
-**Cambiar una `NEXT_PUBLIC_*` obliga a reconstruir** la imagen del frontend. Redesplegar no
-basta; esos valores están dentro del JavaScript que va al navegador.
+**Cambiar una `NEXT_PUBLIC_*` obliga a reconstruir** la imagen. Redesplegar no basta: esos
+valores están dentro del JavaScript que va al navegador.
 
 **El estado de Terraform contiene el `CRON_SECRET`** (viaja en la cabecera de los
 schedulers). En cuanto exista el proyecto, descomentar el backend GCS en `versions.tf` y
 apuntarlo a un bucket privado.
 
-**Volver atrás.** Las imágenes se etiquetan con el SHA del commit:
+**Volver atrás.** La imagen se etiqueta con el SHA del commit:
 
 ```bash
 terraform apply -var="image_tag=abc1234"
 ```
 
-**Lo que queda de Vercel en el código.** `vercel.json`, `@vercel/analytics` y
-`@vercel/speed-insights` siguen ahí. No estorban en Cloud Run —los dos paquetes no hacen
-nada fuera de Vercel— pero se pueden quitar cuando apetezca.
+**Las otras apps del ecosistema.** `ic-suite`, `ic-datalayer-app` y `stock-lens-app` viven
+fuera de este repo y consumían estas rutas en la URL antigua del proxy. Si siguen en uso,
+hay que apuntarlas a la nueva y poner sus dominios en `allowed_origins`.

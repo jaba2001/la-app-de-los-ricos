@@ -40,7 +40,7 @@ resource "google_cloud_scheduler_job" "crons" {
 
   http_target {
     http_method = "GET"
-    uri         = "${google_cloud_run_v2_service.ic_proxy.uri}/api/cron/${each.key}"
+    uri         = "${google_cloud_run_v2_service.scora.uri}/api/cron/${each.key}"
 
     headers = {
       # lib/cron.js compara esto con CRON_SECRET. Es un secreto compartido, asi que queda en

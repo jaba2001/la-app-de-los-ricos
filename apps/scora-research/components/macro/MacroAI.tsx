@@ -10,7 +10,7 @@ import { computeICHealthScore } from "@/lib/scoring";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
-// Opt-in toggle for the daily macro-alert emails sent by the ic-proxy alerts-check
+// Opt-in toggle for the daily macro-alert emails sent by el cron alerts-check
 // cron (credit blowout, QT acceleration, credit divergence). Writes the user's email
 // into sl_alert_prefs; the cron reads that table and emails via Resend.
 function AlertSubscription() {

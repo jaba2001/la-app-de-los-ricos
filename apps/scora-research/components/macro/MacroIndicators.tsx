@@ -255,7 +255,7 @@ function SeriesRow({ item, macro, loading }: { item: SeriesEntry; macro: MacroSt
   );
 }
 
-// ─── P8: Sub-score computation (mirrors ic-proxy/lib/macro.js formulas) ──────
+// ─── P8: Sub-score computation (mirrors lib/server/macro.js formulas) ──────
 function computeSubScores(m: MacroState) {
   const g = (k: keyof MacroState) => m[k] != null ? Number(m[k]) : null;
   const clamp = (v: number) => Math.max(0, Math.min(100, v));
@@ -440,7 +440,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
             <SeriesRow key={s.key} item={s} macro={macro} loading={loading} />
           ))}
           <div style={{ marginTop: "var(--sr-sp-4)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.6, borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
-            "pending" = field not yet written by ic-proxy/lib/macro.js to macro_state. Add FRED series ID to the macro pipeline to activate.
+            "pending" = field not yet written by lib/server/macro.js to macro_state. Add FRED series ID to the macro pipeline to activate.
           </div>
         </div>
 

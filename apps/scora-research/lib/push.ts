@@ -1,5 +1,5 @@
 // Web Push (client). Subscribes the browser to push via the PWA service worker and stores
-// the subscription in Supabase (RLS: owner-only). The sender cron (ic-proxy) reads these and
+// the subscription in Supabase (RLS: owner-only). El cron que las envia (app/api/cron/push-alerts) reads these and
 // pushes regime alerts. Needs NEXT_PUBLIC_VAPID_PUBLIC_KEY (the public half of a free VAPID
 // keypair); until it's set, enablePush() reports "not configured" and the UI stays hidden.
 import { supabase } from "./supabase";

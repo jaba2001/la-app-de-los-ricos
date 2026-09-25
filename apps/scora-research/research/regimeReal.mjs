@@ -1,5 +1,5 @@
 // REAL macro regime as-of, for the backtest — reuses the PRODUCTION regime engine
-// (computeCompositeScores + classifyRegime from ic-proxy/lib/macro.js), so the
+// (computeCompositeScores + classifyRegime from lib/server/macro.js), so the
 // backtest sees the exact same LCC/CSC/RPC/GRC/HSC composites and regime the live
 // app computes. We only rebuild the `ds` input historically: for each MACRO_SERIES
 // we fetch its full FRED history once (cached) and, for a given date, take the two
@@ -9,7 +9,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { computeCompositeScores, classifyRegime, MACRO_SERIES, FRED_UNIT_CONVERSIONS } from "../../ic-proxy/lib/macro.js";
+import { computeCompositeScores, classifyRegime, MACRO_SERIES, FRED_UNIT_CONVERSIONS } from "../lib/server/macro.js";
 
 // La clave sale SOLO del entorno. Estaba embebida como respaldo, lo que la dejaba en el
 // codigo y en el historial de git de un repo compartido. Es gratuita y de bajo impacto,

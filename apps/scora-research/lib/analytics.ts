@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Product analytics (PostHog). Thin, typed wrapper over posthog-js.
 //
-// Same defensive contract as lib/push.ts and ic-proxy/lib/email.js: if
+// Same defensive contract as lib/push.ts and lib/server/email.js: if
 // NEXT_PUBLIC_POSTHOG_KEY is unset, every function here is a no-op. The app must
 // behave identically with and without analytics configured — a metrics outage is
 // never allowed to surface as a broken feature.

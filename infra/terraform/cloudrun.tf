@@ -1,38 +1,36 @@
 locals {
   registro = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.docker.repository_id}"
 
-  # Config NO sensible del backend. Va como variable de entorno normal: meterla en Secret
-  # Manager solo anadiria ruido y coste sin proteger nada que no sea ya publico.
-  #
-  # Los valores de aqui son los que el codigo toma por defecto cuando faltan; cambiarlos es
-  # cambiar comportamiento, asi que estan explicitos en vez de implicitos.
-  config_backend = {
+  # Config NO sensible. Va como variable de entorno normal: meterla en Secret Manager solo
+  # anadiria ruido y coste sin proteger nada que no sea ya publico.
+  config = {
     NODE_ENV = "production"
-    # Limites diarios de IA por plan (lib/quota.js). Sin esto, 5 y 100.
+    # Limites diarios de IA por plan (lib/server/quota.js). Sin esto, 5 y 100.
     AI_DAILY_FREE = "5"
     AI_DAILY_PRO  = "100"
-    # Proveedor de modelo del backend y su respaldo (app/api/llm).
+    # Proveedor de modelo de /api/llm y su respaldo.
     LLM_PROVIDER = "groq"
     LLM_FALLBACK = "gemini"
     # Cuando el limitador no puede hablar con Redis: "1" devuelve 503 en vez de dejar pasar.
-    # Merece la pena encenderlo en cuanto Upstash este confirmado en produccion — el que
-    # protege es el gasto en Anthropic.
+    # Merece la pena encenderlo en cuanto Upstash este confirmado: lo que protege es el gasto.
     RATELIMIT_FAIL_CLOSED = "0"
   }
 }
 
-# ── Backend ──────────────────────────────────────────────────────────────────────────
-resource "google_cloud_run_v2_service" "ic_proxy" {
-  name     = "ic-proxy"
-  location = var.region
-
-  # Sin esto, cualquiera con la URL del servicio puede invocarlo antes de que la IAM de abajo
-  # se aplique. El control real de acceso vive en el propio codigo (requireUser + CORS).
+# ── El servicio ──────────────────────────────────────────────────────────────────────
+#
+# UNO SOLO. Las paginas y las rutas /api/* viven en la misma app Next, asi que tambien en el
+# mismo contenedor. Eso elimina de golpe tres cosas que existian cuando eran dos: el CORS
+# entre dominios, el salto de red entre la app y su backend, y la dependencia circular del
+# despliegue (la imagen de la app ya no necesita saber la URL del backend, porque es ella).
+resource "google_cloud_run_v2_service" "scora" {
+  name                = "scora"
+  location            = var.region
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
 
   template {
-    service_account = google_service_account.ic_proxy.email
+    service_account = google_service_account.scora.email
 
     scaling {
       min_instance_count = var.min_instances
@@ -41,15 +39,15 @@ resource "google_cloud_run_v2_service" "ic_proxy" {
     }
 
     containers {
-      image = "${local.registro}/ic-proxy:${var.image_tag}"
+      image = "${local.registro}/scora:${var.image_tag}"
 
       resources {
         limits = {
           cpu    = "1"
-          memory = "512Mi"
+          memory = "1Gi" # 1 Gi y no 512 Mi: ahora el mismo proceso sirve las paginas y las 25 rutas
         }
-        # La CPU solo se factura mientras se atiende una peticion. El backend es E/S casi
-        # pura (espera a FMP, a Supabase, a Anthropic), asi que no necesita CPU de fondo.
+        # La CPU solo se factura mientras se atiende una peticion. Esta app es E/S casi pura
+        # (espera a FMP, a Supabase, a Anthropic), no necesita CPU de fondo.
         cpu_idle = true
       }
 
@@ -58,22 +56,23 @@ resource "google_cloud_run_v2_service" "ic_proxy" {
       }
 
       dynamic "env" {
-        for_each = local.config_backend
+        for_each = local.config
         content {
           name  = env.key
           value = env.value
         }
       }
 
-      # La URL publica del propio servicio y la de la app. Se rellenan tras el primer apply
-      # (ver el paso 6 del runbook): Cloud Run no conoce su URL hasta existir.
       env {
         name  = "APP_URL"
         value = var.app_url
       }
+      # El CORS ya no hace falta para la propia app (mismo origen). Sigue aqui por las OTRAS
+      # apps del ecosistema que consumen estas rutas: ic-suite, ic-datalayer-app y
+      # stock-lens-app. Si dejan de existir, esta variable se puede vaciar.
       env {
         name  = "ALLOWED_ORIGINS"
-        value = var.app_url
+        value = var.allowed_origins
       }
       env {
         name  = "SUPABASE_URL"
@@ -114,78 +113,17 @@ resource "google_cloud_run_v2_service" "ic_proxy" {
       }
     }
 
-    # Los crons de research pueden tardar: 13f-refresh recorre cientos de posiciones.
+    # Los crons pueden tardar: 13f-refresh recorre cientos de posiciones.
     timeout = "900s"
   }
 
   depends_on = [google_project_service.enabled]
 }
 
-# ── La app ───────────────────────────────────────────────────────────────────────────
-resource "google_cloud_run_v2_service" "frontend" {
-  name                = "scora-research"
-  location            = var.region
-  deletion_protection = false
-  ingress             = "INGRESS_TRAFFIC_ALL"
-
-  template {
-    service_account = google_service_account.frontend.email
-
-    scaling {
-      min_instance_count = var.min_instances
-      max_instance_count = 10
-    }
-
-    containers {
-      image = "${local.registro}/scora-research:${var.image_tag}"
-
-      resources {
-        limits = {
-          cpu    = "1"
-          memory = "512Mi"
-        }
-        cpu_idle = true
-      }
-
-      ports {
-        container_port = 8080
-      }
-
-      env {
-        name  = "NODE_ENV"
-        value = "production"
-      }
-
-      # Ojo: el frontend NO recibe aqui sus NEXT_PUBLIC_*. Esas van incrustadas en la imagen
-      # al construirla (ver apps/scora-research/Dockerfile). Ponerlas aqui no haria nada.
-
-      startup_probe {
-        initial_delay_seconds = 5
-        timeout_seconds       = 3
-        period_seconds        = 5
-        failure_threshold     = 6
-        tcp_socket {
-          port = 8080
-        }
-      }
-    }
-  }
-
-  depends_on = [google_project_service.enabled]
-}
-
-# ── Acceso publico ───────────────────────────────────────────────────────────────────
-# Las dos son webs abiertas. Quien decide que puede hacer cada visitante es el codigo
-# (requireUser, CORS, rate limit), no la IAM de Cloud Run.
-resource "google_cloud_run_v2_service_iam_member" "ic_proxy_publico" {
-  name     = google_cloud_run_v2_service.ic_proxy.name
-  location = var.region
-  role     = "roles/run.invoker"
-  member   = "allUsers"
-}
-
-resource "google_cloud_run_v2_service_iam_member" "frontend_publico" {
-  name     = google_cloud_run_v2_service.frontend.name
+# Web abierta. Quien decide que puede hacer cada visitante es el codigo (requireUser, CORS,
+# rate limit), no la IAM de Cloud Run.
+resource "google_cloud_run_v2_service_iam_member" "publico" {
+  name     = google_cloud_run_v2_service.scora.name
   location = var.region
   role     = "roles/run.invoker"
   member   = "allUsers"

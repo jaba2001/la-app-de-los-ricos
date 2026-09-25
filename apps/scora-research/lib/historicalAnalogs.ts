@@ -4,7 +4,7 @@
  * past periods and surface "what happened then / what followed" context.
  *
  * Composite values below are historically-informed estimates calibrated to match
- * classifyRegime()'s thresholds (ic-proxy/lib/macro.js) for the assigned regime — not
+ * classifyRegime()'s thresholds (lib/server/macro.js) for the assigned regime — not
  * recomputed from archived FRED data. Treat as directional/educational, not as precise
  * backtested figures.
  *

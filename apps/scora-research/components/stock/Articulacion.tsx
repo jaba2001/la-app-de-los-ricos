@@ -4,7 +4,7 @@
 //
 // Aplica las cuatro identidades de `lib/articulacion.ts` a los estados financieros que la app
 // ya descarga. Tiene un valor que el laboratorio no tiene: **la app y el laboratorio usan
-// fuentes DISTINTAS** —aquí llegan de FMP a través de ic-proxy, allí de EDGAR—, así que la
+// fuentes DISTINTAS** —aquí llegan de FMP a través de app/api/fmp, allí de EDGAR—, así que la
 // misma comprobación sobre las dos es un contraste independiente. Si una fuente descuadra y
 // la otra no, el problema es de la fuente y no de la empresa.
 //

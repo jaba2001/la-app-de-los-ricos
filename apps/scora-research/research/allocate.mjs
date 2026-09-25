@@ -9,7 +9,7 @@
 //   SPY  US equities        TLT  long Treasuries     IEF  7-10y Treasuries
 //   GLD  gold               DBC  broad commodities   BIL  T-bills (cash proxy)
 //
-// The regime ids come straight from classifyRegime (ic-proxy/lib/macro.js):
+// The regime ids come straight from classifyRegime (lib/server/macro.js):
 //   expansion · reflation · stagflation · contraction · neutral
 // ─────────────────────────────────────────────────────────────────────────────
 
