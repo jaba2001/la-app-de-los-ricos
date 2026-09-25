@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Legal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 2000px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="SiteHeader" active="None" hint-size="1280px,72px"></dc-import>
+<section style="background: #FFFFFF; padding: 72px 80px 56px; border-bottom: 1px solid #E3E6EA">
+<div style="font-size: 13px; font-weight: 600; color: #0B6E4F; margin-bottom: 16px">Legal</div>
+<h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 52px; line-height: 1.05; letter-spacing: -0.025em">Plain terms, in plain sight.</h1>
+<p style="margin: 16px 0 0; font-size: 14px; color: #5B6778">Last updated [date]</p>
+</section>
+<section style="padding: 64px 80px 96px; display: grid; grid-template-columns: 240px 1fr; gap: 64px; align-items: start">
+<nav aria-label="On this page" style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; position: sticky; top: 24px">
+<a href="#risk" style="padding: 10px 14px; border-radius: 10px; background: #FFFFFF; border: 1px solid #E3E6EA; color: #0E1A2B; font-weight: 600">Risk disclosure</a>
+<a href="#privacy" style="padding: 10px 14px; border-radius: 10px; color: #3D4A5C">Privacy</a>
+<a href="#terms" style="padding: 10px 14px; border-radius: 10px; color: #3D4A5C">Terms of use</a>
+<a href="#data" style="padding: 10px 14px; border-radius: 10px; color: #3D4A5C">Data sources</a>
+</nav>
+<div style="display: flex; flex-direction: column; gap: 56px; max-width: 760px">
+<article id="risk" style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 34px; letter-spacing: -0.02em">Risk disclosure</h2>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.7">Scora Research is an educational tool for informational purposes only and is not investment advice. Nothing on this site is a recommendation to buy or sell any security.</p>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.7">Scores, valuations, backtests and AI commentary are estimates that may be wrong or out of date; verify independently before making any decision. Backtested results are hypothetical: they are net of an assumed transaction cost, but gross of taxes, wider spreads and market impact.</p>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.7">Past performance — hypothetical or realized — does not predict future results. Capital at risk.</p>
+</article>
+<article id="privacy" style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 34px; letter-spacing: -0.02em">Privacy</h2>
+<div style="font-size: 15px; color: #5B6778; background: #FFFFFF; border: 1px dashed #C9CFD6; border-radius: 14px; padding: 20px; line-height: 1.7">[Privacy policy — pending legal review: data controller, what is collected (email, watchlist, journal, AI run logs), processors (Supabase, Stripe, PostHog, Sentry, Vercel), retention, user rights under GDPR, contact.]</div>
+</article>
+<article id="terms" style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 34px; letter-spacing: -0.02em">Terms of use</h2>
+<div style="font-size: 15px; color: #5B6778; background: #FFFFFF; border: 1px dashed #C9CFD6; border-radius: 14px; padding: 20px; line-height: 1.7">[Terms of use — pending legal review: service description, accounts, acceptable use, subscriptions and cancellation, liability, governing law.]</div>
+</article>
+<article id="data" style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 34px; letter-spacing: -0.02em">Data sources</h2>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.7">Market and fundamental data come from FRED, Finnhub, FMP, SEC EDGAR, Yahoo Finance and other public sources, and may be delayed or incomplete.</p>
+</article>
+</div>
+</section>
+<dc-import name="SiteFooter" hint-size="1280px,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2000}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

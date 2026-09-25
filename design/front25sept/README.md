@@ -1,9 +1,12 @@
 # Canvas de diseño — 25 sept 2026
 
-Exportación del canvas de Claude Design usado para el rediseño del front.
+Exportación del canvas de Claude Design usado para el rediseño del front (sistema v2: ink · paper · evergreen).
 
-- `LandingV2.dc.html` y `PaletaV2.dc.html` — propuesta v2 (ink · paper · evergreen). La landing ya está implementada en `apps/scora-research/app/page.tsx` + `app/landing-v2.css`.
-- El resto de `*.dc.html` — maqueta de las páginas actuales como referencia.
+- Web pública v2: `LandingV2`, `HowItWorks`, `TrackRecordV2`, `EvidenceV2`, `PricingV2`, `DemoV2`, `LoginV2`, `LegalV2` (+ `SiteHeader`, `SiteFooter`).
+- App v2 (vistas de usuario): `DailyV2`, `MacroV2`, `DiscoveryV2`, `MomentumV2`, `StocksV2`, `StockDetailV2`, `WatchlistV2`, `JournalV2`, `AuditV2`, `PicksV2` (+ `AppNavV2`).
+- `PaletaV2` — paleta y tipografía.
+- Sin sufijo (`Main`, `Macro`, …) — versión anterior en tema oscuro, como referencia.
 - `canvas.json` — posición de cada artboard en el canvas.
 
+Implementado en código hasta ahora: la Landing (`apps/scora-research/app/page.tsx` + `app/landing-v2.css`).
 Son archivos de referencia: no forman parte del build.

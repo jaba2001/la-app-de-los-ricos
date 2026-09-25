@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Scora — Picks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 2200px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="None" hint-size="1280px,64px"></dc-import>
+<main style="width: 1040px; align-self: center; padding: 48px 0 64px; display: flex; flex-direction: column; gap: 24px">
+<div><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em">Scora Picks</h1><div style="font-size: 14px; color: #5B6778">Reglas fijas, sin emociones y sin retrospectiva · versión 3 · medido en vivo desde el primer día</div></div>
+<div style="background: #FFFFFF; border: 1.5px solid #0E1A2B; border-radius: 20px; padding: 28px 32px; display: flex; flex-direction: column; gap: 14px; font-size: 15px; color: #3D4A5C; line-height: 1.65">
+<p style="margin: 0"><strong style="color: #0E1A2B">Esto no es una recomendación de inversión ni una predicción de rentabilidad.</strong> Es un sistema de reglas escritas de antemano, publicado entero. El backtest no es evidencia fuera de muestra, y este track record sólo tendrá algo que decir a partir de 24 meses.</p>
+<p style="margin: 0"><strong style="color: #0E1A2B">Corrección del 24 de agosto de 2026.</strong> Tras corregir tres defectos del motor de datos, la señal ya no bate al universo elegible equiponderado en las dos ventanas históricas: gana en una y pierde en la otra.</p>
+<p style="margin: 0"><strong style="color: #0E1A2B">Y lo más incómodo:</strong> el criterio de cierre publicado habría disparado en una de las dos ventanas. La probabilidad de que esto termine en cierre es alta.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E3E6EA; border: 1px solid #E3E6EA; border-radius: 20px; overflow: hidden">
+<div style="background: #FFFFFF; padding: 22px"><div style="font-size: 13px; color: #5B6778">Posiciones abiertas</div><div style="font-size: 28px; font-weight: 700">—/—</div><div style="font-size: 12px; color: #5B6778">la cartera aún se está montando</div></div>
+<div style="background: #FFFFFF; padding: 22px"><div style="font-size: 13px; color: #5B6778">Posiciones cerradas</div><div style="font-size: 28px; font-weight: 700">—</div><div style="font-size: 12px; color: #5B6778">— en positivo</div></div>
+<div style="background: #FFFFFF; padding: 22px"><div style="font-size: 13px; color: #5B6778">Retorno medio al cerrar</div><div style="font-size: 28px; font-weight: 700">—%</div><div style="font-size: 12px; color: #5B6778">simple, sin ponderar</div></div>
+<div style="background: #FFFFFF; padding: 22px"><div style="font-size: 13px; color: #5B6778">Fechas sin comprar</div><div style="font-size: 28px; font-weight: 700">—/—</div><div style="font-size: 12px; color: #5B6778">un hueco vacío es un resultado</div></div>
+</div>
+<section style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 24px 28px; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 18px; font-weight: 700">La cartera, entera</h2>
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums">
+<thead><tr><th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Valor</th><th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Desde</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Percentil al comprar</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Precio de compra</th></tr></thead>
+<tbody><tr><td style="padding: 12px 0"><a href="StockDetailV2.dc.html" style="font-weight: 700">[TICKER]</a></td><td style="padding: 12px 0; color: #3D4A5C">AAAA-MM-DD</td><td style="padding: 12px 0; text-align: right">—</td><td style="padding: 12px 0; text-align: right">$—</td></tr></tbody>
+</table>
+</section>
+<section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 24px 28px; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 18px; font-weight: 700">Todas las cerradas</h2>
+<p style="margin: 0; font-size: 13px; color: #5B6778">Con su resultado y su motivo. Publicar sólo las ganadoras es lo que hace que los track records del sector no valgan nada.</p>
+<div style="margin-top: 8px; font-size: 13px; color: #5B6778; background: #FAFAF7; border-radius: 12px; padding: 14px">Valor · Comprada · Vendida · Retorno · Por qué se vendió</div>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 24px 28px; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 18px; font-weight: 700">Cada decisión, incluidas las de no comprar</h2>
+<p style="margin: 0; font-size: 13px; color: #5B6778">El sistema mira el día 1 y el 15. Si nadie cumple las reglas, no compra — y esa fecha aparece igual.</p>
+<div style="margin-top: 8px; font-size: 13px; color: #5B6778; background: #FAFAF7; border-radius: 12px; padding: 14px">Fecha · Universo · Elegibles · Compras · Ventas · Cartera</div>
+</div>
+</section>
+<section style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px 32px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 30px; letter-spacing: -0.02em">Las reglas, en cinco líneas</h2>
+<ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: #3D4A5C; line-height: 1.6">
+<li><strong style="color: #0E1A2B">Qué se compra:</strong> los valores del S&amp;P 500 en el 70% mejor por calidad.</li>
+<li><strong style="color: #0E1A2B">Cuándo:</strong> el primer día hábil y el día 15, 2 valores cada vez. Fechas fijas.</li>
+<li><strong style="color: #0E1A2B">Persistencia:</strong> hay que cumplir el umbral 60 días seguidos.</li>
+<li><strong style="color: #0E1A2B">Cuándo se vende:</strong> si la señal cae bajo el percentil 50 en dos evaluaciones seguidas, entre otras reglas.</li>
+<li><strong style="color: #0E1A2B">Pesos:</strong> equiponderado, tope de 40 posiciones y cuarentena de 12 meses.</li>
+</ol>
+<p style="margin: 0; font-size: 13px; color: #5B6778; line-height: 1.6">Sin bancos ni REITs: las métricas de calidad no significan nada en sus balances. Se mide contra el S&amp;P 500, su versión equiponderada y el universo elegible equiponderado; si a 24 meses queda por debajo de este último, se publica y se cierra.</p>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":2200}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

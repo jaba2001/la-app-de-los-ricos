@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Discovery</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1700px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="Discovery" hint-size="1280px,64px"></dc-import>
+<main style="width: 1120px; align-self: center; padding: 48px 0 64px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+<div><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em">Discovery</h1>
+<p style="margin: 4px 0 0; font-size: 15px; color: #3D4A5C; max-width: 680px">The S&amp;P 500 ranked by 12-1m momentum — a map of what's leading right now, not a list of recommendations.</p></div>
+<div role="tablist" aria-label="Universe" style="display: flex; gap: 4px; background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 999px; padding: 4px">
+<button type="button" role="tab" aria-selected="true" style="font-family: inherit; font-size: 13px; font-weight: 600; color: #FFFFFF; background: #0E1A2B; border: none; padding: 8px 16px; border-radius: 999px">Stocks · S&amp;P 500</button>
+<button type="button" role="tab" aria-selected="false" style="font-family: inherit; font-size: 13px; color: #3D4A5C; background: transparent; border: none; padding: 8px 16px; border-radius: 999px">Cross-asset</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 24px; display: flex; gap: 20px; align-items: center">
+<div style="text-align: center; min-width: 72px"><div style="font-size: 12px; color: #5B6778">Implied corr.</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1.1">—</div></div>
+<div><div style="font-size: 15px; font-weight: 700">Selection regime: [label]</div><div style="font-size: 13px; color: #3D4A5C">[How much the ranking can matter at this correlation]</div></div>
+</div>
+<div style="background: #FDF4DC; border-radius: 20px; padding: 20px 24px">
+<div style="font-size: 14px; font-weight: 700; color: #5C3D00">What we measured, before you trust this list</div>
+<div style="font-size: 13px; color: #5C3D00; line-height: 1.6; margin-top: 4px">Over 192 months (2010–2026), the top momentum decile returned +728% while holding the same names equally weighted returned +908%. Ranking lagged doing nothing by 180 points. Use it as a leadership map, not a buy list.</div>
+</div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="8">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{false}}"><button type="button" style="font-family: inherit; font-size: 13px; font-weight: 600; color: #0B6E4F; background: #E7F3EE; border: 1px solid #0B6E4F; padding: 6px 14px; border-radius: 999px">{{c.l}}</button></sc-if>
+<sc-if value="{{c.off}}" hint-placeholder-val="{{true}}"><button type="button" style="font-family: inherit; font-size: 13px; color: #3D4A5C; background: #FFFFFF; border: 1px solid #E3E6EA; padding: 6px 14px; border-radius: 999px">{{c.l}}</button></sc-if>
+</sc-for>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums">
+<thead><tr style="background: #FAFAF7">
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">#</th>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Ticker</th>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Sector</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">12-1m mom</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">6m</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Momentum</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Price</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+<tr><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; color: #5B6778">{{r.n}}</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; font-weight: 700">[TICKER]</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; color: #3D4A5C">[Sector]</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #0B6E4F; font-weight: 600">+—%</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #3D4A5C">—%</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; text-align: right"><span style="display: inline-flex; min-width: 36px; justify-content: center; font-size: 13px; font-weight: 700; color: #0B6E4F; background: #E7F3EE; padding: 2px 8px; border-radius: 999px">—</span></td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; text-align: right">$—</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 12px; color: #5B6778">As of [date] · [N] names · momentum from free EOD prices · audited over 192 months. Educational — not investment advice.</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+var C = ['All','Communication Services','Consumer Cyclical','Energy','Financial Services','Healthcare','Industrials','Technology'];
+var rows = []; for (var i = 1; i <= 12; i++) rows.push({ n: i });
+return { chips: C.map(function (l, i) { return { l: l, on: i === 0, off: i !== 0 }; }), rows: rows };
+}
+}
+</script>
+</body>
+</html>

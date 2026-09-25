@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Stock detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1700px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="Stocks" hint-size="1280px,64px"></dc-import>
+<div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EA; padding: 24px 48px 0; display: flex; flex-direction: column; gap: 16px">
+<a href="StocksV2.dc.html" style="font-size: 13px; font-weight: 600; color: #5B6778">← Stocks</a>
+<div style="display: flex; align-items: flex-end; gap: 24px">
+<div><div style="display: flex; align-items: center; gap: 10px"><h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.02em">[TICKER]</h1><span style="font-size: 12px; font-weight: 600; color: #3D4A5C; background: #F1F3F5; padding: 3px 8px; border-radius: 6px">Earnings MM-DD · AMC</span></div><div style="font-size: 15px; color: #3D4A5C">[Company name]</div></div>
+<div style="margin-left: auto; text-align: right"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1">$—</div><div style="font-size: 14px; font-weight: 600; color: #0B6E4F">+—% today</div></div>
+<div style="display: flex; gap: 8px">
+<button type="button" style="font-family: inherit; font-size: 14px; font-weight: 600; color: #0E1A2B; background: #FFFFFF; border: 1px solid #C9CFD6; border-radius: 999px; padding: 0 16px; min-height: 40px">☆ Watchlist</button>
+<button type="button" style="font-family: inherit; font-size: 14px; font-weight: 600; color: #0E1A2B; background: #FFFFFF; border: 1px solid #C9CFD6; border-radius: 999px; padding: 0 16px; min-height: 40px">Export CSV</button>
+</div>
+</div>
+<nav aria-label="Stock sections" style="display: flex; gap: 16px; font-size: 13px; font-weight: 500; align-items: center">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="16">
+<sc-if value="{{t.on}}" hint-placeholder-val="{{false}}"><a href="#" aria-current="page" style="padding: 8px 0 12px; color: #0E1A2B; font-weight: 700; border-bottom: 2px solid #0B6E4F; white-space: nowrap">{{t.label}}</a></sc-if>
+<sc-if value="{{t.off}}" hint-placeholder-val="{{true}}"><a href="#" style="padding: 8px 0 12px; color: #5B6778; border-bottom: 2px solid transparent; white-space: nowrap">{{t.label}}</a></sc-if>
+</sc-for>
+</nav>
+</div>
+<main style="padding: 28px 48px 64px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: flex-end"><div role="tablist" aria-label="View" style="display: flex; gap: 4px; background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 999px; padding: 3px"><button type="button" role="tab" aria-selected="false" style="font-family: inherit; font-size: 12px; color: #3D4A5C; background: transparent; border: none; padding: 6px 12px; border-radius: 999px">Beginner</button><button type="button" role="tab" aria-selected="true" style="font-family: inherit; font-size: 12px; font-weight: 600; color: #FFFFFF; background: #0E1A2B; border: none; padding: 6px 12px; border-radius: 999px">Pro · 16 tabs</button></div></div>
+<div style="background: #FFFFFF; border: 1.5px solid #0E1A2B; border-radius: 20px; padding: 28px 32px; display: grid; grid-template-columns: 280px 1fr; gap: 32px">
+<div><div style="font-size: 13px; font-weight: 600; color: #5B6778">The verdict</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 36px; line-height: 1.1; margin-top: 6px">[The call]</div></div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<ol style="margin: 0; padding-left: 20px; font-size: 15px; color: #3D4A5C; display: flex; flex-direction: column; gap: 6px"><li>[Reason 1]</li><li>[Reason 2]</li><li>[Reason 3]</li></ol>
+<div style="font-size: 14px; background: #FAFAF7; border-radius: 12px; padding: 12px 14px"><strong>What would change this:</strong> <span style="color: #3D4A5C">[falsifier]</span></div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 13px; color: #5B6778">IC score</div><div style="font-size: 26px; font-weight: 700">—</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 13px; color: #5B6778">Rating</div><div style="font-size: 26px; font-weight: 700">—</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 13px; color: #5B6778">Macro tilt</div><div style="font-size: 26px; font-weight: 700">—</div></div>
+</div>
+<div style="height: 300px; border-radius: 14px; background: #F6F7F9; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #5B6778">[Price chart · 1M 6M 1Y 5Y]</div>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 16px; font-weight: 700">Alerts</div>
+<div style="font-size: 14px; color: #3D4A5C">Get notified on price, rating or reverse-DCF changes for this ticker.</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600">Price crosses<input type="text" placeholder="$0.00" style="font-family: inherit; font-size: 15px; padding: 0 14px; min-height: 44px; border: 1px solid #C9CFD6; border-radius: 12px"></label>
+<button type="button" style="margin-top: auto; font-family: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; background: #0B6E4F; border: none; border-radius: 999px; min-height: 44px">Create alert</button>
+</div>
+</div>
+<div style="font-size: 13px; color: #5B6778">Before analysis: an empty state lists the modules and a “Fetching n / N data sources…” progress bar.</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1700}}'>
+class Component extends DCLogic {
+renderVals() {
+var T = ['Overview','Signals','Risk Model','Governance','Fundamentals','Valuation','Report','Diligence','Chart','Research','Smart Money','Sentiment','News','Options','Screener','Compare'];
+return { tabs: T.map(function (l, i) { return { label: l, on: i === 0, off: i !== 0 }; }) };
+}
+}
+</script>
+</body>
+</html>

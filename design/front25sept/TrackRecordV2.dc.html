@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Track record</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 3800px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="SiteHeader" active="Track record" hint-size="1280px,72px"></dc-import>
+
+<section style="background: #FFFFFF; padding: 88px 80px 80px; border-bottom: 1px solid #E3E6EA">
+<div style="font-size: 13px; font-weight: 600; color: #0B6E4F; margin-bottom: 20px">Track record</div>
+<h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 60px; line-height: 1.05; letter-spacing: -0.025em; max-width: 900px">The whole record, including the parts that don't flatter us.</h1>
+<p style="margin: 24px 0 0; font-size: 19px; line-height: 1.6; color: #3D4A5C; max-width: 760px">The honest finding: picking stocks doesn't beat the market, but regime-driven multi-asset allocation does — risk-adjusted, with a fraction of the drawdown. Below: the growth mandate, the validated allocator, the stock-picking result and the live forward record.</p>
+</section>
+
+<section style="padding: 88px 80px 72px; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 32px">
+<div><div style="font-size: 13px; font-weight: 600; color: #5B6778">Growth mandate vs the S&amp;P 500 · Jan 2007 – Aug 2026 · 236 months · net of costs</div>
+<h2 style="margin: 8px 0 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em">Risk-adjusted scorecard</h2></div>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #5B6778; border: 1px solid #E3E6EA; padding: 4px 8px; border-radius: 6px">BACKTEST</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: #E3E6EA; border: 1px solid #E3E6EA; border-radius: 20px; overflow: hidden">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="8">
+<div style="background: #FFFFFF; padding: 24px"><div style="font-size: 13px; color: #5B6778">{{s.k}}</div><div style="font-size: 30px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums">{{s.v}}</div><div style="font-size: 13px; color: #5B6778">{{s.sub}}</div></div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px">
+<caption style="text-align: left; font-size: 13px; font-weight: 600; color: #3D4A5C; padding-bottom: 10px">By sub-period</caption>
+<thead><tr><th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 16px; border-bottom: 1px solid #E3E6EA">Period</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 700; color: #0B6E4F; padding: 12px 16px; border-bottom: 1px solid #E3E6EA">Scora Growth</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 16px; border-bottom: 1px solid #E3E6EA">S&amp;P 500</th></tr></thead>
+<tbody>
+<tr><th scope="row" style="text-align: left; font-weight: 500; padding: 14px 16px; border-bottom: 1px solid #EEF0F2">2007–2019</th><td style="text-align: right; padding: 14px 16px; border-bottom: 1px solid #EEF0F2">+204% · Sharpe 0.87 · −16% DD</td><td style="text-align: right; padding: 14px 16px; border-bottom: 1px solid #EEF0F2; color: #3D4A5C">+196% · 0.56 · −51%</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; padding: 14px 16px">2020–2026</th><td style="text-align: right; padding: 14px 16px">+148% · Sharpe 0.89 · −16% DD</td><td style="text-align: right; padding: 14px 16px; color: #3D4A5C">+160% · 0.74 · −24%</td></tr>
+</tbody>
+</table>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 13px; font-weight: 600; color: #3D4A5C">Worst peak-to-trough fall</div>
+<div style="display: grid; grid-template-columns: 110px 1fr 64px; gap: 12px; align-items: center; font-size: 13px"><span>Scora Growth</span><div style="height: 14px; background: #F1F3F5; border-radius: 4px"><div style="width: 32%; height: 100%; background: #0B6E4F; border-radius: 4px"></div></div><strong style="text-align: right">−16.2%</strong></div>
+<div style="display: grid; grid-template-columns: 110px 1fr 64px; gap: 12px; align-items: center; font-size: 13px"><span>60/40</span><div style="height: 14px; background: #F1F3F5; border-radius: 4px"><div style="width: 57%; height: 100%; background: #7A8599; border-radius: 4px"></div></div><strong style="text-align: right">−28.8%</strong></div>
+<div style="display: grid; grid-template-columns: 110px 1fr 64px; gap: 12px; align-items: center; font-size: 13px"><span>S&amp;P 500</span><div style="height: 14px; background: #F1F3F5; border-radius: 4px"><div style="width: 100%; height: 100%; background: #7A8599; border-radius: 4px"></div></div><strong style="text-align: right">−50.7%</strong></div>
+</div>
+</div>
+</section>
+
+<section style="background: #FFFFFF; border-top: 1px solid #E3E6EA; border-bottom: 1px solid #E3E6EA; padding: 88px 80px; display: grid; grid-template-columns: 360px 1fr; gap: 64px">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em">What these numbers don't say.</h2>
+<p style="margin: 0; font-size: 15px; color: #3D4A5C; line-height: 1.6">An evaluator would find these on their own. We'd rather you read them here first.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">The Sharpe edge isn't significant</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">t = 1.47 vs the S&amp;P over 236 months. Reaching t = 2 would take roughly 17 more years of data.</div></div>
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">The drawdown is a different claim</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">−16.2% against −50.7% isn't an estimate — it's the worst case that actually happened.</div></div>
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">“A third of the drawdown” leans on 2008</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">The ratio is 0.32 over the full record and 0.68 from 2009. Our drawdown stays near −16% in all 8 windows tested; the index's doesn't.</div></div>
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">The Sharpe doesn't survive deflation</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">Tested once, it would clear the bar (99.9%). After 344 trials on the same data, the probability falls to 81.1%.</div></div>
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">Returns have fat tails</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">Excess kurtosis +2.52 — more extreme months than the Sharpe ratio assumes. Skew is near zero; the index's is −0.71.</div></div>
+<div style="border: 1px solid #E3E6EA; border-radius: 14px; padding: 20px"><div style="font-size: 15px; font-weight: 700">Cash earns T-bills, not zero</div><div style="font-size: 13px; color: #3D4A5C; margin-top: 6px; line-height: 1.6">Every ratio uses the real risk-free rate (FRED TB3MS, 1.55% a year on average). With rf = 0 the Sharpe would read 1.01.</div></div>
+</div>
+</section>
+
+<section style="padding: 88px 80px; display: flex; flex-direction: column; gap: 28px">
+<div><div style="font-size: 13px; font-weight: 600; color: #5B6778">Regime-driven multi-asset allocation · Jan 2007 – Jun 2026 · 234 months</div>
+<h2 style="margin: 8px 0 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em">The validated edge</h2></div>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; max-width: 780px; line-height: 1.6">Risk-on tilt + dual-momentum + risk-parity. It beats a regime-free dual-momentum control out-of-sample: the walk-forward Sharpe (2011–2026, 178 months) is 0.99, with an overfit gap of about 0.01.</p>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 20px"><div style="font-size: 13px; color: #5B6778">Sharpe</div><div style="font-size: 28px; font-weight: 700">1.01</div><div style="font-size: 13px; color: #5B6778">SPY 0.72</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 20px"><div style="font-size: 13px; color: #5B6778">Max drawdown</div><div style="font-size: 28px; font-weight: 700">−7.5%</div><div style="font-size: 13px; color: #5B6778">SPY −50.7%</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 20px"><div style="font-size: 13px; color: #5B6778">Walk-forward OOS</div><div style="font-size: 28px; font-weight: 700">0.99</div><div style="font-size: 13px; color: #5B6778">Sharpe · gap ~0.01</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 20px"><div style="font-size: 13px; color: #5B6778">Total return</div><div style="font-size: 28px; font-weight: 700">+154%</div><div style="font-size: 13px; color: #5B6778">SPY +652%</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 20px"><div style="font-size: 13px; color: #5B6778">Control (no regime)</div><div style="font-size: 28px; font-weight: 700">0.89</div><div style="font-size: 13px; color: #5B6778">Sharpe · −14.0% DD</div></div>
+</div>
+<table style="width: 640px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums">
+<caption style="text-align: left; font-size: 13px; font-weight: 600; color: #3D4A5C; padding-bottom: 10px">Sharpe by sub-period</caption>
+<thead><tr><th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Period</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 700; color: #0B6E4F; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Allocator</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">Dual-mom only</th><th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 10px 0; border-bottom: 1px solid #C9CFD6">SPY</th></tr></thead>
+<tbody>
+<tr><th scope="row" style="text-align: left; font-weight: 500; padding: 12px 0; border-bottom: 1px solid #EEF0F2">pre-2020 (out-of-sample)</th><td style="text-align: right; padding: 12px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700; color: #0B6E4F">0.93</td><td style="text-align: right; padding: 12px 0; border-bottom: 1px solid #EEF0F2">0.75</td><td style="text-align: right; padding: 12px 0; border-bottom: 1px solid #EEF0F2">0.60</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; padding: 12px 0">2020–2026</th><td style="text-align: right; padding: 12px 0; font-weight: 700; color: #0B6E4F">1.15</td><td style="text-align: right; padding: 12px 0">1.14</td><td style="text-align: right; padding: 12px 0">0.89</td></tr>
+</tbody>
+</table>
+</section>
+
+<section style="background: #FFFFFF; border-top: 1px solid #E3E6EA; border-bottom: 1px solid #E3E6EA; padding: 88px 80px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div><div style="font-size: 13px; font-weight: 600; color: #5B6778">500 names · survivorship-free · Jan 2020 – Jun 2026</div>
+<h2 style="margin: 8px 0 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 36px; line-height: 1.1; letter-spacing: -0.02em">Stock-picking, honestly</h2></div>
+<p style="margin: 0; font-size: 15px; color: #3D4A5C; line-height: 1.6">Ranking by value/quality does not beat SPY. Momentum only carries information when market correlation is low — a stock-picker's tape.</p>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">Value/quality return</div><div style="font-size: 22px; font-weight: 700; color: #B42318">+128%</div><div style="font-size: 12px; color: #5B6778">SPY +154%</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">Information coef.</div><div style="font-size: 22px; font-weight: 700">0.007</div><div style="font-size: 12px; color: #5B6778">34,405 name-months</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">Momentum IC · low corr</div><div style="font-size: 22px; font-weight: 700">+0.064</div><div style="font-size: 12px; color: #5B6778">high corr −0.054</div></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div><div style="font-size: 13px; font-weight: 600; color: #5B6778">Sealed monthly · realized vs SPY</div>
+<h2 style="margin: 8px 0 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 36px; line-height: 1.1; letter-spacing: -0.02em">Live forward record</h2></div>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #8A5A00; background: #FDF4DC; padding: 4px 8px; border-radius: 6px">UN-BACKTESTED</span>
+</div>
+<p style="margin: 0; font-size: 15px; color: #3D4A5C; line-height: 1.6">The universe is scored on the 2nd of each month and sealed as an immutable cohort. This is the proof no backtest can give.</p>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">Cohorts sealed</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">BUY hit-rate</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">BUY avg return</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div style="background: #FAFAF7; border-radius: 12px; padding: 16px"><div style="font-size: 12px; color: #5B6778">Live IC</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+</div>
+</div>
+</section>
+
+<section style="padding: 88px 80px; display: grid; grid-template-columns: 360px 1fr; gap: 64px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em">How to read these numbers.</h2>
+<dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 40px">
+<div><dt style="font-size: 15px; font-weight: 700">Hypothetical, not realized</dt><dd style="margin: 6px 0 0; font-size: 14px; color: #3D4A5C; line-height: 1.6">Allocator and stock-picking results are backtests. Only the forward record is live.</dd></div>
+<div><dt style="font-size: 15px; font-weight: 700">Net of what, exactly</dt><dd style="margin: 6px 0 0; font-size: 14px; color: #3D4A5C; line-height: 1.6">An assumed round-trip cost at each rebalance. Gross of taxes, wider spreads and market impact.</dd></div>
+<div><dt style="font-size: 15px; font-weight: 700">Survivorship</dt><dd style="margin: 6px 0 0; font-size: 14px; color: #3D4A5C; line-height: 1.6">Stock-picking runs on a point-in-time universe, delisted names included.</dd></div>
+<div><dt style="font-size: 15px; font-weight: 700">No selected trades</dt><dd style="margin: 6px 0 0; font-size: 14px; color: #3D4A5C; line-height: 1.6">The whole record is here, including the result that doesn't work.</dd></div>
+</dl>
+</section>
+<dc-import name="SiteFooter" hint-size="1280px,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":3800}}'>
+class Component extends DCLogic {
+renderVals() {
+return { stats: [
+{ k: 'Sharpe', v: '0.87', sub: 'S&P 0.63' }, { k: 'Sortino', v: '1.46', sub: 'S&P 0.92' },
+{ k: 'Calmar', v: '0.67', sub: 'S&P 0.22' }, { k: 'Max drawdown', v: '−16.2%', sub: 'S&P −50.7%' },
+{ k: 'Jensen α / yr', v: '+4.32%', sub: 'CAPM vs S&P' }, { k: 'Monthly VaR 95%', v: '−4.3%', sub: 'S&P −8.2%' },
+{ k: 'Monthly CVaR 95%', v: '−6.4%', sub: 'S&P −11.2%' }, { k: 'Total return', v: '+653%', sub: 'S&P +668%' }
+] };
+}
+}
+</script>
+</body>
+</html>

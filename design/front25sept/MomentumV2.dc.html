@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Market momentum</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1600px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="Momentum" hint-size="1280px,64px"></dc-import>
+<main style="width: 960px; align-self: center; padding: 48px 0 64px; display: flex; flex-direction: column; gap: 20px">
+<div><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em">Market momentum</h1>
+<p style="margin: 4px 0 0; font-size: 15px; color: #3D4A5C; max-width: 720px">How much of the market is actually participating, and whether credit and risk appetite agree. This answers “what is the backdrop?” — not “what should I buy?”</p></div>
+<div style="background: #FDF4DC; border-radius: 16px; padding: 18px 22px">
+<div style="font-size: 14px; font-weight: 700; color: #5C3D00">Context, not a timing signal</div>
+<div style="font-size: 13px; color: #5C3D00; line-height: 1.6; margin-top: 4px">Three ways of turning these signals into returns were tested and all failed out of sample. The one that survived — the correlation gate — improved risk-adjusted return, not return.</div>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 32px; display: flex; gap: 32px; align-items: center">
+<div style="text-align: center; min-width: 140px"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 72px; line-height: 1">—</div><div style="font-size: 13px; color: #5B6778">of 100</div></div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 22px; font-weight: 700">[Broad strength · Constructive · Mixed · Narrowing · Stressed]</div>
+<div style="font-size: 15px; color: #3D4A5C">[Detail from the live breadth snapshot]</div>
+<div style="align-self: flex-start; font-size: 13px; font-weight: 600; color: #8A5A00; background: #FDF4DC; padding: 5px 12px; border-radius: 999px">Divergence: index above its 200-day, fewer than 45% of names are</div>
+</div>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 18px">
+<div style="font-size: 16px; font-weight: 700">The signals behind it</div>
+<sc-for list="{{signals}}" as="s" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 180px 1fr 90px; gap: 16px; align-items: center">
+<div><div style="font-size: 14px; font-weight: 600">{{s}}</div></div>
+<div style="height: 8px; background: #F1F3F5; border-radius: 999px"></div>
+<div style="text-align: right; font-size: 14px; font-variant-numeric: tabular-nums"><span style="color: #5B6778">—</span> <strong style="margin-left: 8px">—</strong></div>
+</div>
+</sc-for>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px; display: flex; gap: 28px; align-items: center">
+<div style="text-align: center; min-width: 110px"><div style="font-size: 13px; color: #5B6778">Selection weight</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 48px; line-height: 1.1">—%</div><div style="font-size: 12px; color: #5B6778">[regime]</div></div>
+<div style="font-size: 14px; color: #3D4A5C; line-height: 1.6">Scales continuously with implied correlation. Over two independent windows (2010–2018 and 2019–2026) it improved Sharpe — 1.08→1.14 and 0.78→0.86 — but <strong style="color: #0E1A2B">not total return</strong>. It is risk management, not an edge.</div>
+</div>
+<div style="font-size: 12px; color: #5B6778">Breadth as of [date] · aggregated daily. Educational — not investment advice.</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1600}}'>
+class Component extends DCLogic {
+renderVals() { return { signals: ['Above 200-day','Above 50-day','Positive 12-1m','Up last month','Risk appetite','Dispersion','Credit','Index trend'] }; }
+}
+</script>
+</body>
+</html>

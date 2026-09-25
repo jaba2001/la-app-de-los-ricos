@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Watchlist</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1000px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="Watchlist" hint-size="1280px,64px"></dc-import>
+<main style="width: 1120px; align-self: center; padding: 48px 0 64px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+<div><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em">Watchlist</h1><div style="font-size: 14px; color: #5B6778">[N] tickers · quotes refresh on load</div></div>
+<form style="display: flex; gap: 8px">
+<label style="display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ticker</span><input type="text" placeholder="AAPL, MSFT…" style="width: 200px; font-family: inherit; font-size: 14px; padding: 0 16px; min-height: 44px; border: 1px solid #C9CFD6; border-radius: 999px; background: #FFFFFF"></label>
+<button type="submit" style="font-family: inherit; font-size: 14px; font-weight: 600; color: #FFFFFF; background: #0B6E4F; border: none; border-radius: 999px; padding: 0 20px; min-height: 44px">Add</button>
+</form>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums">
+<thead><tr style="background: #FAFAF7">
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Ticker</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Price</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Change</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">P/E</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Market cap</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Added</th>
+<th scope="col" style="padding: 12px 20px; border-bottom: 1px solid #E3E6EA"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2"><a href="StockDetailV2.dc.html" style="font-weight: 700; color: #0E1A2B">[TICKER]</a><div style="font-size: 12px; color: #5B6778">[Company]</div></td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; font-weight: 600">$—</td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right"><span style="font-size: 13px; font-weight: 600; color: #0B6E4F; background: #E7F3EE; padding: 3px 8px; border-radius: 6px">+—%</span></td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #3D4A5C">—</td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #3D4A5C">—</td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #5B6778">DD MMM</td><td style="padding: 16px 20px; border-bottom: 1px solid #EEF0F2; text-align: right"><button type="button" aria-label="Remove from watchlist" style="font-family: inherit; width: 32px; height: 32px; border-radius: 999px; border: 1px solid #E3E6EA; background: #FFFFFF; color: #5B6778">×</button></td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 13px; color: #5B6778">Empty state: “Your watchlist is empty — add tickers above or use ☆ on any stock page.”</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+renderVals() { return { rows: [1,2,3,4,5,6] }; }
+}
+</script>
+</body>
+</html>

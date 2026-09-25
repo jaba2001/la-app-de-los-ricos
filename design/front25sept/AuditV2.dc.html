@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — AI audit trail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1300px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+<dc-import name="AppNavV2" active="Audit" hint-size="1280px,64px"></dc-import>
+<main style="width: 1040px; align-self: center; padding: 48px 0 64px; display: flex; flex-direction: column; gap: 20px">
+<div><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 40px; letter-spacing: -0.02em">AI audit trail</h1>
+<p style="margin: 4px 0 0; font-size: 15px; color: #3D4A5C; max-width: 720px">Every grounded AI answer is logged with the sources it cited and a code-enforced grounding check — the figures it emitted are verified against the data it was given.</p></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 22px"><div style="font-size: 13px; color: #5B6778">Logged runs</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 44px; line-height: 1.1">—</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 22px"><div style="font-size: 13px; color: #5B6778">Grounded</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 44px; line-height: 1.1; color: #0B6E4F">—%</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 22px"><div style="font-size: 13px; color: #5B6778">Flagged figures</div><div style="font-family: 'Newsreader', Georgia, serif; font-size: 44px; line-height: 1.1">—</div></div>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 14px">
+<thead><tr style="background: #FAFAF7">
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">When</th>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Module</th>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Ticker</th>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Grounding</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 20px; border-bottom: 1px solid #E3E6EA">Sources</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+<tr><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; color: #5B6778; font-size: 13px">Mmm D, HH:MM</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; font-weight: 600">{{r.m}}</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; font-weight: 700">[TICKER]</td>
+<td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2">
+<sc-if value="{{r.ok}}" hint-placeholder-val="{{true}}"><span style="font-size: 12px; font-weight: 600; color: #0B6E4F; background: #E7F3EE; padding: 3px 10px; border-radius: 999px">✓ Grounded</span></sc-if>
+<sc-if value="{{r.bad}}" hint-placeholder-val="{{false}}"><span style="font-size: 12px; font-weight: 600; color: #8A5A00; background: #FDF4DC; padding: 3px 10px; border-radius: 999px">⚠ — figures flagged</span></sc-if>
+</td><td style="padding: 14px 20px; border-bottom: 1px solid #EEF0F2; text-align: right; color: #5B6778">—</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="font-size: 12px; color: #5B6778">Click a row to see the model, prompt size, cited sources, any unverified figures and the full output. Logged to your account only. Educational — not advice.</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { var ms = ['Stock thesis','Research note','Red-flag scanner','Moat audit','Bull vs bear','Macro sensitivity','Scora brief']; return { rows: ms.map(function (m, i) { return { m: m, ok: i !== 2, bad: i === 2 }; }) }; }
+}
+</script>
+</body>
+</html>
