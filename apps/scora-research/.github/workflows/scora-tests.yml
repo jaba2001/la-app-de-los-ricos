@@ -287,6 +287,9 @@ jobs:
       - name: Aislamiento contra Postgres real (se salta sin base)
         run: node --experimental-strip-types --no-warnings scripts/aislamiento-e2e.test.mjs
 
+      - name: El cliente de datos (reemplazo de supabase.from)
+        run: node --experimental-strip-types --no-warnings scripts/datacliente.test.mjs
+
       # ── EL BACKEND ────────────────────────────────────────────────────────────────────
       # Estas 15 vivian en el repo ic-proxy con su propio `npm test`, y al fusionarlo todo en
       # una sola app se habrian quedado sin correr en ningun sitio. Lo cazo el guardian de

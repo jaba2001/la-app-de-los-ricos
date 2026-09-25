@@ -68,6 +68,18 @@ function degrade(request, name, reason, forceClosed = false) {
 }
 
 /**
+ * Los tipos van en JSDoc porque este modulo es JavaScript y ahora lo llaman rutas en
+ * TypeScript (app/api/data). Sin ellos, TS deduce `request: null` del valor por defecto y
+ * rechaza que se le pase un Request de verdad.
+ *
+ * @param {string} name
+ * @param {string} userId
+ * @param {number} [max]
+ * @param {number} [windowSec]
+ * @param {Request|null} [request]
+ * @param {{failClosed?: boolean, cost?: number}} [opts]
+ * @returns {Promise<Response|null>}
+ *
  * @param opts.failClosed  Force a 503 when the limiter is unavailable, ignoring the global
  *   fail-open default. Required for UNAUTHENTICATED routes: fail-open is only defensible
  *   when requireUser still stands behind it. On /api/waitlist there is nothing behind it,
