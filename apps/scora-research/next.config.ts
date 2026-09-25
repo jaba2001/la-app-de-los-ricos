@@ -36,6 +36,9 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  // Empaqueta el servidor y solo las dependencias que usa en .next/standalone, para que la
+  // imagen de contenedor no lleve los 573 paquetes de node_modules.
+  output: "standalone",
   // There is a package-lock.json both here and in the repo root, so Next guesses at the
   // workspace root and warns on every build. Pointing it at this project silences the
   // warning and, more importantly, keeps build tracing scoped to the files this app

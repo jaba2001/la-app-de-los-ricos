@@ -1,0 +1,19 @@
+# cp terraform.tfvars.example terraform.tfvars   (terraform.tfvars esta en .gitignore)
+
+project_id   = "mi-proyecto-scora"
+region       = "europe-west1"
+supabase_url = "https://xxxx.supabase.co"
+
+# El MISMO valor que CRON_SECRET en infra/.env.gcp. Si no coinciden, los 8 crons reciben
+# un 401 y dejan de actualizarse los datos macro — sin que nada avise.
+cron_secret = "pegar-aqui-el-mismo"
+
+vapid_public_key = ""
+vapid_subject    = "mailto:tu@correo.com"
+
+# Se deja asi en el primer apply y se rellena despues con la URL real (paso 6 del runbook).
+# app_url = "https://scora-research-xxxxx.europe-west1.run.app"
+
+# 0 = no se paga nada mientras nadie entra, a cambio de arranque en frio.
+min_instances = 0
+image_tag     = "latest"

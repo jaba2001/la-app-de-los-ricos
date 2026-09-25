@@ -6,3 +6,14 @@ node_modules/
 .vercel/
 *.tsbuildinfo
 research/.cache/
+
+# ── Google Cloud ──
+# Credenciales reales y estado de Terraform. El estado incluye CRON_SECRET, asi que subirlo
+# equivale a publicar la llave de los crons.
+infra/.env.gcp
+infra/terraform/terraform.tfvars
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/*.tfplan
+*-key.json
