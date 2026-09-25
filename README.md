@@ -12,6 +12,20 @@ Para traer algo de ellos si hiciera falta:
 git fetch upstream-scora-research   # o upstream-ic-proxy
 ```
 
+## Cómo se trabaja
+
+`main` es la rama de trabajo y está protegida:
+
+| Quién | Cómo |
+|---|---|
+| Jorge (dueño del repo) | Empuja directo a `main` |
+| Alejandro y demás colaboradores | Abren una PR hacia `main`; Jorge la revisa y aprueba |
+
+La protección exige **1 aprobación** para fusionar una PR, descarta las aprobaciones
+viejas si se sube código nuevo, y prohíbe el force-push y el borrado de `main`. Los
+administradores del repo quedan exentos a propósito (`enforce_admins: false`), que es
+lo que permite el flujo de arriba.
+
 ## Estructura
 
 ```
