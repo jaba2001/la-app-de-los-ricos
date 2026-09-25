@@ -1,7 +1,16 @@
 # Scora — monorepo
 
-Integra los dos repos que forman el producto. Cada app se sigue desplegando
-por separado en Vercel; esto unifica el historial y el sitio donde se trabaja.
+**Este es el repositorio oficial.** Integra los dos repos que formaban el producto
+(`scora-research` + `ic-proxy`) en uno solo, con el historial completo de ambos.
+
+Los repos originales de Alejandro Alvarado quedan como referencia de solo lectura
+(remotos `upstream-*`, con el push deshabilitado a propósito). El trabajo va aquí.
+
+Para traer algo de ellos si hiciera falta:
+
+```bash
+git fetch upstream-scora-research   # o upstream-ic-proxy
+```
 
 ## Estructura
 
