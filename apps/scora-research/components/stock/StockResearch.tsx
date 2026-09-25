@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
 import { aiAnalyzeAudited } from "@/lib/proxy";
-import { supabase } from "@/lib/supabase";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { getRating, calcFactorTilts, SECTOR_PE_BM, SECTOR_EV_BM } from "@/lib/scoring";
+import { latestAnalyses } from "@/lib/latestAnalyses";
 
 interface Props {
   data: StockData | null;
@@ -65,14 +65,8 @@ export default function StockResearch({ data, scores, loading, ticker, macro, ma
   useEffect(() => {
     if (!peersKey || loading) return;
     setPeerLoading(true);
-    supabase
-      .from("sl_analyses")
-      .select("*")
-      .in("ticker", peerList)
-      .order("analysis_date", { ascending: false })
-      .then(({ data: rows }) => {
-        const map: Record<string, StockAnalysis> = {};
-        if (rows) (rows as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
+    latestAnalyses(peerList)
+      .then((map) => {
         setPeerScores(map);
         setPeerLoading(false);
       });

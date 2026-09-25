@@ -18,13 +18,25 @@
 import { Redis } from '@upstash/redis';
 import * as Sentry from '@sentry/nextjs';
 
+// La caché puede vivir en SU PROPIA instancia de Upstash, separada de la del rate limiter.
+//
+// POR QUÉ: la instancia compartida está en `noeviction` — al llenarse no descarta lo viejo,
+// RECHAZA escrituras. Y el rate limiter escribe ahí mismo. Es decir: llenar la caché no la
+// degrada, se lleva por delante el control de coste de las rutas de pago. Rechazar los
+// parámetros desconocidos (ver cacheKey) sube mucho el listón, pero no cambia el hecho de
+// que dos sistemas con criticidad muy distinta compartan un recurso agotable.
+//
+// Con UPSTASH_CACHE_REST_URL/TOKEN puestos, la caché se va a su instancia y el peor caso de
+// una caché llena vuelve a ser lo que debería: caché llena. Sin poner nada, se usa la de
+// siempre y el comportamiento es idéntico al de hoy: separarlas es una decisión de
+// despliegue, no un cambio de código.
+function cacheUrl()   { return process.env.UPSTASH_CACHE_REST_URL   || process.env.UPSTASH_REDIS_REST_URL; }
+function cacheToken() { return process.env.UPSTASH_CACHE_REST_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN; }
+
 let _redis = null;
 function redis() {
   if (_redis) return _redis;
-  _redis = new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  _redis = new Redis({ url: cacheUrl(), token: cacheToken() });
   return _redis;
 }
 
@@ -36,8 +48,8 @@ const PREFIX = 'c:v1:';
 function enabled() {
   return (
     process.env.CACHE_DISABLED !== '1' &&
-    !!process.env.UPSTASH_REDIS_REST_URL &&
-    !!process.env.UPSTASH_REDIS_REST_TOKEN
+    !!cacheUrl() &&
+    !!cacheToken()
   );
 }
 
@@ -120,3 +132,32 @@ export async function cacheSet(key, { status, body }, ttlSec) {
     warn('set', e);
   }
 }
+
+// ── Single-flight ────────────────────────────────────────────────────────────────────
+//
+// La caché evita el segundo viaje al proveedor, pero no evita el primero N VECES A LA VEZ:
+// si veinte peticiones piden AAPL con la entrada fría, las veinte ven un fallo de caché y
+// las veinte salen a FMP. Es el patrón de estampida, y es peor de lo que parece aquí,
+// porque las respuestas llegan a la vez y las veinte escriben la misma clave.
+//
+// `dedupe` hace que solo la primera trabaje: las demás esperan su resultado. El mapa vive
+// EN EL PROCESO, así que cubre lo que comparte isolate — que en el runtime edge es bastante,
+// y sobre todo cubre el caso de un lote y sus vecinos inmediatos. Deduplicar entre isolates
+// necesitaría un cerrojo en Redis: más viajes de red en el camino rápido para un caso que
+// hoy no se da (la app aún no tiene ese tráfico). Cuando lo tenga, este es el sitio.
+//
+// Nunca cachea el fallo: si la primera lanza, las que esperaban reciben el mismo error y la
+// siguiente petición vuelve a intentarlo de cero.
+const _inflight = new Map();
+
+export function dedupe(key, producer) {
+  if (!key) return producer();           // sin clave no hay identidad que compartir
+  const running = _inflight.get(key);
+  if (running) return running;
+  const p = (async () => { try { return await producer(); } finally { _inflight.delete(key); } })();
+  _inflight.set(key, p);
+  return p;
+}
+
+/** Solo para pruebas: cuántas producciones hay en vuelo. */
+export function _inflightSize() { return _inflight.size; }

@@ -57,6 +57,10 @@ const ROUTES = [
   // POST-only routes: a GET returns 405 (exists) — proves the path is mounted.
   ["GET", `/api/anthropic/messages`, 401, 405],
   ["GET", `/api/llm`, 401, 405],
+  // El endpoint de lotes: sin token responde 401 (auth-first) y, si el proxy aún no lo
+  // tiene desplegado, 404 — que es exactamente lo que el cliente detecta para caer a
+  // peticiones sueltas. Un 405 aquí significaría que existe pero no acepta POST.
+  ["POST", `/api/batch`, 401],
 ];
 
 const timeout = (ms) => new Promise((_, r) => setTimeout(() => r(new Error("timeout")), ms));

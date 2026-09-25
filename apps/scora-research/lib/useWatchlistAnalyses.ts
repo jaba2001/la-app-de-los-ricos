@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "./supabase";
 import { useAuth } from "./auth";
 import type { StockAnalysis, WatchlistItem } from "./types";
+import { latestAnalyses } from "./latestAnalyses";
 
 interface WatchlistAnalyses {
   watchlist: WatchlistItem[];
@@ -40,14 +41,7 @@ export function useWatchlistAnalyses(extraTickers: string[] = []): WatchlistAnal
     const tickers = Array.from(new Set([...list.map(w => w.ticker), ...extraTickers]));
     if (tickers.length === 0) { setAnalyses({}); setLoading(false); return; }
 
-    const { data: rows } = await supabase
-      .from("sl_analyses")
-      .select("*")
-      .in("ticker", tickers)
-      .order("analysis_date", { ascending: false });
-    const map: Record<string, StockAnalysis> = {};
-    if (rows) (rows as StockAnalysis[]).forEach(a => { if (!map[a.ticker]) map[a.ticker] = a; });
-    setAnalyses(map);
+    setAnalyses(await latestAnalyses(tickers));
     setLoading(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, extraKey]);

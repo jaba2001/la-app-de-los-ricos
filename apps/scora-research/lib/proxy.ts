@@ -2,6 +2,7 @@ import { supabase } from "./supabase";
 import { checkGrounding, checkDirection } from "./grounding";
 import { track } from "./analytics";
 import { setQuota } from "./quotaState";
+import { createBatcher } from "./batchQueue";
 
 const BASE = process.env.NEXT_PUBLIC_PROXY_URL ?? "https://ic-proxy-psi.vercel.app";
 
@@ -35,7 +36,7 @@ export class QuotaError extends Error {
   }
 }
 
-export async function authedFetch<T = unknown>(
+async function singleFetch<T = unknown>(
   path: string,
   options?: RequestInit,
   timeoutMs = 30_000
@@ -81,6 +82,72 @@ export async function authedFetch<T = unknown>(
     throw new Error(`[proxy ${res.status}] ${path}: ${text}`);
   }
   return res.json() as Promise<T>;
+}
+
+// ── Micro-agrupación de peticiones ───────────────────────────────────────────────────
+//
+// EL PROBLEMA QUE RESUELVE: abrir un ticker hace 33 llamadas a `authedFetch`, todas en el
+// mismo tick (un `Promise.allSettled` con 30 entradas). Cada una era una petición HTTP con
+// su propia autenticación y su propio rate-limit en el proxy: ~99 viajes de red internos
+// para una sola acción del usuario. Y como el cubo de FMP es de 40/min y un ticker gasta
+// 20, el techo real eran DOS análisis por minuto.
+//
+// CÓMO: las llamadas GET a rutas de datos no salen al instante; se encolan y se mandan
+// juntas a /api/batch en el siguiente turno del bucle de eventos. Todo lo que se pida en el
+// mismo tick viaja en una petición. El servidor cobra el rate-limit por el número real de
+// sub-llamadas, así que esto ahorra viajes, no cuota.
+//
+// POR QUÉ NO HAY QUE TOCAR NINGÚN LLAMANTE: la firma y el comportamiento de `authedFetch`
+// no cambian —mismo valor devuelto, mismos errores, mismo `Promise.allSettled` alrededor—.
+// La agrupación es un detalle de transporte.
+//
+// SI EL LOTE FALLA, se reintenta cada petición por su vía individual. Eso es lo que permite
+// desplegar este cliente ANTES que el proxy: contra un proxy sin /api/batch, el primer lote
+// da 404, cae al camino de siempre y el usuario no nota nada.
+
+/** Rutas que /api/batch sabe despachar. Debe coincidir con `route()` del endpoint. */
+const BATCHABLE = /^\/api\/(fmp|finnhub|congress|edgar|simfin|finviz|short-interest)(\/|\?|$)/;
+
+interface BatchEnvelope { results: { id: string; status: number; body: string }[] }
+
+const batcher = createBatcher(
+  {
+    send: (requests) =>
+      singleFetch<BatchEnvelope>("/api/batch", { method: "POST", body: JSON.stringify({ requests }) }, 60_000),
+    single: (path) => singleFetch(path),
+  },
+  {
+    maxBatch: 40, // el servidor rechaza más de 40 (MAX_SUB en app/api/batch/route.js)
+    onFallback: (e) => {
+      if (process.env.NODE_ENV !== "production") console.warn("[batch] degradado a peticiones sueltas:", e);
+    },
+  }
+);
+
+/**
+ * Petición autenticada al proxy.
+ *
+ * Los GET a rutas de datos se agrupan con los del mismo tick en una sola llamada a
+ * /api/batch (ver arriba). Todo lo demás —POST, cabeceras propias, `signal` propio,
+ * rutas de IA— sale por su cuenta, sin cambios.
+ */
+export function authedFetch<T = unknown>(
+  path: string,
+  options?: RequestInit,
+  timeoutMs = 30_000
+): Promise<T> {
+  const method = (options?.method ?? "GET").toUpperCase();
+  const agrupable =
+    // Interruptor de emergencia sin desplegar código.
+    process.env.NEXT_PUBLIC_BATCH_DISABLED !== "1" &&
+    method === "GET" &&
+    !options?.body &&
+    !options?.signal &&      // un abort propio no se puede honrar dentro de un lote
+    !options?.headers &&     // cabeceras a medida ⇒ la petición es especial, va sola
+    BATCHABLE.test(path);
+
+  if (!agrupable) return singleFetch<T>(path, options, timeoutMs);
+  return batcher.enqueue<T>(path);
 }
 
 /**

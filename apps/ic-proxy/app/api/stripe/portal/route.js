@@ -24,7 +24,7 @@ export async function POST(request) {
 
   if (!stripeEnabled()) return json({ error: 'Payments are not enabled yet.' }, 503);
 
-  const { user, error: authErr } = await requireUser(request);
+  const { user, error: authErr } = await requireUser(request, { strict: true });
   if (authErr) return authErr;
 
   const rl = await checkRateLimit('stripe-portal', user.id, 20, 3600, request);

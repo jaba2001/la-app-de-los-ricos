@@ -76,6 +76,11 @@ function degrade(request, name, reason, forceClosed = false) {
  */
 export async function checkRateLimit(name, userId, max = 10, windowSec = 60, request = null, opts = {}) {
   const forceClosed = opts.failClosed === true;
+  // `cost` consume varias unidades de golpe. Lo usa /api/batch: un lote con 20 llamadas a
+  // FMP tiene que gastar 20 del cubo de FMP, no 1. Sin esto, agrupar peticiones sería una
+  // forma trivial de saltarse el límite — el lote sería más barato que las 20 sueltas que
+  // sustituye, que es justo lo contrario de lo que debe pasar.
+  const cost = Number.isInteger(opts.cost) && opts.cost > 0 ? opts.cost : 1;
   // Fail-open by default: rate limiting is a cost guard, not the security boundary
   // (requireUser already gates every authenticated route). Missing Upstash env or a Redis
   // outage must degrade to "no limit + warning", never to an opaque 500 on every request.
@@ -85,12 +90,12 @@ export async function checkRateLimit(name, userId, max = 10, windowSec = 60, req
   let res;
   try {
     const lim = limiter(name, max, windowSec);
-    res = await lim.limit(userId);
+    res = await lim.limit(userId, { rate: cost });
   } catch (e) {
     return degrade(request, name, e?.message || String(e), forceClosed);
   }
   if (!res.success) {
-    return new Response(JSON.stringify({error:'Too many requests', limit:max, window:`${windowSec}s`}), {
+    return new Response(JSON.stringify({error:'Too many requests', limit:max, window:`${windowSec}s`, ...(cost > 1 ? { cost } : {})}), {
       status: 429,
       headers: corsHeaders(request, {
         'Content-Type': 'application/json',

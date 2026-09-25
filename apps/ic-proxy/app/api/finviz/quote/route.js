@@ -99,13 +99,7 @@ function parseFinvizHtml(html) {
   return result;
 }
 
-export async function GET(request) {
-  const { user, error: authErr } = await requireUser(request);
-  if (authErr) return authErr;
-  // Scrapes finviz.com HTML: unbounded calls risk getting the egress IP blocked, so this
-  // is throttled tighter than the JSON APIs. 6h cache means the UI barely notices.
-  const rl = await checkRateLimit('finviz', user.id, 15, 60, request);
-  if (rl) return rl;
+export async function serve(request) {
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
@@ -200,6 +194,22 @@ export async function GET(request) {
       }),
     });
   }
+}
+
+
+// `serve` es todo lo que pasa DESPUÉS de identificar al usuario: validar, mirar la caché y
+// llamar al proveedor. Está separado de `GET` para que /api/batch pueda reutilizarlo sin
+// repetir la autenticación por sub-petición — y, sobre todo, para que NO PUEDA saltarse
+// nada: el lote entra por esta misma puerta, con las mismas listas blancas y la misma
+// caché. Una segunda implementación de la validación es justo lo que no queremos.
+export async function GET(request) {
+  const { user, error: authErr } = await requireUser(request);
+  if (authErr) return authErr;
+  // Scrapes finviz.com HTML: unbounded calls risk getting the egress IP blocked, so this
+  // is throttled tighter than the JSON APIs. 6h cache means the UI barely notices.
+  const rl = await checkRateLimit('finviz', user.id, 15, 60, request);
+  if (rl) return rl;
+  return serve(request);
 }
 
 export async function OPTIONS(request) {

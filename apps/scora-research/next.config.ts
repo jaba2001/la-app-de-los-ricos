@@ -77,7 +77,23 @@ export default withSentryConfig(withPwaConfig, {
   silent: true,
   // Source maps can only be uploaded with an auth token — skip cleanly without one.
   sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
-  // Strips Sentry's debug logging from the bundle (replaces the deprecated disableLogger).
-  webpack: { treeshake: { removeDebugLogging: true } },
+  // Poda del SDK en el bundle. `removeDebugLogging` reemplaza al antiguo disableLogger.
+  //
+  // `removeTracing` quita el codigo de performance monitoring, y es el unico cambio de esta
+  // configuracion que se NOTA en el arranque: la base compartida baja de 188 kB a 139 kB y
+  // /stock/[ticker] de 348 a 299 (medido con `next build`, no estimado). Todas las paginas
+  // pagaban esos 49 kB porque Sentry va en el chunk compartido.
+  //
+  // QUE SE PIERDE: las trazas de rendimiento de Sentry. NO se pierde el reporte de errores,
+  // que es para lo que esta puesto. El rendimiento ya lo miden Vercel Speed Insights y
+  // PostHog, ambos ya instalados, y el muestreo estaba al 10% justamente porque la cuota
+  // gratuita de Sentry no aguanta mas (ver instrumentation-client.ts).
+  //
+  // PARA REVERTIRLO: quitar `removeTracing` de aqui. Nada mas depende de ello.
+  //
+  // Se probaron tambien excludeReplay{ShadowDom,Iframe,Worker}: CERO efecto medido, porque
+  // la integracion de Replay nunca se anadio y ese codigo no llega al bundle. No se dejan
+  // puestas para no sugerir que hacen algo.
+  webpack: { treeshake: { removeDebugLogging: true, removeTracing: true } },
   telemetry: false,
 });

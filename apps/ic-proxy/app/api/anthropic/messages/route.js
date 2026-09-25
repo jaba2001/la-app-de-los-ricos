@@ -15,7 +15,7 @@ const ALLOWED_MODELS = new Set([
 const MAX_BODY_BYTES = 50 * 1024; // 50 KB
 
 export async function POST(request) {
-  const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
+  const { user, error: authErr } = await requireUser(request, { strict: true }); if (authErr) return authErr;
   const rl = await checkRateLimit('anthropic', user.id, 5, 60, request); if (rl) return rl;
   // Segunda dimensión, por IP. Esta es la única ruta que cuesta dinero de verdad
   // (Anthropic), y el límite por usuario no acota el gasto: registrarse es gratis, así
