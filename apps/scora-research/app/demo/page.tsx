@@ -7,7 +7,7 @@
 // degrades to the static validated numbers + CTA instead of breaking.
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { regimeConfirmation } from "@/lib/regimeLoop";
 import { buildAllocation, computeRiskOn, ALLOC_ASSETS, ASSET_META } from "@/lib/allocation";
 import { secularRegime } from "@/lib/secular";
@@ -25,7 +25,7 @@ export default function Demo() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    supabase.from("macro_state").select("*").eq("id", 1).single()
+    datos.from("macro_state").select("*").eq("id", 1).single()
       .then(({ data }) => { setMacro((data as MacroState) ?? null); setLoaded(true); });
   }, []);
 

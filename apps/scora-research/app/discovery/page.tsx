@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import type { MacroState } from "@/lib/types";
 import { stockPickingRegime } from "@/lib/microScore";
 import { Sk } from "@/components/ui/Skeleton";
@@ -33,8 +33,8 @@ export default function DiscoveryPage() {
     setGroup("All");
     (async () => {
       const [{ data: d }, { data: m }] = await Promise.all([
-        supabase.from("sl_discovery").select("*").eq("feed", feed).order("rank", { ascending: true }),
-        supabase.from("macro_state").select("*").eq("id", 1).single(),
+        datos.from("sl_discovery").select("*").eq("feed", feed).order("rank", { ascending: true }),
+        datos.from("macro_state").select("*").eq("id", 1).single(),
       ]);
       if (!alive) return;
       setRows((d as Row[]) ?? []);

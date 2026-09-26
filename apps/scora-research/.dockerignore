@@ -4,7 +4,12 @@ node_modules
 .env
 .env.local
 .vercel
+# research/.cache SI se excluye: son descargas temporales de FRED y la SEC, se regeneran.
 research/.cache
-research/out
+# research/out NO se excluye, aunque lo parezca por el nombre. Sus 76 JSON son los
+# resultados publicados de los backtests y la app los IMPORTA en tiempo de compilacion
+# (`@/research/out/backtest_summary.json` y tres mas). Excluirlos hacia que el build
+# fallara solo dentro del contenedor, con "Module not found" — en local compilaba bien
+# porque alli los ficheros estan.
 scripts/*.test.mjs
 *.md

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
@@ -115,14 +115,14 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
   const [sectorPeers, setSectorPeers] = useState<{ ticker: string; score: number; date: string }[]>([]);
 
   useEffect(() => {
-    supabase.from("sl_analyses")
+    datos.from("sl_analyses")
       .select("analysis_date, score_total, macro_tilt")
       .eq("ticker", ticker.toUpperCase())
       .order("analysis_date", { ascending: true })
       .limit(30)
       .then(({ data: rows }) => {
-        if (rows) setScoreHistory(rows.map(r => ({
-          date: r.analysis_date as string,
+        if (rows) setScoreHistory((rows as { analysis_date: string; score_total: unknown; macro_tilt?: unknown }[]).map(r => ({
+          date: r.analysis_date,
           score: Number(r.score_total) + Number(r.macro_tilt ?? 0),
         })));
       });
@@ -132,7 +132,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
     const sector = data?.profile?.sector as string | undefined;
     if (!sector) return;
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
-    supabase.from("sl_analyses")
+    datos.from("sl_analyses")
       .select("ticker, analysis_date, score_total, macro_tilt")
       .eq("sector", sector)
       .gte("analysis_date", thirtyDaysAgo)
@@ -142,7 +142,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
         if (!rows) return;
         const seen = new Set<string>();
         const deduped: { ticker: string; score: number; date: string }[] = [];
-        for (const row of rows) {
+        for (const row of rows as { ticker: string; score_total: unknown; macro_tilt?: unknown; analysis_date: string }[]) {
           if (!seen.has(row.ticker as string)) {
             seen.add(row.ticker as string);
             deduped.push({

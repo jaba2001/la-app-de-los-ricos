@@ -275,6 +275,26 @@ jobs:
       - name: Frescura de los artefactos publicados
         run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
 
+      # ── AISLAMIENTO ENTRE USUARIOS ────────────────────────────────────────────────────
+      # La garantia de que un usuario no ve los datos de otro dejo de estar en la base de
+      # datos (38 politicas RLS de Supabase) y paso a lib/server/data/query.ts. Si esa
+      # mudanza se rompe NADA FALLA: la app funciona y cada usuario ve el diario de los
+      # demas. Esta prueba es lo unico que lo caza, asi que va lo primero.
+      - name: Aislamiento entre usuarios (construccion del SQL)
+        run: node --experimental-strip-types --no-warnings scripts/aislamiento.test.mjs
+      # La de extremo a extremo necesita un Postgres; sin el se salta y lo dice. Levantarlo
+      # aqui con services: postgres es el siguiente paso cuando el esquema se estabilice.
+      - name: Aislamiento contra Postgres real (se salta sin base)
+        run: node --experimental-strip-types --no-warnings scripts/aislamiento-e2e.test.mjs
+
+      - name: El cliente de datos (reemplazo de supabase.from)
+        run: node --experimental-strip-types --no-warnings scripts/datacliente.test.mjs
+
+      # El traductor de PostgREST a SQL: por el pasan las 34 llamadas de los crons, que
+      # deciden a quien se le manda una alerta. Se salta sin Postgres.
+      - name: Traductor PostgREST (se salta sin base)
+        run: node --experimental-strip-types --no-warnings scripts/postgrest.test.mjs
+
       # ── EL BACKEND ────────────────────────────────────────────────────────────────────
       # Estas 15 vivian en el repo ic-proxy con su propio `npm test`, y al fusionarlo todo en
       # una sola app se habrian quedado sin correr en ningun sitio. Lo cazo el guardian de

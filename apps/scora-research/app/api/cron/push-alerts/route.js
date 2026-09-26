@@ -7,6 +7,7 @@
 import webpush from "web-push";
 import { assertCron } from '../../../../lib/server/cron.js';
 import { macroAlertFor } from '../../../../lib/server/macroAlerts.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,8 +29,8 @@ export async function GET(request) {
 
   // current macro state + last sent key + last observed regime
   const [msRes, stRes] = await Promise.all([
-    fetch(`${SB}/rest/v1/macro_state?id=eq.1&select=risk_on,breadth_200dma,regime_confirmation,regime_id`, { headers: sbHeaders }),
-    fetch(`${SB}/rest/v1/push_alert_state?id=eq.1&select=last_confirmation,last_regime`, { headers: sbHeaders }),
+    sbFetch(`macro_state?id=eq.1&select=risk_on,breadth_200dma,regime_confirmation,regime_id`, { headers: sbHeaders }),
+    sbFetch(`push_alert_state?id=eq.1&select=last_confirmation,last_regime`, { headers: sbHeaders }),
   ]);
   const macro = (await msRes.json())?.[0];
   const state = (await stRes.json())?.[0] ?? {};
@@ -41,7 +42,7 @@ export async function GET(request) {
   // Always record the current key so a future re-entry re-triggers; only SEND on a new actionable key.
   // `last_regime` se guarda SIEMPRE, dispare o no: es la referencia con la que se detecta
   // la transición siguiente, y en la primera pasada es lo único que se hace (siembra).
-  await fetch(`${SB}/rest/v1/push_alert_state?id=eq.1`, {
+  await sbFetch(`push_alert_state?id=eq.1`, {
     method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
     body: JSON.stringify({ last_confirmation: alert.key, last_regime: alert.regime ?? lastRegime, last_sent: new Date().toISOString() }),
   });
@@ -49,7 +50,7 @@ export async function GET(request) {
   if (alert.key === "ok" || alert.key === last) return json({ ok: true, sent: 0, state: alert.key, regime: alert.regime, seeded: lastRegime == null, note: alert.key === last ? "unchanged" : "not actionable" }, 200);
 
   // fetch all subscriptions and push
-  const subs = await (await fetch(`${SB}/rest/v1/push_subscriptions?select=endpoint,p256dh,auth`, { headers: sbHeaders })).json();
+  const subs = await (await sbFetch(`push_subscriptions?select=endpoint,p256dh,auth`, { headers: sbHeaders })).json();
   const payload = JSON.stringify({ title: alert.title, body: alert.body, url: "/macro", tag: "scora-regime" });
   let sent = 0; const dead = [];
   await Promise.all((subs || []).map(async (s) => {
@@ -57,7 +58,7 @@ export async function GET(request) {
     catch (e) { if (e?.statusCode === 404 || e?.statusCode === 410) dead.push(s.endpoint); }
   }));
   // prune expired subscriptions
-  for (const ep of dead) await fetch(`${SB}/rest/v1/push_subscriptions?endpoint=eq.${encodeURIComponent(ep)}`, { method: "DELETE", headers: sbHeaders });
+  for (const ep of dead) await sbFetch(`push_subscriptions?endpoint=eq.${encodeURIComponent(ep)}`, { method: "DELETE", headers: sbHeaders });
 
   return json({ ok: true, state: alert.key, sent, pruned: dead.length, subs: (subs || []).length }, 200);
 }

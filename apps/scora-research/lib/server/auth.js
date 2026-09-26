@@ -1,13 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { jwtVerify, createRemoteJWKSet, decodeProtectedHeader } from 'jose';
 import { corsHeaders } from './cors.js';
-
-let _client = null;
-function client() {
-  if (_client) return _client;
-  _client = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-  return _client;
-}
 
 function deny(request, message, status = 401) {
   return new Response(JSON.stringify({ error: message }), {
@@ -35,29 +27,38 @@ function deny(request, message, status = 401) {
 // de red de siempre. Desplegar esto sin tocar variables de entorno no cambia el
 // comportamiento; la mejora se activa al añadir SUPABASE_JWT_SECRET (o sola, vía JWKS).
 
-const AUD = 'authenticated';
+// Identity Platform firma los tokens con RS256 y claves rotativas de Google, publicadas en
+// un JWKS. No hay secreto compartido que guardar: se comprueba la firma contra la clave
+// publica que corresponda al `kid` del token.
+//
+//   emisor    : https://securetoken.google.com/<proyecto>
+//   audiencia : <proyecto>
+//
+// Con Supabase era HS256 con un secreto del proyecto. El cambio es a mejor: sin secreto que
+// pueda filtrarse, y la verificacion sigue siendo local — que era el objetivo de todo esto.
+const PROYECTO = process.env.GCP_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || '';
+const EMISOR = PROYECTO ? `https://securetoken.google.com/${PROYECTO}` : undefined;
 
 let _jwks = null;
+
+/**
+ * Solo para pruebas: sustituye el juego de claves de Google por uno local, para poder
+ * firmar un token valido y comprobar el camino feliz. Sin esta costura la prueba solo
+ * podria comprobar rechazos — y el rechazo es la mitad del contrato, no todo.
+ */
+export function _usarJwks(j) { _jwks = j; }
+
 function jwks() {
   if (_jwks) return _jwks;
-  if (!process.env.SUPABASE_URL) return null;
-  // jose cachea el juego de claves por módulo (una descarga por isolate, no por petición)
-  // y lo refresca solo cuando aparece un `kid` que no conoce.
-  _jwks = createRemoteJWKSet(new URL(`${process.env.SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
+  // jose cachea el juego de claves por modulo: una descarga por isolate, no por peticion,
+  // y solo lo refresca cuando aparece un `kid` desconocido (es decir, cuando Google rota).
+  _jwks = createRemoteJWKSet(new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'));
   return _jwks;
 }
 
-let _secret = null;
-function hsSecret() {
-  if (_secret !== null) return _secret;
-  const raw = process.env.SUPABASE_JWT_SECRET;
-  _secret = raw ? new TextEncoder().encode(raw) : false;
-  return _secret;
-}
-
-/** ¿Se puede verificar sin red? Falso ⇒ los llamantes usan `getUser`. */
+/** ¿Hay configuracion para verificar? Sin proyecto no se puede comprobar la audiencia. */
 export function localVerifyAvailable() {
-  return Boolean(hsSecret() || process.env.SUPABASE_URL);
+  return Boolean(PROYECTO);
 }
 
 /**
@@ -70,47 +71,28 @@ export function localVerifyAvailable() {
  */
 export async function verifyTokenLocally(token) {
   if (!token) return null;
+  if (!PROYECTO) return undefined;   // sin configurar: que lo decida el llamante
 
-  // El ALGORITMO DE LA CABECERA decide con qué clave hay que comprobar la firma, y se lee
-  // antes de verificar nada. No es confiar en el token: es enrutar. Un HS256 se comprueba
-  // SOLO con el secreto compartido y un ES/RS SOLO con el JWKS — nunca se prueba el otro
-  // camino si el primero falla. Intentarlo era el bug que encontró la prueba: un token con
-  // firma falsa se iba a buscar claves por la red y, si esa descarga fallaba, volvía como
-  // «no he podido comprobarlo» en vez de como inválido.
   let alg;
+  try { ({ alg } = decodeProtectedHeader(token)); } catch { return null; }
+  // Identity Platform firma en RS256. Un token que diga otra cosa no es suyo.
+  if (alg !== 'RS256') return null;
+
   try {
-    ({ alg } = decodeProtectedHeader(token));
-  } catch {
-    return null; // ni siquiera es un JWT
-  }
-  if (!alg || alg === 'none') return null;
-
-  const issuer = process.env.SUPABASE_URL ? `${process.env.SUPABASE_URL}/auth/v1` : undefined;
-  const opts = { audience: AUD, ...(issuer ? { issuer } : {}) };
-
-  if (alg.startsWith('HS')) {
-    const secret = hsSecret();
-    if (!secret) return undefined; // no configurado: que lo resuelva la red
-    try {
-      const { payload } = await jwtVerify(token, secret, { ...opts, algorithms: [alg] });
-      return payloadToUser(payload);
-    } catch {
-      return null;
-    }
-  }
-
-  const keys = jwks();
-  if (!keys) return undefined;
-  try {
-    const { payload } = await jwtVerify(token, keys, { ...opts, algorithms: [alg] });
+    const { payload } = await jwtVerify(token, jwks(), {
+      audience: PROYECTO,
+      issuer: EMISOR,
+      algorithms: ['RS256'],
+    });
+    // `auth_time` existe en los tokens de Identity Platform y no en otros de Google: sirve
+    // para no aceptar, por ejemplo, un token de servicio del mismo proyecto.
+    if (payload.auth_time == null) return null;
     return payloadToUser(payload);
   } catch (e) {
-    // Un fallo al DESCARGAR el juego de claves no es un token inválido: es una avería de
-    // red. Distinguirlo importa, porque denegar aquí dejaría la app entera fuera durante
-    // un incidente de Supabase; devolver `undefined` hace que el llamante lo reintente por
-    // el camino de red, que es el comportamiento de antes.
+    // Un fallo al DESCARGAR las claves no es un token invalido: es una averia de red. Se
+    // distingue porque denegar aqui dejaria a todo el mundo fuera durante un incidente.
     const code = String(e?.code || '');
-    if (code === 'ERR_JWKS_NO_MATCHING_KEY' || code === 'ERR_JWKS_TIMEOUT' || code === 'ERR_JWKS_INVALID' || /fetch|network/i.test(String(e?.message || ''))) {
+    if (code === 'ERR_JWKS_TIMEOUT' || code === 'ERR_JWKS_INVALID' || /fetch|network/i.test(String(e?.message || ''))) {
       return undefined;
     }
     return null;
@@ -121,6 +103,7 @@ export async function verifyTokenLocally(token) {
 function payloadToUser(payload) {
   if (!payload?.sub) return null;
   return {
+    // `sub` es el uid de Identity Platform (28 caracteres), no un uuid como en Supabase.
     id: payload.sub,
     email: payload.email ?? null,
     role: payload.role ?? null,
@@ -148,13 +131,9 @@ export async function optionalUser(request) {
   const local = await verifyTokenLocally(token);
   if (local !== undefined) return local; // válido o inválido, ya está decidido
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) return null;
-  try {
-    const { data, error } = await client().auth.getUser(token);
-    return error ? null : (data?.user ?? null);
-  } catch {
-    return null;
-  }
+  // Sin verificacion local no hay camino alternativo: antes se preguntaba a Supabase, y
+  // Google no ofrece equivalente (ni hace falta: la firma se comprueba sin red).
+  return null;
 }
 
 /**
@@ -175,15 +154,9 @@ export async function requireUser(request, opts = {}) {
     // `undefined` ⇒ no se pudo comprobar sin red; sigue al camino de siempre.
   }
 
-  // Fail closed: without Supabase credentials we cannot validate anything, so every
-  // request must be rejected rather than fall through to an unauthenticated handler.
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-    console.error('requireUser: SUPABASE_URL/SUPABASE_ANON_KEY missing — denying all requests');
-    return { user: null, error: deny(request, 'Server misconfigured: auth unavailable', 503) };
-  }
-  const { data, error } = await client().auth.getUser(token);
-  if (error || !data?.user) {
-    return { user: null, error: deny(request, 'Invalid token') };
-  }
-  return { user: data.user, error: null };
+  // Fail closed: si no se puede comprobar, se deniega. Antes habia un camino de red a
+  // Supabase como respaldo; con Identity Platform la firma se verifica sin red, asi que no
+  // poder verificar significa que falta configuracion y denegar es lo correcto.
+  console.error('requireUser: GCP_PROJECT_ID sin configurar — denegando todo');
+  return { user: null, error: deny(request, 'Server misconfigured: auth unavailable', 503) };
 }

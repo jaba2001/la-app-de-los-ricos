@@ -33,6 +33,8 @@ locals {
     "ELEVENLABS_KEY",
     # Crons
     "CRON_SECRET",
+    # Cloud SQL
+    "PGPASSWORD",
   ]
 }
 

@@ -8,6 +8,7 @@ import webpush from "web-push";
 import { crossedUpSma150, baseBreakoutConfirmed, trendStage } from "../../../../lib/server/technicals.js";
 import { assertCron, pgv } from '../../../../lib/server/cron.js';
 import { evaluateAnalysisAlert, ANALYSIS_KINDS } from '../../../../lib/server/alertKinds.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,7 +25,7 @@ function json(body, status = 200) {
 async function fetchQuote(ticker) {
   try {
     const u = `https://financialmodelingprep.com/stable/quote?symbol=${encodeURIComponent(ticker)}&apikey=${process.env.FMP_KEY}`;
-    const r = await fetch(u, { headers: { Accept: "application/json" } });
+    const r = await sbFetch(u, { headers: { Accept: "application/json" } });
     if (!r.ok) return null;
     const arr = await r.json();
     const px = Array.isArray(arr) && arr[0] ? Number(arr[0].price) : null;
@@ -36,7 +37,7 @@ async function fetchQuote(ticker) {
 async function fetchHistory(ticker) {
   try {
     const u = `https://financialmodelingprep.com/stable/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&apikey=${process.env.FMP_KEY}`;
-    const r = await fetch(u, { headers: { Accept: "application/json" } });
+    const r = await sbFetch(u, { headers: { Accept: "application/json" } });
     if (!r.ok) return [];
     const arr = await r.json();
     if (!Array.isArray(arr)) return [];
@@ -65,7 +66,7 @@ export async function GET(request) {
   if (pushReady) webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:alerts@scora.app", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
   // 1) active price alerts
-  const alertsRes = await fetch(`${SB}/rest/v1/sl_alerts?active=eq.true&kind=in.(price_above,price_below)&select=id,user_id,ticker,kind,threshold,last_triggered_at,one_shot`, { headers: sbHeaders });
+  const alertsRes = await sbFetch(`sl_alerts?active=eq.true&kind=in.(price_above,price_below)&select=id,user_id,ticker,kind,threshold,last_triggered_at,one_shot`, { headers: sbHeaders });
   if (!alertsRes.ok) return json({ error: "sl_alerts read failed", status: alertsRes.status }, 500);
   const alertsRaw = await alertsRes.json();
   // NOTE (2026-08-18): esto hacía `return` cuando no había alertas de PRECIO, lo que se
@@ -84,7 +85,7 @@ export async function GET(request) {
   const subsCache = {};
   async function subsFor(userId) {
     if (subsCache[userId]) return subsCache[userId];
-    const r = await fetch(`${SB}/rest/v1/push_subscriptions?user_id=eq.${pgv(userId)}&select=endpoint,p256dh,auth`, { headers: sbHeaders });
+    const r = await sbFetch(`push_subscriptions?user_id=eq.${pgv(userId)}&select=endpoint,p256dh,auth`, { headers: sbHeaders });
     const s = r.ok ? await r.json() : [];
     return (subsCache[userId] = Array.isArray(s) ? s : []);
   }
@@ -98,7 +99,7 @@ export async function GET(request) {
 
     // mark fired (so the next run dedupes even if push isn't configured yet). one-shot alerts
     // auto-pause (active=false) so they never re-fire; recurring ones re-arm after 24h.
-    await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+    await sbFetch(`sl_alerts?id=eq.${pgv(a.id)}`, {
       method: "PATCH",
       headers: { ...sbHeaders, Prefer: "return=minimal" },
       body: JSON.stringify({ last_triggered_at: new Date().toISOString(), last_value: price, ...(a.one_shot ? { active: false } : {}) }),
@@ -123,7 +124,7 @@ export async function GET(request) {
   // signal, and fire. stage_change compares the current stage to the stored last_value; the first
   // observation is recorded without firing.
   let techFired = 0, techPriced = 0;
-  const techRes = await fetch(`${SB}/rest/v1/sl_alerts?active=eq.true&kind=in.(${TECH_KINDS.join(",")})&select=id,user_id,ticker,kind,last_triggered_at,last_value,one_shot`, { headers: sbHeaders });
+  const techRes = await sbFetch(`sl_alerts?active=eq.true&kind=in.(${TECH_KINDS.join(",")})&select=id,user_id,ticker,kind,last_triggered_at,last_value,one_shot`, { headers: sbHeaders });
   const techAlerts = techRes.ok ? await techRes.json() : [];
   if (Array.isArray(techAlerts) && techAlerts.length > 0) {
     const techFresh = techAlerts.filter(a => !a.last_triggered_at || (now - new Date(a.last_triggered_at).getTime()) > DAY_MS || a.kind === "stage_change");
@@ -146,7 +147,7 @@ export async function GET(request) {
         const prev = a.last_value != null ? Number(a.last_value) : null;
         if (prev == null) {
           // first observation → record silently
-          await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, { method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" }, body: JSON.stringify({ last_value: st }) }).catch(() => {});
+          await sbFetch(`sl_alerts?id=eq.${pgv(a.id)}`, { method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" }, body: JSON.stringify({ last_value: st }) }).catch(() => {});
           continue;
         }
         if (st !== prev) { fire = true; msg = `changed trend stage (${prev} → ${st})`; patch = { last_value: st }; }
@@ -154,7 +155,7 @@ export async function GET(request) {
       if (!fire) continue;
       techFired++;
 
-      await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+      await sbFetch(`sl_alerts?id=eq.${pgv(a.id)}`, {
         method: "PATCH",
         headers: { ...sbHeaders, Prefer: "return=minimal" },
         body: JSON.stringify({ last_triggered_at: new Date().toISOString(), ...patch, ...(a.one_shot ? { active: false } : {}) }),
@@ -180,7 +181,7 @@ export async function GET(request) {
   // guardó) — cero llamadas a FMP. Se dispara en la TRANSICIÓN y solo si el análisis es
   // reciente; ver lib/alertKinds.js y scripts/alertkinds.test.mjs.
   let anFired = 0, anChecked = 0;
-  const anRes = await fetch(`${SB}/rest/v1/sl_alerts?active=eq.true&kind=in.(${ANALYSIS_KINDS.join(",")})&select=id,user_id,ticker,kind,last_triggered_at,last_value,one_shot`, { headers: sbHeaders });
+  const anRes = await sbFetch(`sl_alerts?active=eq.true&kind=in.(${ANALYSIS_KINDS.join(",")})&select=id,user_id,ticker,kind,last_triggered_at,last_value,one_shot`, { headers: sbHeaders });
   const anAlerts = anRes.ok ? await anRes.json() : [];
   if (Array.isArray(anAlerts) && anAlerts.length > 0) {
     const anFresh = anAlerts.filter(a => !a.last_triggered_at || (now - new Date(a.last_triggered_at).getTime()) > DAY_MS);
@@ -192,7 +193,7 @@ export async function GET(request) {
       const key = `${userId}:${ticker}`;
       if (key in anCache) return anCache[key];
       const url = `${SB}/rest/v1/sl_analyses?user_id=eq.${pgv(userId)}&ticker=eq.${pgv(ticker)}&select=rating,reverse_dcf,analysis_date&order=analysis_date.desc&limit=1`;
-      const r = await fetch(url, { headers: sbHeaders });
+      const r = await sbFetch(url, { headers: sbHeaders });
       const rows = r.ok ? await r.json() : [];
       return (anCache[key] = Array.isArray(rows) && rows[0] ? rows[0] : null);
     }
@@ -208,7 +209,7 @@ export async function GET(request) {
         // upside de exactamente 0 no llegaría a sembrarse y la transición se perdería.
         const prevVal = a.last_value == null ? null : Number(a.last_value);
         if (nextValue != null && prevVal !== nextValue) {
-          await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+          await sbFetch(`sl_alerts?id=eq.${pgv(a.id)}`, {
             method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
             body: JSON.stringify({ last_value: nextValue }),
           }).catch(() => {});
@@ -217,7 +218,7 @@ export async function GET(request) {
       }
       anFired++;
 
-      await fetch(`${SB}/rest/v1/sl_alerts?id=eq.${pgv(a.id)}`, {
+      await sbFetch(`sl_alerts?id=eq.${pgv(a.id)}`, {
         method: "PATCH", headers: { ...sbHeaders, Prefer: "return=minimal" },
         body: JSON.stringify({ last_triggered_at: new Date().toISOString(), last_value: nextValue, ...(a.one_shot ? { active: false } : {}) }),
       }).catch(() => {});

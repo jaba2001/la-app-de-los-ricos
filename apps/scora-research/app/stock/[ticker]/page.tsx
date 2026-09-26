@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { authedFetch } from "@/lib/proxy";
 import { calcScores, calcFactorTilts, calcSubScores, getRating, getMacroTilt, findDisqualifiers, SECTOR_ETF, SCORE_VERSION_SECTOR_PCTL, SCORE_VERSION_ABSOLUTE_BANDS, type FactorTilts, type SubScores, type Disqualifier } from "@/lib/scoring";
 import { loadFactorDist, distForScoring, SCORE_USES_SECTOR_PERCENTILES } from "@/lib/factorDist";
@@ -166,17 +166,17 @@ export default function StockTickerPage() {
     setLoading(false);
     setFetchProgress(0);
     setFailedApis(0);
-    supabase.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
+    datos.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
   }, [session, ticker]);
 
   async function toggleWatchlist() {
     if (!session || !ticker) return;
     if (watchlisted && watchlistId != null) {
-      await supabase.from("sl_watchlist").delete().eq("id", watchlistId);
+      await datos.from("sl_watchlist").delete().eq("id", watchlistId);
       setWatchlisted(false); setWatchlistId(null);
     } else {
-      const { data } = await supabase.from("sl_watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
+      const { data } = await datos.from("sl_watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
       if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); }
     }
   }
@@ -210,7 +210,7 @@ export default function StockTickerPage() {
 
       // ── Always-fresh: macro + live quote ─────────────────────────
       const [macroRes, quoteRes] = await Promise.allSettled([
-        track(supabase.from("macro_state").select("*").eq("id", 1).single()),
+        track(datos.from("macro_state").select("*").eq("id", 1).single()),
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
       ]);
 
@@ -236,14 +236,14 @@ export default function StockTickerPage() {
       // sectorial y poder pedirlo dentro del lote (ver más abajo); el sector real sigue
       // saliendo del `profile`, así que adivinar mal no ensucia nada.
       const [snapRes, lastSectorRes] = await Promise.all([
-        supabase
+        datos
           .from("stock_snapshot")
           .select("data")
           .eq("ticker", ticker.toUpperCase())
           .eq("snapshot_date", today)
           .eq("user_id", session.user.id)
           .maybeSingle(),
-        supabase
+        datos
           .from("sl_analyses")
           .select("sector")
           .eq("ticker", ticker.toUpperCase())
@@ -252,9 +252,12 @@ export default function StockTickerPage() {
           .limit(1)
           .maybeSingle(),
       ]);
-      const snap = snapRes.data;
+      // Tipos explicitos: el Promise.all mezcla dos consultas de forma distinta y TS colapsa
+      // la inferencia a `{}`. El cliente de Supabase devolvia `any` y esto no hacia falta.
+      const snap = (snapRes as { data: { data?: unknown } | null }).data;
+      const ultimoSector = (lastSectorRes as { data: { sector?: string } | null }).data;
       // El ETF que CREEMOS que toca. Null la primera vez que se mira un ticker.
-      const etfAdivinado = SECTOR_ETF[(lastSectorRes.data?.sector as string) ?? ""] ?? null;
+      const etfAdivinado = SECTOR_ETF[ultimoSector?.sector ?? ""] ?? null;
 
       if (!live()) return;
       let stockData: StockData;
@@ -545,7 +548,7 @@ export default function StockTickerPage() {
       // payload would poison every re-analyze for the rest of the day.
       const snapshotWorthSaving = stockData.profile != null || stockData.income.length > 0 || stockData.history.length > 0;
       const { quote: _snapQ, rdcf: _snapR, history: _sh, spyHistory: _ss, sectorEtfHistory: _se, ...snapRest } = stockData;
-      if (snapshotWorthSaving) await supabase.from("stock_snapshot").upsert({
+      if (snapshotWorthSaving) await datos.from("stock_snapshot").upsert({
         ticker: ticker.toUpperCase(),
         snapshot_date: today,
         user_id: session.user.id,
@@ -684,7 +687,7 @@ export default function StockTickerPage() {
       setDisqualifiers(disq);
 
       const rating = getRating(calc.total, disq);
-      const { data: saved } = await supabase.from("sl_analyses").upsert({
+      const { data: saved } = await datos.from("sl_analyses").upsert({
         user_id: session.user.id,
         ticker: ticker.toUpperCase(),
         analysis_date: today,
@@ -716,7 +719,7 @@ export default function StockTickerPage() {
       // forward return vs SPY can be measured later. The table has no UPDATE/DELETE
       // policy and we insert do-nothing-on-conflict, so the record can't be curated.
       const icForLog = Math.round(Math.max(0, Math.min(100, calc.total + (macroTiltData?.tilt ?? 0))));
-      await supabase.from("sl_score_log").upsert({
+      await datos.from("sl_score_log").upsert({
         user_id: session.user.id,
         ticker: ticker.toUpperCase(),
         score_date: today,
@@ -738,7 +741,7 @@ export default function StockTickerPage() {
   useEffect(() => {
     if (!session || !ticker || hasAnalyzed || autoChecked) return;
     const today = new Date().toISOString().split("T")[0];
-    supabase.from("stock_snapshot").select("ticker")
+    datos.from("stock_snapshot").select("ticker")
       .eq("ticker", ticker.toUpperCase()).eq("snapshot_date", today).eq("user_id", session.user.id)
       .maybeSingle()
       .then(({ data: snap }) => {

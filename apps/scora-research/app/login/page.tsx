@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { sendSignInLinkToEmail } from "firebase/auth";
+import { auth } from "@/lib/firebaseClient";
 import { useAuth } from "@/lib/auth";
 
 export default function LoginPage() {
@@ -20,11 +21,20 @@ export default function LoginPage() {
     e.preventDefault();
     setSubmitting(true);
     setError("");
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: "https://scora-research.vercel.app/auth/callback" },
-    });
-    if (error) { setError(error.message); setSubmitting(false); return; }
+    try {
+      await sendSignInLinkToEmail(auth(), email, {
+        // Identity Platform exige que el dominio esté en la lista de autorizados; si no,
+        // devuelve auth/unauthorized-continue-uri. Se usa el origen actual para que funcione
+        // igual en local y en Cloud Run sin tocar código.
+        url: `${window.location.origin}/auth/callback`,
+        handleCodeInApp: true,
+      });
+      // El correo hay que recordarlo: el enlace puede abrirse en otro navegador, y allí el
+      // SDK no sabe a quién pertenece. Sin esto, la vuelta pide teclearlo otra vez.
+      window.localStorage.setItem("scora:emailLogin", email);
+    } catch (e) {
+      setError((e as Error).message); setSubmitting(false); return;
+    }
     setSent(true);
     setSubmitting(false);
   }

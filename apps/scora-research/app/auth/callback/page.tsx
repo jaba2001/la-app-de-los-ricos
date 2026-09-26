@@ -1,31 +1,35 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
+import { auth } from "@/lib/firebaseClient";
 
 export default function AuthCallback() {
   const router = useRouter();
   const [status, setStatus] = useState("Verifying your link…");
 
   useEffect(() => {
-    // Supabase JS automatically reads the #access_token hash from the URL
-    // and fires SIGNED_IN via onAuthStateChange.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        setStatus("Signed in — redirecting…");
+    // Con Supabase bastaba escuchar: el SDK leia el token del hash de la URL solo. Identity
+    // Platform pide completar la entrada a mano con el email, porque el enlace por si solo
+    // no dice a quien pertenece — se puede abrir en otro navegador o reenviar.
+    if (!isSignInWithEmailLink(auth(), window.location.href)) {
+      setStatus("Este enlace no es válido o ya se usó.");
+      return;
+    }
+    let email = window.localStorage.getItem("scora:emailLogin");
+    if (!email) {
+      // Caso real: el enlace se abre en otro dispositivo. Preguntarlo es el camino que
+      // recomienda Google; el enlace solo sirve para ESE correo, asi que teclear otro falla.
+      email = window.prompt("Confirma tu correo para completar el acceso") ?? "";
+      if (!email) { setStatus("Hace falta el correo para completar el acceso."); return; }
+    }
+    signInWithEmailLink(auth(), email, window.location.href)
+      .then(() => {
+        window.localStorage.removeItem("scora:emailLogin");
+        setStatus("Dentro — redirigiendo…");
         router.replace("/macro");
-      }
-      if (event === "TOKEN_REFRESHED" && session) {
-        router.replace("/macro");
-      }
-    });
-
-    // Also check if session already exists (e.g. page refresh)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) router.replace("/macro");
-    });
-
-    return () => subscription.unsubscribe();
+      })
+      .catch((e) => setStatus(`No se pudo completar: ${(e as Error).message}`));
   }, [router]);
 
   return (

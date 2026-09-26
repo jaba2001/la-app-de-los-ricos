@@ -292,7 +292,16 @@ export default function Pricing() {
   }, [waitingForWebhook, refresh, isPro]);
 
   const go = useCallback(() => router.push(session ? "/macro" : "/login"), [router, session]);
-  const token = session?.access_token ?? null;
+  // El token ya no es un campo de la sesión sino una función que lo renueva: guardarlo
+  // como valor daría 401 a la hora, cuando caduca. Se resuelve aquí y se vuelve a pedir
+  // cada vez que la sesión cambia (Identity Platform lo renueva solo y dispara el efecto).
+  const [token, setToken] = useState<string | null>(null);
+  useEffect(() => {
+    let vivo = true;
+    if (!session) { setToken(null); return; }
+    session.getToken().then((t) => { if (vivo) setToken(t); });
+    return () => { vivo = false; };
+  }, [session]);
   const priceLabel = formatPrice(cfg?.price ?? null);
 
   // Qué enseña la tarjeta Pro. El orden importa: quien ya paga ve su gestión aunque el

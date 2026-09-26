@@ -16,7 +16,7 @@
 // lib/server/entitlements.js. Aquí decidimos qué se ENSEÑA; allí, qué se PERMITE.
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { datos } from "./dataClient";
 import { useAuth } from "./auth";
 
 export interface Subscription {
@@ -77,7 +77,7 @@ export function useEntitlements(): Entitlements {
     if (!userId) { setSub(null); setLoading(false); return; }
 
     let cancelled = false;
-    supabase
+    datos
       .from("sl_subscriptions")
       .select("status,price_id,current_period_end,cancel_at_period_end")
       .eq("user_id", userId)

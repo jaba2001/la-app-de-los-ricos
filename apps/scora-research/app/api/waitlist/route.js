@@ -17,8 +17,13 @@ import { checkRateLimit, clientIp } from '../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/server/cors.js';
 import { sendEmail } from '../../../lib/server/email.js';
 import { optionalUser } from '../../../lib/server/auth.js';
+import { sbFetch } from "../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 
 // Intentionally permissive but structural — the goal is to reject typos and junk, not to
 // re-implement RFC 5322. Deliverability is proven by the welcome email, not by a regex.
@@ -85,7 +90,7 @@ export async function POST(request) {
     user_id: user?.id ?? null,
   };
 
-  const res = await fetch(`${process.env.SUPABASE_URL}/rest/v1/sl_waitlist`, {
+  const res = await sbFetch(`sl_waitlist`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

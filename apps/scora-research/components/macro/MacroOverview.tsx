@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { MacroState, StockAnalysis } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { getRating, computeICHealthScore } from "@/lib/scoring";
@@ -95,15 +95,16 @@ export default function MacroOverview({ macro, loading }: Props) {
   const [topAtRisk,  setTopAtRisk]  = useState<StockAnalysis[]>([]);
 
   useEffect(() => {
-    supabase.from("macro_state_history")
+    datos.from("macro_state_history")
       .select("snapshot_date, ic_score")
       .order("snapshot_date", { ascending: true })
       .limit(90)
       .then(({ data }) => {
-        if (data) setIcHistory(data.map(r => ({ date: r.snapshot_date as string, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)));
+        if (data) setIcHistory((data as { snapshot_date: string; ic_score: unknown }[])
+          .map(r => ({ date: r.snapshot_date, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)));
       });
     if (session) {
-      supabase.from("sl_analyses")
+      datos.from("sl_analyses")
         .select("ticker, sector, score_total, macro_tilt, rating, analysis_date")
         .eq("user_id", session.user.id)
         .order("analysis_date", { ascending: false })

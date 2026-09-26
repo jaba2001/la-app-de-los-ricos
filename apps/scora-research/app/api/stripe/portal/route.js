@@ -12,8 +12,13 @@ import { requireUser } from '../../../../lib/server/auth.js';
 import { checkRateLimit } from '../../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight, allowOrigin } from '../../../../lib/server/cors.js';
 import { stripeApi, stripeEnabled } from '../../../../lib/server/stripe.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 
 const FALLBACK_APP = 'https://scora-research.vercel.app';
 
@@ -37,9 +42,9 @@ export async function POST(request) {
 
   try {
     // Identidad de facturación derivada del token, nunca de la petición.
-    const q = `${process.env.SUPABASE_URL}/rest/v1/sl_subscriptions` +
+    const q = `sl_subscriptions` +
       `?user_id=eq.${user.id}&select=stripe_customer_id`;
-    const res = await fetch(q, {
+    const res = await sbFetch(q, {
       headers: {
         apikey: process.env.SUPABASE_SERVICE_KEY,
         Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,

@@ -10,7 +10,7 @@
 // template (lib/server/brief.js); there is no model in that path, which is why this can
 // be shown verbatim without passing the grounding gate.
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { datos } from "@/lib/dataClient";
 import { track } from "@/lib/analytics";
 
 interface Briefing {
@@ -35,7 +35,7 @@ export default function MacroBrief() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    supabase
+    datos
       .from("sl_briefings")
       .select("brief_date,cadence,transcript,audio_url,duration_sec,macro_snapshot_date")
       .order("brief_date", { ascending: false })

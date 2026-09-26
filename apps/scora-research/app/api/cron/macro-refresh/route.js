@@ -16,8 +16,13 @@
 // auth/Supabase que los crons `13f-refresh` y `alerts-check`.
 import { buildMacroState } from '../../../../lib/server/macro.js';
 import { assertCron } from '../../../../lib/server/cron.js';
+import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 
-export const runtime = 'edge';
+// RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
+// sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
+// porque se hablaba por HTTP, que edge sí sabe hacer. Es el precio de tener la base dentro
+// de la red privada en vez de detrás de una API pública, y para un cron da igual.
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
@@ -46,8 +51,7 @@ export async function GET(request) {
 
   // Upsert a Supabase con service role (bypassa RLS). Conflict key = id (fila
   // única id=1). merge-duplicates → actualiza esa fila, no inserta otra.
-  const sbResp = await fetch(
-    `${process.env.SUPABASE_URL}/rest/v1/macro_state?on_conflict=id`,
+  const sbResp = await sbFetch(`macro_state?on_conflict=id`,
     {
       method: 'POST',
       headers: {
@@ -68,8 +72,7 @@ export async function GET(request) {
   // accumulate; today it's a thin daily log of just the 5 composites + regime + ic_score + vix.
   if (sbResp.ok) {
     try {
-      await fetch(
-        `${process.env.SUPABASE_URL}/rest/v1/macro_state_history?on_conflict=snapshot_date`,
+      await sbFetch(`macro_state_history?on_conflict=snapshot_date`,
         {
           method: 'POST',
           headers: {
@@ -99,8 +102,8 @@ export async function GET(request) {
       ok: sbResp.ok,
       wrote: sbResp.ok ? row : undefined,
       seriesFetched,
-      supabase_status: sbResp.status,
-      supabase_error: sbBody,
+      db_status: sbResp.status,
+      db_error: sbBody,
       fred_errors: errors.length ? errors : undefined,
       timestamp: new Date().toISOString(),
     }),
