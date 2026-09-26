@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scora — Landing v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<div style="width: 1280px; height: 3320px; box-sizing: border-box; background: #FAFAF7; color: #0E1A2B; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+
+<header style="height: 72px; box-sizing: border-box; padding: 0 80px; display: flex; align-items: center; gap: 40px; border-bottom: 1px solid #E3E6EA; background: #FFFFFF">
+<a href="#" style="display: flex; align-items: center; gap: 10px; color: #0E1A2B">
+<span style="width: 30px; height: 30px; border-radius: 8px; background: #0E1A2B; display: flex; align-items: center; justify-content: center">
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 12L6 7L9 10L13 4" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="13" cy="4" r="1.6" fill="{{accent}}"></circle></svg>
+</span>
+<span style="font-size: 17px; font-weight: 700; letter-spacing: -0.02em">Scora</span>
+</a>
+<nav aria-label="Main" style="display: flex; gap: 28px; font-size: 14px; font-weight: 500">
+<a href="HowItWorks.dc.html" style="color: #3D4A5C">How it works</a>
+<a href="TrackRecordV2.dc.html" style="color: #3D4A5C">Track record</a>
+<a href="EvidenceV2.dc.html" style="color: #3D4A5C">Evidence</a>
+<a href="PricingV2.dc.html" style="color: #3D4A5C">Pricing</a>
+</nav>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 20px">
+<a href="LoginV2.dc.html" style="font-size: 14px; font-weight: 600; color: #0E1A2B">Sign in</a>
+<a href="LoginV2.dc.html" style="font-size: 14px; font-weight: 600; color: #FFFFFF; background: #0E1A2B; padding: 11px 20px; border-radius: 999px">Start free</a>
+</div>
+</header>
+
+<section style="padding: 88px 80px 72px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 64px; align-items: center; background: #FFFFFF">
+<div style="display: flex; flex-direction: column; align-items: flex-start">
+<div style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: {{brand}}; background: #E7F3EE; padding: 6px 12px; border-radius: 999px; margin-bottom: 28px">
+<span style="width: 6px; height: 6px; border-radius: 999px; background: {{brand}}"></span>Every result published — including the ones against us
+</div>
+<h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 64px; line-height: 1.04; letter-spacing: -0.025em; color: #0E1A2B">Investing, with the evidence in plain sight.</h1>
+<p style="margin: 24px 0 0; font-size: 19px; line-height: 1.6; color: #3D4A5C; max-width: 540px">Scora is a regime-driven allocation engine that shows its work: validated out-of-sample, measured net of costs, and paired with an AI layer that can't invent a number.</p>
+<div style="display: flex; gap: 12px; margin-top: 36px">
+<a href="LoginV2.dc.html" style="font-size: 16px; font-weight: 600; color: #FFFFFF; background: {{brand}}; padding: 15px 28px; border-radius: 999px">Start free</a>
+<a href="DemoV2.dc.html" style="font-size: 16px; font-weight: 600; color: #0E1A2B; background: #FFFFFF; border: 1px solid #C9CFD6; padding: 14px 26px; border-radius: 999px">Try the live demo</a>
+</div>
+<div style="margin-top: 20px; font-size: 13px; color: #5B6778">Free core, forever · No card required · Educational research, not investment advice. Capital at risk.</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 28px; box-shadow: 0 1px 2px rgba(14,26,43,0.04), 0 12px 32px rgba(14,26,43,0.06); display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start">
+<div><div style="font-size: 15px; font-weight: 700">Growth mandate vs S&amp;P 500</div><div style="font-size: 12px; color: #5B6778; margin-top: 2px">Jan 2007 – Aug 2026 · 236 months · net of costs</div></div>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #5B6778; border: 1px solid #E3E6EA; padding: 4px 8px; border-radius: 6px">BACKTEST</span>
+</div>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #3D4A5C">
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: {{brand}}"></span>Scora Growth</span>
+<span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #7A8599"></span>S&amp;P 500</span>
+</div>
+<div>
+<div style="font-size: 12px; font-weight: 600; color: #3D4A5C; margin-bottom: 10px">Worst peak-to-trough fall</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: grid; grid-template-columns: 1fr 64px; gap: 12px; align-items: center"><div style="height: 14px; background: #F1F3F5; border-radius: 4px; display: flex"><div style="width: 32%; background: {{brand}}; border-radius: 4px"></div></div><span style="font-size: 14px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums">−16.2%</span></div>
+<div style="display: grid; grid-template-columns: 1fr 64px; gap: 12px; align-items: center"><div style="height: 14px; background: #F1F3F5; border-radius: 4px; display: flex"><div style="width: 100%; background: #7A8599; border-radius: 4px"></div></div><span style="font-size: 14px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums">−50.7%</span></div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #E3E6EA; padding-top: 16px">
+<div><div style="font-size: 12px; color: #5B6778">Sharpe</div><div style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">0.87</div><div style="font-size: 12px; color: #5B6778">S&amp;P 0.63</div></div>
+<div><div style="font-size: 12px; color: #5B6778">Sortino</div><div style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">1.46</div><div style="font-size: 12px; color: #5B6778">S&amp;P 0.92</div></div>
+<div><div style="font-size: 12px; color: #5B6778">Total return</div><div style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">+653%</div><div style="font-size: 12px; color: #5B6778">S&amp;P +668%</div></div>
+</div>
+<div style="font-size: 12px; line-height: 1.55; color: #3D4A5C; background: #F6F7F9; border-radius: 10px; padding: 12px 14px">The S&amp;P returned more in raw terms, and the Sharpe edge isn't statistically significant (t = 1.47). We publish both.</div>
+</div>
+</section>
+
+<section aria-label="Key facts" style="padding: 0 80px; background: #FFFFFF">
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #E3E6EA; border-bottom: 1px solid #E3E6EA">
+<div style="padding: 32px 24px 32px 0; border-right: 1px solid #E3E6EA"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1">236</div><div style="font-size: 14px; color: #3D4A5C; margin-top: 8px">months backtested, 2008 included, net of costs</div></div>
+<div style="padding: 32px 24px; border-right: 1px solid #E3E6EA"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1">344</div><div style="font-size: 14px; color: #3D4A5C; margin-top: 8px">strategy trials disclosed — not just the winner</div></div>
+<div style="padding: 32px 24px; border-right: 1px solid #E3E6EA"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1">0×</div><div style="font-size: 14px; color: #3D4A5C; margin-top: 8px">leverage, ever</div></div>
+<div style="padding: 32px 0 32px 24px"><div style="font-family: 'Newsreader', Georgia, serif; font-size: 40px; line-height: 1">€0</div><div style="font-size: 14px; color: #3D4A5C; margin-top: 8px">for the full engine, forever</div></div>
+</div>
+</section>
+
+<section style="padding: 112px 80px 96px; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 48px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.02em; max-width: 560px">Top-down, one layer at a time.</h2>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; max-width: 440px; line-height: 1.6">The long cycle sets the ceiling, the regime sets the tilt, and a breadth loop flags when the macro read and the market disagree — an early warning, not a forecast.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px"><span style="font-size: 13px; font-weight: 700; color: {{brand}}; font-variant-numeric: tabular-nums">01</span><div style="font-size: 18px; font-weight: 700">Secular clock</div><div style="font-size: 14px; color: #3D4A5C; line-height: 1.55">Valuation and the long cycle set the baseline equity weight.</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px"><span style="font-size: 13px; font-weight: 700; color: {{brand}}; font-variant-numeric: tabular-nums">02</span><div style="font-size: 18px; font-weight: 700">Risk-on allocation</div><div style="font-size: 14px; color: #3D4A5C; line-height: 1.55">Liquidity, recession risk and financial stress tilt the mix across assets.</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px"><span style="font-size: 13px; font-weight: 700; color: {{brand}}; font-variant-numeric: tabular-nums">03</span><div style="font-size: 18px; font-weight: 700">Sector rotation</div><div style="font-size: 14px; color: #3D4A5C; line-height: 1.55">The regime picks which parts of the market to lean into.</div></div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px"><span style="font-size: 13px; font-weight: 700; color: {{brand}}; font-variant-numeric: tabular-nums">04</span><div style="font-size: 18px; font-weight: 700">Selection, gated</div><div style="font-size: 14px; color: #3D4A5C; line-height: 1.55">Stock picking gets weight only when correlation says it can matter.</div></div>
+</div>
+</section>
+
+<section style="padding: 96px 80px; background: #FFFFFF; border-top: 1px solid #E3E6EA; border-bottom: 1px solid #E3E6EA; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 64px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.02em">Where we win. And where we don't.</h2>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.6">Most platforms show you the chart that flatters them. We show the whole table — against the index and a plain 60/40 — so you can judge the trade-off yourself.</p>
+<a href="TrackRecordV2.dc.html" style="font-size: 15px; font-weight: 600">See the full track record →</a>
+</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums">
+<caption style="text-align: left; font-size: 12px; color: #5B6778; padding-bottom: 12px">Jan 2007 – Aug 2026 · monthly · net of costs · rf = T-bills. Best in each row marked ●.</caption>
+<thead><tr>
+<th scope="col" style="text-align: left; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 0; border-bottom: 1px solid #C9CFD6">Metric</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 700; color: {{brand}}; padding: 12px 0; border-bottom: 1px solid #C9CFD6">Scora Growth</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 0; border-bottom: 1px solid #C9CFD6">S&amp;P 500</th>
+<th scope="col" style="text-align: right; font-size: 12px; font-weight: 600; color: #5B6778; padding: 12px 0; border-bottom: 1px solid #C9CFD6">60/40</th>
+</tr></thead>
+<tbody>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0; border-bottom: 1px solid #EEF0F2">Total return</th><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">+653%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700">● +668%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">+372%</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0; border-bottom: 1px solid #EEF0F2">Annual return (CAGR)</th><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">10.81%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700">● 10.92%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">8.21%</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0; border-bottom: 1px solid #EEF0F2">Sharpe ratio</th><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700; color: {{brand}}">● 0.87</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">0.63</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">0.70</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0; border-bottom: 1px solid #EEF0F2">Sortino ratio</th><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700; color: {{brand}}">● 1.46</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">0.92</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">1.05</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0; border-bottom: 1px solid #EEF0F2">Max drawdown</th><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2; font-weight: 700; color: {{brand}}">● −16.2%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">−50.7%</td><td style="text-align: right; padding: 14px 0; border-bottom: 1px solid #EEF0F2">−28.8%</td></tr>
+<tr><th scope="row" style="text-align: left; font-weight: 500; color: #3D4A5C; padding: 14px 0">Calmar ratio</th><td style="text-align: right; padding: 14px 0; font-weight: 700; color: {{brand}}">● 0.67</td><td style="text-align: right; padding: 14px 0">0.22</td><td style="text-align: right; padding: 14px 0">0.29</td></tr>
+</tbody>
+</table>
+</section>
+
+<section style="padding: 112px 80px 96px; display: flex; flex-direction: column; gap: 48px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.02em; max-width: 640px">Built to be checked, not just trusted.</h2>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="width: 44px; height: 44px; border-radius: 12px; background: #E7F3EE; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B6E4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"></path><path d="M9 12l2 2 4-4"></path></svg></span>
+<div style="font-size: 17px; font-weight: 700">AI with a hard gate</div>
+<div style="font-size: 14px; color: #3D4A5C; line-height: 1.6">Every figure an AI answer emits is checked in code against the data it was given. Anything unverified is flagged.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="width: 44px; height: 44px; border-radius: 12px; background: #E7F3EE; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B6E4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8l4 4v12H4V4h4z"></path><path d="M8 12h8M8 16h5"></path></svg></span>
+<div style="font-size: 17px; font-weight: 700">A public audit trail</div>
+<div style="font-size: 14px; color: #3D4A5C; line-height: 1.6">Each AI run is logged with its sources and its grounding result, so you can read exactly what it relied on.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="width: 44px; height: 44px; border-radius: 12px; background: #E7F3EE; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B6E4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19h16"></path><path d="M6 15l4-4 3 3 5-6"></path></svg></span>
+<div style="font-size: 17px; font-weight: 700">Out-of-sample, survivorship-free</div>
+<div style="font-size: 14px; color: #3D4A5C; line-height: 1.6">Walk-forward tests on point-in-time data, with the number of attempts published next to the result.</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="width: 44px; height: 44px; border-radius: 12px; background: #E7F3EE; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B6E4F" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg></span>
+<div style="font-size: 17px; font-weight: 700">A live fund, in the open</div>
+<div style="font-size: 14px; color: #3D4A5C; line-height: 1.6">An autonomous paper fund runs the strategy forward, every rebalance visible — no hindsight possible.</div>
+</div>
+</div>
+</section>
+
+<section style="padding: 0 80px 112px; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: stretch">
+<div style="display: flex; flex-direction: column; gap: 16px; padding-right: 24px">
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.02em">Free where it matters.</h2>
+<p style="margin: 0; font-size: 16px; color: #3D4A5C; line-height: 1.6">The engine runs on free data, so the analysis stays free. Pro only adds convenience.</p>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 18px; font-weight: 700">Free</span><span style="font-family: 'Newsreader', Georgia, serif; font-size: 40px">€0</span></div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: #3D4A5C">
+<li>✓ Macro regime + validated allocator</li><li>✓ Live track record &amp; AI audit trail</li><li>✓ Stock, bond &amp; instrument analysis</li><li>✓ Daily AI analyses</li><li>✓ Discovery screener</li>
+</ul>
+<a href="#" style="margin-top: auto; text-align: center; font-size: 15px; font-weight: 600; color: #FFFFFF; background: {{brand}}; padding: 13px 0; border-radius: 999px">Start free</a>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E3E6EA; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 18px; font-weight: 700">Pro <span style="font-size: 12px; font-weight: 600; color: #5B6778; margin-left: 6px">Coming soon</span></span><span style="font-family: 'Newsreader', Georgia, serif; font-size: 40px">[€—]</span></div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: #3D4A5C">
+<li>✓ Everything in Free</li><li>✓ Higher daily AI limits</li><li>✓ Regime-change &amp; divergence alerts</li><li>✓ Watchlist signal notifications</li><li>✓ Research-note export</li>
+</ul>
+<a href="#" style="margin-top: auto; text-align: center; font-size: 15px; font-weight: 600; color: #0E1A2B; border: 1px solid #C9CFD6; padding: 12px 0; border-radius: 999px">Notify me</a>
+</div>
+</section>
+
+<section style="margin: 0 80px; padding: 72px; background: #0E1A2B; border-radius: 28px; display: flex; justify-content: space-between; align-items: center; gap: 48px">
+<div>
+<h2 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 400; font-size: 44px; line-height: 1.1; letter-spacing: -0.02em; color: #F3F5F7; max-width: 560px">See today's regime before you sign up.</h2>
+<p style="margin: 16px 0 0; font-size: 16px; color: #AEB8C6">The live read the engine runs on — no account needed.</p>
+</div>
+<div style="display: flex; gap: 12px; flex-shrink: 0">
+<a href="DemoV2.dc.html" style="font-size: 16px; font-weight: 600; color: #0E1A2B; background: #FFFFFF; padding: 15px 28px; border-radius: 999px">Open the live demo</a>
+<a href="#" style="font-size: 16px; font-weight: 600; color: #F3F5F7; border: 1px solid #3A4A60; padding: 14px 26px; border-radius: 999px">Start free</a>
+</div>
+</section>
+
+<footer style="padding: 72px 80px 56px; display: flex; flex-direction: column; gap: 40px">
+<div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px"><span style="font-size: 17px; font-weight: 700">Scora</span><span style="font-size: 14px; color: #5B6778; max-width: 320px">Regime-driven research, measured in public.</span></div>
+<nav aria-label="Product" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 700; color: #0E1A2B">Product</span><a href="#" style="color: #3D4A5C">Live demo</a><a href="#" style="color: #3D4A5C">Daily close</a><a href="PricingV2.dc.html" style="color: #3D4A5C">Pricing</a></nav>
+<nav aria-label="Evidence" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 700; color: #0E1A2B">Evidence</span><a href="TrackRecordV2.dc.html" style="color: #3D4A5C">Track record</a><a href="#" style="color: #3D4A5C">Evidence ledger</a><a href="#" style="color: #3D4A5C">AI audit trail</a></nav>
+</div>
+<p style="margin: 0; padding-top: 24px; border-top: 1px solid #E3E6EA; font-size: 12px; line-height: 1.7; color: #5B6778">Scora Research is an educational tool for informational purposes only and is not investment advice. Scores, valuations, backtests and AI commentary are estimates that may be wrong or out of date; verify independently before making any decision. Backtested results are hypothetical. Past performance does not predict future results. Capital at risk. Data from FRED, Finnhub, FMP, SEC EDGAR and other public sources.</p>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"color","default":"#0B6E4F","options":["#0B6E4F","#1D4ED8","#0E1A2B"]},"accent":{"editor":"color","default":"#D4A017"},"$preview":{"width":1280,"height":3320}}'>
+class Component extends DCLogic {
+renderVals() {
+return { brand: this.props.brand ?? '#0B6E4F', accent: this.props.accent ?? '#D4A017' };
+}
+}
+</script>
+</body>
+</html>

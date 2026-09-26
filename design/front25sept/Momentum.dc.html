@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Market Momentum</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1150px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Momentum" hint-size="1280px,56px"></dc-import>
+<div style="width: 1080px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+<div><h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Market Momentum</h1>
+<p style="margin: 6px 0 0; font-size: 12px; color: #94A3B8; max-width: 760px; line-height: 1.6">How much of the market is actually participating, and whether credit and risk appetite agree. This answers <em>“what is the backdrop?”</em> — not <em>“what should I buy?”</em></p></div>
+<div style="padding: 12px; border-radius: 10px; background: #122540; border: 1px dashed #1E3A5F">
+<div style="font-size: 10px; font-weight: 700; color: #94A3B8; margin-bottom: 4px">What this is measured to do — and what it is not</div>
+<div style="font-size: 10px; color: #4A6080; line-height: 1.55">This is <strong style="color: #94A3B8">context, not a timing signal</strong>. We tested three ways of turning market signals into returns in this codebase — a momentum composite, a binary regime gate and sector-relative percentiles — and all three failed out of sample. The one that survived (the correlation gate) improved <strong style="color: #94A3B8">risk-adjusted return, not return</strong>.</div>
+</div>
+<div style="display: flex; align-items: center; gap: 20px; background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="text-align: center; min-width: 120px"><div style="font-size: 48px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: #4A6080">—</div><div style="font-size: 10px; color: #4A6080; margin-top: 4px">of 100</div></div>
+<div><div style="font-size: 18px; font-weight: 700">[Momentum label]</div><div style="font-size: 12px; color: #94A3B8; margin-top: 4px">[Detail from the live breadth snapshot]</div><div style="margin-top: 8px; font-size: 10px; color: #F59E0B; font-weight: 600">⚠ Divergence: the index is above its 200-day average while fewer than 45% of names are.</div></div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">The — signals behind it</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{signals}}" as="s" hint-placeholder-count="7">
+<div><div style="display: flex; justify-content: space-between; margin-bottom: 3px"><span style="font-size: 12px; font-weight: 600">{{s.label}}</span><span style="font-size: 10px; color: #4A6080">— <strong style="margin-left: 8px; color: #94A3B8">—</strong></span></div>
+<div style="height: 4px; background: #1A3050; border-radius: 2px"></div>
+<div style="font-size: 10px; color: #4A6080; margin-top: 2px">[hint]</div></div>
+</sc-for>
+</div>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Selection weight today</div>
+<div style="display: flex; align-items: center; gap: 16px">
+<div style="min-width: 90px; text-align: center"><div style="font-size: 28px; font-weight: 700; line-height: 1">—%</div><div style="font-size: 10px; color: #4A6080; margin-top: 2px">[regime]</div></div>
+<div><div style="font-size: 12px; color: #94A3B8">[Regime detail]</div><div style="font-size: 10px; color: #4A6080; margin-top: 6px">Scales continuously with implied correlation. Measured over two independent windows (2010-2018 and 2019-2026) it improved Sharpe — 1.08→1.14 and 0.78→0.86 — but <strong style="color: #94A3B8">not total return</strong>. It is risk management, not an edge.</div></div>
+</div>
+</div>
+<div style="text-align: right; font-size: 10px; color: #4A6080">Breadth as of — · aggregated daily by research/macro_breadth.mjs. Educational — not investment advice.</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1150}}'>
+class Component extends DCLogic {
+renderVals() { return { signals: ['Above 200-day','Above 50-day','Positive 12-1m','Up last month','Risk appetite','Dispersion','Credit','Index trend'].map(function (l) { return { label: l }; }) }; }
+}
+</script>
+</body>
+</html>

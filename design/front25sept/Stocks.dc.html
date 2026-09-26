@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stock Analysis</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 900px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Stocks" hint-size="1280px,56px"></dc-import>
+<div style="width: 1080px; box-sizing: border-box; padding: 40px 24px; display: flex; flex-direction: column; gap: 32px">
+<div style="text-align: center; display: flex; flex-direction: column; align-items: center">
+<h1 style="margin: 0; font-size: 36px; font-weight: 800; letter-spacing: -0.02em">Stock Analysis</h1>
+<p style="margin: 6px 0 20px; font-size: 14px; color: #94A3B8">Micro fundamentals + macro regime · NYSE, NASDAQ, BME/IBEX, LSE, Xetra, Euronext and more</p>
+<form style="display: flex; gap: 8px; width: 640px">
+<label style="flex-grow: 1; display: flex"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Ticker</span><input type="text" placeholder="Company name or ticker (e.g. Apple, AAPL, SAN.MC)…" style="width: 100%; background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 14px; padding: 10px 14px"></label>
+<button type="submit" style="padding: 10px 20px; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 600; background: #F59E0B; color: #070E1A; border: none; min-height: 44px">Analyze</button>
+</form>
+<div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 12px">
+<sc-for list="{{picks}}" as="p" hint-placeholder-count="10">
+<button type="button" style="font-family: inherit; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; color: #94A3B8; background: #0D1B2E; border: 1px solid #1E3A5F">{{p.t}}</button>
+</sc-for>
+</div>
+</div>
+<div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 12px"><div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080">Watchlist</div><span style="font-size: 10px; color: #4A6080">— tickers</span></div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{cards}}" as="c" hint-placeholder-count="4">
+<div style="position: relative; background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 16px">
+<button type="button" aria-label="Remove" style="position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; font-family: inherit; background: transparent; border: none; color: #4A6080">×</button>
+<div style="font-size: 14px; font-weight: 700; color: #F59E0B">[TICKER]</div>
+<div style="font-size: 28px; font-weight: 800; margin-top: 4px">—</div>
+<div style="font-size: 10px; font-weight: 700; color: #94A3B8">[Rating]</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return { picks: ['AAPL','MSFT','NVDA','AMZN','MC.PA','SAP.DE','SAN.MC','NESN.SW','BP.L','ASML.AS'].map(function (t) { return { t: t }; }), cards: [1,2,3,4] }; }
+}
+</script>
+</body>
+</html>

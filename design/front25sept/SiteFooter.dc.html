@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Site footer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&amp;family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#FAFAF7;color:#0E1A2B}
+a{color:#0B6E4F;text-decoration:none}a:hover{color:#08553D}
+</style>
+</helmet>
+<footer style="width: 1280px; height: 320px; box-sizing: border-box; padding: 64px 80px 48px; display: flex; flex-direction: column; gap: 32px; background: #FAFAF7; border-top: 1px solid #E3E6EA; font-family: 'Hanken Grotesk', system-ui, sans-serif; color: #0E1A2B">
+<div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px"><span style="font-size: 17px; font-weight: 700">Scora</span><span style="font-size: 14px; color: #5B6778; max-width: 320px">Regime-driven research, measured in public.</span></div>
+<nav aria-label="Product" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 700">Product</span><a href="HowItWorks.dc.html" style="color: #3D4A5C">How it works</a><a href="DemoV2.dc.html" style="color: #3D4A5C">Live demo</a><a href="PricingV2.dc.html" style="color: #3D4A5C">Pricing</a></nav>
+<nav aria-label="Evidence" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 700">Evidence</span><a href="TrackRecordV2.dc.html" style="color: #3D4A5C">Track record</a><a href="EvidenceV2.dc.html" style="color: #3D4A5C">Evidence ledger</a><a href="#" style="color: #3D4A5C">AI audit trail</a></nav>
+<nav aria-label="Legal" style="display: flex; flex-direction: column; gap: 10px; font-size: 14px"><span style="font-weight: 700">Legal</span><a href="LegalV2.dc.html" style="color: #3D4A5C">Risk disclosure</a><a href="LegalV2.dc.html" style="color: #3D4A5C">Privacy</a><a href="LegalV2.dc.html" style="color: #3D4A5C">Terms</a></nav>
+</div>
+<p style="margin: 0; padding-top: 24px; border-top: 1px solid #E3E6EA; font-size: 12px; line-height: 1.7; color: #5B6778">Scora Research is an educational tool for informational purposes only and is not investment advice. Scores, valuations, backtests and AI commentary are estimates that may be wrong or out of date; verify independently before making any decision. Backtested results are hypothetical. Past performance does not predict future results. Capital at risk. Data from FRED, Finnhub, FMP, SEC EDGAR and other public sources.</p>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":320}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

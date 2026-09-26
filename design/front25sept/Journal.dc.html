@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Trade Journal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1150px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Journal" hint-size="1280px,56px"></dc-import>
+<div style="width: 1080px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div><h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Trade Journal</h1>
+<p style="margin: 6px 0 0; font-size: 12px; color: #94A3B8">Log your real trades, group them by thesis, and track live P&amp;L. Your own book — separate from the paper fund.</p></div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Open cost basis</div><div style="font-size: 22px; font-weight: 700">$—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Market value</div><div style="font-size: 22px; font-weight: 700">$—</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Unrealized P&amp;L</div><div style="font-size: 22px; font-weight: 700; color: #10B981">+$—</div><div style="font-size: 10px; color: #4A6080">—% of cost</div></div>
+<div style="background: #122540; border-radius: 10px; padding: 12px"><div style="font-size: 10px; color: #4A6080; margin-bottom: 4px">Realized P&amp;L</div><div style="font-size: 22px; font-weight: 700; color: #10B981">+$—</div></div>
+</div>
+<form style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Log a trade</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-items: end">
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 10px; color: #4A6080">Ticker<input type="text" placeholder="AAPL" style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 10px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 10px; color: #4A6080">Side<select style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 10px"><option>Buy</option><option>Sell</option></select></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 10px; color: #4A6080">Qty<input type="text" placeholder="10" style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 10px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 10px; color: #4A6080">Price<input type="text" placeholder="0.00" style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 10px"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 10px; color: #4A6080">Thesis<input type="text" placeholder="[thesis]" style="background: #122540; border: 1px solid #2A4F7A; border-radius: 10px; color: #F0F4F8; font-family: inherit; font-size: 12px; padding: 8px 10px"></label>
+<button type="submit" style="padding: 9px 16px; border-radius: 10px; font-family: inherit; font-size: 12px; font-weight: 700; background: #F59E0B; color: #070E1A; border: none; min-height: 38px">Log trade</button>
+</div>
+</form>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Open positions</div>
+<div style="font-size: 12px; color: #4A6080; padding: 16px 0; text-align: center">No open positions. Log a trade above.</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Attribution by thesis</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px"><thead><tr><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Thesis</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Cost basis</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">P&amp;L</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Return</th></tr></thead>
+<tbody><tr><td style="padding: 8px 0; color: #94A3B8">[Thesis]</td><td style="padding: 8px 0; text-align: right">$—</td><td style="padding: 8px 0; text-align: right">$—</td><td style="padding: 8px 0; text-align: right">—%</td></tr></tbody></table>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 20px">
+<div style="font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #4A6080; margin-bottom: 12px">Closed trades</div>
+<table style="width: 100%; border-collapse: collapse; font-size: 12px"><thead><tr><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Ticker</th><th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Realized P&amp;L</th><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0 8px 12px; border-bottom: 1px solid #1E3A5F">Thesis</th><th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 0; border-bottom: 1px solid #1E3A5F">Closed</th></tr></thead>
+<tbody><tr><td style="padding: 8px 0; color: #F59E0B; font-weight: 700">[TICKER]</td><td style="padding: 8px 0; text-align: right">$—</td><td style="padding: 8px 0 8px 12px; color: #94A3B8">[Thesis]</td><td style="padding: 8px 0; color: #4A6080">—</td></tr></tbody></table>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+<div style="background: #0D1B2E; border: 1px dashed #2A4F7A; border-radius: 10px; padding: 12px; font-size: 10px; color: #4A6080">&lt;ExposureAudit /&gt;</div>
+<div style="background: #0D1B2E; border: 1px dashed #2A4F7A; border-radius: 10px; padding: 12px; font-size: 10px; color: #4A6080">&lt;FactorExposure /&gt;</div>
+<div style="background: #0D1B2E; border: 1px dashed #2A4F7A; border-radius: 10px; padding: 12px; font-size: 10px; color: #4A6080">&lt;PortfolioOptimizer /&gt;</div>
+<div style="background: #0D1B2E; border: 1px dashed #2A4F7A; border-radius: 10px; padding: 12px; font-size: 10px; color: #4A6080">&lt;PositionSizer /&gt;</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1150}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,8 +1,42 @@
 "use client";
 import { useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { GROWTH_BACKTEST as G } from "@/lib/trackRecord";
+import "./landing-v2.css";
+
+// Landing v2 — light "ink, paper, evergreen" system (see app/landing-v2.css).
+// Every figure comes from lib/trackRecord.ts so the page can never drift from the
+// published record, including the rows where the S&P wins.
+
+const signed = (v: number, d = 0) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(d)}%`;
+const dd = (v: number) => `−${Math.abs(v).toFixed(1)}%`;
+
+type Row = { k: string; us: number; spy: number; b64: number; fmt: (v: number) => string; higherIsBetter: boolean };
+const ROWS: Row[] = [
+  { k: "Total return", us: G.strategy.totalReturn, spy: G.spy.totalReturn, b64: G.bench6040.totalReturn, fmt: (v) => signed(v), higherIsBetter: true },
+  { k: "Annual return (CAGR)", us: G.strategy.cagr, spy: G.spy.cagr, b64: G.bench6040.cagr, fmt: (v) => `${v.toFixed(2)}%`, higherIsBetter: true },
+  { k: "Sharpe ratio", us: G.strategy.sharpe, spy: G.spy.sharpe, b64: G.bench6040.sharpe, fmt: (v) => v.toFixed(2), higherIsBetter: true },
+  { k: "Sortino ratio", us: G.strategy.sortino, spy: G.spy.sortino, b64: G.bench6040.sortino, fmt: (v) => v.toFixed(2), higherIsBetter: true },
+  { k: "Max drawdown", us: G.strategy.maxDrawdown, spy: G.spy.maxDrawdown, b64: G.bench6040.maxDrawdown, fmt: dd, higherIsBetter: true },
+  { k: "Calmar ratio", us: G.strategy.calmar, spy: G.spy.calmar, b64: G.bench6040.calmar, fmt: (v) => v.toFixed(2), higherIsBetter: true },
+];
+
+function Cell({ v, best, us, fmt }: { v: number; best: boolean; us?: boolean; fmt: (v: number) => string }) {
+  return <td className={best ? `best${us ? " us" : ""}` : undefined}>{best ? "● " : ""}{fmt(v)}</td>;
+}
+
+function LogoMark() {
+  return (
+    <span className="lv2-logo-mark" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M2 12L6 7L9 10L13 4" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="13" cy="4" r="1.6" fill="var(--lv-gold)" />
+      </svg>
+    </span>
+  );
+}
 
 export default function Landing() {
   const { session, loading } = useAuth();
@@ -12,96 +46,261 @@ export default function Landing() {
   useEffect(() => { if (!loading && session) router.replace("/macro"); }, [session, loading, router]);
   if (session) return null;
 
-  const go = () => router.push("/login");
-  const card = { background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg, 14px)", padding: "var(--sr-sp-5)" } as const;
+  const ddRatio = Math.abs(G.strategy.maxDrawdown) / Math.abs(G.spy.maxDrawdown);
 
   return (
-    <div style={{ maxWidth: 1080, margin: "0 auto", padding: "var(--sr-sp-4) var(--sr-sp-6) var(--sr-sp-6)" }}>
-      {/* Minimal top bar (the app Nav is hidden when logged out) */}
-      <div className="sr-flex-between" style={{ padding: "var(--sr-sp-2) 0 var(--sr-sp-3)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--sr-amber)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 7L9 10L13 4" stroke="#070E1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="13" cy="4" r="1.5" fill="#070E1A" /></svg>
+    <div className="lv2">
+      <header className="lv2-header">
+        <div className="lv2-wrap">
+          <Link href="/" className="lv2-logo" aria-label="Scora home">
+            <LogoMark />
+            <span className="lv2-logo-word">Scora</span>
+          </Link>
+          <nav className="lv2-nav" aria-label="Main">
+            <Link href="/demo">How it works</Link>
+            <Link href="/track-record">Track record</Link>
+            <Link href="/evidence">Evidence</Link>
+            <Link href="/pricing">Pricing</Link>
+          </nav>
+          <div className="lv2-header-actions">
+            <Link href="/login" className="lv2-signin">Sign in</Link>
+            <Link href="/login" className="lv2-btn lv2-btn-dark lv2-btn-sm">Start free</Link>
           </div>
-          <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }}>Scora <span style={{ fontWeight: 400, color: "var(--sr-text-3)" }}>Research</span></span>
         </div>
-        <div style={{ display: "flex", gap: "var(--sr-sp-3)", alignItems: "center" }}>
-          <a onClick={() => router.push("/pricing")} style={{ cursor: "pointer", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Pricing</a>
-          <button onClick={go} style={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text)", fontSize: "var(--sr-t-sm)", fontWeight: 600, padding: "6px 14px", cursor: "pointer" }}>Sign in</button>
-        </div>
-      </div>
+      </header>
 
-      {/* Hero */}
-      <section style={{ padding: "clamp(32px,7vw,80px) 0 clamp(24px,4vw,44px)", textAlign: "center", maxWidth: 780, marginInline: "auto" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--sr-amber) 35%, transparent)", background: "color-mix(in srgb, var(--sr-amber) 8%, transparent)", fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)", fontWeight: 600, marginBottom: "var(--sr-sp-4)" }}>
-          Free · macro + micro research
-        </div>
-        <h1 style={{ fontSize: "clamp(30px,6vw,54px)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.08, margin: 0, textWrap: "balance" }}>
-          The top-down system that <span style={{ color: "var(--sr-amber)" }}>corrects itself</span>.
-        </h1>
-        <p style={{ fontSize: "clamp(16px,2.4vw,20px)", color: "var(--sr-text-2)", lineHeight: 1.6, margin: "var(--sr-sp-4) auto 0", maxWidth: 620 }}>
-          Regime-driven multi-asset allocation, <strong style={{ color: "var(--sr-text)" }}>validated out-of-sample</strong> — plus an AI layer that <strong style={{ color: "var(--sr-text)" }}>can&apos;t invent a number</strong>, enforced in code. Not a &ldquo;+8% in 30 days&rdquo; pitch. Risk, managed and auditable.
-        </p>
-        <div style={{ display: "flex", gap: "var(--sr-sp-3)", justifyContent: "center", marginTop: "var(--sr-sp-5)", flexWrap: "wrap" }}>
-          <button onClick={go} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "12px 28px", fontSize: "var(--sr-t-base)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
-          <button onClick={() => router.push("/demo")} style={{ background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid color-mix(in srgb, var(--sr-amber) 40%, var(--sr-border))", borderRadius: "var(--sr-radius)", padding: "12px 24px", fontSize: "var(--sr-t-base)", fontWeight: 600, cursor: "pointer" }}>Live demo — no signup</button>
-          <button onClick={() => router.push("/track-record")} style={{ background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", padding: "12px 24px", fontSize: "var(--sr-t-base)", fontWeight: 600, cursor: "pointer" }}>See the evidence</button>
-        </div>
-      </section>
-
-      {/* Validated numbers — vs the S&P 500, the only benchmark that matters */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
-        {[
-          { k: "Sharpe ratio", v: G.strategy.sharpe.toFixed(2), s: `S&P 500: ${G.spy.sharpe.toFixed(2)}` },
-          { k: "Sortino ratio", v: G.strategy.sortino.toFixed(2), s: `S&P 500: ${G.spy.sortino.toFixed(2)}` },
-          { k: "Max drawdown", v: `${G.strategy.maxDrawdown}%`, s: `S&P 500: ${G.spy.maxDrawdown}%` },
-          { k: "Jensen α / yr", v: `+${G.strategy.alpha}%`, s: `vs the S&P 500 (CAPM)` },
-        ].map((s) => (
-          <div key={s.k} style={{ ...card, textAlign: "center", padding: "var(--sr-sp-4)" }}>
-            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.k}</div>
-            <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-pos)", margin: "4px 0 2px" }} className="num">{s.v}</div>
-            <div className="sr-hint">{s.s}</div>
+      <section className="lv2-hero">
+        <div className="lv2-wrap">
+          <div>
+            <div className="lv2-eyebrow">Every result published — including the ones against us</div>
+            <h1 className="lv2-h1 serif">Investing, with the evidence in plain sight.</h1>
+            <p className="lv2-lede">
+              Scora is a regime-driven allocation engine that shows its work: validated out-of-sample,
+              measured net of costs, and paired with an AI layer that can&apos;t invent a number.
+            </p>
+            <div className="lv2-ctas">
+              <Link href="/login" className="lv2-btn lv2-btn-primary">Start free</Link>
+              <Link href="/demo" className="lv2-btn lv2-btn-outline">Try the live demo</Link>
+            </div>
+            <div className="lv2-fineprint">
+              Free core, forever · No card required · Educational research, not investment advice. Capital at risk.
+            </div>
           </div>
-        ))}
-      </section>
-      <p style={{ textAlign: "center", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", margin: "0 auto var(--sr-sp-6)", maxWidth: 640, lineHeight: 1.6 }}>
-        {G.period}, net of costs. The S&P returned more in raw terms (+{G.spy.totalReturn.toFixed(0)}% vs +{G.strategy.totalReturn.toFixed(0)}%) — we show it openly — but at <strong style={{ color: "var(--sr-text-2)" }}>2.9× the drawdown</strong>. Even on raw return, most active managers can&apos;t match it: <strong>~90% of active US large-cap funds trail the S&P 500 over 15 years</strong> (SPIVA U.S. Scorecard, S&P Dow Jones Indices). Scora doesn&apos;t chase raw return — it wins the risk-adjusted one.
-      </p>
 
-      {/* Three pillars */}
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--sr-sp-4)", marginBottom: "var(--sr-sp-6)" }}>
-        {[
-          { t: "Ahead of the S&P 500 where it counts", d: `Not on raw return — almost nothing does, and we never pretend otherwise (no leverage, ever). On the risk-adjusted scorecard a professional actually uses: Sharpe ${G.strategy.sharpe.toFixed(2)} vs ${G.spy.sharpe.toFixed(2)}, Sortino ${G.strategy.sortino.toFixed(2)} vs ${G.spy.sortino.toFixed(2)}, +${G.strategy.alpha}%/yr Jensen alpha, and a third of the drawdown — free, transparent and rules-based. The Sharpe gap does not reach statistical significance (t = ${G.significacion.tVsSpy}); the drawdown is not an estimate, it is what happened.`, tag: "measured · net of costs · rf = T-bills" },
-          { t: "AI that can't hallucinate", d: "Every AI answer is checked against the data it was given, in code — not just in the prompt. Fabricated figures are flagged and logged. A weaker, free model stays safe because governance doesn't depend on the model.", tag: "code-enforced gate" },
-          { t: "A self-correcting top-down loop", d: "Secular clock → risk-on allocation → sector rotation → selection, with a breadth loop that flags when the macro read and the market's participation diverge — an early warning, not a forecast.", tag: "macro ↔ micro" },
-          { t: "Institutional analysis, free", d: "Distress & earnings-quality scores (Altman Z, accruals, DuPont), reverse-DCF, comparables, bond duration and multi-leg option strategies — the desk toolkit, on free data. Verified context for your own decision, never a 'buy this' signal.", tag: "context, not hype" },
-        ].map((p) => (
-          <div key={p.t} style={card}>
-            <div style={{ fontSize: "9px", fontWeight: 700, color: "var(--sr-amber)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>{p.tag}</div>
-            <h3 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, margin: "0 0 8px", letterSpacing: "-0.01em" }}>{p.t}</h3>
-            <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6, margin: 0 }}>{p.d}</p>
+          <figure className="lv2-card" style={{ margin: 0 }} aria-labelledby="lv2-card-title">
+            <div className="lv2-card-head">
+              <div>
+                <div className="lv2-card-title" id="lv2-card-title">Growth mandate vs S&amp;P 500</div>
+                <div className="lv2-card-sub">{G.period} · {G.months} months · net of costs</div>
+              </div>
+              <span className="lv2-tag">BACKTEST</span>
+            </div>
+            <div className="lv2-legend">
+              <span><span className="lv2-swatch" style={{ background: "var(--lv-brand)" }} />Scora Growth</span>
+              <span><span className="lv2-swatch" style={{ background: "var(--lv-bench)" }} />S&amp;P 500</span>
+            </div>
+            <div>
+              <div className="lv2-bar-label">Worst peak-to-trough fall</div>
+              <div className="lv2-bars">
+                <div className="lv2-bar-row" title={`Scora Growth ${dd(G.strategy.maxDrawdown)}`}>
+                  <div className="lv2-bar-track"><div className="lv2-bar-fill" style={{ width: `${ddRatio * 100}%`, background: "var(--lv-brand)" }} /></div>
+                  <span className="lv2-bar-val num">{dd(G.strategy.maxDrawdown)}</span>
+                </div>
+                <div className="lv2-bar-row" title={`S&P 500 ${dd(G.spy.maxDrawdown)}`}>
+                  <div className="lv2-bar-track"><div className="lv2-bar-fill" style={{ width: "100%", background: "var(--lv-bench)" }} /></div>
+                  <span className="lv2-bar-val num">{dd(G.spy.maxDrawdown)}</span>
+                </div>
+              </div>
+            </div>
+            <div className="lv2-card-stats">
+              <div><div className="lv2-stat-k">Sharpe</div><div className="lv2-stat-v num">{G.strategy.sharpe.toFixed(2)}</div><div className="lv2-stat-k">S&amp;P {G.spy.sharpe.toFixed(2)}</div></div>
+              <div><div className="lv2-stat-k">Sortino</div><div className="lv2-stat-v num">{G.strategy.sortino.toFixed(2)}</div><div className="lv2-stat-k">S&amp;P {G.spy.sortino.toFixed(2)}</div></div>
+              <div><div className="lv2-stat-k">Total return</div><div className="lv2-stat-v num">{signed(G.strategy.totalReturn)}</div><div className="lv2-stat-k">S&amp;P {signed(G.spy.totalReturn)}</div></div>
+            </div>
+            <figcaption className="lv2-note">
+              The S&amp;P returned more in raw terms, and the Sharpe edge isn&apos;t statistically significant
+              (t = {G.significacion.tVsSpy}). We publish both.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section className="lv2-facts" aria-label="Key facts">
+        <div className="lv2-wrap">
+          <div className="lv2-facts-grid">
+            <div className="lv2-fact"><div className="lv2-fact-n serif">{G.months}</div><div className="lv2-fact-d">months backtested, 2008 included, net of costs</div></div>
+            <div className="lv2-fact"><div className="lv2-fact-n serif">{G.deflacion.ensayos}</div><div className="lv2-fact-d">strategy trials disclosed — not just the winner</div></div>
+            <div className="lv2-fact"><div className="lv2-fact-n serif">0×</div><div className="lv2-fact-d">leverage, ever</div></div>
+            <div className="lv2-fact"><div className="lv2-fact-n serif">€0</div><div className="lv2-fact-d">for the full engine, forever</div></div>
           </div>
-        ))}
-      </section>
-
-      {/* Honest positioning */}
-      <section style={{ ...card, background: "color-mix(in srgb, var(--sr-amber) 6%, var(--sr-surface))", borderColor: "color-mix(in srgb, var(--sr-amber) 26%, transparent)", textAlign: "center", marginBottom: "var(--sr-sp-6)" }}>
-        <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, lineHeight: 1.5, maxWidth: 680, marginInline: "auto" }}>
-          Everything is <span style={{ color: "var(--sr-amber)" }}>measured, not asserted</span> — the backtest is survivorship-free and out-of-sample, the AI cites only real numbers, and a live autonomous paper fund runs the strategy in the open.
-        </div>
-        <div style={{ display: "flex", gap: "var(--sr-sp-4)", justifyContent: "center", marginTop: "var(--sr-sp-4)", flexWrap: "wrap" }}>
-          <a onClick={() => router.push("/track-record")} style={{ cursor: "pointer", color: "var(--sr-amber)", fontWeight: 600, fontSize: "var(--sr-t-sm)" }}>→ Live track record</a>
-          <a onClick={() => router.push("/audit")} style={{ cursor: "pointer", color: "var(--sr-amber)", fontWeight: 600, fontSize: "var(--sr-t-sm)" }}>→ AI audit trail</a>
-          <a onClick={() => router.push("/pricing")} style={{ cursor: "pointer", color: "var(--sr-amber)", fontWeight: 600, fontSize: "var(--sr-t-sm)" }}>→ Pricing</a>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section style={{ textAlign: "center", padding: "var(--sr-sp-5) 0 var(--sr-sp-6)" }}>
-        <h2 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 var(--sr-sp-3)" }}>See the regime for yourself.</h2>
-        <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", margin: "0 0 var(--sr-sp-4)" }}>Free to start. The whole engine runs on free data.</p>
-        <button onClick={go} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "12px 32px", fontSize: "var(--sr-t-base)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
+      <section className="lv2-section">
+        <div className="lv2-wrap">
+          <div className="lv2-split-head">
+            <h2 className="lv2-h2 serif">Top-down, one layer at a time.</h2>
+            <p className="lv2-body">
+              The long cycle sets the ceiling, the regime sets the tilt, and a breadth loop flags when the macro
+              read and the market disagree — an early warning, not a forecast.
+            </p>
+          </div>
+          <div className="lv2-steps">
+            {[
+              ["01", "Secular clock", "Valuation and the long cycle set the baseline equity weight."],
+              ["02", "Risk-on allocation", "Liquidity, recession risk and financial stress tilt the mix across assets."],
+              ["03", "Sector rotation", "The regime picks which parts of the market to lean into."],
+              ["04", "Selection, gated", "Stock picking gets weight only when correlation says it can matter."],
+            ].map(([n, t, d]) => (
+              <div className="lv2-step" key={n}>
+                <span className="lv2-step-n num">{n}</span>
+                <div className="lv2-step-t">{t}</div>
+                <div className="lv2-step-d">{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
+
+      <section className="lv2-section-alt">
+        <div className="lv2-wrap lv2-score">
+          <div className="lv2-score-intro">
+            <h2 className="lv2-h2 serif">Where we win. And where we don&apos;t.</h2>
+            <p className="lv2-body">
+              Most platforms show you the chart that flatters them. We show the whole table — against the index and
+              a plain 60/40 — so you can judge the trade-off yourself.
+            </p>
+            <Link href="/track-record" className="lv2-link">See the full track record →</Link>
+          </div>
+          <table className="lv2-table">
+            <caption>{G.period} · monthly · net of costs · rf = T-bills. Best in each row marked ●.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Metric</th>
+                <th scope="col" className="lv2-us">Scora Growth</th>
+                <th scope="col">S&amp;P 500</th>
+                <th scope="col">60/40</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ROWS.map((r) => {
+                const best = Math.max(r.us, r.spy, r.b64);
+                return (
+                  <tr key={r.k}>
+                    <th scope="row">{r.k}</th>
+                    <Cell v={r.us} best={r.us === best} us fmt={r.fmt} />
+                    <Cell v={r.spy} best={r.spy === best} fmt={r.fmt} />
+                    <Cell v={r.b64} best={r.b64 === best} fmt={r.fmt} />
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="lv2-section">
+        <div className="lv2-wrap">
+          <h2 className="lv2-h2 serif" style={{ maxWidth: 640 }}>Built to be checked, not just trusted.</h2>
+          <div className="lv2-trust">
+            <div className="lv2-trust-item">
+              <span className="lv2-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" /><path d="M9 12l2 2 4-4" /></svg></span>
+              <div className="lv2-trust-t">AI with a hard gate</div>
+              <div className="lv2-trust-d">Every figure an AI answer emits is checked in code against the data it was given. Anything unverified is flagged.</div>
+            </div>
+            <div className="lv2-trust-item">
+              <span className="lv2-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 4h8l4 4v12H4V4h4z" /><path d="M8 12h8M8 16h5" /></svg></span>
+              <div className="lv2-trust-t">A public audit trail</div>
+              <div className="lv2-trust-d">Each AI run is logged with its sources and its grounding result, so you can read exactly what it relied on.</div>
+            </div>
+            <div className="lv2-trust-item">
+              <span className="lv2-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19h16" /><path d="M6 15l4-4 3 3 5-6" /></svg></span>
+              <div className="lv2-trust-t">Out-of-sample, survivorship-free</div>
+              <div className="lv2-trust-d">Walk-forward tests on point-in-time data, with the number of attempts published next to the result.</div>
+            </div>
+            <div className="lv2-trust-item">
+              <span className="lv2-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg></span>
+              <div className="lv2-trust-t">A live fund, in the open</div>
+              <div className="lv2-trust-d">An autonomous paper fund runs the strategy forward, every rebalance visible — no hindsight possible.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="lv2-wrap lv2-pricing">
+          <div className="lv2-pricing-intro">
+            <h2 className="lv2-h2 serif">Free where it matters.</h2>
+            <p className="lv2-body">The engine runs on free data, so the analysis stays free. Pro only adds convenience.</p>
+          </div>
+          <div className="lv2-plan">
+            <div className="lv2-plan-head"><span className="lv2-plan-name">Free</span><span className="lv2-plan-price serif">€0</span></div>
+            <ul>
+              <li>Macro regime + validated allocator</li>
+              <li>Live track record &amp; AI audit trail</li>
+              <li>Stock, bond &amp; instrument analysis</li>
+              <li>Daily AI analyses</li>
+              <li>Discovery screener</li>
+            </ul>
+            <Link href="/login" className="lv2-btn lv2-btn-primary">Start free</Link>
+          </div>
+          <div className="lv2-plan">
+            <div className="lv2-plan-head">
+              <span className="lv2-plan-name">Pro<span className="lv2-plan-soon">Coming soon</span></span>
+            </div>
+            <ul>
+              <li>Everything in Free</li>
+              <li>Higher daily AI limits</li>
+              <li>Regime-change &amp; divergence alerts</li>
+              <li>Watchlist signal notifications</li>
+              <li>Research-note export</li>
+            </ul>
+            <Link href="/pricing" className="lv2-btn lv2-btn-outline">See pricing</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="lv2-wrap">
+        <div className="lv2-band">
+          <div>
+            <h2 className="lv2-h2 serif">See today&apos;s regime before you sign up.</h2>
+            <p>The live read the engine runs on — no account needed.</p>
+          </div>
+          <div className="lv2-band-ctas">
+            <Link href="/demo" className="lv2-btn lv2-btn-light">Open the live demo</Link>
+            <Link href="/login" className="lv2-btn lv2-btn-ghost-dark">Start free</Link>
+          </div>
+        </div>
+      </section>
+
+      <footer className="lv2-footer">
+        <div className="lv2-wrap">
+          <div className="lv2-footer-grid">
+            <div className="lv2-footer-col">
+              <strong style={{ fontSize: 17 }}>Scora</strong>
+              <span style={{ color: "var(--lv-muted)", maxWidth: 320 }}>Regime-driven research, measured in public.</span>
+            </div>
+            <nav className="lv2-footer-col" aria-label="Product">
+              <strong>Product</strong>
+              <Link href="/demo">Live demo</Link>
+              <Link href="/daily">Daily close</Link>
+              <Link href="/pricing">Pricing</Link>
+            </nav>
+            <nav className="lv2-footer-col" aria-label="Evidence">
+              <strong>Evidence</strong>
+              <Link href="/track-record">Track record</Link>
+              <Link href="/evidence">Evidence ledger</Link>
+              <Link href="/audit">AI audit trail</Link>
+            </nav>
+          </div>
+          <p className="lv2-legal">
+            Scora Research is an educational tool for informational purposes only and is not investment advice.
+            Scores, valuations, backtests and AI commentary are estimates that may be wrong or out of date; verify
+            independently before making any decision. Backtested results are hypothetical. Past performance does not
+            predict future results. Capital at risk. Data from FRED, Finnhub, FMP, SEC EDGAR and other public sources.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

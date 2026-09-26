@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Discovery</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif;background:#070E1A;color:#F0F4F8}
+a{color:#F59E0B;text-decoration:none}a:hover{color:#FBBF24}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1300px; box-sizing: border-box; background: #070E1A; color: #F0F4F8; font-family: 'Hanken Grotesk', system-ui, sans-serif; line-height: 1.5; display: flex; flex-direction: column; align-items: center">
+<dc-import name="AppNav" active="Discovery" hint-size="1280px,56px"></dc-import>
+<div style="width: 1080px; box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div><h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Discovery</h1>
+<p style="margin: 6px 0 0; font-size: 12px; color: #94A3B8; max-width: 760px; line-height: 1.6">The S&amp;P 500 ranked by <strong style="color: #F0F4F8">12-1m momentum</strong>. This is a map of <em>what is leading right now</em> — not a list of recommendations, and not a claim that these names will outperform.</p></div>
+<div style="display: flex; gap: 6px">
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #F0F4F8; background: #122540; border: 1px solid #2A4F7A">Stocks · S&amp;P 500</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Cross-asset</button>
+</div>
+<div style="display: flex; align-items: center; gap: 16px; background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; padding: 16px 20px">
+<div style="text-align: center; min-width: 60px"><div style="font-size: 10px; color: #4A6080">Corr</div><div style="font-size: 22px; font-weight: 700">—</div></div>
+<div><div style="font-size: 14px; font-weight: 700">Selection regime: [label]</div><div style="font-size: 12px; color: #94A3B8">[Regime detail based on implied correlation]</div></div>
+</div>
+<div style="padding: 12px; border-radius: 10px; background: #122540; border: 1px dashed #1E3A5F">
+<div style="font-size: 10px; font-weight: 700; color: #94A3B8; margin-bottom: 4px">What we measured, before you trust this list</div>
+<div style="font-size: 10px; color: #4A6080; line-height: 1.55">Over <strong style="color: #94A3B8">192 months (2010–2026)</strong> on the point-in-time S&amp;P 500, picking the top momentum decile returned <strong style="color: #94A3B8">+728%</strong> — while holding <em>the same 400 names equally weighted</em>, with no selection at all, returned <strong style="color: #94A3B8">+908%</strong>. Ranking by momentum <strong style="color: #94A3B8">lagged doing nothing by 180 points</strong>, and its information coefficient is statistically indistinguishable from zero. Use this as a leadership map, not as a buy list.</div>
+</div>
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #F0F4F8; background: #122540; border: 1px solid #2A4F7A">All</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Communication Services</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Consumer Cyclical</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Energy</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Financial Services</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Healthcare</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">Technology</button>
+<button type="button" style="font-family: inherit; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; color: #4A6080; background: transparent; border: 1px solid transparent">…</button>
+</div>
+<div style="background: #0D1B2E; border: 1px solid #1E3A5F; border-radius: 14px; overflow: hidden">
+<table style="width: 100%; border-collapse: collapse; font-size: 12px">
+<thead><tr>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">#</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Ticker</th>
+<th style="text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Sector</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">12-1m mom</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">6m</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Momentum</th>
+<th style="text-align: right; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4A6080; padding: 8px 12px; border-bottom: 1px solid #1E3A5F">Price</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+<tr><td style="padding: 8px 12px; color: #4A6080; border-bottom: 1px solid #16304F">{{r.n}}</td><td style="padding: 8px 12px; color: #F59E0B; font-weight: 700; border-bottom: 1px solid #16304F">[TICKER]</td><td style="padding: 8px 12px; color: #94A3B8; border-bottom: 1px solid #16304F">[Sector]</td><td style="padding: 8px 12px; text-align: right; color: #10B981; border-bottom: 1px solid #16304F">+—%</td><td style="padding: 8px 12px; text-align: right; color: #94A3B8; border-bottom: 1px solid #16304F">—%</td><td style="padding: 8px 12px; text-align: right; border-bottom: 1px solid #16304F"><span style="padding: 2px 8px; border-radius: 999px; background: rgba(16,185,129,0.15); color: #10B981; font-weight: 700">—</span></td><td style="padding: 8px 12px; text-align: right; color: #94A3B8; border-bottom: 1px solid #16304F">$—</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<div style="text-align: right; font-size: 10px; color: #4A6080">As of — · — names · momentum from free EOD prices · research/discovery.mjs · audited in research/momentum_audit.mjs (192 months). Educational — not investment advice.</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1300}}'>
+class Component extends DCLogic {
+renderVals() { var rows = []; for (var i = 1; i <= 12; i++) rows.push({ n: i }); return { rows: rows }; }
+}
+</script>
+</body>
+</html>

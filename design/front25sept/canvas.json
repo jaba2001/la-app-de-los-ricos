@@ -1,0 +1,375 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "AppNav.dc.html": {
+      "h": 56,
+      "title": "[Anterior] AppNav",
+      "w": 1280,
+      "x": 6800,
+      "y": 14620
+    },
+    "Audit.dc.html": {
+      "h": 900,
+      "title": "[Anterior] Audit",
+      "w": 1280,
+      "x": 2720,
+      "y": 14620
+    },
+    "Daily.dc.html": {
+      "h": 1300,
+      "title": "[Anterior] Daily",
+      "w": 1280,
+      "x": 5440,
+      "y": 11200
+    },
+    "Demo.dc.html": {
+      "h": 1500,
+      "title": "[Anterior] Demo",
+      "w": 1280,
+      "x": 2720,
+      "y": 11200
+    },
+    "Discovery.dc.html": {
+      "h": 1300,
+      "title": "[Anterior] Discovery",
+      "w": 1280,
+      "x": 0,
+      "y": 13200
+    },
+    "Evidence.dc.html": {
+      "h": 1700,
+      "title": "[Anterior] Evidence",
+      "w": 1280,
+      "x": 1360,
+      "y": 14620
+    },
+    "Journal.dc.html": {
+      "h": 1150,
+      "title": "[Anterior] Journal",
+      "w": 1280,
+      "x": 6800,
+      "y": 13200
+    },
+    "Login.dc.html": {
+      "h": 800,
+      "title": "[Anterior] Login",
+      "w": 1280,
+      "x": 1360,
+      "y": 11200
+    },
+    "Macro.dc.html": {
+      "h": 1600,
+      "title": "[Anterior] Macro",
+      "w": 1280,
+      "x": 6800,
+      "y": 11200
+    },
+    "Main.dc.html": {
+      "h": 1880,
+      "title": "[Anterior] Landing",
+      "w": 1280,
+      "x": 0,
+      "y": 11200
+    },
+    "Momentum.dc.html": {
+      "h": 1150,
+      "title": "[Anterior] Momentum",
+      "w": 1280,
+      "x": 1360,
+      "y": 13200
+    },
+    "Picks.dc.html": {
+      "h": 1600,
+      "title": "[Anterior] Picks",
+      "w": 1280,
+      "x": 4080,
+      "y": 14620
+    },
+    "Pricing.dc.html": {
+      "h": 1000,
+      "title": "[Anterior] Pricing",
+      "w": 1280,
+      "x": 4080,
+      "y": 11200
+    },
+    "Sistema.dc.html": {
+      "h": 1500,
+      "title": "[Anterior] Design system",
+      "w": 1280,
+      "x": 5440,
+      "y": 14620
+    },
+    "StockDetail.dc.html": {
+      "h": 1100,
+      "title": "[Anterior] Stock detail",
+      "w": 1280,
+      "x": 4080,
+      "y": 13200
+    },
+    "Stocks.dc.html": {
+      "h": 900,
+      "title": "[Anterior] Stocks",
+      "w": 1280,
+      "x": 2720,
+      "y": 13200
+    },
+    "TrackRecord.dc.html": {
+      "h": 1700,
+      "title": "[Anterior] Track Record",
+      "w": 1280,
+      "x": 0,
+      "y": 14620
+    },
+    "Watchlist.dc.html": {
+      "h": 700,
+      "title": "[Anterior] Watchlist",
+      "w": 1280,
+      "x": 5440,
+      "y": 13200
+    },
+    "LandingV2.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 3320,
+      "title": "Home — Landing v2"
+    },
+    "PaletaV2.dc.html": {
+      "x": 0,
+      "y": 9560,
+      "w": 1280,
+      "h": 1100,
+      "title": "Paleta y tipografía v2"
+    },
+    "HowItWorks.dc.html": {
+      "x": 1360,
+      "y": 0,
+      "w": 1280,
+      "h": 3700,
+      "title": "How it works"
+    },
+    "TrackRecordV2.dc.html": {
+      "x": 2720,
+      "y": 0,
+      "w": 1280,
+      "h": 3800,
+      "title": "Track record"
+    },
+    "EvidenceV2.dc.html": {
+      "x": 4080,
+      "y": 0,
+      "w": 1280,
+      "h": 3900,
+      "title": "Evidence ledger"
+    },
+    "PricingV2.dc.html": {
+      "x": 5440,
+      "y": 0,
+      "w": 1280,
+      "h": 2300,
+      "title": "Pricing"
+    },
+    "DemoV2.dc.html": {
+      "x": 6800,
+      "y": 0,
+      "w": 1280,
+      "h": 2700,
+      "title": "Live demo"
+    },
+    "LoginV2.dc.html": {
+      "x": 8160,
+      "y": 0,
+      "w": 1280,
+      "h": 860,
+      "title": "Sign in"
+    },
+    "LegalV2.dc.html": {
+      "x": 9520,
+      "y": 0,
+      "w": 1280,
+      "h": 2000,
+      "title": "Legal"
+    },
+    "SiteHeader.dc.html": {
+      "x": 1360,
+      "y": 9744,
+      "w": 1280,
+      "h": 72,
+      "title": "Componente: SiteHeader"
+    },
+    "SiteFooter.dc.html": {
+      "x": 1360,
+      "y": 9936,
+      "w": 1280,
+      "h": 320,
+      "title": "Componente: SiteFooter"
+    },
+    "DailyV2.dc.html": {
+      "x": 0,
+      "y": 4320,
+      "w": 1280,
+      "h": 1700,
+      "title": "Daily"
+    },
+    "MacroV2.dc.html": {
+      "x": 1360,
+      "y": 4320,
+      "w": 1280,
+      "h": 2200,
+      "title": "Macro"
+    },
+    "DiscoveryV2.dc.html": {
+      "x": 2720,
+      "y": 4320,
+      "w": 1280,
+      "h": 1700,
+      "title": "Discovery"
+    },
+    "MomentumV2.dc.html": {
+      "x": 4080,
+      "y": 4320,
+      "w": 1280,
+      "h": 1600,
+      "title": "Momentum"
+    },
+    "StocksV2.dc.html": {
+      "x": 5440,
+      "y": 4320,
+      "w": 1280,
+      "h": 1200,
+      "title": "Stocks"
+    },
+    "StockDetailV2.dc.html": {
+      "x": 6800,
+      "y": 4320,
+      "w": 1280,
+      "h": 1700,
+      "title": "Stock detail"
+    },
+    "WatchlistV2.dc.html": {
+      "x": 0,
+      "y": 6940,
+      "w": 1280,
+      "h": 1000,
+      "title": "Watchlist"
+    },
+    "JournalV2.dc.html": {
+      "x": 1360,
+      "y": 6940,
+      "w": 1280,
+      "h": 1700,
+      "title": "Journal"
+    },
+    "AuditV2.dc.html": {
+      "x": 2720,
+      "y": 6940,
+      "w": 1280,
+      "h": 1300,
+      "title": "AI audit trail"
+    },
+    "PicksV2.dc.html": {
+      "x": 4080,
+      "y": 6940,
+      "w": 1280,
+      "h": 2200,
+      "title": "Scora Picks (fuera del menú)"
+    },
+    "AppNavV2.dc.html": {
+      "x": 1360,
+      "y": 9560,
+      "w": 1280,
+      "h": 64,
+      "title": "Componente: AppNavV2"
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-25T10:00:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "n1": {
+      "kind": "title1",
+      "maxW": 10800,
+      "text": "Web pública (sin sesión)",
+      "x": 0,
+      "y": -300
+    },
+    "n2": {
+      "kind": "title1",
+      "maxW": 8080,
+      "text": "App — pestañas (1/2)",
+      "x": 0,
+      "y": 4020
+    },
+    "n3": {
+      "kind": "title1",
+      "maxW": 8080,
+      "text": "App — pestañas (2/2) + Picks  ·  Track record y Evidence están en la fila Web pública",
+      "x": 0,
+      "y": 6640
+    },
+    "n4": {
+      "kind": "title1",
+      "maxW": 2640,
+      "text": "Sistema de diseño v2",
+      "x": 0,
+      "y": 9260
+    },
+    "n5": {
+      "kind": "title1",
+      "maxW": 8080,
+      "text": "Archivo — versión anterior (tema oscuro)",
+      "x": 0,
+      "y": 10900
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Login.dc.html",
+    "Demo.dc.html",
+    "Pricing.dc.html",
+    "Daily.dc.html",
+    "Macro.dc.html",
+    "Discovery.dc.html",
+    "Momentum.dc.html",
+    "Stocks.dc.html",
+    "StockDetail.dc.html",
+    "Watchlist.dc.html",
+    "Journal.dc.html",
+    "TrackRecord.dc.html",
+    "Evidence.dc.html",
+    "Audit.dc.html",
+    "Picks.dc.html",
+    "Sistema.dc.html",
+    "AppNav.dc.html",
+    "LandingV2.dc.html",
+    "PaletaV2.dc.html",
+    "HowItWorks.dc.html",
+    "TrackRecordV2.dc.html",
+    "EvidenceV2.dc.html",
+    "PricingV2.dc.html",
+    "DemoV2.dc.html",
+    "LoginV2.dc.html",
+    "LegalV2.dc.html",
+    "SiteHeader.dc.html",
+    "SiteFooter.dc.html",
+    "DailyV2.dc.html",
+    "MacroV2.dc.html",
+    "DiscoveryV2.dc.html",
+    "MomentumV2.dc.html",
+    "StocksV2.dc.html",
+    "StockDetailV2.dc.html",
+    "WatchlistV2.dc.html",
+    "JournalV2.dc.html",
+    "AuditV2.dc.html",
+    "PicksV2.dc.html",
+    "AppNavV2.dc.html"
+  ],
+  "pages": [],
+  "title": "Scora Research — Front"
+}
