@@ -145,7 +145,7 @@ const FECHAS_60D = ["2026-01-02", "2026-01-15", "2026-02-02", "2026-02-16"];   /
 
 // ── Salida por señal: hacen falta DOS evaluaciones (§5.1) ───────────────────────────────
 {
-  let state = { holdings: [{ ticker: "X", since: "2025-01-02" }], quarantineUntil: {}, belowExitCount: {} };
+  const state = { holdings: [{ ticker: "X", since: "2025-01-02" }], quarantineUntil: {}, belowExitCount: {} };
   const primera = decide({ date: "2026-02-02", signal: { X: 0.40 }, history: [], state });
   eq(primera.sells.length, 0, "una sola evaluación bajo el umbral NO vende");
   const segunda = decide({ date: "2026-02-16", signal: { X: 0.40 }, history: [], state: primera.nextState });

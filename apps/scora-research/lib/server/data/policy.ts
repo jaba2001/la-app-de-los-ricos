@@ -45,24 +45,23 @@ export const POLICY: Record<string, TablePolicy> = {
   sl_journal:         { scope: "user", userColumn: "user_id", ops: ["select", "insert", "update", "delete"] },
   sl_score_log:       { scope: "user", userColumn: "user_id", ops: ["upsert"] },
   sl_subscriptions:   { scope: "user", userColumn: "user_id", ops: ["select"] },
-  sl_waitlist:        { scope: "user", userColumn: "user_id", ops: ["insert"] },
   sl_watchlist:       { scope: "user", userColumn: "user_id", ops: ["select", "insert", "delete"] },
   stock_snapshot:     { scope: "user", userColumn: "user_id", ops: ["select", "upsert"] },
 
   // ── COMPARTIDAS: iguales para todos. Solo lectura desde el navegador ─────────────────
   // Las escribe el servidor (crons) o CI, nunca el cliente: por eso ninguna lleva `insert`.
   kb_cards:               { scope: "shared", ops: ["select"] },
-  kb_chunks:              { scope: "shared", ops: ["select"] },
   kb_docs:                { scope: "shared", ops: ["select"] },
   macro_state:            { scope: "shared", ops: ["select"] },
   macro_state_history:    { scope: "shared", ops: ["select"] },
   sl_briefings:           { scope: "shared", ops: ["select"] },
   sl_cohort:              { scope: "shared", ops: ["select"] },
-  sl_daily_close:         { scope: "shared", ops: ["select"] },
   sl_discovery:           { scope: "shared", ops: ["select"] },
+  // Las dos las lee components/macro/PaperFund.tsx: el track y el ultimo rebalanceo.
+  // `sl_paper_fund` estuvo fuera de esta lista y la seccion se pintaba VACIA sin error
+  // visible — el componente ignora el error de la consulta. Van juntas a proposito.
+  sl_paper_fund:          { scope: "shared", ops: ["select"] },
   sl_paper_fund_track:    { scope: "shared", ops: ["select"] },
-  sl_picks_position:      { scope: "shared", ops: ["select"] },
-  sl_picks_run:           { scope: "shared", ops: ["select"] },
   sl_track_summary:       { scope: "shared", ops: ["select"] },
   smart_money_top_buyers: { scope: "shared", ops: ["select"] },
 
@@ -77,8 +76,14 @@ export const POLICY: Record<string, TablePolicy> = {
  * constancia de que la ausencia es una decisión y no un olvido.
  */
 export const NO_EXPUESTAS: Record<string, string> = {
+  // Estaban permitidas pero NADIE las consulta desde el navegador (verificado recorriendo
+  // las 118 llamadas del cliente). Cada tabla expuesta de mas es superficie que auditar.
+  kb_chunks:         "la busca /api/data via rpc search_kb_chunks, no por consulta directa",
+  sl_daily_close:    "lo pinta /daily desde el servidor",
+  sl_picks_position: "lo lee lib/picksData.ts en el servidor",
+  sl_picks_run:      "idem",
+  sl_waitlist:       "se escribe por /api/waitlist, que valida el correo y limita por IP",
   sl_stripe_events: "eventos de facturación: los escribe el webhook de Stripe, nadie más",
-  sl_paper_fund:    "lo gestiona el cron de rebalanceo; el cliente solo lee su track",
   sl_revisions:     "artefacto de research, lo escribe CI",
   push_alert_state: "estado interno del cron de alertas",
 };

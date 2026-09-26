@@ -109,7 +109,7 @@ function neweyWest(serie, retardo = 24) {
   if (n < 3) return null;
   const m = media(serie);
   const d = serie.map((x) => x - m);
-  let g0 = d.reduce((s, x) => s + x * x, 0) / n;
+  const g0 = d.reduce((s, x) => s + x * x, 0) / n;
   let suma = g0;
   for (let l = 1; l <= Math.min(retardo, n - 1); l++) {
     let g = 0;
