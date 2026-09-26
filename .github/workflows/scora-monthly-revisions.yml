@@ -15,6 +15,13 @@ on:
     - cron: "0 15 3 * *" # 3rd of each month, 15:00 UTC (after the monthly score cron on the 2nd)
   workflow_dispatch: {} # allow manual runs
 
+# Los comandos de abajo asumen apps/scora-research: este fichero vivia alli hasta que se
+# descubrio que GitHub Actions SOLO mira .github/ en la RAIZ del repositorio. Estuvo sin
+# ejecutarse desde que los dos repos se fusionaron en el monorepo.
+defaults:
+  run:
+    working-directory: apps/scora-research
+
 jobs:
   track:
     runs-on: ubuntu-latest

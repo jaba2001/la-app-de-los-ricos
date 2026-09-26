@@ -63,18 +63,41 @@ const post = async (ruta, cuerpo, cab = {}) => {
 {
   const r = await fetch(`${BASE}/api/fmp/quote?symbol=AAPL`, { signal: AbortSignal.timeout(10000) });
   const t = await r.text();
-  check("401 devuelve JSON, no HTML", t.trim().startsWith("{"), true);
-  check("con la clave `error`", JSON.parse(t).error !== undefined, true);
+  const esJson = t.trim().startsWith("{");
+  check("401 devuelve JSON, no HTML", esJson, true);
+  // El JSON.parse iba fuera del condicional y reventaba EXACTAMENTE en el caso que la linea
+  // de arriba detecta: si el servidor devolvia HTML, la suite moria ahi y las cuatro
+  // comprobaciones de cabeceras de seguridad no llegaban a correr.
+  let tieneError = false;
+  if (esJson) { try { tieneError = JSON.parse(t).error !== undefined; } catch { /* no es JSON */ } }
+  check("con la clave `error`", tieneError, true);
 }
 
 // ── JSON invalido no debe tumbar el servidor ────────────────────────────────────────
 {
-  for (const ruta of ["/api/data", "/api/batch", "/api/waitlist"]) {
+  // Ojo con lo que esto prueba de verdad. En /api/data y /api/batch la sesion se comprueba
+  // ANTES de leer el cuerpo, asi que un JSON roto sin token devuelve 401 y el cuerpo ni se
+  // mira: afirmar "no es 500" ahi no prueba nada sobre el parseo.
+  //
+  // Lo que si se puede afirmar sin sesion es que NINGUNA entrada mal formada provoca un
+  // error del servidor. Y que el codigo es el de autenticacion, no uno de parseo — si un
+  // dia /api/data devolviera 400 aqui, significaria que lee el cuerpo antes de autenticar,
+  // que es un cambio de orden que conviene notar.
+  for (const ruta of ["/api/data", "/api/batch"]) {
     const r = await fetch(`${BASE}${ruta}`, {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: "{roto", signal: AbortSignal.timeout(10000),
     });
-    check(`${ruta} con JSON roto → no es 500`, r.status >= 500 && r.status !== 503, false);
+    check(`${ruta} con JSON roto → 401 (la sesion va antes que el cuerpo)`, r.status, 401);
+  }
+  // waitlist no exige sesion: ahi el cuerpo SI se llega a leer, asi que la comprobacion
+  // del parseo es real. 503 cuando no hay limitador, 400 cuando lo hay; nunca 500.
+  {
+    const r = await fetch(`${BASE}/api/waitlist`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: "{roto", signal: AbortSignal.timeout(10000),
+    });
+    check("waitlist con JSON roto → no es error del servidor", r.status === 500, false);
   }
 }
 
@@ -112,5 +135,5 @@ const post = async (ruta, cuerpo, cab = {}) => {
   }
 }
 
-console.log(bad ? `\ncontrato: ${bad} fallo(s)` : "\ncontrato: 16 comprobaciones OK");
+console.log(bad ? `\ncontrato: ${bad} fallo(s)` : "\ncontrato: 17 comprobaciones OK");
 process.exit(bad ? 1 : 0);

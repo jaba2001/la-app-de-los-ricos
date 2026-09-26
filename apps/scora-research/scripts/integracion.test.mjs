@@ -19,10 +19,25 @@
 const BASE = process.env.BASE || "http://127.0.0.1:3099";
 
 // ¿Hay servidor? Sin él no se puede probar nada de esto y saltar es mejor que fingir.
+// SOLO se salta cuando NO HAY NADIE al otro lado. Un servidor que contesta 500 es un
+// servidor ROTO, y eso tiene que fallar: la version anterior lo trataba como "no hay
+// servidor" y las 36 comprobaciones —incluidas todas las que sustituyen a la RLS— pasaban
+// en silencio contra una app caida. Un test que se salta solo cuando le conviene no prueba
+// nada.
 try {
   const r = await fetch(`${BASE}/api/ai/limits`, { signal: AbortSignal.timeout(5000) });
-  if (!r.ok && r.status !== 200) throw new Error(String(r.status));
-} catch {
+  if (!r.ok) {
+    console.error(`\nintegracion: el servidor en ${BASE} contesta ${r.status} en /api/ai/limits.`);
+    console.error("Eso es un servidor roto, no un servidor ausente. No se salta.");
+    process.exit(1);
+  }
+} catch (e) {
+  // Solo los fallos de CONEXION significan "no hay servidor". Un timeout o un 500 no.
+  const red = /ECONNREFUSED|fetch failed|ENOTFOUND|EAI_AGAIN/i.test(String(e?.cause?.code || e?.message || e));
+  if (!red) {
+    console.error(`\nintegracion: fallo hablando con ${BASE}: ${e?.message || e}`);
+    process.exit(1);
+  }
   console.log(`\n○ integracion: SALTADO — no hay servidor en ${BASE}`);
   console.log("  Arrancalo con: npm run build && PORT=3099 node .next/standalone/server.js");
   process.exit(0);
@@ -36,10 +51,17 @@ const check = (l, got, want) => {
 };
 
 const pedir = async (ruta, init = {}) => {
-  const r = await fetch(`${BASE}${ruta}`, { signal: AbortSignal.timeout(30000), ...init });
-  let cuerpo = null;
-  try { cuerpo = await r.json(); } catch { /* no todas devuelven JSON */ }
-  return { status: r.status, cuerpo, headers: r.headers };
+  try {
+    const r = await fetch(`${BASE}${ruta}`, { signal: AbortSignal.timeout(30000), ...init });
+    let cuerpo = null;
+    try { cuerpo = await r.json(); } catch { /* no todas devuelven JSON */ }
+    return { status: r.status, cuerpo, headers: r.headers };
+  } catch (e) {
+    // Sin esto, UN timeout entre 36 peticiones abortaba la suite con una promesa sin
+    // capturar y las comprobaciones restantes no llegaban a ejecutarse. Se devuelve un
+    // status 0 para que la comprobacion falle con su nombre, que es informacion util.
+    return { status: 0, cuerpo: { error: String(e?.message || e) }, headers: new Headers() };
+  }
 };
 
 // ── 1. Rutas PÚBLICAS: deben responder 200 sin sesión ───────────────────────────────
@@ -47,8 +69,10 @@ const pedir = async (ruta, init = {}) => {
   const l = await pedir("/api/ai/limits");
   check("ai/limits responde 200", l.status, 200);
   check("y trae los dos planes", [typeof l.cuerpo?.free, typeof l.cuerpo?.pro], ["number", "number"]);
-  // Es informacion de precio publica: si algun dia exige sesion, /pricing deja de pintar.
-  check("free < pro", l.cuerpo.free < l.cuerpo.pro, true);
+  // Con `?.`: si el cuerpo viene vacio, esto falla como comprobacion (util) en vez de
+  // lanzar un TypeError que aborta la suite en la tercera de 36 — antes de que llegue a
+  // correr una sola de las comprobaciones de sesion, que son las que importan.
+  check("free < pro", (l.cuerpo?.free ?? 0) < (l.cuerpo?.pro ?? 0), true);
 }
 
 // ── 2. TODA ruta de datos exige sesión ──────────────────────────────────────────────
@@ -75,7 +99,12 @@ const pedir = async (ruta, init = {}) => {
   // devuelve 503, que es el comportamiento correcto — no 401.
   {
     const r = await pedir("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
-    check("waitlist no acepta sin limitador (fail-closed)", [r.status, r.cuerpo?.error], [503, "Rate limiter unavailable"]);
+    // Depende del entorno, y fijar uno solo hacia que la suite fallara en el otro:
+    //   · sin Upstash  -> 503, porque su limitador es fail-closed a proposito (sin el
+    //     seria un cañon de correos anonimo).
+    //   · con Upstash  -> 400, porque el cuerpo vacio no trae correo valido.
+    // Lo que se prueba es lo comun a los dos: un cuerpo vacio NUNCA se acepta.
+    check("waitlist rechaza un cuerpo vacio", [r.status, r.status === 503 || r.status === 400], [r.status, true]);
   }
 
   for (const [method, ruta] of protegidas) {

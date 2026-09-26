@@ -8,12 +8,15 @@
 // romperse y que los errores de red llegan a la pantalla en vez de quedarse en la consola.
 import { test, expect, type Page, type ConsoleMessage, type Response } from "@playwright/test";
 
-// HALLAZGO A-3 (ver AUDIT_REPORT.md): /_vercel/insights y /_vercel/speed-insights dan 404
-// en cada carga. Esos scripts los servia la PLATAFORMA de Vercel; en Cloud Run no existen,
-// pero @vercel/analytics y @vercel/speed-insights siguen en app/layout.tsx pidiendolos.
-// Se filtran aqui para que la suite mida lo que puede arreglarse hoy, no para taparlo: el
-// fallo esta en el informe y el fix es quitar los dos componentes del layout.
-const RUIDO_CONOCIDO = /favicon|manifest|sw\.js|posthog|sentry|_vercel\/(insights|speed-insights)/i;
+// Ruido que NO indica un fallo de la app: el favicon y el manifest pueden faltar en local,
+// el service worker solo existe tras un build de PWA, y PostHog y Sentry no estan
+// configurados en pruebas.
+//
+// Ya NO se filtran los 404 de /_vercel/*: el hallazgo A-3 esta corregido en este mismo
+// commit (los componentes de Vercel salieron del layout) y filtrarlos ahora dejaria pasar
+// una regresion si alguien los vuelve a anadir. Si reaparecen, estas pruebas fallan — que
+// es lo que queremos.
+const RUIDO_CONOCIDO = /favicon|manifest|sw\.js|posthog|sentry/i;
 
 /**
  * Vigila la página: errores de consola, excepciones sin capturar y RECURSOS QUE FALLAN.
