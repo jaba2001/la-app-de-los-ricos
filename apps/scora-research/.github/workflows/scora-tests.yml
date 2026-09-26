@@ -275,6 +275,16 @@ jobs:
       - name: Frescura de los artefactos publicados
         run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
 
+      # ── INTEGRACION Y CONTRATO ────────────────────────────────────────────────────────
+      # Las 51 suites de abajo prueban funciones puras importandolas. Ninguna arranca la
+      # app, asi que un fallo de cableado —una ruta mal exportada, un runtime equivocado,
+      # un import que solo revienta en produccion— las pasa todas y rompe en el navegador.
+      # Estas dos si llaman a la app; sin servidor se saltan y lo dicen.
+      - name: Integracion (cada endpoint contra la app real)
+        run: node --experimental-strip-types --no-warnings scripts/integracion.test.mjs
+      - name: Contrato front-back (payloads y formas de respuesta)
+        run: node --experimental-strip-types --no-warnings scripts/contrato.test.mjs
+
       # ── AISLAMIENTO ENTRE USUARIOS ────────────────────────────────────────────────────
       # La garantia de que un usuario no ve los datos de otro dejo de estar en la base de
       # datos (38 politicas RLS de Supabase) y paso a lib/server/data/query.ts. Si esa
