@@ -1,5 +1,10 @@
 # Auditoría de Scora — 26 de septiembre de 2026
 
+> **Estado: 10 de los 11 hallazgos CORREGIDOS** (commit posterior a la auditoría).
+> Queda **B-3** (rotar la clave de FRED), que requiere acción en fred.stlouisfed.org, y
+> **M-1** (subir a Next 16), que es una migración mayor y no un arreglo — se deja decidida
+> aparte. Cada hallazgo lleva abajo su estado y qué se hizo.
+
 ## Resumen ejecutivo
 
 El proyecto está **sano y verificado de punta a punta**. La suite pasa de 51 a 53 suites y
@@ -26,6 +31,8 @@ credenciales: el login completo y las pantallas con sesión.
 
 #### C-1 · `sl_paper_fund` bloqueada por la política — la sección se renderiza vacía
 
+**✅ CORREGIDO.** `sl_paper_fund` añadida a `POLICY` junto a su track, con un comentario que explica que el componente lee las dos.
+
 **Dónde:** `apps/scora-research/lib/server/data/policy.ts:81` · `components/macro/PaperFund.tsx:24`
 
 `PaperFund.tsx` consulta **dos** tablas: `sl_paper_fund_track` (permitida) y `sl_paper_fund`,
@@ -51,6 +58,8 @@ Y borrar su entrada de `NO_EXPUESTAS`.
 
 #### A-1 · La lista de CORS apunta a dominios de Vercel que se apagan
 
+**✅ CORREGIDO.** Añadido el dominio de Cloud Run. Los de Vercel se conservan mientras ese despliegue siga vivo, anotado para retirarlos al apagarlo.
+
 **Dónde:** `lib/server/cors.js:21-28`
 
 Contiene `scora-research.vercel.app`, `ic-suite.vercel.app`, `ic-datalayer-app.vercel.app` y
@@ -64,6 +73,8 @@ bloqueará.
 propio, el definitivo. Revisar si los de Vercel siguen haciendo falta.
 
 #### A-2 · El proyecto no tenía ESLint configurado
+
+**✅ CORREGIDO.** `eslint.config.mjs` en el repo, `npm run lint` en scripts y en `npm run verify`. 0 errores, 107 avisos (ninguno bloquea).
 
 **Dónde:** raíz de `apps/scora-research` (resuelto en esta auditoría)
 
@@ -81,6 +92,8 @@ esas reglas nuevas.** Se bajaron a aviso, documentando el porqué. Subirlas a er
 decisión aparte que exige arreglarlas primero.
 
 #### A-3 · Los scripts de Vercel dan 404 en cada carga de página
+
+**✅ CORREGIDO.** `@vercel/analytics` y `@vercel/speed-insights` fuera del layout y desinstalados. Verificado con E2E: cero recursos fallidos en las 6 pruebas.
 
 **Dónde:** `app/layout.tsx:9-10,67-68`
 
@@ -104,6 +117,8 @@ la da PostHog, que sí funciona.
 
 #### M-1 · `next@15.5.19` con 1 vulnerabilidad crítica y 7 altas
 
+**⏸ NO CORREGIDO — decisión pendiente.** Subir a Next 16 es un cambio mayor, no un arreglo: cambia el runtime, las reglas de React y el comportamiento de las rutas. Dado que las dos críticas son de Server Actions y esta app no las usa, no hay urgencia. Merece su propia rama.
+
 `npm audit` da 15 vulnerabilidades (1 crítica, 7 altas, 7 moderadas).
 
 **Matización que cambia la severidad real:** las dos críticas de Next son *Denial of Service
@@ -115,6 +130,8 @@ El fix es Next 16, un cambio mayor. Las altas (`brace-expansion`, `browserslist`
 `postcss`, `sharp`…) son todas dependencias de compilación, no de ejecución.
 
 #### M-2 · El parseo del Congreso traga fila a fila en silencio
+
+**✅ CORREGIDO.** Los dos `catch` ahora anotan el fallo de parseo, lo registran en el log, y una cámara que contesta 200 pero cuyo cuerpo no se puede leer **deja de contar como buena**: no se cachea ese vacío.
 
 **Dónde:** `lib/server/providers/congress.js:91,111`
 
@@ -129,6 +146,8 @@ deja de disfrazarse de «no hay operaciones»"*).
 lista vacía.
 
 #### M-3 · Promesa sin `catch`
+
+**✅ CORREGIDO.** `.catch()` añadido; si el token no se renueva, queda `null` y el botón lo trata como sin sesión.
 
 **Dónde:** `app/pricing/page.tsx:302`
 
@@ -148,11 +167,11 @@ botón de pago se queda sin token, sin avisar.
 
 | | Hallazgo | Dónde |
 |---|---|---|
-| **B-1** | 5 tablas permitidas que nadie consulta: `kb_chunks`, `sl_daily_close`, `sl_picks_position`, `sl_picks_run`, `sl_waitlist`. Superficie de más | `lib/server/data/policy.ts` |
-| **B-2** | 4 `catch {}` sin comentario. Comportamiento correcto (recorrer nombres candidatos), pero ilegible | `app/api/cron/13f-refresh/route.js:41,47` |
-| **B-3** | Clave de FRED en el historial de un repo **público**, sin rotar | 7 commits |
-| **B-4** | `let` que nunca se reasigna. Bloqueaba el build con `prefer-const` en error | `lib/deflacion.ts:54` |
-| **B-5** | 10 variables sin usar y 10 apóstrofos sin escapar en JSX | varios |
+| **B-1** ✅ | Corregido: quitadas de `POLICY`, con la razón de cada una en `NO_EXPUESTAS`. 5 tablas permitidas que nadie consulta: `kb_chunks`, `sl_daily_close`, `sl_picks_position`, `sl_picks_run`, `sl_waitlist`. Superficie de más | `lib/server/data/policy.ts` |
+| **B-2** ✅ | Corregido: los 4 llevan ahora un comentario que explica la intención. 4 `catch {}` sin comentario. Comportamiento correcto (recorrer nombres candidatos), pero ilegible | `app/api/cron/13f-refresh/route.js:41,47` |
+| **B-3** ⏸ | **Pendiente: requiere rotarla en fred.stlouisfed.org.** Clave de FRED en el historial de un repo **público**, sin rotar | 7 commits |
+| **B-4** ✅ | Corregido separando la declaración de `q` (sí se reasigna) y `r`. Las 30 pruebas del cálculo siguen pasando. `let` que nunca se reasigna. Bloqueaba el build con `prefer-const` en error | `lib/deflacion.ts:54` |
+| **B-5** ✅ | Corregido con `eslint --fix`. 10 variables sin usar y 10 apóstrofos sin escapar en JSX | varios |
 
 ---
 

@@ -38,13 +38,13 @@ async function fetchInfoTableXml(cikInt, accNo) {
       const xml = await fetch(`${base}/${name}`, { headers }).then(r => r.text());
       if (/<(?:\w+:)?infoTable>/i.test(xml)) return xml;
     }
-  } catch {}
+  } catch { /* el listado del directorio fallo: se prueban los nombres fijos de abajo */ }
   // Fallback: known fixed names.
   for (const name of ['infotable.xml', 'form13fInfoTable.xml']) {
     try {
       const xml = await fetch(`${base}/${name}`, { headers }).then(r => r.text());
       if (/<(?:\w+:)?infoTable>/i.test(xml)) return xml;
-    } catch {}
+    } catch { /* ese nombre no existe en este envio: se prueba el siguiente */ }
   }
   return '';
 }
