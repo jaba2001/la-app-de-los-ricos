@@ -87,3 +87,8 @@ variable "vapid_subject" {
   type        = string
   default     = "mailto:alerts@scora.app"
 }
+
+variable "cloud_sql_instance" {
+  description = "Conexion de la instancia, en formato proyecto:region:instancia. Se ve con `gcloud sql instances describe scora-db --format='value(connectionName)'`."
+  type        = string
+}

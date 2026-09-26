@@ -55,12 +55,33 @@ resource "google_cloud_run_v2_service" "scora" {
         container_port = 8080
       }
 
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
+      }
+
       dynamic "env" {
         for_each = local.config
         content {
           name  = env.key
           value = env.value
         }
+      }
+
+      // La conexion a Cloud SQL. Cloud Run monta un socket en /cloudsql/<instancia> y el
+      // trafico va cifrado por el proxy de Google: no hay contraseña por la red abierta ni
+      // IP que autorizar en el cortafuegos de la base.
+      env {
+        name  = "CLOUD_SQL_INSTANCE"
+        value = var.cloud_sql_instance
+      }
+      env {
+        name  = "PGDATABASE"
+        value = "scora"
+      }
+      env {
+        name  = "PGUSER"
+        value = "postgres"
       }
 
       env {
@@ -110,6 +131,15 @@ resource "google_cloud_run_v2_service" "scora" {
         tcp_socket {
           port = 8080
         }
+      }
+    }
+
+    # Sin esto el socket /cloudsql/... no existe dentro del contenedor y cada consulta
+    # falla con ENOENT — un error que no menciona Cloud SQL por ninguna parte.
+    volumes {
+      name = "cloudsql"
+      cloud_sql_instance {
+        instances = [var.cloud_sql_instance]
       }
     }
 
