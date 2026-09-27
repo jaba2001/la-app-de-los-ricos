@@ -54,30 +54,51 @@ export function pool(): Pool {
 
 // ── Las columnas reales, cacheadas ───────────────────────────────────────────────────
 // query.ts valida cada nombre de columna contra el esquema de verdad: es lo único que no se
-// puede parametrizar y por tanto la única vía de inyección. Se lee una vez por instancia.
+// puede parametrizar y por tanto la única vía de inyección.
+//
+// Se relee cada ESQUEMA_TTL_MS (AUDIT_REPORT M-6). Antes se leía una vez por instancia y para
+// siempre: tras una migración que añadía una columna, la app la rechazaba ("Columna no
+// permitida") hasta que Cloud Run reciclara la instancia, que puede ser días.
+let ESQUEMA_TTL_MS = 10 * 60_000;
 let _esquema: Esquema | null = null;
+let _leidoEn = 0;
 let _leyendo: Promise<Esquema> | null = null;
 
 export async function esquema(): Promise<Esquema> {
-  if (_esquema) return _esquema;
+  if (_esquema && Date.now() - _leidoEn < ESQUEMA_TTL_MS) return _esquema;
   // Sin esto, N peticiones simultáneas en un arranque en frío lanzarían N consultas iguales.
   if (_leyendo) return _leyendo;
   _leyendo = (async () => {
-    // El ::text no es decorativo: column_name es de tipo information_schema.sql_identifier y
-    // el driver no sabe convertir un array de ese tipo — devolvería la cadena "{a,b,c}" y el
-    // Set acabaría lleno de letras sueltas, rechazando toda columna.
-    const { rows } = await pool().query<{ t: string; cols: string[] }>(
-      `select table_name::text as t, array_agg(column_name::text) as cols
-         from information_schema.columns
-        where table_schema = 'public'
-        group by 1`
-    );
-    _esquema = Object.fromEntries(rows.map((r) => [r.t, new Set(r.cols)]));
-    _leyendo = null;
-    return _esquema;
+    try {
+      // El ::text no es decorativo: column_name es de tipo information_schema.sql_identifier
+      // y el driver no sabe convertir un array de ese tipo — devolvería la cadena "{a,b,c}" y
+      // el Set acabaría lleno de letras sueltas, rechazando toda columna.
+      const { rows } = await pool().query<{ t: string; cols: string[] }>(
+        `select table_name::text as t, array_agg(column_name::text) as cols
+           from information_schema.columns
+          where table_schema = 'public'
+          group by 1`
+      );
+      _esquema = Object.fromEntries(rows.map((r) => [r.t, new Set(r.cols)]));
+      _leidoEn = Date.now();
+      return _esquema;
+    } catch (e) {
+      // Con un esquema anterior se sigue sirviendo: mejor unos minutos con la foto vieja que
+      // tumbar /api/data. Sin ninguno, se propaga (503) — pero sin quedarse pegado.
+      if (_esquema) return _esquema;
+      throw e;
+    } finally {
+      // SIEMPRE, también si falla. Antes solo se limpiaba en el camino feliz: una primera
+      // lectura fallida (la base arrancando) dejaba la promesa rechazada guardada y cada
+      // petición posterior fallaba hasta reiniciar la instancia, aunque la base ya hubiera
+      // vuelto (AUDIT_REPORT M-6).
+      _leyendo = null;
+    }
   })();
   return _leyendo;
 }
 
 /** Para las pruebas: olvida el esquema cacheado. */
-export function _olvidarEsquema() { _esquema = null; _leyendo = null; }
+export function _olvidarEsquema() { _esquema = null; _leidoEn = 0; _leyendo = null; }
+/** Para las pruebas: cambia la caducidad. */
+export function _ttlEsquema(ms: number) { ESQUEMA_TTL_MS = ms; }

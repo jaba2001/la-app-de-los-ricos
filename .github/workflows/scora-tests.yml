@@ -330,6 +330,11 @@ jobs:
 
       # /daily y /picks leian el REST de Supabase y salian vacias en produccion sin que nada
       # fallara (AUDIT_REPORT C-2). Se salta sin Postgres, como la anterior.
+      # La cache del esquema caduca y se recupera de una primera lectura fallida
+      # (AUDIT_REPORT M-6). Se salta sin Postgres.
+      - name: Cache del esquema (se salta sin base)
+        run: node --experimental-strip-types --no-warnings scripts/esquema.test.mjs
+
       - name: Lecturas de servidor de /daily y /picks (se salta sin base)
         run: node --experimental-strip-types --no-warnings scripts/lecturas_servidor.test.mjs
 
