@@ -79,7 +79,7 @@ export async function POST(request) {
       mode: 'subscription',
       'line_items[0][price]': process.env.STRIPE_PRICE_ID,
       'line_items[0][quantity]': 1,
-      // El puente entre el usuario de Supabase y el cliente de Stripe. Sin esto el webhook
+      // El puente entre el usuario (uid de Identity Platform) y el cliente de Stripe. Sin esto el webhook
       // recibe un pago y no sabe a quién dárselo.
       client_reference_id: user.id,
       ...(customerId ? { customer: customerId } : { customer_email: user.email }),

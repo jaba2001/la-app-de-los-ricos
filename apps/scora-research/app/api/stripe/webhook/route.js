@@ -25,17 +25,16 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 // de la red privada en vez de detrás de una API pública, y para un cron da igual.
 export const runtime = 'nodejs';
 
-const KEY = () => process.env.SUPABASE_SERVICE_KEY;
+// sbFetch solo mira `Prefer` (upsert o no). Las cabeceras apikey/Authorization de Supabase
+// que iban aquí ya no significaban nada.
+const sbHeaders = (extra = {}) => ({ 'Content-Type': 'application/json', ...extra });
 
-const sbHeaders = (extra = {}) => ({
-  'Content-Type': 'application/json',
-  apikey: KEY(),
-  Authorization: `Bearer ${KEY()}`,
-  ...extra,
-});
-
-/** Un uuid de verdad. client_reference_id lo elegimos nosotros, pero llega desde fuera. */
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/**
+ * Un uid de Identity Platform (hasta 128 caracteres alfanuméricos; en la práctica 28).
+ * client_reference_id lo elegimos nosotros, pero llega desde fuera. Antes exigía un UUID —el
+ * id de Supabase—, y todo pago de un usuario de Identity Platform se descartaba en silencio.
+ */
+const UID = /^[A-Za-z0-9]{1,128}$/;
 
 const iso = (unixSec) =>
   Number.isFinite(unixSec) && unixSec > 0 ? new Date(unixSec * 1000).toISOString() : null;
@@ -183,7 +182,7 @@ export async function POST(request) {
 
         // Un pago único (mode: 'payment') no crea suscripción: no es nuestro caso, se ignora.
         if (!subId) break;
-        if (!userId || !UUID.test(userId)) {
+        if (!userId || !UID.test(userId)) {
           // Sin usuario no hay a quién dar el permiso. Se registra y se devuelve 200: es un
           // fallo de configuración del Payment Link (le falta client_reference_id), y
           // reintentarlo no lo va a arreglar.

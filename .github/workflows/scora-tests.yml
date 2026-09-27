@@ -359,6 +359,10 @@ jobs:
       # insertar el suyo (AUDIT_REPORT A-4). La parte con Postgres se salta sin base.
       - name: Registro de auditoria de la IA
         run: node --experimental-strip-types --no-warnings scripts/auditoriaia.test.mjs
+      # El webhook de Stripe de punta a punta: exigia un UUID de Supabase y descartaba todo pago
+      # de un uid de Identity Platform. Sin Postgres se salta.
+      - name: Webhook de Stripe contra la base
+        run: node --experimental-strip-types --no-warnings scripts/stripewebhook.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)
