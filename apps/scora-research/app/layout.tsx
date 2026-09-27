@@ -7,6 +7,7 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import ConsentBanner from "@/components/ConsentBanner";
+import { SITIO } from "@/lib/sitio";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -22,7 +23,7 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://scora-research.vercel.app"),
+  metadataBase: new URL(SITIO),
   title: { default: "Scora Research — the top-down system that corrects itself", template: "%s · Scora Research" },
   description: "Regime-driven multi-asset allocation, validated out-of-sample, plus an AI layer that can't invent a number — enforced in code. Free. Risk, managed and auditable.",
   keywords: ["macro regime", "asset allocation", "risk parity", "stock research", "grounded AI", "backtest", "top-down"],

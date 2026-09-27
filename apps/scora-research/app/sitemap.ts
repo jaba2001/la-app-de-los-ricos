@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { fetchDailyDates } from "@/lib/dailyClose";
+import { SITIO } from "@/lib/sitio";
 
 // Public, indexable routes. Auth-gated app pages (stock, watchlist, audit) are excluded —
 // they render behind login and carry no public content. The landing, pricing and the live
@@ -9,7 +10,7 @@ import { fetchDailyDates } from "@/lib/dailyClose";
 export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "https://scora-research.vercel.app";
+  const base = SITIO;
   const now = new Date();
 
   const routes: MetadataRoute.Sitemap = [

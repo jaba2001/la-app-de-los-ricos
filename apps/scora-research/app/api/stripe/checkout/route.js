@@ -15,6 +15,7 @@ import { checkRateLimit } from '../../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight, allowOrigin } from '../../../../lib/server/cors.js';
 import { stripeApi, stripeEnabled } from '../../../../lib/server/stripe.js';
 import { sbFetch } from "../../../../lib/server/data/postgrest.js";
+import { SITIO } from "../../../../lib/sitio.ts";
 
 // RUNTIME NODE, no edge. Esta ruta habla con Cloud SQL y el driver de Postgres necesita
 // sockets de Node — en edge el build falla con "Can't resolve 'fs'". Con Supabase no pasaba
@@ -22,7 +23,10 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 // de la red privada en vez de detrás de una API pública, y para un cron da igual.
 export const runtime = 'nodejs';
 
-const FALLBACK_APP = 'https://scora-research.vercel.app';
+// Era https://scora-research.vercel.app, el despliegue antiguo. Como la URL de Cloud Run no
+// está en la lista de CORS y APP_URL no está puesta, un pago devolvía al usuario allí
+// (AUDIT_REPORT B-4).
+const FALLBACK_APP = SITIO;
 
 /**
  * A dónde vuelve el usuario tras pagar.
