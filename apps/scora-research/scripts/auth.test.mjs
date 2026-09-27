@@ -11,7 +11,7 @@ import { generateKeyPair, SignJWT, exportJWK, createLocalJWKSet } from "jose";
 
 const PROYECTO = "scora-509716";
 process.env.GCP_PROJECT_ID = PROYECTO;
-const { verifyTokenLocally, localVerifyAvailable, _usarJwks } = await import("../lib/server/auth.js");
+const { verifyTokenLocally, localVerifyAvailable, _usarJwks, requireUser } = await import("../lib/server/auth.js");
 
 // Un par de claves de mentira que hace de Google para la prueba.
 const { publicKey, privateKey } = await generateKeyPair("RS256");
@@ -20,8 +20,9 @@ _usarJwks(createLocalJWKSet({ keys: [jwk] }));
 // Y otra distinta, para el token de un emisor que no es quien dice ser.
 const otra = await generateKeyPair("RS256");
 
-let bad = 0;
+let bad = 0, total = 0;
 const check = (l, got, want) => {
+  total++;
   if (!Object.is(got, want)) { bad++; console.log(`FAIL  ${l}\n      got:  ${got}\n      want: ${want}`); }
 };
 
@@ -85,6 +86,27 @@ check("vacio", await verifyTokenLocally(""), null);
   check("HS256 rechazado (solo RS256)", await verifyTokenLocally(hs), null);
 }
 
+// ── requireUser, con y sin `strict` ─────────────────────────────────────────────────
+// `strict` lo piden las rutas que gastan dinero (IA y Stripe). Hasta el 27-09 tenia detras
+// una llamada a Supabase; al quitarla, `strict` caia directo en "denegar todo" y esas cuatro
+// rutas devolvian 503 a cualquier usuario con sesion. Ninguna prueba lo cubria porque aqui
+// solo se probaba verifyTokenLocally (AUDIT_REPORT C-1).
+{
+  const pide = (token) => new Request("http://x/api/anthropic/messages",
+    { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  const bueno = await firma();
+  for (const strict of [false, true]) {
+    const tag = strict ? "strict" : "normal";
+    const ok = await requireUser(pide(bueno), { strict });
+    check(`${tag}: token valido → usuario`, ok.user?.id, "uid28caracteresDeIdentityPl");
+    check(`${tag}: token valido → sin error`, ok.error, null);
+    const falso = await requireUser(pide(await firma({}, { key: otra.privateKey })), { strict });
+    check(`${tag}: firmado por otro → 401`, falso.error?.status, 401);
+    const sin = await requireUser(pide(null), { strict });
+    check(`${tag}: sin token → 401`, sin.error?.status, 401);
+  }
+}
+
 // ── Sin configurar: "no he podido comprobarlo", que NO es "invalido" ────────────────
 {
   delete process.env.GCP_PROJECT_ID; delete process.env.GOOGLE_CLOUD_PROJECT;
@@ -94,5 +116,5 @@ check("vacio", await verifyTokenLocally(""), null);
   process.env.GCP_PROJECT_ID = PROYECTO;
 }
 
-console.log(bad ? `\nauth: ${bad} fallo(s)` : "\nauth: 14 comprobaciones OK");
+console.log(bad ? `\nauth: ${bad} fallo(s) de ${total}` : `\nauth: ${total} comprobaciones OK`);
 process.exit(bad ? 1 : 0);

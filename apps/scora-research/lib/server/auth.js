@@ -16,16 +16,12 @@ function deny(request, message, status = 401) {
 // token ya viene firmado: comprobar la firma aquí no necesita a nadie.
 //
 // EL COSTE HONESTO DE ESTO: un token verificado localmente sigue siendo válido hasta que
-// expira, aunque el usuario cierre sesión o se le revoque el acceso antes. La red lo habría
-// detectado en el acto; la firma no. Los access tokens de Supabase duran 1 h por defecto,
-// así que esa es la ventana. Se acepta para las rutas de DATOS —solo leen datos de mercado
-// que son iguales para todo el mundo— y NO se acepta donde se gasta dinero: las rutas de IA
-// y de Stripe piden `strict: true` y siguen preguntando a Supabase (ver requireUser). Ahí
-// la latencia da igual (son pocas llamadas) y la revocación tiene que ser inmediata.
+// expira, aunque el usuario cierre sesión o se le revoque el acceso antes. Los tokens de
+// Identity Platform duran 1 h, así que esa es la ventana, y hoy vale para TODAS las rutas:
+// las de IA y Stripe piden `strict: true`, pero desde la migración no hay camino de red que
+// lo refuerce (ver requireUser y AUDIT_REPORT C-1).
 //
-// SI NO HAY NADA CONFIGURADO, no se rompe: sin JWT secret ni SUPABASE_URL se cae al camino
-// de red de siempre. Desplegar esto sin tocar variables de entorno no cambia el
-// comportamiento; la mejora se activa al añadir SUPABASE_JWT_SECRET (o sola, vía JWKS).
+// SIN GCP_PROJECT_ID no se puede comprobar la audiencia, y se deniega todo con 503.
 
 // Identity Platform firma los tokens con RS256 y claves rotativas de Google, publicadas en
 // un JWKS. No hay secreto compartido que guardar: se comprueba la firma contra la clave
@@ -137,9 +133,13 @@ export async function optionalUser(request) {
 }
 
 /**
- * @param opts.strict  Salta la verificación local y pregunta SIEMPRE a Supabase. Para las
- *   rutas que gastan dinero (IA, Stripe): ahí una sesión revocada tiene que dejar de valer
- *   en el acto, y el viaje de red no se nota porque son pocas llamadas.
+ * @param opts.strict  Lo piden las rutas que gastan dinero (IA, Stripe). Con Supabase
+ *   significaba "pregunta siempre a la red", para que una sesión revocada dejara de valer en
+ *   el acto. Esa llamada desapareció con la migración y `strict` se quedó cayendo directo en
+ *   "denegar todo": las cuatro rutas devolvían 503 a cualquier usuario (AUDIT_REPORT C-1).
+ *   Hoy verifica la firma igual que el resto. La revocación inmediata necesitaría consultar
+ *   `tokensValidAfterTime` con el Admin SDK; hasta entonces, la ventana es la vida del token
+ *   de Identity Platform (1 h). Se conserva el parámetro para no perder qué rutas lo piden.
  */
 export async function requireUser(request, opts = {}) {
   const token = bearer(request);
@@ -147,16 +147,14 @@ export async function requireUser(request, opts = {}) {
     return { user: null, error: deny(request, 'Missing Authorization header') };
   }
 
-  if (!opts.strict) {
-    const local = await verifyTokenLocally(token);
-    if (local) return { user: local, error: null };
-    if (local === null) return { user: null, error: deny(request, 'Invalid token') };
-    // `undefined` ⇒ no se pudo comprobar sin red; sigue al camino de siempre.
-  }
+  const local = await verifyTokenLocally(token);
+  if (local) return { user: local, error: null };
+  if (local === null) return { user: null, error: deny(request, 'Invalid token') };
 
-  // Fail closed: si no se puede comprobar, se deniega. Antes habia un camino de red a
-  // Supabase como respaldo; con Identity Platform la firma se verifica sin red, asi que no
-  // poder verificar significa que falta configuracion y denegar es lo correcto.
-  console.error('requireUser: GCP_PROJECT_ID sin configurar — denegando todo');
+  // `undefined`: no se pudo comprobar. O falta GCP_PROJECT_ID o no se pudieron descargar las
+  // claves de Google. En los dos casos se deniega, y el log dice cuál de los dos es.
+  console.error(localVerifyAvailable()
+    ? `requireUser: no se pudieron obtener las claves de Google — denegando${opts.strict ? ' (strict)' : ''}`
+    : 'requireUser: GCP_PROJECT_ID sin configurar — denegando todo');
   return { user: null, error: deny(request, 'Server misconfigured: auth unavailable', 503) };
 }
