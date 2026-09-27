@@ -26,6 +26,11 @@ REGISTRO="${REGION}-docker.pkg.dev/${PROYECTO}/scora"
 
 # Las NEXT_PUBLIC_* salen del mismo fichero que los secretos. Se INCRUSTAN en el bundle del
 # navegador al compilar, asi que cambiarlas obliga a reconstruir; redesplegar no basta.
+#
+# Las tres de Identity Platform van con ${VAR:?...}: si faltan, el build PARA. Aqui se
+# pasaban las de Supabase —muertas desde la migracion— y las de Firebase no se pasaban
+# en absoluto, aunque el Dockerfile las declara. Una reconstruccion con eso habria dejado
+# el bundle sin clave y el login caido, con un "auth/invalid-api-key" que no apunta aqui.
 if [[ -f "$AQUI/.env.gcp" ]]; then
   set -a; source "$AQUI/.env.gcp"; set +a
 fi
@@ -63,8 +68,10 @@ gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 # manifiesto y no de esto.
 docker build \
   --platform linux/amd64 \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" \
+  --build-arg NEXT_PUBLIC_FIREBASE_API_KEY="${NEXT_PUBLIC_FIREBASE_API_KEY:?falta en infra/.env.gcp — sin ella el bundle sale sin configuracion de Identity Platform y NADIE puede entrar}" \
+  --build-arg NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN="${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:?falta en infra/.env.gcp}" \
+  --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID="${NEXT_PUBLIC_FIREBASE_PROJECT_ID:?falta en infra/.env.gcp}" \
+  --build-arg NEXT_PUBLIC_PROXY_URL="${NEXT_PUBLIC_PROXY_URL:-}" \
   --build-arg NEXT_PUBLIC_POSTHOG_KEY="${NEXT_PUBLIC_POSTHOG_KEY:-}" \
   --build-arg NEXT_PUBLIC_POSTHOG_HOST="${NEXT_PUBLIC_POSTHOG_HOST:-https://eu.i.posthog.com}" \
   --build-arg NEXT_PUBLIC_SENTRY_DSN="${NEXT_PUBLIC_SENTRY_DSN:-}" \
