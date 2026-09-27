@@ -1,0 +1,47 @@
+name: Conectar con Cloud SQL
+description: >
+  Autentica en GCP sin claves (Workload Identity Federation) y abre Cloud SQL Auth Proxy en
+  127.0.0.1:5432, para que los procesos de research escriban en Cloud SQL (AUDIT_REPORT C-5).
+  El job que la use necesita `permissions: id-token: write`.
+
+# Sin clave de cuenta de servicio a proposito: el token de OIDC de GitHub se cambia por uno de
+# GCP de corta duracion, y solo este repositorio puede hacerlo (condicion del proveedor en
+# infra/github-actions-cloudsql.sh). Una clave JSON en un secreto no caduca nunca.
+inputs:
+  workload_identity_provider:
+    description: projects/NUM/locations/global/workloadIdentityPools/POOL/providers/PROV
+    required: true
+  service_account:
+    description: cuenta de servicio con roles/cloudsql.client
+    required: true
+  instance:
+    description: proyecto:region:instancia
+    required: false
+    default: scora-509716:europe-west1:scora-db
+
+runs:
+  using: composite
+  steps:
+    - uses: google-github-actions/auth@v2
+      with:
+        workload_identity_provider: ${{ inputs.workload_identity_provider }}
+        service_account: ${{ inputs.service_account }}
+
+    - name: Arrancar Cloud SQL Auth Proxy
+      shell: bash
+      run: |
+        set -euo pipefail
+        V=v2.14.1
+        curl -sSfL -o "$RUNNER_TEMP/cloud-sql-proxy" \
+          "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/$V/cloud-sql-proxy.linux.amd64"
+        chmod +x "$RUNNER_TEMP/cloud-sql-proxy"
+        "$RUNNER_TEMP/cloud-sql-proxy" --address 127.0.0.1 --port 5432 "${{ inputs.instance }}" \
+          > "$RUNNER_TEMP/cloud-sql-proxy.log" 2>&1 &
+        # Esperar a que acepte conexiones. Si no llega, el paso falla aqui, con el log del
+        # proxy a la vista, y no mas tarde con un «connection refused» que no dice por que.
+        for i in $(seq 1 30); do
+          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then echo "proxy listo"; exit 0; fi
+          sleep 1
+        done
+        cat "$RUNNER_TEMP/cloud-sql-proxy.log"
+        exit 1

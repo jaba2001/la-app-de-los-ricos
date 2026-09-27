@@ -8,8 +8,8 @@ name: Scora — monthly analyst-revision tracking
 # next-month returns. After ~6-12 months the evidence says — on our own universe — whether a
 # paid PIT estimate feed (~$100s/mo) is justified. All free (Finnhub recommendation trends).
 #
-# Requires two repo secrets: FINNHUB_KEY (new — add it) and SUPABASE_SERVICE_KEY (already set
-# for the scoring/measurement crons).
+# Requires FINNHUB_KEY plus the Cloud SQL secrets shared by every data workflow
+# (GCP_WIF_PROVIDER, GCP_JOBS_SA, PGUSER, PGPASSWORD — see infra/github-actions-cloudsql.sh).
 on:
   schedule:
     - cron: "0 15 3 * *" # 3rd of each month, 15:00 UTC (after the monthly score cron on the 2nd)
@@ -25,13 +25,27 @@ defaults:
 jobs:
   track:
     runs-on: ubuntu-latest
+    # id-token: para cambiar el token de OIDC de GitHub por uno de GCP (acción cloud-sql).
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Instalar dependencias (pg, para escribir en Cloud SQL)
+        run: npm ci
+      - uses: ./.github/actions/cloud-sql
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_JOBS_SA }}
       - name: Snapshot analyst revisions → sl_revisions (+ live IC)
         env:
           FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGDATABASE: scora
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
         run: node --experimental-strip-types --no-warnings research/cron-revisions.mjs

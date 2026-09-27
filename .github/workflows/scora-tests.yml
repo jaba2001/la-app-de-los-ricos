@@ -375,6 +375,13 @@ jobs:
       # fila) y el informe nunca anunciaba un cambio de regimen. Sin Postgres se salta.
       - name: Cron del cierre diario contra la base
         run: node --experimental-strip-types --no-warnings scripts/cierrecron.test.mjs
+      # Migracion de Supabase a Cloud SQL (AUDIT_REPORT C-5): los scripts de research ya no
+      # hablan con Supabase, los workflows abren el proxy, y el rol scora_jobs cubre cada tabla.
+      - name: Research escribe en Cloud SQL (guardian)
+        run: node --experimental-strip-types --no-warnings scripts/researchcloudsql.test.mjs
+      # La copia de datos, con Supabase simulado y contra Postgres real. Sin Postgres se salta.
+      - name: Copia de Supabase a Cloud SQL
+        run: node --experimental-strip-types --no-warnings scripts/migrarsupabase.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

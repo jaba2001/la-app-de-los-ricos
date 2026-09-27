@@ -23,13 +23,27 @@ defaults:
 jobs:
   breadth:
     runs-on: ubuntu-latest
+    # id-token: para cambiar el token de OIDC de GitHub por uno de GCP (acción cloud-sql).
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Instalar dependencias (pg, para escribir en Cloud SQL)
+        run: npm ci
+      - uses: ./.github/actions/cloud-sql
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_JOBS_SA }}
       - name: Aggregate breadth → macro_state
         env:
           TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGDATABASE: scora
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
         run: node --experimental-strip-types --no-warnings research/macro_breadth.mjs
