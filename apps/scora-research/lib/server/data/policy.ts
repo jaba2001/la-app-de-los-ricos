@@ -15,7 +15,8 @@
 // el navegador, y una operación que no esté en `ops` se rechaza. Añadir una tabla nueva
 // obliga a decidir explícitamente si es privada.
 
-export type Op = "select" | "insert" | "upsert" | "update" | "delete";
+import type { Op } from "../../dataContract.ts";
+export type { Op };
 
 export interface TablePolicy {
   /** `user`: cada fila pertenece a alguien y SIEMPRE se filtra por él.

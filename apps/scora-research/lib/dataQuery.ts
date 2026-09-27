@@ -28,25 +28,10 @@ export interface Respuesta<T> {
  *  `Record<string, unknown>` no se puede convertir a una interfaz sin indice. */
 export type Fila = Record<string, unknown>;
 
-interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is" | "not_null"; val: unknown }
-type Op = "select" | "insert" | "upsert" | "update" | "delete";
-
-interface Peticion {
-  rpc?: string;
-  args?: Fila;
-  table: string; op: Op;
-  columns?: string; filters?: Filtro[];
-  /** `{ count: "exact" }`: devuelve cuantas filas cumplen, no solo la pagina. */
-  count?: boolean;
-  /** `{ head: true }`: solo interesa el numero, no las filas. */
-  head?: boolean;
-  order?: { col: string; asc: boolean }[];
-  limit?: number;
-  rows?: Record<string, unknown>[];
-  patch?: Record<string, unknown>;
-  onConflict?: string[];
-  ignoreDuplicates?: boolean;
-}
+// La forma de la consulta vive en lib/dataContract.ts y la importa también el servidor: lo que
+// se manda y lo que se entiende no pueden volver a separarse sin que falle el typecheck
+// (AUDIT_REPORT M-8).
+import type { Op, Peticion } from "./dataContract.ts";
 
 // ── Transporte inyectable ────────────────────────────────────────────────────────────
 // Igual que lib/batchQueue.ts: la parte que habla con la red se inyecta para que este

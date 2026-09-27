@@ -101,6 +101,32 @@ await db.query("insert into macro_state_history (snapshot_date) values ('2026-09
   check("una columna date llega al cliente como YYYY-MM-DD", data?.snapshot_date, "2026-09-27");
 }
 
+// ── M-8 · ignoreDuplicates: el registro inmutable no se sobrescribe ─────────────────
+// app/stock/[ticker] sella UNA nota por ticker y día en sl_score_log con ignoreDuplicates. El
+// servidor ignoraba el campo y hacía DO UPDATE: re-analizar el mismo día cambiaba la nota
+// sellada, que es justo lo que el registro existe para impedir.
+await db.query("delete from sl_score_log where user_id = 'ana'");
+{
+  usuario = "ana";
+  const sella = (score) => datos.from("sl_score_log").upsert(
+    { ticker: "AAPL", score_date: "2026-09-27", score_total: score },
+    { onConflict: "user_id,ticker,score_date", ignoreDuplicates: true });
+  await sella(70);
+  const segunda = await sella(10);
+  check("re-sellar el mismo día no da error", segunda.error, null);
+  const { rows } = await db.query("select score_total from sl_score_log where user_id = 'ana'");
+  check("se conserva la PRIMERA nota sellada", rows.map((r) => Number(r.score_total)), [70]);
+  // Y un upsert normal sí sigue PISANDO (no se ha roto el caso general): las preferencias de
+  // alertas se guardan así.
+  await db.query("delete from sl_alert_prefs where user_id = 'ana'");
+  await datos.from("sl_alert_prefs").upsert({ email: "a@x.com", macro_alerts: true }, { onConflict: "user_id" });
+  await datos.from("sl_alert_prefs").upsert({ email: "a@x.com", macro_alerts: false }, { onConflict: "user_id" });
+  check("un upsert sin ignoreDuplicates sigue actualizando",
+    (await db.query("select macro_alerts from sl_alert_prefs where user_id = 'ana'")).rows.map((r) => r.macro_alerts), [false]);
+  await db.query("delete from sl_alert_prefs where user_id = 'ana'");
+}
+await db.query("delete from sl_score_log where user_id = 'ana'");
+
 await db.query("truncate sl_analyses, sl_cohort, sl_watchlist, macro_state_history");
 await db.end();
 console.log(bad ? `\n✗ datacontrato: ${bad} fallo(s) de ${total}` : `\n✓ datacontrato: ${total} comprobaciones OK contra Postgres real`);

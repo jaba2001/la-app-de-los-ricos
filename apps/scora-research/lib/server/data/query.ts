@@ -11,30 +11,11 @@
 //      columnas raras. El identificador sale del token verificado en el servidor, nunca
 //      del cuerpo de la petición.
 
-import { policyFor, funcionPermitida, type Op, type TablePolicy } from "./policy.ts";
-
-/** `not_null` es `.not(col, "is", null)` del cliente. Antes el cliente lo mandaba como
- *  `neq null`, que en SQL es `col <> NULL` y no devuelve ninguna fila (AUDIT_REPORT M-1). */
-export interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is" | "not_null"; val: unknown }
-export interface Peticion {
-  /** `{ count: "exact" }`: además de las filas, cuántas cumplen el filtro sin el LIMIT. */
-  count?: boolean;
-  /** `{ head: true }`: solo el recuento, sin filas. */
-  head?: boolean;
-  /** Llamada a funcion: `rpc` lleva el nombre y `args` los parametros. */
-  rpc?: string;
-  args?: Record<string, unknown>;
-  table: string;
-  op: Op;
-  columns?: string;                 // lo que iría en .select("a,b,c")
-  filters?: Filtro[];
-  order?: { col: string; asc: boolean }[];
-  limit?: number;
-  rows?: Record<string, unknown>[]; // insert / upsert
-  patch?: Record<string, unknown>;  // update
-  onConflict?: string[];            // upsert
-  single?: boolean;
-}
+import { policyFor, funcionPermitida, type TablePolicy } from "./policy.ts";
+// La forma de la consulta es la MISMA que manda el navegador: vive en lib/dataContract.ts,
+// que importan los dos lados (AUDIT_REPORT M-8).
+import type { Filtro, Peticion } from "../../dataContract.ts";
+export type { Filtro, Peticion };
 
 export interface SqlListo { text: string; values: unknown[] }
 
@@ -180,7 +161,10 @@ export function construir(p: Peticion, userId: string | null, esquema: Esquema, 
       const conf = (p.onConflict ?? []).map((c) => ident(c.trim(), cols, p.table));
       if (!conf.length) throw new RechazoPolitica("upsert necesita onConflict");
       const set = [...nombres].map((c) => `${ident(c, cols, p.table)} = EXCLUDED.${ident(c, cols, p.table)}`);
-      sql += set.length
+      // `ignoreDuplicates`: la primera fila gana y no se pisa. Lo usa el registro inmutable del
+      // track record (sl_score_log, una nota por ticker y día). Se ignoraba, y cada análisis
+      // posterior del mismo día SOBRESCRIBÍA la nota sellada (AUDIT_REPORT M-8).
+      sql += set.length && !p.ignoreDuplicates
         ? ` ON CONFLICT (${conf.join(", ")}) DO UPDATE SET ${set.join(", ")}`
         : ` ON CONFLICT (${conf.join(", ")}) DO NOTHING`;
     }
