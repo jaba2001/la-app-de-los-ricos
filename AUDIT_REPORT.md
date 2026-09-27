@@ -7,7 +7,15 @@
 > `sql/gcp/001_schema.sql` + `002_user_id_texto.sql`. Lo que no se pudo probar está marcado
 > **NO VERIFICADO** con el motivo.
 
-## Resumen ejecutivo
+## Estado final
+
+**Arreglados y verificados: 12** (C-1, C-2, C-3, C-4, A-1 en código, A-3, A-7, A-8, M-1, M-2,
+M-4, M-7). **Pendientes de decisión: 1 crítico (C-5) y 4 altos (A-2, A-4, A-5, A-6)**, más
+medios y bajos. Ninguna matriz queda en ❌ por un fallo de código sin arreglar: los ❌ que
+quedan son C-5, que es mover datos. La lista de lo NO VERIFICADO, con su motivo, está en la
+fase 7. **Nada de esto está desplegado.**
+
+## Resumen ejecutivo (tal como se encontró)
 
 La migración de Supabase a Google Cloud está **a medias**, y hay cosas rotas que las pruebas
 no ven:
@@ -196,6 +204,7 @@ Estados: **ARREGLADO** (commit) · **PENDIENTE DE DECISIÓN** (pregunta D-n al f
 test cubre `strict`.
 *Arreglo:* `strict` verifica la firma localmente igual que el resto; la revocación inmediata
 necesita el Admin SDK (D-3).
+**Estado: ARREGLADO** (`834a280`). `auth.test.mjs` 14 → 23 comprobaciones; 3 fallaban antes.
 
 **C-2 · `/daily` y `/picks` leen de Supabase.** `lib/dailyClose.ts:39-58`,
 `lib/picksData.ts:39-55`. Hacen `fetch` a `${NEXT_PUBLIC_SUPABASE_URL}/rest/v1` con la clave
@@ -204,6 +213,15 @@ función devuelve `null` y la página pinta su estado vacío. *Prueba en producc
 «No close published yet». El cron `daily-close` escribe en Cloud SQL: el informe existe y no se
 ve.
 *Arreglo:* leer de Cloud SQL con el pool del servidor, y distinguir «fuente caída» de «vacío».
+**Estado: ARREGLADO** (`d2ac1c2`). Leen por `sbFetch`, que además aprendió `not.is.null`. Un
+fallo de lectura queda en el log; en pantalla sigue degradando a vacío porque `next build`
+pre-renderiza sin base (distinguirlo en pantalla va con D-7). Prueba nueva
+`lecturas_servidor.test.mjs`: con el código anterior fallan 9 de 13. Verificado además en el
+build: `/daily` pre-renderizado contiene el informe de la base, y `/picks` la posición.
+⚠️ **Y había una segunda mitad**, encontrada al arreglar A-3: el cron `daily-close` respondía
+500 en producción por una guarda de Supabase, así que el informe **nunca se generaba**.
+Arreglado en A-3 y probado de extremo a extremo en local (genera y guarda el informe con 11
+sectores).
 
 **C-3 · Las columnas `date` cambian de formato y se desplazan un día.**
 `lib/server/data/pool.ts` no registra conversor para el OID 1082 y `node-pg` crea un `Date` a
@@ -213,11 +231,17 @@ Rompe `components/stock/StockScreener.tsx:285` (`a.analysis_date + "T00:00:00Z"`
 `Invalid Date` → «NaN días») y enseña la marca ISO completa en `/macro` («Snapshot: …»), el
 diario, `MacroBrief`, `PaperFund` y `/picks`. Afecta también a `sbFetch` (crons).
 *Arreglo:* devolver `date` como el texto `YYYY-MM-DD` que da Postgres, igual que PostgREST.
+**Estado: ARREGLADO** (`bbd06ca`). Probado en Madrid, UTC y Los Ángeles; parte de la prueba
+corre sin base, así que también en CI. En la app arrancada: `/api/publico` devuelve
+`"snapshot_date":"2026-09-26"` y el sitemap vuelve a listar los días publicados (con el
+formato anterior `isIsoDay` los filtraba todos).
 
 **C-4 · La suite está en rojo en `main`.** `scripts/guardianes.test.mjs`: `numeros.test.mjs`
 corre en `npm test` pero no en CI. Como `npm test` encadena con `&&`, las suites posteriores no
 se ejecutaban. CI: 5 de 5 ejecuciones fallidas el 27-09.
 *Arreglo:* añadir el paso al workflow.
+**Estado: ARREGLADO** (`10d4d38`). Cada prueba nueva de esta auditoría está en `npm test` y
+en CI (el guardián lo exige): guardianes 13/13, workflows 200/200.
 
 **C-5 · Doble fuente de verdad: 9 workflows escriben en Supabase, la app lee de Cloud SQL.**
 `research/cron-score.mjs:34`, `research/paperfund_measure.mjs:16` y demás;
@@ -227,7 +251,8 @@ Track record, picks, paper fund, discovery, base de conocimiento y breadth no se
 la app. **NO VERIFICADO** qué hay hoy en Cloud SQL: no tengo credenciales de lectura de la base.
 *Propuesta:* un `sbFetch` para scripts (conexión por Cloud SQL Auth Proxy o IP autorizada) y
 copiar los datos históricos de Supabase. **PENDIENTE DE DECISIÓN (D-1)**: implica mover datos
-entre bases y dar a GitHub acceso a Cloud SQL.
+entre bases y dar a GitHub acceso a Cloud SQL. Mismo caso, encontrado después:
+`lib/server/tts.js` sube el audio del brief a **Supabase Storage** (no por `sbFetch`).
 
 ### 🟠 Alto
 
@@ -239,6 +264,8 @@ Cloud Run y no en `infra/terraform/cloudrun.tf:6-17`: un `terraform apply` la bo
 Además producción corre un build anterior a `main` (`/api/publico` → 404).
 *Arreglo de código:* añadir `GCP_PROJECT_ID = var.project_id` al Terraform (sin aplicar). Lo
 demás es de configuración: D-2.
+**Estado: ARREGLADO en código** (`8460725`), **sin aplicar** y **NO VERIFICADO** con
+`terraform validate` (terraform no está instalado aquí). Las claves ausentes: D-2.
 
 **A-2 · Sin límite de peticiones ni cuota de IA en producción.** Sin Upstash, `ratelimit.js`
 y `quota.js` dejan pasar todo (`RATELIMIT_FAIL_CLOSED=0`). Cualquier cuenta puede agotar la
@@ -252,6 +279,10 @@ quien pague recibe la cuota gratuita), `app/api/waitlist/route.js:74`,
 variables.
 *Arreglo:* quitar las guardas. Quitar los secretos de Supabase del Terraform
 (`secrets.tf:19-21`) destruiría recursos → D-2.
+**Estado: ARREGLADO** (`495caec`). Al hacerlo aparecieron cuatro más, peores que las del
+informe: el **webhook de Stripe** respondía 503 a cada evento (un pago no daba Pro), y los
+crons `daily-close`, `push-alerts` y `ticker-alerts` respondían 500 sin hacer nada. Nueve en
+total. `isPro` probado sin variables de Supabase contra Postgres real: 2 de 5 fallaban antes.
 
 **A-4 · El registro de auditoría de la IA lo escribe el cliente.** `lib/proxy.ts:340-353`.
 Puede omitirse o falsearse (solo sobre las filas propias), y es la pieza que `/audit` y la
@@ -269,16 +300,29 @@ consentimiento (`lib/analytics.ts:101-112`). **PENDIENTE DE DECISIÓN (D-6).**
 **A-7 · `/api/anthropic/messages` es un relé abierto de Claude.**
 `app/api/anthropic/messages/route.js:60-68` reenvía el cuerpo del cliente entero.
 *Arreglo:* reenviar solo `model`, `max_tokens` y `messages` (texto; roles `user`/`assistant`).
+**Estado: ARREGLADO** (`62724c3`). `lib/server/anthropicBody.js` + `anthropicbody.test.mjs`
+(10). `/api/llm` no tenía el problema.
+
+**A-8 · `sbFetch` devolvía 500 ante un duplicado: la idempotencia de Stripe estaba rota.**
+*(Encontrado durante la fase 6.)* PostgREST responde 409 a una clave única violada;
+`claimEvent` del webhook lo usa para reconocer un evento ya procesado, y `/api/waitlist` para
+no tratar como error a quien se apunta dos veces. Con 500, el webhook lanzaba y Stripe
+reintentaba el mismo evento durante días; la lista de espera decía «Could not save your
+email». Probado contra Postgres real antes de tocar nada.
+**Estado: ARREGLADO** (`5981aac`). `23505` → 409; el resto sigue en 500. `postgrest` 21 → 25.
 
 ### 🟡 Medio
 
 **M-1 · `.not()` devuelve siempre 0 filas.** `lib/dataQuery.ts:124-128` → `sector <> NULL`.
 Único uso: `app/stock/[ticker]/page.tsx:250` (el ETF sectorial nunca se adelanta en el lote).
 *Arreglo:* operador `not_null` → `IS NOT NULL`.
+**Estado: ARREGLADO** (`bf15ab9`, junto con M-2: tocan las mismas líneas). Prueba de contrato
+nueva `datacontrato.test.mjs`: el cliente real contra el camino real del servidor.
 
 **M-2 · `count: "exact"` no es exacto.** `app/api/data/route.ts:57` devuelve `rowCount`
 (≤ `LIMIT`) y `head` se ignora. Probado: 1000 de 1500. Sin llamador hoy.
 *Arreglo:* `count(*)` real, y sin filas cuando `head`.
+**Estado: ARREGLADO** (`bf15ab9`). 1500 sobre 1500, y respeta el filtro de usuario.
 
 **M-3 · 27 consultas ignoran el error.** `app/stock/[ticker]/page.tsx:169,176,179,213,239,
 246,551,690,744`, `app/stock/page.tsx:50,107,112`, `app/discovery/page.tsx:36-37`,
@@ -290,20 +334,30 @@ como un guardado que no ocurre. **PENDIENTE DE DECISIÓN (D-7)**: son 27 cambios
 
 **M-4 · El servidor rechaza tickers con dígitos que el buscador ofrece.**
 `lib/server/providers/*.js` (`^[A-Z.\-]{1,15}$`). *Arreglo:* admitir dígitos.
+**Estado: ARREGLADO** en FMP y Finnhub (`e2ebe58`); `simbolos.test.mjs` (24). Short-interest,
+Finviz, EDGAR y el Congreso solo cubren EE. UU. y siguen rechazándolos, que es correcto. Si
+el plan de FMP sirve de verdad esos mercados es **NO VERIFICADO** (no tengo su clave).
 
 **M-5 · `/api/data` no usa transacción en lotes con escrituras.** Un lote puede aplicarse a
 medias. No he encontrado ninguna pantalla que mande dos escrituras dependientes en el mismo
 lote, pero el agrupado depende del orden de los `await` (**NO VERIFICADO** en ejecución).
-Propuesta documentada, sin cambio.
+**Estado: PENDIENTE** — cambio de diseño (transacción por lote), no un fallo que se vea hoy.
+Lo hago si me dices que sí.
 
 **M-6 · El esquema se cachea para siempre** (`lib/server/data/pool.ts:47-72`): tras añadir
-una columna, la app la rechaza hasta reiniciar la instancia. Propuesta documentada, sin cambio.
+una columna, la app la rechaza hasta reiniciar la instancia.
+**Estado: PENDIENTE** — se mitiga redesplegando tras cada migración; propongo documentarlo
+en `DEPLOY_GCP.md` o caducar la caché.
 
 **M-7 · `.env.gcp.example` desactualizado.** 33 variables usadas sin documentar; Supabase
 marcado como imprescindible. *Arreglo:* rehacerlo.
+**Estado: ARREGLADO** (`4421206`). Cubre las 62, añade las tres `NEXT_PUBLIC_FIREBASE_*` que
+`build-and-push.sh` exige y el ejemplo no tenía, y sigue cargando con `source`.
 
 **M-8 · Tipos duplicados cliente/servidor, ya divergentes** (`Peticion`, `Filtro`).
-*Propuesta:* un único `lib/dataContract.ts` importado por los dos. Sin cambio en esta pasada.
+*Propuesta:* un único `lib/dataContract.ts` importado por los dos.
+**Estado: PENDIENTE** — refactor. Mientras tanto, `datacontrato.test.mjs` caza la divergencia
+que importa: lo que el cliente manda y el servidor no entiende.
 
 ### ⚪ Bajo
 
@@ -316,8 +370,101 @@ scripts de research → **PENDIENTE DE DECISIÓN (D-8).**
 **B-3 · Heredados del informe del 26-09:** rotar la clave de FRED y subir a Next 16. Siguen
 abiertos.
 
+**B-4 · Las URL canónicas apuntan al dominio antiguo.** `app/layout.tsx` (`metadataBase`) y el
+sitemap generan `https://scora-research.vercel.app/...`, que era el despliegue de Vercel. Los
+buscadores y las tarjetas sociales enlazan fuera de Cloud Run. Encontrado en la fase 7. Cuál
+es el dominio definitivo es decisión tuya → D-9.
+
+**B-5 · El aviso del limitador en `/api/publico` dice «auth still enforced»** en una ruta sin
+sesión. Solo el texto del log. Sin cambio.
+
 ---
 
-## Fase 6 y 7
+## Fase 6 · Arreglos
 
-*(Se completa tras los arreglos.)*
+12 commits sobre `165e697`, uno por problema salvo M-1 + M-2 (mismas líneas):
+
+| commit | hallazgo |
+|---|---|
+| `3f09a25` | informe (fases 1-5) |
+| `10d4d38` | C-4 · CI |
+| `834a280` | C-1 · `strict` |
+| `bbd06ca` | C-3 · fechas |
+| `d2ac1c2` | C-2 · `/daily` y `/picks` |
+| `5981aac` | A-8 · 409 en duplicados |
+| `495caec` | A-3 · nueve guardas de Supabase |
+| `62724c3` | A-7 · relé de Claude |
+| `bf15ab9` | M-1 + M-2 · `.not()` y `count` |
+| `e2ebe58` | M-4 · tickers con dígitos |
+| `8460725` | A-1 · `GCP_PROJECT_ID` en Terraform |
+| `4421206` | M-7 · `.env.gcp.example` |
+
+Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (10),
+`simbolos` (24), y ampliadas `auth` (+9), `numeros` (+3), `postgrest` (+5). Cada una se vio
+**fallar** con el código anterior antes de pasar con el nuevo.
+
+## Fase 7 · Verificación final
+
+| comprobación | resultado |
+|---|---|
+| `next build` (producción, contra Postgres local) | ✅ exit 0. Los avisos del build son los de lint, sin ninguno nuevo |
+| typecheck (`tsc --noEmit`) | ✅ 0 errores, antes y después |
+| lint (`eslint .`) | ✅ 0 errores · 121 avisos, **los mismos 121** de antes |
+| suite, antes (`165e697`, con Postgres, sin servidor) | 54 suites · **1 en rojo** (C-4) · 2 saltadas · 3.559 aserciones en verde |
+| suite, después (con Postgres y con servidor) | 58 suites · **0 en rojo** · 0 saltadas · **3.695** aserciones. Sin las 53 que necesitan servidor: 3.642 → **+83 nuevas** |
+| integración contra la app arrancada | ✅ 36/36 |
+| contrato HTTP contra la app arrancada | ✅ 17/17 |
+| E2E en navegador (Playwright) | ✅ 6/6 |
+| recorrido de 21 rutas con `curl` | ✅ 21 × 200 |
+| recorrido de 17 páginas en Chromium | ✅ 0 errores de consola, 0 respuestas 4xx/5xx, sin «NaN», «Invalid Date» ni fechas ISO en pantalla; las 9 con sesión redirigen a `/login` |
+| log del servidor | ✅ limpio salvo los avisos esperados del limitador sin Upstash |
+| cron `daily-close` de extremo a extremo | ✅ 401 sin secreto; con él, genera y guarda el informe (11 sectores) |
+
+**NO VERIFICADO, y por qué:**
+
+- **Las pantallas con sesión, cargando datos reales en el navegador.** El servidor solo acepta
+  tokens firmados por Google para el proyecto, y no tengo una cuenta de Identity Platform con
+  la que iniciar sesión. Lo que hay detrás está probado a nivel de función y contra Postgres
+  real: `requireUser` (con y sin `strict`), aislamiento entre usuarios, el contrato cliente ↔
+  `/api/data` y `isPro`. Para cerrarlo hace falta una cuenta de prueba (última pregunta).
+- **Los datos de Cloud SQL en producción** (C-5): sin credenciales de lectura.
+- **`terraform validate`** (A-1): terraform no está instalado.
+- **Que FMP sirva tickers internacionales** con el plan contratado (M-4): sin su clave.
+- **Producción no corre este código.** Va por detrás incluso del `main` anterior
+  (`/api/publico` → 404). Nada de lo arreglado está desplegado; no he desplegado nada.
+- **Observación sin causa confirmada:** en Chromium local, `/daily` y `/picks` no llegan a
+  «red en reposo» aunque el documento se cierra en 1 ms por `curl` y la página se pinta
+  completa y sin errores. Sospecha: `upgrade-insecure-requests` en la CSP sobre `http://`
+  local. En producción (https) no debería aplicar; no lo he podido comprobar allí.
+
+## Preguntas pendientes (D-n)
+
+**Datos y migración**
+- **D-1 · Cómo terminar la migración de datos (C-5).** ¿Los 9 workflows de GitHub pasan a
+  escribir en Cloud SQL (necesitan acceso: Cloud SQL Auth Proxy con una cuenta de servicio, o
+  IP autorizada) y se copia el histórico de Supabase? ¿O se mueven a Cloud Scheduler? ¿Y el
+  audio del brief (Supabase Storage) pasa a Cloud Storage?
+- **D-5 · Rol de base de datos (A-5).** ¿Creo la migración de un rol `scora_app` con permisos
+  mínimos para que la app deje de conectar como `postgres`? Es un cambio de roles en la base.
+
+**Producción e infraestructura**
+- **D-2 · Configuración del servicio (A-1, A-2, A-3).** En Cloud Run faltan `ANTHROPIC_KEY`,
+  Stripe, Upstash, Resend, VAPID y Groq/Gemini. ¿Es a propósito (lanzamiento sin IA ni cobro)
+  o hay que subirlas? ¿Enciendo `RATELIMIT_FAIL_CLOSED=1`? ¿Quito del Terraform los secretos
+  de Supabase (destruye esos recursos al aplicar)?
+- **D-9 · Dominio.** ¿Cuál es el definitivo, para `metadataBase` y el sitemap (B-4)?
+- **Despliegue.** ¿Quieres que despliegue estos arreglos, o lo haces tú?
+
+**Producto y legal**
+- **D-3 · Revocación de sesión.** Hoy una sesión revocada vale hasta 1 h también en IA y
+  Stripe. ¿Añado el Admin SDK de Firebase para comprobarla al instante en esas rutas?
+- **D-4 · Registro de auditoría de la IA (A-4).** ¿Lo movemos al servidor? Implica que el
+  filtro de grounding también corra allí, no solo en el navegador.
+- **D-6 · RGPD (A-6).** ¿Borrado de cuenta, página de privacidad y términos, y banner de
+  consentimiento para PostHog? Afecta a lo que lleves al abogado.
+- **D-7 · Errores que se ven como vacío (M-3).** ¿Arreglo las 27 consultas para que un fallo
+  muestre un error en pantalla? Son 27 cambios de interfaz.
+- **D-8 · Rutas de proveedor sin uso (B-1).** ¿Quito de la lista blanca las 16 que el front no
+  pide? Algún script de research podría usarlas.
+- **Cuenta de prueba.** Para cerrar lo NO VERIFICADO de las pantallas con sesión necesito una
+  cuenta de Identity Platform de prueba, o que hagas tú ese recorrido.
