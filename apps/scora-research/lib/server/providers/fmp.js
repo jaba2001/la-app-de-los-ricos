@@ -11,15 +11,17 @@ import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
 
 
+// Solo lo que el front pide de verdad. Cada ruta de aquí es una puerta a FMP firmada con
+// nuestra clave y con cargo a nuestra cuota, así que las que nadie usaba se cerraron el 27-09
+// (news, price-target-consensus, upgrades-downgrades-consensus, historical-dividends,
+// historical-shares-float, key-metrics, senate-trading, insider-trading — AUDIT_REPORT B-1).
+// El cron insider-refresh llama a FMP directamente, no por aquí. Añadir una es una línea.
 const ALLOWED = new Set([
   'quote','profile','key-metrics-ttm','ratios-ttm',
-  'historical-price-eod/full','income-statement','news',
-  'price-target-consensus','analyst-estimates','upgrades-downgrades-consensus',
-  'discounted-cash-flow','balance-sheet-statement','price-target',
-  'cash-flow-statement','peers','historical-dividends',
-  'institutional-holder','historical-shares-float','shares-float',
-  'key-metrics','financial-growth','earnings-surprises',
-  'search','senate-trading','house-disclosure','insider-trading',
+  'historical-price-eod/full','income-statement',
+  'analyst-estimates','discounted-cash-flow','balance-sheet-statement','price-target',
+  'cash-flow-statement','peers','institutional-holder','shares-float',
+  'financial-growth','earnings-surprises','search','house-disclosure',
 ]);
 
 // A segment may only be a plain path atom. Without this, an encoded slash lets a caller

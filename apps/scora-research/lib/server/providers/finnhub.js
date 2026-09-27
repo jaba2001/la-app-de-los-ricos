@@ -11,13 +11,13 @@ import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
 
 
+// Solo lo que el front pide de verdad, como en fmp.js. Cerradas el 27-09 por no tener ningún
+// llamador: profile2, news, stock/insider-sentiment, calendar/economic,
+// stock/financials-reported, stock/social-sentiment, forex/rates, crypto/candle
+// (AUDIT_REPORT B-1).
 const ALLOWED = new Set([
-  'quote', 'profile2', 'company-news', 'news', 'stock/recommendation',
-  'stock/insider-transactions', 'stock/insider-sentiment',
-  'stock/earnings', 'calendar/earnings', 'calendar/economic',
-  'stock/financials-reported', 'stock/transcripts',
-  'stock/short-interest', 'stock/social-sentiment',
-  'forex/rates', 'crypto/candle',
+  'quote', 'company-news', 'stock/recommendation', 'stock/insider-transactions',
+  'stock/earnings', 'calendar/earnings', 'stock/transcripts', 'stock/short-interest',
   'stock/metric', 'stock/price-target',
 ]);
 
