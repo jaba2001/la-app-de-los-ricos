@@ -1,9 +1,9 @@
 // Cron: per-ticker price alerts (P0-4). Reads active price_above/price_below rows from
-// sl_alerts (service key → bypasses RLS), fetches live FMP quotes for the distinct tickers,
+// sl_alerts (Cloud SQL, server-side), fetches live FMP quotes for the distinct tickers,
 // and Web-Pushes the OWNER of each triggered alert (push_subscriptions.user_id). Dedupe:
 // an alert that fired in the last 24h is skipped (last_triggered_at). Node runtime (web-push
-// needs Node crypto). Free: FMP quote + self-generated VAPID. Env: CRON_SECRET, SUPABASE_URL,
-// SUPABASE_SERVICE_KEY, FMP_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
+// needs Node crypto). Free: FMP quote + self-generated VAPID. Env: CRON_SECRET,
+// FMP_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
 import webpush from "web-push";
 import { crossedUpSma150, baseBreakoutConfirmed, trendStage } from "../../../../lib/server/technicals.js";
 import { assertCron, pgv } from '../../../../lib/server/cron.js';
@@ -13,9 +13,8 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SB = process.env.SUPABASE_URL;
-const KEY = process.env.SUPABASE_SERVICE_KEY;
-const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
+// sbFetch solo mira `Prefer`; las cabeceras apikey/Authorization de Supabase ya no pintaban nada.
+const sbHeaders = { "Content-Type": "application/json" };
 const DAY_MS = 86400000;
 
 function json(body, status = 200) {
@@ -25,7 +24,10 @@ function json(body, status = 200) {
 async function fetchQuote(ticker) {
   try {
     const u = `https://financialmodelingprep.com/stable/quote?symbol=${encodeURIComponent(ticker)}&apikey=${process.env.FMP_KEY}`;
-    const r = await sbFetch(u, { headers: { Accept: "application/json" } });
+    // fetch, no sbFetch: esto es FMP. La migración a Cloud SQL cambió los fetch por sbFetch
+    // a ciegas y este también cayó: sbFetch lo leía como nombre de tabla, devolvía 500 y
+    // ninguna alerta de precio ni técnica se disparaba.
+    const r = await fetch(u, { headers: { Accept: "application/json" } });
     if (!r.ok) return null;
     const arr = await r.json();
     const px = Array.isArray(arr) && arr[0] ? Number(arr[0].price) : null;
@@ -37,7 +39,10 @@ async function fetchQuote(ticker) {
 async function fetchHistory(ticker) {
   try {
     const u = `https://financialmodelingprep.com/stable/historical-price-eod/full?symbol=${encodeURIComponent(ticker)}&apikey=${process.env.FMP_KEY}`;
-    const r = await sbFetch(u, { headers: { Accept: "application/json" } });
+    // fetch, no sbFetch: esto es FMP. La migración a Cloud SQL cambió los fetch por sbFetch
+    // a ciegas y este también cayó: sbFetch lo leía como nombre de tabla, devolvía 500 y
+    // ninguna alerta de precio ni técnica se disparaba.
+    const r = await fetch(u, { headers: { Accept: "application/json" } });
     if (!r.ok) return [];
     const arr = await r.json();
     if (!Array.isArray(arr)) return [];
@@ -193,7 +198,7 @@ export async function GET(request) {
     async function latestAnalysis(userId, ticker) {
       const key = `${userId}:${ticker}`;
       if (key in anCache) return anCache[key];
-      const url = `${SB}/rest/v1/sl_analyses?user_id=eq.${pgv(userId)}&ticker=eq.${pgv(ticker)}&select=rating,reverse_dcf,analysis_date&order=analysis_date.desc&limit=1`;
+      const url = `sl_analyses?user_id=eq.${pgv(userId)}&ticker=eq.${pgv(ticker)}&select=rating,reverse_dcf,analysis_date&order=analysis_date.desc&limit=1`;
       const r = await sbFetch(url, { headers: sbHeaders });
       const rows = r.ok ? await r.json() : [];
       return (anCache[key] = Array.isArray(rows) && rows[0] ? rows[0] : null);

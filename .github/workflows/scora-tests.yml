@@ -367,6 +367,10 @@ jobs:
       # de Supabase que ya no existe y nadie recibia el correo. Sin Postgres se salta.
       - name: Cron de alertas macro contra la base
         run: node --experimental-strip-types --no-warnings scripts/alertascron.test.mjs
+      # Alertas por ticker de punta a punta: las llamadas a FMP iban por sbFetch y ninguna
+      # alerta de precio ni tecnica se disparaba. Sin Postgres se salta.
+      - name: Cron de alertas por ticker contra la base
+        run: node --experimental-strip-types --no-warnings scripts/tickeralertascron.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)
