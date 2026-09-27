@@ -7,6 +7,7 @@ import type { MacroState } from "@/lib/types";
 import { marketMomentum, type MarketMomentum } from "@/lib/marketMomentum";
 import { stockPickingRegime } from "@/lib/microScore";
 import { Sk } from "@/components/ui/Skeleton";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 export default function MarketMomentumPage() {
   const { session, loading: authLoading } = useAuth();
@@ -14,6 +15,7 @@ export default function MarketMomentumPage() {
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [mm, setMm] = useState<MarketMomentum | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
   useEffect(() => { if (!authLoading && !session) router.replace("/login"); }, [session, authLoading, router]);
 
@@ -21,8 +23,10 @@ export default function MarketMomentumPage() {
     if (!session) return;
     let alive = true;
     (async () => {
-      const { data } = await datos.from("macro_state").select("*").eq("id", 1).single();
+      const { data, error } = await datos.from("macro_state").select("*").eq("id", 1).single();
       if (!alive) return;
+      // Un fallo no es "sin datos de amplitud" (AUDIT_REPORT M-3).
+      setErrorCarga(error ? NO_SE_PUDO_CARGAR : null);
       const m = (data as MacroState) ?? null;
       setMacro(m);
       setMm(m ? marketMomentum({
@@ -40,6 +44,7 @@ export default function MarketMomentumPage() {
 
   return (
     <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1080, margin: "0 auto" }} className="animate-fade-in">
+      <DataError mensaje={errorCarga} />
       <div style={{ marginBottom: "var(--sr-sp-5)" }}>
         <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>Market Momentum</h1>
         <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 6, maxWidth: 760, lineHeight: 1.6 }}>

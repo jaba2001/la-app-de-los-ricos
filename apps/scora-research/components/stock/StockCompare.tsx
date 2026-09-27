@@ -5,6 +5,7 @@ import type { StockAnalysis } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
 import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import { Pill } from "@/components/ui/Pill";
+import DataError from "@/components/ui/DataError";
 
 interface Props { ticker: string; peers?: string[] }
 
@@ -29,7 +30,7 @@ const VALUATION_METRICS: { label: string; get: (a: StockAnalysis) => number | nu
 
 export default function StockCompare({ ticker, peers = [] }: Props) {
   const router = useRouter();
-  const { watchlist, analyses } = useWatchlistAnalyses([ticker]);
+  const { watchlist, analyses, error: errorWatchlist } = useWatchlistAnalyses([ticker]);
   const [selected, setSelected] = useState<string[]>([ticker]);
 
   // Suggested peers (from FMP) not already tracked — a discovery affordance for auto-comparison.
@@ -53,6 +54,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
 
   return (
     <div className="animate-fade-in">
+      <DataError mensaje={errorWatchlist} />
       {/* Ticker selector */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div className="section-label">Select tickers to compare (max 4)</div>

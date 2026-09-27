@@ -18,7 +18,10 @@ export interface KbCard { id: string; topic: string; claim: string; source: stri
 
 /** Fetch the whole (small) knowledge base once. */
 export async function fetchKbCards(): Promise<KbCard[]> {
-  const { data } = await datos.from("kb_cards").select("id,topic,claim,source,tags,weight");
+  const { data, error } = await datos.from("kb_cards").select("id,topic,claim,source,tags,weight");
+  // Sin tarjetas el prompt va sin KNOWLEDGE BASE (renderKb devuelve ""), que es degradar, no
+  // inventar. Pero no en silencio: queda en la consola (AUDIT_REPORT M-3).
+  if (error) console.warn("[knowledge] kb_cards no disponible:", error.message);
   return (data as KbCard[]) ?? [];
 }
 
@@ -79,10 +82,13 @@ export async function fetchDocChunks(
     /* RPC missing or unreachable → fall through to kb_docs */
   }
 
-  const { data } = await datos
+  const { data, error } = await datos
     .from("kb_docs")
     .select("ticker,form,section,text,filed_date,fiscal_year")
     .eq("ticker", t);
+  // Sin extractos, la tesis se hace sin citar el 10-K; lo que la pantalla enseña ("Filings
+  // loaded: …") ya lo refleja. Queda en la consola para distinguirlo de "no hay filings".
+  if (error) console.warn("[knowledge] kb_docs no disponible:", error.message);
   let docs = (data as KbDoc[]) ?? [];
   if (sections?.length) { const want = new Set(sections); docs = docs.filter((d) => want.has(d.section)); }
   // Deterministic order: Risk Factors first (most useful for bear points), then MD&A, then Business.

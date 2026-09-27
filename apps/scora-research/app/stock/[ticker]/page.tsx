@@ -15,6 +15,7 @@ import { useMode, setMode, tabVisible, BEGINNER_TABS } from "@/lib/mode";
 import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
+import DataError, { NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 
 const TabSk = () => <Sk w="100%" h={500} />;
 
@@ -134,6 +135,9 @@ export default function StockTickerPage() {
   // 2 siempre frescas (macro + quote) + 31 del lote. La ranura del ETF sectorial cuenta
   // aunque no se adivine, para que este numero no dependa de si es la primera visita.
   const TOTAL_SOURCES = 33;
+  // Fallos de lectura o escritura que no impiden el análisis pero no pueden callarse
+  // (AUDIT_REPORT M-3): la watchlist, o un análisis que se ve pero no quedó guardado.
+  const [avisoDatos, setAvisoDatos] = useState<string | null>(null);
   const [watchlisted, setWatchlisted] = useState(false);
   const [watchlistId, setWatchlistId] = useState<number | null>(null);
   const [autoChecked, setAutoChecked] = useState(false);
@@ -167,17 +171,26 @@ export default function StockTickerPage() {
     setFetchProgress(0);
     setFailedApis(0);
     datos.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
-      .then(({ data }) => { if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); } });
+      .then(({ data, error }) => {
+        // Sin esto, la estrella salía vacía también cuando la consulta fallaba: parecía que
+        // el valor no estaba en la watchlist.
+        if (error) setAvisoDatos("Couldn't check whether this ticker is in your watchlist.");
+        else if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); }
+      });
   }, [session, ticker]);
 
   async function toggleWatchlist() {
     if (!session || !ticker) return;
+    // Antes la estrella cambiaba aunque la escritura fallara: el valor "se quitaba" y volvía
+    // al recargar. Ahora solo cambia si la base lo confirma.
     if (watchlisted && watchlistId != null) {
-      await datos.from("sl_watchlist").delete().eq("id", watchlistId);
+      const { error } = await datos.from("sl_watchlist").delete().eq("id", watchlistId);
+      if (error) { setAvisoDatos(NO_SE_PUDO_GUARDAR); return; }
       setWatchlisted(false); setWatchlistId(null);
     } else {
-      const { data } = await datos.from("sl_watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
-      if (data) { setWatchlisted(true); setWatchlistId((data as { id: number }).id); }
+      const { data, error } = await datos.from("sl_watchlist").insert({ user_id: session.user.id, ticker }).select("id").single();
+      if (error || !data) { setAvisoDatos(NO_SE_PUDO_GUARDAR); return; }
+      setWatchlisted(true); setWatchlistId((data as { id: number }).id);
     }
   }
 
@@ -214,9 +227,11 @@ export default function StockTickerPage() {
         track(authedFetch<unknown[]>(`/api/fmp/quote?symbol=${ticker}`)),
       ]);
 
-      const macroData = macroRes.status === "fulfilled"
-        ? (macroRes.value as { data: MacroState }).data
-        : contextMacro;
+      // `datos` no rechaza: un fallo llega como { data: null, error }. Antes eso contaba como
+      // "fulfilled" y el macro quedaba en null aunque el contexto tuviera uno bueno.
+      const macroData = (macroRes.status === "fulfilled"
+        ? (macroRes.value as { data: MacroState | null }).data
+        : null) ?? contextMacro;
       if (!live()) return;
       setMacro(macroData);
       if (macroData) setMacroContext(macroData);
@@ -235,6 +250,10 @@ export default function StockTickerPage() {
       // Supabase y en paralelo no cuesta ni un milisegundo más. Sirve para ADIVINAR el ETF
       // sectorial y poder pedirlo dentro del lote (ver más abajo); el sector real sigue
       // saliendo del `profile`, así que adivinar mal no ensucia nada.
+      //
+      // Aquí un error SÍ puede tratarse como "no hay": las dos son cachés. Sin snapshot se
+      // piden los datos frescos y sin sector no se adelanta el ETF; el resultado es el mismo
+      // dato, solo más lento. No se enseña nada falso (AUDIT_REPORT M-3).
       const [snapRes, lastSectorRes] = await Promise.all([
         datos
           .from("stock_snapshot")
@@ -548,6 +567,8 @@ export default function StockTickerPage() {
       // payload would poison every re-analyze for the rest of the day.
       const snapshotWorthSaving = stockData.profile != null || stockData.income.length > 0 || stockData.history.length > 0;
       const { quote: _snapQ, rdcf: _snapR, history: _sh, spyHistory: _ss, sectorEtfHistory: _se, ...snapRest } = stockData;
+      // Es una caché: si no se guarda, la próxima visita pide los datos otra vez. No merece un
+      // aviso en pantalla, pero tampoco pasar en silencio.
       if (snapshotWorthSaving) await datos.from("stock_snapshot").upsert({
         ticker: ticker.toUpperCase(),
         snapshot_date: today,
@@ -558,7 +579,8 @@ export default function StockTickerPage() {
           spyHistory:       _ss.slice(0, 252),
           sectorEtfHistory: _se.slice(0, 252),
         },
-      }, { onConflict: "ticker,snapshot_date,user_id" });
+      }, { onConflict: "ticker,snapshot_date,user_id" })
+        .then(({ error }) => { if (error) console.warn("[stock] no se guardó la caché del día:", error.message); });
 
       } // end cache miss
 
@@ -687,7 +709,7 @@ export default function StockTickerPage() {
       setDisqualifiers(disq);
 
       const rating = getRating(calc.total, disq);
-      const { data: saved } = await datos.from("sl_analyses").upsert({
+      const { data: saved, error: errorGuardado } = await datos.from("sl_analyses").upsert({
         user_id: session.user.id,
         ticker: ticker.toUpperCase(),
         analysis_date: today,
@@ -713,13 +735,16 @@ export default function StockTickerPage() {
       }, { onConflict: "ticker,analysis_date,user_id" }).select().single();
 
       if (saved && live()) setSavedAnalysis(saved as StockAnalysis);
+      // El análisis se ve igual, pero NO entra en el historial del que tiran las alertas y la
+      // comparación con el día anterior. Antes eso pasaba sin que nadie lo supiera.
+      if (errorGuardado && live()) setAvisoDatos("This analysis is shown but couldn't be saved to your history, so alerts won't use it. Try analyzing again.");
 
       // ── Live track record: immutable score snapshot (append-only, 1/ticker/day) ──
       // Seals the score with a timestamp and the point-in-time price, so realized
       // forward return vs SPY can be measured later. The table has no UPDATE/DELETE
       // policy and we insert do-nothing-on-conflict, so the record can't be curated.
       const icForLog = Math.round(Math.max(0, Math.min(100, calc.total + (macroTiltData?.tilt ?? 0))));
-      await datos.from("sl_score_log").upsert({
+      const { error: errorRegistro } = await datos.from("sl_score_log").upsert({
         user_id: session.user.id,
         ticker: ticker.toUpperCase(),
         score_date: today,
@@ -731,6 +756,8 @@ export default function StockTickerPage() {
         regime_id: macroData?.regime_id ?? null,
         price_at_score: quote?.price != null ? Number(quote.price) : null,
       }, { onConflict: "user_id,ticker,score_date", ignoreDuplicates: true });
+      // El registro inmutable del track record: si falla, ese día falta en la medición.
+      if (errorRegistro) console.warn("[stock] no se selló la nota del día en sl_score_log:", errorRegistro.message);
 
     } catch (e) {
       if (live()) setError(e instanceof Error ? e.message : "Analysis failed");
@@ -746,6 +773,8 @@ export default function StockTickerPage() {
       .maybeSingle()
       .then(({ data: snap }) => {
         setAutoChecked(true);
+        // Un error aquí equivale a "no hay caché": no se lanza el análisis solo y el usuario
+        // lo pide con el botón. Nada falso en pantalla (AUDIT_REPORT M-3).
         if (snap) analyze();  // fresh snapshot → cheap cache-hit load
       });
   }, [session, ticker, hasAnalyzed, autoChecked, analyze]);
@@ -894,6 +923,11 @@ export default function StockTickerPage() {
             </button>
           )}
         </div>
+        {avisoDatos && (
+          <div style={{ padding: "0 var(--sr-sp-6)" }}>
+            <DataError mensaje={avisoDatos} onCerrar={() => setAvisoDatos(null)} />
+          </div>
+        )}
 
         {/* Sub-tabs */}
         <div style={{ padding: "0 var(--sr-sp-6)", display: "flex", gap: "var(--sr-sp-1)", height: "var(--sr-subnav-h)", alignItems: "center", overflowX: "auto" }}>

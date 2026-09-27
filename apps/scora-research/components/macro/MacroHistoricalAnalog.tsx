@@ -7,6 +7,7 @@ import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import DataError from "@/components/ui/DataError";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -31,7 +32,7 @@ function fmtMonths(v: number | null): string {
 
 export default function MacroHistoricalAnalog({ macro, loading }: Props) {
   const { session } = useAuth();
-  const { analyses, loading: holdingsLoading } = useWatchlistAnalyses();
+  const { analyses, loading: holdingsLoading, error: errorWatchlist } = useWatchlistAnalyses();
   const holdings = useMemo(
     () => Object.values(analyses).map(a => ({ sector: a.sector ?? null })),
     [analyses],
@@ -65,6 +66,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
 
   return (
     <div className="animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
+      <DataError mensaje={errorWatchlist} />
 
       {hasNullComposites && (
         <div style={{

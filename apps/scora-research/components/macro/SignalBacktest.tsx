@@ -3,6 +3,7 @@ import { useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import { runBacktest, type BacktestAnalysis, type BacktestResult, type DatedClose } from "@/lib/backtest";
+import DataError from "@/components/ui/DataError";
 
 const VERDICT_META: Record<BacktestResult["verdict"], { label: string; color: string; note: string }> = {
   supportive:  { label: "Supportive", color: "var(--sr-pos)",  note: "BUY-rated calls beat SPY more often than the rest" },
@@ -19,10 +20,14 @@ function toCloses(raw: unknown): DatedClose[] {
 }
 
 export default function SignalBacktest() {
-  const { watchlist, analyses } = useWatchlistAnalyses();
+  const { watchlist, analyses, error: errorWatchlist } = useWatchlistAnalyses();
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Tickers que se quedaron fuera porque su historial de precios no llegó. Antes se sustituía
+  // por [] en silencio y el veredicto salía sobre una muestra más pequeña sin decirlo
+  // (AUDIT_REPORT M-3).
+  const [excluidos, setExcluidos] = useState<string[]>([]);
 
   const analyzed = watchlist.map(w => w.ticker).filter(t => analyses[t]);
 
@@ -30,14 +35,21 @@ export default function SignalBacktest() {
     if (analyzed.length === 0) return;
     setLoading(true);
     setError("");
+    setExcluidos([]);
     try {
       // One EOD history call per analyzed ticker + SPY (proxy caches EOD 1h).
+      const FALLO = Symbol("fallo");
       const [spyRaw, ...tickerRaws] = await Promise.all([
         authedFetch<unknown>(`/api/fmp/historical-price-eod/full?symbol=SPY`),
-        ...analyzed.map(t => authedFetch<unknown>(`/api/fmp/historical-price-eod/full?symbol=${t}`).catch(() => [])),
+        ...analyzed.map(t => authedFetch<unknown>(`/api/fmp/historical-price-eod/full?symbol=${t}`).catch(() => FALLO)),
       ]);
       const historyByTicker: Record<string, DatedClose[]> = {};
-      analyzed.forEach((t, i) => { historyByTicker[t] = toCloses(tickerRaws[i]); });
+      const fuera: string[] = [];
+      analyzed.forEach((t, i) => {
+        if (tickerRaws[i] === FALLO) { fuera.push(t); historyByTicker[t] = []; }
+        else historyByTicker[t] = toCloses(tickerRaws[i]);
+      });
+      setExcluidos(fuera);
       // One analysis point per ticker (latest). Extend to full history when the
       // backend stores per-day analyses.
       const points: BacktestAnalysis[] = analyzed.map(t => {
@@ -69,8 +81,12 @@ export default function SignalBacktest() {
         <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{error}</div>
       )}
 
-      {analyzed.length === 0 && !loading && (
+      <DataError mensaje={errorWatchlist} />
+      {analyzed.length === 0 && !loading && !errorWatchlist && (
         <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>Analyze tickers in your watchlist first to build a backtest.</div>
+      )}
+      {result && excluidos.length > 0 && (
+        <DataError mensaje={`${excluidos.length} of ${analyzed.length} tickers left out — no price history came back (${excluidos.join(", ")}). The result below covers only the rest.`} />
       )}
 
       {result && (() => {

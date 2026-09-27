@@ -5,6 +5,7 @@ import type { MacroState, Scores, StockAnalysis } from "@/lib/types";
 import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 import { trajectoryRating, stockPickingRegime } from "@/lib/microScore";
 import { topDownContext } from "@/lib/topDown";
 import type { RegimeId } from "@/lib/timeframes";
@@ -113,18 +114,23 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
   const [scoreHistory, setScoreHistory] = useState<{ date: string; score: number }[]>([]);
   const [sectorPeers, setSectorPeers] = useState<{ ticker: string; score: number; date: string }[]>([]);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
   useEffect(() => {
+    // Los 30 análisis MÁS RECIENTES. En orden ascendente con limit(30) llegaban los 30 más
+    // antiguos, y la curva de la nota se quedaba congelada en el pasado para quien analiza a
+    // menudo. Descendente y dada la vuelta (AUDIT_REPORT M-3).
     datos.from("sl_analyses")
       .select("analysis_date, score_total, macro_tilt")
       .eq("ticker", ticker.toUpperCase())
-      .order("analysis_date", { ascending: true })
+      .order("analysis_date", { ascending: false })
       .limit(30)
-      .then(({ data: rows }) => {
+      .then(({ data: rows, error }) => {
+        if (error) { setErrorCarga(NO_SE_PUDO_CARGAR); return; }
         if (rows) setScoreHistory((rows as { analysis_date: string; score_total: unknown; macro_tilt?: unknown }[]).map(r => ({
           date: r.analysis_date,
           score: Number(r.score_total) + Number(r.macro_tilt ?? 0),
-        })));
+        })).reverse());
       });
   }, [ticker]);
 
@@ -138,7 +144,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
       .gte("analysis_date", thirtyDaysAgo)
       .order("analysis_date", { ascending: false })
       .limit(200)
-      .then(({ data: rows }) => {
+      .then(({ data: rows, error }) => {
+        if (error) { setErrorCarga(NO_SE_PUDO_CARGAR); return; }
         if (!rows) return;
         const seen = new Set<string>();
         const deduped: { ticker: string; score: number; date: string }[] = [];
@@ -182,6 +189,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
   return (
     <div className="animate-fade-in">
+      <DataError mensaje={errorCarga} />
       {/* Answer-first: the move, decomposed, before any of the deeper panels. */}
       <WhyMoved data={data} loading={loading} ticker={ticker} />
 

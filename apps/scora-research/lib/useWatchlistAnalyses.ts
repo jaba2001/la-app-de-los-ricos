@@ -4,12 +4,16 @@ import { datos } from "./dataClient";
 import { useAuth } from "./auth";
 import type { StockAnalysis, WatchlistItem } from "./types";
 import { latestAnalyses } from "./latestAnalyses";
+import { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface WatchlistAnalyses {
   watchlist: WatchlistItem[];
   /** Latest analysis per ticker (deduped, newest kept). */
   analyses: Record<string, StockAnalysis>;
   loading: boolean;
+  /** Mensaje si la watchlist no se pudo leer. Sin él, un fallo parecía una watchlist vacía
+   *  en las tres pantallas que usan esto (AUDIT_REPORT M-3). */
+  error: string | null;
   refetch: () => void;
 }
 
@@ -25,16 +29,18 @@ export function useWatchlistAnalyses(extraTickers: string[] = []): WatchlistAnal
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [analyses, setAnalyses] = useState<Record<string, StockAnalysis>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const extraKey = extraTickers.join(",");
 
   const load = useCallback(async () => {
     if (!session) { setLoading(false); return; }
     setLoading(true);
-    const { data: wl } = await datos
+    const { data: wl, error: e } = await datos
       .from("sl_watchlist")
       .select("*")
       .eq("user_id", session.user.id);
+    setError(e ? NO_SE_PUDO_CARGAR : null);
     const list = (wl ?? []) as WatchlistItem[];
     setWatchlist(list);
 
@@ -48,5 +54,5 @@ export function useWatchlistAnalyses(extraTickers: string[] = []): WatchlistAnal
 
   useEffect(() => { load(); }, [load]);
 
-  return { watchlist, analyses, loading, refetch: load };
+  return { watchlist, analyses, loading, error, refetch: load };
 }

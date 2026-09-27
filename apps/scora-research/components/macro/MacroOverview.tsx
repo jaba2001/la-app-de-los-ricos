@@ -7,6 +7,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { getRating, computeICHealthScore } from "@/lib/scoring";
 import { useAuth } from "@/lib/auth";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -93,15 +94,21 @@ export default function MacroOverview({ macro, loading }: Props) {
 
   const [icHistory,  setIcHistory]  = useState<{ date: string; score: number }[]>([]);
   const [topAtRisk,  setTopAtRisk]  = useState<StockAnalysis[]>([]);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
   useEffect(() => {
+    // Los 90 MÁS RECIENTES. Se pedían en orden ascendente con limit(90), que devuelve los 90
+    // más ANTIGUOS: la gráfica enseñaba el principio de la tabla como si fuera lo último, y
+    // cuanto más creciera la tabla, más vieja la historia. Se piden descendentes y se dan la
+    // vuelta para pintar de izquierda a derecha (AUDIT_REPORT M-3).
     datos.from("macro_state_history")
       .select("snapshot_date, ic_score")
-      .order("snapshot_date", { ascending: true })
+      .order("snapshot_date", { ascending: false })
       .limit(90)
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) { setErrorCarga(NO_SE_PUDO_CARGAR); return; }
         if (data) setIcHistory((data as { snapshot_date: string; ic_score: unknown }[])
-          .map(r => ({ date: r.snapshot_date, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)));
+          .map(r => ({ date: r.snapshot_date, score: Number(r.ic_score) })).filter(r => !isNaN(r.score)).reverse());
       });
     if (session) {
       datos.from("sl_analyses")
@@ -109,7 +116,8 @@ export default function MacroOverview({ macro, loading }: Props) {
         .eq("user_id", session.user.id)
         .order("analysis_date", { ascending: false })
         .limit(200)
-        .then(({ data }) => {
+        .then(({ data, error }) => {
+          if (error) { setErrorCarga(NO_SE_PUDO_CARGAR); return; }
           if (!data) return;
           const seen = new Set<string>();
           const unique = (data as StockAnalysis[]).filter(r => { if (seen.has(r.ticker)) return false; seen.add(r.ticker); return true; });
@@ -124,6 +132,7 @@ export default function MacroOverview({ macro, loading }: Props) {
 
   return (
     <div className="animate-fade-in">
+      <DataError mensaje={errorCarga} />
       {/* Top row: IC Score + Regime */}
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-6)", alignItems: "stretch" }}>
         <div className="card" style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-5)", minWidth: 260 }}>

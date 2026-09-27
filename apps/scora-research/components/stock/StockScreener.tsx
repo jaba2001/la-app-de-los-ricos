@@ -11,6 +11,7 @@ import { normalizeFundamentals } from "@/lib/normalize";
 import { useMacroContext } from "@/lib/MacroContext";
 import { track } from "@/lib/analytics";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
+import DataError, { NO_SE_PUDO_CARGAR, NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { latestAnalyses } from "@/lib/latestAnalyses";
@@ -35,11 +36,14 @@ export default function StockScreener() {
   const [analyzingTickers, setAnalyzingTickers] = useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = useState<"ic_score" | "score_total" | "macro_tilt">("ic_score");
   const [extraCols, setExtraCols] = useState<Set<string>>(new Set());
+  // Lecturas y escrituras que fallan: se dicen en vez de callarse (AUDIT_REPORT M-3).
+  const [aviso, setAviso] = useState<string | null>(null);
 
   useEffect(() => {
     if (!session) return;
-    datos.from("sl_watchlist").select("*").eq("user_id", session.user.id).then(({ data }) => {
-      if (data) setWatchlist(data as WatchlistItem[]);
+    datos.from("sl_watchlist").select("*").eq("user_id", session.user.id).then(({ data, error }) => {
+      if (error) setAviso(NO_SE_PUDO_CARGAR);
+      else if (data) setWatchlist(data as WatchlistItem[]);
       setLoading(false);
     });
   }, [session]);
@@ -126,9 +130,15 @@ export default function StockScreener() {
         fcf_yield: null,
       };
 
-      await datos.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
+      const { error } = await datos.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
+      // La nota se enseña igual —está calculada—, pero si no se guardó no entra en el
+      // historial ni en las alertas, y eso hay que decirlo.
+      if (error) setAviso(`${ticker}: scored but not saved to your history. Try again.`);
       setAnalyses(prev => ({ ...prev, [ticker]: row as StockAnalysis }));
-    } catch { /* fail silently — screener still shows the row */ }
+    } catch (e) {
+      // Antes: `catch {}` con "fail silently". La fila se quedaba sin nota y nadie sabía por qué.
+      setAviso(`${ticker}: couldn't be scored (${e instanceof Error ? e.message : "data unavailable"}).`);
+    }
     setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
   }
 
@@ -136,16 +146,17 @@ export default function StockScreener() {
     e.preventDefault();
     const t = newTicker.trim().toUpperCase();
     if (!t || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await datos.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
-    if (data) {
-      setWatchlist(prev => [...prev, data as WatchlistItem]);
-      setNewTicker("");
-      quickAnalyze(t);
-    }
+    const { data, error } = await datos.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
+    if (error || !data) { setAviso(NO_SE_PUDO_GUARDAR); return; }
+    setWatchlist(prev => [...prev, data as WatchlistItem]);
+    setNewTicker("");
+    quickAnalyze(t);
   }
 
   async function removeTicker(t: string) {
-    await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    const { error } = await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    // Antes se quitaba de la lista aunque el borrado fallara, y volvía al recargar.
+    if (error) { setAviso(NO_SE_PUDO_GUARDAR); return; }
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 
@@ -203,6 +214,7 @@ export default function StockScreener() {
 
   return (
     <div className="animate-fade-in">
+      <DataError mensaje={aviso} onCerrar={() => setAviso(null)} />
       {/* Stock-picking regime — validated Phase 4 context: does selecting names pay right now? */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${picking.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${picking.color} 28%, transparent)` }}>
         <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: picking.color, whiteSpace: "nowrap" }}>Selection regime: {picking.label}</span>

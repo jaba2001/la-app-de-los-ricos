@@ -55,6 +55,13 @@ export async function disablePush(): Promise<void> {
   try {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
-    if (sub) { const ep = sub.endpoint; await sub.unsubscribe(); await datos.from("push_subscriptions").delete().eq("endpoint", ep); }
-  } catch { /* best effort */ }
+    if (sub) {
+      const ep = sub.endpoint;
+      await sub.unsubscribe();
+      // El navegador ya no recibirá nada (unsubscribe va primero); si la fila no se borra, el
+      // cron seguirá intentando un endpoint muerto hasta que el servicio push devuelva 410.
+      const { error } = await datos.from("push_subscriptions").delete().eq("endpoint", ep);
+      if (error) console.warn("[push] suscripción desactivada pero no borrada de la base:", error.message);
+    }
+  } catch (e) { console.warn("[push] no se pudo desactivar:", e instanceof Error ? e.message : e); }
 }

@@ -6,6 +6,7 @@ import { datos } from "@/lib/dataClient";
 import type { MacroState } from "@/lib/types";
 import { stockPickingRegime } from "@/lib/microScore";
 import { Sk } from "@/components/ui/Skeleton";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface Row {
   ticker: string; sector: string | null; price: number | null;
@@ -21,6 +22,7 @@ export default function DiscoveryPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
   const [feed, setFeed] = useState<Feed>("equity");
   const [group, setGroup] = useState<string>("All");
 
@@ -32,11 +34,13 @@ export default function DiscoveryPage() {
     setLoaded(false);
     setGroup("All");
     (async () => {
-      const [{ data: d }, { data: m }] = await Promise.all([
+      const [{ data: d, error: eD }, { data: m, error: eM }] = await Promise.all([
         datos.from("sl_discovery").select("*").eq("feed", feed).order("rank", { ascending: true }),
         datos.from("macro_state").select("*").eq("id", 1).single(),
       ]);
       if (!alive) return;
+      // Un fallo no es "no hay candidatos" (AUDIT_REPORT M-3).
+      setErrorCarga(eD || eM ? NO_SE_PUDO_CARGAR : null);
       setRows((d as Row[]) ?? []);
       setMacro((m as MacroState) ?? null);
       setLoaded(true);
@@ -54,6 +58,7 @@ export default function DiscoveryPage() {
 
   return (
     <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1080, margin: "0 auto" }} className="animate-fade-in">
+      <DataError mensaje={errorCarga} />
       <div style={{ marginBottom: "var(--sr-sp-4)" }}>
         <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>Discovery</h1>
         <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 6, maxWidth: 720, lineHeight: 1.6 }}>

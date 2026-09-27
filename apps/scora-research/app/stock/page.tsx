@@ -8,6 +8,7 @@ import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
 import { Sk } from "@/components/ui/Skeleton";
 import { latestAnalyses } from "@/lib/latestAnalyses";
+import DataError, { NO_SE_PUDO_CARGAR, NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 
 interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
 
@@ -40,6 +41,7 @@ export default function StockPage() {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [analyses, setAnalyses] = useState<Record<string, StockAnalysis>>({});
   const [loadingWl, setLoadingWl] = useState(true);
+  const [errorWl, setErrorWl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && !session) router.replace("/login");
@@ -47,8 +49,10 @@ export default function StockPage() {
 
   useEffect(() => {
     if (!session) return;
-    datos.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data }) => {
-      if (data) setWatchlist(data as WatchlistItem[]);
+    datos.from("sl_watchlist").select("*").eq("user_id", session!.user.id).then(({ data, error }) => {
+      // Un fallo NO es una watchlist vacía: se dice, en vez de enseñar "Your watchlist is empty".
+      if (error) setErrorWl(NO_SE_PUDO_CARGAR);
+      else if (data) setWatchlist(data as WatchlistItem[]);
       setLoadingWl(false);
     });
   }, [session]);
@@ -102,14 +106,10 @@ export default function StockPage() {
     else if (e.key === "Escape") { setSuggestions([]); setSuggIdx(-1); }
   }
 
-  async function addToWatchlist(t: string) {
-    if (!session || watchlist.some(w => w.ticker === t)) return;
-    const { data } = await datos.from("sl_watchlist").insert({ user_id: session!.user.id, ticker: t }).select().single();
-    if (data) setWatchlist(prev => [...prev, data as WatchlistItem]);
-  }
-
   async function removeFromWatchlist(t: string) {
-    await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    const { error } = await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
+    // Antes se quitaba de la lista aunque el borrado fallara: desaparecía y volvía al recargar.
+    if (error) { setErrorWl(NO_SE_PUDO_GUARDAR); return; }
     setWatchlist(prev => prev.filter(w => w.ticker !== t));
   }
 
@@ -212,12 +212,13 @@ export default function StockPage() {
           <div className="section-label">Watchlist</div>
           <span className="sr-hint">{watchlist.length} tickers</span>
         </div>
+        <DataError mensaje={errorWl} onCerrar={() => setErrorWl(null)} />
 
         {loadingWl ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "var(--sr-sp-3)" }}>
             {[0, 1, 2, 3].map(i => <div key={i} className="card" style={{ height: 80 }}><Sk w="100%" h={80} /></div>)}
           </div>
-        ) : watchlist.length === 0 ? (
+        ) : watchlist.length === 0 && !errorWl ? (
           <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-8)", color: "var(--sr-text-3)" }}>
             Your watchlist is empty. Search any ticker above and analyze it to add it here.
           </div>

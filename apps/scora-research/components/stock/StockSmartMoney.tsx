@@ -5,6 +5,7 @@ import type { StockData } from "@/app/stock/[ticker]/page";
 import { datos } from "@/lib/dataClient";
 import { computeSmartMoneySignal } from "@/lib/smartMoney";
 import { Sk } from "@/components/ui/Skeleton";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
 interface InsiderRow { rank: number; ticker: string; sector: string; net_insider_buying_usd: number; num_insiders: number; month: string; }
@@ -22,16 +23,23 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
   const router = useRouter();
   const [topBuyers, setTopBuyers] = useState<InsiderRow[]>([]);
   const [loadingTop, setLoadingTop] = useState(true);
+  const [errorTop, setErrorTop] = useState<string | null>(null);
 
   useEffect(() => {
     datos.from("smart_money_top_buyers")
       .select("rank, ticker, sector, net_insider_buying_usd, num_insiders, month")
       .order("month", { ascending: false })
       .order("rank", { ascending: true })
-      .limit(20)
+      .limit(60)
       .then(({ data, error }) => {
-        if (data) setTopBuyers(data as InsiderRow[]);
-        if (error) console.warn("smart_money_top_buyers:", error.message);
+        // Un fallo no es "No data yet" (AUDIT_REPORT M-3).
+        if (error) setErrorTop(NO_SE_PUDO_CARGAR);
+        // SOLO el último mes. Con limit(20) a secas, un mes con menos de 20 filas se rellenaba
+        // con compradores del mes anterior, presentados como si fueran de ahora.
+        else if (data?.length) {
+          const filas = data as InsiderRow[];
+          setTopBuyers(filas.filter((r) => r.month === filas[0].month).slice(0, 20));
+        }
         setLoadingTop(false);
       });
   }, []);
@@ -241,7 +249,8 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       {/* Market-wide top insider buyers */}
       <div className="card">
         <div className="section-label">Market Top Insider Buyers — Open Market (Updated Weekly)</div>
-        {loadingTop ? <Sk w="100%" h={200} /> : topBuyers.length === 0 ? (
+        <DataError mensaje={errorTop} />
+        {loadingTop ? <Sk w="100%" h={200} /> : errorTop ? null : topBuyers.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>
             No data yet — cron runs every Monday (FMP Form 4s)
           </div>

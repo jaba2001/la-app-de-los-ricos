@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
+import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface AuditRow {
   id: number; ticker: string | null; module: string; model: string | null;
@@ -12,6 +13,13 @@ interface AuditRow {
 }
 
 const MODULE_LABEL: Record<string, string> = {
+  // Los nombres que la app registra HOY (el `module` de cada aiAnalyzeAudited). Faltaban: la
+  // tabla enseñaba "stock-thesis" en vez de su nombre (AUDIT_REPORT M-3).
+  "stock-thesis": "Stock thesis", "research-report": "Research note",
+  "investment-verdict": "Investment verdict", "earnings-analysis": "Earnings analysis",
+  "earnings-tone": "Earnings tone", "news-relevance": "News relevance",
+  "macro-synthesis": "Macro synthesis", "allocation-brief": "Scora brief",
+  // Due diligence usa estos, y las filas antiguas pueden llevar los cortos.
   thesis: "Stock thesis", report: "Research note", redflags: "Red-flag scanner",
   moat: "Moat audit", bullbear: "Bull vs bear", macrosens: "Macro sensitivity",
   thesisupdate: "Thesis triggers", earnings: "Earnings tone", brief: "Scora brief",
@@ -23,13 +31,19 @@ export default function AuditPage() {
   const [rows, setRows] = useState<AuditRow[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
 
   useEffect(() => { if (!authLoading && !session) router.replace("/login"); }, [session, authLoading, router]);
 
   useEffect(() => {
     if (!session) return;
     datos.from("ai_audit_log").select("*").order("created_at", { ascending: false }).limit(100)
-      .then(({ data }) => { setRows((data as AuditRow[]) ?? []); setLoaded(true); });
+      .then(({ data, error }) => {
+        // Un fallo aquí se leía como "0 respuestas registradas": justo lo contrario de lo que
+        // esta pantalla promete (AUDIT_REPORT M-3).
+        setErrorCarga(error ? NO_SE_PUDO_CARGAR : null);
+        setRows((data as AuditRow[]) ?? []); setLoaded(true);
+      });
   }, [session]);
 
   const stats = useMemo(() => {
@@ -43,6 +57,7 @@ export default function AuditPage() {
 
   return (
     <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1000, margin: "0 auto" }} className="animate-fade-in">
+      <DataError mensaje={errorCarga} />
       <div style={{ marginBottom: "var(--sr-sp-5)" }}>
         <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>AI Audit Trail</h1>
         <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 6, maxWidth: 720, lineHeight: 1.6 }}>
