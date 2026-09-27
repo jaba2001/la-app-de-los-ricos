@@ -14,6 +14,7 @@
 // todos a propósito, para eso mandan las alertas). La puerta del navegador es
 // app/api/data/route.ts, que sí aplica policy.ts. No mezclar las dos.
 import { pool } from "./pool.ts";
+import { filasConNumeros } from "./numeros.js";
 
 const IDENT = /^[a-z_][a-z0-9_]*$/;
 
@@ -136,7 +137,7 @@ export async function sbFetch(url, init = {}) {
     }
 
     const r = await pool().query(text, vals);
-    return respuesta(200, r.rows);
+    return respuesta(200, filasConNumeros(r));
   } catch (e) {
     // Misma forma que una Response fallida: los llamantes hacen `r.ok ? await r.json() : []`
     // y así no hay que tocar su manejo de errores.

@@ -18,22 +18,11 @@ import { checkRateLimit, clientIp } from "../../../lib/server/ratelimit.js";
 import { corsHeaders, preflight } from "../../../lib/server/cors.js";
 import { pool } from "../../../lib/server/data/pool.ts";
 
-// node-pg devuelve numeric/decimal e int8 como CADENA para no perder precision.
-// Las paginas hacen v.toFixed(), asi que una cadena revienta la vista entera con
-// "e.toFixed is not a function". Se convierte por OID —1700 numeric, 20 int8— y no
-// adivinando por el aspecto del valor, que estropearia tickers o fechas.
-const OID_NUMERICOS = new Set([1700, 20, 700, 701]);
+import { filasConNumeros } from "../../../lib/server/data/numeros.js";
 
-function aNumeros(res: { rows: Record<string, unknown>[]; fields: { name: string; dataTypeID: number }[] }) {
-  const fila = res.rows[0];
-  if (!fila) return null;
-  const cols = new Set(res.fields.filter(f => OID_NUMERICOS.has(f.dataTypeID)).map(f => f.name));
-  const out: Record<string, unknown> = {};
-  for (const [k, v] of Object.entries(fila)) {
-    out[k] = cols.has(k) && v != null ? Number(v) : v;
-  }
-  return out;
-}
+import type { ResultadoPg } from "../../../lib/server/data/numeros.js";
+
+const unaFila = (res: ResultadoPg) => filasConNumeros(res)[0] ?? null;
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -61,11 +50,11 @@ export async function GET(request: Request) {
     ]);
 
     return new Response(JSON.stringify({
-      resumen:  aNumeros(resumen),
+      resumen:  unaFila(resumen),
       cohortes: cohortes.rows[0]?.n ?? 0,
-      track:    aNumeros(track),
-      cartera:  aNumeros(cartera),
-      macro:    aNumeros(macro),
+      track:    unaFila(track),
+      cartera:  unaFila(cartera),
+      macro:    unaFila(macro),
     }), {
       status: 200,
       headers: corsHeaders(request, {
