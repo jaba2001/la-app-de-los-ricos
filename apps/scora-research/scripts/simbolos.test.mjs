@@ -62,5 +62,14 @@ check("fmp/key-metrics-ttm sigue abierta (no la confunde con key-metrics)", awai
 check("fmp/price-target sigue abierta (no la confunde con price-target-consensus)", await rutaFmp("price-target"), 500);
 check("finnhub/stock/transcripts/list sigue abierta", await rutaFh("stock/transcripts/list"), 500);
 
+// Next 15 entrega `params` como Promise. Con params.path leído a pelo, solo funcionaba gracias
+// a una capa de compatibilidad obsoleta; con la Promise sin más, lanzaba.
+const conPromesa = async (serve, prov, path) => {
+  try { return (await serve(pide(`http://x/api/${prov}/${path}?symbol=AAPL`), { params: Promise.resolve({ path: path.split("/") }) })).status; }
+  catch (e) { return `lanza: ${e.message}`; }
+};
+check("fmp con params como Promise (Next 15)", await conPromesa(fmp, "fmp", "quote"), 500);
+check("finnhub con params como Promise (Next 15)", await conPromesa(finnhub, "finnhub", "quote"), 500);
+
 console.log(bad ? `\n✗ simbolos: ${bad} fallo(s) de ${total}` : `\n✓ simbolos: ${total} comprobaciones OK`);
 process.exit(bad ? 1 : 0);

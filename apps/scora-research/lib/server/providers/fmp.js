@@ -35,12 +35,14 @@ const ALLOWED = new Set([
 const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
 const isDotSegment = (s) => s === '.' || s === '..';
 
-export async function serve(request, { params }) {
+export async function serve(request, ctx) {
   const json = (obj, status) => new Response(JSON.stringify(obj), {
     status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
   });
 
-  const segments = params.path;
+  // En Next 15 `params` es una Promise (el acceso síncrono solo va por una capa de
+  // compatibilidad obsoleta). /api/batch pasa un objeto plano: `await` vale para los dos.
+  const segments = (await ctx.params).path;
   if (!segments.every(s => SAFE_SEGMENT.test(s) && !isDotSegment(s))) {
     return json({ error: 'Invalid path' }, 400);
   }

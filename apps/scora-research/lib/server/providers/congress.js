@@ -29,7 +29,10 @@ function normTicker(raw) {
   return String(raw || '').replace(/^[$]/, '').toUpperCase().trim();
 }
 
-export async function serve(request, { params }) {
+export async function serve(request, ctx) {
+  // En Next 15 `params` es una Promise (el acceso síncrono solo va por una capa de
+  // compatibilidad obsoleta). /api/batch pasa un objeto plano: `await` vale para los dos.
+  const params = await ctx.params;
 
   const ticker = (params.ticker || '').toUpperCase().replace(/[^A-Z.\-]/g, '');
   if (!ticker || ticker.length > 8) {
