@@ -12,9 +12,14 @@ const POSTHOG = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.co
 // Sentry DSNs resolve to o<org>.ingest.sentry.io (US) or o<org>.ingest.de.sentry.io (EU);
 // both are listed so the region can change without a code edit.
 const SENTRY_INGEST = "https://*.ingest.sentry.io https://*.ingest.de.sentry.io";
+// Identity Platform habla desde el NAVEGADOR con estos dos origenes: identitytoolkit
+// para entrar y securetoken para renovar el token cada hora. Sin ellos en connect-src
+// el navegador corta la peticion y Firebase lo reporta como "network-request-failed",
+// que no dice nada de CSP — nadie podia entrar en ningun entorno.
+const IDENTITY = "https://identitytoolkit.googleapis.com https://securetoken.googleapis.com";
 
-// The Supabase session lives in localStorage, so any XSS is a full account takeover —
-// CSP is the mitigation that was missing entirely (only HSTS was being served).
+// La sesion vive en el navegador, asi que cualquier XSS es un secuestro de cuenta
+// completo — la CSP es la mitigacion que faltaba entera (solo se servia HSTS).
 //
 // script-src needs 'unsafe-inline' because Next's App Router emits inline hydration
 // scripts (self.__next_f.push) and we don't run a nonce middleware; 'unsafe-eval' is
@@ -26,8 +31,9 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  // 'self' also covers Vercel Analytics + Speed Insights (they post to /_vercel/*).
-  `connect-src 'self' https://*.supabase.co wss://*.supabase.co ${PROXY} ${POSTHOG} ${SENTRY_INGEST}`,
+  // Supabase salio del proyecto en la migracion a Google Cloud; sus origenes estaban
+  // aqui de resto y se quitan.
+  `connect-src 'self' ${IDENTITY} ${PROXY} ${POSTHOG} ${SENTRY_INGEST}`,
   "worker-src 'self'",       // PWA service worker
   "manifest-src 'self'",
   "frame-ancestors 'none'",  // clickjacking — the app was embeddable
