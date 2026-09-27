@@ -10,8 +10,16 @@
 // El pool es DE MÓDULO a propósito. Cloud Run reutiliza la instancia entre peticiones, así
 // que abrir una conexión por petición desperdiciaría el arranque de TLS y agotaría el
 // límite de conexiones de Cloud SQL en cuanto hubiera concurrencia.
-import { Pool } from "pg";
+import { Pool, types } from "pg";
 import type { Esquema } from "./query.ts";
+
+// LAS COLUMNAS `date` VUELVEN COMO TEXTO, igual que las servia PostgREST. Por defecto node-pg
+// las convierte en un Date a medianoche de la zona LOCAL del proceso: al serializar a JSON sale
+// "2026-09-27T00:00:00.000Z" en UTC y "2026-09-26T22:00:00.000Z" en Madrid — otro formato y,
+// fuera de UTC, otro dia. Una fecha de calendario no es un instante y no se convierte. El
+// registro es global del driver: vale para /api/data, /api/publico y sbFetch (crons).
+// AUDIT_REPORT C-3; lo vigila scripts/numeros.test.mjs.
+types.setTypeParser(types.builtins.DATE, (v) => v);
 
 let _pool: Pool | null = null;
 

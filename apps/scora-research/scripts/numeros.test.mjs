@@ -9,21 +9,48 @@
 // Se prueba contra Postgres de verdad: el fallo esta en los METADATOS de tipo que
 // devuelve el driver, asi que un mock de las filas no lo detectaria — de hecho no lo
 // detecto, y por eso el fallo llego a la pantalla dos veces.
+//
+// LAS FECHAS, el mismo problema con otro tipo (AUDIT_REPORT C-3). PostgREST devolvia una
+// columna `date` como "2026-09-27"; node-pg la convierte en un Date a medianoche LOCAL, que al
+// pasar a JSON sale "2026-09-27T00:00:00.000Z" en UTC y "2026-09-26T22:00:00.000Z" en Madrid:
+// otro formato y, fuera de UTC, otro dia. Rompia `analysis_date + "T00:00:00Z"` (NaN dias) y
+// pintaba la marca ISO entera en /macro, el diario y /picks.
 import pg from "pg";
-
-const host = process.env.PGHOST || "/tmp/scpg";
-const port = Number(process.env.PGPORT || 5544);
-const probe = new pg.Client({ host, port, user: "postgres", database: "scora" });
-try { await probe.connect(); }
-catch { console.log(`\n○ numeros: SALTADO — no hay Postgres en ${host}:${port}`); process.exit(0); }
-
-const { filasConNumeros } = await import("../lib/server/data/numeros.js");
 
 let mal = 0;
 const comprueba = (nombre, ok, detalle = "") => {
   if (ok) console.log(`  ✓ ${nombre}`);
   else { console.log(`  ✗ ${nombre}${detalle ? " — " + detalle : ""}`); mal++; }
 };
+
+// 0. Sin base: cargar el pool tiene que dejar registrado el conversor de `date` (OID 1082).
+//    Esta parte corre tambien en CI, donde no hay Postgres.
+await import("../lib/server/data/pool.ts");
+console.log("\nnumeros — las date llegan como el texto de Postgres");
+comprueba("date (1082) se devuelve tal cual, sin pasar por Date",
+  pg.types.getTypeParser(1082)("2026-09-27") === "2026-09-27",
+  `fue ${JSON.stringify(pg.types.getTypeParser(1082)("2026-09-27"))}`);
+
+const host = process.env.PGHOST || "/tmp/scpg";
+const port = Number(process.env.PGPORT || 5544);
+const probe = new pg.Client({ host, port, user: "postgres", database: "scora" });
+try { await probe.connect(); }
+catch {
+  console.log(`\n○ numeros: parte con base SALTADA — no hay Postgres en ${host}:${port}`);
+  console.log(mal ? `\n✗ numeros: ${mal} fallos` : "\n✓ numeros: todo correcto (sin base)");
+  process.exit(mal ? 1 : 0);
+}
+
+const { filasConNumeros } = await import("../lib/server/data/numeros.js");
+
+// 0b. Con base, y en una zona que NO es UTC, que es donde se veia el dia de menos.
+{
+  const r = await probe.query("select date '2026-09-27' as d, now() as ts");
+  const f = filasConNumeros(r)[0];
+  comprueba(`date de Postgres → "2026-09-27" (TZ=${process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone})`,
+    f.d === "2026-09-27", `fue ${JSON.stringify(f.d)}`);
+  comprueba("timestamptz sigue siendo un instante (Date)", f.ts instanceof Date);
+}
 
 console.log("\nnumeros — los numeric llegan como number");
 
