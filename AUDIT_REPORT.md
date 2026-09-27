@@ -21,7 +21,7 @@ llamadas de verdad. Diez fallos más, **cuatro de ellos graves y silenciosos** (
 Pro, cancelaciones que fallan, alertas que no se disparan, correos que no salen) — ver «Tercera
 ronda» al final.
 
-**Queda abierto, y no es código:** C-5 (migrar los datos de Supabase a Cloud SQL: bloqueado por
+**Queda abierto, y no es código:** C-5 (código listo; faltan los pasos en producción — ver «C-5» al final; bloqueado por
 permisos de esta sesión), las claves que faltan en producción (D-2), aplicar el rol de A-5, los
 textos legales de A-6 y la revocación inmediata de sesión (D-3). La CI está en rojo por la
 guarda de frescura de los backtests: se están regenerando (ver «Segunda ronda»).
@@ -599,3 +599,61 @@ en la CI: `stripewebhook`, `alertascron`, `tickeralertascron`, `cierrecron`; amp
 Build de producción sin errores; typecheck 0; lint sin errores (los ficheros tocados no añaden
 avisos); **suite completa con Postgres y servidor en verde (67 suites, 0 fallos)**; integración
 37/37 contra la app compilada; los 8 crons ejecutados contra la base sin un solo error de SQL.
+
+## C-5 · Migración de Supabase a Cloud SQL — código listo, falta ejecutarla en producción
+
+### Qué hay en Supabase (contado el 27-09, solo lectura)
+
+~52 800 filas en 31 tablas; el 97 % es la base de conocimiento (`kb_chunks` 51 323, `kb_docs`
+709). Las columnas de las 31 coinciden con Cloud SQL. En Supabase hay además `smart_money_13f`
+(268 filas, sin DDL en ningún repo → `004`) y las tablas `ic_*`/`api_calls_log`, que son del
+proyecto ic-proxy y quedan fuera.
+
+**Datos de usuarios: no se copian.** Sus `user_id` son de Supabase Auth y no existen en Identity
+Platform: serían filas huérfanas con datos personales que nadie puede ver ni borrar. Son pocas
+(24 análisis, 10 notas selladas, 9 snapshots, 8 registros de IA, 1 alerta, 1 suscripción push).
+
+### Lo que estaba roto y salió al probarlo
+
+Los 9 workflows del monorepo **nunca se habían ejecutado** (el repo no tiene secretos; los que
+escriben en Supabase son los del repo antiguo). Al lanzarlos contra una copia real:
+`sl_track_summary.months_live` era entero y el script escribe `41.9`; `sl_paper_fund_track` no
+tenía las columnas de costes. Los dos fallaban entero → `005`. La tabla del cron 13f → `004`.
+
+### Qué se ha cambiado (en `main`, commits `f5a2d12`…`523192d`)
+
+| pieza | |
+|---|---|
+| `research/*.mjs` (9) | escriben con `sbFetch` en Cloud SQL; verificado ejecutando los 9 |
+| `.github/actions/cloud-sql` | auth sin clave (Workload Identity Federation) + Cloud SQL Auth Proxy |
+| 9 workflows | `npm ci`, `id-token: write`, la acción, y `PG*` en vez de `SUPABASE_SERVICE_KEY` |
+| `sql/gcp/004`, `005`, `006` | tabla 13f, desfases, y el rol `scora_jobs` (solo tablas de research; **no** lee datos de usuarios) |
+| `scripts/migrar_supabase.mjs` | copia idempotente y todo-o-nada; probada contra Supabase real dos veces |
+| `infra/github-actions-cloudsql.sh` | cuenta de servicio, pool WIF limitado a este repo, usuario `scora_jobs`, secretos |
+| pruebas | `migrarsupabase` (16), `researchcloudsql` (85) |
+
+### Pasos en producción — EN ESTE ORDEN (copiar primero, activar después)
+
+El control de permisos de la sesión bloqueó conectar a la base de producción, así que esto lo
+lanza Jorge:
+
+```bash
+cd ~/Desktop/scora
+# 0. túnel a la base de producción (dejar abierto en otra terminal)
+cloud-sql-proxy --port 5433 scora-509716:europe-west1:scora-db
+# 1. esquema (aditivo, idempotente)
+export PGHOST=127.0.0.1 PGPORT=5433 PGUSER=postgres PGDATABASE=scora PGPASSWORD=…   # la de infra/.env.gcp
+for f in 004_smart_money_13f 005_desfases_research 006_rol_jobs; do
+  psql -v ON_ERROR_STOP=1 -f apps/scora-research/sql/gcp/$f.sql; done
+# 2. copia (primero en seco, luego de verdad)
+cd apps/scora-research
+SUPABASE_SERVICE_KEY=… node --experimental-strip-types --no-warnings scripts/migrar_supabase.mjs --dry-run
+SUPABASE_SERVICE_KEY=… node --experimental-strip-types --no-warnings scripts/migrar_supabase.mjs
+# 3. activar: cuenta de servicio, WIF, contraseña de scora_jobs y secretos de GitHub
+cd ~/Desktop/scora && ./infra/github-actions-cloudsql.sh
+# 4. probar un workflow a mano
+gh workflow run scora-weekly-measure.yml -R jaba2001/la-app-de-los-ricos
+```
+
+Después: pedir a Alejandro que **pare los crons del repo antiguo** (siguen escribiendo en
+Supabase) y, si pasaron días entre 2 y 3, relanzar la copia con `--sin-pisar`.
