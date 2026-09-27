@@ -313,6 +313,12 @@ jobs:
       - name: Traductor PostgREST (se salta sin base)
         run: node --experimental-strip-types --no-warnings scripts/postgrest.test.mjs
 
+      # Los numeric/int8 de Postgres llegan como cadena y la interfaz hace .toFixed() sobre
+      # ellos. Se añadio a `npm test` sin añadirlo aqui, y el guardian de guardianes tuvo el
+      # CI en rojo el 27-09 por eso (AUDIT_REPORT C-4).
+      - name: Tipos de Postgres hacia la interfaz (numeric, date)
+        run: node --experimental-strip-types --no-warnings scripts/numeros.test.mjs
+
       # ── EL BACKEND ────────────────────────────────────────────────────────────────────
       # Estas 15 vivian en el repo ic-proxy con su propio `npm test`, y al fusionarlo todo en
       # una sola app se habrian quedado sin correr en ningun sitio. Lo cazo el guardian de
