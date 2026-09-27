@@ -56,6 +56,19 @@ function condicion(col, expr, push) {
   }
 }
 
+/** `(col.op.valor,col.op.valor)` → `(c1 OR c2)`. Sin anidar: nadie lo usa y así se lee. */
+function disyuncion(expr, push) {
+  const dentro = /^\((.*)\)$/.exec(expr)?.[1];
+  if (!dentro) throw new Error(`or mal formado: ${expr}`);
+  if (/[()]/.test(dentro)) throw new Error("or anidado no soportado");
+  const partes = dentro.split(",").map((p) => {
+    const i = p.indexOf(".");
+    if (i === -1) throw new Error(`or mal formado: ${p}`);
+    return condicion(p.slice(0, i), p.slice(i + 1), push);
+  });
+  return `(${partes.join(" OR ")})`;
+}
+
 /** PostgREST manda todo como texto; `true`, `false` y `null` son valores, no cadenas. */
 function valor(s) {
   const d = decodeURIComponent(s);
@@ -86,6 +99,10 @@ export async function sbFetch(url, init = {}) {
     const where = [];
     for (const [k, v] of q) {
       if (["select", "order", "limit", "offset", "on_conflict"].includes(k)) continue;
+      // `or=(a.is.null,a.lt.X)`: lo usa el webhook de Stripe para descartar eventos viejos en
+      // el propio UPDATE. Sin esto, cada cancelación o renovación daba 500 para siempre y la
+      // suscripción se quedaba en el estado del alta.
+      if (k === "or") { where.push(disyuncion(v, push)); continue; }
       where.push(condicion(k, v, push));
     }
     const W = where.length ? ` WHERE ${where.join(" AND ")}` : "";

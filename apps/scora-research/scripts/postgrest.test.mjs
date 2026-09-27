@@ -19,8 +19,9 @@ process.env.PGUSER = "postgres"; process.env.PGDATABASE = "scora";
 const { sbFetch } = await import("../lib/server/data/postgrest.js");
 const { pool } = await import("../lib/server/data/pool.ts");
 
-let bad = 0;
+let bad = 0, total = 0;
 const check = (l, got, want) => {
+  total++;
   const ok = JSON.stringify(got) === JSON.stringify(want);
   if (!ok) { bad++; console.log(`FAIL  ${l}\n      got:  ${JSON.stringify(got)}\n      want: ${JSON.stringify(want)}`); }
 };
@@ -120,6 +121,24 @@ check("las alertas siguen ahi tras los intentos", (await filas("sl_alerts?select
   await p.query("truncate sl_stripe_events, sl_waitlist");
 }
 
+// ── or=(…) — el filtro del webhook de Stripe contra eventos desordenados ─────────────────
+{
+  await p.query("truncate sl_subscriptions");
+  await p.query(`insert into sl_subscriptions (user_id, stripe_customer_id, status, last_event_at) values
+    ('u1', 'cus_1', 'active', '2026-09-20T00:00:00Z'), ('u2', 'cus_2', 'active', null)`);
+  const parchea = (cus, antesDe) => sbFetch(`sl_subscriptions?${new URLSearchParams({
+    stripe_customer_id: `eq.${cus}`, or: `(last_event_at.is.null,last_event_at.lt.${antesDe})` })}`,
+    { method: "PATCH", body: JSON.stringify({ status: "canceled" }) });
+  check("or: evento más nuevo → actualiza", (await (await parchea("cus_1", "2026-09-27T00:00:00.000Z")).json()).length, 1);
+  check("or: evento más viejo → no toca nada", (await (await parchea("cus_1", "2026-09-01T00:00:00.000Z")).json()).length, 0);
+  check("or: sin last_event_at → actualiza", (await (await parchea("cus_2", "2026-09-01T00:00:00.000Z")).json()).length, 1);
+  check("or: el filtro de cliente sigue mandando (el OR va entre paréntesis)",
+    (await p.query("select count(*)::int n from sl_subscriptions where status = 'canceled'")).rows[0].n, 2);
+  check("or anidado → 500, no SQL a medias",
+    (await sbFetch("sl_subscriptions?or=(a.eq.1,or(b.eq.2))", { method: "PATCH", body: '{"status":"x"}' })).status, 500);
+  await p.query("truncate sl_subscriptions");
+}
+
 await p.end();
-console.log(bad ? `\npostgrest: ${bad} fallo(s)` : "\npostgrest: 25 comprobaciones OK contra Postgres real");
+console.log(bad ? `\npostgrest: ${bad} fallo(s) de ${total}` : `\npostgrest: ${total} comprobaciones OK contra Postgres real`);
 process.exit(bad ? 1 : 0);
