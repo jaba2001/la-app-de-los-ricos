@@ -117,7 +117,7 @@ async function growthWithEquity(equityRetFn) {
     let gross = 0;
     for (const a of ASSETS) {
       const wa = w[a] || 0; if (!wa) continue;
-      let r = a === "SPY" ? await equityRetFn(i) : await fwd1(a, d);
+      const r = a === "SPY" ? await equityRetFn(i) : await fwd1(a, d);
       if (r == null) continue; gross += wa * r;
     }
     let turn = 0; for (const a of ASSETS) turn += Math.abs((w[a] || 0) - (prev[a] || 0));

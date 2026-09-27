@@ -35,6 +35,27 @@ echo "Registro : $REGISTRO"
 echo "Etiqueta : $TAG"
 echo
 
+# ── El lock tiene que traer los binarios de LINUX ────────────────────────────────────
+# `npm install` en macOS PODA las dependencias opcionales de otras plataformas, asi que el
+# lock se queda sin los binarios de Linux (rollup, napi-rs, swc...) y el `npm ci` de dentro
+# del contenedor falla con "Missing: rollup@x from lock file".
+#
+# Ha pasado DOS veces: cada vez que se instala o quita un paquete desde el Mac. Se comprueba
+# aqui para que el fallo salga en dos segundos y con una explicacion, en vez de a los cinco
+# minutos de build con un mensaje que no menciona la causa.
+echo "Comprobando que el lock sirve para Linux..."
+if ! docker run --rm --platform linux/amd64 -v "$APP":/app:ro -w /tmp \
+       -v "$APP/package.json":/tmp/package.json:ro -v "$APP/package-lock.json":/tmp/package-lock.json:ro \
+       node:22-alpine sh -c 'npm ci --ignore-scripts --dry-run >/dev/null 2>&1'; then
+  echo "" >&2
+  echo "El package-lock.json no tiene los paquetes de Linux. Se regenera asi:" >&2
+  echo "  docker run --rm --platform linux/amd64 -v \"\$PWD\":/app -w /app node:22-alpine \\" >&2
+  echo "    npm install --package-lock-only --ignore-scripts" >&2
+  echo "" >&2
+  echo "Hay que rehacerlo cada vez que se instala o quita un paquete desde macOS." >&2
+  exit 1
+fi
+
 gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
 
 # --platform linux/amd64 es obligatorio desde un Mac con chip Apple: sin eso la imagen sale

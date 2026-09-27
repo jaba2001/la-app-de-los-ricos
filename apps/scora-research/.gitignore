@@ -176,3 +176,7 @@ research/data/*.tmp
 !research/out/insiders.json
 !research/out/sankey_universo.json
 !research/data/cusip_ticker.json
+
+# Playwright: capturas, trazas y el estado de la ultima ejecucion. Son salida, no fuente.
+test-results/
+playwright-report/

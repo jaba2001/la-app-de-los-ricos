@@ -58,6 +58,8 @@ export async function serve(request, { params }) {
 
   const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().substring(0, 10);
   const trades = [];
+  // Que camara contesto 200 pero no se pudo leer. Vacio = todo bien.
+  const falloParseo = {};
 
   const fetchWithTimeout = (url, ms = 8000) => {
     const ctrl = new AbortController();
@@ -88,7 +90,12 @@ export async function serve(request, { params }) {
           disclosure_date: normalizeDate(r.disclosure_date),
         });
       }
-    } catch {}
+    } catch (e) {
+      // NO es lo mismo «no hay operaciones» que «no se ha podido leer». Un 200 cuyo cuerpo
+      // cambia de forma caia aqui en silencio y la camara aportaba cero, indistinguible de
+      // un ticker sin operaciones. Se anota para no cachear ese vacio mas abajo.
+      falloParseo.senate = String(e?.message || e);
+    }
   }
 
   if (houseRes.status === 'fulfilled' && houseRes.value.ok) {
@@ -108,7 +115,9 @@ export async function serve(request, { params }) {
           disclosure_date: normalizeDate(r.disclosure_date),
         });
       }
-    } catch {}
+    } catch (e) {
+      falloParseo.house = String(e?.message || e);
+    }
   }
 
   trades.sort((a, b) => b.date.localeCompare(a.date));
@@ -118,9 +127,15 @@ export async function serve(request, { params }) {
   // cacheable answer for most tickers (few names have congressional trades), but an empty
   // result because BOTH dumps timed out is an outage — storing that for 12 h would keep
   // serving "no trades" long after the sources came back.
-  const anySourceOk =
-    (senateRes.status === 'fulfilled' && senateRes.value.ok) ||
-    (houseRes.status === 'fulfilled' && houseRes.value.ok);
+  // Una camara solo cuenta como buena si contesto 200 Y su cuerpo se pudo leer. Sin la
+  // segunda condicion, un cambio de formato aguas arriba se cacheaba 12 h como «no hay
+  // operaciones» — que es el mismo fallo que el apagon, con otra causa.
+  const senateOk = senateRes.status === 'fulfilled' && senateRes.value.ok && !falloParseo.senate;
+  const houseOk  = houseRes.status === 'fulfilled'  && houseRes.value.ok  && !falloParseo.house;
+  const anySourceOk = senateOk || houseOk;
+  if (Object.keys(falloParseo).length) {
+    console.warn('congress: respuesta ilegible ->', JSON.stringify(falloParseo));
+  }
   if (anySourceOk) await cacheSet(key, { status: 200, body }, CONGRESS_TTL);
 
   // ⚠️ SI NINGUNA CAMARA CONTESTO, ESTO NO ES «NO HAY OPERACIONES»: ES UN APAGON.

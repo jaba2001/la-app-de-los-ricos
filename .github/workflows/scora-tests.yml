@@ -28,6 +28,13 @@ on:
     - cron: "0 6 * * 1" # lunes 06:00 UTC
   workflow_dispatch: {}
 
+# Los comandos de abajo asumen apps/scora-research: este fichero vivia alli hasta que se
+# descubrio que GitHub Actions SOLO mira .github/ en la RAIZ del repositorio. Estuvo sin
+# ejecutarse desde que los dos repos se fusionaron en el monorepo.
+defaults:
+  run:
+    working-directory: apps/scora-research
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -37,6 +44,7 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+          cache-dependency-path: apps/scora-research/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -274,6 +282,16 @@ jobs:
       # publicados siguieron siendo los del día anterior sin que nada lo dijera.
       - name: Frescura de los artefactos publicados
         run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
+
+      # ── INTEGRACION Y CONTRATO ────────────────────────────────────────────────────────
+      # Las 51 suites de abajo prueban funciones puras importandolas. Ninguna arranca la
+      # app, asi que un fallo de cableado —una ruta mal exportada, un runtime equivocado,
+      # un import que solo revienta en produccion— las pasa todas y rompe en el navegador.
+      # Estas dos si llaman a la app; sin servidor se saltan y lo dicen.
+      - name: Integracion (cada endpoint contra la app real)
+        run: node --experimental-strip-types --no-warnings scripts/integracion.test.mjs
+      - name: Contrato front-back (payloads y formas de respuesta)
+        run: node --experimental-strip-types --no-warnings scripts/contrato.test.mjs
 
       # ── AISLAMIENTO ENTRE USUARIOS ────────────────────────────────────────────────────
       # La garantia de que un usuario no ve los datos de otro dejo de estar en la base de

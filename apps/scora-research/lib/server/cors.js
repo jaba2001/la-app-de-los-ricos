@@ -21,6 +21,11 @@
 const DEFAULT_ORIGINS = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  // Cloud Run — donde vive Scora desde la migracion. La propia app NO lo necesita (desde
+  // que front y back son la misma, el navegador llama al mismo origen y no hay CORS), pero
+  // si lo necesitan las otras apps del ecosistema cuando apunten aqui.
+  'https://scora-628763661566.europe-west1.run.app',
+  // Vercel — el despliegue anterior. Se conserva mientras siga vivo; al apagarlo, fuera.
   'https://scora-research.vercel.app',
   'https://ic-suite.vercel.app',
   'https://ic-datalayer-app.vercel.app',

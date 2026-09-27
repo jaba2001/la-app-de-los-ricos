@@ -71,7 +71,7 @@ const sectorCache = new Map();
 const porFecha = new Map();
 
 for (const fecha of fechas) {
-  let miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
+  const miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
   // ⚠️ NO truncar: `membersAsOf` devuelve los tickers EN ORDEN ALFABÉTICO, así que un
   // slice(0, N) borraba sistemáticamente de la S a la Z — 99 nombres en 2020, entre ellos
   // UnitedHealth, Visa, Walmart, Exxon, Verizon y Wells Fargo. Un universo truncado por la

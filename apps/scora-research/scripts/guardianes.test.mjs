@@ -107,7 +107,11 @@ const deTestAll = () => {
   return vistos;
 };
 
-const wf = readFileSync(join(RAIZ, ".github", "workflows", "scora-tests.yml"), "utf8");
+// Los workflows viven en la RAIZ DEL REPOSITORIO, no en esta carpeta. GitHub Actions solo
+// mira .github/ en la raiz, y mientras estuvieron dentro de apps/scora-research no se
+// ejecuto ninguno — descubierto en la revision del 26-09-2026. Se resuelve subiendo dos
+// niveles desde aqui.
+const wf = readFileSync(join(RAIZ, "..", "..", ".github", "workflows", "scora-tests.yml"), "utf8");
 const deCI = new Set((wf.match(/(?:scripts|research)\/[\w-]+\.(?:test\.)?mjs/g) ?? []));
 
 // Lo que legítimamente corre en un solo sitio, con su motivo escrito. Sin motivo no entra: una

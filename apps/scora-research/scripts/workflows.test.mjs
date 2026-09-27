@@ -23,12 +23,17 @@
 //   node --experimental-strip-types --no-warnings scripts/workflows.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFileSync, readdirSync, existsSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
 
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) pass++; else { fail++; console.error(`  ✖ ${m}`); } };
 
-const DIR = ".github/workflows";
+// Los workflows viven en la RAIZ DEL REPOSITORIO, no en esta carpeta. GitHub Actions solo
+// mira .github/ en la raiz, y mientras estuvieron dentro de apps/scora-research no se
+// ejecuto ninguno — descubierto en la revision del 26-09-2026. Se resuelve subiendo dos
+// niveles desde aqui.
+const DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", ".github", "workflows");
 // Construido con RegExp para que ningun escape tenga que sobrevivir a un heredoc.
 const NUEVA_LINEA = new RegExp(String.fromCharCode(92) + "r?" + String.fromCharCode(92) + "n");
 const ficheros = readdirSync(DIR).filter((f) => /\.ya?ml$/.test(f));

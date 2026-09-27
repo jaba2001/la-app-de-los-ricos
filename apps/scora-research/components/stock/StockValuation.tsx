@@ -127,7 +127,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
   useEffect(() => {
     setScenarios(defaultScenarios);
     setActiveScenario("base");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [defaultScenarios]);
 
   const active: DCFScenario = scenarios?.[activeScenario] ?? defaultScenarios.base;

@@ -56,7 +56,7 @@ console.log(`\n  FACTOR DIST HISTÓRICO · ${fechas.length} fechas semestrales $
 for (const fecha of fechas) {
   if (historia[fecha]) { console.log(`  ${fecha}  (ya calculada, se reutiliza)`); continue; }
   // Miembros del índice EN ESA FECHA — no los de hoy. Es la mitad del point-in-time.
-  let miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
+  const miembros = table ? [...new Set(membersAsOf(table, fecha) || [])] : CURATED;
   // ⚠️ NO truncar: `membersAsOf` devuelve los tickers EN ORDEN ALFABÉTICO, así que un
   // slice(0, N) borraba sistemáticamente de la S a la Z — 99 nombres en 2020, entre ellos
   // UnitedHealth, Visa, Walmart, Exxon, Verizon y Wells Fargo. Un universo truncado por la

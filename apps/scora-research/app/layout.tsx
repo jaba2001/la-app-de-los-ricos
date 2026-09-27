@@ -6,8 +6,6 @@ import { MacroProvider } from "@/lib/MacroContext";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -64,8 +62,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </AuthProvider>
         {/* Delivery metrics (Core Web Vitals per route). Complements PostHog:
             PostHog measures behaviour, these measure how fast it arrives. */}
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -299,7 +299,12 @@ export default function Pricing() {
   useEffect(() => {
     let vivo = true;
     if (!session) { setToken(null); return; }
-    session.getToken().then((t) => { if (vivo) setToken(t); });
+    // Con .catch: si el token no se puede renovar (caducado, red caida) hay que dejarlo en
+    // null y que el boton lo trate como "sin sesion". Sin el quedaba una promesa sin capturar
+    // y el boton de pago se quedaba mudo, sin avisar de nada.
+    session.getToken()
+      .then((t) => { if (vivo) setToken(t); })
+      .catch(() => { if (vivo) setToken(null); });
     return () => { vivo = false; };
   }, [session]);
   const priceLabel = formatPrice(cfg?.price ?? null);

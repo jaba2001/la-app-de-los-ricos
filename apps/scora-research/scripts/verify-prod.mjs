@@ -36,7 +36,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
     if (!m) continue;
     const k = m[1];
-    let v = m[2].replace(/^["']|["']$/g, '');
+    const v = m[2].replace(/^["']|["']$/g, '');
     if (process.env[k] == null || process.env[k] === '') process.env[k] = v;
   }
 })();
