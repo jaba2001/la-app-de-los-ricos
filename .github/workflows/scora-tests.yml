@@ -364,6 +364,8 @@ jobs:
       # con Postgres se salta sin base.
       - name: Borrado de cuenta
         run: node --experimental-strip-types --no-warnings scripts/cuenta.test.mjs
+      - name: La analitica no arranca sin consentimiento
+        run: node --experimental-strip-types --no-warnings scripts/consentimiento.test.mjs
       - name: Cuota diaria de IA y suscripciones
         run: node --experimental-strip-types --no-warnings scripts/quota.test.mjs && node --experimental-strip-types --no-warnings scripts/stripe.test.mjs
       - name: Alertas (kinds, macro) y cierre diario

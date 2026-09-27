@@ -94,9 +94,39 @@ export function resetIdentity(): void {
   }
 }
 
-/** Initialise once, client-side only. Safe to call repeatedly. */
-export function initAnalytics(): void {
+// ── Consentimiento (RGPD / ePrivacy — AUDIT_REPORT A-6) ─────────────────────────────
+// PostHog guarda una cookie y un identificador en localStorage, y `identify` liga los eventos
+// a una persona: no es almacenamiento estrictamente necesario, así que exige consentimiento
+// PREVIO. Hasta el 27-09 arrancaba al cargar la página, sin preguntar.
+//
+// La elección se guarda en localStorage, y eso SÍ es estrictamente necesario: es la única
+// forma de no volver a preguntar en cada visita. Sin elección, no se inicia nada.
+const CLAVE_CONSENTIMIENTO = "scora:analitica";
+export type Consentimiento = "si" | "no" | null;
+
+export function leerConsentimiento(): Consentimiento {
+  try {
+    const v = window.localStorage.getItem(CLAVE_CONSENTIMIENTO);
+    return v === "si" || v === "no" ? v : null;
+  } catch {
+    return null; // modo privado o almacenamiento bloqueado: se trata como "no ha elegido"
+  }
+}
+
+/** Guarda la elección y la aplica al momento: acepta → arranca; rechaza → apaga y borra. */
+export function guardarConsentimiento(v: "si" | "no"): void {
+  try { window.localStorage.setItem(CLAVE_CONSENTIMIENTO, v); } catch { /* sin almacenamiento, vale solo esta visita */ }
+  if (v === "si") { initAnalytics(v); return; }
+  if (ready) {
+    try { posthog.opt_out_capturing(); posthog.reset(); } catch { /* ignore */ }
+    ready = false;
+  }
+}
+
+/** Initialise once, client-side only, and ONLY with consent. Safe to call repeatedly. */
+export function initAnalytics(consentimiento: Consentimiento = typeof window === "undefined" ? null : leerConsentimiento()): void {
   if (ready || !KEY || typeof window === "undefined") return;
+  if (consentimiento !== "si") return;
   try {
     posthog.init(KEY, {
       api_host: HOST,

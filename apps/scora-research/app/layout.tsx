@@ -6,6 +6,7 @@ import { MacroProvider } from "@/lib/MacroContext";
 import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import ConsentBanner from "@/components/ConsentBanner";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -49,6 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* Renders nothing — mounts PostHog and keeps identity in sync. Must be
               inside AuthProvider (reads the session). No-op without a PostHog key. */}
           <AnalyticsProvider />
+          {/* Pide consentimiento antes de que PostHog arranque; sin respuesta no se inicia. */}
+          <ConsentBanner />
           <MacroProvider>
             <Nav />
             <main style={{
