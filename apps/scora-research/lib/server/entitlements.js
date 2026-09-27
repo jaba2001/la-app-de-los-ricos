@@ -28,17 +28,13 @@ import { sbFetch } from "./data/postgrest.js";
  */
 export async function isPro(userId) {
   if (!userId) return false;
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return false;
-
+  // Aquí había `if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) return false`. sbFetch va contra
+  // Cloud SQL y no usa esas variables; en producción no existen, así que la guarda hacía a
+  // todo el mundo gratuito, también a quien pagaba (AUDIT_REPORT A-3).
   try {
     const q = `sl_subscriptions` +
       `?user_id=eq.${encodeURIComponent(userId)}&select=status,current_period_end`;
-    const res = await sbFetch(q, {
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-      },
-    });
+    const res = await sbFetch(q);
     if (!res.ok) return false;
 
     const rows = await res.json().catch(() => []);

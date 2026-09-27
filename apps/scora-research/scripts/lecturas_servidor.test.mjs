@@ -77,6 +77,29 @@ check("cerradas: fecha de cierre como YYYY-MM-DD", cerradas[0]?.closed_on, "2026
 check("decisiones, de la más reciente a la más antigua",
   (await fetchRuns()).map((r) => r.decision_date), ["2026-09-15", "2026-09-01"]);
 
+// ── isPro: quién ha pagado (lib/server/entitlements.js) ─────────────────────────────
+// Decide la cuota de IA de cada usuario. Tenía una guarda `if (!SUPABASE_URL ||
+// !SUPABASE_SERVICE_KEY) return false` que sobrevivió a la migración: en producción esas
+// variables no existen, así que TODO el mundo era gratuito, también quien pagaba
+// (AUDIT_REPORT A-3). Se prueba sin ellas, como corre producción.
+{
+  delete process.env.SUPABASE_URL; delete process.env.SUPABASE_SERVICE_KEY;
+  const { isPro } = await import("../lib/server/entitlements.js");
+  await p.query("truncate sl_subscriptions");
+  const futuro = new Date(Date.now() + 30 * 86400e3).toISOString();
+  const pasado = new Date(Date.now() - 86400e3).toISOString();
+  await p.query(`insert into sl_subscriptions (user_id, stripe_customer_id, status, current_period_end) values
+    ('pagando', 'cus_1', 'active', $1), ('prueba', 'cus_2', 'trialing', $1),
+    ('cancelado', 'cus_3', 'canceled', $1), ('vencido', 'cus_4', 'active', $2)`,
+    [futuro, pasado]);
+  check("suscripción activa → Pro", await isPro("pagando"), true);
+  check("en periodo de prueba → Pro", await isPro("prueba"), true);
+  check("cancelada → no Pro", await isPro("cancelado"), false);
+  check("periodo vencido → no Pro", await isPro("vencido"), false);
+  check("sin suscripción → no Pro", await isPro("nadie"), false);
+  await p.query("truncate sl_subscriptions");
+}
+
 await p.query("truncate sl_daily_close, sl_picks_position, sl_picks_run");
 await p.end();
 console.log(bad ? `\n✗ lecturas_servidor: ${bad} fallo(s) de ${total}` : `\n✓ lecturas_servidor: ${total} comprobaciones OK contra Postgres real`);

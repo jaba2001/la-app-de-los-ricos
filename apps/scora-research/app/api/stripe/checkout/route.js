@@ -58,22 +58,17 @@ export async function POST(request) {
   const origin = appOrigin(request);
 
   try {
-    // Si ya fue cliente, se reutiliza. La lectura va con la service key porque RLS impide
+    // Si ya fue cliente, se reutiliza. La lectura va por el servidor porque policy.ts impide
     // (a propósito) que el navegador toque esta tabla, y aquí ya sabemos quién es por token.
+    // Antes dependía de SUPABASE_*, que en producción no existen: un cliente que volvía a
+    // pagar recibía un customer de Stripe nuevo (AUDIT_REPORT A-3).
     let customerId = null;
-    if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
-      const q = `sl_subscriptions` +
-        `?user_id=eq.${user.id}&select=stripe_customer_id`;
-      const res = await sbFetch(q, {
-        headers: {
-          apikey: process.env.SUPABASE_SERVICE_KEY,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        },
-      });
-      if (res.ok) {
-        const rows = await res.json().catch(() => []);
-        customerId = rows?.[0]?.stripe_customer_id ?? null;
-      }
+    const q = `sl_subscriptions` +
+      `?user_id=eq.${user.id}&select=stripe_customer_id`;
+    const res = await sbFetch(q);
+    if (res.ok) {
+      const rows = await res.json().catch(() => []);
+      customerId = rows?.[0]?.stripe_customer_id ?? null;
     }
 
     const session = await stripeApi('checkout/sessions', {

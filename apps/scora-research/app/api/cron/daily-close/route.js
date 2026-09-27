@@ -19,7 +19,6 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const SB = process.env.SUPABASE_URL;
 const KEY = process.env.SUPABASE_SERVICE_KEY;
 const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
 
@@ -62,7 +61,9 @@ async function fetchQuotes(symbols) {
 
 export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
-  if (!SB || !KEY) return json({ error: 'Supabase not configured' }, 500);
+  // Sin guarda de SUPABASE_*: sbFetch va contra Cloud SQL y no las usa. La que había aquí
+  // devolvía 500 en producción, donde no existen: el informe diario no se generaba nunca
+  // (AUDIT_REPORT A-3).
   // Sin guarda de FMP_KEY: este cron ya no la usa, y abortar por una variable que no
   // necesita lo dejaría muerto por una razón falsa.
 

@@ -12,7 +12,6 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const SB = process.env.SUPABASE_URL;
 const KEY = process.env.SUPABASE_SERVICE_KEY;
 const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
 
@@ -22,7 +21,8 @@ const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type":
 
 export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
-  if (!KEY || !SB) return json({ error: "Supabase not configured" }, 500);
+  // Sin guarda de SUPABASE_*: sbFetch va contra Cloud SQL y no las usa. La que había aquí
+  // devolvía 500 en producción, donde no existen (AUDIT_REPORT A-3).
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return json({ ok: true, skipped: "VAPID not configured" }, 200);
 
   webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:alerts@scora.app", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);

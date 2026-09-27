@@ -71,15 +71,13 @@ export async function POST(request) {
     return json({ error: 'Enter a valid email address.' }, 400);
   }
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-    console.error('waitlist: Supabase env missing');
-    return json({ error: 'Waitlist is not configured yet.' }, 503);
-  }
+  // Aquí había una guarda que exigía SUPABASE_URL y SUPABASE_SERVICE_KEY y devolvía 503 sin
+  // ellas. sbFetch va contra Cloud SQL y no las usa; en producción no existen, así que la
+  // lista de espera estaba cerrada (AUDIT_REPORT A-3).
 
   // Identity comes from a VERIFIED token or not at all. body.userId is deliberately
-  // ignored: it is an unauthenticated claim, and the column is a FK to auth.users, so a
-  // forged-but-nonexistent uuid would also fail the insert and surface as a 502 to a
-  // legitimate visitor. Logged-out signups simply carry a null user_id, as designed.
+  // ignored: it is an unauthenticated claim. Logged-out signups simply carry a null
+  // user_id, as designed.
   const user = await optionalUser(request);
 
   const row = {
@@ -94,9 +92,8 @@ export async function POST(request) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      apikey: process.env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-      // Signing up twice must not look like a failure to the person doing it.
+      // Signing up twice must not look like a failure to the person doing it: the unique
+      // index on lower(email) answers 409, handled below as success.
       Prefer: 'resolution=ignore-duplicates,return=minimal',
     },
     body: JSON.stringify(row),

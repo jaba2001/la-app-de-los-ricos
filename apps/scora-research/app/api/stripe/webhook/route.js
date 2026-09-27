@@ -25,7 +25,6 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 // de la red privada en vez de detrás de una API pública, y para un cron da igual.
 export const runtime = 'nodejs';
 
-const SB = () => process.env.SUPABASE_URL;
 const KEY = () => process.env.SUPABASE_SERVICE_KEY;
 
 const sbHeaders = (extra = {}) => ({
@@ -158,15 +157,9 @@ export async function POST(request) {
     });
   }
 
-  // Deliberadamente DESPUÉS de verificar la firma: así un sondeo sin credenciales recibe
-  // siempre "firma inválida" y no averigua nada sobre cómo está configurado el servidor.
-  // Para Stripe da igual el orden — su firma siempre es válida y verá el 503 igualmente.
-  if (!SB() || !KEY()) {
-    console.error('stripe webhook: Supabase env missing');
-    return new Response(JSON.stringify({ error: 'not configured' }), {
-      status: 503, headers: { 'Content-Type': 'application/json' },
-    });
-  }
+  // Aquí había una guarda que exigía SUPABASE_URL y SUPABASE_SERVICE_KEY y respondía 503 sin
+  // ellas. sbFetch va contra Cloud SQL y no las usa; en producción no existen, así que cada
+  // pago se habría rechazado y quien pagara no recibiría Pro (AUDIT_REPORT A-3).
 
   const eventAt = iso(event.created) ?? new Date().toISOString();
   const ok = () => new Response(JSON.stringify({ received: true }), {

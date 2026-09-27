@@ -35,21 +35,13 @@ export async function POST(request) {
   const rl = await checkRateLimit('stripe-portal', user.id, 20, 3600, request);
   if (rl) return rl;
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-    console.error('stripe portal: Supabase env missing');
-    return json({ error: 'Billing is unavailable right now.' }, 503);
-  }
-
+  // Sin guarda de SUPABASE_*: sbFetch va contra Cloud SQL y no usa esas variables, y la que
+  // había aquí cerraba el portal en producción, donde no existen (AUDIT_REPORT A-3).
   try {
     // Identidad de facturación derivada del token, nunca de la petición.
     const q = `sl_subscriptions` +
       `?user_id=eq.${user.id}&select=stripe_customer_id`;
-    const res = await sbFetch(q, {
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-      },
-    });
+    const res = await sbFetch(q);
     if (!res.ok) throw new Error(`lookup ${res.status}`);
 
     const rows = await res.json().catch(() => []);

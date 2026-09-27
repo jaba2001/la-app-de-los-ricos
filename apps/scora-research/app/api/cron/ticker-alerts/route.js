@@ -60,7 +60,8 @@ function triggered(kind, threshold, price) {
 
 export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
-  if (!KEY || !SB) return json({ error: "Supabase not configured" }, 500);
+  // Sin guarda de SUPABASE_*: sbFetch va contra Cloud SQL y no las usa. La que había aquí
+  // devolvía 500 en producción, donde no existen (AUDIT_REPORT A-3).
   if (!process.env.FMP_KEY) return json({ error: "FMP_KEY missing" }, 500);
   const pushReady = !!(process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY);
   if (pushReady) webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:alerts@scora.app", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);

@@ -29,8 +29,6 @@ const sb = (path, init = {}) =>
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      apikey: process.env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
       ...(init.headers || {}),
     },
   });
@@ -39,9 +37,9 @@ export async function GET(request) {
   const denied = assertCron(request); if (denied) return denied;
   const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'Content-Type': 'application/json' } });
 
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) {
-    return json({ error: 'Supabase env missing' }, 503);
-  }
+  // Sin guarda de SUPABASE_*: sbFetch va contra Cloud SQL. La que había aquí hacía que el
+  // brief diario no se generara nunca en producción, donde esas variables no existen
+  // (AUDIT_REPORT A-3).
 
   // 1 · latest snapshot
   const r = await sb('macro_state?select=*&order=snapshot_date.desc&limit=1');
