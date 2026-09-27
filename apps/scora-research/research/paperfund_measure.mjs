@@ -4,23 +4,22 @@
 // each month held at the weights of the most recent rebalance, compounded. Computes NAV
 // vs SPY, max drawdown, annualized Sharpe, and an honest letter grade, then upserts one
 // row to sl_paper_fund_track (a NAV history). No hindsight — only sealed decisions.
-// Run: SUPABASE_SERVICE_KEY=… node --experimental-strip-types --no-warnings research/paperfund_measure.mjs
+// Run: PGHOST=… PGPASSWORD=… node --experimental-strip-types --no-warnings research/paperfund_measure.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFileSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { priceAsOf } from "./prices.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
 const today = new Date().toISOString().slice(0, 10);
 const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"];
 
 async function fetchRebalances() {
-  if (!SB_KEY) return [];
-  const r = await fetch(`${SB_URL}/rest/v1/sl_paper_fund?select=rebalance_date,weights&order=rebalance_date.asc`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+  if (!hayBase()) return [];
+  const r = await sbFetch(`sl_paper_fund?select=rebalance_date,weights&order=rebalance_date.asc`);
   return r.ok ? await r.json() : [];
 }
 
@@ -188,15 +187,15 @@ console.log(`     comision de gestion   : ${comisionTotalPb.toFixed(2)} pb   (pr
 console.log(`     y las referencias pagan la suya: SPY ${TER_SPY} %/año · 60/40 ${(0.6 * TER_SPY + 0.4 * TER_IEF).toFixed(4)} %/año`);
 console.log(`     origen de los diferenciales: ${COSTES.fuente.slice(0, 96)}…`);
 
-if (SB_KEY) {
-  const resp = await fetch(`${SB_URL}/rest/v1/sl_paper_fund_track?on_conflict=as_of`, {
+if (hayBase()) {
+  const resp = await sbFetch(`sl_paper_fund_track?on_conflict=as_of`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "resolution=merge-duplicates" },
+    headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify(row),
   });
-  console.log(`  Supabase upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  console.log(`  cloud sql upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — seed sl_paper_fund_track from the JSON)");
+  console.log("  (sin base: PGHOST no definido — seed sl_paper_fund_track from the JSON)");
   const { writeFileSync } = await import("fs");
   writeFileSync(new URL("./out/paperfund_track.json", import.meta.url), JSON.stringify(row, null, 2));
 }

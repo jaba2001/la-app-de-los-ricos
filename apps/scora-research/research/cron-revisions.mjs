@@ -7,17 +7,16 @@
 // After ~6-12 months this says — with our own universe's evidence — whether paying for a
 // proper PIT estimate feed (~$100s/mo) is justified. All free: Finnhub recommendation trends.
 //   node --experimental-strip-types --no-warnings research/cron-revisions.mjs [--dry]
-// Env: FINNHUB_KEY, SUPABASE_URL, SUPABASE_SERVICE_KEY (writes); SUPABASE_ANON_KEY ok for reads.
+// Env: FINNHUB_KEY, PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE (research/db.mjs).
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { priceAsOf } from "./prices.mjs";
 import { CURATED } from "./universe.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const DRY = process.argv.includes("--dry");
 const today = new Date().toISOString().slice(0, 10);
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_READ_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const FINNHUB = process.env.FINNHUB_KEY;
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -54,18 +53,18 @@ for (const t of CURATED) {
 console.log(`revision snapshot ${today}: ${rows.length}/${CURATED.length} names (cons + 3m revision + price)`);
 
 // ── write the snapshot ────────────────────────────────────────────────────────
-if (DRY || !process.env.SUPABASE_SERVICE_KEY) {
+if (DRY || !hayBase()) {
   writeFileSync(join(OUT, "revisions_snap.json"), JSON.stringify(rows, null, 2));
   console.log(rows.slice(0, 12).map((r) => `  ${r.ticker.padEnd(6)} cons ${String(r.cons).padStart(6)}  rev ${String(r.rev).padStart(6)}  n=${String(r.n_analysts).padStart(2)}  $${r.price}`).join("\n"));
   console.log(`  → wrote research/out/revisions_snap.json (${rows.length} rows)`);
-  if (!DRY) console.error("SUPABASE_SERVICE_KEY not set — snapshot not written to DB.");
+  if (!DRY) console.error("sin base (PGHOST no definido) — el snapshot no se escribe.");
 } else {
-  const res = await fetch(`${SB_URL}/rest/v1/sl_revisions?on_conflict=snap_date,ticker`, {
+  const res = await sbFetch(`sl_revisions?on_conflict=snap_date,ticker`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, Prefer: "resolution=merge-duplicates" },
+    headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify(rows),
   });
-  console.log(`supabase sl_revisions: ${res.status} ${res.ok ? "ok" : await res.text()}`);
+  console.log(`cloud sql sl_revisions: ${res.status} ${res.ok ? "ok" : await res.text()}`);
   if (!res.ok) process.exit(1);
 }
 
@@ -73,7 +72,7 @@ if (DRY || !process.env.SUPABASE_SERVICE_KEY) {
 // Pull the full history, join consecutive month pairs on ticker, compute forward return and
 // the Spearman IC of rev→fwd and cons→fwd. Needs ≥2 distinct snapshot dates to say anything.
 try {
-  const hist = await fetch(`${SB_URL}/rest/v1/sl_revisions?select=snap_date,ticker,cons,rev,price&order=snap_date.asc`, { headers: { apikey: SB_READ_KEY, Authorization: `Bearer ${SB_READ_KEY}` } });
+  const hist = await sbFetch(`sl_revisions?select=snap_date,ticker,cons,rev,price&order=snap_date.asc`);
   const all = hist.ok ? await hist.json() : [];
   const dates = [...new Set(all.map((r) => r.snap_date))].sort();
   if (dates.length < 2) {

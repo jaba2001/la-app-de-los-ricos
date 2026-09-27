@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import { loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { aboveSMA, fwdReturn, hasPriceAt } from "./prices.mjs";
 import { regimeConfirmation } from "../lib/regimeLoop.ts";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -57,14 +58,11 @@ console.log(`  200dma ${row.breadth_200dma}%  ·  50dma ${row.breadth_50dma}%  �
 writeFileSync(join(OUT, "macro_breadth.json"), JSON.stringify(row, null, 2));
 console.log(`  → wrote research/out/macro_breadth.json`);
 
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
-
 // Close the loop (A3): read the live top-down gauge and compare it to bottom-up breadth.
 let confirmation = null;
-if (SB_KEY) {
+if (hayBase()) {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/macro_state?id=eq.1&select=risk_on`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+    const r = await sbFetch(`macro_state?id=eq.1&select=risk_on`);
     const j = await r.json();
     const riskOn = Array.isArray(j) ? Number(j[0]?.risk_on) : NaN;
     const conf = regimeConfirmation(isNaN(riskOn) ? null : riskOn, row.breadth_200dma);
@@ -73,13 +71,13 @@ if (SB_KEY) {
   } catch { /* keep null */ }
 }
 
-if (SB_KEY) {
-  const resp = await fetch(`${SB_URL}/rest/v1/macro_state?id=eq.1`, {
+if (hayBase()) {
+  const resp = await sbFetch(`macro_state?id=eq.1`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "return=minimal" },
+    headers: { "Content-Type": "application/json", Prefer: "return=minimal" },
     body: JSON.stringify({ breadth_200dma: row.breadth_200dma, breadth_50dma: row.breadth_50dma, breadth_mom: row.breadth_mom, breadth_1m: row.breadth_1m, breadth_updated_at: row.breadth_updated_at, regime_confirmation: confirmation }),
   });
-  console.log(`  Supabase macro_state PATCH: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  console.log(`  cloud sql macro_state PATCH: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — patch macro_state from the JSON via MCP)");
+  console.log("  (sin base: PGHOST no definido — patch macro_state from the JSON)");
 }

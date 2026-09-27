@@ -38,6 +38,9 @@ export function pool(): Pool {
     // Sin esto, una base que no responde deja la petición colgada hasta el timeout de Cloud
     // Run (900 s) en vez de fallar en 5 segundos y devolver un error legible.
     connectionTimeoutMillis: 5_000,
+    // Los scripts de research (research/db.mjs) usan este mismo pool: sin esto, al terminar se
+    // quedaban 30 s colgados esperando a que caducaran las conexiones ociosas.
+    allowExitOnIdle: true,
   };
 
   _pool = new Pool(

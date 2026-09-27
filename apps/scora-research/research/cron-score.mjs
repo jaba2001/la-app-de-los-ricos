@@ -2,7 +2,7 @@
 // as of today (point-in-time by construction, since "today" only knows today's data)
 // and appends an immutable cohort to sl_cohort. Runs on GitHub Actions, 1st of month.
 //   node --experimental-strip-types --no-warnings research/cron-score.mjs [--dry]
-// Env: FMP_KEY, FRED_KEY, SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Env: FMP_KEY, FRED_KEY, PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE (research/db.mjs)
 import { tickerToCik, fundamentalsAsOf, sicSector } from "./edgar.mjs";
 import { rawPriceAsOf, priceAsOf, momentum } from "./prices.mjs";
 import { scoreStock } from "./score.mjs";
@@ -11,6 +11,7 @@ import { SCORE_VERSION_ABSOLUTE_BANDS, SCORE_VERSION_SECTOR_PCTL } from "../lib/
 import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { sbFetch, hayBase } from "./db.mjs";
 
 // F2 — distribuciones sectoriales. Si el artefacto existe, el score se calcula contra el
 // sector y la cohorte se sella como versión 2; si no, bandas absolutas y versión 1.
@@ -29,9 +30,6 @@ console.log(`score v${SCORE_VERSION} (${USE_SECTOR_PCTL ? "percentiles sector-re
 
 const DRY = process.argv.includes("--dry");
 const today = new Date().toISOString().slice(0, 10);
-// SUPABASE_URL is public (already in the app client) — default it so only the
-// service_role key needs to be a secret.
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
 
 const rows = [];
 for (const t of CURATED) {
@@ -50,21 +48,19 @@ for (const t of CURATED) {
 }
 console.log(`scored ${rows.length}/${CURATED.length} names as of ${today}`);
 
-if (DRY || !process.env.SUPABASE_SERVICE_KEY) {
+if (DRY || !hayBase()) {
   console.log(rows.map((r) => `  ${r.ticker.padEnd(6)} ${String(r.score_total).padStart(3)}  ${(r.sector || "").slice(0, 12).padEnd(12)} $${r.adj_price}`).join("\n"));
-  if (!DRY) console.error("\nSUPABASE_SERVICE_KEY not set — not writing.");
+  if (!DRY) console.error("\nsin base (PGHOST no definido) — no se escribe.");
   process.exit(0);
 }
 
-const res = await fetch(`${SB_URL}/rest/v1/sl_cohort?on_conflict=score_date,ticker`, {
+const res = await sbFetch(`sl_cohort?on_conflict=score_date,ticker`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    apikey: process.env.SUPABASE_SERVICE_KEY,
-    Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
     Prefer: "resolution=merge-duplicates",
   },
   body: JSON.stringify(rows),
 });
-console.log(`supabase sl_cohort: ${res.status} ${res.ok ? "ok" : await res.text()}`);
+console.log(`cloud sql sl_cohort: ${res.status} ${res.ok ? "ok" : await res.text()}`);
 if (!res.ok) process.exit(1);

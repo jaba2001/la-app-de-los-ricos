@@ -4,27 +4,25 @@
 // risk-on tilt (blendWeights) + Antonacci absolute momentum (applyDualMomentum) — and
 // seals an immutable target-weight snapshot to sl_paper_fund. No discretion, no hindsight.
 // Reuses research/allocate.mjs (the shared allocator) + prices.mjs (12-1m momentum).
-// Run: SUPABASE_SERVICE_KEY=… node --experimental-strip-types --no-warnings research/paperfund_rebalance.mjs
+// Run: PGHOST=… PGPASSWORD=… node --experimental-strip-types --no-warnings research/paperfund_rebalance.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { ASSETS, growthWeights, applyDualMomentum } from "./allocate.mjs";
 import { fwdReturn } from "./prices.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
 const today = new Date().toISOString().slice(0, 10);
 const addMonths = (d, n) => { const x = new Date(d + "T00:00:00Z"); x.setUTCMonth(x.getUTCMonth() + n); return x.toISOString().slice(0, 10); };
 
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
-
 // 1) current risk-on from the live macro_state row (the same field the app reads).
 //
 // ⚠️ UN FALLO DE RED NO PUEDE VALER 50, y valía. Esto decide un CAMBIO DE RÉGIMEN —≥50 acciones,
 // <50 cesta defensiva— así que el `?? 50` de antes dejaba cualquier error justo en la frontera
-// y **del lado de acciones**. Si Supabase no respondía y el régimen real era 20, el fondo se
+// y **del lado de acciones**. Si la base no respondía y el régimen real era 20, el fondo se
 // rebalanceaba entero a renta variable; y la fila que escribía decía `risk_on: 50`, afirmando
 // en la base de datos un dato que nadie había observado.
 //
@@ -35,10 +33,10 @@ const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
 // Devuelve el número, o `NO_SE_SABE`. Quien llama NO puede rellenarlo con un valor por defecto.
 const NO_SE_SABE = Symbol("risk-on: no se pudo leer");
 async function fetchRiskOn() {
-  if (!SB_KEY) return NO_SE_SABE;
+  if (!hayBase()) return NO_SE_SABE;
   for (let intento = 0; intento < 3; intento++) {
     try {
-      const r = await fetch(`${SB_URL}/rest/v1/macro_state?id=eq.1&select=risk_on`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } });
+      const r = await sbFetch(`macro_state?id=eq.1&select=risk_on`);
       if (r.ok) {
         const j = await r.json();
         const v = Array.isArray(j) ? Number(j[0]?.risk_on) : NaN;
@@ -89,13 +87,13 @@ const row = { rebalance_date: today, weights: w, risk_on: +riskOn.toFixed(1), mo
 writeFileSync(join(OUT, "paperfund_rebalance.json"), JSON.stringify(row, null, 2));
 console.log(`  → wrote research/out/paperfund_rebalance.json`);
 
-if (SB_KEY) {
-  const resp = await fetch(`${SB_URL}/rest/v1/sl_paper_fund?on_conflict=rebalance_date`, {
+if (hayBase()) {
+  const resp = await sbFetch(`sl_paper_fund?on_conflict=rebalance_date`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "resolution=merge-duplicates" },
+    headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify(row),
   });
-  console.log(`  Supabase upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  console.log(`  cloud sql upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — seed sl_paper_fund from the JSON)");
+  console.log("  (sin base: PGHOST no definido — seed sl_paper_fund from the JSON)");
 }

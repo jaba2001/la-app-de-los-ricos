@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // DISCOVERY screener feed (Phase 4 applied) — ranks the current S&P 500 by the
 // validated momentum factor (12-1m, the edge that earns IC +0.07 when correlation is
-// low). Free: Yahoo/Tiingo prices + EDGAR sector. Writes the top names to Supabase
-// sl_discovery (or research/out/discovery.json when no service key is present).
+// low). Free: Yahoo/Tiingo prices + EDGAR sector. Writes the top names to Cloud SQL
+// sl_discovery (or only research/out/discovery.json when PGHOST is not set).
 // Run: TIINGO_TOKEN=… node --experimental-strip-types --no-warnings research/discovery.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { writeFileSync, mkdirSync, existsSync } from "fs";
@@ -11,6 +11,7 @@ import { fileURLToPath } from "url";
 import { loadSP500Historical, membersAsOf } from "./universe.mjs";
 import { fwdReturn, rawPriceAsOf, hasPriceAt } from "./prices.mjs";
 import { tickerToCik, sicSector } from "./edgar.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const TOP = 150;
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
@@ -61,15 +62,13 @@ writeFileSync(join(OUT, "discovery.json"), JSON.stringify(top, null, 2));
 console.log(`\n  → wrote research/out/discovery.json (${top.length} rows)`);
 
 // Optional direct upsert if a service key is present (else seed via MCP from the JSON)
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
-if (SB_KEY) {
-  const resp = await fetch(`${SB_URL}/rest/v1/sl_discovery?on_conflict=ticker`, {
+if (hayBase()) {
+  const resp = await sbFetch(`sl_discovery?on_conflict=ticker`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "resolution=merge-duplicates" },
+    headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify(top),
   });
-  console.log(`  Supabase upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  console.log(`  cloud sql upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — seed sl_discovery from the JSON)");
+  console.log("  (sin base: PGHOST no definido — seed sl_discovery from the JSON)");
 }

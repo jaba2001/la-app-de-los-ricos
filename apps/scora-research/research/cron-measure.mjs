@@ -3,12 +3,11 @@
 // record to sl_track_summary. Runs on GitHub Actions, weekly. Starts empty and grows
 // into a clean, un-backtested forward record.
 //   node --experimental-strip-types --no-warnings research/cron-measure.mjs [--dry]
-// Env: FMP_KEY, SUPABASE_URL, SUPABASE_SERVICE_KEY
+// Env: FMP_KEY, PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE (research/db.mjs)
 import { priceAsOf } from "./prices.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const DRY = process.argv.includes("--dry");
-const SB = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const KEY = process.env.SUPABASE_SERVICE_KEY;
 const today = new Date().toISOString().slice(0, 10);
 const BUY = 60;
 
@@ -22,13 +21,11 @@ function spearman(x, y) {
 }
 
 async function readCohort() {
-  const r = await fetch(`${SB}/rest/v1/sl_cohort?select=score_date,ticker,score_total,adj_price,score_version&order=score_date.asc&limit=100000`, {
-    headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
-  });
+  const r = await sbFetch(`sl_cohort?select=score_date,ticker,score_total,adj_price,score_version&order=score_date.asc&limit=100000`);
   return r.ok ? await r.json() : [];
 }
 
-const cohort = KEY ? await readCohort() : [];
+const cohort = hayBase() ? await readCohort() : [];
 console.log(`read ${cohort.length} cohort rows`);
 
 const spyAtCache = new Map();
@@ -108,11 +105,11 @@ const summary = {
 };
 console.log(summary);
 
-if (DRY || !KEY) { if (!DRY) console.error("SUPABASE_SERVICE_KEY not set — not writing."); process.exit(0); }
-const res = await fetch(`${SB}/rest/v1/sl_track_summary?on_conflict=id`, {
+if (DRY || !hayBase()) { if (!DRY) console.error("sin base (PGHOST no definido) — no se escribe."); process.exit(0); }
+const res = await sbFetch(`sl_track_summary?on_conflict=id`, {
   method: "POST",
-  headers: { "Content-Type": "application/json", apikey: KEY, Authorization: `Bearer ${KEY}`, Prefer: "resolution=merge-duplicates" },
+  headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
   body: JSON.stringify(summary),
 });
-console.log(`supabase sl_track_summary: ${res.status} ${res.ok ? "ok" : await res.text()}`);
+console.log(`cloud sql sl_track_summary: ${res.status} ${res.ok ? "ok" : await res.text()}`);
 if (!res.ok) process.exit(1);

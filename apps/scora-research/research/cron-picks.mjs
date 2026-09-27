@@ -23,7 +23,7 @@
 //
 //   node --experimental-strip-types --no-warnings research/cron-picks.mjs [--dry] [--date YYYY-MM-DD] [--force]
 //
-// Env: SUPABASE_URL (opcional), SUPABASE_SERVICE_KEY (obligatoria para escribir)
+// Env: PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE (obligatorias para escribir; research/db.mjs)
 // ─────────────────────────────────────────────────────────────────────────────
 // CURATED NO se importa a propósito: es el universo de laboratorio y no puede acabar
 // decidiendo en producción ni por accidente. Ver el guardián de §3.
@@ -37,6 +37,7 @@ import {
   PICKS_RULES_VERSION, ENTRY_PCTL, EXIT_PCTL, EXIT_CONSECUTIVE,
   TARGET_POSITIONS, BUYS_PER_DATE, PERSISTENCE_DAYS, QUARANTINE_MONTHS,
 } from "../lib/picks.ts";
+import { sbFetch, hayBase } from "./db.mjs";
 
 // ⚠️ ANTES DE NADA: la caché de precios de `prices.mjs` NO CADUCA — está pensada para
 // backtests reproducibles. Un proceso en vivo que la leyera se quedaría clavado en la última
@@ -48,19 +49,16 @@ const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? proce
 const DRY = process.argv.includes("--dry");
 const FORCE = process.argv.includes("--force");
 const HOY = arg("--date", new Date().toISOString().slice(0, 10));
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const KEY = process.env.SUPABASE_SERVICE_KEY;
 
 const sb = async (path, init = {}) => {
-  const r = await fetch(`${SB_URL}/rest/v1/${path}`, {
+  const r = await sbFetch(`${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      apikey: KEY, Authorization: `Bearer ${KEY}`,
       ...(init.headers ?? {}),
     },
   });
-  if (!r.ok) throw new Error(`supabase ${path}: ${r.status} ${await r.text()}`);
+  if (!r.ok) throw new Error(`cloud sql ${path}: ${r.status} ${await r.text()}`);
   return r.status === 204 ? null : r.json();
 };
 
@@ -126,7 +124,7 @@ if (!objetivos.includes(HOY)) {
 
 // ── 2 · Reconstruir el estado desde la base ─────────────────────────────────────────────
 let abiertas = [], cerradas = [], runs = [];
-if (KEY) {
+if (hayBase()) {
   const v = `rules_version=eq.${PICKS_RULES_VERSION}`;
   abiertas = await sb(`sl_picks_position?${v}&closed_on=is.null&select=ticker,opened_on,open_pctl&order=opened_on.asc`);
   cerradas = await sb(`sl_picks_position?${v}&closed_on=not.is.null&select=ticker,closed_on&order=closed_on.desc&limit=500`);
@@ -145,7 +143,7 @@ if (KEY) {
     process.exit(0);
   }
 } else {
-  console.log(`  ⚠ SUPABASE_SERVICE_KEY no definida — se asume cartera vacía (sólo tiene sentido con --dry).`);
+  console.log(`  ⚠ sin base (PGHOST no definido) — se asume cartera vacía (sólo tiene sentido con --dry).`);
 }
 
 const previos = [...runs].reverse();   // cronológico
@@ -380,8 +378,8 @@ const runRow = {
   signal,
 };
 
-if (DRY || !KEY) {
-  console.log(`\n  ${DRY ? "DRY RUN" : "SIN SUPABASE_SERVICE_KEY"} — no se escribe nada.`);
+if (DRY || !hayBase()) {
+  console.log(`\n  ${DRY ? "DRY RUN" : "SIN BASE (PGHOST)"} — no se escribe nada.`);
   console.log(`  La fila de sl_picks_run que se habría escrito: universo ${runRow.universe_size} (foto del ${runRow.universe_asof}) · elegibles ${runRow.eligible_count} · compras ${runRow.bought_count} · ventas ${runRow.sold_count} · cartera ${runRow.positions_after}\n`);
   process.exit(0);
 }

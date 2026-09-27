@@ -2,7 +2,7 @@
 // FILING INGESTION (Phase 3) — the "second brain per company". Pulls each name's
 // latest 10-K from SEC EDGAR (free, public, no API key), strips it to text, and
 // splits the three sections an analyst actually reads — Business (Item 1),
-// Risk Factors (Item 1A), MD&A (Item 7) — into Supabase kb_docs. The AI thesis /
+// Risk Factors (Item 1A), MD&A (Item 7) — into kb_docs (Cloud SQL). The AI thesis /
 // research report then RETRIEVE these verbatim excerpts and CITE them, so the model
 // reasons from the real filing instead of training-data memory (Karpathy grounding).
 // Reuses research/edgar.mjs (tickerToCik). Free end-to-end.
@@ -13,6 +13,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { tickerToCik } from "./edgar.mjs";
 import { htmlToText, extractSections } from "./sectionParser.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const UA = "Scora Research contact@scora.app"; // SEC requires a descriptive UA
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
@@ -190,31 +191,28 @@ console.log(`\n  → wrote research/out/kb_docs.json (${all.length} section rows
 writeFileSync(join(OUT, "kb_chunks.json"), JSON.stringify(allChunks, null, 2));
 console.log(`  → wrote research/out/kb_chunks.json (${allChunks.length} chunks)`);
 
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
-
 /** Upsert in batches — a single 20 MB body would be rejected by PostgREST. */
 async function upsert(table, rows, batch = 500) {
   let ok = 0;
   for (let i = 0; i < rows.length; i += batch) {
     const slice = rows.slice(i, i + batch);
-    const resp = await fetch(`${SB_URL}/rest/v1/${table}?on_conflict=id`, {
+    const resp = await sbFetch(`${table}?on_conflict=id`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "resolution=merge-duplicates,return=minimal" },
+      headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" },
       body: JSON.stringify(slice),
     });
     if (resp.ok) ok += slice.length;
     else console.log(`  ${table} batch ${i}: ${resp.status} ${await resp.text().catch(() => "")}`);
   }
-  console.log(`  Supabase ${table}: ${ok}/${rows.length} rows upserted`);
+  console.log(`  cloud sql ${table}: ${ok}/${rows.length} rows upserted`);
 }
 
-if (SB_KEY && all.length) {
+if (hayBase() && all.length) {
   await upsert("kb_docs", all);
   // kb_chunks is what the grounded thesis actually retrieves from now on. If this table
   // doesn't exist yet, run sql/2026-07-29_kb_chunks_fts.sql first — the app
   // falls back to kb_docs until then, so nothing breaks in the meantime.
   await upsert("kb_chunks", allChunks);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — seed kb_docs/kb_chunks from the JSON via MCP)");
+  console.log("  (sin base: PGHOST no definido — seed kb_docs/kb_chunks from the JSON)");
 }
