@@ -3,6 +3,7 @@ import { checkRateLimit, clientIp } from '../../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight } from '../../../../lib/server/cors.js';
 import { checkDailyQuota } from '../../../../lib/server/quota.js';
 import { isPro } from '../../../../lib/server/entitlements.js';
+import { cuerpoParaAnthropic } from '../../../../lib/server/anthropicBody.js';
 
 // RUNTIME NODE, no edge. Esta ruta comprueba la suscripcion (lib/server/entitlements.js) y
 // eso ahora consulta Cloud SQL, cuyo driver necesita sockets de Node. Con Supabase la
@@ -52,9 +53,10 @@ export async function POST(request) {
   if (!Number.isFinite(body.max_tokens) || body.max_tokens < 1 || body.max_tokens > 4096) {
     return json({ error: 'max_tokens must be a number in [1, 4096]' }, 400);
   }
-  if (!Array.isArray(body.messages) || body.messages.length === 0) {
-    return json({ error: 'messages array required' }, 400);
-  }
+  // Solo se reenvía model, max_tokens y mensajes de texto. Antes iba el cuerpo del cliente
+  // entero, con `system`, `tools` o lo que quisiera añadir (AUDIT_REPORT A-7).
+  const permitido = cuerpoParaAnthropic(body);
+  if (permitido.error) return json({ error: permitido.error }, 400);
 
   // Cuota diaria. DESPUÉS de validar el cuerpo: una petición malformada no debe gastar el
   // día de nadie. Y antes de llamar a Anthropic, que es lo que cuesta dinero.
@@ -73,7 +75,7 @@ export async function POST(request) {
       'x-api-key': process.env.ANTHROPIC_KEY,
       'anthropic-version': '2023-06-01',
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(permitido.body),
   });
 
   const text = await res.text();

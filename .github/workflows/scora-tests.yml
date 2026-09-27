@@ -331,6 +331,10 @@ jobs:
       # el fallo que dice proteger, y la primera vez que salta de verdad.
       - name: Autenticacion (verificacion local del token)
         run: node --experimental-strip-types --no-warnings scripts/auth.test.mjs
+      # Lo que se reenvia a Anthropic con nuestra clave: model, max_tokens y texto, nada mas
+      # (AUDIT_REPORT A-7).
+      - name: Cuerpo reenviado a Anthropic
+        run: node --experimental-strip-types --no-warnings scripts/anthropicbody.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)
