@@ -7,7 +7,6 @@
 // degrades to the static validated numbers + CTA instead of breaking.
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { datos } from "@/lib/dataClient";
 import { regimeConfirmation } from "@/lib/regimeLoop";
 import { buildAllocation, computeRiskOn, ALLOC_ASSETS, ASSET_META } from "@/lib/allocation";
 import { secularRegime } from "@/lib/secular";
@@ -24,9 +23,17 @@ export default function Demo() {
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // Por /api/publico, no por la puerta autenticada: esta pagina es publica y su
+  // propia copia promete "the live read the app runs on". Con datos.from() el
+  // visitante anonimo recibia 401 y siempre veia el aviso de "no disponible".
   useEffect(() => {
-    datos.from("macro_state").select("*").eq("id", 1).single()
-      .then(({ data }) => { setMacro((data as MacroState) ?? null); setLoaded(true); });
+    (async () => {
+      try {
+        const res = await fetch("/api/publico");
+        if (res.ok) setMacro(((await res.json()).macro as MacroState) ?? null);
+      } catch { /* el aviso de abajo cubre el caso */ }
+      setLoaded(true);
+    })();
   }, []);
 
   const riskOn = macro?.risk_on != null ? Number(macro.risk_on)

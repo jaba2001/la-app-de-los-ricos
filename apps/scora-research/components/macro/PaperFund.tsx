@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import { datos } from "@/lib/dataClient";
 import { ALLOC_ASSETS, ASSET_META, blendWeights, type Weights } from "@/lib/allocation";
 
 interface Track { as_of: string; inception: string; nav: number; spy_nav: number; bench6040_nav?: number | null; bench6040_ret?: number | null; total_ret: number; spy_ret: number; max_dd: number; sharpe: number; grade: string; }
@@ -17,15 +16,20 @@ export default function PaperFund() {
   const [loaded, setLoaded] = useState(false);
   const [slider, setSlider] = useState<number | null>(null);
 
+  // Va por /api/publico y no por la puerta autenticada: este componente se pinta
+  // tambien en /demo, que es publica, y alli datos.from() devolvia 401 — de ahi el
+  // "the live read isn't available" que veia todo visitante anonimo.
   useEffect(() => {
     (async () => {
-      const [{ data: t }, { data: r }] = await Promise.all([
-        datos.from("sl_paper_fund_track").select("*").order("as_of", { ascending: false }).limit(1).maybeSingle(),
-        datos.from("sl_paper_fund").select("*").order("rebalance_date", { ascending: false }).limit(1).maybeSingle(),
-      ]);
-      setTrack((t as Track) ?? null);
-      setReb((r as Reb) ?? null);
-      if (r) setSlider(Number((r as Reb).risk_on ?? 50));
+      try {
+        const res = await fetch("/api/publico");
+        if (res.ok) {
+          const d = await res.json();
+          setTrack((d.track as Track) ?? null);
+          setReb((d.cartera as Reb) ?? null);
+          if (d.cartera) setSlider(Number((d.cartera as Reb).risk_on ?? 50));
+        }
+      } catch { /* sin expediente se pinta el estado vacio, no se rompe la pagina */ }
       setLoaded(true);
     })();
   }, []);

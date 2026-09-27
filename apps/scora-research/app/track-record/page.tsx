@@ -1,8 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth";
-import { datos } from "@/lib/dataClient";
 import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as A, STOCK_PICKING as M } from "@/lib/trackRecord";
 import PaperFund from "@/components/macro/PaperFund";
 
@@ -25,27 +22,28 @@ function Stat({ label, value, color, sub }: { label: string; value: string; colo
   );
 }
 
+// Publica a proposito: esta en el sitemap como indexable y la landing la enlaza
+// tres veces. Antes tenia guardia de login, asi que quien llegaba desde Google
+// acababa en la pantalla de acceso. El expediente publicado se sirve por
+// /api/publico, que no exige sesion.
 export default function TrackRecordPage() {
-  const { session, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [live, setLive] = useState<LiveSummary | null>(null);
   const [cohortRows, setCohortRows] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
 
-  useEffect(() => { if (!authLoading && !session) router.replace("/login"); }, [session, authLoading, router]);
-
   useEffect(() => {
-    if (!session) return;
     (async () => {
-      const { data } = await datos.from("sl_track_summary").select("*").eq("id", 1).maybeSingle();
-      setLive((data as LiveSummary) ?? null);
-      const { count } = await datos.from("sl_cohort").select("id", { count: "exact", head: true });
-      setCohortRows(count ?? 0);
+      try {
+        const res = await fetch("/api/publico");
+        if (res.ok) {
+          const d = await res.json();
+          setLive((d.resumen as LiveSummary) ?? null);
+          setCohortRows(d.cohortes ?? 0);
+        }
+      } catch { /* el backtest validado es estatico y se pinta igual */ }
       setLoaded(true);
     })();
-  }, [session]);
-
-  if (authLoading || !session) return null;
+  }, []);
 
   return (
     <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1080, margin: "0 auto" }} className="animate-fade-in">
