@@ -363,6 +363,10 @@ jobs:
       # de un uid de Identity Platform. Sin Postgres se salta.
       - name: Webhook de Stripe contra la base
         run: node --experimental-strip-types --no-warnings scripts/stripewebhook.test.mjs
+      # El cron de alertas macro de punta a punta: la lista de suscriptores se pedia a una URL
+      # de Supabase que ya no existe y nadie recibia el correo. Sin Postgres se salta.
+      - name: Cron de alertas macro contra la base
+        run: node --experimental-strip-types --no-warnings scripts/alertascron.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

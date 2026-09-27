@@ -29,28 +29,15 @@ async function fetchObs(seriesId) {
 
 async function alreadyAlertedToday(alertType) {
   const since = new Date(Date.now() - 86400000).toISOString();
-  const url = `${process.env.SUPABASE_URL}/rest/v1/alerts_log?alert_type=eq.${pgv(alertType)}&triggered_at=gte.${pgv(since)}&user_id=is.null&select=id&limit=1`;
-  const r = await sbFetch(url, {
-    headers: {
-      apikey: process.env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-    },
-  });
+  const url = `alerts_log?alert_type=eq.${pgv(alertType)}&triggered_at=gte.${pgv(since)}&user_id=is.null&select=id&limit=1`;
+  const r = await sbFetch(url);
   if (!r.ok) return false;
   const arr = await r.json();
   return Array.isArray(arr) && arr.length > 0;
 }
 
 async function insertAlert(row) {
-  const r = await sbFetch(`alerts_log`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      apikey: process.env.SUPABASE_SERVICE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-    },
-    body: JSON.stringify(row),
-  });
+  const r = await sbFetch(`alerts_log`, { method: 'POST', body: JSON.stringify(row) });
   if (!r.ok) return { ok: false, status: r.status, body: await r.text() };
   return { ok: true };
 }
@@ -108,13 +95,7 @@ export async function GET(request) {
   // macro-refresh y la cachea en macro_state (credit_divergence + proxy). Aquí
   // solo la leemos y emitimos alerta si está activa (0 fetches de mercado extra).
   try {
-    const url = `${process.env.SUPABASE_URL}/rest/v1/macro_state?id=eq.1&select=credit_divergence,credit_private_proxy,credit_stress&limit=1`;
-    const r = await sbFetch(url, {
-      headers: {
-        apikey: process.env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-      },
-    });
+    const r = await sbFetch(`macro_state?id=eq.1&select=credit_divergence,credit_private_proxy,credit_stress&limit=1`);
     if (r.ok) {
       const arr = await r.json();
       const m = Array.isArray(arr) ? arr[0] : null;
@@ -152,14 +133,11 @@ export async function GET(request) {
     .map((a) => a.message);
   if (freshMessages.length > 0) {
     try {
-      const subUrl = `${process.env.SUPABASE_URL}/rest/v1/sl_alert_prefs?macro_alerts=eq.true&select=email&limit=1000`;
-      const sr = await fetch(subUrl, {
-        headers: {
-          apikey: process.env.SUPABASE_SERVICE_KEY,
-          Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
-        },
-      });
-      const subs = sr.ok ? await sr.json() : [];
+      // Era un fetch() directo a `${SUPABASE_URL}/rest/v1/…`: sin Supabase la URL era
+      // "undefined/rest/v1/…", el fetch lanzaba y ningún suscriptor recibía nunca el correo.
+      const sr = await sbFetch(`sl_alert_prefs?macro_alerts=eq.true&select=email&limit=1000`);
+      if (!sr.ok) throw new Error(`sl_alert_prefs HTTP ${sr.status}`);
+      const subs = await sr.json();
       const recipients = Array.isArray(subs)
         ? [...new Set(subs.map((s) => s.email).filter((e) => e && e.includes('@')))]
         : [];
