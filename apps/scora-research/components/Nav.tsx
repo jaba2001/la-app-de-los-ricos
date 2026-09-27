@@ -209,6 +209,13 @@ export default function Nav() {
         <button
           className="btn-ghost"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
+          onClick={() => router.push("/account")}
+        >
+          Account
+        </button>
+        <button
+          className="btn-ghost"
+          style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
           onClick={signOut}
         >
           Sign out

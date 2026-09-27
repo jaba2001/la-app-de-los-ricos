@@ -360,6 +360,10 @@ jobs:
         run: node --experimental-strip-types --no-warnings scripts/cors.test.mjs && node --experimental-strip-types --no-warnings scripts/segment.test.mjs
       - name: El guardian de los crons
         run: node --experimental-strip-types --no-warnings scripts/cron.test.mjs
+      # Borrar una cuenta borra todas sus filas y solo las suyas (AUDIT_REPORT A-6). La parte
+      # con Postgres se salta sin base.
+      - name: Borrado de cuenta
+        run: node --experimental-strip-types --no-warnings scripts/cuenta.test.mjs
       - name: Cuota diaria de IA y suscripciones
         run: node --experimental-strip-types --no-warnings scripts/quota.test.mjs && node --experimental-strip-types --no-warnings scripts/stripe.test.mjs
       - name: Alertas (kinds, macro) y cierre diario

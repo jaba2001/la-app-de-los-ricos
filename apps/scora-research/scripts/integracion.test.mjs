@@ -93,6 +93,8 @@ const pedir = async (ruta, init = {}) => {
     ["POST", "/api/data"],
     ["POST", "/api/anthropic/messages"],
     ["POST", "/api/llm"],
+    // Borra todos los datos de quien llama: sin sesion no puede hacer nada (AUDIT_REPORT A-6).
+    ["DELETE", "/api/cuenta"],
   ];
   // /api/waitlist va aparte: limita por IP ANTES de mirar la sesion, y su limitador es
   // fail-closed a proposito (sin el seria un cañon de correos anonimo). Sin Upstash
