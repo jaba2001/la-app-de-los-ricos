@@ -5,6 +5,10 @@ locals {
   # anadiria ruido y coste sin proteger nada que no sea ya publico.
   config = {
     NODE_ENV = "production"
+    # La audiencia de los tokens de Identity Platform (lib/server/auth.js). Sin ella, toda
+    # ruta con sesion responde 503. En el servicio en marcha estaba puesta A MANO y no aqui:
+    # el siguiente `terraform apply` la habria borrado (AUDIT_REPORT A-1).
+    GCP_PROJECT_ID = var.project_id
     # Limites diarios de IA por plan (lib/server/quota.js). Sin esto, 5 y 100.
     AI_DAILY_FREE = "5"
     AI_DAILY_PRO  = "100"
