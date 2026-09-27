@@ -43,6 +43,9 @@ const firma = async (claims = {}, { key = privateKey, alg = "RS256", exp = "1h" 
   check("token valido → uid", u?.id, "uid28caracteresDeIdentityPl");
   check("token valido → email", u?.email, "a@b.c");
   check("hay verificacion", localVerifyAvailable(), true);
+  // Un correo sin verificar no puede usarse para actuar sobre datos de ese correo (cuenta.js).
+  check("sin email_verified → false", u?.email_verified, false);
+  check("email_verified: true → true", (await verifyTokenLocally(await firma({ email_verified: true })))?.email_verified, true);
 }
 
 // ── Rechazos ────────────────────────────────────────────────────────────────────────

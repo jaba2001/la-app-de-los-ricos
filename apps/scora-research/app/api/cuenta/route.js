@@ -9,7 +9,7 @@ import { requireUser } from '../../../lib/server/auth.js';
 import { checkRateLimit } from '../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/server/cors.js';
 import { pool } from '../../../lib/server/data/pool.ts';
-import { borrarDatosDeUsuario, SuscripcionActiva } from '../../../lib/server/cuenta.js';
+import { borrarDatosDeUsuario, correoParaBorrar, SuscripcionActiva } from '../../../lib/server/cuenta.js';
 
 // Postgres necesita sockets de Node.
 export const runtime = 'nodejs';
@@ -25,7 +25,7 @@ export async function DELETE(request) {
   if (rl) return rl;
 
   try {
-    const borradas = await borrarDatosDeUsuario(pool(), user.id, user.email);
+    const borradas = await borrarDatosDeUsuario(pool(), user.id, correoParaBorrar(user));
     // Rastro de la operación, sin datos personales: cuándo y cuántas filas, no quién.
     const total = Object.values(borradas).reduce((s, n) => s + n, 0);
     console.info(`cuenta borrada: ${total} filas en ${Object.keys(borradas).length} tablas`);

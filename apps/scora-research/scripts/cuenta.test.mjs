@@ -7,7 +7,7 @@
 //
 // La parte sin base (la lista cubre las privadas de policy.ts) corre siempre.
 import pg from "pg";
-import { TABLAS_DE_USUARIO, SuscripcionActiva } from "../lib/server/cuenta.js";
+import { TABLAS_DE_USUARIO, SuscripcionActiva, correoParaBorrar } from "../lib/server/cuenta.js";
 import { POLICY } from "../lib/server/data/policy.ts";
 
 let bad = 0, total = 0;
@@ -17,6 +17,13 @@ const check = (l, got, want) => {
     bad++; console.log(`FAIL  ${l}\n      got:  ${JSON.stringify(got)}\n      want: ${JSON.stringify(want)}`);
   }
 };
+
+// El correo solo cuenta si está verificado: si no, registrarse con el correo de Beni bastaba
+// para borrar su alta en la lista de espera.
+check("correo verificado → se usa", correoParaBorrar({ email: "a@x.com", email_verified: true }), "a@x.com");
+check("correo sin verificar → no se usa", correoParaBorrar({ email: "beni@x.com", email_verified: false }), null);
+check("sin la marca → no se usa", correoParaBorrar({ email: "beni@x.com" }), null);
+
 
 // ── Sin base ────────────────────────────────────────────────────────────────────────
 {

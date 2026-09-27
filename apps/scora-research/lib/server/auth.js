@@ -102,6 +102,9 @@ function payloadToUser(payload) {
     // `sub` es el uid de Identity Platform (28 caracteres), no un uuid como en Supabase.
     id: payload.sub,
     email: payload.email ?? null,
+    // Identity Platform deja registrarse con un correo sin comprobarlo: quien use el correo
+    // de otro solo debe poder actuar sobre él si está verificado (p. ej. lib/server/cuenta.js).
+    email_verified: payload.email_verified === true,
     role: payload.role ?? null,
     app_metadata: payload.app_metadata ?? {},
     user_metadata: payload.user_metadata ?? {},

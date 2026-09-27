@@ -24,6 +24,12 @@ export const TABLAS_DE_USUARIO = [
   "sl_waitlist", "sl_watchlist", "stock_snapshot",
 ];
 
+/** El correo por el que se pueden borrar altas sin sesión: solo si Identity Platform lo ha
+ *  verificado. Sin esto, registrarse con el correo de otro permitía borrar SU alta. */
+export function correoParaBorrar(user) {
+  return user?.email && user.email_verified === true ? user.email : null;
+}
+
 export class SuscripcionActiva extends Error {
   constructor() { super("Cancel your subscription before deleting your account."); this.name = "SuscripcionActiva"; }
 }
@@ -31,7 +37,7 @@ export class SuscripcionActiva extends Error {
 /**
  * @param {import("pg").Pool} db
  * @param {string} userId  sale del token verificado, nunca de la petición
- * @param {string|null} email  del token; para las altas en la lista de espera sin sesión
+ * @param {string|null} email  del token Y verificado (correoParaBorrar); para las altas sin sesión
  * @returns {Promise<Record<string, number>>} filas borradas por tabla
  */
 export async function borrarDatosDeUsuario(db, userId, email) {
