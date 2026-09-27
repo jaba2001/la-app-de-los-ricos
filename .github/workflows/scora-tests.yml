@@ -371,6 +371,10 @@ jobs:
       # alerta de precio ni tecnica se disparaba. Sin Postgres se salta.
       - name: Cron de alertas por ticker contra la base
         run: node --experimental-strip-types --no-warnings scripts/tickeralertascron.test.mjs
+      # Cierre diario de punta a punta: el regimen anterior se pedia a macro_state (una sola
+      # fila) y el informe nunca anunciaba un cambio de regimen. Sin Postgres se salta.
+      - name: Cron del cierre diario contra la base
+        run: node --experimental-strip-types --no-warnings scripts/cierrecron.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

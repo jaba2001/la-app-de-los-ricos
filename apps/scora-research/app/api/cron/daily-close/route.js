@@ -11,7 +11,7 @@
 //
 // Coste: 12 peticiones al día a la API chart de Yahoo (gratis, sin clave). Ninguna a FMP —
 // su plan aquí no cubre ETFs; ver `fetchQuotes`.
-// Env: CRON_SECRET, SUPABASE_URL, SUPABASE_SERVICE_KEY.
+// Env: CRON_SECRET.
 import { assertCron, pgv } from '../../../../lib/server/cron.js';
 import { buildDailyClose, SECTOR_UNIVERSE, parseYahooQuote } from '../../../../lib/server/dailyClose.js';
 import { sbFetch } from "../../../../lib/server/data/postgrest.js";
@@ -19,8 +19,8 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const KEY = process.env.SUPABASE_SERVICE_KEY;
-const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' };
+// sbFetch solo mira `Prefer`; las cabeceras apikey/Authorization de Supabase ya no pintaban nada.
+const sbHeaders = { 'Content-Type': 'application/json' };
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -67,11 +67,19 @@ export async function GET(request) {
   // Sin guarda de FMP_KEY: este cron ya no la usa, y abortar por una variable que no
   // necesita lo dejaría muerto por una razón falsa.
 
-  // 1 · los dos snapshots macro más recientes (el previo detecta el cambio de régimen)
-  const mRes = await sbFetch(`macro_state?select=*&order=snapshot_date.desc&limit=2`, { headers: sbHeaders });
+  // 1 · el snapshot macro actual, y el régimen del día anterior para detectar el cambio.
+  // macro_state tiene UNA fila (CHECK id = 1): pedirle "las dos más recientes" devolvía
+  // siempre una, prevMacro salía null y el informe nunca anunciaba un cambio de régimen. El
+  // anterior está en macro_state_history, que macro-refresh rellena cada día.
+  const mRes = await sbFetch(`macro_state?id=eq.1&select=*&limit=1`, { headers: sbHeaders });
   const mRows = mRes.ok ? await mRes.json().catch(() => []) : [];
   const macro = Array.isArray(mRows) && mRows[0] ? mRows[0] : null;
-  const prevMacro = Array.isArray(mRows) && mRows[1] ? mRows[1] : null;
+  let prevMacro = null;
+  if (macro?.snapshot_date) {
+    const hRes = await sbFetch(`macro_state_history?snapshot_date=lt.${pgv(String(macro.snapshot_date).slice(0, 10))}&select=snapshot_date,regime_id&order=snapshot_date.desc&limit=1`);
+    const hRows = hRes.ok ? await hRes.json().catch(() => []) : [];
+    prevMacro = Array.isArray(hRows) && hRows[0] ? hRows[0] : null;
+  }
 
   // 2 · índice + sectores
   const symbols = ['SPY', ...SECTOR_UNIVERSE.map((s) => s.etf)];
