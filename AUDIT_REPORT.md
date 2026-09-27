@@ -7,13 +7,19 @@
 > `sql/gcp/001_schema.sql` + `002_user_id_texto.sql`. Lo que no se pudo probar está marcado
 > **NO VERIFICADO** con el motivo.
 
-## Estado final
+## Estado final (actualizado al cierre de la segunda ronda, 27-09 por la tarde)
 
-**Arreglados y verificados: 12** (C-1, C-2, C-3, C-4, A-1 en código, A-3, A-7, A-8, M-1, M-2,
-M-4, M-7). **Pendientes de decisión: 1 crítico (C-5) y 4 altos (A-2, A-4, A-5, A-6)**, más
-medios y bajos. Ninguna matriz queda en ❌ por un fallo de código sin arreglar: los ❌ que
-quedan son C-5, que es mover datos. La lista de lo NO VERIFICADO, con su motivo, está en la
-fase 7. **Nada de esto está desplegado.**
+**Ronda 1** (desplegada el 27-09 en la revisión `scora-00004-5dw`): C-1, C-2, C-3, C-4, A-1 en
+código, A-3, A-7, A-8, M-1, M-2, M-4, M-7.
+
+**Ronda 2** (en `main`, **pendiente de desplegar**): A-4, A-5 (preparado, sin aplicar), A-6
+(parte técnica), M-3, M-6, M-8, B-1, B-4, y tres fallos nuevos que salieron al hacerlo — ver
+«Segunda ronda» al final.
+
+**Queda abierto, y no es código:** C-5 (migrar los datos de Supabase a Cloud SQL: bloqueado por
+permisos de esta sesión), las claves que faltan en producción (D-2), aplicar el rol de A-5, los
+textos legales de A-6 y la revocación inmediata de sesión (D-3). La CI está en rojo por la
+guarda de frescura de los backtests: se están regenerando (ver «Segunda ronda»).
 
 ## Resumen ejecutivo (tal como se encontró)
 
@@ -468,3 +474,75 @@ Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (
   pide? Algún script de research podría usarlas.
 - **Cuenta de prueba.** Para cerrar lo NO VERIFICADO de las pantallas con sesión necesito una
   cuenta de Identity Platform de prueba, o que hagas tú ese recorrido.
+
+---
+
+## Segunda ronda · 27-09 por la tarde («revisa lo que tengas que revisar y corrige todo»)
+
+### Despliegue de la ronda 1 — verificado en producción
+
+Revisión `scora-00004-5dw` (imagen `1660a0b`), desplegada por Jorge. Comprobado con peticiones
+públicas: 20 páginas en 200 y una ruta inexistente en 404; `/api/publico` (antes 404) devuelve el
+macro con `"snapshot_date":"2026-09-26"` (C-3 en producción); IA, datos, proveedores y crons dan
+401 sin sesión, no 503 (C-1); Stripe responde «Payments are not enabled yet» porque faltan sus
+claves, que es lo esperado; los logs de la revisión no tienen errores de la aplicación. Track
+record, cohortes y paper fund salen vacíos en producción: confirma C-5.
+
+### Lo corregido en esta ronda
+
+| commit | hallazgo | qué |
+|---|---|---|
+| `6b69191` | **A-4** | El registro de auditoría de la IA lo escribe el servidor con el usuario del token; el navegador ya no puede insertar. Y un fallo nuevo: el cliente metía textos en `violations` (`numeric[]`), el insert fallaba y **la fila se perdía en silencio** justo cuando la respuesta tenía una violación. |
+| `672bdfd` | **A-6** | Borrado de cuenta: `DELETE /api/cuenta` borra las 13 tablas y la lista de espera por correo, en una transacción, y se niega con una suscripción viva. Página `/account`. |
+| `3590ae6` | **A-6** | PostHog no arranca sin consentimiento; aviso con Aceptar/Rechazar del mismo peso; retirarlo apaga en el acto. |
+| `bbc5052` + `d269a01` | **B-1** | Cerradas las 16 rutas de proveedor sin llamador. Con sesión dan 403; sin sesión, 401 como todas (se comprueba la sesión primero, a propósito). |
+| `518ea13` | **B-4** | La URL propia sale de `lib/sitio.ts` (`NEXT_PUBLIC_SITE_URL`, o la de Cloud Run): canónicas, sitemap, robots y **vuelta de Stripe**, que habría devuelto al usuario al dominio viejo. |
+| `b4227c3` | **M-3** | Las 27 consultas: los fallos de lectura se avisan, las escrituras no cambian la interfaz si la base no confirma, las cachés se documentan. |
+| `4981119` | **A-5** | Rol `scora_app` con permisos mínimos (`sql/gcp/003_rol_app.sql`), probado en local y con la app entera funcionando sobre él. **Sin aplicar.** |
+| `4774969` | **M-6** | La caché del esquema caduca a los 10 min. Y peor: una primera lectura fallida dejaba `/api/data` en 503 **hasta reiniciar la instancia**. |
+| `7719f09` | **M-8** | Un solo contrato de tipos cliente/servidor (`lib/dataContract.ts`). Y el registro **inmutable** `sl_score_log` se podía sobrescribir: `ignoreDuplicates` se ignoraba. |
+
+### Fallos nuevos que aparecieron al corregir (ya arreglados)
+
+- **Dos gráficas enseñaban lo más antiguo como si fuera lo último**: el histórico del IC en
+  `/macro` (90 días) y la curva de la nota en la ficha (30 análisis) se pedían en orden
+  ascendente con `limit`. (`b4227c3`)
+- **Smart money mezclaba meses**: un mes con menos de 20 compradores se rellenaba con el anterior.
+- **El backtest de señales excluía tickers sin decirlo** cuando no llegaban sus precios.
+- **`/audit` no reconocía los módulos** que la app registra hoy (`stock-thesis`, etc.).
+- **La prueba de integración decía «36» a mano**; ahora cuenta (37 con `DELETE /api/cuenta`).
+
+### M-5 · se cierra sin cambio, y por qué
+
+Un lote de `/api/data` agrupa consultas **independientes** de componentes distintos que coinciden
+en el mismo instante; no son pasos de una misma operación. Hacerlo atómico acoplaría escrituras
+que no tienen nada que ver (si falla guardar un análisis, se desharía el alta en la watchlist de
+otro componente). Donde sí hay varias escrituras que deben ir juntas —borrar una cuenta— se hace
+en el servidor con una transacción (`lib/server/cuenta.js`). **NO CAMBIO NECESARIO.**
+
+### La CI: los backtests están caducados de verdad
+
+La guarda de frescura no da un falso positivo: el S&P 500 cambió desde que se generaron (entran
+**BE, P, ILMN**; salen **BLDR, TAP, TTD**). Se están regenerando las dos ventanas con
+`picks_rules_backtest.mjs --rebuild` (horas de cálculo). Cuando terminen hay que versionar los
+artefactos y, si las cifras publicadas cambian, actualizar los documentos que las citan — la
+guarda `cifras_publicadas` lo exige. **Estado: EN CURSO.**
+
+### Verificación de esta ronda
+
+Build de producción sin errores; typecheck 0; lint **120 avisos (antes 121), ninguno nuevo**;
+suite completa con Postgres y servidor: **63 suites, 0 en rojo, 0 saltadas, 3.778 aserciones**
+(antes 58 · 3.695); integración 37, contrato 17, smoke 35 rutas, E2E 6; 18 páginas en Chromium
+sin errores de consola. Cada prueba nueva se vio fallar con el código anterior.
+
+### Sigue abierto
+
+| | por qué no lo he hecho |
+|---|---|
+| **C-5** migrar datos de Supabase y pasar los 9 workflows a Cloud SQL | El control de permisos de esta sesión bloqueó leer datos de producción y cambiar a dónde escriben los procesos. Necesita tu permiso o que lo lances tú, más una cuenta de servicio y secretos en GitHub. Orden obligado: **copiar primero, activar después**. |
+| **D-2** claves de producción | Anthropic, Groq, Gemini, Stripe, Upstash, Resend y VAPID están vacías en tu `.env.gcp`. |
+| **A-5** aplicar el rol | Cambio de permisos en Cloud SQL; pasos en la cabecera del `.sql`. |
+| **A-6** privacidad y términos | Texto legal: abogado. |
+| **D-3** revocación inmediata | Necesita el Admin SDK de Firebase (dependencia nueva). |
+| **A-4** guardar también los textos de las violaciones | Columna nueva: cambio de esquema. |
+| **Desplegar la ronda 2** | El despliegue lo bloquea el control de permisos: `gcloud run deploy` con la nueva imagen. |
