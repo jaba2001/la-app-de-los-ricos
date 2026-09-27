@@ -1,6 +1,6 @@
 import { tokenActual } from "./auth";
-import { datos } from "./dataClient";
 import { checkGrounding, checkDirection } from "./grounding";
+import { estimateCostUsd, usageDeAnthropic, type AiUsage } from "./costeIA";
 import { track } from "./analytics";
 import { setQuota } from "./quotaState";
 import { createBatcher } from "./batchQueue";
@@ -168,6 +168,9 @@ export function authedFetch<T = unknown>(
  */
 const AI_MODELS = { fast: "claude-haiku-4-5", deep: "claude-sonnet-4-6" } as const;
 
+/** Lo que el servidor devuelve tras registrar la auditoría (lib/server/auditoriaIA.js). */
+export interface AuditoriaServidor { grounded: boolean; violations: (number | string)[]; registrado: boolean; }
+
 interface AnthropicResponse {
   content?: { type: string; text?: string }[];
   error?: { message?: string };
@@ -179,46 +182,46 @@ interface AnthropicResponse {
     cache_read_input_tokens?: number;
     cache_creation_input_tokens?: number;
   };
+  /** Solo si la petición llevaba `scora_audit`. */
+  scora_audit?: AuditoriaServidor;
 }
 
-/** Token counts for one completion. Null when the backend doesn't report them. */
-export interface AiUsage {
-  inputTokens: number | null;
-  outputTokens: number | null;
-  cacheReadTokens: number | null;
-  cacheCreationTokens: number | null;
+export type { AiUsage };
+export { estimateCostUsd };
+export interface AiCompletion { text: string; usage: AiUsage | null; audit?: AuditoriaServidor | null; }
+
+/** Metadatos de auditoría que viajan con la petición y usa el SERVIDOR para escribir la fila. */
+export interface MetaAuditoria {
+  module: string; ticker?: string | null; sources?: string[] | null;
+  dataBlockEsPrompt?: boolean; dataBlock?: string;
 }
-export interface AiCompletion { text: string; usage: AiUsage | null; }
 
 // ── Pluggable provider seam (Phase 7 "ralph") ────────────────────────────────────────
 // aiAnalyze talks to a Provider, not to Anthropic directly, so the backend is swappable
 // behind one interface (Anthropic today; a local/OSS model or a different vendor later)
 // without touching any caller. Default = el paso a Anthropic de app/api/anthropic.
-export interface AiProvider { name: string; complete(model: string, maxTokens: number, prompt: string): Promise<AiCompletion>; }
+export interface AiProvider {
+  name: string;
+  complete(model: string, maxTokens: number, prompt: string, auditoria?: MetaAuditoria): Promise<AiCompletion>;
+}
 
 // Both providers return Anthropic's { content:[{type:'text',text}] } shape — el backend
 // /api/llm normalizes any free provider (Groq/Gemini) to it — so parsing is shared.
 function parseAnthropic(res: AnthropicResponse): AiCompletion {
   const text = res.content?.filter((b) => b.type === "text" && typeof b.text === "string").map((b) => b.text).join("\n");
   if (!text) throw new Error(res.error?.message ?? "Empty AI response");
-  const u = res.usage;
-  const usage: AiUsage | null = u
-    ? {
-        inputTokens: u.input_tokens ?? null,
-        outputTokens: u.output_tokens ?? null,
-        cacheReadTokens: u.cache_read_input_tokens ?? null,
-        cacheCreationTokens: u.cache_creation_input_tokens ?? null,
-      }
-    : null;
-  return { text, usage };
+  return { text, usage: usageDeAnthropic(res.usage), audit: res.scora_audit ?? null };
 }
 
 const anthropicProvider: AiProvider = {
   name: "anthropic",
-  async complete(model, maxTokens, prompt) {
+  async complete(model, maxTokens, prompt, auditoria) {
     const res = await authedFetch<AnthropicResponse>("/api/anthropic/messages", {
       method: "POST",
-      body: JSON.stringify({ model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({
+        model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }],
+        ...(auditoria ? { scora_audit: auditoria } : {}),
+      }),
     }, 60_000);
     return parseAnthropic(res);
   },
@@ -228,35 +231,17 @@ const anthropicProvider: AiProvider = {
 // the client-side model name is ignored here. Enabled with NEXT_PUBLIC_AI_PROVIDER=free.
 const freeLlmProvider: AiProvider = {
   name: "free",
-  async complete(_model, maxTokens, prompt) {
+  async complete(_model, maxTokens, prompt, auditoria) {
     const res = await authedFetch<AnthropicResponse>("/api/llm", {
       method: "POST",
-      body: JSON.stringify({ max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({
+        max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }],
+        ...(auditoria ? { scora_audit: auditoria } : {}),
+      }),
     }, 60_000);
     return parseAnthropic(res);
   },
 };
-
-// ── Cost telemetry ───────────────────────────────────────────────────────────────────
-// USD per 1M tokens, for OBSERVABILITY ONLY — never billing. Anthropic's invoice is the
-// source of truth; this exists so "which module is eating the €10/month" is answerable
-// without leaving PostHog. Keep in sync with AI_MODELS above if a tier changes.
-const PRICE_PER_MTOK: Record<string, { in: number; out: number }> = {
-  "claude-haiku-4-5": { in: 1, out: 5 },
-  "claude-sonnet-4-6": { in: 3, out: 15 },
-};
-
-/** Rough USD cost of one completion. Null when tokens or price are unknown. */
-export function estimateCostUsd(model: string, usage: AiUsage | null): number | null {
-  const p = PRICE_PER_MTOK[model];
-  if (!p || !usage || usage.inputTokens == null || usage.outputTokens == null) return null;
-  // Cached reads bill at ~0.1x input. Treated as plain input when not reported, which
-  // over-estimates slightly — better to over- than under-state a cost figure.
-  const cached = usage.cacheReadTokens ?? 0;
-  const fresh = Math.max(0, usage.inputTokens - cached);
-  const usd = (fresh * p.in + cached * p.in * 0.1 + usage.outputTokens * p.out) / 1_000_000;
-  return Math.round(usd * 1e6) / 1e6;
-}
 
 // Default provider is swappable by env with zero code changes: set NEXT_PUBLIC_AI_PROVIDER=free
 // to run the whole AI layer on a free-tier backend (€0). The code grounding gate keeps a
@@ -284,22 +269,41 @@ export interface AuditOpts { module: string; ticker?: string; dataBlock?: string
 export interface AuditedResult { text: string; violations: (number | string)[]; grounded: boolean; }
 
 /**
- * Like aiAnalyze, but (1) runs the code-level grounding gate over the output vs the DATA
- * block it was grounded on, and (2) writes an immutable row to ai_audit_log (inputs,
- * cited sources, output, model, violations, timestamp). Returns the flagged numbers so the
- * UI can surface "grounded ✓" or "N unverified figures". Logging is best-effort (never
- * blocks the answer). This is the governance layer that makes the AI auditable & vendible.
+ * Like aiAnalyze, but audited: the SERVER runs the code-level grounding gate over the output
+ * vs the DATA block and writes the immutable row to ai_audit_log (inputs, cited sources,
+ * output, model, violations, timestamp). Returns the flagged numbers so the UI can surface
+ * "grounded ✓" or "N unverified figures".
+ *
+ * Hasta el 27-09 la fila la escribía ESTE código, en el navegador: podía omitirse o
+ * falsearse, y además se perdía en silencio cuando había una violación direccional (texto en
+ * una columna numeric[]). Ahora el navegador solo manda los metadatos (AUDIT_REPORT A-4).
  */
 export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise<AuditedResult> {
   const model = AI_MODELS[opts.tier ?? "fast"];
-  const { text, usage } = await activeProvider.complete(model, opts.maxTokens ?? 1000, prompt);
+  const auditoria: MetaAuditoria = {
+    module: opts.module,
+    ticker: opts.ticker ?? null,
+    sources: opts.sources ?? null,
+    // Casi siempre el bloque de datos ES el prompt: se marca en vez de mandarlo dos veces.
+    ...(opts.dataBlock === prompt ? { dataBlockEsPrompt: true } : opts.dataBlock ? { dataBlock: opts.dataBlock } : {}),
+  };
+  const { text, usage, audit } = await activeProvider.complete(model, opts.maxTokens ?? 1000, prompt, auditoria);
   const costUsd = estimateCostUsd(model, usage);
-  const gate = opts.dataBlock ? checkGrounding(text, opts.dataBlock) : { ok: true, violations: [] as number[], checked: 0 };
-  // Directional gate (F2.1): real numbers arranged into a false claim ("$165 sits above
-  // the $184.20 price") — independent of the DATA block, always applicable.
-  const dir = checkDirection(text);
-  const violations: (number | string)[] = [...gate.violations, ...dir.violations];
-  const grounded = gate.ok && dir.ok;
+  let violations: (number | string)[];
+  let grounded: boolean;
+  if (audit) {
+    ({ violations, grounded } = audit);
+  } else {
+    // Un proveedor que no pasa por nuestras rutas (setAiProvider en pruebas o un modelo
+    // local) no deja fila en el servidor. El filtro se sigue aplicando aquí para que la
+    // interfaz no enseñe como fundamentado algo que no se ha comprobado.
+    const gate = opts.dataBlock ? checkGrounding(text, opts.dataBlock) : { ok: true, violations: [] as number[], checked: 0 };
+    // Directional gate (F2.1): real numbers arranged into a false claim ("$165 sits above
+    // the $184.20 price") — independent of the DATA block, always applicable.
+    const dir = checkDirection(text);
+    violations = [...gate.violations, ...dir.violations];
+    grounded = gate.ok && dir.ok;
+  }
   // Product analytics. This event maps 1:1 to an Anthropic call, so it's the metric
   // that answers "is the free tier's 1-deep-dive/day sustainable?". Carrying
   // `grounded` + violation COUNT (never the text) also turns ai_audit_log — which is
@@ -320,37 +324,8 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
     output_tokens: usage?.outputTokens ?? null,
     cache_read_tokens: usage?.cacheReadTokens ?? null,
     est_cost_usd: costUsd,
+    // Si el servidor no pudo escribir la fila, se ve aquí el mismo día.
+    audit_logged: audit?.registrado ?? false,
   });
-  try {
-    const { auth } = await import("./firebaseClient");
-    const user = auth().currentUser;
-    if (user) {
-      const base = {
-        user_id: user.uid,
-        ticker: opts.ticker ?? null,
-        module: opts.module,
-        model,
-        prompt_chars: prompt.length,
-        sources: opts.sources ?? null,
-        output: text.slice(0, 8000),
-        violations,
-        grounded,
-      };
-      const withUsage = {
-        ...base,
-        input_tokens: usage?.inputTokens ?? null,
-        output_tokens: usage?.outputTokens ?? null,
-        cache_read_tokens: usage?.cacheReadTokens ?? null,
-        est_cost_usd: costUsd,
-      };
-      // Write the usage columns when they exist, and fall back to the original shape when
-      // they don't. Without this, deploying the code before applying
-      // sql/2026-07-29_ai_audit_log_usage.sql would make every insert fail on an unknown
-      // column — and since audit writes are deliberately swallowed below, the audit trail
-      // (the moat) would go silently empty. Order matters: never lose the row.
-      const { error } = await datos.from("ai_audit_log").insert(withUsage);
-      if (error) await datos.from("ai_audit_log").insert(base);
-    }
-  } catch { /* audit is best-effort — never block the user's answer */ }
   return { text, violations, grounded };
 }

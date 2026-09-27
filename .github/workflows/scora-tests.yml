@@ -346,6 +346,10 @@ jobs:
       # (AUDIT_REPORT A-7).
       - name: Cuerpo reenviado a Anthropic
         run: node --experimental-strip-types --no-warnings scripts/anthropicbody.test.mjs
+      # El registro de auditoria de la IA lo escribe el servidor, y el navegador ya no puede
+      # insertar el suyo (AUDIT_REPORT A-4). La parte con Postgres se salta sin base.
+      - name: Registro de auditoria de la IA
+        run: node --experimental-strip-types --no-warnings scripts/auditoriaia.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

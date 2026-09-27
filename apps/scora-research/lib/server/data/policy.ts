@@ -35,7 +35,10 @@ export interface TablePolicy {
  */
 export const POLICY: Record<string, TablePolicy> = {
   // ── PRIVADAS: 13 tablas. El servidor añade el filtro de usuario siempre ──────────────
-  ai_audit_log:       { scope: "user", userColumn: "user_id", ops: ["select", "insert"] },
+  // Solo lectura: la fila la escribe el servidor al recibir la respuesta del modelo
+  // (lib/server/auditoriaIA.js). Si el navegador pudiera insertar, podría fabricar su propio
+  // registro de auditoría (AUDIT_REPORT A-4).
+  ai_audit_log:       { scope: "user", userColumn: "user_id", ops: ["select"] },
   alerts_log:         { scope: "user", userColumn: "user_id", ops: ["insert"] },
   ic_briefs:          { scope: "user", userColumn: "user_id", ops: ["insert"] },
   push_subscriptions: { scope: "user", userColumn: "user_id", ops: ["select", "upsert", "delete"] },

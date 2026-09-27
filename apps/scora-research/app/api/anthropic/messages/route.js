@@ -4,6 +4,7 @@ import { corsHeaders, preflight } from '../../../../lib/server/cors.js';
 import { checkDailyQuota } from '../../../../lib/server/quota.js';
 import { isPro } from '../../../../lib/server/entitlements.js';
 import { cuerpoParaAnthropic } from '../../../../lib/server/anthropicBody.js';
+import { leerMetaAuditoria, anotarRespuesta } from '../../../../lib/server/auditoriaIA.js';
 
 // RUNTIME NODE, no edge. Esta ruta comprueba la suscripcion (lib/server/entitlements.js) y
 // eso ahora consulta Cloud SQL, cuyo driver necesita sockets de Node. Con Supabase la
@@ -57,6 +58,10 @@ export async function POST(request) {
   // entero, con `system`, `tools` o lo que quisiera añadir (AUDIT_REPORT A-7).
   const permitido = cuerpoParaAnthropic(body);
   if (permitido.error) return json({ error: permitido.error }, 400);
+  // Los metadatos de auditoría no van a Anthropic: los usa el servidor para escribir él la
+  // fila de ai_audit_log (AUDIT_REPORT A-4).
+  const meta = leerMetaAuditoria(body.scora_audit);
+  if (meta?.error) return json({ error: meta.error }, 400);
 
   // Cuota diaria. DESPUÉS de validar el cuerpo: una petición malformada no debe gastar el
   // día de nadie. Y antes de llamar a Anthropic, que es lo que cuesta dinero.
@@ -78,7 +83,10 @@ export async function POST(request) {
     body: JSON.stringify(permitido.body),
   });
 
-  const text = await res.text();
+  const text = await anotarRespuesta({
+    textoRespuesta: await res.text(), ok: res.ok, userId: user.id,
+    model: permitido.body.model, messages: permitido.body.messages, meta,
+  });
   return new Response(text, {
     status: res.status,
     headers: corsHeaders(request, {

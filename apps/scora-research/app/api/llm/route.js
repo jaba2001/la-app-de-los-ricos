@@ -10,6 +10,7 @@ import { requireUser } from '../../../lib/server/auth.js';
 import { checkRateLimit, clientIp } from '../../../lib/server/ratelimit.js';
 import { corsHeaders, preflight } from '../../../lib/server/cors.js';
 import { checkDailyQuota } from '../../../lib/server/quota.js';
+import { leerMetaAuditoria, anotarRespuesta } from '../../../lib/server/auditoriaIA.js';
 import { isPro } from '../../../lib/server/entitlements.js';
 
 // RUNTIME NODE, no edge. Esta ruta comprueba la suscripcion (lib/server/entitlements.js) y
@@ -79,6 +80,10 @@ export async function POST(request) {
   const maxTokens = Math.floor(Math.min(4096, body.max_tokens));
   const prompt = body.messages.map((m) => (typeof m.content === 'string' ? m.content : '')).join('\n').trim();
   if (!prompt) return json({ error: 'empty prompt' }, 400);
+  // El registro de auditoría lo escribe el servidor, igual que en la ruta de Anthropic
+  // (AUDIT_REPORT A-4).
+  const meta = leerMetaAuditoria(body.scora_audit);
+  if (meta?.error) return json({ error: meta.error }, 400);
 
   // Misma cuota diaria que la ruta de Anthropic, aunque aquí los proveedores sean gratis.
   // Dos motivos:
@@ -103,7 +108,12 @@ export async function POST(request) {
   if (text == null) return json({ error: lastErr?.message || 'All LLM providers failed' }, 502);
 
   // Normalize to Anthropic shape so the client parses it identically.
-  return new Response(JSON.stringify({ content: [{ type: 'text', text }], provider: used }), {
+  const respuesta = await anotarRespuesta({
+    textoRespuesta: JSON.stringify({ content: [{ type: 'text', text }], provider: used }),
+    ok: true, userId: user.id, model: used,
+    messages: [{ role: 'user', content: prompt }], meta,
+  });
+  return new Response(respuesta, {
     status: 200,
     headers: corsHeaders(request, {
       'Content-Type': 'application/json',
