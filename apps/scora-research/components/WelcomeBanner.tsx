@@ -31,7 +31,7 @@ export default function WelcomeBanner() {
         <li>Search any ticker up top — stocks, bonds, metals, ETFs all get the right analysis.</li>
         <li>See the <a onClick={() => router.push("/track-record")} style={{ cursor: "pointer" }}>evidence</a> and the <a onClick={() => router.push("/audit")} style={{ cursor: "pointer" }}>AI audit trail</a> — everything is measured, not asserted.</li>
       </ol>
-      <button onClick={dismiss} style={{ marginTop: "var(--sr-sp-3)", background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "7px 18px", fontSize: "var(--sr-t-xs)", fontWeight: 700, cursor: "pointer" }}>Got it</button>
+      <button onClick={dismiss} style={{ marginTop: "var(--sr-sp-3)", background: "var(--sr-amber)", color: "var(--sr-text-inv)", border: "none", borderRadius: "var(--sr-radius)", padding: "7px 18px", fontSize: "var(--sr-t-xs)", fontWeight: 700, cursor: "pointer" }}>Got it</button>
     </div>
   );
 }

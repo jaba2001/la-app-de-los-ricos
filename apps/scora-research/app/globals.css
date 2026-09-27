@@ -6,40 +6,53 @@
    ───────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* ── Core palette ── */
-  --sr-bg:         #070E1A;   /* Page background */
-  --sr-surface:    #0D1B2E;   /* Cards, panels */
-  --sr-surface-2:  #122540;   /* Elevated cards */
-  --sr-surface-3:  #1A3050;   /* Hover states, active rows */
+  /* ── Core palette — "ink · paper · evergreen" (V2) ──
+     Migrado del sistema oscuro al claro. Los nombres --sr-* se conservan
+     porque hay ~2.000 usos; solo cambian los valores. Referencia:
+     design/front25sept/*.dc.html y app/landing-v2.css                  */
+  --sr-bg:         #FAFAF7;   /* Page background — paper */
+  --sr-surface:    #FFFFFF;   /* Cards, panels */
+  --sr-surface-2:  #F6F7F9;   /* Elevated cards */
+  --sr-surface-3:  #EEF0F2;   /* Hover states, active rows */
 
   /* ── Borders ── */
-  --sr-border:     #1E3A5F;
-  --sr-border-2:   #2A4F7A;
+  --sr-border:     #E3E6EA;
+  --sr-border-2:   #C9CFD6;
 
   /* ── Text ── */
-  --sr-text:       #F0F4F8;   /* Primary */
-  --sr-text-2:     #94A3B8;   /* Secondary */
-  --sr-text-3:     #4A6080;   /* Tertiary / labels */
-  --sr-text-inv:   #070E1A;   /* On amber buttons */
+  --sr-text:       #0E1A2B;   /* Primary — ink */
+  --sr-text-2:     #3D4A5C;   /* Secondary */
+  --sr-text-3:     #5B6778;   /* Tertiary / labels — muted */
+  --sr-text-inv:   #FFFFFF;   /* On brand buttons */
 
-  /* ── Brand accent — Amber ── */
-  --sr-amber:      #F59E0B;
-  --sr-amber-dim:  color-mix(in srgb, #F59E0B 15%, transparent);
-  --sr-amber-mid:  color-mix(in srgb, #F59E0B 30%, transparent);
+  /* ── Brand accent — Evergreen (antes ámbar) ──
+     --sr-amber conserva el nombre por compatibilidad; ya no es ámbar. */
+  --sr-brand:      #0B6E4F;
+  --sr-brand-ink:  #08553D;
+  --sr-amber:      var(--sr-brand);
+  --sr-amber-dim:  #E7F3EE;
+  --sr-amber-mid:  color-mix(in srgb, #0B6E4F 30%, transparent);
 
-  /* ── Semantic colors ── */
-  --sr-pos:        #10B981;   /* Green — positive, bullish */
-  --sr-neg:        #EF4444;   /* Red — negative, bearish */
-  --sr-warn:       #F59E0B;   /* Amber — caution */
-  --sr-info:       #3B82F6;   /* Blue — info */
-  --sr-neutral:    #6B7280;   /* Gray — neutral */
+  /* ── Semantic colors ──
+     En las maquetas las ganancias van en evergreen y las pérdidas en rojo
+     profundo; no hay verde brillante. El ámbar vivo no tiene contraste
+     suficiente sobre papel, así que el aviso usa oro oscuro para texto. */
+  --sr-pos:        #0B6E4F;   /* Positivo, alcista */
+  --sr-neg:        #B42318;   /* Negativo, bajista */
+  --sr-warn:       #8A5A00;   /* Aviso — oro legible sobre claro */
+  --sr-warn-tint:  #FDF4DC;   /* Fondo de aviso */
+  --sr-gold:       #D4A017;   /* Acento decorativo (punto del logo) */
+  --sr-info:       #1D4E89;   /* Derivado: las maquetas no definen azul */
+  --sr-neutral:    #7A8599;   /* Neutro / benchmark */
 
-  /* ── Composite score colors ── */
-  --sr-lcc:        #06B6D4;   /* Liquidity — Cyan */
-  --sr-rpc:        #EF4444;   /* Recession — Red */
-  --sr-csc:        #F97316;   /* Credit Stress — Orange */
-  --sr-grc:        #F59E0B;   /* Geopolitical — Amber */
-  --sr-hsc:        #8B5CF6;   /* Housing — Purple */
+  /* ── Composite score colors ──
+     Series de gráfico, no presentes en las maquetas: oscurecidas desde
+     las originales para que contrasten sobre papel. */
+  --sr-lcc:        #0E7490;   /* Liquidity — Cyan */
+  --sr-rpc:        #B42318;   /* Recession — Red */
+  --sr-csc:        #C2410C;   /* Credit Stress — Orange */
+  --sr-grc:        #8A5A00;   /* Geopolitical — Gold */
+  --sr-hsc:        #6D28D9;   /* Housing — Purple */
 
   /* ── Typography scale ── */
   --sr-t-xs:       0.625rem;  /* 10px — micro labels */
@@ -59,6 +72,7 @@
   --sr-sp-4: 16px;
   --sr-sp-5: 20px;
   --sr-sp-6: 24px;
+  --sr-sp-7: 28px;
   --sr-sp-8: 32px;
   --sr-sp-10: 40px;
   --sr-sp-12: 48px;
@@ -71,9 +85,9 @@
   --sr-radius-pill: 999px;
 
   /* ── Shadows ── */
-  --sr-shadow:     0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-  --sr-shadow-lg:  0 4px 20px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
-  --sr-shadow-amber: 0 0 20px color-mix(in srgb, #F59E0B 20%, transparent);
+  --sr-shadow:     0 1px 2px rgba(14,26,43,0.06), 0 1px 3px rgba(14,26,43,0.04);
+  --sr-shadow-lg:  0 4px 16px rgba(14,26,43,0.08), 0 1px 4px rgba(14,26,43,0.05);
+  --sr-shadow-amber: 0 0 0 3px color-mix(in srgb, #0B6E4F 14%, transparent);
 
   /* ── Nav heights ── */
   --sr-nav-h:      56px;
@@ -98,6 +112,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  color-scheme: light;   /* controles nativos y scrollbars en claro */
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -407,7 +422,7 @@ input, textarea { font-family: inherit; }
   font-weight: 700;
   cursor: pointer;
   background: var(--sr-amber);
-  color: #0a1120;
+  color: var(--sr-text-inv);
   border: none;
 }
 .sr-btn-amber:disabled { cursor: default; }
@@ -428,3 +443,18 @@ input, textarea { font-family: inherit; }
 .sr-grid-3 { grid-template-columns: repeat(3, 1fr); }
 .sr-grid-4 { grid-template-columns: repeat(4, 1fr); }
 .sr-grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+/* ─── Contenedor de pagina ────────────────────────────────────────────
+   Usado por /picks y /evidence. Estaba referenciado en el marcado pero
+   nunca definido, asi que esas dos vistas salian sin margen ni ancho
+   maximo. El canal lateral coincide con el resto del sitio (40px).     */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--sr-sp-10);
+}
+
+@media (max-width: 640px) {
+  .container { padding-inline: var(--sr-sp-4); }
+}

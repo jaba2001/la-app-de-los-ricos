@@ -290,7 +290,6 @@ export default function Landing() {
               <strong>Evidence</strong>
               <Link href="/track-record">Track record</Link>
               <Link href="/evidence">Evidence ledger</Link>
-              <Link href="/audit">AI audit trail</Link>
             </nav>
           </div>
           <p className="lv2-legal">

@@ -39,19 +39,19 @@ export default function AuthCallback() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      background: "#070E1A",
-      color: "#F0F4F8",
+      background: "#FAFAF7",
+      color: "#0E1A2B",
       fontFamily: "'SF Pro Display','Segoe UI',system-ui,sans-serif",
       gap: 20,
     }}>
       <div style={{
         width: 48, height: 48, borderRadius: 14,
-        background: "#F59E0B",
+        background: "#0B6E4F",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-          <path d="M3 19L10 11L15 16L22 6" stroke="#070E1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="22" cy="6" r="2.5" fill="#070E1A"/>
+          <path d="M3 19L10 11L15 16L22 6" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <circle cx="22" cy="6" r="2.5" fill="#FFFFFF"/>
         </svg>
       </div>
       <div style={{ textAlign: "center" }}>
@@ -60,7 +60,7 @@ export default function AuthCallback() {
       </div>
       <div style={{
         width: 32, height: 32, border: "2px solid #1E3A5F",
-        borderTopColor: "#F59E0B", borderRadius: "50%",
+        borderTopColor: "#0B6E4F", borderRadius: "50%",
         animation: "spin 0.8s linear infinite",
       }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>

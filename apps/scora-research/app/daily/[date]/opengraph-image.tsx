@@ -14,12 +14,12 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Scora Research — daily market close";
 
-const BG = "#070E1A";
-const AMBER = "#F5A524";
-const TEXT = "#E8EDF5";
-const MUTED = "#8A94A6";
-const POS = "#2ECC71";
-const NEG = "#FF5C5C";
+const BG = "#FAFAF7";
+const AMBER = "#0B6E4F";
+const TEXT = "#0E1A2B";
+const MUTED = "#5B6778";
+const POS = "#0B6E4F";
+const NEG = "#B42318";
 
 export default async function Image({ params }: { params: Promise<{ date: string }> }) {
   const { date } = await params;

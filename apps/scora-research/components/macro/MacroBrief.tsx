@@ -67,7 +67,7 @@ export default function MacroBrief() {
               onClick={toggle} aria-label={playing ? "Pause the brief" : "Play the brief"}
               style={{
                 flexShrink: 0, width: 38, height: 38, borderRadius: "50%", border: "none",
-                background: "var(--sr-amber)", color: "#0a1120", cursor: "pointer",
+                background: "var(--sr-amber)", color: "var(--sr-text-inv)", cursor: "pointer",
                 fontSize: 15, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
               }}
             >
