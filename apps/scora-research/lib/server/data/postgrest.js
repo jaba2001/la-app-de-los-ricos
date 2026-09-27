@@ -37,10 +37,15 @@ function condicion(col, expr, push) {
     case "lt":  return `${C} < ${push(valor(crudo))}`;
     case "lte": return `${C} <= ${push(valor(crudo))}`;
     case "is":
-      // PostgREST admite is.null y is.not.null; la app solo usa el primero.
       if (crudo === "null") return `${C} IS NULL`;
       if (crudo === "not.null") return `${C} IS NOT NULL`;
       throw new Error(`is.${crudo} no soportado`);
+    case "not":
+      // La negación de PostgREST va DELANTE: `not.is.null`. Es la que escribe /picks para las
+      // posiciones cerradas; sin esto la consulta fallaba y la tabla salía vacía. Solo se
+      // admite esa forma: negar cualquier otro operador no lo usa nadie (AUDIT_REPORT C-2).
+      if (crudo === "is.null") return `${C} IS NOT NULL`;
+      throw new Error(`not.${crudo} no soportado`);
     case "in": {
       const lista = crudo.replace(/^\(|\)$/g, "");
       // Un IN vacío en SQL es error de sintaxis; aquí significa "ninguna fila".

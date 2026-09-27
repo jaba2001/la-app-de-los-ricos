@@ -313,6 +313,11 @@ jobs:
       - name: Traductor PostgREST (se salta sin base)
         run: node --experimental-strip-types --no-warnings scripts/postgrest.test.mjs
 
+      # /daily y /picks leian el REST de Supabase y salian vacias en produccion sin que nada
+      # fallara (AUDIT_REPORT C-2). Se salta sin Postgres, como la anterior.
+      - name: Lecturas de servidor de /daily y /picks (se salta sin base)
+        run: node --experimental-strip-types --no-warnings scripts/lecturas_servidor.test.mjs
+
       # Los numeric/int8 de Postgres llegan como cadena y la interfaz hace .toFixed() sobre
       # ellos. Se añadio a `npm test` sin añadirlo aqui, y el guardian de guardianes tuvo el
       # CI en rojo el 27-09 por eso (AUDIT_REPORT C-4).

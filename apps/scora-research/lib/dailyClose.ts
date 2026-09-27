@@ -6,9 +6,14 @@
 // que lo fija desde el otro lado para que un cambio en el backend no rompa esta página en
 // silencio.
 //
-// La lectura va por REST con la anon key (pública) apoyándose en la política
-// `sl_daily_close_read`. Se hace desde el SERVIDOR a propósito: el informe es la pieza
-// indexable del producto, y un render de cliente le da a un buscador una página vacía.
+// La lectura va contra Cloud SQL, por el mismo traductor de PostgREST que usan los crons.
+// Se hace desde el SERVIDOR a propósito: el informe es la pieza indexable del producto, y un
+// render de cliente le da a un buscador una página vacía.
+//
+// Hasta el 27-09 leía el REST de Supabase con NEXT_PUBLIC_SUPABASE_URL, que el build ya no
+// recibe: la página decía «No close published yet» mientras el cron escribía el informe en
+// Cloud SQL (AUDIT_REPORT C-2).
+import { sbFetch } from "./server/data/postgrest.js";
 
 export interface DailySectorRow { etf: string; name: string; changePct: number }
 
@@ -32,30 +37,18 @@ export interface DailyReport {
   gaps: string[];
 }
 
-/** Cuánto puede tardar la página en reflejar un cierre nuevo. El cron escribe una vez al
- *  día, así que 15 minutos es de sobra y evita machacar la base en un pico de tráfico. */
-const REVALIDATE_SECONDS = 900;
-
-function restUrl(path: string): string | null {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base) return null;
-  return `${base}/rest/v1/${path}`;
-}
-
+// La frescura la fija cada página con `export const revalidate` (15 min: el cron escribe una
+// vez al día).
 async function restGet<T>(path: string): Promise<T | null> {
-  const url = restUrl(path);
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return null;
-  try {
-    const r = await fetch(url, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!r.ok) return null;
-    return (await r.json()) as T;
-  } catch {
-    return null; // la página degrada a su estado vacío; nunca revienta el render
+  // La página degrada a su estado vacío y nunca revienta el render: `next build` la
+  // pre-renderiza sin base de datos. Pero el fallo se registra, para que "la base no
+  // contesta" no se confunda en silencio con "no hay informe".
+  const r = await sbFetch(path);
+  if (!r.ok) {
+    console.error(`[dailyClose] lectura fallida (${r.status}): ${path.split("?")[0]}`);
+    return null;
   }
+  return (await r.json()) as T;
 }
 
 /** Un ISO day y nada más — va directo a una query, así que no se acepta nada raro. */

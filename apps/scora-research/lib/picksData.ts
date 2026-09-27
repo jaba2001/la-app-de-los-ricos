@@ -1,17 +1,18 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Lectura de Scora Picks para la página pública.
 //
-// Va por REST con la anon key, apoyándose en las políticas de lectura pública de
-// `sl_picks_run` y `sl_picks_position`. Desde el SERVIDOR a propósito: el track record es la
-// pieza que hace creíble al producto, y un render de cliente le da a un buscador —y a
-// cualquiera que comparta el enlace— una página vacía.
+// Va contra Cloud SQL, por el mismo traductor de PostgREST que usan los crons. Desde el
+// SERVIDOR a propósito: el track record es la pieza que hace creíble al producto, y un render
+// de cliente le da a un buscador —y a cualquiera que comparta el enlace— una página vacía.
+// Hasta el 27-09 leía el REST de Supabase con variables que el build ya no recibe, y la
+// página salía siempre vacía (AUDIT_REPORT C-2).
 //
 // Nunca lanza: si la base no responde, la página degrada a su estado vacío. Un track record
-// que revienta el render es peor que uno que dice "todavía no hay decisiones".
+// que revienta el render es peor que uno que dice "todavía no hay decisiones". Pero el fallo
+// queda en el log, para no confundir "la base no contesta" con "no hay decisiones".
 // ─────────────────────────────────────────────────────────────────────────────
 import { PICKS_RULES_VERSION } from "./picks.ts";
-
-const REVALIDATE_SECONDS = 900;
+import { sbFetch } from "./server/data/postgrest.js";
 
 export interface PickPosition {
   ticker: string;
@@ -36,20 +37,14 @@ export interface PickRun {
   positions_after: number;
 }
 
+// La frescura la fija la página con `export const revalidate` (15 min).
 async function restGet<T>(path: string): Promise<T | null> {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!base || !key) return null;
-  try {
-    const r = await fetch(`${base}/rest/v1/${path}`, {
-      headers: { apikey: key, Authorization: `Bearer ${key}` },
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!r.ok) return null;
-    return (await r.json()) as T;
-  } catch {
+  const r = await sbFetch(path);
+  if (!r.ok) {
+    console.error(`[picksData] lectura fallida (${r.status}): ${path.split("?")[0]}`);
     return null;
   }
+  return (await r.json()) as T;
 }
 
 const V = `rules_version=eq.${PICKS_RULES_VERSION}`;

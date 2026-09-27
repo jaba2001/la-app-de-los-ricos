@@ -52,6 +52,13 @@ check("gte numérico",
   (await filas("sl_alerts?threshold=gte.250&select=ticker")).map(r => r.ticker), ["MSFT"]);
 check("is.null — el guardián de alerts_log",
   (await filas("sl_alerts?threshold=is.null&select=ticker")).map(r => r.ticker), ["TSLA"]);
+// La sintaxis de PostgREST para "no es null" es `not.is.null`, no `is.not.null`: es la que
+// escribe /picks para las posiciones cerradas (AUDIT_REPORT C-2).
+{
+  const r = await filas("sl_alerts?threshold=not.is.null&select=ticker");
+  check("not.is.null — las posiciones cerradas de /picks",
+    Array.isArray(r) ? r.map(x => x.ticker).sort() : r, ["AAPL", "MSFT"]);
+}
 check("eq.false (booleano, no la cadena 'false')",
   (await filas("sl_alerts?active=eq.false&select=ticker")).map(r => r.ticker), ["TSLA"]);
 check("order + limit",
@@ -96,5 +103,5 @@ check("operador inventado", (await filas("sl_alerts?ticker=raro.AAPL&select=id")
 check("las alertas siguen ahi tras los intentos", (await filas("sl_alerts?select=id")).length, 3);
 
 await p.end();
-console.log(bad ? `\npostgrest: ${bad} fallo(s)` : "\npostgrest: 20 comprobaciones OK contra Postgres real");
+console.log(bad ? `\npostgrest: ${bad} fallo(s)` : "\npostgrest: 21 comprobaciones OK contra Postgres real");
 process.exit(bad ? 1 : 0);
