@@ -45,5 +45,22 @@ for (const s of ["aapl", "AAPL US", "AAPL&apikey=x", "AAPL/../x", "A".repeat(16)
   check(`finnhub rechaza ${JSON.stringify(s)}`, await estadoFh(s), 400);
 }
 
+// Rutas cerradas el 27-09 porque el front no las pide (AUDIT_REPORT B-1): con sesión, 403.
+// Sin sesión darían 401 como cualquier otra, por eso se prueban aquí y no en smoke-proxy.
+const rutaFmp = async (path) => (await fmp(pide(`http://x/api/fmp/${path}?symbol=AAPL`), { params: { path: path.split("/") } })).status;
+const rutaFh = async (path) => (await finnhub(pide(`http://x/api/finnhub/${path}?symbol=AAPL`), { params: { path: path.split("/") } })).status;
+for (const p of ["news", "price-target-consensus", "upgrades-downgrades-consensus", "historical-dividends",
+                 "historical-shares-float", "key-metrics", "senate-trading", "insider-trading"]) {
+  check(`fmp/${p} cerrada → 403`, await rutaFmp(p), 403);
+}
+for (const p of ["profile2", "news", "stock/insider-sentiment", "calendar/economic",
+                 "stock/financials-reported", "stock/social-sentiment", "forex/rates", "crypto/candle"]) {
+  check(`finnhub/${p} cerrada → 403`, await rutaFh(p), 403);
+}
+// Y las que el front sí usa siguen abiertas (500 = pasó la lista y pidió la clave).
+check("fmp/key-metrics-ttm sigue abierta (no la confunde con key-metrics)", await rutaFmp("key-metrics-ttm"), 500);
+check("fmp/price-target sigue abierta (no la confunde con price-target-consensus)", await rutaFmp("price-target"), 500);
+check("finnhub/stock/transcripts/list sigue abierta", await rutaFh("stock/transcripts/list"), 500);
+
 console.log(bad ? `\n✗ simbolos: ${bad} fallo(s) de ${total}` : `\n✓ simbolos: ${total} comprobaciones OK`);
 process.exit(bad ? 1 : 0);

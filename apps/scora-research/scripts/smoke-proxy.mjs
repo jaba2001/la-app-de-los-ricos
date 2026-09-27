@@ -1,7 +1,9 @@
 // Proxy contract smoke test — verifies every route the frontend calls actually
 // exists on the deployed app. No JWT needed: an existing protected route
-// answers 401 (auth-first), a missing route answers 404, a disallowed FMP/Finnhub
-// path answers 403. This catches the class of bug where the frontend calls a path
+// answers 401 (auth-first), a missing route answers 404. A path outside the FMP/Finnhub
+// allowlist ALSO answers 401 here — the session is checked before the allowlist, so without
+// a token closed and open paths look the same (that's deliberate: no endpoint enumeration).
+// Closure is tested with a signed token in scripts/simbolos.test.mjs. This catches the class of bug where the frontend calls a path
 // the proxy never exposed (three AI/data features shipped broken for exactly this).
 //
 // Run: node scripts/smoke-proxy.mjs   (uses global fetch, Node 18+)
@@ -49,16 +51,11 @@ const ROUTES = [
   ["GET", `/api/fmp/house-disclosure?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/shares-float?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/search?query=apple`, 401],
-  // Cerradas el 27-09 porque el front no las pide (AUDIT_REPORT B-1): 403 antes de mirar la
-  // sesion. Si alguien las vuelve a abrir sin llamador, esto lo delata.
-  ["GET", `/api/fmp/insider-trading?symbol=${SYM}`, 403],
-  ["GET", `/api/fmp/senate-trading?symbol=${SYM}`, 403],
-  ["GET", `/api/fmp/historical-shares-float?symbol=${SYM}`, 403],
-  ["GET", `/api/fmp/news?tickers=SPY&limit=1`, 403],
+  // Las rutas cerradas el 27-09 (AUDIT_REPORT B-1) ya no se listan: sin token dan 401 igual
+  // que las abiertas. Que están cerradas lo comprueba simbolos.test.mjs con un token firmado.
   // Finnhub
   ["GET", `/api/finnhub/quote?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/company-news?symbol=${SYM}&from=${ago90}&to=${today}`, 401],
-  ["GET", `/api/finnhub/news?category=general`, 403],
   ["GET", `/api/finnhub/stock/insider-transactions?symbol=${SYM}`, 401],
   ["GET", `/api/finnhub/stock/metric?symbol=${SYM}&metric=all`, 401],
   ["GET", `/api/finnhub/stock/price-target?symbol=${SYM}`, 401],

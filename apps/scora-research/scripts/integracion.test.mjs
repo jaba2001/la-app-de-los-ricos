@@ -43,9 +43,10 @@ try {
   process.exit(0);
 }
 
-let bad = 0;
+let bad = 0, total = 0;
 const fallos = [];
 const check = (l, got, want) => {
+  total++;
   const ok = JSON.stringify(got) === JSON.stringify(want);
   if (!ok) { bad++; fallos.push(l); console.log(`FAIL  ${l}\n      got:  ${JSON.stringify(got)}\n      want: ${JSON.stringify(want)}`); }
 };
@@ -177,5 +178,6 @@ const pedir = async (ruta, init = {}) => {
   }
 }
 
-console.log(bad ? `\nintegracion: ${bad} fallo(s) — ${fallos.join(" · ")}` : "\nintegracion: 36 comprobaciones OK contra la app real");
+// El total se cuenta: estaba escrito a mano ("36") y seguía diciendo 36 al añadir rutas.
+console.log(bad ? `\nintegracion: ${bad} fallo(s) de ${total} — ${fallos.join(" · ")}` : `\nintegracion: ${total} comprobaciones OK contra la app real`);
 process.exit(bad ? 1 : 0);
