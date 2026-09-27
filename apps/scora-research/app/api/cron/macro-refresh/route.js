@@ -49,15 +49,13 @@ export async function GET(request) {
 
   const { row, errors, seriesFetched } = built;
 
-  // Upsert a Supabase con service role (bypassa RLS). Conflict key = id (fila
+  // Upsert en Cloud SQL. Conflict key = id (fila
   // única id=1). merge-duplicates → actualiza esa fila, no inserta otra.
   const sbResp = await sbFetch(`macro_state?on_conflict=id`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        apikey: process.env.SUPABASE_SERVICE_KEY,
-        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         Prefer: 'resolution=merge-duplicates',
       },
       body: JSON.stringify(row),
@@ -77,8 +75,6 @@ export async function GET(request) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            apikey: process.env.SUPABASE_SERVICE_KEY,
-            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
             Prefer: 'resolution=merge-duplicates',
           },
           body: JSON.stringify({

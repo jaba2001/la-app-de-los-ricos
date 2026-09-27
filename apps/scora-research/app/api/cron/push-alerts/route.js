@@ -2,8 +2,8 @@
 // there's a NEW actionable event (a breadth divergence or a risk-off shift), and if so pushes
 // a notification to every stored subscription. Deduped via push_alert_state so the same event
 // isn't re-sent every run. Node runtime (web-push needs Node crypto). Free: VAPID is a
-// self-generated keypair, no third-party service. Env: CRON_SECRET, SUPABASE_URL,
-// SUPABASE_SERVICE_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
+// self-generated keypair, no third-party service. Env: CRON_SECRET,
+// VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT.
 import webpush from "web-push";
 import { assertCron } from '../../../../lib/server/cron.js';
 import { macroAlertFor } from '../../../../lib/server/macroAlerts.js';
@@ -12,8 +12,8 @@ import { sbFetch } from "../../../../lib/server/data/postgrest.js";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const KEY = process.env.SUPABASE_SERVICE_KEY;
-const sbHeaders = { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" };
+// sbFetch solo mira `Prefer`; las cabeceras apikey/Authorization de Supabase ya no pintaban nada.
+const sbHeaders = { "Content-Type": "application/json" };
 
 // La decisión de qué se notifica vive en lib/macroAlerts.js — pura y con tests
 // (scripts/macroalerts.test.mjs). Estaba aquí inline y sin cobertura, aunque decide lo que

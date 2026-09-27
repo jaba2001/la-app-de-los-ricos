@@ -139,14 +139,12 @@ export async function GET(request) {
   }
   const deduped = [...byKey.values()];
 
-  // Upsert to Supabase using service role (bypasses RLS)
+  // Upsert en Cloud SQL (sbFetch traduce el on_conflict + merge-duplicates a ON CONFLICT DO UPDATE)
   const sbResp = await sbFetch(`smart_money_13f?on_conflict=fund_cik,filing_date,ticker`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         'Prefer': 'resolution=merge-duplicates',
       },
       body: JSON.stringify(deduped),

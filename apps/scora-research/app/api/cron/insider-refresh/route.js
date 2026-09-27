@@ -81,8 +81,6 @@ export async function GET(request) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': process.env.SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
         'Prefer': 'resolution=merge-duplicates',
       },
       body: JSON.stringify(rows),
