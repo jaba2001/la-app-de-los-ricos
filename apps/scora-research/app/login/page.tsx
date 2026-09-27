@@ -81,8 +81,8 @@ export default function LoginPage() {
             boxShadow: "var(--sr-shadow-amber)",
           }}>
             <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-              <path d="M3 19L10 11L15 16L22 6" stroke="#070E1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <circle cx="22" cy="6" r="2.5" fill="#070E1A"/>
+              <path d="M3 19L10 11L15 16L22 6" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="22" cy="6" r="2.5" fill="#FFFFFF"/>
             </svg>
           </div>
           <div>

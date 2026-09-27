@@ -43,12 +43,12 @@ export default function Demo() {
       <div className="sr-flex-between" style={{ padding: "var(--sr-sp-2) 0 var(--sr-sp-4)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }} onClick={() => router.push("/")}>
           <div style={{ width: 26, height: 26, borderRadius: 7, background: "var(--sr-amber)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 7L9 10L13 4" stroke="#070E1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="13" cy="4" r="1.5" fill="#070E1A" /></svg>
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 7L9 10L13 4" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><circle cx="13" cy="4" r="1.5" fill="#FFFFFF" /></svg>
           </div>
           <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }}>Scora <span style={{ fontWeight: 400, color: "var(--sr-text-3)" }}>Research</span></span>
           <span style={{ fontSize: "10px", fontWeight: 700, color: "var(--sr-amber)", padding: "2px 8px", borderRadius: 999, border: "1px solid color-mix(in srgb, var(--sr-amber) 35%, transparent)", background: "color-mix(in srgb, var(--sr-amber) 8%, transparent)" }}>LIVE DEMO · READ-ONLY</span>
         </div>
-        <button onClick={() => router.push("/login")} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "8px 18px", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
+        <button onClick={() => router.push("/login")} style={{ background: "var(--sr-amber)", color: "var(--sr-text-inv)", border: "none", borderRadius: "var(--sr-radius)", padding: "8px 18px", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
       </div>
 
       <h1 style={{ fontSize: "clamp(22px,4vw,32px)", fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 var(--sr-sp-2)" }}>Today&apos;s regime, straight from the engine.</h1>
@@ -148,7 +148,7 @@ export default function Demo() {
           The Growth mandate behind this read, vs the S&amp;P 500 ({A.months} months, net of costs): Sharpe {A.strategy.sharpe.toFixed(2)} vs {A.spy.sharpe.toFixed(2)} · Sortino {A.strategy.sortino.toFixed(2)} vs {A.spy.sortino.toFixed(2)} · max drawdown {A.strategy.maxDrawdown}% vs {A.spy.maxDrawdown}% · Jensen α +{A.strategy.alpha}%/yr. <span style={{ color: "var(--sr-text-3)", fontWeight: 400 }}>The index returned more in raw terms (+{A.spy.totalReturn.toFixed(0)}% vs +{A.strategy.totalReturn.toFixed(0)}%) at 2.9× the drawdown — we show it openly. On the risk-adjusted scorecard, Growth beats it. (For context: ~90% of active US large-cap funds trail the S&amp;P 500 over 15 years on raw return — SPIVA U.S. Scorecard.)</span>
         </div>
         <div style={{ display: "flex", gap: "var(--sr-sp-3)", justifyContent: "center", marginTop: "var(--sr-sp-3)", flexWrap: "wrap" }}>
-          <button onClick={() => router.push("/login")} style={{ background: "var(--sr-amber)", color: "#0a1120", border: "none", borderRadius: "var(--sr-radius)", padding: "10px 26px", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
+          <button onClick={() => router.push("/login")} style={{ background: "var(--sr-amber)", color: "var(--sr-text-inv)", border: "none", borderRadius: "var(--sr-radius)", padding: "10px 26px", fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer" }}>Start free →</button>
           <button onClick={() => router.push("/track-record")} style={{ background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", padding: "10px 20px", fontSize: "var(--sr-t-sm)", fontWeight: 600, cursor: "pointer" }}>See the evidence</button>
         </div>
       </section>

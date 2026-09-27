@@ -155,7 +155,7 @@ Be specific, quantitative, and actionable. Use exact numbers from the data. Scen
 function buildHTMLReport(macro: MacroState, synthesis: string, date: string): string {
   const escape = (s: string) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const renderSynthesis = synthesis
-    .replace(/## (.+)/g, '<h3 style="color:#F59E0B;margin:1.2em 0 0.5em;font-size:14px;letter-spacing:0.05em">$1</h3>')
+    .replace(/## (.+)/g, '<h3 style="color:#0B6E4F;margin:1.2em 0 0.5em;font-size:14px;letter-spacing:0.05em">$1</h3>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br>');
 
@@ -168,7 +168,7 @@ function buildHTMLReport(macro: MacroState, synthesis: string, date: string): st
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff;color:#0f172a;font-size:12px;line-height:1.6}
   .page{max-width:900px;margin:0 auto;padding:32px}
-  .header{border-bottom:3px solid #F59E0B;padding-bottom:16px;margin-bottom:24px}
+  .header{border-bottom:3px solid #0B6E4F;padding-bottom:16px;margin-bottom:24px}
   .title{font-size:22px;font-weight:700;letter-spacing:-0.02em}
   .sub{color:#64748b;font-size:12px;margin-top:4px}
   .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:0.05em}

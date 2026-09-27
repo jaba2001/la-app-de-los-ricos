@@ -111,8 +111,8 @@ export default function Nav() {
           boxShadow: "var(--sr-shadow-amber)",
         }}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M2 12L6 7L9 10L13 4" stroke="#070E1A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="13" cy="4" r="1.5" fill="#070E1A"/>
+            <path d="M2 12L6 7L9 10L13 4" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <circle cx="13" cy="4" r="1.5" fill="#FFFFFF"/>
           </svg>
         </div>
         <div>
