@@ -144,6 +144,10 @@ export async function sbFetch(url, init = {}) {
     const r = await pool().query(text, vals);
     return respuesta(200, filasConNumeros(r));
   } catch (e) {
+    // Una clave única violada (23505) es 409, como en PostgREST. No es cosmético: el webhook
+    // de Stripe reconoce así un evento ya procesado y la lista de espera a quien se apunta dos
+    // veces. Con 500, el webhook lanzaba y Stripe reintentaba durante días (AUDIT_REPORT A-8).
+    if (e?.code === "23505") return respuesta(409, { error: "duplicate key", code: "23505" });
     // Misma forma que una Response fallida: los llamantes hacen `r.ok ? await r.json() : []`
     // y así no hay que tocar su manejo de errores.
     console.error("sbFetch:", e?.message || e);

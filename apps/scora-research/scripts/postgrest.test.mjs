@@ -102,6 +102,24 @@ check("tabla con nombre invalido", (await filas('sl_alerts";drop table sl_alerts
 check("operador inventado", (await filas("sl_alerts?ticker=raro.AAPL&select=id")).error, true);
 check("las alertas siguen ahi tras los intentos", (await filas("sl_alerts?select=id")).length, 3);
 
+// ── Duplicados: 409, como PostgREST ─────────────────────────────────────────────────
+// Dos llamantes deciden por ese 409 (AUDIT_REPORT A-8): el webhook de Stripe lo usa para
+// reconocer un evento ya procesado, y la lista de espera para no tratar como error a quien se
+// apunta dos veces. Con un 500 el webhook lanzaba y Stripe reintentaba durante dias.
+{
+  await p.query("truncate sl_stripe_events, sl_waitlist");
+  const evento = () => sbFetch("sl_stripe_events", { method: "POST", body: JSON.stringify({ event_id: "evt_1", type: "t" }) });
+  check("evento de Stripe nuevo → 200", (await evento()).status, 200);
+  check("el mismo evento otra vez → 409", (await evento()).status, 409);
+  const correo = (email) => sbFetch("sl_waitlist", { method: "POST", body: JSON.stringify({ email, tier: "pro", source: "pricing" }) });
+  await correo("a@b.c");
+  check("correo repetido (indice unico en lower(email)) → 409", (await correo("A@b.c")).status, 409);
+  // Otro tipo de error sigue siendo 500: el 409 es solo para la unicidad.
+  check("NOT NULL violado → 500, no 409",
+    (await sbFetch("sl_waitlist", { method: "POST", body: JSON.stringify({ tier: "pro" }) })).status, 500);
+  await p.query("truncate sl_stripe_events, sl_waitlist");
+}
+
 await p.end();
-console.log(bad ? `\npostgrest: ${bad} fallo(s)` : "\npostgrest: 21 comprobaciones OK contra Postgres real");
+console.log(bad ? `\npostgrest: ${bad} fallo(s)` : "\npostgrest: 25 comprobaciones OK contra Postgres real");
 process.exit(bad ? 1 : 0);
