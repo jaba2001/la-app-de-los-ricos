@@ -224,6 +224,10 @@ jobs:
       # y T en años — no son equivalentes y la version mal daba t=1,62 donde la buena da 1,92.
       - name: Metricas ajustadas al riesgo (fase 1)
         run: node --experimental-strip-types --no-warnings scripts/riesgo.test.mjs
+      # El rol de base de datos de la app: filas si, esquema no (AUDIT_REPORT A-5). Se salta
+      # sin Postgres.
+      - name: Rol de base de datos con permisos minimos
+        run: node --experimental-strip-types --no-warnings scripts/rolapp.test.mjs
 
       # Tests de temporizacion (Merton-Henriksson / Treynor-Mazuy) con errores robustos. Lo que
       # fijan no es que funcionen sino que NO den falso positivo: la sonda con errores OLS
