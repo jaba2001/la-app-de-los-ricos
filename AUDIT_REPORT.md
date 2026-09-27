@@ -14,7 +14,12 @@ código, A-3, A-7, A-8, M-1, M-2, M-4, M-7.
 
 **Ronda 2** (en `main`, **pendiente de desplegar**): A-4, A-5 (preparado, sin aplicar), A-6
 (parte técnica), M-3, M-6, M-8, B-1, B-4, y tres fallos nuevos que salieron al hacerlo — ver
-«Segunda ronda» al final.
+«Segunda ronda».
+
+**Ronda 3** (en `main`, **pendiente de desplegar**): revisión completa de `main` con las APIs
+llamadas de verdad. Diez fallos más, **cuatro de ellos graves y silenciosos** (pagos que no dan
+Pro, cancelaciones que fallan, alertas que no se disparan, correos que no salen) — ver «Tercera
+ronda» al final.
 
 **Queda abierto, y no es código:** C-5 (migrar los datos de Supabase a Cloud SQL: bloqueado por
 permisos de esta sesión), las claves que faltan en producción (D-2), aplicar el rol de A-5, los
@@ -540,9 +545,57 @@ sin errores de consola. Cada prueba nueva se vio fallar con el código anterior.
 | | por qué no lo he hecho |
 |---|---|
 | **C-5** migrar datos de Supabase y pasar los 9 workflows a Cloud SQL | El control de permisos de esta sesión bloqueó leer datos de producción y cambiar a dónde escriben los procesos. Necesita tu permiso o que lo lances tú, más una cuenta de servicio y secretos en GitHub. Orden obligado: **copiar primero, activar después**. |
-| **D-2** claves de producción | Anthropic, Groq, Gemini, Stripe, Upstash, Resend y VAPID están vacías en tu `.env.gcp`. |
+| **D-2** claves de producción | Anthropic y Upstash ya están en Secret Manager (`anthropic-key`, `upstash-redis-rest-url`, `upstash-redis-rest-token`), **sin enganchar todavía al servicio** — se hace en el próximo despliegue. Faltan Groq, Gemini, Stripe, Resend y VAPID. |
 | **A-5** aplicar el rol | Cambio de permisos en Cloud SQL; pasos en la cabecera del `.sql`. |
 | **A-6** privacidad y términos | Texto legal: abogado. |
 | **D-3** revocación inmediata | Necesita el Admin SDK de Firebase (dependencia nueva). |
 | **A-4** guardar también los textos de las violaciones | Columna nueva: cambio de esquema. |
-| **Desplegar la ronda 2** | El despliegue lo bloquea el control de permisos: `gcloud run deploy` con la nueva imagen. |
+| **Desplegar las rondas 2 y 3** | Solo cuando lo digas («despliega»). |
+
+## Tercera ronda · revisión completa de `main` y verificación de las APIs
+
+Método: releer todo lo cambiado en las rondas 1–2, ejecutar **los 8 crons** contra Postgres local
+con la red simulada, y llamar **cada ruta de la API con proveedores reales** (FMP, Finnhub, FRED,
+SEC, SimFin, Finviz, CFTC, Anthropic, Upstash) con un token firmado en proceso. Cada prueba
+nueva se vio fallar con el código anterior antes de corregirlo.
+
+### Lo que estaba roto
+
+| | fallo | efecto real | commit |
+|---|---|---|---|
+| 🔴 R3-1 | El webhook de Stripe exigía que `client_reference_id` fuera un **UUID** (el id de Supabase). Los uid de Identity Platform tienen 28 caracteres alfanuméricos. | **Todo pago se descartaba** con un 200 y un `console.error`: quien pagaba no recibía Pro y Stripe no reintentaba. | `5ac37c3` |
+| 🔴 R3-2 | `sbFetch` no entendía `or=(…)`, que el webhook usa para ignorar eventos desordenados. | Toda cancelación o renovación daba **500 para siempre**: nadie perdía Pro al cancelar. | `c963245` |
+| 🔴 R3-3 | `ticker-alerts`: la migración cambió `fetch` por `sbFetch` a ciegas y arrastró las dos llamadas a FMP. | **Ninguna alerta de precio ni técnica se disparaba**; el cron respondía 200 con `fired: 0`. | `d29bfc1` |
+| 🔴 R3-4 | `alerts-check` leía los suscriptores con `fetch("${SUPABASE_URL}/rest/v1/…")` → `undefined/rest/v1/…`. | **Ningún correo de alerta macro llegaba a nadie.** | `a70b143` |
+| 🟠 R3-5 | `daily-close` buscaba el régimen anterior en `macro_state`, que tiene **una sola fila** (`CHECK id = 1`). | El cierre diario **nunca anunciaba un cambio de régimen**. Ahora lee `macro_state_history`. | `47e0db6` |
+| 🟠 R3-6 | Metadatos de auditoría de IA (ronda 2): ticker en minúsculas, >20 fuentes o fuentes largas → 400; el bloque de datos se mandaba duplicado → 413 con transcripts largos. | **El análisis de IA fallaba entero** por un metadato del registro (p. ej. en `/stock/aapl`). Ahora se normaliza/recorta, y el bloque viaja como posición en el prompt. Verificado con Anthropic real. | `6b7181f` |
+| 🟠 R3-7 | Rutas dinámicas (`fmp`, `finnhub`, `congress`) leían `params` de forma síncrona. | En Next 15 `params` es una Promise; solo funcionaba por un shim obsoleto. | `3e74f79` |
+| 🟡 R3-8 | Borrar la cuenta borraba altas de la lista de espera por el correo del token **aunque no estuviera verificado**. | Registrarse con el correo de otro permitía borrarle su alta. Ahora solo con `email_verified`. | `d26b4e8` |
+| 🟡 R3-9 | Consentimiento: no se podía retirar tras aceptar (RGPD art. 7.3); y rechazar → aceptar dejaba PostHog en opt-out. | Enlace «Analytics preferences» en los dos pies; `opt_in` al aceptar. | `114615e` |
+| ⚪ R3-10 | Cabeceras `apikey`/`Authorization` de Supabase en 5 crons. | Ninguno (sbFetch las ignora), pero hacían creer que dependían de Supabase. | `c460202` |
+
+Pruebas nuevas, todas de punta a punta contra Postgres real y registradas en `package.json` y
+en la CI: `stripewebhook`, `alertascron`, `tickeralertascron`, `cierrecron`; ampliadas
+`auditoriaia`, `cuenta`, `auth`, `consentimiento`, `postgrest` (ahora cuenta su total) y
+`simbolos`.
+
+### APIs verificadas con llamadas reales
+
+| ruta | resultado |
+|---|---|
+| FMP quote · key-metrics-ttm · historical-eod | ✅ 200 con datos |
+| FMP de valores internacionales (p. ej. `0700.HK`) | ⚠️ **402 del plan de FMP**: el plan no los cubre. No es del código; el buscador los ofrece igualmente. |
+| Finnhub quote · metric | ✅ |
+| FRED · EDGAR · SimFin · Finviz · short-interest · CFTC COT | ✅ |
+| `/api/batch` (FMP + Finnhub en un lote) | ✅ |
+| `/api/data` · `/api/publico` · `/api/ai/limits` | ✅ |
+| `/api/anthropic/messages` con auditoría (ticker en minúsculas, fuente de 300 caracteres) | ✅ 200, fila escrita por el servidor con ticker `AAPL` y la fuente recortada a 120 |
+| Upstash (`PING`) | ✅ `PONG` |
+| `/api/congress` | ⚠️ **503 esperado**: los volcados STOCK Act de S3 son privados (403) desde el 04-09. El front ya lo trata como «sin datos», no como «0 operaciones». Hace falta otra fuente. |
+| Producción (solo lectura): `/`, `/pricing`, `/daily`, `/track-record`, `/api/publico`, `/api/ai/limits`, `/api/stripe/config` | ✅ 200; `/api/data` sin token → 401 |
+
+### Verificación de esta ronda
+
+Build de producción sin errores; typecheck 0; lint sin errores (los ficheros tocados no añaden
+avisos); **suite completa con Postgres y servidor en verde (67 suites, 0 fallos)**; integración
+37/37 contra la app compilada; los 8 crons ejecutados contra la base sin un solo error de SQL.
