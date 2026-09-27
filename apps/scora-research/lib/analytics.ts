@@ -114,13 +114,38 @@ export function leerConsentimiento(): Consentimiento {
 }
 
 /** Guarda la elección y la aplica al momento: acepta → arranca; rechaza → apaga y borra. */
+// localStorage no avisa de cambios en la misma pestaña: el aviso se entera por este evento.
+const EVENTO_CONSENTIMIENTO = "scora:consentimiento";
+const avisar = () => { try { window.dispatchEvent(new Event(EVENTO_CONSENTIMIENTO)); } catch { /* ignore */ } };
+
+/** Para useSyncExternalStore: el aviso se vuelve a pintar cuando cambia la elección. */
+export function suscribirConsentimiento(cb: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener(EVENTO_CONSENTIMIENTO, cb);
+  return () => window.removeEventListener(EVENTO_CONSENTIMIENTO, cb);
+}
+
+function apagar() {
+  if (!ready) return;
+  try { posthog.opt_out_capturing(); posthog.reset(); } catch { /* ignore */ }
+  ready = false;
+}
+
 export function guardarConsentimiento(v: "si" | "no"): void {
   try { window.localStorage.setItem(CLAVE_CONSENTIMIENTO, v); } catch { /* sin almacenamiento, vale solo esta visita */ }
-  if (v === "si") { initAnalytics(v); return; }
-  if (ready) {
-    try { posthog.opt_out_capturing(); posthog.reset(); } catch { /* ignore */ }
-    ready = false;
-  }
+  if (v === "si") initAnalytics(v); else apagar();
+  avisar();
+}
+
+/**
+ * Retirar el consentimiento tiene que ser tan fácil como darlo (RGPD art. 7.3): el enlace
+ * «Analytics preferences» del pie llama a esto, se apaga la analítica y vuelve a salir el
+ * aviso para elegir otra vez.
+ */
+export function olvidarConsentimiento(): void {
+  try { window.localStorage.removeItem(CLAVE_CONSENTIMIENTO); } catch { /* ignore */ }
+  apagar();
+  avisar();
 }
 
 /** Initialise once, client-side only, and ONLY with consent. Safe to call repeatedly. */
@@ -141,6 +166,9 @@ export function initAnalytics(consentimiento: Consentimiento = typeof window ===
       // than cookies alone.
       persistence: "localStorage+cookie",
     });
+    // Quien rechazó y luego acepta arrastra el opt-out que PostHog guardó al rechazar: sin
+    // esto, aceptar no enviaba nada nunca más.
+    if (posthog.has_opted_out_capturing()) posthog.opt_in_capturing();
     ready = true;
   } catch {
     ready = false;

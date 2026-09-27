@@ -3,28 +3,22 @@
 //
 // Solo aparece si hay analítica configurada y la persona no ha elegido todavía. Aceptar y
 // rechazar pesan lo mismo a propósito: un "Rechazar" escondido no es un consentimiento libre.
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore, type CSSProperties } from "react";
 import { useAuth } from "@/lib/auth";
-import { analyticsConfigured, leerConsentimiento, guardarConsentimiento, identify } from "@/lib/analytics";
-
-// La elección vive en localStorage, que no avisa de cambios en la misma pestaña: la
-// suscripción no hace nada y el cierre del aviso lo lleva el estado local de abajo.
-const sinSuscripcion = () => () => {};
+import { analyticsConfigured, leerConsentimiento, guardarConsentimiento, olvidarConsentimiento, suscribirConsentimiento, identify } from "@/lib/analytics";
 
 export default function ConsentBanner() {
   const { session } = useAuth();
   // En el servidor no hay localStorage: "servidor" hace que no se pinte nada en el HTML, así
   // que a quien ya eligió no le parpadea el aviso al hidratar.
-  const eleccion = useSyncExternalStore(sinSuscripcion, leerConsentimiento, () => "servidor" as const);
-  const [cerrado, setCerrado] = useState(false);
+  const eleccion = useSyncExternalStore(suscribirConsentimiento, leerConsentimiento, () => "servidor" as const);
 
-  if (cerrado || eleccion !== null || !analyticsConfigured()) return null;
+  if (eleccion !== null || !analyticsConfigured()) return null;
 
   const elegir = (v: "si" | "no") => {
     guardarConsentimiento(v);
     // Quien ya tenía sesión no pasa otra vez por el `identify` de AnalyticsProvider.
     if (v === "si" && session?.user?.id) identify(session.user.id);
-    setCerrado(true);
   };
 
   const boton = {
@@ -48,5 +42,16 @@ export default function ConsentBanner() {
         <button style={boton} onClick={() => elegir("si")}>Accept</button>
       </div>
     </div>
+  );
+}
+
+/** Enlace del pie para cambiar la elección: la borra y el aviso vuelve a aparecer. */
+export function PreferenciasAnalitica({ className, style }: { className?: string; style?: CSSProperties }) {
+  if (!analyticsConfigured()) return null;
+  return (
+    <button type="button" onClick={olvidarConsentimiento} className={className}
+      style={{ background: "none", border: "none", padding: 0, font: "inherit", color: "inherit", textDecoration: "underline", cursor: "pointer", ...style }}>
+      Analytics preferences
+    </button>
   );
 }

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { GROWTH_BACKTEST as G } from "@/lib/trackRecord";
 import "./landing-v2.css";
+import { PreferenciasAnalitica } from "@/components/ConsentBanner";
+import { analyticsConfigured } from "@/lib/analytics";
 
 // Landing v2 — light "ink, paper, evergreen" system (see app/landing-v2.css).
 // Every figure comes from lib/trackRecord.ts so the page can never drift from the
@@ -291,6 +293,12 @@ export default function Landing() {
               <Link href="/track-record">Track record</Link>
               <Link href="/evidence">Evidence ledger</Link>
             </nav>
+            {analyticsConfigured() && (
+              <nav className="lv2-footer-col" aria-label="Privacy">
+                <strong>Privacy</strong>
+                <PreferenciasAnalitica style={{ textDecoration: "none", textAlign: "left" }} />
+              </nav>
+            )}
           </div>
           <p className="lv2-legal">
             Scora Research is an educational tool for informational purposes only and is not investment advice.
