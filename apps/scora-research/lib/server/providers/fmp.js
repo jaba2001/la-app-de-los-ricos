@@ -49,7 +49,9 @@ export async function serve(request, { params }) {
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
-  if (symbol && !/^[A-Z.\-]{1,15}$/.test(symbol)) {
+  // Con dígitos: el buscador ofrece valores como 0700.HK o 7203.T, y sin ellos la ficha salía
+  // vacía por un 400 nuestro (AUDIT_REPORT M-4). Sigue sin admitir nada que altere la URL.
+  if (symbol && !/^[A-Z0-9.\-]{1,15}$/.test(symbol)) {
     return json({ error: 'Invalid symbol' }, 400);
   }
 

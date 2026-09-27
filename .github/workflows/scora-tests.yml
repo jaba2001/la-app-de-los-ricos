@@ -213,6 +213,11 @@ jobs:
       - name: La serie mensual del allocator
         run: node --experimental-strip-types --no-warnings scripts/serie.test.mjs
 
+      # Los tickers que el buscador ofrece (0700.HK, 7203.T) tienen que pasar a FMP y Finnhub;
+      # lo que altere la URL, no (AUDIT_REPORT M-4).
+      - name: Simbolos admitidos por los proveedores
+        run: node --experimental-strip-types --no-warnings scripts/simbolos.test.mjs
+
       # Metricas de la fase 1: M2, captura alcista/bajista, forma de la distribucion y la
       # significacion de una diferencia de Sharpe. El punto critico esta en esta ultima:
       # Jobson-Korkie va con los Sharpe POR PERIODO y T = observaciones, NO con los anualizados

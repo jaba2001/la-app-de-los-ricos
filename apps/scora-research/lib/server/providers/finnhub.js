@@ -48,7 +48,8 @@ export async function serve(request, { params }) {
 
   const url = new URL(request.url);
   const symbol = url.searchParams.get('symbol');
-  if (symbol && !/^[A-Z.\-:]{1,12}$/.test(symbol)) {
+  // Con dígitos, como en fmp.js: 0700.HK, 7203.T (AUDIT_REPORT M-4).
+  if (symbol && !/^[A-Z0-9.\-:]{1,12}$/.test(symbol)) {
     return json({ error: 'Invalid symbol' }, 400);
   }
 
