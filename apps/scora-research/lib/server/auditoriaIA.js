@@ -20,28 +20,55 @@ const TEXTO_CORTO = /^[\w.\-:/ ]{1,64}$/;
 /**
  * Lee `scora_audit` del cuerpo de la petición.
  * @returns null si no viene (llamada sin auditar), { error } si viene mal, o los metadatos.
+ *
+ * Solo se RECHAZA lo que no tiene la forma esperada. Lo que la tiene pero se pasa de largo se
+ * RECORTA: rechazar costaba la respuesta entera al usuario (un 400 en lugar del análisis) por un
+ * metadato del registro. Ticker en minúsculas (viene de la URL: /stock/aapl) → se normaliza.
  */
 export function leerMetaAuditoria(meta) {
   if (meta == null) return null;
   if (typeof meta !== "object" || Array.isArray(meta)) return { error: "scora_audit must be an object" };
   if (typeof meta.module !== "string" || !TEXTO_CORTO.test(meta.module)) return { error: "scora_audit.module invalid" };
-  if (meta.ticker != null && (typeof meta.ticker !== "string" || !/^[A-Z0-9.\-]{1,15}$/.test(meta.ticker))) {
-    return { error: "scora_audit.ticker invalid" };
+  let ticker = null;
+  if (meta.ticker != null) {
+    ticker = typeof meta.ticker === "string" ? meta.ticker.trim().toUpperCase() : "";
+    if (!/^[A-Z0-9.\-]{1,15}$/.test(ticker)) return { error: "scora_audit.ticker invalid" };
   }
-  if (meta.sources != null && (!Array.isArray(meta.sources) || meta.sources.length > 20
-      || !meta.sources.every((s) => typeof s === "string" && s.length <= 120))) {
-    return { error: "scora_audit.sources invalid" };
+  if (meta.sources != null && !Array.isArray(meta.sources)) return { error: "scora_audit.sources invalid" };
+  const sources = meta.sources == null ? null
+    : meta.sources.filter((s) => typeof s === "string" && s.length > 0).slice(0, 20).map((s) => s.slice(0, 120));
+  // Dónde está el bloque de datos DENTRO del prompt: [inicio, longitud]. Se manda la posición y
+  // no el texto porque mandarlo aparte duplicaba el cuerpo contra el tope de 50 KB (413).
+  let dataBlockEnPrompt = null;
+  if (meta.dataBlockEnPrompt != null) {
+    const r = meta.dataBlockEnPrompt;
+    if (!Array.isArray(r) || r.length !== 2 || !r.every((n) => Number.isInteger(n) && n >= 0)) {
+      return { error: "scora_audit.dataBlockEnPrompt invalid" };
+    }
+    dataBlockEnPrompt = r;
   }
   if (meta.dataBlock != null && typeof meta.dataBlock !== "string") return { error: "scora_audit.dataBlock invalid" };
   return {
     module: meta.module,
-    ticker: meta.ticker ?? null,
-    sources: meta.sources ?? null,
-    // Casi siempre el bloque de datos ES el prompt: se marca en vez de mandarlo dos veces,
-    // que duplicaría el cuerpo contra el tope de 50 KB.
+    ticker,
+    sources,
+    // Casi siempre el bloque de datos ES el prompt: se marca en vez de mandarlo dos veces.
     dataBlockEsPrompt: meta.dataBlockEsPrompt === true,
+    dataBlockEnPrompt,
     dataBlock: meta.dataBlock ?? null,
   };
+}
+
+/** El bloque contra el que se comprueba el grounding, según lo que indicaron los metadatos. */
+export function bloqueDeDatos(meta, prompt) {
+  if (meta.dataBlockEsPrompt) return prompt;
+  if (meta.dataBlockEnPrompt) {
+    const [inicio, largo] = meta.dataBlockEnPrompt;
+    // Fuera de rango = el cliente se equivocó; se usa el prompt entero, que es todo lo que el
+    // modelo vio, en vez de comprobar contra un trozo vacío (que marcaría todas las cifras).
+    return inicio + largo <= prompt.length ? prompt.slice(inicio, inicio + largo) : prompt;
+  }
+  return meta.dataBlock;
 }
 
 /** El mismo filtro que antes corría en el navegador (lib/grounding.ts), sobre el mismo texto. */
@@ -84,7 +111,7 @@ export async function anotarRespuesta({ textoRespuesta, ok, userId, model, messa
  * devuelve `registrado: false`, pero no le quita la respuesta al usuario.
  */
 export async function registrarAuditoria({ userId, model, prompt, texto, usageRaw, meta }) {
-  const dataBlock = meta.dataBlockEsPrompt ? prompt : meta.dataBlock;
+  const dataBlock = bloqueDeDatos(meta, prompt);
   const ev = evaluarGrounding(texto, dataBlock);
   const usage = usageDeAnthropic(usageRaw);
   const fila = {

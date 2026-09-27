@@ -9,7 +9,7 @@
 // La parte pura (validación de metadatos, reparto de violaciones, política) corre siempre;
 // la de Postgres se salta sin base.
 import pg from "pg";
-import { leerMetaAuditoria, evaluarGrounding } from "../lib/server/auditoriaIA.js";
+import { leerMetaAuditoria, evaluarGrounding, bloqueDeDatos } from "../lib/server/auditoriaIA.js";
 import { construir, RechazoPolitica } from "../lib/server/data/query.ts";
 
 let bad = 0, total = 0;
@@ -23,10 +23,32 @@ const check = (l, got, want) => {
 // ── Sin base ────────────────────────────────────────────────────────────────────────
 check("sin scora_audit → null (llamada sin auditar)", leerMetaAuditoria(undefined), null);
 check("metadatos válidos", leerMetaAuditoria({ module: "stock-thesis", ticker: "AAPL", sources: ["fmp"], dataBlockEsPrompt: true }),
-  { module: "stock-thesis", ticker: "AAPL", sources: ["fmp"], dataBlockEsPrompt: true, dataBlock: null });
+  { module: "stock-thesis", ticker: "AAPL", sources: ["fmp"], dataBlockEsPrompt: true, dataBlockEnPrompt: null, dataBlock: null });
 check("módulo con caracteres raros → error", "error" in leerMetaAuditoria({ module: "x'; drop" }), true);
-check("ticker en minúsculas → error", "error" in leerMetaAuditoria({ module: "m", ticker: "aapl" }), true);
 check("sources que no es lista → error", "error" in leerMetaAuditoria({ module: "m", sources: "fmp" }), true);
+
+// Revisión 27-09: tres metadatos que el cliente manda de verdad y que el servidor rechazaba con
+// 400, llevándose por delante el análisis entero.
+//  · /stock/aapl → useParams da "aapl" y varias pantallas lo pasan tal cual.
+check("ticker en minúsculas → se normaliza, no se rechaza", leerMetaAuditoria({ module: "m", ticker: " aapl " }).ticker, "AAPL");
+check("ticker con caracteres de URL → error", "error" in leerMetaAuditoria({ module: "m", ticker: "AAPL&x=1" }), true);
+//  · las fuentes de DueDiligence son "10-K Item 1A. Risk Factors…" y StockNews junta hasta 20+.
+{
+  const m = leerMetaAuditoria({ module: "m", sources: [...Array(25)].map((_, i) => `fuente ${i} ` + "x".repeat(200)) });
+  check("más de 20 fuentes → se recortan a 20", m.sources?.length, 20);
+  check("una fuente larga → se trunca a 120", m.sources?.[0].length, 120);
+  check("entradas que no son texto → se descartan", leerMetaAuditoria({ module: "m", sources: ["fmp", 3, null] }).sources, ["fmp"]);
+}
+//  · el bloque dentro del prompt viaja como posición, no como texto duplicado.
+{
+  const prompt = "REGLAS 12 · DATA: price $184.20 · FIN";
+  const ini = prompt.indexOf("DATA"), largo = "DATA: price $184.20".length;
+  const m = leerMetaAuditoria({ module: "m", dataBlockEnPrompt: [ini, largo] });
+  check("dataBlockEnPrompt → el servidor recorta el bloque del prompt", bloqueDeDatos(m, prompt), "DATA: price $184.20");
+  check("fuera de rango → el prompt entero, no un bloque vacío", bloqueDeDatos(leerMetaAuditoria({ module: "m", dataBlockEnPrompt: [30, 999] }), prompt), prompt);
+  check("posición con negativos → error", "error" in leerMetaAuditoria({ module: "m", dataBlockEnPrompt: [-1, 3] }), true);
+  check("dataBlockEsPrompt → el prompt", bloqueDeDatos(leerMetaAuditoria({ module: "m", dataBlockEsPrompt: true }), prompt), prompt);
+}
 
 const DATOS = "DATA: price $184.20 · target $165";
 const MENTIRA = "The $165 target sits above the $184.20 price.";   // cifras reales, afirmación falsa

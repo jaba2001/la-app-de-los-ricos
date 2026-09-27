@@ -193,7 +193,7 @@ export interface AiCompletion { text: string; usage: AiUsage | null; audit?: Aud
 /** Metadatos de auditoría que viajan con la petición y usa el SERVIDOR para escribir la fila. */
 export interface MetaAuditoria {
   module: string; ticker?: string | null; sources?: string[] | null;
-  dataBlockEsPrompt?: boolean; dataBlock?: string;
+  dataBlockEsPrompt?: boolean; dataBlockEnPrompt?: [number, number]; dataBlock?: string;
 }
 
 // ── Pluggable provider seam (Phase 7 "ralph") ────────────────────────────────────────
@@ -269,6 +269,21 @@ export interface AuditOpts { module: string; ticker?: string; dataBlock?: string
 export interface AuditedResult { text: string; violations: (number | string)[]; grounded: boolean; }
 
 /**
+ * Cómo le dice el cliente al servidor contra qué comprobar el grounding SIN mandar el bloque
+ * de datos otra vez (duplicaba el cuerpo y un transcript largo daba 413):
+ *   · el bloque es el prompt           → dataBlockEsPrompt
+ *   · el bloque está dentro del prompt → dataBlockEnPrompt: [inicio, longitud]
+ *   · no está (p. ej. el prompt lleva solo un extracto) → el prompt entero, que es lo que el
+ *     modelo vio de verdad.
+ */
+export function ubicarBloque(prompt: string, dataBlock?: string): Pick<MetaAuditoria, "dataBlockEsPrompt" | "dataBlockEnPrompt"> {
+  if (!dataBlock) return {};
+  if (dataBlock === prompt) return { dataBlockEsPrompt: true };
+  const i = prompt.indexOf(dataBlock);
+  return i >= 0 ? { dataBlockEnPrompt: [i, dataBlock.length] } : { dataBlockEsPrompt: true };
+}
+
+/**
  * Like aiAnalyze, but audited: the SERVER runs the code-level grounding gate over the output
  * vs the DATA block and writes the immutable row to ai_audit_log (inputs, cited sources,
  * output, model, violations, timestamp). Returns the flagged numbers so the UI can surface
@@ -282,10 +297,9 @@ export async function aiAnalyzeAudited(prompt: string, opts: AuditOpts): Promise
   const model = AI_MODELS[opts.tier ?? "fast"];
   const auditoria: MetaAuditoria = {
     module: opts.module,
-    ticker: opts.ticker ?? null,
+    ticker: opts.ticker ? opts.ticker.toUpperCase() : null,
     sources: opts.sources ?? null,
-    // Casi siempre el bloque de datos ES el prompt: se marca en vez de mandarlo dos veces.
-    ...(opts.dataBlock === prompt ? { dataBlockEsPrompt: true } : opts.dataBlock ? { dataBlock: opts.dataBlock } : {}),
+    ...ubicarBloque(prompt, opts.dataBlock),
   };
   const { text, usage, audit } = await activeProvider.complete(model, opts.maxTokens ?? 1000, prompt, auditoria);
   const costUsd = estimateCostUsd(model, usage);
