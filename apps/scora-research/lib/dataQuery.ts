@@ -28,7 +28,7 @@ export interface Respuesta<T> {
  *  `Record<string, unknown>` no se puede convertir a una interfaz sin indice. */
 export type Fila = Record<string, unknown>;
 
-interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is"; val: unknown }
+interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is" | "not_null"; val: unknown }
 type Op = "select" | "insert" | "upsert" | "update" | "delete";
 
 interface Peticion {
@@ -115,9 +115,12 @@ class Consulta<T = unknown> implements PromiseLike<Respuesta<T>> {
   in(col: string, val: unknown[]) { this.pet.filters!.push({ col, op: "in", val }); return this; }
   /** Solo `is(col, null)`: es lo único que la app usa y lo único que el servidor admite. */
   is(col: string, val: null)     { this.pet.filters!.push({ col, op: "is", val }); return this; }
-  not(col: string, _op: string, val: unknown) {
-    // La app solo escribe `.not("sector", "is", null)`. Se traduce a "distinto de null".
-    this.pet.filters!.push({ col, op: val === null ? "neq" : "neq", val });
+  /** Solo `.not(col, "is", null)`: es lo único que la app usa. Antes se mandaba como
+   *  `neq null`, que en SQL es `col <> NULL` y no devuelve NINGUNA fila (AUDIT_REPORT M-1).
+   *  Cualquier otra negación lanza aquí, en vez de traducirse a algo que parece funcionar. */
+  not(col: string, op: "is", val: null) {
+    if (op !== "is" || val !== null) throw new Error(`.not("${col}", "${op}", …) no está soportado: solo .not(col, "is", null)`);
+    this.pet.filters!.push({ col, op: "not_null", val: null });
     return this;
   }
   order(col: string, opts?: { ascending?: boolean }) {

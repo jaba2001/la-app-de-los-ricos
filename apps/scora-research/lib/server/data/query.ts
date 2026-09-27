@@ -13,8 +13,14 @@
 
 import { policyFor, funcionPermitida, type Op, type TablePolicy } from "./policy.ts";
 
-export interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is"; val: unknown }
+/** `not_null` es `.not(col, "is", null)` del cliente. Antes el cliente lo mandaba como
+ *  `neq null`, que en SQL es `col <> NULL` y no devuelve ninguna fila (AUDIT_REPORT M-1). */
+export interface Filtro { col: string; op: "eq" | "neq" | "in" | "gt" | "gte" | "lt" | "lte" | "is" | "not_null"; val: unknown }
 export interface Peticion {
+  /** `{ count: "exact" }`: además de las filas, cuántas cumplen el filtro sin el LIMIT. */
+  count?: boolean;
+  /** `{ head: true }`: solo el recuento, sin filas. */
+  head?: boolean;
   /** Llamada a funcion: `rpc` lleva el nombre y `args` los parametros. */
   rpc?: string;
   args?: Record<string, unknown>;
@@ -82,7 +88,15 @@ function comprobar(p: Peticion, userId: string | null): { pol: TablePolicy; scop
   return { pol, scoped };
 }
 
-export function construir(p: Peticion, userId: string | null, esquema: Esquema): SqlListo {
+/** El recuento de un select: mismo FROM y mismo WHERE —incluido el filtro de usuario—, sin
+ *  ORDER ni LIMIT. Antes se devolvía el `rowCount` de la consulta paginada, que nunca pasa
+ *  del LIMIT: 1000 filas contadas sobre 1500 (AUDIT_REPORT M-2). */
+export function construirConteo(p: Peticion, userId: string | null, esquema: Esquema): SqlListo {
+  if (p.rpc || p.op !== "select") throw new RechazoPolitica("El recuento solo existe para select");
+  return construir(p, userId, esquema, true);
+}
+
+export function construir(p: Peticion, userId: string | null, esquema: Esquema, conteo = false): SqlListo {
   if (p.rpc) return construirRpc(p, userId);
   const { pol, scoped } = comprobar(p, userId);
   const cols = esquema[p.table];
@@ -115,6 +129,7 @@ export function construir(p: Peticion, userId: string | null, esquema: Esquema):
       case "is":  // solo null / not null: cualquier otra cosa sería SQL interpolado
         if (f.val !== null) throw new RechazoPolitica("`is` solo admite null");
         where.push(`${c} IS NULL`); break;
+      case "not_null": where.push(`${c} IS NOT NULL`); break;
       case "in": {
         const arr = Array.isArray(f.val) ? f.val : [];
         // Un IN vacío en SQL es un error de sintaxis; semánticamente es "ninguna fila".
@@ -128,6 +143,7 @@ export function construir(p: Peticion, userId: string | null, esquema: Esquema):
 
   // ── SELECT ─────────────────────────────────────────────────────────────────────────
   if (p.op === "select") {
+    if (conteo) return { text: `SELECT count(*)::bigint AS n FROM ${T}${W}`, values: vals };
     const sel = !p.columns || p.columns.trim() === "*"
       ? "*"
       : p.columns.split(",").map((c) => ident(c.trim(), cols, p.table)).join(", ");

@@ -308,6 +308,12 @@ jobs:
       - name: El cliente de datos (reemplazo de supabase.from)
         run: node --experimental-strip-types --no-warnings scripts/datacliente.test.mjs
 
+      # Cliente real contra el camino real del servidor: lo que la pantalla MANDA contra lo que
+      # /api/data ENTIENDE. Ahi se escondian .not() y count (AUDIT_REPORT M-1, M-2). La parte
+      # con Postgres se salta sin base.
+      - name: Contrato de /api/data (cliente ↔ servidor)
+        run: node --experimental-strip-types --no-warnings scripts/datacontrato.test.mjs
+
       # El traductor de PostgREST a SQL: por el pasan las 34 llamadas de los crons, que
       # deciden a quien se le manda una alerta. Se salta sin Postgres.
       - name: Traductor PostgREST (se salta sin base)

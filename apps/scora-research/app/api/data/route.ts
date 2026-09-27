@@ -9,9 +9,9 @@
 import { requireUser } from "../../../lib/server/auth.js";
 import { checkRateLimit } from "../../../lib/server/ratelimit.js";
 import { corsHeaders, preflight } from "../../../lib/server/cors.js";
-import { construir, RechazoPolitica, type Peticion } from "../../../lib/server/data/query.ts";
+import { RechazoPolitica, type Peticion } from "../../../lib/server/data/query.ts";
 import { pool, esquema } from "../../../lib/server/data/pool.ts";
-import { filasConNumeros } from "../../../lib/server/data/numeros.js";
+import { ejecutarConsulta } from "../../../lib/server/data/ejecutar.ts";
 
 export const runtime = "nodejs";
 
@@ -49,12 +49,7 @@ export async function POST(request: Request) {
   const results = [];
   for (const q of qs) {
     try {
-      const sql = construir(q, user.id, esq);
-      const r = await p.query(sql.text, sql.values as unknown[]);
-      // `.single()` y `.maybeSingle()` se resuelven en el cliente a partir de esto: el
-      // servidor devuelve siempre filas, que es lo único que sabe.
-      const filas = filasConNumeros(r);
-      results.push({ rows: filas, count: r.rowCount ?? filas.length });
+      results.push(await ejecutarConsulta(p, q, user.id, esq));
     } catch (e) {
       if (e instanceof RechazoPolitica) {
         // Un rechazo de política es un 403 y se dice por qué: son errores de programación
