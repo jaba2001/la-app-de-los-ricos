@@ -49,18 +49,24 @@ for (const s of ["aapl", "AAPL US", "AAPL&apikey=x", "AAPL/../x", "A".repeat(16)
 // Sin sesión darían 401 como cualquier otra, por eso se prueban aquí y no en smoke-proxy.
 const rutaFmp = async (path) => (await fmp(pide(`http://x/api/fmp/${path}?symbol=AAPL`), { params: { path: path.split("/") } })).status;
 const rutaFh = async (path) => (await finnhub(pide(`http://x/api/finnhub/${path}?symbol=AAPL`), { params: { path: path.split("/") } })).status;
-for (const p of ["news", "price-target-consensus", "upgrades-downgrades-consensus", "historical-dividends",
-                 "historical-shares-float", "key-metrics", "senate-trading", "insider-trading"]) {
+for (const p of ["news", "upgrades-downgrades-consensus", "historical-dividends",
+                 "historical-shares-float", "key-metrics", "senate-trading", "insider-trading",
+                 // 12-10-2026: /stable las renombró ([] con 404) o el plan no las da (402).
+                 "peers", "price-target", "earnings-surprises", "institutional-holder", "house-disclosure"]) {
   check(`fmp/${p} cerrada → 403`, await rutaFmp(p), 403);
 }
 for (const p of ["profile2", "news", "stock/insider-sentiment", "calendar/economic",
-                 "stock/financials-reported", "stock/social-sentiment", "forex/rates", "crypto/candle"]) {
+                 "stock/financials-reported", "stock/social-sentiment", "forex/rates", "crypto/candle",
+                 // 12-10-2026: 403 «You don't have access» con el plan de Finnhub del proyecto.
+                 "stock/transcripts/list", "stock/short-interest", "stock/price-target"]) {
   check(`finnhub/${p} cerrada → 403`, await rutaFh(p), 403);
 }
 // Y las que el front sí usa siguen abiertas (500 = pasó la lista y pidió la clave).
 check("fmp/key-metrics-ttm sigue abierta (no la confunde con key-metrics)", await rutaFmp("key-metrics-ttm"), 500);
-check("fmp/price-target sigue abierta (no la confunde con price-target-consensus)", await rutaFmp("price-target"), 500);
-check("finnhub/stock/transcripts/list sigue abierta", await rutaFh("stock/transcripts/list"), 500);
+for (const p of ["stock-peers", "price-target-consensus", "earnings"]) {
+  check(`fmp/${p} abierta (sustituye a la ruta antigua)`, await rutaFmp(p), 500);
+}
+check("finnhub/stock/metric sigue abierta", await rutaFh("stock/metric"), 500);
 
 // Next 15 entrega `params` como Promise. Con params.path leído a pelo, solo funcionaba gracias
 // a una capa de compatibilidad obsoleta; con la Promise sin más, lanzaba.

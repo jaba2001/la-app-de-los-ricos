@@ -74,7 +74,18 @@ const ROUTES = {
   simfin:   'lib/server/providers/simfin.js',
   congress: 'lib/server/providers/congress.js',
 };
+// FMP comparte UNA constante entre la ruta y el lote (LIMITE_FMP): iguales por construcción.
+// Se comprueba que los dos la usen y se toma su valor real.
+{
+  const { LIMITE_FMP } = await import('../lib/server/providers/fmp.js');
+  const fmpSrc = readFileSync(new URL('../lib/server/providers/fmp.js', import.meta.url), 'utf8');
+  check('el lote usa LIMITE_FMP', /limiter: 'fmp',\s*\.\.\.LIMITE_FMP/.test(batchSrc), true);
+  check('la ruta fmp usa LIMITE_FMP', /checkRateLimit\('fmp', user\.id, LIMITE_FMP\.max, LIMITE_FMP\.window/.test(fmpSrc), true);
+  check('el límite de FMP cubre al menos dos fichas por minuto (~21 llamadas cada una)', LIMITE_FMP.max >= 60, true);
+  declared.fmp = LIMITE_FMP;
+}
 for (const [name, file] of Object.entries(ROUTES)) {
+  if (name === 'fmp') continue;
   const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
   const m = src.match(new RegExp(`checkRateLimit\\('${name}', user\\.id, (\\d+), (\\d+)`));
   check(`cubo ${name} declarado`, Boolean(m && declared[name]), true);

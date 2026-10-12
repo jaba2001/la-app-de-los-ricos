@@ -15,10 +15,14 @@ import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
 // llamador: profile2, news, stock/insider-sentiment, calendar/economic,
 // stock/financials-reported, stock/social-sentiment, forex/rates, crypto/candle
 // (AUDIT_REPORT B-1).
+//
+// 12-10-2026: fuera stock/transcripts, stock/short-interest y stock/price-target. Con el plan de
+// este proyecto responden 403 «You don't have access to this resource» (comprobado contra la
+// API real); se pedían en cada análisis y siempre fallaban. El short interest sale gratis de
+// /api/short-interest (NASDAQ/FINRA) y el objetivo de precio de FMP price-target-consensus.
 const ALLOWED = new Set([
   'quote', 'company-news', 'stock/recommendation', 'stock/insider-transactions',
-  'stock/earnings', 'calendar/earnings', 'stock/transcripts', 'stock/short-interest',
-  'stock/metric', 'stock/price-target',
+  'stock/earnings', 'calendar/earnings', 'stock/metric',
 ]);
 
 // A segment may only be a plain path atom. Without this, an encoded slash lets a caller
@@ -78,7 +82,8 @@ export async function serve(request, ctx) {
   // After requireUser + checkRateLimit, so the cache can never bypass either.
   const key = cacheKey('finnhub', path, url.searchParams);
   const hit = await cacheGet(key);
-  if (hit) {
+  // Una entrada de error es de antes de que se dejaran de cachear (ver abajo): se ignora.
+  if (hit && hit.status >= 200 && hit.status < 300) {
     return new Response(hit.body, {
       status: hit.status,
       headers: corsHeaders(request, {
@@ -98,15 +103,17 @@ export async function serve(request, ctx) {
   const { status, body } = await dedupe(key, async () => {
     const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
     const text = await res.text();
-    await cacheSet(key, { status: res.status, body: text }, CACHE_TTL);
+    // Solo lo que salió bien: un 403 o un 429 cacheado se servía a todos durante el TTL.
+    if (res.ok) await cacheSet(key, { status: res.status, body: text }, CACHE_TTL);
     return { status: res.status, body: text };
   });
 
+  const ok = status >= 200 && status < 300;
   return new Response(body, {
     status,
     headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+      'Cache-Control': ok ? `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}` : 'no-store',
       'X-Scora-Cache': 'MISS',
     }),
   });

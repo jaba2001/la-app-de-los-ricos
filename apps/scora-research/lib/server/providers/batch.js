@@ -23,7 +23,7 @@ import { requireUser } from '../auth.js';
 import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 
-import { serve as fmpServe } from './fmp.js';
+import { serve as fmpServe, LIMITE_FMP } from './fmp.js';
 import { serve as finnhubServe } from './finnhub.js';
 import { serve as shortIntServe } from './short-interest.js';
 import { serve as finvizServe } from './finviz.js';
@@ -40,7 +40,7 @@ const MAX_SUB = 40;
 // números es feo; tenerlos distintos sería peor, así que si cambia uno hay que cambiar los
 // dos. La prueba scripts/batch.test.mjs comprueba que no se separen.
 const PROVIDERS = {
-  fmp:        { serve: fmpServe,       limiter: 'fmp',      max: 40, window: 60 },
+  fmp:        { serve: fmpServe,       limiter: 'fmp',      ...LIMITE_FMP }, // mismo límite que la ruta suelta
   finnhub:    { serve: finnhubServe,   limiter: 'finnhub',  max: 60, window: 60 },
   'short-interest': { serve: shortIntServe, limiter: 'shortint', max: 20, window: 60 },
   finviz:     { serve: finvizServe,    limiter: 'finviz',   max: 15, window: 60 },

@@ -9,19 +9,26 @@ import { requireUser } from '../auth.js';
 import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
+import { respaldoYahoo, esSimboloFueraDePlan } from './yahoo.js';
 
 
 // Solo lo que el front pide de verdad. Cada ruta de aquí es una puerta a FMP firmada con
 // nuestra clave y con cargo a nuestra cuota, así que las que nadie usaba se cerraron el 27-09
-// (news, price-target-consensus, upgrades-downgrades-consensus, historical-dividends,
-// historical-shares-float, key-metrics, senate-trading, insider-trading — AUDIT_REPORT B-1).
-// El cron insider-refresh llama a FMP directamente, no por aquí. Añadir una es una línea.
+// (AUDIT_REPORT B-1). El cron insider-refresh llama a FMP directamente, no por aquí.
+//
+// 12-10-2026, recorriendo cada pestaña en un navegador con sesión: cinco de estas devolvían
+// `[]` con 404 en CADA análisis, porque /stable las renombró o el plan no las incluye. Se
+// cambian por las que sí responden (comprobado contra la API real):
+//   peers               → stock-peers
+//   price-target        → price-target-consensus
+//   earnings-surprises  → earnings            (trae epsActual/epsEstimated por trimestre)
+//   institutional-holder, house-disclosure → fuera: 402 en este plan, no hay sustituto.
 const ALLOWED = new Set([
   'quote','profile','key-metrics-ttm','ratios-ttm',
   'historical-price-eod/full','income-statement',
-  'analyst-estimates','discounted-cash-flow','balance-sheet-statement','price-target',
-  'cash-flow-statement','peers','institutional-holder','shares-float',
-  'financial-growth','earnings-surprises','search','house-disclosure',
+  'analyst-estimates','discounted-cash-flow','balance-sheet-statement','price-target-consensus',
+  'cash-flow-statement','stock-peers','shares-float',
+  'financial-growth','earnings','search',
 ]);
 
 // A segment may only be a plain path atom. Without this, an encoded slash lets a caller
@@ -69,13 +76,13 @@ export async function serve(request, ctx) {
       ? 60                     // 1 min  — live price
     : /^historical-price-eod/.test(path)
       ? 3600                   // 1 h    — EOD history (today's bar isn't closed yet)
-    : /^(income-statement|balance-sheet-statement|cash-flow-statement|earnings-surprises|historical-shares-float|institutional-holder|senate-trading|house-disclosure|insider-trading|historical-dividends)/.test(path)
-      ? 86400                  // 24 h   — statements / holders / disclosures
-    : /^(peers|profile)/.test(path)
+    : /^(income-statement|balance-sheet-statement|cash-flow-statement|earnings)/.test(path)
+      ? 86400                  // 24 h   — statements / earnings
+    : /^(stock-peers|profile)/.test(path)
       ? 604800                 // 7 d    — nearly static company info
     : /^(key-metrics-ttm|ratios-ttm|key-metrics|financial-growth)/.test(path)
       ? 43200                  // 12 h   — TTM ratios (updated weekly)
-    : /^(price-target|analyst-estimates|price-target-consensus|upgrades-downgrades-consensus|discounted-cash-flow)/.test(path)
+    : /^(price-target-consensus|analyst-estimates|discounted-cash-flow)/.test(path)
       ? 21600                  // 6 h    — analyst updates infrequent intraday
     : 3600;                    // 1 h    — sensible default for everything else
 
@@ -83,7 +90,8 @@ export async function serve(request, ctx) {
   // be used to bypass auth or the cost guard — it only skips the upstream call.
   const key = cacheKey('fmp', path, url.searchParams);
   const hit = await cacheGet(key);
-  if (hit) {
+  // Una entrada de error es de antes de que se dejaran de cachear (ver abajo): se ignora.
+  if (hit && hit.status >= 200 && hit.status < 300) {
     return new Response(hit.body, {
       status: hit.status,
       headers: corsHeaders(request, {
@@ -103,19 +111,29 @@ export async function serve(request, ctx) {
 
   // Single-flight: si otra petición ya está pidiendo esta misma clave, se espera a la suya
   // en vez de salir otra vez al proveedor (ver `dedupe` en lib/cache.js).
-  const { status, body } = await dedupe(key, async () => {
+  const { status, body, fuente } = await dedupe(key, async () => {
     const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
-    const text = await res.text();
-    await cacheSet(key, { status: res.status, body: text }, CACHE_TTL);
-    return { status: res.status, body: text };
+    let r = { status: res.status, body: await res.text(), fuente: 'fmp' };
+    // ETFs fuera del plan (402 «Special Endpoint»): cotización e histórico salen de Yahoo con
+    // la forma de FMP. Ver lib/server/providers/yahoo.js.
+    if ((path === 'quote' || path === 'historical-price-eod/full') && esSimboloFueraDePlan(r.status, r.body)) {
+      const y = await respaldoYahoo(path, url.searchParams);
+      if (y) r = { ...y, fuente: 'yahoo' };
+    }
+    // Solo se cachea lo que salió bien. Antes se cacheaba TODO, errores incluidos: un 402 o un
+    // 429 se quedaba fijado hasta 24 h para todos los usuarios aunque la causa ya no existiera.
+    if (r.status >= 200 && r.status < 300) await cacheSet(key, r, CACHE_TTL);
+    return r;
   });
 
+  const ok = status >= 200 && status < 300;
   return new Response(body, {
     status,
     headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+      'Cache-Control': ok ? `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}` : 'no-store',
       'X-Scora-Cache': 'MISS',
+      'X-Scora-Source': fuente ?? 'fmp',
     }),
   });
 }
@@ -126,9 +144,17 @@ export async function serve(request, ctx) {
 // repetir la autenticación por sub-petición — y, sobre todo, para que NO PUEDA saltarse
 // nada: el lote entra por esta misma puerta, con las mismas listas blancas y la misma
 // caché. Una segunda implementación de la validación es justo lo que no queremos.
+/**
+ * Llamadas a FMP por usuario y minuto. Era 40, y abrir la ficha de UNA acción gasta ~21: al
+ * analizar la segunda en el mismo minuto el lote entero salía 429 y la ficha quedaba vacía
+ * («11 data sources unavailable», recorrido del 12-10-2026). 120 ≈ cinco fichas por minuto,
+ * un ritmo de uso normal; la caché compartida absorbe las repetidas. Lo usa también el lote.
+ */
+export const LIMITE_FMP = { max: 120, window: 60 };
+
 export async function GET(request, ctx) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('fmp', user.id, 40, 60, request); if (rl) return rl;
+  const rl = await checkRateLimit('fmp', user.id, LIMITE_FMP.max, LIMITE_FMP.window, request); if (rl) return rl;
   return serve(request, ctx);
 }
 
