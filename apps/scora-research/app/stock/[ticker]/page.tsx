@@ -398,6 +398,8 @@ export default function StockTickerPage() {
       const fmpTargets: Record<string, unknown>[] = consenso && Number(consenso.targetConsensus) > 0 ? [{
         priceTarget:    Number(consenso.targetConsensus),
         adjPriceTarget: Number(consenso.targetConsensus),
+        targetLow:      Number(consenso.targetLow) || null,
+        targetHigh:     Number(consenso.targetHigh) || null,
         publishedDate:  new Date().toISOString().slice(0, 10),
         analystName:    `High $${Number(consenso.targetHigh).toFixed(0)} · Low $${Number(consenso.targetLow).toFixed(0)} · Median $${Number(consenso.targetMedian).toFixed(0)}`,
         analystCompany: "FMP consensus",

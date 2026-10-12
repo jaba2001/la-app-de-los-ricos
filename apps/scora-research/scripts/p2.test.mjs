@@ -11,6 +11,7 @@ import { netManagedMoney, wowChange, netAsPctOfOI, goldSilverRatio, positioningR
 import { getEtf, overlap, cheaperAlternatives } from "../lib/etf.ts";
 import { altmanZ, accrualsRatio, dupont, mertonPD, piotroskiF, beneishM, normCdf } from "../lib/quality.ts";
 import { waccBridge, dcfMatrix, sectorComps } from "../lib/valuation.ts";
+import { estimacionProxima, ingresosEstimados } from "../lib/estimaciones.ts";
 import { effectiveDuration, impliedCreditLoss, bondMetrics } from "../lib/bonds.ts";
 import { difference, fitAR, forecastARIMA } from "../lib/arima.ts";
 import { esgLite } from "../lib/esg.ts";
@@ -201,6 +202,15 @@ approx("sin intereses: coste de deuda estimado rf+1 tras impuestos", sinInt.cost
 ok("sin intereses: marcado como estimado", sinInt.costOfDebtEstimated === true);
 ok("con intereses: no estimado", wb.costOfDebtEstimated === false);
 ok("sin deuda: coste 0 y no estimado", waccBridge({ rf: 4, beta: 1, marketCap: 800, totalDebt: 0, interestExpense: null }).costOfDebtEstimated === false);
+// FMP lista las estimaciones de la más LEJANA a la más cercana: el Report tomaba 2030 como
+// «crecimiento a corto plazo» y el DCF de AAPL salía $707–$1.688.
+{
+  const est = [{ date: "2030-09-27", revenueAvg: 650e9 }, { date: "2028-09-27", revenueAvg: 520e9 }, { date: "2026-09-26", revenueAvg: 450e9 }, { date: "2027-09-25", revenueAvg: 480e9 }];
+  ok("estimación próxima = el primer ejercicio futuro, no el primero de la lista", estimacionProxima(est, new Date("2026-10-12"))?.date === "2027-09-25");
+  ok("ingresos estimados de esa fila", ingresosEstimados(estimacionProxima(est, new Date("2026-10-12"))) === 480e9);
+  ok("sin futuras → null", estimacionProxima([{ date: "2020-01-01" }], new Date("2026-10-12")) === null);
+  ok("nombre antiguo del campo también vale", ingresosEstimados({ estimatedRevenueAvg: 5 }) === 5);
+}
 const dm = dcfMatrix({ revenueTTM: 1000, fcfMarginTTM: 0.15, netDebt: 0, sharesOut: 100 }, [8, 10], [5, 10]);
 ok("dcf matrix dims", dm.grid.length === 2 && dm.grid[0].length === 2);
 ok("dcf matrix cell positive", typeof dm.grid[0][0] === "number" && dm.grid[0][0] > 0);

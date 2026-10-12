@@ -1,4 +1,5 @@
 "use client";
+import { estimacionProxima, ingresosEstimados } from "@/lib/estimaciones";
 import { useEffect, useMemo, useState } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState, Scores } from "@/lib/types";
@@ -60,9 +61,9 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
     const rf = num(macro?.dgs10) ?? 4.2;
     const evEbitda = num(data.metrics?.enterpriseValueOverEBITDATTM);
 
-    // Near-term growth from analyst revenue estimates, else conservative default.
-    const est = data.analystEstimates ?? [];
-    const estRev = est.length ? num(est[0].estimatedRevenueAvg ?? est[0].revenueAvg) : null;
+    // Near-term growth from the NEXT fiscal year's revenue estimate (lib/estimaciones.ts:
+    // FMP lists the furthest year first), else a conservative default.
+    const estRev = ingresosEstimados(estimacionProxima(data.analystEstimates));
     let g1 = 8;
     if (estRev != null && revTTM > 0) g1 = Math.max(-10, Math.min(40, ((estRev - revTTM) / revTTM) * 100));
     const g2 = g1 / 2;
@@ -74,9 +75,12 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
       currentEvEbitda: evEbitda, g1, g2,
     });
 
-    // Analyst targets (low/mean/high) from the price-target list.
-    const tps = (data.priceTargets ?? []).map((t) => num(t.priceTarget ?? t.adjPriceTarget)).filter((x): x is number => x != null && x > 0);
-    const analyst = tps.length ? { low: Math.min(...tps), high: Math.max(...tps), mean: tps.reduce((a, b) => a + b, 0) / tps.length } : { low: null, high: null, mean: null };
+    // Analyst targets (low/mean/high). The FMP consensus row carries its own low/high; a
+    // per-analyst list (older shape) contributes each target.
+    const pts = (data.priceTargets ?? []).flatMap((t) => [num(t.targetLow), num(t.priceTarget ?? t.adjPriceTarget), num(t.targetHigh)]);
+    const tps = pts.filter((x): x is number => x != null && x > 0);
+    const means = (data.priceTargets ?? []).map((t) => num(t.priceTarget ?? t.adjPriceTarget)).filter((x): x is number => x != null && x > 0);
+    const analyst = tps.length ? { low: Math.min(...tps), high: Math.max(...tps), mean: means.length ? means.reduce((a, b) => a + b, 0) / means.length : null } : { low: null, high: null, mean: null };
     const week52 = { low: num(data.quote?.yearLow) ?? num(data.technicals?.week52Low), high: num(data.quote?.yearHigh) ?? num(data.technicals?.week52High) };
 
     const dp = dupont(niTTM, revTTM, num(balance[0]?.totalAssets), num(balance[0]?.totalStockholdersEquity ?? balance[0]?.totalEquity));
