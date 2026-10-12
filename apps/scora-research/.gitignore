@@ -180,3 +180,6 @@ research/data/*.tmp
 # Playwright: capturas, trazas y el estado de la ultima ejecucion. Son salida, no fuente.
 test-results/
 playwright-report/
+
+# Sesión del usuario de pruebas de Playwright (lleva un refresh token real).
+e2e/.auth/

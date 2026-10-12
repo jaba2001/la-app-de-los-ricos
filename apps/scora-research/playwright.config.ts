@@ -41,5 +41,15 @@ export default defineConfig({
     navigationTimeout: 30_000,
     trace: "off",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    // Visitante sin sesión.
+    { name: "chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: [/sesion\//, /\.setup\.ts$/] },
+    // Con sesión: el setup inicia sesión una vez con el usuario de pruebas (e2e/sesion.setup.ts)
+    // y las pruebas de e2e/sesion/ arrancan ya dentro. Sin E2E_EMAIL/E2E_PASSWORD se saltan.
+    { name: "setup", testMatch: /sesion\.setup\.ts$/ },
+    {
+      name: "con-sesion", testDir: "./e2e/sesion", dependencies: ["setup"],
+      use: { ...devices["Desktop Chrome"], storageState: "e2e/.auth/usuario.json" },
+    },
+  ],
 });

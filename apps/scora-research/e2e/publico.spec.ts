@@ -1,8 +1,8 @@
 // Flujos del visitante SIN sesión, en un navegador real y contra la API real.
 //
-// Es lo único que se puede recorrer de punta a punta sin credenciales: el login es por
-// enlace mágico y exige un buzón. Todo lo que hay detrás de la sesión queda BLOQUEADO y
-// está anotado como tal en AUDIT_REPORT.md.
+// Es lo único que se puede recorrer de punta a punta sin credenciales. Lo que hay detrás de
+// la sesión lo recorre e2e/sesion/ con el usuario de pruebas (ver e2e/sesion.setup.ts: el
+// login de la app es por enlace mágico, y el de pruebas entra con contraseña).
 //
 // Lo que se comprueba no es que "la página carga", sino que el JavaScript arranca sin
 // romperse y que los errores de red llegan a la pantalla en vez de quedarse en la consola.
