@@ -70,12 +70,28 @@ const nextConfig: NextConfig = {
 
 const withPwaConfig = withPWA({
   dest: "public",
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
+  // `cacheOnFrontEndNav` y `aggressiveFrontEndNavCaching` FUERA (12-10-2026). Su worker
+  // (swe-worker) vuelve a pedir cada página para guardarla y deja la respuesta sin consumir:
+  // en /picks esa petición quedaba abierta para siempre — también en producción, comprobado
+  // con Playwright. La página se veía bien, pero nunca terminaba de cargar y cada visita dejaba
+  // una conexión colgada. Lo que daban (páginas sin conexión) aquí no sirve: sin red no hay datos.
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
-  // Load our Web Push handlers into the generated service worker.
-  workboxOptions: { importScripts: ["/push-sw.js"] },
+  // Extiende la caché por defecto de next-pwa, sustituyendo SOLO la regla `apis`. Por defecto
+  // guardaba 24 h en el navegador cada GET a /api/* (NetworkFirst): datos de la sesión de un
+  // usuario —su watchlist, sus análisis— que en un equipo compartido, sin red, podía ver el
+  // siguiente. Los datos de la API no se cachean en el navegador: la caché está en el servidor.
+  extendDefaultRuntimeCaching: true,
+  workboxOptions: {
+    // Load our Web Push handlers into the generated service worker.
+    importScripts: ["/push-sw.js"],
+    runtimeCaching: [{
+      urlPattern: ({ sameOrigin, url }) => sameOrigin && url.pathname.startsWith("/api/"),
+      handler: "NetworkOnly",
+      options: { cacheName: "apis" },
+      method: "GET",
+    }],
+  },
 })(nextConfig);
 
 // ORDER MATTERS: Sentry wraps the PWA-wrapped config, never the reverse. next-pwa
