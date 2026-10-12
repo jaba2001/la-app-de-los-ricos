@@ -669,7 +669,15 @@ tenía las columnas de costes. Los dos fallaban entero → `005`. La tabla del c
 ### Pasos en producción — EN ESTE ORDEN (copiar primero, activar después)
 
 El control de permisos de la sesión bloqueó conectar a la base de producción, así que esto lo
-lanza Jorge:
+lanza Jorge. **Desde el 12-10 es un solo comando**, que hace todo lo de abajo, pregunta antes de
+copiar y prueba un workflow al final (probado en local contra la copia, sin túnel):
+
+```bash
+cd ~/Desktop/scora && ./infra/migrar-produccion.sh
+# más adelante, si Supabase siguió escribiendo: ./infra/migrar-produccion.sh --sin-pisar
+```
+
+Lo mismo, paso a paso:
 
 ```bash
 cd ~/Desktop/scora

@@ -64,9 +64,11 @@ echo "✓ federación: solo $REPO puede actuar como $SA"
 
 # ── 3. Usuario de base de datos ──────────────────────────────────────────────────────────
 CLAVE="$(openssl rand -base64 36 | tr -d '/+=\n' | cut -c1-40)"
-if gcloud sql users list --instance "$INSTANCIA" --project "$PROYECTO" --format='value(name)' | grep -qx scora_jobs; then
-  gcloud sql users set-password scora_jobs --instance "$INSTANCIA" --project "$PROYECTO" --password "$CLAVE" >/dev/null
-  echo "✓ usuario scora_jobs: contraseña renovada"
+# Primero se intenta cambiar la contraseña y, si el usuario no existe, se crea. Al revés no:
+# sql/gcp/006_rol_jobs.sql crea el rol por SQL, y la API de Cloud SQL puede no listarlo como
+# usuario — «create» fallaría con «ya existe».
+if gcloud sql users set-password scora_jobs --instance "$INSTANCIA" --project "$PROYECTO" --password "$CLAVE" >/dev/null 2>&1; then
+  echo "✓ usuario scora_jobs: contraseña puesta"
 else
   gcloud sql users create scora_jobs --instance "$INSTANCIA" --project "$PROYECTO" --password "$CLAVE" >/dev/null
   echo "✓ usuario scora_jobs creado"
@@ -85,6 +87,9 @@ if [[ -f "$ENV_FILE" ]]; then
   done
 fi
 echo "✓ secretos del repositorio: GCP_WIF_PROVIDER, GCP_JOBS_SA, PGUSER, PGPASSWORD"
+
+# Lanzado desde infra/migrar-produccion.sh, las migraciones y la copia ya están hechas.
+[[ -n "${C5_DESDE_MIGRAR:-}" ]] && exit 0
 
 cat <<FIN
 
