@@ -42,6 +42,9 @@ gcloud projects add-iam-policy-binding "$PROYECTO" --quiet \
 echo "✓ cuenta de servicio $SA con roles/cloudsql.client"
 
 # ── 2. Workload Identity Federation ──────────────────────────────────────────────────────
+# El intercambio del token de GitHub por uno de GCP pasa por STS e IAM Credentials. Sin STS
+# activado, el proxy abría el puerto y fallaba en la primera consulta (ECONNRESET, 12-10-2026).
+gcloud services enable sts.googleapis.com iamcredentials.googleapis.com --project "$PROYECTO"
 if ! gcloud iam workload-identity-pools describe "$POOL" --location global --project "$PROYECTO" >/dev/null 2>&1; then
   gcloud iam workload-identity-pools create "$POOL" --location global --project "$PROYECTO" \
     --display-name "GitHub Actions"

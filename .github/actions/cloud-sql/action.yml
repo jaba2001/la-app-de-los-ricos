@@ -31,17 +31,26 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        V=v2.14.1
+        V=v2.22.1
         curl -sSfL -o "$RUNNER_TEMP/cloud-sql-proxy" \
           "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/$V/cloud-sql-proxy.linux.amd64"
         chmod +x "$RUNNER_TEMP/cloud-sql-proxy"
-        "$RUNNER_TEMP/cloud-sql-proxy" --address 127.0.0.1 --port 5432 "${{ inputs.instance }}" \
+        # --run-connection-test: el proxy abre el puerto AUNQUE no pueda autenticarse, y el fallo
+        # salía después, en la primera consulta del script, como un «ECONNRESET» que no dice por
+        # qué (primera ejecución contra Cloud SQL, 12-10-2026). Con la prueba, si no llega a la
+        # instancia se para aquí mismo, con su log a la vista.
+        "$RUNNER_TEMP/cloud-sql-proxy" --run-connection-test --address 127.0.0.1 --port 5432 "${{ inputs.instance }}" \
           > "$RUNNER_TEMP/cloud-sql-proxy.log" 2>&1 &
-        # Esperar a que acepte conexiones. Si no llega, el paso falla aqui, con el log del
-        # proxy a la vista, y no mas tarde con un «connection refused» que no dice por que.
-        for i in $(seq 1 30); do
-          if (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null; then echo "proxy listo"; exit 0; fi
+        PID=$!
+        for i in $(seq 1 60); do
+          if ! kill -0 "$PID" 2>/dev/null; then
+            echo "::error::Cloud SQL Auth Proxy se ha parado"; cat "$RUNNER_TEMP/cloud-sql-proxy.log"; exit 1
+          fi
+          if grep -q "ready for new connections" "$RUNNER_TEMP/cloud-sql-proxy.log" 2>/dev/null; then
+            cat "$RUNNER_TEMP/cloud-sql-proxy.log"; echo "proxy listo"; exit 0
+          fi
           sleep 1
         done
+        echo "::error::Cloud SQL Auth Proxy no está listo en 60 s"
         cat "$RUNNER_TEMP/cloud-sql-proxy.log"
         exit 1
