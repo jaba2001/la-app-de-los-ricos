@@ -14,12 +14,28 @@
 //   · El balance solo miraba 10-Q: el cierre de ejercicio (10-K) no aparecía nunca.
 
 const DIA = 86400000;
+// Lo que no sea una lista cuenta como vacío: la SEC a veces devuelve un objeto en su lugar.
+const lista = (x) => (Array.isArray(x) ? x : []);
 const dias = (f) => (+new Date(f.end) - +new Date(f.start)) / DIA;
+
+/**
+ * Los hechos de un concepto, de la respuesta de companyfacts (`facts["us-gaap"]`). El BPA
+ * viene en «USD/shares» y las acciones en «shares», no en «USD». Solo vale una lista no vacía.
+ */
+export function unidadesDe(gaap, tag) {
+  for (const u of ['USD', 'USD/shares', 'shares']) {
+    const v = gaap?.[tag]?.units?.[u];
+    if (Array.isArray(v) && v.length) return v;
+  }
+  return [];
+}
 
 /** Une varios conceptos (y presentaciones repetidas): por periodo, el presentado más tarde. */
 export function unirConceptos(...listas) {
   const porPeriodo = new Map();
-  for (const lista of listas) for (const f of lista ?? []) {
+  // Lo que no sea una lista se ignora: la SEC a veces devuelve un objeto vacío en su lugar
+  // (KO, 12-10-2026) y un concepto raro no puede tumbar los demás.
+  for (const l of listas) for (const f of lista(l)) {
     if (f?.end == null || f.val == null) continue;
     const k = `${f.start ?? ""}|${f.end}`;
     const prev = porPeriodo.get(k);
@@ -36,7 +52,7 @@ export function unirConceptos(...listas) {
  */
 export function trimestres(hechos) {
   const out = new Map();
-  const conDuracion = (hechos ?? []).filter((f) => f.start && f.end);
+  const conDuracion = lista(hechos).filter((f) => f.start && f.end);
   for (const f of conDuracion) { const d = dias(f); if (d >= 70 && d <= 110) out.set(f.end, f.val); }
   const porInicio = new Map();
   for (const f of conDuracion) {
@@ -62,14 +78,14 @@ export function trimestres(hechos) {
 /** Ejercicios completos (300–400 días), uno por fecha de cierre. */
 export function anuales(hechos) {
   const out = new Map();
-  for (const f of hechos ?? []) if (f.start && f.end && dias(f) >= 300 && dias(f) <= 400) out.set(f.end, f.val);
+  for (const f of lista(hechos)) if (f.start && f.end && dias(f) >= 300 && dias(f) <= 400) out.set(f.end, f.val);
   return out;
 }
 
 /** Saldos (balance) de 10-Q Y 10-K, uno por fecha. */
 export function saldos(hechos) {
   const out = new Map();
-  for (const f of [...(hechos ?? [])].sort((a, b) => String(a.filed ?? "").localeCompare(String(b.filed ?? "")))) {
+  for (const f of [...lista(hechos)].sort((a, b) => String(a.filed ?? "").localeCompare(String(b.filed ?? "")))) {
     if (f.end && !f.start && (f.form === "10-Q" || f.form === "10-K")) out.set(f.end, f.val);
   }
   return out;
@@ -92,9 +108,9 @@ export function construirEstados(c, { nTrimestres = 12 } = {}) {
   const ocfQ = trimestres(ocf), capQ = trimestres(capex);
   const ocfA = anuales(ocf), capA = anuales(capex);
   // El BPA no se puede restar entre acumulados (cambia el nº de acciones): solo el trimestral.
-  const epsQ = new Map((c.eps ?? []).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
+  const epsQ = new Map(lista(c.eps).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
   // Acciones diluidas medias: un PROMEDIO, no se puede restar entre acumulados. Solo trimestral.
-  const accQ = new Map((c.dilutedShares ?? []).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
+  const accQ = new Map(lista(c.dilutedShares).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
 
   const income = fechasDesc(revQ, nTrimestres).map((date) => ({
     date,

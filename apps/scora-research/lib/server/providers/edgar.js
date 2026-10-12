@@ -9,7 +9,8 @@ import { requireUser } from '../auth.js';
 import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet } from '../cache.js';
-import { construirEstados } from '../edgarHechos.js';
+import { construirEstados, unidadesDe } from '../edgarHechos.js';
+import { fetchConReintento } from './red.js';
 
 
 const UA = 'ScoraMVP alealvarado804@gmail.com';
@@ -31,17 +32,20 @@ async function getMap() {
   return m;
 }
 
-async function getConcept(cik10, tag) {
-  try {
-    const r = await fetch(
-      `https://data.sec.gov/api/xbrl/companyconcept/CIK${cik10}/us-gaap/${tag}.json`,
-      { headers: { 'User-Agent': UA } }
-    );
-    if (!r.ok) return null;
-    const d = await r.json();
-    // El BPA viene en «USD/shares», no en «USD»: sin esto salía siempre null.
-    return d?.units?.USD ?? d?.units?.["USD/shares"] ?? d?.units?.shares ?? null;
-  } catch { return null; }
+// Todos los hechos us-gaap de la empresa en UNA petición (companyfacts).
+//
+// POR QUÉ (12-10-2026). Antes se pedía cada concepto por separado (companyconcept, 18
+// peticiones por ficha). Para KO la SEC respondía `"units":{"USD":{}}` —un objeto vacío— en
+// casi todos los conceptos, mientras companyfacts traía los mismos datos completos; y ese
+// objeto tumbaba la ficha entera con «not iterable». Una petición en vez de 18 es además lo
+// que pide la política de acceso de la SEC (~300 KB comprimidos, < 0,2 s).
+async function getFacts(cik10) {
+  const r = await fetchConReintento(`https://data.sec.gov/api/xbrl/companyfacts/CIK${cik10}.json`, { headers: { 'User-Agent': UA } });
+  // 404 = la empresa no tiene hechos XBRL (p. ej. solo presenta en papel): no es un fallo.
+  if (r.status === 404) return {};
+  if (!r.ok) throw new Error(`companyfacts HTTP ${r.status}`);
+  const d = await r.json();
+  return d?.facts?.['us-gaap'] ?? {};
 }
 
 
@@ -58,13 +62,13 @@ export async function serve(request) {
     return new Response(EMPTY, { status: 200, headers: { ...CORS, 'Cache-Control': 'public, max-age=3600, s-maxage=3600' } });
   }
 
-  // Highest-value cache in the proxy: one call here fans out to 13 parallel XBRL
-  // requests against the SEC, which enforces fair-access limits (hence the tight 5/min
+  // Highest-value cache in the proxy: one call here downloads the company's whole XBRL
+  // facts file from the SEC, which enforces fair-access limits (hence the tight 5/min
   // rate limit above). 24 h TTL because company facts only change when a filing lands —
   // same reasoning, and the same value, as the FMP statements endpoints.
   // v3: lo cacheado antes tiene CapEx positivo e ingresos de 2018 (v1) o no trae las acciones
-  // diluidas (v2). Ver edgarHechos.js.
-  const key = cacheKey('edgar', 'companyfacts-v3', new URLSearchParams({ symbol: sym }));
+  // diluidas (v2). v4: sale de companyfacts; con companyconcept KO salía vacía. Ver edgarHechos.js.
+  const key = cacheKey('edgar', 'companyfacts-v4', new URLSearchParams({ symbol: sym }));
   const hit = await cacheGet(key);
   if (hit) {
     return new Response(hit.body, {
@@ -81,8 +85,7 @@ export async function serve(request) {
     }
     const cik10 = cik.padStart(10, '0');
 
-    // Parallel fetch all XBRL concepts (13 requests)
-    // Todos los conceptos que hacen falta, en paralelo. Varios de ingresos y de deuda porque
+    // Los conceptos que hacen falta, sacados del fichero de hechos. Varios de ingresos y de deuda porque
     // cada empresa usa uno distinto y algunas lo cambian con los años (ver edgarHechos.js).
     const CONCEPTOS = {
       revenues: 'Revenues', revenueContract: 'RevenueFromContractWithCustomerExcludingAssessedTax',
@@ -95,9 +98,8 @@ export async function serve(request) {
       capex: 'PaymentsToAcquirePropertyPlantAndEquipment',
       dilutedShares: 'WeightedAverageNumberOfDilutedSharesOutstanding',
     };
-    const nombres = Object.keys(CONCEPTOS);
-    const valores = await Promise.all(nombres.map((n) => getConcept(cik10, CONCEPTOS[n])));
-    const crudo = Object.fromEntries(nombres.map((n, i) => [n, valores[i] ?? []]));
+    const gaap = await getFacts(cik10);
+    const crudo = Object.fromEntries(Object.entries(CONCEPTOS).map(([n, tag]) => [n, unidadesDe(gaap, tag)]));
     const { income, balanceSheet, cashFlow, annualIncome } = construirEstados(crudo);
 
     const body = JSON.stringify({ income, balanceSheet, cashFlow, annualIncome, source: 'edgar', cik });

@@ -5,7 +5,7 @@
 // Cada bloque es un fallo que se vio en la ficha de AAPL el 12-10-2026 (ver la cabecera del
 // módulo): ingresos de 2018, flujo de caja con un trimestre por año, CapEx con el signo al
 // revés y el cierre de ejercicio ausente del balance.
-import { unirConceptos, trimestres, anuales, saldos, construirEstados } from "../lib/server/edgarHechos.js";
+import { unirConceptos, trimestres, anuales, saldos, construirEstados, unidadesDe } from "../lib/server/edgarHechos.js";
 import { completarConEdgar } from "../lib/trimestres.ts";
 
 let bad = 0, total = 0;
@@ -25,6 +25,30 @@ const f = (start, end, val, form = "10-Q", filed = end) => ({ start, end, val, f
   // Mismo periodo presentado dos veces (el 10-K repite el año anterior): gana el último.
   const rep = unirConceptos([f("2025-01-01", "2025-03-31", 10, "10-Q", "2025-05-01")], [f("2025-01-01", "2025-03-31", 12, "10-K", "2026-02-01")]);
   check("periodo repetido → el presentado más tarde", rep.map((x) => x.val), [12]);
+}
+
+// ── La SEC devolvió `"units":{"USD":{}}` para los ingresos de KO: un objeto, no una lista ──
+{
+  check("un concepto que no es lista no tumba la unión", unirConceptos({}, [f("2025-01-01", "2025-03-31", 5)]).length, 1);
+  check("y los estados se construyen con lo demás", construirEstados({ revenues: {}, revenueContract: [f("2025-01-01", "2025-03-31", 7)] }).income.map((r) => r.revenue), [7]);
+  const todoObjetos = { revenues: {}, eps: {}, dilutedShares: {}, assets: {}, operatingCashFlow: {}, capex: {}, revenueContract: [f("2025-01-01", "2025-03-31", 7)] };
+  check("ni en BPA, acciones, balance o caja", Object.values(construirEstados(todoObjetos)).map((x) => x.length), [1, 0, 0, 0]);
+}
+
+// ── companyfacts: la unidad buena de cada concepto ──────────────────────────────────────
+{
+  const gaap = {
+    Revenues: { units: { USD: [f("2025-01-01", "2025-03-31", 1)] } },
+    EarningsPerShareDiluted: { units: { pure: [], "USD/shares": [f("2025-01-01", "2025-03-31", 1.5)] } },
+    WeightedAverageNumberOfDilutedSharesOutstanding: { units: { shares: [f("2025-01-01", "2025-03-31", 9e9)] } },
+    Assets: { units: { USD: {} } },
+  };
+  check("USD", unidadesDe(gaap, "Revenues").length, 1);
+  check("el BPA en USD/shares", unidadesDe(gaap, "EarningsPerShareDiluted")[0].val, 1.5);
+  check("las acciones en shares", unidadesDe(gaap, "WeightedAverageNumberOfDilutedSharesOutstanding")[0].val, 9e9);
+  check("un objeto en vez de lista → vacío", unidadesDe(gaap, "Assets"), []);
+  check("concepto que la empresa no usa → vacío", unidadesDe(gaap, "SalesRevenueNet"), []);
+  check("sin hechos → vacío", unidadesDe(undefined, "Revenues"), []);
 }
 
 // ── Acumulados del año → trimestres ─────────────────────────────────────────────────────
