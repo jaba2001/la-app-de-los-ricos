@@ -69,6 +69,8 @@ if (hayBase()) {
     body: JSON.stringify(top),
   });
   console.log(`  cloud sql upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  // Un upsert fallido tiene que poner el workflow en rojo, no quedarse en el log.
+  if (!resp.ok) process.exit(1);
 } else {
   console.log("  (sin base: PGHOST no definido — seed sl_discovery from the JSON)");
 }

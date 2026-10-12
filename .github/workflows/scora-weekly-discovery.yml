@@ -1,7 +1,7 @@
 name: Scora — weekly discovery ranking
 
-# Ranks the current S&P 500 by 12-1m momentum (the validated Phase-4 factor) and upserts
-# the top names to sl_discovery, so the /discovery screener stays fresh without anyone
+# Ranks the current S&P 500 by 12-1m momentum (the validated Phase-4 factor) and the
+# cross-asset board, and upserts both to sl_discovery, so the /discovery screener stays fresh without anyone
 # opening the app. Free data (Yahoo/Tiingo prices + EDGAR sector).
 on:
   schedule:
@@ -42,3 +42,14 @@ jobs:
           PGUSER: ${{ secrets.PGUSER }}
           PGPASSWORD: ${{ secrets.PGPASSWORD }}
         run: node --experimental-strip-types --no-warnings research/discovery.mjs
+      # El tablero cross-asset (metales, materias primas, renta fija, sectores). Hasta el
+      # 12-10-2026 no lo lanzaba ningún workflow y /discovery enseñaba los datos del 09-07.
+      - name: Rank cross-asset → sl_discovery
+        env:
+          TIINGO_TOKEN: ${{ secrets.TIINGO_TOKEN }}            # optional — delisted coverage
+          PGHOST: 127.0.0.1
+          PGPORT: "5432"
+          PGDATABASE: scora
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+        run: node --experimental-strip-types --no-warnings research/discovery_instruments.mjs

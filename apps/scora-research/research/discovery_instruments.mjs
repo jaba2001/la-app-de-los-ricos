@@ -4,13 +4,17 @@
 // momentum factor that drives the validated dual-momentum allocation (Sharpe ~1.0).
 // This is the cross-asset momentum board: which sleeve is leading right now.
 // Free: Yahoo/Tiingo prices (research/prices.mjs). Writes feed='cross-asset' rows to
-// Supabase sl_discovery (or research/out/discovery_instruments.json without a key).
+// sl_discovery in Cloud SQL (or only research/out/discovery_instruments.json without PGHOST).
+// Lo lanza el workflow semanal scora-weekly-discovery.yml: hasta el 12-10-2026 seguía
+// escribiendo en Supabase y ningún workflow lo ejecutaba, así que /discovery enseñaba los
+// datos del 09-07.
 // Run: node --experimental-strip-types --no-warnings research/discovery_instruments.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { fwdReturn, rawPriceAsOf, hasPriceAt } from "./prices.mjs";
+import { sbFetch, hayBase } from "./db.mjs";
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), "out");
 if (!existsSync(OUT)) mkdirSync(OUT, { recursive: true });
@@ -81,15 +85,16 @@ for (const r of rows) console.log(`  #${String(r.rank).padStart(2)} ${r.ticker.p
 writeFileSync(join(OUT, "discovery_instruments.json"), JSON.stringify(rows, null, 2));
 console.log(`\n  → wrote research/out/discovery_instruments.json (${rows.length} rows)`);
 
-const SB_URL = process.env.SUPABASE_URL || "https://acxaosesbsprrusdvgop.supabase.co";
-const SB_KEY = process.env.SUPABASE_SERVICE_KEY;
-if (SB_KEY) {
-  const resp = await fetch(`${SB_URL}/rest/v1/sl_discovery?on_conflict=ticker`, {
+if (!rows.length) { console.error("  ✖ ningún instrumento con precio: no se escribe nada"); process.exit(1); }
+if (hayBase()) {
+  const resp = await sbFetch(`sl_discovery?on_conflict=ticker`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, Prefer: "resolution=merge-duplicates" },
+    headers: { "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
     body: JSON.stringify(rows),
   });
-  console.log(`  Supabase upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  console.log(`  cloud sql upsert: ${resp.status} ${resp.ok ? "OK" : await resp.text()}`);
+  // Un upsert fallido tiene que poner el workflow en rojo, no quedarse en el log.
+  if (!resp.ok) process.exit(1);
 } else {
-  console.log("  (no SUPABASE_SERVICE_KEY — seed the cross-asset rows from the JSON)");
+  console.log("  (sin base: PGHOST no definido — seed sl_discovery from the JSON)");
 }

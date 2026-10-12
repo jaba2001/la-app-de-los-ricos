@@ -7,6 +7,7 @@ import type { MacroState } from "@/lib/types";
 import { stockPickingRegime } from "@/lib/microScore";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
+import { ultimaTanda } from "@/lib/discovery";
 
 interface Row {
   ticker: string; sector: string | null; price: number | null;
@@ -41,7 +42,7 @@ export default function DiscoveryPage() {
       if (!alive) return;
       // Un fallo no es "no hay candidatos" (AUDIT_REPORT M-3).
       setErrorCarga(eD || eM ? NO_SE_PUDO_CARGAR : null);
-      setRows((d as Row[]) ?? []);
+      setRows(ultimaTanda((d as Row[]) ?? []));
       setMacro((m as MacroState) ?? null);
       setLoaded(true);
     })();
