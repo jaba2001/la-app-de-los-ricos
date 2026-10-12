@@ -18,6 +18,7 @@ import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData 
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
+import { classifyInstrument } from "@/lib/instrument";
 
 const TabSk = () => <Sk w="100%" h={500} />;
 
@@ -48,6 +49,9 @@ const RiskModel         = dynamic(() => import("@/components/stock/RiskModel"), 
 const Governance        = dynamic(() => import("@/components/stock/Governance"),        { loading: TabSk, ssr: false });
 const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForecast"),   { ssr: false });
 const ValuationLab      = dynamic(() => import("@/components/stock/ValuationLab"),      { ssr: false });
+
+/** Pestañas que solo tienen sentido para la acción de una empresa (estados financieros). */
+const SOLO_ACCIONES = new Set(["governance", "fundamentals", "valuation", "report", "diligence", "research", "smartmoney"]);
 
 const TABS = [
   { id: "overview",      label: "Overview" },
@@ -115,13 +119,21 @@ export default function StockTickerPage() {
 
   const [activeTab, setActiveTab] = useState("overview");
   const mode = useMode();
-  const visibleTabs = useMemo(() => TABS.filter(t => tabVisible(t.id, mode)), [mode]);
+  const [data, setData] = useState<StockData | null>(null);
+  // Para un ETF, metal, bono o cripto, las pestañas que viven de los estados financieros de UNA
+  // empresa salían enteras en «—»/«N/A»/«Insufficient data» (recorrido con SPY, 12-10-2026).
+  const esAccion = useMemo(() => {
+    const p = data?.profile;
+    return classifyInstrument(ticker, p ? { isEtf: Boolean(p.isEtf ?? p.isFund), sector: p.sector as string | undefined, industry: p.industry as string | undefined } : null).isEquity;
+  }, [data?.profile, ticker]);
+  const visibleTabs = useMemo(
+    () => TABS.filter(t => tabVisible(t.id, mode) && (esAccion || !SOLO_ACCIONES.has(t.id))),
+    [mode, esAccion]);
   // Si el modo cambia estando en una pestaña que Beginner oculta, su contenido seguiría
   // pintándose sin pestaña resaltada. Se vuelve a Overview, que existe en ambos modos.
   useEffect(() => {
-    if (!tabVisible(activeTab, mode)) setActiveTab("overview");
-  }, [mode, activeTab]);
-  const [data, setData] = useState<StockData | null>(null);
+    if (!tabVisible(activeTab, mode) || (!esAccion && SOLO_ACCIONES.has(activeTab))) setActiveTab("overview");
+  }, [mode, activeTab, esAccion]);
   const [macro, setMacro] = useState<MacroState | null>(null);
   const [scores, setScores] = useState<Scores | null>(null);
   const [subScores, setSubScores] = useState<SubScores | null>(null);
@@ -745,6 +757,22 @@ export default function StockTickerPage() {
       // F2: el score se juzga contra la distribución del SECTOR cuando está disponible.
       // `loadFactorDist()` degrada a null si el fichero no está publicado, y entonces
       // calcScores cae a las bandas absolutas de siempre — la nota nunca deja de calcularse.
+      // ETFs, metales, bonos y cripto NO se puntúan con el modelo de acciones (12-10-2026): SPY
+      // salía «AVOID · score 18» —sin P/E, márgenes ni balance que puntuar— y esa nota se
+      // guardaba en sl_analyses (la watchlist) y en sl_score_log, el registro INMUTABLE del
+      // track record de selección de acciones, que contaminaba. Su lectura es la de
+      // InstrumentPanel: momentum y régimen.
+      const instrumento = classifyInstrument(ticker, stockData.profile ? {
+        isEtf: Boolean(stockData.profile.isEtf ?? stockData.profile.isFund),
+        sector: stockData.profile.sector as string | undefined,
+        industry: stockData.profile.industry as string | undefined,
+      } : null);
+      if (!instrumento.isEquity) {
+        if (!live()) return;
+        setScores(null); setSubScores(null); setFactorTilts(null); setDisqualifiers([]);
+        setLoading(false);
+        return;
+      }
       const factorDist = await loadFactorDist();          // grados y descalificadores
       const scoringDist = await distForScoring();        // null: no validado contra retornos
       const calc = calcScores(scoreInputs, scoringDist);
@@ -855,7 +883,12 @@ export default function StockTickerPage() {
   const profile = data?.profile;
   const quote   = data?.quote;
   const sector  = (profile?.sector as string) ?? "";
-  const macroTilt = macro ? getMacroTilt(macro, sector, factorTilts) : null;
+  const instrumentoVista = classifyInstrument(ticker, profile ? {
+    isEtf: Boolean(profile.isEtf ?? profile.isFund), sector: profile.sector as string | undefined, industry: profile.industry as string | undefined,
+  } : null);
+  // La inclinación macro es POR SECTOR de una empresa: a SPY le aplicaba la de «Financial
+  // Services» (el sector que FMP le asigna). Para no-acciones no se aplica.
+  const macroTilt = macro && instrumentoVista.isEquity ? getMacroTilt(macro, sector, factorTilts) : null;
   const icScore   = scores && macroTilt ? Math.max(0, Math.min(100, scores.total + macroTilt.tilt)) : null;
   const rating    = icScore != null ? getRating(icScore, disqualifiers) : (scores ? getRating(scores.total, disqualifiers) : null);
 

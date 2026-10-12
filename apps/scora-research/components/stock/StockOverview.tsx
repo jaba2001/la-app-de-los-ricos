@@ -176,7 +176,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
   const ret3m  = periodRet(cl, 63);
   const ret6m  = periodRet(cl, 126);
   const spyRet = periodRet(spyCl, 126);
-  const alpha6m = ret6m != null && spyRet != null ? ret6m - spyRet : null;
+  // SPY contra sí mismo daba «+0.0% · Outperforming»: sin referencia no hay alpha.
+  const alpha6m = ticker.toUpperCase() !== "SPY" && ret6m != null && spyRet != null ? ret6m - spyRet : null;
   const vs50   = sma50  != null && price != null ? ((price - sma50)  / sma50)  * 100 : null;
   const vs200  = sma200 != null && price != null ? ((price - sma200) / sma200) * 100 : null;
 
@@ -253,7 +254,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               ) : macroTilt ? (
                 <div>
                   <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-2)" }}>
-                    <strong style={{ color: macroTilt.color }}>{profile?.sector ? `${profile.sector as string} sector` : "This position"}</strong>
+                    <strong style={{ color: macroTilt.color }}>{!instr.isEquity ? instr.label : profile?.sector ? `${profile.sector as string} sector` : "This position"}</strong>
                     {" — macro tilt is "}<strong style={{ color: macroTilt.color }}>{macroTilt.label}</strong>
                     {macroTilt.tilt !== 0 && <span className="num"> ({macroTilt.tilt > 0 ? "+" : ""}{macroTilt.tilt} pts)</span>}
                   </div>
@@ -608,6 +609,9 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
         {/* Right */}
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
+          {/* Solo acciones: para un ETF, metal o bono las 12 casillas salían en «—» (no tienen P/E,
+              ROIC ni márgenes). Su lectura es la de InstrumentPanel: momentum y régimen. */}
+          {instr.isEquity && (
           <div className="card">
             <div className="section-label">Key Metrics (TTM)</div>
             <div className="sr-grid-4">
@@ -632,6 +636,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               ))}
             </div>
           </div>
+          )}
 
           {!loading && quote?.price != null && (() => {
             const p52 = Number(quote.price), low52 = quote.yearLow != null ? Number(quote.yearLow) : null, high52 = quote.yearHigh != null ? Number(quote.yearHigh) : null;

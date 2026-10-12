@@ -39,7 +39,8 @@ export default function InstrumentPanel({ instrument, closes, spyCloses, macro, 
   const uptrend = last != null && sma200 != null ? last > sma200 : (m121 ?? 0) > 0;
   const above50 = last != null && sma50 != null ? last > sma50 : null;
   const score = momScore(m121, m6);
-  const rs6 = (m6 != null && ret(spyCloses, 126) != null) ? m6 - (ret(spyCloses, 126) as number) : null;
+  // Contra sí mismo no hay fuerza relativa (SPY salía «0pp»).
+  const rs6 = ticker.toUpperCase() === "SPY" ? null : (m6 != null && ret(spyCloses, 126) != null) ? m6 - (ret(spyCloses, 126) as number) : null;
   const picking = stockPickingRegime(macro?.implied_corr ?? null);
 
   // Buy/sell signal — trend + momentum + not-overextended
