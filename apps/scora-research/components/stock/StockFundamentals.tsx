@@ -105,20 +105,28 @@ function HistoricalFinancials({ annual, loading }: { annual: Record<string, unkn
   );
 }
 
-function SharesDilutionChart({ sharesFloat, loading }: { sharesFloat: Record<string, unknown>[]; loading: boolean }) {
+function SharesDilutionChart({ sharesFloat, income, loading }: { sharesFloat: Record<string, unknown>[]; income: Record<string, unknown>[]; loading: boolean }) {
+  // La serie sale de las acciones diluidas medias de cada trimestre (FMP + los anteriores de
+  // EDGAR). shares-float solo trae el dato ACTUAL: con él el gráfico era un punto suelto y
+  // decía «0.0% dilution · Share buybacks» sin historia ninguna (recorrido, 12-10-2026).
   const chartData = useMemo(() => {
+    const trimestral = income
+      .map(r => ({ date: String(r.date ?? "").slice(0, 7), shares: Number(r.weightedAverageShsOutDil) / 1e6 }))
+      .filter(r => r.date && Number.isFinite(r.shares) && r.shares > 0)
+      .sort((a, b) => a.date.localeCompare(b.date));
+    if (trimestral.length >= 2) return trimestral;
     return [...sharesFloat]
       .sort((a, b) => String(a.date ?? "").localeCompare(String(b.date ?? "")))
       .map(r => ({
         date:   String(r.date ?? "").slice(0, 7),
         shares: Number(r.outstandingShares ?? r.floatShares ?? 0) / 1e6,
-        float:  Number(r.floatShares ?? 0) / 1e6,
       }));
-  }, [sharesFloat]);
+  }, [sharesFloat, income]);
 
   const first = chartData[0]?.shares ?? 0;
   const last  = chartData[chartData.length - 1]?.shares ?? 0;
-  const dilution = first > 0 ? ((last - first) / first) * 100 : null;
+  // Con un solo punto no hay tendencia: ni «0.0% dilution» ni «Share buybacks».
+  const dilution = chartData.length >= 2 && first > 0 ? ((last - first) / first) * 100 : null;
 
   return (
     <div className="card">
@@ -135,7 +143,11 @@ function SharesDilutionChart({ sharesFloat, loading }: { sharesFloat: Record<str
           </span>
         )}
       </div>
-      {loading || !chartData.length ? <Sk w="100%" h={160} /> : (
+      {loading ? <Sk w="100%" h={160} /> : chartData.length < 2 ? (
+        <div className="sr-hint" style={{ padding: "var(--sr-sp-4) 0" }}>
+          Not enough share-count history to show a trend.
+        </div>
+      ) : (
         <ResponsiveContainer width="100%" height={160}>
           <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--sr-border)" strokeOpacity={0.4} />
@@ -473,7 +485,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
       {/* Shares / Dilution chart */}
       {(sharesFloat.length > 0 || !loading) && (
-        <SharesDilutionChart sharesFloat={sharesFloat} loading={loading} />
+        <SharesDilutionChart sharesFloat={sharesFloat} income={data?.income ?? []} loading={loading} />
       )}
 
       {/* Quarterly Income Statement */}

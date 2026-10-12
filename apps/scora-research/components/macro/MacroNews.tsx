@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { Sk } from "@/components/ui/Skeleton";
+import { decodificar } from "@/lib/form4";
 
 interface NewsItem {
   title: string;
@@ -169,8 +170,9 @@ export default function MacroNews() {
           for (const n of r.value) {
             if (!n.headline) continue;
             items.push({
-              title: n.headline,
-              text: n.summary || undefined,
+              // Finnhub manda entidades HTML («S&amp;P 500»): se veían tal cual.
+              title: decodificar(n.headline),
+              text: n.summary ? decodificar(n.summary) : undefined,
               url: n.url,
               site: n.source,
               publishedDate: n.datetime ? new Date(n.datetime * 1000).toISOString() : undefined,

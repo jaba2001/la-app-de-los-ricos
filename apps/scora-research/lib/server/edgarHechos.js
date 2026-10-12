@@ -93,6 +93,8 @@ export function construirEstados(c, { nTrimestres = 12 } = {}) {
   const ocfA = anuales(ocf), capA = anuales(capex);
   // El BPA no se puede restar entre acumulados (cambia el nº de acciones): solo el trimestral.
   const epsQ = new Map((c.eps ?? []).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
+  // Acciones diluidas medias: un PROMEDIO, no se puede restar entre acumulados. Solo trimestral.
+  const accQ = new Map((c.dilutedShares ?? []).filter((f) => f.start && f.end && dias(f) >= 70 && dias(f) <= 110).map((f) => [f.end, f.val]));
 
   const income = fechasDesc(revQ, nTrimestres).map((date) => ({
     date,
@@ -101,6 +103,7 @@ export function construirEstados(c, { nTrimestres = 12 } = {}) {
     operatingIncome: de(opQ, date),
     netIncome: de(netQ, date),
     eps: de(epsQ, date),
+    weightedAverageShsOutDil: de(accQ, date), // mismo nombre que FMP
   }));
 
   const activos = saldos(c.assets), caja = saldos(c.cash), patrimonio = saldos(c.equity), pasivos = saldos(c.liabilities);

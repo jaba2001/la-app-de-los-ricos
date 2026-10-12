@@ -1104,7 +1104,7 @@ export default function StockTickerPage() {
             {activeTab === "options"      && (
               <>
                 <OptionsLab  ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} history={data?.history} score={icScore} />
-                <OptionsCalc ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} />
+                <OptionsCalc ticker={ticker} price={quote?.price as number ?? null} rate={macro?.dgs10 as number ?? null} divYield={data?.metrics?.dividendYieldTTM != null ? Number(data.metrics.dividendYieldTTM) * 100 : null} />
               </>
             )}
             {activeTab === "screener"     && <StockScreener />}

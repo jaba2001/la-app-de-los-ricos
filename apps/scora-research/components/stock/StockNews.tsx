@@ -4,6 +4,7 @@ import { aiAnalyzeAudited, authedFetch } from "@/lib/proxy";
 import { buildNewsRelevance, type NewsHeadline } from "@/lib/aiGrounding";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
+import { decodificar } from "@/lib/form4";
 
 interface Props { ticker: string }
 interface RawNews { datetime?: number; headline?: string; source?: string; summary?: string; url?: string; category?: string }
@@ -48,7 +49,9 @@ export default function StockNews({ ticker }: Props) {
         const clean = (Array.isArray(rows) ? rows : [])
           .filter(r => r.headline)
           .sort((a, b) => (b.datetime ?? 0) - (a.datetime ?? 0))
-          .slice(0, 30);
+          .slice(0, 30)
+          // Finnhub manda entidades HTML («S&amp;P 500»): se veían tal cual y llegaban así a la IA.
+          .map(r => ({ ...r, headline: decodificar(r.headline ?? ""), summary: r.summary ? decodificar(r.summary) : r.summary }));
         setNews(clean);
       })
       .catch(() => { if (live) setNews([]); })

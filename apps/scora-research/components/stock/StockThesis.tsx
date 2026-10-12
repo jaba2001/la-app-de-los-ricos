@@ -65,7 +65,7 @@ export default function StockThesis({ input, macro }: Props) {
           <div className="section-label" style={{ margin: 0 }}>AI thesis · grounded</div>
           <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>
             Cites only {input.ticker}&apos;s computed metrics — no invented numbers.
-            {docs.length > 0 && <span style={{ color: "var(--sr-pos)", marginLeft: 4 }}>· Grounded in 10-K{docs[0].fiscal_year ? ` FY${docs[0].fiscal_year}` : ""} ({docs.map((d) => d.section).join(", ")})</span>}
+            {docs.length > 0 && <span style={{ color: "var(--sr-pos)", marginLeft: 4 }}>· Grounded in 10-K{docs[0].fiscal_year ? ` FY${docs[0].fiscal_year}` : ""} ({[...new Set(docs.map((d) => d.section))].join(", ")})</span>}
           </div>
         </div>
         <button className="btn-primary" onClick={generate} disabled={loading} style={{ flexShrink: 0 }}>

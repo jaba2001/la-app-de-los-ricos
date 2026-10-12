@@ -67,6 +67,12 @@ const f = (start, end, val, form = "10-Q", filed = end) => ({ start, end, val, f
   check("CapEx NEGATIVO (convenio de FMP: FCF = OCF + CapEx)", e.cashFlow.map((r) => r.capitalExpenditure), [-7, -5]);
   check("FCF del trimestre derivado", e.cashFlow[0].freeCashFlow, 50 - 7);
   check("deuda total = LP + CP + papel comercial", e.balanceSheet[0].totalDebt, 95);
+  const acc = construirEstados({
+    revenueContract: [f("2025-01-01", "2025-03-31", 100), f("2025-04-01", "2025-06-30", 110)],
+    dilutedShares: [f("2025-01-01", "2025-03-31", 15.2e9), f("2025-04-01", "2025-06-30", 15.0e9), f("2025-01-01", "2025-06-30", 15.1e9)],
+  });
+  // Un promedio no se resta entre acumulados: el 6m (15,1) NO debe convertirse en «trimestre».
+  check("acciones diluidas por trimestre, con el nombre de FMP", acc.income.map((r) => r.weightedAverageShsOutDil), [15.0e9, 15.2e9]);
 }
 
 // ── FMP (5 trimestres) + EDGAR (los anteriores) ─────────────────────────────────────────

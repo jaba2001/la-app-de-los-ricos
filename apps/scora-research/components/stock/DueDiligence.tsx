@@ -92,7 +92,7 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
 
       {/* Golden-rule / governance banner */}
       <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-amber) 8%, var(--sr-surface-2))", border: "1px solid color-mix(in srgb, var(--sr-amber) 24%, transparent)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.5 }}>
-        Every module runs under a <strong style={{ color: "var(--sr-text)" }}>code-enforced grounding gate</strong>: the output&apos;s figures are checked against the data block, the run is logged to your audit trail, and any unverified number or advice phrasing is flagged below.{docs.length > 0 && <span style={{ color: "var(--sr-pos)" }}> Filings loaded: {docs.map((d) => d.section).join(", ")}.</span>}
+        Every module runs under a <strong style={{ color: "var(--sr-text)" }}>code-enforced grounding gate</strong>: the output&apos;s figures are checked against the data block, the run is logged to your audit trail, and any unverified number or advice phrasing is flagged below.{docs.length > 0 && <span style={{ color: "var(--sr-pos)" }}> Filings loaded: {[...new Set(docs.map((d) => d.section))].join(", ")}.</span>}
       </div>
 
       {/* Module cards */}

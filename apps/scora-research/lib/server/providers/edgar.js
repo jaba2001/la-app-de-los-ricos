@@ -40,7 +40,7 @@ async function getConcept(cik10, tag) {
     if (!r.ok) return null;
     const d = await r.json();
     // El BPA viene en «USD/shares», no en «USD»: sin esto salía siempre null.
-    return d?.units?.USD ?? d?.units?.["USD/shares"] ?? null;
+    return d?.units?.USD ?? d?.units?.["USD/shares"] ?? d?.units?.shares ?? null;
   } catch { return null; }
 }
 
@@ -62,8 +62,9 @@ export async function serve(request) {
   // requests against the SEC, which enforces fair-access limits (hence the tight 5/min
   // rate limit above). 24 h TTL because company facts only change when a filing lands —
   // same reasoning, and the same value, as the FMP statements endpoints.
-  // v2: lo cacheado antes del 12-10-2026 tiene CapEx positivo e ingresos de 2018 (edgarHechos.js).
-  const key = cacheKey('edgar', 'companyfacts-v2', new URLSearchParams({ symbol: sym }));
+  // v3: lo cacheado antes tiene CapEx positivo e ingresos de 2018 (v1) o no trae las acciones
+  // diluidas (v2). Ver edgarHechos.js.
+  const key = cacheKey('edgar', 'companyfacts-v3', new URLSearchParams({ symbol: sym }));
   const hit = await cacheGet(key);
   if (hit) {
     return new Response(hit.body, {
@@ -92,6 +93,7 @@ export async function serve(request) {
       longTermDebtCurrent: 'LongTermDebtCurrent', commercialPaper: 'CommercialPaper',
       operatingCashFlow: 'NetCashProvidedByUsedInOperatingActivities',
       capex: 'PaymentsToAcquirePropertyPlantAndEquipment',
+      dilutedShares: 'WeightedAverageNumberOfDilutedSharesOutstanding',
     };
     const nombres = Object.keys(CONCEPTOS);
     const valores = await Promise.all(nombres.map((n) => getConcept(cik10, CONCEPTOS[n])));

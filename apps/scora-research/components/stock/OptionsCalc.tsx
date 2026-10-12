@@ -6,7 +6,7 @@ import {
   type OptionType, type StrategyName,
 } from "@/lib/greeks";
 
-interface Props { ticker: string; price: number | null; rate: number | null; }
+interface Props { ticker: string; price: number | null; rate: number | null; /** % anual */ divYield?: number | null; }
 
 const numInput: React.CSSProperties = {
   width: 90, background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)",
@@ -22,19 +22,24 @@ function Field({ label, value, onChange, step = 1, min }: { label: string; value
   );
 }
 
-export default function OptionsCalc({ ticker, price, rate }: Props) {
+/** «−$15.53», no «$-15.53». */
+const usd = (x: number) => `${x < 0 ? "−" : ""}$${Math.abs(x).toFixed(2)}`;
+
+export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
   const [type, setType] = useState<OptionType>("call");
   const [spot, setSpot] = useState<number>(price ?? 100);
   const [strike, setStrike] = useState<number>(price != null ? Math.round(price) : 100);
   const [days, setDays] = useState<number>(30);
   const [ivPct, setIvPct] = useState<number>(30);
   const [ratePct, setRatePct] = useState<number>(rate != null ? Number(rate) : 4.2);
-  const [divPct, setDivPct] = useState<number>(0);
+  // Rentabilidad por dividendo real (era 0 fijo: una call de AAPL salía sobrevalorada).
+  const [divPct, setDivPct] = useState<number>(divYield != null ? Number(divYield) : 0);
   const [touched, setTouched] = useState(false); // once the user edits, stop auto-prefilling
 
   // Prefill from live data when it arrives — but NEVER overwrite a value the user has edited.
   useEffect(() => { if (!touched && price != null) { setSpot(price); setStrike(Math.round(price)); } }, [price, touched]);
   useEffect(() => { if (!touched && rate != null) setRatePct(Number(rate)); }, [rate, touched]);
+  useEffect(() => { if (!touched && divYield != null) setDivPct(Number(divYield)); }, [divYield, touched]);
 
   // Wrap a setter so any manual edit flips `touched` and freezes the prefill.
   const mark = (fn: (n: number) => void) => (n: number) => { setTouched(true); fn(n); };
@@ -180,7 +185,7 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
             <div key={p.label} style={{ padding: "var(--sr-sp-2)", borderRadius: "var(--sr-radius)", textAlign: "center", background: `color-mix(in srgb, ${p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)"} 10%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)"} 24%, transparent)` }}>
               <div className="sr-hint">{p.label} · ${p.spot.toFixed(0)}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                {p.pnl >= 0 ? "+" : ""}${p.pnl.toFixed(2)}
+                {p.pnl >= 0 ? "+" : "−"}${Math.abs(p.pnl).toFixed(2)}
               </div>
             </div>
           ))}
@@ -204,8 +209,8 @@ export default function OptionsCalc({ ticker, price, rate }: Props) {
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(96px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
               {stat("Net " + (strat.netPremium >= 0 ? "debit" : "credit"), `$${Math.abs(strat.netPremium).toFixed(2)}`, strat.netPremium >= 0 ? "paid" : "received")}
-              {stat("Max profit", strat.maxProfit == null ? "∞" : `$${strat.maxProfit.toFixed(2)}`)}
-              {stat("Max loss", strat.maxLoss == null ? "∞" : `$${strat.maxLoss.toFixed(2)}`)}
+              {stat("Max profit", strat.maxProfit == null ? "∞" : usd(strat.maxProfit))}
+              {stat("Max loss", strat.maxLoss == null ? "∞" : usd(strat.maxLoss))}
               {stat("Break-even", strat.breakevens.length ? strat.breakevens.map((b) => `$${b.toFixed(0)}`).join(" / ") : "—")}
               {stat("Net delta", strat.netDelta.toFixed(2), "per share")}
               {stat("Net theta/day", strat.netTheta.toFixed(3))}
