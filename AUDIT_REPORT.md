@@ -21,8 +21,8 @@ llamadas de verdad. Diez fallos más, **cuatro de ellos graves y silenciosos** (
 Pro, cancelaciones que fallan, alertas que no se disparan, correos que no salen) — ver «Tercera
 ronda» al final.
 
-**Queda abierto, y no es código:** C-5 (código listo; faltan los pasos en producción — ver «C-5» al final; bloqueado por
-permisos de esta sesión), las claves que faltan en producción (D-2), aplicar el rol de A-5, los
+**C-5 hecha el 12-10-2026** (ver «C-5» al final). **Queda abierto, y no es código:** que Alejandro
+pare los crons del repo antiguo, las claves que faltan en producción (D-2), aplicar el rol de A-5, los
 textos legales de A-6 y la revocación inmediata de sesión (D-3). La CI está en rojo por la
 guarda de frescura de los backtests: se están regenerando (ver «Segunda ronda»).
 
@@ -634,7 +634,22 @@ Build de producción sin errores; typecheck 0; lint sin errores (los ficheros to
 avisos); **suite completa con Postgres y servidor en verde (67 suites, 0 fallos)**; integración
 37/37 contra la app compilada; los 8 crons ejecutados contra la base sin un solo error de SQL.
 
-## C-5 · Migración de Supabase a Cloud SQL — código listo, falta ejecutarla en producción
+## C-5 · Migración de Supabase a Cloud SQL — HECHA el 12-10-2026
+
+**Resultado.** Jorge lanzó `infra/migrar-produccion.sh`: migraciones 004–007, copia de 19 tablas
+(~53 400 filas; `kb_chunks` 51 803) y activación (cuenta `scora-gh-jobs`, federación con GitHub,
+usuario `scora_jobs`, secretos del repo). El workflow de prueba falló la primera vez y destapó dos
+cosas, ya arregladas: **STS no estaba activado** en el proyecto (el proxy abría el puerto y la
+primera consulta daba `ECONNRESET`) y **`cron-measure` / `paperfund_measure` trataban una lectura
+fallida como «no hay filas»** y habrían escrito un histórico vacío encima del bueno (`e332e62`).
+Después, en verde contra Cloud SQL: weekly-measure (213 cohortes), weekly-filings, macro-breadth,
+weekly-discovery y paperfund-measure (nota «Accruing», ya no la «A» de dos meses). Los que crean
+historia inmutable (monthly-score, picks, paperfund-rebalance, monthly-revisions) NO se lanzaron a
+mano: corren en su fecha — picks, la primera, hoy a las 21:30 UTC.
+
+**Pendiente:** que Alejandro pare los crons del repo antiguo; si siguen escribiendo en Supabase
+días después, `./infra/migrar-produccion.sh --sin-pisar`. Y el audio del brief (Storage).
+
 
 ### Qué hay en Supabase (contado el 27-09, solo lectura)
 
