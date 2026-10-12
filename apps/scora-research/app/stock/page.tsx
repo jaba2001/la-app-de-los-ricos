@@ -1,29 +1,15 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { datos } from "@/lib/dataClient";
-import { authedFetch } from "@/lib/proxy";
 import type { StockAnalysis, WatchlistItem } from "@/lib/types";
 import { getRating } from "@/lib/scoring";
 import { Sk } from "@/components/ui/Skeleton";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import DataError, { NO_SE_PUDO_CARGAR, NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 import { t as tr, tv } from "@/lib/i18n/cliente";
-
-interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
-
-function tickerFlag(symbol: string, exchange: string): string {
-  const dot = symbol.lastIndexOf(".");
-  if (dot === -1) return ["NASDAQ", "NYSE", "AMEX"].includes(exchange) ? "🇺🇸" : "🌐";
-  const sfx = symbol.slice(dot + 1).toUpperCase();
-  const FLAGS: Record<string, string> = {
-    PA: "🇫🇷", DE: "🇩🇪", L: "🇬🇧", MI: "🇮🇹", AS: "🇳🇱", SW: "🇨🇭",
-    MC: "🇪🇸", ST: "🇸🇪", CO: "🇩🇰", OL: "🇳🇴", HE: "🇫🇮", LS: "🇵🇹",
-    BR: "🇧🇪", VI: "🇦🇹", TO: "🇨🇦", AX: "🇦🇺", HK: "🇭🇰", T: "🇯🇵", SI: "🇸🇬",
-  };
-  return FLAGS[sfx] ?? "🌐";
-}
+import TickerSearch, { tickerFlag } from "@/components/TickerSearch";
 
 const QUICK_PICKS = [
   { t: "AAPL",    l: "🇺🇸" }, { t: "MSFT",    l: "🇺🇸" }, { t: "NVDA",    l: "🇺🇸" },
@@ -35,10 +21,6 @@ const QUICK_PICKS = [
 export default function StockPage() {
   const { session, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [ticker, setTicker] = useState("");
-  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
-  const [suggIdx, setSuggIdx] = useState(-1);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
   const [analyses, setAnalyses] = useState<Record<string, StockAnalysis>>({});
   const [loadingWl, setLoadingWl] = useState(true);
@@ -67,46 +49,6 @@ export default function StockPage() {
       });
   }, [watchlist]);
 
-  // Debounced FMP search
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (ticker.length < 2) { setSuggestions([]); return; }
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const results = await authedFetch<SearchResult[]>(
-          `/api/fmp/search?query=${encodeURIComponent(ticker)}&limit=8`
-        );
-        setSuggestions(Array.isArray(results) ? results.slice(0, 8) : []);
-      } catch {
-        setSuggestions([]);
-      }
-    }, 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [ticker]);
-
-  function pickSuggestion(sym: string) {
-    setSuggestions([]);
-    setSuggIdx(-1);
-    router.push(`/stock/${sym}`);
-  }
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (suggIdx >= 0 && suggestions[suggIdx]) {
-      pickSuggestion(suggestions[suggIdx].symbol);
-      return;
-    }
-    const t = ticker.trim().toUpperCase();
-    if (t) router.push(`/stock/${t}`);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (!suggestions.length) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setSuggIdx(i => Math.min(i + 1, suggestions.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setSuggIdx(i => Math.max(i - 1, -1)); }
-    else if (e.key === "Escape") { setSuggestions([]); setSuggIdx(-1); }
-  }
-
   async function removeFromWatchlist(t: string) {
     const { error } = await datos.from("sl_watchlist").delete().eq("ticker", t).eq("user_id", session!.user.id);
     // Antes se quitaba de la lista aunque el borrado fallara: desaparecía y volvía al recargar.
@@ -125,65 +67,13 @@ export default function StockPage() {
         <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-6)" }}>
           {tr("Micro fundamentals + macro regime · NYSE, NASDAQ, BME/IBEX, LSE, Xetra, Euronext and more")}</p>
 
-        <form onSubmit={handleSearch} style={{ display: "flex", gap: "var(--sr-sp-3)", maxWidth: 520, margin: "0 auto" }}>
-          <div style={{ position: "relative", flex: 1 }}>
-            <input
-              className="sr-input"
-              style={{ width: "100%" }}
-              placeholder={tr("Company name or ticker (e.g. Apple, AAPL, SAN.MC)…")}
-              value={ticker}
-              onChange={e => { setTicker(e.target.value.toUpperCase()); setSuggIdx(-1); }}
-              onKeyDown={handleKeyDown}
-              onBlur={() => setTimeout(() => { setSuggestions([]); setSuggIdx(-1); }, 160)}
-              autoFocus
-              autoComplete="off"
-              maxLength={15}
-            />
-            {suggestions.length > 0 && (
-              <div style={{
-                position: "absolute", top: "calc(100% + 4px)", left: 0, right: 0,
-                background: "var(--sr-surface-2)", border: "1px solid var(--sr-border-2)",
-                borderRadius: "var(--sr-radius)", boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
-                zIndex: 500, overflow: "hidden",
-              }}>
-                {suggestions.map((s, i) => (
-                  <div
-                    key={s.symbol}
-                    onMouseDown={() => pickSuggestion(s.symbol)}
-                    onMouseEnter={() => setSuggIdx(i)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: 10, padding: "9px 14px",
-                      cursor: "pointer", textAlign: "left",
-                      background: i === suggIdx ? "var(--sr-surface-2)" : "transparent",
-                      borderBottom: i < suggestions.length - 1 ? "1px solid var(--sr-border)" : "none",
-                    }}
-                  >
-                    <span style={{ fontSize: 16, minWidth: 22, lineHeight: 1 }}>
-                      {tickerFlag(s.symbol, s.exchangeShortName)}
-                    </span>
-                    <span style={{
-                      fontWeight: 700, color: "var(--sr-amber)", fontSize: "var(--sr-t-sm)",
-                      minWidth: 88, fontFamily: "var(--font-mono, ui-monospace, monospace)",
-                    }}>
-                      {s.symbol}
-                    </span>
-                    <span style={{
-                      color: "var(--sr-text-2)", fontSize: "var(--sr-t-sm)",
-                      flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                    }}>
-                      {s.name}
-                    </span>
-                    <span style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)", flexShrink: 0 }}>
-                      {s.exchangeShortName}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>
-            {tr("Analyze")}</button>
-        </form>
+        <TickerSearch
+          variant="hero"
+          placeholder={tr("Company name or ticker (e.g. Apple, AAPL, SAN.MC)…")}
+          submitLabel={tr("Analyze")}
+          autoFocus
+          style={{ maxWidth: 520, margin: "0 auto" }}
+        />
 
         {/* Quick picks */}
         <div style={{ marginTop: "var(--sr-sp-4)", display: "flex", gap: "var(--sr-sp-2)", justifyContent: "center", flexWrap: "wrap" }}>
@@ -239,7 +129,7 @@ export default function StockPage() {
                     onClick={e => { e.stopPropagation(); removeFromWatchlist(w.ticker); }}
                   >×</button>
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: 4 }}>
-                    {tickerFlag(w.ticker, "")} {w.ticker}
+                    {tickerFlag(w.ticker)} {w.ticker}
                   </div>
                   {a ? (
                     <>

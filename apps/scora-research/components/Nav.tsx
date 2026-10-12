@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
-import { authedFetch } from "@/lib/proxy";
 import QuotaPill from "@/components/ui/QuotaPill";
+import TickerSearch from "@/components/TickerSearch";
 import SelectorIdioma from "@/components/SelectorIdioma";
 import { t } from "@/lib/i18n/cliente";
 
@@ -21,68 +21,15 @@ const MAIN_TABS = [
   { label: "Audit", href: "/audit" },
 ];
 
-interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
-
-function tickerFlag(symbol: string, exchange: string): string {
-  const dot = symbol.lastIndexOf(".");
-  if (dot === -1) return ["NASDAQ", "NYSE", "AMEX"].includes(exchange) ? "🇺🇸" : "🌐";
-  const sfx = symbol.slice(dot + 1).toUpperCase();
-  const FLAGS: Record<string, string> = {
-    PA: "🇫🇷", DE: "🇩🇪", L: "🇬🇧", MI: "🇮🇹", AS: "🇳🇱", SW: "🇨🇭",
-    MC: "🇪🇸", ST: "🇸🇪", CO: "🇩🇰", OL: "🇳🇴", HE: "🇫🇮", LS: "🇵🇹",
-    BR: "🇧🇪", VI: "🇦🇹", TO: "🇨🇦", AX: "🇦🇺", HK: "🇭🇰", T: "🇯🇵", SI: "🇸🇬",
-  };
-  return FLAGS[sfx] ?? "🌐";
-}
-
 export default function Nav() {
   const { session, signOut } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
 
-  const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
-  const [suggIdx, setSuggIdx] = useState(-1);
   // Menú plegable para pantallas estrechas: las 10 pestañas, el buscador y la cuenta no caben
   // por debajo de ~1100 px, y la barra empujaba la página entera hacia los lados en el móvil.
   const [menuAbierto, setMenuAbierto] = useState(false);
   useEffect(() => { setMenuAbierto(false); }, [pathname]);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (query.length < 2) { setSuggestions([]); return; }
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const results = await authedFetch<SearchResult[]>(
-          `/api/fmp/search?query=${encodeURIComponent(query)}&limit=7`
-        );
-        setSuggestions(Array.isArray(results) ? results.slice(0, 7) : []);
-      } catch {
-        setSuggestions([]);
-      }
-    }, 280);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query]);
-
-  function pick(sym: string) {
-    setQuery("");
-    setSuggestions([]);
-    setSuggIdx(-1);
-    router.push(`/stock/${sym}`);
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (!suggestions.length) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setSuggIdx(i => Math.min(i + 1, suggestions.length - 1)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setSuggIdx(i => Math.max(i - 1, -1)); }
-    else if (e.key === "Escape") { setSuggestions([]); setSuggIdx(-1); }
-    else if (e.key === "Enter") {
-      e.preventDefault();
-      if (suggIdx >= 0 && suggestions[suggIdx]) { pick(suggestions[suggIdx].symbol); }
-      else if (query.trim()) { pick(query.trim().toUpperCase()); }
-    }
-  }
 
   if (!session) return null;
 
@@ -145,69 +92,10 @@ export default function Nav() {
       </nav>
 
       {/* Global ticker search */}
-      <div style={{ position: "relative", flex: 1, minWidth: 0, maxWidth: 340 }}>
-        <input
-          placeholder={t("Search ticker or company…")}
-          value={query}
-          onChange={e => { setQuery(e.target.value.toUpperCase()); setSuggIdx(-1); }}
-          onKeyDown={handleKeyDown}
-          onBlur={() => setTimeout(() => { setSuggestions([]); setSuggIdx(-1); }, 160)}
-          autoComplete="off"
-          maxLength={15}
-          style={{
-            width: "100%",
-            background: "var(--sr-surface-2)",
-            border: "1px solid var(--sr-border)",
-            borderRadius: "var(--sr-radius)",
-            color: "var(--sr-text)",
-            fontSize: "var(--sr-t-sm)",
-            padding: "6px 12px",
-            outline: "none",
-            fontFamily: "inherit",
-          }}
-        />
-        {suggestions.length > 0 && (
-          <div style={{
-            position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
-            background: "var(--sr-surface-2)", border: "1px solid var(--sr-border-2)",
-            borderRadius: "var(--sr-radius)", boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
-            zIndex: 500, overflow: "hidden",
-          }}>
-            {suggestions.map((s, i) => (
-              <div
-                key={s.symbol}
-                onMouseDown={() => pick(s.symbol)}
-                onMouseEnter={() => setSuggIdx(i)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 8, padding: "8px 12px",
-                  cursor: "pointer",
-                  background: i === suggIdx ? "var(--sr-surface-2)" : "transparent",
-                  borderBottom: i < suggestions.length - 1 ? "1px solid var(--sr-border)" : "none",
-                }}
-              >
-                <span style={{ fontSize: 14, minWidth: 20, lineHeight: 1 }}>
-                  {tickerFlag(s.symbol, s.exchangeShortName)}
-                </span>
-                <span style={{
-                  fontWeight: 700, color: "var(--sr-amber)", fontSize: "var(--sr-t-xs)",
-                  minWidth: 80, fontFamily: "var(--font-mono, ui-monospace, monospace)",
-                }}>
-                  {s.symbol}
-                </span>
-                <span style={{
-                  color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)",
-                  flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                }}>
-                  {s.name}
-                </span>
-                <span style={{ color: "var(--sr-text-3)", fontSize: "10px", flexShrink: 0 }}>
-                  {s.exchangeShortName}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <TickerSearch
+        placeholder={t("Search ticker or company…")}
+        style={{ flex: 1, minWidth: 0, maxWidth: 340 }}
+      />
 
       {/* Cuota de IA + sign out */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto" }}>

@@ -386,6 +386,11 @@ jobs:
       # Los ETFs que el plan de FMP no cubre salen de Yahoo con la forma exacta de FMP.
       - name: Respaldo de Yahoo para ETFs
         run: node --experimental-strip-types --no-warnings scripts/yahoo.test.mjs
+      # El buscador de la barra y de /stock: /stable/search de FMP no existe y el desplegable
+      # no salía nunca. Ahora busca en la lista de la SEC, una curada de Europa y Yahoo, con
+      # erratas («nvidea» → NVDA, «inditex» → ITX.MC). Sin red: datos de ejemplo.
+      - name: Buscador de valores (ticker o nombre, con erratas)
+        run: node --experimental-strip-types --no-warnings scripts/busqueda.test.mjs
       # Finviz cambio el HTML de su tabla en 2026 y el parser devolvia {} en silencio.
       - name: Parser de Finviz (formatos 2026 y anterior)
         run: node --experimental-strip-types --no-warnings scripts/finviz.test.mjs

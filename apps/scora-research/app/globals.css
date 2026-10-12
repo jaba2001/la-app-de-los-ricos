@@ -459,6 +459,22 @@ input, textarea { font-family: inherit; }
   .container { padding-inline: var(--sr-sp-4); }
 }
 
+/* ─── Buscador de valores (components/TickerSearch) ──────────────────
+   En la barra el campo puede ser estrecho: el panel se abre más ancho y
+   alineado a su borde DERECHO, que siempre deja sitio a la izquierda.
+   En el móvil ocupa todo el ancho bajo la barra, para no salirse por la
+   derecha (la barra está fija arriba y de lado a lado, así que `fixed`
+   cae en el mismo sitio tanto si se mide contra ella como contra la
+   ventana).                                                            */
+.ticker-search-panel { position: absolute; top: calc(100% + 6px); left: 0; width: 100%; }
+.ticker-search-panel--nav { left: auto; right: 0; width: max(100%, 380px); }
+@media (max-width: 640px) {
+  .ticker-search-panel--nav {
+    position: fixed; top: var(--sr-nav-h);
+    left: var(--sr-sp-3); right: var(--sr-sp-3); width: auto;
+  }
+}
+
 /* ─── Móvil (12-10-2026) ──────────────────────────────────────────────
    Recorrido a 390 px: la barra de arriba empujaba la página hacia los
    lados, las rejillas no se apilaban y Macro quedaba cortada a la derecha.

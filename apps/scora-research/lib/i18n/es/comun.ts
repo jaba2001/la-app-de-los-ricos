@@ -16,6 +16,8 @@ export const COMUN: Record<string, string> = {
   "Open menu": "Abrir menú",
   "Close menu": "Cerrar menú",
   "Search ticker or company…": "Buscar ticker o empresa…",
+  "Searching…": "Buscando…",
+  "No matches": "Sin resultados",
   "Language": "Idioma",
   "Scora Research": "Scora Research",
 

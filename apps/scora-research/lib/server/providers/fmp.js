@@ -24,12 +24,14 @@ import { fetchConReintento } from './red.js';
 //   price-target        → price-target-consensus
 //   earnings-surprises  → earnings            (trae epsActual/epsEstimated por trimestre)
 //   institutional-holder, house-disclosure → fuera: 402 en este plan, no hay sustituto.
+//   search              → fuera: /stable/search no existe (404). El buscador va por /api/search
+//                         (lib/server/busqueda.js), que no gasta cuota de FMP.
 const ALLOWED = new Set([
   'quote','profile','key-metrics-ttm','ratios-ttm',
   'historical-price-eod/full','income-statement',
   'analyst-estimates','discounted-cash-flow','balance-sheet-statement','price-target-consensus',
   'cash-flow-statement','stock-peers','shares-float',
-  'financial-growth','earnings','search',
+  'financial-growth','earnings',
 ]);
 
 // A segment may only be a plain path atom. Without this, an encoded slash lets a caller

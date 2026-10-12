@@ -48,7 +48,8 @@ const ROUTES = [
   ["GET", `/api/fmp/earnings?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/discounted-cash-flow?symbol=${SYM}`, 401],
   ["GET", `/api/fmp/shares-float?symbol=${SYM}`, 401],
-  ["GET", `/api/fmp/search?query=apple`, 401],
+  // Buscador: ya no pasa por FMP (lib/server/busqueda.js).
+  ["GET", `/api/search?q=apple`, 401],
   // Las rutas cerradas el 27-09 (AUDIT_REPORT B-1) ya no se listan: sin token dan 401 igual
   // que las abiertas. Que están cerradas lo comprueba simbolos.test.mjs con un token firmado.
   // Finnhub
