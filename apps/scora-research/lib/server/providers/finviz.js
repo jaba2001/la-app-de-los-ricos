@@ -29,14 +29,23 @@ function toNum(s) {
   return isNaN(n) ? null : n;
 }
 
-function parseFinvizHtml(html) {
+export function parseFinvizHtml(html) {
   const result = {};
-
-  // Primary regex: <b>LABEL</b></td>...<td ...>VALUE
-  const re1 = /<b>([^<]{1,40})<\/b><\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g;
   const pairs = [];
   let m;
-  while ((m = re1.exec(html)) !== null) {
+
+  // Formato de 2026: <div class="snapshot-td-label">LABEL</div></td><td …><div class="snapshot-td-content">VALOR</div>.
+  // Finviz lo cambió (y movió quote.ashx a /stock?t=): con solo los patrones antiguos el parser
+  // devolvía {} y la pestaña Sentiment salía llena de «—» (recorrido con sesión, 12-10-2026).
+  const re0 = /<div class="snapshot-td-label">([^<]{1,40})<\/div><\/td>\s*<td[^>]*>\s*<div class="snapshot-td-content">([\s\S]*?)<\/div>\s*<\/td>/g;
+  while ((m = re0.exec(html)) !== null) {
+    pairs.push([m[1].trim(), m[2].replace(/<[^>]+>/g, '').trim()]);
+  }
+
+  // Formato anterior: <b>LABEL</b></td>...<td ...>VALUE
+  const re1 = /<b>([^<]{1,40})<\/b><\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/g;
+  const formatoNuevo = pairs.length > 0;
+  while (!formatoNuevo && (m = re1.exec(html)) !== null) {
     const label = m[1].trim();
     const value = m[2].replace(/<[^>]+>/g, '').trim();
     pairs.push([label, value]);
@@ -63,14 +72,16 @@ function parseFinvizHtml(html) {
       case 'Inst Own':         result.instOwn         = pctToDecimal(value); break;
       case 'Inst Trans':       result.instTrans       = pctToDecimal(value); break;
       case 'Rel Volume':       result.relVolume       = toNum(value);        break;
-      case 'ATR':              result.atr             = toNum(value);        break;
+      case 'ATR':
+      case 'ATR (14)':         result.atr             = toNum(value);        break; // nombre de 2026
       case 'Volatility': {
         // "1.72% 1.84%" — take first number
         const first = value.split(' ')[0];
         result.volatility14d = pctToDecimal(first);
         break;
       }
-      case 'Fwd P/E':          result.forwardPe       = toNum(value);        break;
+      case 'Fwd P/E':
+      case 'Forward P/E':      result.forwardPe       = toNum(value);        break; // nombre de 2026
       case 'PEG':              result.peg             = toNum(value);        break;
       case 'P/S':              result.ps              = toNum(value);        break;
       case 'P/C':              result.pc              = toNum(value);        break;
@@ -92,6 +103,8 @@ function parseFinvizHtml(html) {
       }
       case 'EPS next 5Y':      result.epsNext5Y       = pctToDecimal(value); break;
       case 'Sales past 3Y':    result.salesGrowth3Y   = pctToDecimal(value); break;
+      // 2026: «Sales past 3/5Y» trae los dos, «3.5% 8.2%»: el primero es el de 3 años.
+      case 'Sales past 3/5Y':  result.salesGrowth3Y   = pctToDecimal(value.split(' ')[0]); break;
       case 'Perf Year':        result.perfYear        = pctToDecimal(value); break;
       case 'Perf 3Y':          result.perf3Y          = pctToDecimal(value); break;
       case 'Perf 5Y':          result.perf5Y          = pctToDecimal(value); break;
@@ -133,7 +146,8 @@ export async function serve(request) {
   }
 
   try {
-    const finvizUrl = `https://finviz.com/quote.ashx?t=${symbol}`;
+    // quote.ashx redirige dos veces (→ /quote → /stock): se pide la dirección final.
+    const finvizUrl = `https://finviz.com/stock?t=${symbol}`;
     const res = await fetch(finvizUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',

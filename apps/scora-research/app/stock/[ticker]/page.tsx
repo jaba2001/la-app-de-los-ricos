@@ -545,9 +545,14 @@ export default function StockTickerPage() {
       const finvizData: FinvizData | null = finvizRes.status === "fulfilled"
         ? (finvizRes.value as FinvizData) ?? null
         : null;
+      // Finviz quitó el objetivo de precio de su tabla y el de Finnhub es de pago: el objetivo
+      // de la pestaña Sentiment sale del consenso de FMP (la misma cifra que Research).
+      const objetivo = consenso && Number(consenso.targetConsensus) > 0
+        ? { targetMean: Number(consenso.targetConsensus), targetHigh: Number(consenso.targetHigh), targetLow: Number(consenso.targetLow) }
+        : fhTarget;
       let finvizMerged = mergeFinviz(
         finvizData,
-        finnhubToFinvizFallback(fhM, analystConsensus, fhTarget),
+        finnhubToFinvizFallback(fhM, analystConsensus, objetivo),
       );
       // Short float: NASDAQ short interest ÷ float (both free); FINRA short-volume
       // ratio as the fallback. Overlays onto the Sentiment tab's Short Interest cells.
