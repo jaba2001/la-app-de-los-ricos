@@ -83,8 +83,8 @@ export default function MetalsCockpit({ macro }: Props) {
                   </div>
                   <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(read.tone), marginBottom: 4 }}>{tv(read.label)}</div>
                   <div className="sr-hint">
-                    {net != null ? tr(`Managed-money net ${net >= 0 ? "+" : ""}${net.toLocaleString()} contracts`) : tr("No COT data")}
-                    {wow != null ? ` · WoW ${wow >= 0 ? "+" : ""}${wow.toLocaleString()}` : ""}
+                    {net != null ? tr(`Managed-money net ${net >= 0 ? "+" : ""}${net.toLocaleString("en-US")} contracts`) : tr("No COT data")}
+                    {wow != null ? ` · WoW ${wow >= 0 ? "+" : ""}${wow.toLocaleString("en-US")}` : ""}
                   </div>
                 </div>
               );

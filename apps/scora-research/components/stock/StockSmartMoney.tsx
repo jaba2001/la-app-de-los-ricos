@@ -183,7 +183,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                       <td>{(t.transactionDate as string)?.slice(0, 10) ?? "—"}</td>
                       <td style={{ maxWidth: 120, overflow: "hidden", textOverflow: "ellipsis" }}>{(t.reportingName ?? t.name) as string ?? "—"}</td>
                       <td style={{ color: isBuy ? "var(--sr-pos)" : "var(--sr-neg)", fontWeight: 600 }}>{isBuy ? "BUY" : "SELL"}</td>
-                      <td style={{ textAlign: "right" }} className="num">{t.change != null ? Math.abs(t.change as number).toLocaleString() : "—"}</td>
+                      <td style={{ textAlign: "right" }} className="num">{t.change != null ? Math.abs(t.change as number).toLocaleString("en-US") : "—"}</td>
                     </tr>
                   );
                 })}
@@ -206,7 +206,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                 {holders.slice(0, 10).map((h, i) => (
                   <tr key={i}>
                     <td style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis" }}>{h.holder as string ?? "—"}</td>
-                    <td style={{ textAlign: "right" }} className="num">{h.shares != null ? (h.shares as number).toLocaleString() : "—"}</td>
+                    <td style={{ textAlign: "right" }} className="num">{h.shares != null ? (h.shares as number).toLocaleString("en-US") : "—"}</td>
                     <td style={{ textAlign: "right" }} className="num">{h.weightPercent != null ? `${Number(h.weightPercent).toFixed(2)}%` : "—"}</td>
                   </tr>
                 ))}

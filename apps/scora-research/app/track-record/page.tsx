@@ -158,7 +158,7 @@ export default function TrackRecordPage() {
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div className="sr-grid-3" style={{ marginBottom: "var(--sr-sp-3)" }}>
           <Stat label={t("Value/quality return")} value={pct(M.valueQuality.totalReturn, 0)} color="var(--sr-neg)" sub={`SPY ${pct(M.valueQuality.spyReturn, 0)}`} />
-          <Stat label={t("Info. Coefficient")} value={M.valueQuality.ic.toFixed(3)} sub={t(`${M.nameMonths.toLocaleString()} name-months`)} />
+          <Stat label={t("Info. Coefficient")} value={M.valueQuality.ic.toFixed(3)} sub={t(`${M.nameMonths.toLocaleString("en-US")} name-months`)} />
           <Stat label={t("Momentum IC · low corr")} value={`+${M.momentumIC.low.toFixed(3)}`} color="var(--sr-pos)" sub={t(`high corr ${M.momentumIC.high.toFixed(3)}`)} />
         </div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>

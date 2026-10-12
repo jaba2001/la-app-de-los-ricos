@@ -17,7 +17,7 @@ interface Props { data: StockData | null; macro: MacroState | null; scores: Scor
 
 const num = (v: unknown): number | null => { const n = Number(v); return v != null && !isNaN(n) ? n : null; };
 const sum4 = (arr: Record<string, unknown>[], key: string) => arr.slice(0, 4).reduce((s, q) => s + (Number(q[key]) || 0), 0);
-const fmt = (v: number | null, d = 2, pre = "$") => (v == null ? "—" : `${pre}${v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d })}`);
+const fmt = (v: number | null, d = 2, pre = "$") => (v == null ? "—" : `${pre}${v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })}`);
 const pct = (v: number | null, d = 0) => (v == null ? "—" : `${v > 0 ? "+" : ""}${v.toFixed(d)}%`);
 
 function renderMd(text: string) {

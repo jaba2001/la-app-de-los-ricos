@@ -224,7 +224,7 @@ export default function JournalPage() {
                   <tr key={t.id}>
                     <td><Link href={`/stock/${t.ticker}`} style={{ fontWeight: 700, color: "var(--sr-amber)", textDecoration: "none" }} className="num">{t.ticker}</Link></td>
                     <td style={{ color: t.side === "sell" ? "var(--sr-neg)" : "var(--sr-pos)", fontWeight: 600, textTransform: "capitalize" }}>{t.side}</td>
-                    <td style={{ textAlign: "right" }} className="num">{t.shares.toLocaleString()}</td>
+                    <td style={{ textAlign: "right" }} className="num">{t.shares.toLocaleString("en-US")}</td>
                     <td style={{ textAlign: "right" }} className="num">${t.price.toFixed(2)}</td>
                     <td style={{ textAlign: "right" }} className="num">{loadingMarks && mark == null ? "…" : mark != null ? `$${mark.toFixed(2)}` : "—"}</td>
                     <td style={{ textAlign: "right", fontWeight: 600, color: pnl != null ? pnlColor(pnl) : "var(--sr-text-3)" }} className="num">
@@ -304,7 +304,7 @@ export default function JournalPage() {
                   <tr key={t.id}>
                     <td><Link href={`/stock/${t.ticker}`} style={{ fontWeight: 700, color: "var(--sr-amber)", textDecoration: "none" }} className="num">{t.ticker}</Link></td>
                     <td style={{ color: t.side === "sell" ? "var(--sr-neg)" : "var(--sr-pos)", fontWeight: 600, textTransform: "capitalize" }}>{t.side}</td>
-                    <td style={{ textAlign: "right" }} className="num">{t.shares.toLocaleString()}</td>
+                    <td style={{ textAlign: "right" }} className="num">{t.shares.toLocaleString("en-US")}</td>
                     <td style={{ textAlign: "right" }} className="num">${t.price.toFixed(2)}</td>
                     <td style={{ textAlign: "right" }} className="num">{t.exit_price != null ? `$${t.exit_price.toFixed(2)}` : "—"}</td>
                     <td style={{ textAlign: "right", fontWeight: 600, color: pnlColor(pnl) }} className="num">{pnl >= 0 ? "+" : ""}{money(pnl)}</td>

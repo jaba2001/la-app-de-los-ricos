@@ -156,8 +156,8 @@ export function computeSmartMoneySignal(insiders: Row[], congress: Row[]): Smart
   const highlights: SmartMoneyHighlight[] = [];
 
   if (clusterBuy) highlights.push({ label: "Cluster buy", tone: "pos", detail: `${distinctBuyers} distinct insiders bought — the strongest open-market signal.` });
-  if (largestBuy) highlights.push({ label: "Top insider buy", tone: "pos", detail: `${largestBuy.name} — ${largestBuy.usd != null ? fmtUsd(largestBuy.usd) : `${largestBuy.shares.toLocaleString()} sh`}.` });
-  if (largestSell) highlights.push({ label: "Top insider sell", tone: "neg", detail: `${largestSell.name} — ${largestSell.usd != null ? fmtUsd(largestSell.usd) : `${largestSell.shares.toLocaleString()} sh`}.` });
+  if (largestBuy) highlights.push({ label: "Top insider buy", tone: "pos", detail: `${largestBuy.name} — ${largestBuy.usd != null ? fmtUsd(largestBuy.usd) : `${largestBuy.shares.toLocaleString("en-US")} sh`}.` });
+  if (largestSell) highlights.push({ label: "Top insider sell", tone: "neg", detail: `${largestSell.name} — ${largestSell.usd != null ? fmtUsd(largestSell.usd) : `${largestSell.shares.toLocaleString("en-US")} sh`}.` });
   if (largestCongress) highlights.push({ label: "Congress activity", tone: largestCongress.type === "purchase" ? "pos" : "neg", detail: `Largest disclosure ≈ ${fmtUsd(largestCongress.amount)} ${largestCongress.type}.` });
   if (highlights.length === 0) highlights.push({ label: "No smart-money signal", tone: "neu", detail: "No recent insider or congressional activity for this name." });
 

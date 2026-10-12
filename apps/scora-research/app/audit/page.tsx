@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth";
 import { datos } from "@/lib/dataClient";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
-import { t } from "@/lib/i18n/cliente";
+import { t, fechaHora } from "@/lib/i18n/cliente";
 import Trans from "@/components/Trans";
 
 interface AuditRow {
@@ -25,6 +25,8 @@ const MODULE_LABEL: Record<string, string> = {
   thesis: "Stock thesis", report: "Research note", redflags: "Red-flag scanner",
   moat: "Moat audit", bullbear: "Bull vs bear", macrosens: "Macro sensitivity",
   thesisupdate: "Thesis triggers", earnings: "Earnings tone", brief: "Scora brief",
+  // El asistente de pantalla (app/api/assistant).
+  "screen-assistant": "Screen assistant",
 };
 
 export default function AuditPage() {
@@ -92,7 +94,7 @@ export default function AuditPage() {
                 return (
                   <Fragment key={r.id}>
                     <tr style={{ cursor: "pointer" }} onClick={() => setOpen(isOpen ? null : r.id)}>
-                      <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)", whiteSpace: "nowrap" }}>{new Date(r.created_at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+                      <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)", whiteSpace: "nowrap" }}>{fechaHora(r.created_at, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
                       <td style={{ fontWeight: 600 }}>{t(MODULE_LABEL[r.module] ?? r.module)}</td>
                       <td style={{ color: "var(--sr-amber)", fontWeight: 700 }}>{r.ticker ?? "—"}</td>
                       <td>
