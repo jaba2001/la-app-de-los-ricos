@@ -111,6 +111,19 @@ export function buildVerdict(inp: VerdictInput): Verdict {
   const reasons = [tf.monthly.reasons[0], tf.weekly.reasons[0], tf.daily.reasons[0]]
     .filter((r): r is string => typeof r === "string" && r.length > 0);
 
+  // El titular sale de la mezcla nota+tendencia del HORIZONTE; el resumen, solo de los marcos
+  // temporales. Con «Years» (la nota pesa más) salía «Sell 48/100» encima de «Structural buy —
+  // macro tailwind…» sin explicar por qué (recorrido con sesión, 12-10-2026). Si se contradicen,
+  // el resumen lo dice.
+  const alcista = (r: string) => r === "Buy" || r === "Strong Buy";
+  const lecturaAlcista = tf.confluence === "structural-buy" || tf.confluence === "leader-extended" || tf.confluence === "improving";
+  const lecturaBajista = tf.confluence === "avoid" || tf.confluence === "bounce-vs-macro";
+  const contradice = (lecturaAlcista && !alcista(rt.rating)) || (lecturaBajista && alcista(rt.rating));
+  const nota = Math.round(inp.icScore ?? inp.scores.total);
+  const summary = contradice
+    ? `${tf.summary} On a ${horizon} horizon the Scora score (${nota}/100) weighs more, and it pulls the call to ${rt.rating}.`
+    : tf.summary;
+
   return {
     rating: rt.rating,
     color: rt.color,
@@ -118,7 +131,7 @@ export function buildVerdict(inp: VerdictInput): Verdict {
     conviction: rt.conviction,
     convictionPct: rt.convictionPct,
     note: rt.note,
-    summary: tf.summary,
+    summary,
     confluence: tf.confluence,
     timeframes: tf,
     perTimeframe: rt.perTimeframe,

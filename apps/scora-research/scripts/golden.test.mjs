@@ -915,6 +915,18 @@ function requireArtifact(name, regenCmd) {
     ok(JSON.stringify(a) === JSON.stringify(b), "verdict: deterministic for identical inputs");
   }
 
+  // — Titular y resumen no pueden contradecirse sin explicarlo (recorrido 12-10-2026: «Sell
+  //   48/100» sobre «Structural buy — macro tailwind…» con horizonte Years y nota baja). —
+  {
+    const nota = { value: 2, health: 3, momentum: 10, growth: 3, total: 18 };
+    const v = buildVerdict({ ...base, scores: nota, icScore: 18, horizon: "years" });
+    ok(v.confluence === "structural-buy", `contradicción: la lectura de marcos sigue alcista (${v.confluence})`);
+    ok(v.rating === "Sell" || v.rating === "Strong Sell", `contradicción: el titular es bajista (${v.rating})`);
+    ok(/Scora score \(18\/100\) weighs more/.test(v.summary), `contradicción: el resumen explica por qué (${v.summary})`);
+    const sin = buildVerdict({ ...base, horizon: "months" });
+    ok(!/weighs more/.test(sin.summary), "sin contradicción, el resumen es el de siempre");
+  }
+
   // — Every confluence state has a falsifier (no undefined leaking into the UI). —
   {
     const states = ["structural-buy", "leader-extended", "bounce-vs-macro", "improving", "avoid", "mixed"];
