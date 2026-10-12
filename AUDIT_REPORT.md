@@ -438,6 +438,12 @@ Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (
 - **Los datos de Cloud SQL en producción** (C-5): sin credenciales de lectura.
 - **`terraform validate`** (A-1): terraform no está instalado.
 - **Que FMP sirva tickers internacionales** con el plan contratado (M-4): sin su clave.
+- **MVP (12-10-2026, tarde): revisión `scora-00007-2wc`, imagen `d7774dc`** (`infra/desplegar.sh`).
+  Cambios de configuración en producción: login autorizado también en `scora-55se6gumqa-ew.a.run.app`
+  (desde ahí NO se podía entrar: `UNAUTHORIZED_DOMAIN`), copias diarias de Cloud SQL (03:00 UTC,
+  7 días) y protección contra borrado (no había ninguna de las dos), STS activado, y push con
+  claves VAPID propias (antes una alerta se creaba y no llegaba nunca). El interruptor de correos
+  de Macro queda oculto hasta tener Resend (`NEXT_PUBLIC_EMAIL_ALERTS`).
 - ~~**Producción no corre este código.**~~ Desplegado el 12-10-2026: revisión `scora-00006-qbq`,
   imagen `1b60d57` (la anterior, `scora-00005-9hn` / `eb24ccb`, queda para volver atrás). Comprobado
   después: 15 rutas en 200, `/no-existe` 404, `/api/batch` y los crons 401 sin credenciales, las 6
