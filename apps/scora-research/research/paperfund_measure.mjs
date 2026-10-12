@@ -20,7 +20,10 @@ const ASSETS = ["SPY", "TLT", "IEF", "GLD", "DBC", "BIL", "BTCUSD"];
 async function fetchRebalances() {
   if (!hayBase()) return [];
   const r = await sbFetch(`sl_paper_fund?select=rebalance_date,weights&order=rebalance_date.asc`);
-  return r.ok ? await r.json() : [];
+  // Un fallo al leer no es «no hay rebalanceos»: con [] se medía un fondo sin carteras y se
+  // escribía esa cifra en el histórico. Sin datos, no se publica nada.
+  if (!r.ok) throw new Error(`no se pudo leer sl_paper_fund (${r.status}): ${await r.text()} — no se escribe nada`);
+  return await r.json();
 }
 
 // Rejilla de medición: mensual, PERO anclada al inicio REAL del fondo y conteniendo TODAS

@@ -73,7 +73,9 @@ if (DRY || !hayBase()) {
 // the Spearman IC of rev→fwd and cons→fwd. Needs ≥2 distinct snapshot dates to say anything.
 try {
   const hist = await sbFetch(`sl_revisions?select=snap_date,ticker,cons,rev,price&order=snap_date.asc`);
-  const all = hist.ok ? await hist.json() : [];
+  // Un fallo al leer no es «aún no hay meses»: se dice y se sigue (aquí solo se informa).
+  if (!hist.ok) throw new Error(`no se pudo leer sl_revisions (${hist.status})`);
+  const all = await hist.json();
   const dates = [...new Set(all.map((r) => r.snap_date))].sort();
   if (dates.length < 2) {
     console.log(`\n  live IC: pending — ${dates.length} monthly snapshot(s) so far; need ≥2 to measure the first forward IC (next month).`);

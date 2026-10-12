@@ -31,6 +31,10 @@ const tablasTocadas = new Map();
 for (const f of scripts) {
   const s = readFileSync(join(APP, "research", f), "utf8");
   ok(!/rest\/v1|SUPABASE_SERVICE_KEY|supabase\.co/.test(s), `research/${f} ya no habla con Supabase`);
+  // Un fallo al LEER no puede convertirse en «no hay filas»: cron-measure y paperfund_measure
+  // lo hacían y, con la base caída, habrían escrito un histórico vacío encima del bueno
+  // (primera ejecución contra Cloud SQL, 12-10-2026).
+  ok(!/\.ok\s*\?\s*await\s+\w+\.json\(\)\s*:\s*\[\]/.test(s), `research/${f}: una lectura fallida no se trata como vacía`);
   for (const m of s.matchAll(/sbFetch\(`([a-z_]+)[?`]/g)) tablasTocadas.set(m[1], f);
   // cron-picks e ingest_filings construyen la ruta con una variable: sus tablas se leen aparte.
   for (const m of s.matchAll(/sb\(`([a-z_]+)[?`]/g)) tablasTocadas.set(m[1], f);

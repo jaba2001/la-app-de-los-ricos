@@ -20,9 +20,14 @@ function spearman(x, y) {
   return dx && dy ? n / Math.sqrt(dx * dy) : null;
 }
 
+// ⚠️ Un fallo al LEER no es «no hay cohortes». Devolvía [] y el script seguía: calculaba un
+// resumen vacío (0 cohortes, todo null) y lo escribía encima del bueno. El 12-10-2026, primera
+// ejecución contra Cloud SQL, la lectura dio ECONNRESET y solo lo salvó que la escritura también
+// falló. Sin datos que leer, no se publica nada.
 async function readCohort() {
   const r = await sbFetch(`sl_cohort?select=score_date,ticker,score_total,adj_price,score_version&order=score_date.asc&limit=100000`);
-  return r.ok ? await r.json() : [];
+  if (!r.ok) throw new Error(`no se pudo leer sl_cohort (${r.status}): ${await r.text()} — no se escribe nada`);
+  return await r.json();
 }
 
 const cohort = hayBase() ? await readCohort() : [];
