@@ -78,6 +78,16 @@ export const esSimboloFueraDePlan = (status, cuerpo) =>
 export const esLimiteAgotado = (status, cuerpo) => status === 429 && /limit reach/i.test(String(cuerpo));
 
 /**
+ * El mismo activo con el nombre de Yahoo. FMP llama a las criptomonedas «BTCUSD» y Yahoo
+ * «BTC-USD»: sin traducirlo, Bitcoin y Ethereum se quedaban sin respaldo (Markets, con FMP sin
+ * cuota). La respuesta conserva el símbolo de FMP, que es el que espera la app.
+ */
+export function simboloYahoo(simbolo) {
+  const m = /^(BTC|ETH|SOL|XRP|ADA|DOGE|LTC|BNB|AVAX|DOT|LINK)USD$/.exec(simbolo);
+  return m ? `${m[1]}-USD` : simbolo;
+}
+
+/**
  * Pide a Yahoo y devuelve `{ status, body }` con la forma de FMP, o null si Yahoo tampoco
  * lo tiene (y entonces se devuelve el 402 original: el front ya sabe tratarlo).
  */
@@ -86,7 +96,7 @@ export async function respaldoYahoo(path, params) {
   if (!simbolo) return null;
   const historico = path === 'historical-price-eod/full';
   const rango = historico ? '5y' : '5d';
-  const u = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(simbolo)}?range=${rango}&interval=1d`;
+  const u = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(simboloYahoo(simbolo))}?range=${rango}&interval=1d`;
   try {
     const res = await fetch(u, { headers: { 'User-Agent': UA, Accept: 'application/json' } });
     if (!res.ok) return null;

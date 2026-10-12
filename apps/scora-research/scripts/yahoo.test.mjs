@@ -4,7 +4,7 @@
 // Lo que importa es la FORMA: el front lee estas respuestas como si fueran de FMP, así que
 // cualquier campo con otro nombre o el orden al revés rompería el ETF Lab o el Risk Model sin
 // un solo error (datos vacíos que parecen «sin datos»).
-import { cotizacionDesdeYahoo, historicoDesdeYahoo, esSimboloFueraDePlan, esLimiteAgotado } from "../lib/server/providers/yahoo.js";
+import { cotizacionDesdeYahoo, historicoDesdeYahoo, esSimboloFueraDePlan, esLimiteAgotado, simboloYahoo } from "../lib/server/providers/yahoo.js";
 
 let bad = 0, total = 0;
 const check = (l, got, want) => { total++; if (JSON.stringify(got) !== JSON.stringify(want)) { bad++; console.log(`FAIL  ${l}\n      got:  ${JSON.stringify(got)}\n      want: ${JSON.stringify(want)}`); } };
@@ -37,6 +37,8 @@ const cuerpo429 = '{\n  "Error Message": "Limit Reach . Please upgrade your plan
 check("429 «Limit Reach» → respaldo", esLimiteAgotado(429, cuerpo429), true);
 check("429 de NUESTRO limitador (otro cuerpo) → NO", esLimiteAgotado(429, '{"error":"Rate limit exceeded"}'), false);
 check("200 → NO", esLimiteAgotado(200, cuerpo429), false);
+check("cripto con el nombre de Yahoo", [simboloYahoo("BTCUSD"), simboloYahoo("ETHUSD")], ["BTC-USD", "ETH-USD"]);
+check("lo demás no se toca", [simboloYahoo("SPY"), simboloYahoo("^GSPC"), simboloYahoo("USDUSD")], ["SPY", "^GSPC", "USDUSD"]);
 
 console.log(bad ? `\n✗ yahoo: ${bad} fallo(s) de ${total}` : `\n✓ yahoo: ${total} comprobaciones OK`);
 process.exit(bad ? 1 : 0);
