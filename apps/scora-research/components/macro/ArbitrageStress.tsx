@@ -18,6 +18,9 @@ const BAND_COLOR: Record<string, string> = {
  * Todo sale de campos que `macro_state` YA trae de FRED/CBOE: sin datos nuevos, sin coste.
  * Es contexto descriptivo, no una señal de entrada — y el texto lo dice.
  */
+/** Nombre en pantalla de cada banda (la clave interna sigue en español: salía «Calmado»). */
+const BAND_LABEL: Record<string, string> = { calmado: "Calm", normal: "Normal", tenso: "Strained", crisis: "Crisis" };
+
 export default function ArbitrageStress({ macro }: Props) {
   const stress = arbitrageCapitalStress({
     hyOasBps: macro?.hy_oas ?? null,
@@ -44,7 +47,7 @@ export default function ArbitrageStress({ macro }: Props) {
             <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: BAND_COLOR[stress.band] }}>
               {stress.score.toFixed(0)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}>/100</span>
             </div>
-            <div style={{ textTransform: "capitalize", fontWeight: 700, color: BAND_COLOR[stress.band] }}>{stress.band}</div>
+            <div style={{ fontWeight: 700, color: BAND_COLOR[stress.band] }}>{BAND_LABEL[stress.band] ?? stress.band}</div>
             <div className="sr-hint">{stress.covered} of 5 inputs available</div>
           </div>
 

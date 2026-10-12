@@ -23,17 +23,17 @@ import { innovations, type InnovationMethod } from "./factorModel";
 export const MACRO_FACTORS: {
   id: string; label: string; series: string; method: InnovationMethod; shockUnit: string;
 }[] = [
-  { id: "term",   label: "Prima de plazo (10a−3m)", series: "T10Y3M",       method: "diff", shockUnit: "pp" },
-  { id: "credit", label: "Spread de crédito HY",    series: "BAMLH0A0HYM2", method: "diff", shockUnit: "pp" },
-  { id: "infl",   label: "Inflación esperada 10a",  series: "T10YIE",       method: "diff", shockUnit: "pp" },
-  { id: "oil",    label: "Petróleo (WTI)",          series: "DCOILWTICO",   method: "pct",  shockUnit: "%" },
-  { id: "usd",    label: "Dólar (índice amplio)",   series: "DTWEXBGS",     method: "pct",  shockUnit: "%" },
+  { id: "term",   label: "Term premium (10y−3m)", series: "T10Y3M",       method: "diff", shockUnit: "pp" },
+  { id: "credit", label: "HY credit spread",    series: "BAMLH0A0HYM2", method: "diff", shockUnit: "pp" },
+  { id: "infl",   label: "10y expected inflation",  series: "T10YIE",       method: "diff", shockUnit: "pp" },
+  { id: "oil",    label: "Oil (WTI)",          series: "DCOILWTICO",   method: "pct",  shockUnit: "%" },
+  { id: "usd",    label: "Dollar (broad index)",   series: "DTWEXBGS",     method: "pct",  shockUnit: "%" },
 ];
 
 /** Etiquetas en lenguaje llano, para `explainLoadings`. */
 export const FACTOR_LABELS: Record<string, string> = {
-  market: "el mercado", term: "la pendiente de tipos", credit: "el riesgo de crédito",
-  infl: "la inflación esperada", oil: "el petróleo", usd: "el dólar",
+  market: "the market", term: "the yield-curve slope", credit: "credit risk",
+  infl: "expected inflation", oil: "oil", usd: "the dollar",
 };
 
 export interface DatedClose { date: string; close: number }
@@ -104,9 +104,9 @@ export async function fetchMacroInnovations(
 
 /** Escenarios de shock, en las MISMAS unidades que las innovaciones que ajustan el modelo. */
 export const SCENARIOS: { label: string; shocks: Record<string, number> }[] = [
-  { label: "Crédito +150 pb", shocks: { credit: 1.5 } },
-  { label: "Petróleo +30%", shocks: { oil: 30 } },
-  { label: "Dólar +5%", shocks: { usd: 5 } },
-  { label: "Mercado −10%", shocks: { market: -10 } },
-  { label: "Curva +100 pb", shocks: { term: 1 } },
+  { label: "Credit +150 bp", shocks: { credit: 1.5 } },
+  { label: "Oil +30%", shocks: { oil: 30 } },
+  { label: "Dollar +5%", shocks: { usd: 5 } },
+  { label: "Market −10%", shocks: { market: -10 } },
+  { label: "Curve +100 bp", shocks: { term: 1 } },
 ];

@@ -209,12 +209,12 @@ export function fitFactorModel(
   const reliable = n >= minPer * k;
   if (!reliable) {
     warnings.push(
-      `Solo ${n} observaciones para ${k} parámetros (${(n / k).toFixed(1)} por parámetro; ` +
-      `la regla de oficio pide ${minPer}). Betas y t-stats son indicativos, no concluyentes.`
+      `Only ${n} observations for ${k} parameters (${(n / k).toFixed(1)} per parameter; ` +
+      `the rule of thumb asks for ${minPer}). Betas and t-stats are indicative, not conclusive.`
     );
   }
   if (rSquared < 0.1) {
-    warnings.push(`R² de ${(rSquared * 100).toFixed(0)}%: los factores explican muy poco. Trata las betas con escepticismo.`);
+    warnings.push(`R² of ${(rSquared * 100).toFixed(0)}%: the factors explain very little. Treat the betas with skepticism.`);
   }
 
   const aSe = se(0);
@@ -309,8 +309,8 @@ export function explainLoadings(
     .sort((a, b) => Math.abs(b.varianceShare) - Math.abs(a.varianceShare))
     .map((l) => {
       const name = labels[l.factor] ?? l.factor;
-      const dir = l.beta >= 0 ? "largo" : "corto";
-      const flag = l.significant ? "" : " · no significativa";
-      return `${dir} ${name} (beta ${l.beta >= 0 ? "+" : ""}${l.beta.toFixed(2)}, t ${l.tStat.toFixed(1)}, ${(l.varianceShare * 100).toFixed(0)}% de la varianza${flag})`;
+      const dir = l.beta >= 0 ? "long" : "short";
+      const flag = l.significant ? "" : " · not significant";
+      return `${dir} ${name} (beta ${l.beta >= 0 ? "+" : ""}${l.beta.toFixed(2)}, t ${l.tStat.toFixed(1)}, ${(l.varianceShare * 100).toFixed(0)}% of variance${flag})`;
     });
 }

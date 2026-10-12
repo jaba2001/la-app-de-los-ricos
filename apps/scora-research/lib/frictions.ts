@@ -110,11 +110,11 @@ const ANCHORS: Record<string, [number, number][]> = {
 };
 
 const LABELS: Record<string, string> = {
-  idioVol: "Volatilidad idiosincrática",
-  shortInt: "Interés corto (% float)",
-  daysCover: "Días para cubrir",
-  amihud: "Iliquidez (Amihud)",
-  size: "Tamaño (capitalización)",
+  idioVol: "Idiosyncratic volatility",
+  shortInt: "Short interest (% float)",
+  daysCover: "Days to cover",
+  amihud: "Illiquidity (Amihud)",
+  size: "Size (market cap)",
 };
 
 /**
@@ -145,18 +145,18 @@ export function arbitrageCost(inp: FrictionInputs): FrictionResult | null {
   const top = [...components].sort((a, b) => b.score - a.score)[0];
   readings.push(
     band === "baja"
-      ? "Fricción baja: un profesional puede corregir un error de precio aquí con facilidad, así que es poco probable que uno grande persista."
+      ? "Low friction: a professional can easily correct a mispricing here, so a large one is unlikely to persist."
       : band === "media"
-      ? "Fricción media: la convergencia es posible pero no inmediata."
-      : "Fricción alta: caro y arriesgado de arbitrar. Un descuento puede persistir mucho tiempo — o no cerrarse nunca."
+      ? "Medium friction: convergence is possible but not immediate."
+      : "High friction: expensive and risky to arbitrage. A discount can persist for a long time — or never close."
   );
-  readings.push(`Componente dominante: ${top.label.toLowerCase()}.`);
+  readings.push(`Dominant component: ${top.label.toLowerCase()}.`);
   if (components.length < 5) {
-    readings.push(`Calculado sobre ${components.length} de 5 componentes — los ausentes no penalizan ni premian.`);
+    readings.push(`Computed on ${components.length} of 5 components — missing ones neither penalize nor reward.`);
   }
   const idio = components.find((c) => c.key === "idioVol");
   if (idio && idio.score >= 60) {
-    readings.push("La vol idiosincrática alta es el coste de mantenimiento que Pontiff (2006) identifica como el mayor freno al arbitraje: el CAPM la llama diversificable y gratis, pero para quien mantiene la posición no lo es.");
+    readings.push("High idiosyncratic vol is the holding cost Pontiff (2006) identifies as the biggest brake on arbitrage: CAPM calls it diversifiable and free, but for whoever holds the position it isn't.");
   }
   return { score, band, components, covered: components.length, readings };
 }
@@ -196,7 +196,7 @@ const STRESS_ANCHORS: Record<string, [number, number][]> = {
 };
 const STRESS_LABELS: Record<string, string> = {
   hyOasBps: "Spread HY (OAS)", nfci: "NFCI (Chicago)", stlfsi4: "STLFSI4 (St. Louis)",
-  moveIndex: "MOVE (vol de bonos)", vix: "VIX",
+  moveIndex: "MOVE (bond vol)", vix: "VIX",
 };
 
 /**
@@ -225,12 +225,12 @@ export function arbitrageCapitalStress(inp: CapitalStressInputs): CapitalStressR
   const top = [...drivers].sort((a, b) => b.score - a.score)[0];
   const reading =
     band === "crisis"
-      ? `Capital de arbitraje bajo fuerte presión (lidera: ${top.label}). Shleifer & Vishny: aquí los diferenciales se ensanchan antes de cerrarse, y quien gestiona dinero ajeno se ve forzado a liquidar. Desconfía de las señales de reversión.`
+      ? `Arbitrage capital under heavy pressure (led by: ${top.label}). Shleifer & Vishny: here spreads widen before they close, and those managing other people's money are forced to liquidate. Distrust reversal signals.`
       : band === "tenso"
-      ? `Capital de arbitraje tensionado (lidera: ${top.label}). Las correcciones de precio tardan más de lo normal.`
+      ? `Arbitrage capital is strained (led by: ${top.label}). Price corrections take longer than usual.`
       : band === "normal"
-      ? "Capital de arbitraje en condiciones normales."
-      : "Capital de arbitraje abundante: los errores de precio tienden a corregirse rápido.";
+      ? "Arbitrage capital in normal conditions."
+      : "Abundant arbitrage capital: mispricings tend to correct quickly.";
   return { score, band, drivers, covered: drivers.length, reading };
 }
 
@@ -248,23 +248,23 @@ export interface StructuralEdge { title: string; detail: string }
  */
 export const STRUCTURAL_EDGES: StructuralEdge[] = [
   {
-    title: "No tienes reembolsos",
-    detail: "El arbitrajista de Shleifer & Vishny liquida porque sus inversores retiran capital cuando la posición va en contra. A ti nadie te lo retira: puedes aguantar el ensanchamiento que a él le expulsa.",
+    title: "You have no redemptions",
+    detail: "The Shleifer & Vishny arbitrageur liquidates because investors pull capital when the position goes against him. Nobody pulls yours: you can sit through the widening that forces him out.",
   },
   {
-    title: "No tienes riesgo de carrera",
-    detail: "Un gestor que se desvía del índice y pierde durante 18 meses se queda sin trabajo, aunque acabe teniendo razón. Tú no puedes ser despedido de tu propia cartera.",
+    title: "You have no career risk",
+    detail: "A manager who deviates from the index and loses for 18 months is out of a job, even if eventually proven right. You can't be fired from your own portfolio.",
   },
   {
-    title: "No tienes mandato de tracking error",
-    detail: "Los fondos institucionales tienen límites de desviación frente a su índice. Tú puedes tener 0% de un sector entero durante años sin que nadie te obligue a comprarlo.",
+    title: "You have no tracking-error mandate",
+    detail: "Institutional funds have limits on how far they can deviate from their index. You can hold 0% of an entire sector for years without anyone forcing you to buy it.",
   },
   {
-    title: "Tu horizonte no tiene trimestres",
-    detail: "No reportas resultados a nadie en marzo. Las primas que exigen paciencia (iliquidez, valor, convergencias lentas) son precisamente las que el capital profesional no puede cosechar.",
+    title: "Your horizon has no quarters",
+    detail: "You don't report results to anyone in March. The premia that demand patience (illiquidity, value, slow convergence) are precisely the ones professional capital can't harvest.",
   },
   {
-    title: "Lo que NO te da ventaja",
-    detail: "Nada de lo anterior es información. No sabes más que el mercado sobre una empresa, y esa es exactamente la parte que Scora mide y encuentra en ~0. Tu ventaja es estructural, no informativa — confundirlas es el error caro.",
+    title: "What does NOT give you an edge",
+    detail: "None of the above is information. You don't know more than the market about a company, and that is exactly the part Scora measures and finds at ~0. Your edge is structural, not informational — confusing the two is the expensive mistake.",
   },
 ];
