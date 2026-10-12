@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
+import { puntuacionDolar, ETIQUETA_DOLAR } from "@/lib/dolar";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -116,7 +117,7 @@ const COMMODITIES: SeriesEntry[] = [
   { label: "Oil Volatility (OVX)", key: "ovx",        suffix: "", threshold: { warn: 35, bad: 55 }, higherIsBad: true,
     badge: v => v < 20 ? { text: "CALM", color: "var(--sr-pos)" } : v < 35 ? { text: "NORMAL", color: "var(--sr-pos)" } : v < 55 ? { text: "ELEVATED", color: "var(--sr-warn)" } : { text: "STRESS", color: "var(--sr-neg)" } },
   { label: "Oil Shock",            key: "oil_shock",  text: true },
-  { label: "DXY (Broad Trade-Wtd)", key: "dxy",       suffix: "", threshold: { warn: 115, bad: 125 }, higherIsBad: true,
+  { label: "Broad USD index (Fed)", key: "dxy",       suffix: "", threshold: { warn: 115, bad: 125 }, higherIsBad: true,
     badge: v => v < 96 ? { text: "WEAK USD", color: "var(--sr-warn)" } : v < 106 ? { text: "NORMAL", color: "var(--sr-pos)" } : v < 115 ? { text: "STRONG", color: "var(--sr-warn)" } : { text: "VERY STRONG", color: "var(--sr-neg)" } },
   { label: "USD/JPY",              key: "usdjpy",     suffix: "",
     badge: v => v < 135 ? { text: "STRONG JPY", color: "var(--sr-pos)" } : v < 145 ? { text: "NORMAL", color: "var(--sr-text-3)" } : v < 155 ? { text: "WEAK JPY", color: "var(--sr-warn)" } : { text: "INTERVENTION", color: "var(--sr-neg)" } },
@@ -316,7 +317,7 @@ function computeSubScores(m: MacroState) {
   const usdjpy = g("usdjpy");
   const usdjpy_s = usdjpy == null ? 20 : clamp(usdjpy > 155 ? 30 : usdjpy > 145 ? 20 : usdjpy > 140 ? 20 + (145 - usdjpy) * 6 : usdjpy > 135 ? 50 + (140 - usdjpy) * 6 : 80 + Math.min(20, (135 - usdjpy) * 4));
   const dxy = g("dxy");
-  const dxy_s = dxy == null ? 20 : clamp(dxy < 96 ? 10 : dxy < 100 ? 10 + ((dxy - 96) / 4) * 10 : dxy < 106 ? 20 + ((dxy - 100) / 6) * 25 : dxy < 110 ? 45 + ((dxy - 106) / 4) * 35 : 80 + Math.min(20, ((dxy - 110) / 5) * 20));
+  const dxy_s = puntuacionDolar(dxy); // índice amplio, no DXY: lib/dolar.ts
   const grc = wti_s * 0.23 + brentWti_s * 0.14 + ovx_s * 0.19 + 30 * 0.19 + usdjpy_s * 0.1 + dxy_s * 0.1 + 25 * 0.05;
 
   // HSC
@@ -335,7 +336,7 @@ function computeSubScores(m: MacroState) {
     csc: { total: csc, subs: [{ label: "HY OAS Level", s: hyOas_s }, { label: "BB-CCC Diff", s: bbCcc_s }, { label: "BBB Spread", s: bbb_s }, { label: "Fin. Stress", s: stlfsi_s }, { label: "C&I Tightening", s: candi_s }, { label: "Card Delinq.", s: card_s }] },
     lcc: { total: lcc, subs: [{ label: "Net Liquidity", s: netLiq_s }, { label: "Bank Reserves", s: wresbal_s }, { label: "SOFR Spread", s: sofr_s }, { label: "M2 Growth", s: m2_s }] },
     rpc: { total: rpc, subs: [{ label: "Sahm Rule", s: sahm_s }, { label: "Curve 10Y-2Y", s: curve2y_s }, { label: "Curve 10Y-3M", s: curve3m_s }, { label: "Jobless Claims", s: icsa_s }, { label: "UMich Sentiment", s: umcsent_s }, { label: "Housing Starts", s: houst_s }] },
-    grc: { total: grc, subs: [{ label: "WTI Crude", s: wti_s }, { label: "Brent-WTI", s: brentWti_s }, { label: "OVX", s: ovx_s }, { label: "USD/JPY", s: usdjpy_s }, { label: "DXY", s: dxy_s }] },
+    grc: { total: grc, subs: [{ label: "WTI Crude", s: wti_s }, { label: "Brent-WTI", s: brentWti_s }, { label: "OVX", s: ovx_s }, { label: "USD/JPY", s: usdjpy_s }, { label: ETIQUETA_DOLAR, s: dxy_s }] },
     hsc: { total: hsc, subs: [{ label: "Existing Sales", s: hs_s }, { label: "Mortgage Rate", s: mort_s }, { label: "Housing Starts", s: houst_hsc }, { label: "Permits", s: permit_s }, { label: "Case-Shiller", s: cs_s }] },
   };
 }

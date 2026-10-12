@@ -555,6 +555,15 @@ function requireArtifact(name, regenCmd) {
   // ETFs de divisa.
   ok(classifyInstrument("UUP").type === "fx", "UUP → fx");
   ok(classifyInstrument("UUP").drivers.some((d) => d.field === "dxy" && d.good === "high"), "UUP se beneficia de un dólar fuerte");
+}
+{
+  // DTWEXBGS (índice amplio, ~108–123) puntuado con umbrales de DXY (96–110) salía siempre al
+  // máximo e inflaba el GRC. Ahora se convierte de escala (lib/dolar.ts).
+  const { puntuacionDolar } = await import("../lib/dolar.ts");
+  ok(puntuacionDolar(121.4) < 50, `dólar amplio 121,4 ya no puntúa como un DXY de 121 (${puntuacionDolar(121.4).toFixed(1)})`);
+  ok(puntuacionDolar(108) < puntuacionDolar(121) && puntuacionDolar(121) < puntuacionDolar(135), "la puntuación sube con el dólar");
+  ok(puntuacionDolar(null) === 20, "sin dato → neutro 20, como antes");
+  ok(puntuacionDolar(1000) === 100 && puntuacionDolar(1) === 10, "acotada");
   ok(classifyInstrument("FXE").type === "fx", "FXE → fx");
   ok(classifyInstrument("FXE").drivers.some((d) => d.field === "dxy" && d.good === "low"), "FXE se beneficia de un dólar débil");
 

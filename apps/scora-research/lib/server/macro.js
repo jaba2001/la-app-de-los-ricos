@@ -27,6 +27,8 @@
 //   · MOVE blend: was 50/50 average; corrected to 70/30 (ic-compute.js formula).
 //   · SOFR fallback: was ((5.5-sofr)/5.5)*100; corrected to 50+(4.0-sofr)*12.5.
 
+import { puntuacionDolar } from '../dolar.ts';
+
 // ── FRED DIRECT API UNIT CONVERSIONS (origin ≈ line 565) ─────────────────────
 // FRED returns some series in different units than the model uses.
 const FRED_UNIT_CONVERSIONS = {
@@ -352,16 +354,11 @@ function computeCompositeScores(ds, polyData = null) {
         : usdjpy > 135 ? 50 + (140 - usdjpy) * 6
         : 80 + Math.min(20, (135 - usdjpy) * 4)));
     }
+    // DTWEXBGS es el índice AMPLIO del dólar, no el DXY: los umbrales eran los del DXY y el
+    // componente salía siempre al máximo. Ver lib/dolar.ts. (12-10-2026: aquí se DIVERGE a
+    // propósito de IC_DataLayer_v2.js, que tiene el mismo fallo y está en retirada.)
     const dxy = safe("DTWEXBGS");
-    let dxy_score = 20;
-    if (dxy != null) {
-      dxy_score = Math.max(0, Math.min(100,
-        dxy < 96 ? 10
-        : dxy < 100 ? 10 + ((dxy - 96) / 4) * 10
-        : dxy < 106 ? 20 + ((dxy - 100) / 6) * 25
-        : dxy < 110 ? 45 + ((dxy - 106) / 4) * 35
-        : 80 + Math.min(20, ((dxy - 110) / 5) * 20)));
-    }
+    const dxy_score = puntuacionDolar(dxy);
     const ttf = safe("TTF");
     let ttf_score = 25; // fallback when not available
     if (ttf != null) {

@@ -643,7 +643,7 @@ cd ~/Desktop/scora
 cloud-sql-proxy --port 5433 scora-509716:europe-west1:scora-db
 # 1. esquema (aditivo, idempotente)
 export PGHOST=127.0.0.1 PGPORT=5433 PGUSER=postgres PGDATABASE=scora PGPASSWORD=…   # la de infra/.env.gcp
-for f in 004_smart_money_13f 005_desfases_research 006_rol_jobs; do
+for f in 004_smart_money_13f 005_desfases_research 006_rol_jobs 007_rendimiento_real; do
   psql -v ON_ERROR_STOP=1 -f apps/scora-research/sql/gcp/$f.sql; done
 # 2. copia (primero en seco, luego de verdad)
 cd apps/scora-research

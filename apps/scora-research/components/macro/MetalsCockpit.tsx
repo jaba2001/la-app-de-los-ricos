@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import type { MacroState } from "@/lib/types";
 import { METALS, netManagedMoney, wowChange, positioningRead, goldSilverRatio, type CotRow } from "@/lib/metals";
+import { rendimientoReal } from "@/lib/dolar";
 
 interface Props { macro: MacroState | null; loading?: boolean; }
 type CotResponse = Record<string, { market: string; name: string; unit: string; rows: CotRow[] }>;
@@ -44,7 +45,10 @@ export default function MetalsCockpit({ macro }: Props) {
   const gld = quotes.gold?.price ?? null;
   const slv = quotes.silver?.price ?? null;
   const gsr = goldSilverRatio(gld, slv);
-  const realYield = macro?.real_yield_10y != null ? Number(macro.real_yield_10y) : null;
+  // real_yield_10y no es una columna de macro_state (siempre salía «—»). Misma derivación que
+  // la pestaña Indicators: bono a 10 años menos PCE subyacente.
+  const realYield = rendimientoReal(macro as unknown as Record<string, unknown>);
+  const breakeven = macro?.breakeven_10y != null ? Number(macro.breakeven_10y) : null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
@@ -101,12 +105,15 @@ export default function MetalsCockpit({ macro }: Props) {
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: realYield == null ? "var(--sr-text-3)" : realYield < 1 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {realYield != null ? `${realYield.toFixed(2)}%` : "—"}
             </div>
-            <div className="sr-hint">Gold&apos;s biggest macro driver</div>
+            <div className="sr-hint">10y Treasury − core PCE · gold&apos;s biggest macro driver</div>
           </div>
+          {/* Aquí ponía «Gold spot (FRED) · Daily LBMA fix» con el precio de GLD (gold_price sale de
+              una cotización de GLD; la serie LBMA de FRED se dejó de publicar): repetía el
+              precio de arriba con una etiqueta falsa. La inflación implícita es el otro motor. */}
           <div className="sr-tile">
-            <div className="sr-tile-label">Gold spot (FRED)</div>
-            <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{macro?.gold_price != null ? `$${Number(macro.gold_price).toFixed(0)}` : "—"}</div>
-            <div className="sr-hint">Daily LBMA fix</div>
+            <div className="sr-tile-label">10y breakeven inflation</div>
+            <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{breakeven != null ? `${breakeven.toFixed(2)}%` : "—"}</div>
+            <div className="sr-hint">Higher expected inflation supports gold</div>
           </div>
         </div>
 

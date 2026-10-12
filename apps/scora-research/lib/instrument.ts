@@ -73,24 +73,24 @@ const FX_ETF_LONG_USD = new Set(["UUP","USDU"]);                       // suben 
 const FX_ETF_SHORT_USD = new Set(["UDN","FXE","FXY","FXB","FXF","FXA","FXC","FXSG"]); // suben si el dólar baja
 
 // driver presets
-const D_GOLD: MacroDriver[] =[{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"}];
-const D_METAL: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
-const D_COPPER: MacroDriver[] = [{label:"Recession risk",good:"low",field:"recession_prob"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
-const D_COMMOD: MacroDriver[] = [{label:"Core PCE (inflation)",good:"high",field:"core_pce_yoy",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
+const D_GOLD: MacroDriver[] =[{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"Broad USD index",good:"low",field:"dxy"},{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"}];
+const D_METAL: MacroDriver[] = [{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"Broad USD index",good:"low",field:"dxy"}];
+const D_COPPER: MacroDriver[] = [{label:"Recession risk",good:"low",field:"recession_prob"},{label:"Broad USD index",good:"low",field:"dxy"}];
+const D_COMMOD: MacroDriver[] = [{label:"Core PCE (inflation)",good:"high",field:"core_pce_yoy",unit:"%"},{label:"Broad USD index",good:"low",field:"dxy"}];
 const D_OIL: MacroDriver[] = [{label:"WTI level",good:"high",field:"wti_level"},{label:"Core PCE (inflation)",good:"high",field:"core_pce_yoy",unit:"%"}];
 const D_TREASURY: MacroDriver[] = [{label:"10y yield (falling helps)",good:"low",field:"dgs10",unit:"%"},{label:"Recession risk (bid for duration)",good:"high",field:"recession_prob"}];
 const D_HY: MacroDriver[] = [{label:"HY credit spread",good:"low",field:"hy_oas",unit:"bp"},{label:"Recession risk",good:"low",field:"recession_prob"}];
 const D_IG: MacroDriver[] = [{label:"10y yield (falling helps)",good:"low",field:"dgs10",unit:"%"},{label:"Credit spread (BBB)",good:"low",field:"bbb_oas",unit:"bp"}];
 const D_TIPS: MacroDriver[] = [{label:"Breakeven inflation",good:"high",field:"breakeven_10y",unit:"%"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"}];
 const D_RISK: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Recession risk",good:"low",field:"recession_prob"}];
-const D_CRYPTO: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Risk-on gauge",good:"high",field:"risk_on"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"US Dollar (DXY)",good:"low",field:"dxy"}];
+const D_CRYPTO: MacroDriver[] = [{label:"Liquidity cycle",good:"high",field:"liquidity_cycle"},{label:"Risk-on gauge",good:"high",field:"risk_on"},{label:"Real 10y yield",good:"low",field:"real_yield_10y",unit:"%"},{label:"Broad USD index",good:"low",field:"dxy"}];
 
 // Un par de divisas se mueve por el DIFERENCIAL de tipos y por el ciclo del dólar. Los
 // dos drivers se declaran desde el punto de vista de la divisa BASE (la de la izquierda):
 // para EURUSD, "dólar débil" es favorable; para USDJPY es al revés, y por eso el par se
 // invierte antes de asignar drivers.
-const D_FX_VS_USD: MacroDriver[] = [{label:"US Dollar (DXY)",good:"low",field:"dxy"},{label:"US 10y yield",good:"low",field:"dgs10",unit:"%"}];
-const D_USD_BASE: MacroDriver[] = [{label:"US Dollar (DXY)",good:"high",field:"dxy"},{label:"US 10y yield",good:"high",field:"dgs10",unit:"%"}];
+const D_FX_VS_USD: MacroDriver[] = [{label:"Broad USD index",good:"low",field:"dxy"},{label:"US 10y yield",good:"low",field:"dgs10",unit:"%"}];
+const D_USD_BASE: MacroDriver[] = [{label:"Broad USD index",good:"high",field:"dxy"},{label:"US 10y yield",good:"high",field:"dgs10",unit:"%"}];
 
 function has(sym: string, ...sets: Set<string>[]) { return sets.some((s) => s.has(sym)); }
 

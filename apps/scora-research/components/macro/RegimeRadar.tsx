@@ -132,7 +132,7 @@ export default function RegimeRadar({ macro }: Props) {
         <CrossChip label="HY credit" value={hy != null ? hy.toFixed(0) : "—"} unit=" bps" tone={hy == null ? "neutral" : hy > 450 ? "off" : hy < 350 ? "on" : "neutral"} />
         <CrossChip label="Curve 10y-3m" value={curve != null ? curve.toFixed(2) : "—"} unit="%" tone={curve == null ? "neutral" : curve < 0 ? "off" : "on"} />
         <CrossChip label="VIX" value={vix != null ? vix.toFixed(0) : "—"} tone={vix == null ? "neutral" : vix > 25 ? "off" : vix < 18 ? "on" : "neutral"} />
-        <CrossChip label="Dollar (DXY)" value={dxy != null ? dxy.toFixed(0) : "—"} tone="neutral" />
+        <CrossChip label="Broad USD index" value={dxy != null ? dxy.toFixed(0) : "—"} tone="neutral" />
       </div>
 
       <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>

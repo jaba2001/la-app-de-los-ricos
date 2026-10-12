@@ -92,5 +92,6 @@ Falta, como postgres y a través del proxy (cloud-sql-proxy --port 5433 $PROYECT
   psql -h 127.0.0.1 -p 5433 -U postgres -d scora -f apps/scora-research/sql/gcp/004_smart_money_13f.sql
   psql -h 127.0.0.1 -p 5433 -U postgres -d scora -f apps/scora-research/sql/gcp/005_desfases_research.sql
   psql -h 127.0.0.1 -p 5433 -U postgres -d scora -f apps/scora-research/sql/gcp/006_rol_jobs.sql
+  psql -h 127.0.0.1 -p 5433 -U postgres -d scora -f apps/scora-research/sql/gcp/007_rendimiento_real.sql
 y la copia de datos (scripts/migrar_supabase.mjs). El orden completo está en AUDIT_REPORT.md, C-5.
 FIN

@@ -2,6 +2,7 @@
 import type { MacroState } from "@/lib/types";
 import type { Instrument } from "@/lib/instrument";
 import { stockPickingRegime } from "@/lib/microScore";
+import { rendimientoReal } from "@/lib/dolar";
 
 interface Props {
   instrument: Instrument;
@@ -51,7 +52,10 @@ export default function InstrumentPanel({ instrument, closes, spyCloses, macro, 
     return { label: "Neutral", color: "var(--sr-warn)", detail: "Mixed trend/momentum — no clear signal." };
   })();
 
-  const val = (f: string) => { const v = macro ? (macro as unknown as Record<string, unknown>)[f] : null; return typeof v === "number" ? v : null; };
+  const val = (f: string) => {
+    if (f === "real_yield_10y") return rendimientoReal(macro as unknown as Record<string, unknown>); // ver lib/dolar.ts
+    const v = macro ? (macro as unknown as Record<string, unknown>)[f] : null; return typeof v === "number" ? v : null;
+  };
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>

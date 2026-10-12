@@ -57,7 +57,7 @@ LAYER 2 — TACTICAL RISK-ON (liquidity-led, stationary; validated OOS Sharpe 1.
 - (A 12-1m dual-momentum gate then moves any risk sleeve with negative trend to cash — applied live.)
 
 CROSS-ASSET CONTEXT:
-- HY credit OAS: ${n(macro.hy_oas, " bps", 0)} · 10y-3m curve: ${n(macro.t10y3m, "%", 2)} · VIX: ${n(macro.vix, "", 0)} · DXY: ${n(macro.dxy, "", 0)}
+- HY credit OAS: ${n(macro.hy_oas, " bps", 0)} · 10y-3m curve: ${n(macro.t10y3m, "%", 2)} · VIX: ${n(macro.vix, "", 0)} · Broad USD index (Fed, trade-weighted): ${n(macro.dxy, "", 0)}
 - Production regime label: ${macro.regime_label ?? "not available"}
 
 LAYER 4 — STOCK-PICKING REGIME (validated: momentum selection pays when correlation is low):

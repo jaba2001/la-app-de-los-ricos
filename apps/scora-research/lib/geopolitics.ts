@@ -44,7 +44,7 @@ export function geopoliticalRead(macro: MacroState | null): GeoRead | null {
   if (gr != null) drivers.push(`Geopolitical-risk composite ${gr.toFixed(0)}/100.`);
   if (macro.oil_shock && macro.oil_shock !== "none") drivers.push(`Oil-shock signal: ${macro.oil_shock}.`);
   if (macro.brent != null) drivers.push(`Brent ~$${macro.brent.toFixed(0)}${macro.wti_chg_1m != null ? ` (WTI ${macro.wti_chg_1m >= 0 ? "+" : ""}${macro.wti_chg_1m.toFixed(1)}% 1m)` : ""}.`);
-  if (macro.dxy != null) drivers.push(`Dollar (DXY) ${macro.dxy.toFixed(1)} — a stronger dollar tightens global conditions.`);
+  if (macro.dxy != null) drivers.push(`Broad USD index ${macro.dxy.toFixed(1)} (Fed, trade-weighted) — a stronger dollar tightens global conditions.`);
   if (drivers.length === 0) drivers.push("Limited geopolitical inputs in the current snapshot.");
 
   const tilt = level === "High"

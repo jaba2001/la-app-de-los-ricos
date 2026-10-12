@@ -138,7 +138,7 @@ MACRO & FED:
 • UMich Sentiment: ${macro.umcsent ?? "N/A"} | Jobless Claims: ${macro.icsa ?? "N/A"}K
 • Buffett Indicator: ${macro.buffett_indicator ?? "N/A"}% | Expected 10Y Return: ${macro.expected_return_10y ?? "N/A"}%
 • Fed Room: ${macro.fed_room ?? "N/A"} | WTI: $${macro.wti_level ?? "N/A"} (1M: ${macro.wti_chg_1m ?? "N/A"}%) | Oil Shock: ${macro.oil_shock ?? "none"}
-• DXY: ${macro.dxy ?? "N/A"} | USD/JPY: ${macro.usdjpy ?? "N/A"} | Brent: $${macro.brent ?? "N/A"}
+• Broad USD index (Fed, trade-weighted, not DXY): ${macro.dxy ?? "N/A"} | USD/JPY: ${macro.usdjpy ?? "N/A"} | Brent: $${macro.brent ?? "N/A"}
 
 HOUSING:
 • Mortgage Rate 30Y: ${macro.mortgage_rate ?? "N/A"}% | Housing Starts: ${macro.house_starts ?? "N/A"}K | Building Permits: ${macro.building_permits ?? "N/A"}K
