@@ -22,6 +22,7 @@
 //   node --experimental-strip-types --no-warnings scripts/paperfund.test.mjs
 // ─────────────────────────────────────────────────────────────────────────────
 import { readFileSync } from "fs";
+import { calificacionPublicable, DIAS_MINIMOS_PARA_CALIFICAR } from "../lib/paperFund.ts";
 
 const FUENTE = readFileSync(new URL("../research/paperfund_measure.mjs", import.meta.url), "utf8");
 
@@ -164,6 +165,20 @@ comprobar("CONTROL POSITIVO · la versión antigua inventaba pesos antes del ini
   comprobar(`CONTROL POSITIVO · hay mediciones reales, no solo supuestos (${medidos} de ${ACTIVOS.length})`, medidos >= 5);
 }
 
+
+// ── La nota que se PUBLICA (lib/paperFund.ts) ─────────────────────────────────────────────
+// La fila del 31-08 decía «A» con Sharpe 4,48 sobre dos meses: la escribió la versión que
+// calificaba con 2 retornos. La pantalla no puede fiarse de que alguien la haya regenerado.
+{
+  const real = { inception: "2026-07-09", as_of: "2026-08-31", grade: "A" };
+  comprobar("dos meses de vida → Accruing aunque la fila diga A", calificacionPublicable(real).grade === "Accruing");
+  comprobar("y sin nota no se enseña el Sharpe", calificacionPublicable(real).calificable === false);
+  comprobar("con un año, la nota guardada vale", calificacionPublicable({ inception: "2025-07-09", as_of: "2026-07-10", grade: "B" }).grade === "B");
+  comprobar("el listón es un año", DIAS_MINIMOS_PARA_CALIFICAR === 365);
+  comprobar("sin fila → Accruing", calificacionPublicable(null).grade === "Accruing");
+  comprobar("sin fechas → no se califica", calificacionPublicable({ grade: "A" }).grade === "Accruing");
+  comprobar("Accruing guardado sigue siéndolo", calificacionPublicable({ inception: "2024-01-01", as_of: "2026-01-01", grade: "Accruing" }).calificable === false);
+}
 
 console.log(`\n  ${ok} comprobaciones OK${fallos ? ` · ${fallos} FALLOS` : ""}\n`);
 process.exit(fallos ? 1 : 0);
