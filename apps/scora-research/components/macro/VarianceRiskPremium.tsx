@@ -61,7 +61,12 @@ export default function VarianceRiskPremium({ macro }: Props) {
 
   // Se calcula solo al llegar el VIX: es una lectura de contexto, no algo que el usuario
   // deba pedir con un botón.
-  useEffect(() => { if (vix != null && vix > 0 && !rows && !loading) void run(); }, [vix, rows, loading, run]);
+  //
+  // `!error`: sin él, un fallo (FMP sin cuota y Yahoo caído, nuestro propio 429) dejaba `rows`
+  // vacío y `loading` volvía a false, así que el efecto se relanzaba en el acto, para siempre:
+  // ~700 peticiones por segundo mientras la pestaña siguiera abierta. Se reintenta al volver a
+  // la pestaña, que desmonta y monta el componente.
+  useEffect(() => { if (vix != null && vix > 0 && !rows && !loading && !error) void run(); }, [vix, rows, loading, error, run]);
 
   const headline = rows?.[0];
 

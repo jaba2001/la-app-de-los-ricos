@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { computeExposure, detectTheme, type Position, type Bucket } from "@/lib/exposure";
 import { t as tr } from "@/lib/i18n/cliente";
@@ -21,14 +21,23 @@ function BarRow({ b, color }: { b: Bucket; color: string }) {
 
 export default function ExposureAudit({ trades, marks }: Props) {
   const [sectors, setSectors] = useState<Record<string, string>>({});
+  // Tickers cuyo perfil ya se pidió, tenga sector o no: cada uno se pide UNA vez por montaje.
+  //
+  // Antes se volvía a pedir todo ticker sin sector cada vez que cambiaba `sectors`, y
+  // setSectors creaba siempre un objeto nuevo aunque no añadiera nada. Bastaba un ticker que
+  // se quedara sin sector (FMP sin cuota, un 429 nuestro, cripto, un ETF con el sector vacío)
+  // para que el efecto se relanzara sin fin: ~800 peticiones por segundo desde una pestaña.
+  const pedidos = useRef(new Set<string>());
+  const montado = useRef(true);
+  useEffect(() => { montado.current = true; return () => { montado.current = false; }; }, []);
 
   const tickers = useMemo(() => Array.from(new Set(trades.map(t => t.ticker.toUpperCase()))), [trades]);
 
   // Sectors (profile is cached 7d on the proxy → cheap). Falls back to any stored sector.
   useEffect(() => {
-    let alive = true;
-    const need = tickers.filter(t => !sectors[t]);
+    const need = tickers.filter(t => !pedidos.current.has(t));
     if (need.length === 0) return;
+    for (const t of need) pedidos.current.add(t);
     Promise.all(need.map(async t => {
       try {
         const res = await authedFetch<Record<string, unknown>[]>(`/api/fmp/profile?symbol=${t}`);
@@ -36,11 +45,13 @@ export default function ExposureAudit({ trades, marks }: Props) {
         return [t, s] as const;
       } catch { return [t, ""] as const; }
     })).then(pairs => {
-      if (!alive) return;
-      setSectors(prev => { const n = { ...prev }; for (const [t, s] of pairs) if (s) n[t] = s; return n; });
+      // Sin la bandera `alive` de antes: si `tickers` cambia a media petición, estos sectores
+      // siguen valiendo (van por ticker), y descartarlos los dejaría sin pedir nunca.
+      const nuevos = pairs.filter(([, s]) => s);
+      if (!montado.current || nuevos.length === 0) return;
+      setSectors(prev => ({ ...prev, ...Object.fromEntries(nuevos) }));
     });
-    return () => { alive = false; };
-  }, [tickers, sectors]);
+  }, [tickers]);
 
   const exposure = useMemo(() => {
     const positions: Position[] = trades.map(t => {
