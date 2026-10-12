@@ -596,7 +596,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               { label: "Sector",     val: profile?.sector as string },
               { label: "Industry",   val: profile?.industry as string },
               { label: "Exchange",   val: (quote?.exchange as string) ?? (profile?.exchangeShortName as string) },
-              { label: "Market Cap", val: quote?.marketCap != null ? `$${((quote.marketCap as number)/1e9).toFixed(1)}B` : null },
+              // La cotización de respaldo (Yahoo) no trae capitalización: el perfil sí.
+              { label: "Market Cap", val: (() => { const mc = Number(quote?.marketCap ?? profile?.marketCap ?? profile?.mktCap); return Number.isFinite(mc) && mc > 0 ? `$${(mc / 1e9).toFixed(1)}B` : null; })() },
               { label: "Beta (5Y)",  val: n(quote?.beta ?? profile?.beta) },
               { label: "IPO Date",   val: profile?.ipoDate as string },
             ].map(({ label, val }) => (

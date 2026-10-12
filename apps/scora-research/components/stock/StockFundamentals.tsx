@@ -177,10 +177,11 @@ function SharesDilutionChart({ sharesFloat, income, loading }: { sharesFloat: Re
   );
 }
 
-function PeerMetricsTable({ ticker, peers, ratios }: {
+function PeerMetricsTable({ ticker, peers, ratios, metrics }: {
   ticker: string;
   peers: string[];
   ratios: Record<string, unknown> | null;
+  metrics: Record<string, unknown> | null;
 }) {
   const router = useRouter();
   const [peerData, setPeerData] = useState<Record<string, Record<string, unknown>>>({});
@@ -218,7 +219,10 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
     const revGrowth = m ? fmtPct(m.revenueGrowthTTM) : "—";
     return {
       t, isSelf: t === ticker,
-      pe:          m ? fmtPe(m.peRatioTTM) : "—",
+      // El P/E propio está en `metrics` (normalizado); el de los comparables llega crudo de
+      // ratios-ttm, donde /stable lo llama priceToEarningsRatioTTM. Leyendo solo peRatioTTM
+      // salía «—» en todas las filas, también en la del propio valor.
+      pe:          t === ticker ? fmtPe(metrics?.peRatioTTM ?? ratios?.peRatioTTM) : m ? fmtPe(m.priceToEarningsRatioTTM ?? m.peRatioTTM) : "—",
       grossMargin: m ? fmtPct(m.grossProfitMarginTTM) : "—",
       revGrowth,
       roe:         m ? fmtPct(m.returnOnEquityTTM) : "—",
@@ -701,7 +705,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
       {/* Peers */}
       {peers.length > 0 && (
-        <PeerMetricsTable ticker={ticker} peers={peers} ratios={ratios ?? null} />
+        <PeerMetricsTable ticker={ticker} peers={peers} ratios={ratios ?? null} metrics={metrics ?? null} />
       )}
     </div>
   );

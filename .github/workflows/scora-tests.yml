@@ -401,6 +401,9 @@ jobs:
       # Un parpadeo de red dejaba un hueco en pantalla (502 «fetch failed» en la cotizacion de IWM).
       - name: Reintento ante fallos de red de los proveedores
         run: node --experimental-strip-types --no-warnings scripts/red.test.mjs
+      # Con la cotizacion de respaldo (sin capitalizacion) la valoracion salia «Insufficient data».
+      - name: Capitalizacion cuando la cotizacion no la trae
+        run: node --experimental-strip-types --no-warnings scripts/capitalizacion.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

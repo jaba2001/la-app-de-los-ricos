@@ -14,6 +14,7 @@ import { track } from "@/lib/analytics";
 import { useMode, setMode, tabVisible, BEGINNER_TABS } from "@/lib/mode";
 import { completarConEdgar } from "@/lib/trimestres";
 import { esComparableCubierto } from "@/lib/simbolos";
+import { capitalizacion } from "@/lib/capitalizacion";
 import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
@@ -665,6 +666,12 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
 
       // ── Common: RDCF + scoring + upsert ──────────────────────────
       if (!live()) return;
+      // La cotización de respaldo (Yahoo, con FMP sin cuota) no trae capitalización y media
+      // ficha la necesita: se completa con el perfil, el float o las acciones del último trimestre.
+      if (stockData.quote && !(Number(stockData.quote.marketCap) > 0)) {
+        const mc = capitalizacion(stockData.quote, stockData);
+        if (mc) stockData = { ...stockData, quote: { ...stockData.quote, marketCap: mc.valor } };
+      }
       setData(stockData);
 
       const mergedMetrics = stockData.metrics;

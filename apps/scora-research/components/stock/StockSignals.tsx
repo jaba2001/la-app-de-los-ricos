@@ -229,7 +229,7 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
               <div className="sr-tile">
                 <div className="sr-tile-label">DuPont · ROE {(quality.dupont.roe3 * 100).toFixed(1)}%</div>
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6, marginTop: 2 }}>
-                  Margen {(quality.dupont.netMargin * 100).toFixed(1)}% · Rotación {quality.dupont.assetTurnover.toFixed(2)}× · Apal. {quality.dupont.equityMultiplier.toFixed(2)}×
+                  Margin {(quality.dupont.netMargin * 100).toFixed(1)}% · Turnover {quality.dupont.assetTurnover.toFixed(2)}× · Leverage {quality.dupont.equityMultiplier.toFixed(2)}×
                 </div>
               </div>
             )}

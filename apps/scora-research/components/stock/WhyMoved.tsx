@@ -30,7 +30,8 @@ const BUCKET_HINT: Record<AttributionKey, string> = {
 };
 
 /** Percentage points, always signed, two decimals. */
-const pp = (v: number) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)} pp`;
+// Se redondea ANTES de elegir el signo: −0,001 salía como «−0.00 pp».
+const pp = (v: number) => { const r = Math.round(v * 100) / 100; return `${r > 0 ? "+" : r < 0 ? "−" : ""}${Math.abs(r).toFixed(2)} pp`; };
 const pct = (v: number) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(2)}%`;
 
 interface Props {
