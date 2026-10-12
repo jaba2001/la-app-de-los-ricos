@@ -91,7 +91,7 @@ export function positionReturn(p: PickPosition): number | null {
 }
 
 export const CLOSE_REASON_LABEL: Record<string, string> = {
-  senal_bajo_umbral: "la señal cayó bajo la mediana dos evaluaciones seguidas",
-  descalificador: "un pilar entró en el decil inferior de su sector",
-  fuera_del_universo: "dejó de cumplir el universo elegible",
+  senal_bajo_umbral: "the signal fell below the median two evaluations in a row",
+  descalificador: "a pillar entered the bottom decile of its sector",
+  fuera_del_universo: "it stopped meeting the eligible universe",
 };

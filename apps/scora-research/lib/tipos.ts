@@ -102,7 +102,7 @@ export function percentil(valor: number | null, historia: number[]):
   if (v == null) return { pct: null, motivo: "sin valor" };
   const h = historia.filter((x) => Number.isFinite(x));
   if (h.length < UMBRALES_TIPOS.minObsPercentil)
-    return { pct: null, motivo: `muestra insuficiente: ${h.length} obs, hacen falta ${UMBRALES_TIPOS.minObsPercentil}` };
+    return { pct: null, motivo: `sample too small: ${h.length} obs, ${UMBRALES_TIPOS.minObsPercentil} needed` };
   let menores = 0;
   for (const x of h) if (x < v) menores++;
   return { pct: (100 * menores) / h.length, n: h.length };
@@ -194,28 +194,28 @@ export const SENSIBILIDAD_REAL = {
 /** La frase honesta para el panel. El número contemporáneo NUNCA sale sin el predictivo. */
 export function lecturaTipoReal(deltaReal: number | null): string {
   const s = SENSIBILIDAD_REAL;
-  const base = `Medido sobre ${s.meses} meses desde ${s.desde}: con el tipo real bajando, el oro hace ` +
-    `${s.oro.bajando >= 0 ? "+" : ""}${s.oro.bajando} %/mes; subiendo, ${s.oro.subiendo} %. ` +
-    `Pero eso es CONTEMPORÁNEO: mide el mismo mes. Mirando al mes siguiente la correlación cae de ` +
-    `${s.oro.contemporaneo} a ${s.oro.predictivo}. Explica lo que pasó, no anticipa lo que viene.`;
+  const base = `Measured over ${s.meses} months since ${s.desde}: with the real yield falling, gold returns ` +
+    `${s.oro.bajando >= 0 ? "+" : ""}${s.oro.bajando}%/month; rising, ${s.oro.subiendo}%. ` +
+    `But that is CONTEMPORANEOUS: it measures the same month. Looking at the following month the correlation drops from ` +
+    `${s.oro.contemporaneo} to ${s.oro.predictivo}. It explains what happened; it doesn't anticipate what comes next.`;
   if (deltaReal == null) return base;
-  return `El tipo real ${deltaReal < 0 ? "ha bajado" : "ha subido"} ${Math.abs(deltaReal).toFixed(2)} puntos. ${base}`;
+  return `The real yield has ${deltaReal < 0 ? "fallen" : "risen"} ${Math.abs(deltaReal).toFixed(2)} points. ${base}`;
 }
 
 /** La frase honesta para acompañar a un aviso encendido. NUNCA se publica el booleano solo. */
 export function avisoConTasaBase(ensanchando: boolean): string {
-  if (!ensanchando) return "El diferencial de crédito no se está abriendo por encima del corte declarado.";
-  return `El diferencial se está abriendo. Contexto medido: de ${BASE_AVISO.episodios} avisos como éste desde ` +
-    `${BASE_AVISO.desde}, ${BASE_AVISO.seguidosDeUnBuenAno} fueron seguidos de un año de más del +20 %. ` +
-    `La caída media posterior (${BASE_AVISO.caidaTrasAviso} %) no se distingue estadísticamente de la de un ` +
-    `mes cualquiera (${BASE_AVISO.caidaSinCondicionar} %, p = ${BASE_AVISO.p}). Es contexto, no una señal.`;
+  if (!ensanchando) return "The credit spread is not widening beyond the declared cutoff.";
+  return `The spread is widening. Measured context: of ${BASE_AVISO.episodios} warnings like this one since ` +
+    `${BASE_AVISO.desde}, ${BASE_AVISO.seguidosDeUnBuenAno} were followed by a year of more than +20%. ` +
+    `The average subsequent drop (${BASE_AVISO.caidaTrasAviso}%) is not statistically distinguishable from that of ` +
+    `any month (${BASE_AVISO.caidaSinCondicionar}%, p = ${BASE_AVISO.p}). It is context, not a signal.`;
 }
 
 export function liston(a10: number | null, real10: number | null): string | null {
   const n = num(a10);
   if (n == null) return null;
   const r = num(real10);
-  const base = `El Tesoro a 10 años paga ${n.toFixed(2)} % sin riesgo de impago: cualquier activo con riesgo tiene que batir eso para compensar.`;
+  const base = `The 10-year Treasury pays ${n.toFixed(2)}% with no default risk: any risky asset has to beat that to be worth it.`;
   return r == null ? base
-    : `${base} Descontada la inflación esperada, el listón real es ${r.toFixed(2)} %.`;
+    : `${base} Net of expected inflation, the real bar is ${r.toFixed(2)}%.`;
 }

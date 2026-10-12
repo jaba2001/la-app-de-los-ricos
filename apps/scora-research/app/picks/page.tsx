@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Scora Picks",
   description:
-    "Una cartera de reglas mecánicas, idéntica para todo el mundo, con cada decisión publicada — incluidas las fechas sin compras y todas las posiciones que salieron mal.",
+    "A portfolio run by mechanical rules, identical for everyone, with every decision published — including the dates with no buys and every position that went wrong.",
   alternates: { canonical: "/picks" },
 };
 
@@ -67,69 +67,70 @@ export default async function PicksPage() {
       <div style={{ marginBottom: "var(--sr-sp-4)" }}>
         <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, letterSpacing: "-0.02em" }}>Scora Picks</h1>
         <div className="sr-hint">
-          Reglas fijas, sin emociones y sin retrospectiva · versión {PICKS_RULES_VERSION} · medido en vivo desde el primer día
+          Fixed rules, no emotion and no hindsight · version {PICKS_RULES_VERSION} · measured live from day one
         </div>
       </div>
 
       {/* Lo primero que se lee, y va antes que cualquier número. */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)", borderLeft: "3px solid var(--sr-warn, #b45309)" }}>
         <p style={{ margin: 0, fontSize: "var(--sr-t-sm)", lineHeight: 1.7 }}>
-          <strong>Esto no es una recomendación de inversión ni una predicción de rentabilidad.</strong> Es lo que
-          hace un sistema de reglas escritas de antemano, publicado entero: las que funcionan y las que no.
-          Las reglas se diseñaron mirando datos históricos, así que su backtest{" "}
-          <strong>no es evidencia fuera de muestra</strong> — es la razón para probarlas en vivo, no la prueba de
-          que funcionen. Este track record empieza de cero y sólo tendrá algo que decir a partir de 24 meses.
+          <strong>This is not investment advice or a return forecast.</strong> It is what a system of rules
+          written in advance does, published in full: the parts that work and the parts that don&apos;t.
+          The rules were designed by looking at historical data, so their backtest{" "}
+          <strong>is not out-of-sample evidence</strong> — it is the reason to test them live, not proof that
+          they work. This track record starts from zero and will only have something to say after 24 months.
         </p>
         <p style={{ margin: "var(--sr-sp-2) 0 0", fontSize: "var(--sr-t-sm)", lineHeight: 1.7 }}>
-          <strong>Y una corrección del 24 de agosto de 2026, que va aquí y no en una nota al pie.</strong> Al
-          auditar el motor de datos aparecieron tres defectos que afectaban a cuatro de las cinco métricas con
-          las que se elige. Corregidos y vuelto a medir, la señal <strong>ya no bate al universo elegible
-          equiponderado en las dos ventanas históricas</strong>: gana en una y pierde en la otra. Antes ganaba en
-          las dos, y esa diferencia era el defecto, no el mercado. Tampoco se puede seguir diciendo que la
-          cartera caiga menos que el índice: en la ventana reciente cae <strong>más</strong>. No se ha cambiado
-          ninguna regla —cambiarla ahora sería elegirla mirando el resultado—, pero la evidencia previa es más
-          débil de lo que se publicó, y con más razón lo único que va a valer es lo que pase aquí en vivo.
+          <strong>And a correction from August 24, 2026, which goes here and not in a footnote.</strong> An
+          audit of the data engine found three defects affecting four of the five metrics used to select.
+          Fixed and re-measured, the signal <strong>no longer beats the equal-weighted eligible universe in
+          both historical windows</strong>: it wins in one and loses in the other. Before, it won in both,
+          and that difference was the defect, not the market. Nor can we keep saying the portfolio falls
+          less than the index: in the recent window it falls <strong>more</strong>. No rule has been changed
+          —changing one now would mean choosing it by looking at the result— but the earlier evidence is
+          weaker than what was published, which is all the more reason why the only thing that will count
+          is what happens here, live.
         </p>
         <p style={{ margin: "var(--sr-sp-2) 0 0", fontSize: "var(--sr-t-sm)", lineHeight: 1.7 }}>
-          <strong>Y lo más incómodo, que también va aquí:</strong> el criterio de cierre está publicado de
-          antemano —si a 24 meses queda por debajo de su referencia, se publica el resultado y se cierra—.
-          Aplicado a las dos ventanas históricas, <strong>ese criterio habría disparado en una de las dos</strong>.
-          No se relaja: relajar un criterio después de ver el resultado es lo que lo vacía de sentido. Pero
-          quien dedique tiempo o dinero a esto debería partir de que <strong>la probabilidad de que termine en
-          cierre es alta</strong>, y lo era antes de empezar.
+          <strong>And the most uncomfortable part, which also goes here:</strong> the shutdown criterion is
+          published in advance —if after 24 months it is below its benchmark, the result is published and it
+          shuts down—. Applied to the two historical windows, <strong>that criterion would have fired in one of
+          the two</strong>. It is not being relaxed: relaxing a criterion after seeing the result is what empties
+          it of meaning. But anyone putting time or money into this should start from the assumption that{" "}
+          <strong>the probability it ends in shutdown is high</strong>, and it was before it started.
         </p>
       </div>
 
       {!arrancado ? (
         <div className="card">
           <p style={{ margin: 0 }}>
-            <strong>Todavía no hay decisiones publicadas.</strong>
+            <strong>No decisions published yet.</strong>
           </p>
           <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
-            El sistema decide el día 1 y el día 15 de cada mes. Las primeras seis semanas la cartera se queda{" "}
-            <strong>vacía a propósito</strong>: la regla de persistencia exige que un valor lleve{" "}
-            {PERSISTENCE_DAYS} días sobre el umbral antes de poder entrar, y esa historia hay que acumularla.
-            Comprando {BUYS_PER_DATE * 2} al mes, llenar las {TARGET_POSITIONS} posiciones lleva unos diez meses.
+            The system decides on the 1st and the 15th of each month. For the first six weeks the portfolio stays{" "}
+            <strong>empty on purpose</strong>: the persistence rule requires a stock to spend{" "}
+            {PERSISTENCE_DAYS} days above the threshold before it can enter, and that history has to build up.
+            Buying {BUYS_PER_DATE * 2} a month, filling the {TARGET_POSITIONS} positions takes about ten months.
           </p>
         </div>
       ) : (
         <>
           <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-4)" }}>
-            <Tile label="Posiciones abiertas" value={`${open.length}/${TARGET_POSITIONS}`} sub={open.length < TARGET_POSITIONS ? "la cartera aún se está montando" : "cartera completa"} />
-            <Tile label="Posiciones cerradas" value={String(closed.length)} sub={cerradasConRetorno.length ? `${aciertos} en positivo` : "sin cierres todavía"} />
-            <Tile label="Retorno medio al cerrar" value={pct(mediaCerradas)} color={tone(mediaCerradas)} sub="simple, sin ponderar" />
-            <Tile label="Fechas sin comprar" value={`${sinCompra}/${runs.length}`} sub="un hueco vacío es un resultado" />
+            <Tile label="Open positions" value={`${open.length}/${TARGET_POSITIONS}`} sub={open.length < TARGET_POSITIONS ? "the portfolio is still being built" : "portfolio full"} />
+            <Tile label="Closed positions" value={String(closed.length)} sub={cerradasConRetorno.length ? `${aciertos} positive` : "no exits yet"} />
+            <Tile label="Average return at exit" value={pct(mediaCerradas)} color={tone(mediaCerradas)} sub="simple, unweighted" />
+            <Tile label="Dates with no buys" value={`${sinCompra}/${runs.length}`} sub="an empty slot is a result" />
           </div>
 
           <section style={{ marginBottom: "var(--sr-sp-5)" }}>
-            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>La cartera, entera</h2>
+            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>The whole portfolio</h2>
             {open.length === 0 ? (
-              <p className="sr-hint">Ninguna posición abierta ahora mismo.</p>
+              <p className="sr-hint">No open positions right now.</p>
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table className="sr-table">
                   <thead>
-                    <tr><th>Valor</th><th>Desde</th><th>Percentil al comprar</th><th>Precio de compra</th></tr>
+                    <tr><th>Stock</th><th>Since</th><th>Percentile at entry</th><th>Entry price</th></tr>
                   </thead>
                   <tbody>
                     {open.map((p) => (
@@ -147,18 +148,18 @@ export default async function PicksPage() {
           </section>
 
           <section style={{ marginBottom: "var(--sr-sp-5)" }}>
-            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>Todas las cerradas</h2>
+            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>Every closed position</h2>
             <p className="sr-hint" style={{ marginBottom: "var(--sr-sp-2)" }}>
-              Las {closed.length} que se han vendido, con su resultado y su motivo. Sin excepciones: publicar sólo
-              las ganadoras es lo que hace que los track records del sector no valgan nada.
+              All {closed.length} that were sold, with their result and their reason. No exceptions: publishing only
+              the winners is what makes the industry&apos;s track records worthless.
             </p>
             {closed.length === 0 ? (
-              <p className="sr-hint">Todavía no se ha cerrado ninguna posición.</p>
+              <p className="sr-hint">No position has been closed yet.</p>
             ) : (
               <div style={{ overflowX: "auto" }}>
                 <table className="sr-table">
                   <thead>
-                    <tr><th>Valor</th><th>Comprada</th><th>Vendida</th><th>Retorno</th><th>Por qué se vendió</th></tr>
+                    <tr><th>Stock</th><th>Bought</th><th>Sold</th><th>Return</th><th>Why it was sold</th></tr>
                   </thead>
                   <tbody>
                     {closed.map((p) => {
@@ -180,15 +181,15 @@ export default async function PicksPage() {
           </section>
 
           <section style={{ marginBottom: "var(--sr-sp-5)" }}>
-            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>Cada decisión, incluidas las de no comprar</h2>
+            <h2 style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>Every decision, including the ones not to buy</h2>
             <p className="sr-hint" style={{ marginBottom: "var(--sr-sp-2)" }}>
-              El sistema mira el día 1 y el día 15. Si nadie cumple las reglas, no compra — y esa fecha aparece
-              aquí igual. Sin estas filas, un día sin compras sería indistinguible de un sistema parado.
+              The system looks on the 1st and the 15th. If nothing meets the rules, it doesn&apos;t buy — and that date
+              still appears here. Without these rows, a day with no buys would be indistinguishable from a stalled system.
             </p>
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table">
                 <thead>
-                  <tr><th>Fecha</th><th>Universo</th><th>Elegibles</th><th>Compras</th><th>Ventas</th><th>Cartera</th></tr>
+                  <tr><th>Date</th><th>Universe</th><th>Eligible</th><th>Buys</th><th>Sells</th><th>Portfolio</th></tr>
                 </thead>
                 <tbody>
                   {runs.map((r) => (
@@ -208,15 +209,15 @@ export default async function PicksPage() {
             </div>
             {fotos.length > 0 && (
               <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
-                <strong>Sobre qué universo se decidió:</strong> la lista de miembros del S&amp;P 500 usada en
-                cada decisión fue la del{" "}
-                {fotos.length === 1 ? fotos[0] : fotos.join(", ")}, y queda registrada con la decisión para
-                que se pueda comprobar después. <strong>Hasta el 24 de agosto de 2026 esa foto llevaba 366
-                días parada</strong>, porque la fuente histórica dejó de actualizarse y aquí se dijo —
-                equivocadamente — que no había sustituto: los candidatos que se revisaron parecían traer
-                tickers erróneos y resultó que eran los tickers <em>actuales</em>, comprobados uno a uno contra
-                los registros de la SEC. Corregido: ahora la foto es del día. Las decisiones tomadas antes de
-                esa fecha se tomaron sobre el índice de agosto de 2025 y no se reescriben.
+                <strong>Which universe each decision used:</strong> the S&amp;P 500 membership list used in
+                each decision was the one from{" "}
+                {fotos.length === 1 ? fotos[0] : fotos.join(", ")}, and it is stored with the decision so it
+                can be checked later. <strong>Until August 24, 2026 that snapshot had been frozen for 366
+                days</strong>, because the historical source stopped updating and this page said —
+                wrongly — that there was no substitute: the candidates reviewed seemed to carry wrong tickers,
+                and it turned out they were the <em>current</em> tickers, checked one by one against SEC
+                records. Fixed: the snapshot is now current. Decisions taken before that date used the August
+                2025 index and are not rewritten.
               </p>
             )}
           </section>
@@ -224,34 +225,33 @@ export default async function PicksPage() {
       )}
 
       <section className="card">
-        <h2 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>Las reglas, en cinco líneas</h2>
+        <h2 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, marginBottom: "var(--sr-sp-2)" }}>The rules, in five lines</h2>
         <ul style={{ margin: 0, paddingLeft: "1.1rem", fontSize: "var(--sr-t-sm)", lineHeight: 1.8 }}>
-          <li><strong>Qué se compra:</strong> los valores del S&amp;P 500 en el {(ENTRY_PCTL * 100).toFixed(0)}% mejor por calidad — rentabilidad bruta sobre activos, ROIC, margen operativo, cobertura de intereses y deuda neta. Todo de los estados financieros; nada del precio.</li>
-          <li><strong>Cuándo:</strong> el primer día hábil y el día 15, {BUYS_PER_DATE} valores cada vez. Fechas fijas: no se adelantan porque el mercado caiga ni se retrasan porque «esté caro».</li>
-          <li><strong>Persistencia:</strong> hay que cumplir el umbral {PERSISTENCE_DAYS} días seguidos. Sin esto se compra el pico de un día.</li>
-          <li><strong>Cuándo se vende:</strong> si la señal cae bajo el percentil {(EXIT_PCTL * 100).toFixed(0)} en dos evaluaciones seguidas, si un pilar entra en el decil inferior de su sector, o si deja de cumplir el universo. <strong>No hay stop-loss por precio</strong>: un stop es una regla sobre el precio, no sobre el negocio.</li>
-          <li><strong>Pesos:</strong> equiponderado, tope de {TARGET_POSITIONS} posiciones, y un valor vendido no puede volver en {QUARANTINE_MONTHS} meses.</li>
+          <li><strong>What gets bought:</strong> S&amp;P 500 stocks in the top {(ENTRY_PCTL * 100).toFixed(0)}% by quality — gross profitability on assets, ROIC, operating margin, interest coverage and net debt. All from the financial statements; nothing from the price.</li>
+          <li><strong>When:</strong> the first business day and the 15th, {BUYS_PER_DATE} stocks each time. Fixed dates: not brought forward because the market falls, not delayed because it &quot;looks expensive&quot;.</li>
+          <li><strong>Persistence:</strong> the threshold must be met {PERSISTENCE_DAYS} days in a row. Without it you buy a one-day spike.</li>
+          <li><strong>When it sells:</strong> if the signal falls below the {(EXIT_PCTL * 100).toFixed(0)}th percentile in two evaluations in a row, if a pillar enters the bottom decile of its sector, or if it stops meeting the universe. <strong>There is no price stop-loss</strong>: a stop is a rule about the price, not about the business.</li>
+          <li><strong>Weights:</strong> equal-weighted, capped at {TARGET_POSITIONS} positions, and a stock that is sold can&apos;t return for {QUARANTINE_MONTHS} months.</li>
         </ul>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.7 }}>
-          <strong>Esta cartera no tiene bancos, y no es una opinión sobre la banca.</strong> Las cinco métricas
-          de calidad —margen operativo, cobertura de intereses, deuda neta sobre EBITDA— no significan nada en
-          el balance de un banco, donde los intereses son el negocio y no un gasto. Medido: de los 18 mayores
-          bancos del índice, <strong>ninguno</strong> llega a tener nota. Tampoco hay REITs, por el mismo tipo
-          de razón. Es un sesgo sectorial permanente que va incluido en el precio — y conviene saber que en
-          las dos ventanas del backtest los bancos rindieron por debajo del índice, así que no tenerlos ayudó.
-          Cuánto de la ventaja histórica es eso y cuánto es selección <strong>todavía no está medido</strong>.
-          {" "}Desde el 23-08-2026 sí existe un juego de métricas propio de banca —margen de intereses,
-          eficiencia, peso de las comisiones, depósitos sobre activo—, y se ha comprobado que los datos
-          públicos lo sostienen para los 20 bancos comerciales del índice. Lo que <em>no</em> sostienen es la
-          calidad crediticia (40 %) ni la solvencia regulatoria (30 %), así que esas dos no se calculan:
-          ordenar por una métrica que sólo existe para el 40 % es ordenar la disponibilidad del dato.
-          Nada de eso entra todavía en esta cartera: meter bancos cambia la estrategia, no arregla un fallo,
-          y eso exige abrir una versión de reglas nueva y validarla antes.
+          <strong>This portfolio holds no banks, and that is not an opinion about banking.</strong> The quality
+          metrics —operating margin, interest coverage, net debt to EBITDA— mean nothing on a bank&apos;s balance
+          sheet, where interest is the business and not an expense. Measured: of the 18 largest banks in the
+          index, <strong>none</strong> gets a score. There are no REITs either, for the same kind of reason. It is
+          a permanent sector bias that comes with the product — and it is worth knowing that in both backtest
+          windows banks underperformed the index, so not holding them helped. How much of the historical edge
+          is that and how much is selection <strong>has not been measured yet</strong>.
+          {" "}Since 2026-08-23 there is a bank-specific metric set —net interest margin, efficiency, fee share,
+          deposits to assets—, and public data has been checked to support it for the index&apos;s 20 commercial
+          banks. What it does <em>not</em> support is credit quality (40%) or regulatory capital (30%), so those two
+          aren&apos;t computed: ranking by a metric that only exists for 40% is ranking data availability.
+          None of that enters this portfolio yet: adding banks changes the strategy, it doesn&apos;t fix a bug,
+          and that requires opening a new rules version and validating it first.
         </p>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.7 }}>
-          Se mide contra tres referencias, y la tercera es la que de verdad dice si seleccionar aporta algo: el
-          S&amp;P 500, su versión equiponderada, y el universo elegible equiponderado. Si a 24 meses queda por
-          debajo de esa tercera, se publica el resultado y se cierra el producto.
+          It is measured against three benchmarks, and the third is the one that really tells whether selection
+          adds anything: the S&amp;P 500, its equal-weighted version, and the equal-weighted eligible universe. If
+          after 24 months it is below that third one, the result is published and the product is shut down.
         </p>
       </section>
     </main>

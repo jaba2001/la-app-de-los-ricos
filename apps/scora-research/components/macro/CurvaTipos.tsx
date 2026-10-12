@@ -16,11 +16,14 @@ const TONO: Record<FormaCurva, string> = {
 };
 
 const EXPLICA: Record<FormaCurva, string> = {
-  normal: "prestar más tiempo paga más, que es lo que cabe esperar",
-  plana: "el plazo casi no se paga: el mercado no ve mucha diferencia entre dos años y diez",
-  jorobada: "el tramo medio paga más que los dos extremos — la forma que aparece en los giros",
-  invertida: "prestar a diez años paga MENOS que a dos, que sólo tiene sentido si se esperan bajadas de tipos",
+  normal: "lending for longer pays more, which is what you would expect",
+  plana: "term barely gets paid: the market sees little difference between two years and ten",
+  jorobada: "the middle of the curve pays more than both ends — the shape that shows up at turning points",
+  invertida: "lending for ten years pays LESS than for two, which only makes sense if rate cuts are expected",
 };
+
+/** Nombre en pantalla de cada forma (la clave interna sigue en español). */
+const NOMBRE_FORMA: Record<FormaCurva, string> = { normal: "normal", plana: "flat", jorobada: "humped", invertida: "inverted" };
 
 /**
  * LA CURVA DE TIPOS, Y EL LISTÓN QUE PONE.
@@ -74,9 +77,9 @@ export default function CurvaTipos() {
       setDeltaReal(antes.length && hoyReal != null ? hoyReal - antes[antes.length - 1].v : null);
       setInf5a5(ultimo(t5));
       setSerieBaa(baa);
-      if (!ultimo(a10)) setError("FRED no ha devuelto el tramo de 10 años.");
+      if (!ultimo(a10)) setError("FRED didn't return the 10-year yield.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Fallo al leer la curva de tipos");
+      setError(e instanceof Error ? e.message : "Couldn't read the yield curve");
     }
     setLoading(false);
   }, []);
@@ -90,38 +93,38 @@ export default function CurvaTipos() {
   const frase = curva ? liston(curva.a10, real10) : null;
 
   const tramos: [string, number | null, string][] = curva ? [
-    ["3 meses", curva.m3, "el dinero a la vista"],
-    ["2 años", curva.a2, "lo que el mercado espera de la política monetaria"],
-    ["10 años", curva.a10, "la referencia: el listón de todo lo demás"],
-    ["30 años", curva.a30, "expectativas a muy largo plazo"],
+    ["3 months", curva.m3, "cash"],
+    ["2 years", curva.a2, "what the market expects from monetary policy"],
+    ["10 years", curva.a10, "the benchmark: the bar for everything else"],
+    ["30 years", curva.a30, "very long-term expectations"],
   ] : [];
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-      <div className="section-label">La curva de tipos · el suelo que todo lo demás tiene que batir</div>
+      <div className="section-label">The yield curve · the floor everything else has to beat</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 660 }}>
-        Un bono del Tesoro es lo más parecido que hay a rentabilidad sin riesgo de impago. Si paga el 5 %, cualquier
-        activo con riesgo tiene que batir ese 5 % para compensar. Por eso cuando los tipos suben,{" "}
-        <strong>todo lo demás se reprecia a la baja</strong> — es la explicación de esos días en que la cartera cae sin
-        ninguna noticia mala.
+        A Treasury bond is the closest thing there is to a return with no default risk. If it pays 5%, any risky
+        asset has to beat that 5% to be worth it. That is why, when rates rise,{" "}
+        <strong>everything else reprices lower</strong> — the explanation for those days the portfolio falls with no
+        bad news at all.
       </div>
 
       {error && (
         <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 10%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)" }}>{error}</div>
       )}
-      {loading && !curva && <div className="sr-hint">Leyendo FRED…</div>}
+      {loading && !curva && <div className="sr-hint">Reading FRED…</div>}
 
       {curva && f && (
         <>
           <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-3)" }}>
             <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: TONO[f.forma] }}>
               {curva.a10 != null ? `${curva.a10.toFixed(2)} %` : "—"}
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> a 10 años</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> 10-year</span>
             </div>
-            <div style={{ fontWeight: 700, textTransform: "capitalize", color: TONO[f.forma] }}>curva {f.forma}</div>
+            <div style={{ fontWeight: 700, textTransform: "capitalize", color: TONO[f.forma] }}>{NOMBRE_FORMA[f.forma]} curve</div>
             <div className="sr-hint">
-              10a−2a {f.t10y2 != null ? `${f.t10y2 >= 0 ? "+" : ""}${f.t10y2.toFixed(2)}` : "—"} ·
-              {" "}10a−3m {f.t10y3m != null ? `${f.t10y3m >= 0 ? "+" : ""}${f.t10y3m.toFixed(2)}` : "—"}
+              10y−2y {f.t10y2 != null ? `${f.t10y2 >= 0 ? "+" : ""}${f.t10y2.toFixed(2)}` : "—"} ·
+              {" "}10y−3m {f.t10y3m != null ? `${f.t10y3m >= 0 ? "+" : ""}${f.t10y3m.toFixed(2)}` : "—"}
             </div>
           </div>
           <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)" }}>{EXPLICA[f.forma]}.</div>
@@ -129,9 +132,9 @@ export default function CurvaTipos() {
           <div style={{ overflowX: "auto" }}>
             <table className="sr-table">
               <thead><tr>
-                <th>Plazo</th>
-                <th style={{ textAlign: "right" }}>Rendimiento</th>
-                <th>Qué mide</th>
+                <th>Maturity</th>
+                <th style={{ textAlign: "right" }}>Yield</th>
+                <th>What it measures</th>
               </tr></thead>
               <tbody>
                 {tramos.map(([k, v, q]) => (
@@ -147,32 +150,32 @@ export default function CurvaTipos() {
 
           {desc && (
             <div style={{ marginTop: "var(--sr-sp-4)" }}>
-              <div className="section-label">Nominal = real + inflación esperada</div>
+              <div className="section-label">Nominal = real + expected inflation</div>
               <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-2)", lineHeight: 1.55, maxWidth: 660 }}>
-                Dos épocas con el mismo 4 % nominal no se parecen en nada: con inflación esperada al 1 % aprieta mucho
-                más que con el 3 %. El <strong>tipo real</strong> sale de los TIPS; el breakeven es la diferencia.
+                Two periods with the same 4% nominal yield look nothing alike: with expected inflation at 1% it bites much
+                harder than at 3%. The <strong>real yield</strong> comes from TIPS; the breakeven is the difference.
               </div>
               <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
-                <div className="sr-tile"><div className="sr-tile-label">Nominal 10a</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.nominal.toFixed(2)} %</div></div>
-                <div className="sr-tile"><div className="sr-tile-label">Real 10a (TIPS)</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.real.toFixed(2)} %</div></div>
-                <div className="sr-tile"><div className="sr-tile-label">Breakeven</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.breakeven.toFixed(2)} %</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>implícito en los dos anteriores</div></div>
-                <div className="sr-tile"><div className="sr-tile-label">5a dentro de 5a</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.expectativa5a5 == null ? "—" : `${desc.expectativa5a5.toFixed(2)} %`}</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>otro horizonte: no se promedia</div></div>
+                <div className="sr-tile"><div className="sr-tile-label">Nominal 10y</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.nominal.toFixed(2)} %</div></div>
+                <div className="sr-tile"><div className="sr-tile-label">Real 10y (TIPS)</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.real.toFixed(2)} %</div></div>
+                <div className="sr-tile"><div className="sr-tile-label">Breakeven</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.breakeven.toFixed(2)} %</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>implied by the two before</div></div>
+                <div className="sr-tile"><div className="sr-tile-label">5y, 5y forward</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{desc.expectativa5a5 == null ? "—" : `${desc.expectativa5a5.toFixed(2)} %`}</div><div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>a different horizon: not averaged in</div></div>
               </div>
             </div>
           )}
 
           {cr && (
             <div style={{ marginTop: "var(--sr-sp-4)" }}>
-              <div className="section-label">El diferencial de crédito · lo que cobra el mercado por prestar a quien puede fallar</div>
+              <div className="section-label">The credit spread · what the market charges to lend to someone who might default</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
                 <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800 }}>{cr.valor.toFixed(2)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> pp</span></div>
                 {cr.percentil != null && (
                   <div style={{ fontWeight: 700, color: cr.percentil > 80 ? "var(--sr-neg)" : cr.percentil < 25 ? "var(--sr-pos)" : "var(--sr-text-2)" }}>
-                    percentil {cr.percentil.toFixed(0)} de {serieBaa!.length.toLocaleString("es")} observaciones desde {serieBaa![0].date.slice(0, 4)}
+                    {cr.percentil.toFixed(0)}th percentile of {serieBaa!.length.toLocaleString("en")} observations since {serieBaa![0].date.slice(0, 4)}
                   </div>
                 )}
                 <div className="sr-hint">
-                  hace 90 días {cr.hace90d == null ? "—" : `${cr.hace90d.toFixed(2)} pp`} ·
+                  90 days ago {cr.hace90d == null ? "—" : `${cr.hace90d.toFixed(2)} pp`} ·
                   {" "}delta {cr.delta == null ? "—" : `${cr.delta >= 0 ? "+" : ""}${cr.delta.toFixed(2)}`}
                 </div>
               </div>
@@ -184,9 +187,9 @@ export default function CurvaTipos() {
                 {avisoConTasaBase(cr.ensanchando)}
               </div>
               <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>
-                Corte declarado: {UMBRALES_TIPOS.ensancheMinimo} pp en {UMBRALES_TIPOS.ventanaEnsanche} días.
-                Se usa BAA10Y (Baa − Tesoro 10a) y no la serie de alto rendimiento de ICE BofA porque FRED
-                sólo sirve 786 observaciones de ésta desde 2023: mide lo mismo con 41 años en vez de tres.
+                Declared cutoff: {UMBRALES_TIPOS.ensancheMinimo} pp in {UMBRALES_TIPOS.ventanaEnsanche} days.
+                It uses BAA10Y (Baa − 10y Treasury) rather than the ICE BofA high-yield series because FRED
+                only serves 786 observations of that one since 2023: it measures the same thing with 41 years instead of three.
               </div>
             </div>
           )}
@@ -197,7 +200,7 @@ export default function CurvaTipos() {
               las dos cifras juntas, y scripts/tipos.test.mjs falla si alguien quita la segunda. */}
           {real10 != null && (
             <div style={{ marginTop: "var(--sr-sp-4)" }}>
-              <div className="section-label">El tipo real y los metales</div>
+              <div className="section-label">The real yield and metals</div>
               <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700, padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-text-3) 8%, transparent)" }}>
                 {lecturaTipoReal(deltaReal)}
               </div>

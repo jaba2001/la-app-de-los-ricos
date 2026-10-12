@@ -61,7 +61,7 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   const corta = Array.from({ length: UMBRALES_TIPOS.minObsPercentil - 1 }, (_, i) => i);
   const r = percentil(50, corta);
   ok(r.pct === null, "muestra por debajo del mínimo: NO se da percentil");
-  ok(/insuficiente/.test(r.motivo) && /\d/.test(r.motivo), "y se dice cuántas obs hay y cuántas hacen falta");
+  ok(/too small/.test(r.motivo) && /\d/.test(r.motivo), "y se dice cuántas obs hay y cuántas hacen falta");
 
   const larga = Array.from({ length: 1000 }, (_, i) => i / 10);  // 0 … 99,9
   cerca(percentil(50, larga).pct, 50, 1.5, "en el centro de una uniforme, percentil ~50");
@@ -95,7 +95,7 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   // El percentil del diferencial usa SÓLO la historia hasta la fecha pedida: sin mirar futuro.
   const medio = credito(fuerte, dia(200));
   ok(medio.fecha <= dia(200), "el as-of no mira más allá de la fecha pedida");
-  ok(medio.percentil === null && /insuficiente/.test(medio.motivoPercentil),
+  ok(medio.percentil === null && /too small/.test(medio.motivoPercentil),
      "y con 201 obs no inventa un percentil: lo declara insuficiente");
 }
 
@@ -124,9 +124,9 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   // ⚠️ El punto va ESCAPADO. Sin escapar, `0.146` casa tambien «0x146» o «0,146» por accidente
   // y el test pasaria aunque la cifra estuviera mal. Ya paso en esta sesion con un sed.
   ok(!/0\.146/.test("0X146"), "y el punto escapado no casa cualquier caracter");
-  ok(/contexto, no una señal|no una señal/i.test(t), "y se declara explicitamente como contexto, no señal");
+  ok(/context, not a signal/i.test(t), "y se declara explicitamente como contexto, no señal");
   ok(!/comprar|vender|salir|proteger|crisis viene/i.test(t), "y no recomienda nada");
-  ok(/no se esta abriendo|no se está abriendo/i.test(avisoConTasaBase(false)), "apagado, dice justo eso");
+  ok(/not widening/i.test(avisoConTasaBase(false)), "apagado, dice justo eso");
   ok(BASE_AVISO.p > 0.05, "la tasa base guardada refleja que NO es significativo");
   ok(BASE_AVISO.seguidosDeUnBuenAno / BASE_AVISO.episodios > 0.3, "mas de un tercio de los avisos fueron falsas alarmas");
 }
@@ -184,9 +184,9 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   ok(/2\.46|2,46/.test(t), "la frase cita el retorno con el tipo real bajando");
   ok(/CONTEMPOR|contempor/i.test(t), "y declara que es contemporaneo");
   ok(/-0\.078|-0,078/.test(t), "y publica el rho PREDICTIVO al lado");
-  ok(/no anticipa/i.test(t), "y dice explicitamente que no anticipa nada");
-  ok(/ha bajado/.test(t), "y con un delta negativo dice que ha bajado");
-  ok(/ha subido/.test(lecturaTipoReal(0.15)), "y al reves");
+  ok(/doesn't anticipate/i.test(t), "y dice explicitamente que no anticipa nada");
+  ok(/has fallen/.test(t), "y con un delta negativo dice que ha bajado");
+  ok(/has risen/.test(lecturaTipoReal(0.15)), "y al reves");
   ok(!/comprar|vender|oportunidad|deberia/i.test(t), "sin recomendar nada");
   ok(lecturaTipoReal(null).length > 50, "sin delta se publica igual el contexto");
 
