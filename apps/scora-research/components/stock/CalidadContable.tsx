@@ -43,7 +43,7 @@ export default function CalidadContable({ ticker }: Props) {
     return () => { vivo = false; };
   }, [ticker]);
 
-  if (fila === undefined) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">Cargando…</div></div>;
+  if (fila === undefined) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">Loading…</div></div>;
 
   const tieneVida = fila?.vidaCorregida != null;
   const tieneRec = fila?.precioRecompra != null;
@@ -51,13 +51,13 @@ export default function CalidadContable({ ticker }: Props) {
   if (!fila || (!tieneVida && !tieneRec)) {
     return (
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Lo que revela su contabilidad</div>
+        <div className="section-label">What its accounts reveal</div>
         <div className="sr-hint" style={{ lineHeight: 1.55 }}>
-          Para {ticker.toUpperCase()} no hay datos suficientes. La vida útil implícita necesita el
-          inmovilizado <strong>bruto</strong> de dos ejercicios y el precio de recompra necesita las
-          <strong> acciones</strong> recompradas, y no todas las empresas etiquetan esas cifras en sus
-          cuentas. Sobre el índice hay cobertura del 63 % y el 62 %; es un hueco de los datos, no un
-          juicio sobre la empresa.
+          Not enough data for {ticker.toUpperCase()}. The implied useful life needs <strong>gross</strong>{" "}
+          fixed assets for two fiscal years and the buyback price needs the number of
+          <strong> shares</strong> repurchased, and not every company tags those figures in its
+          filings. Index coverage is 63% and 62%; this is a data gap, not a judgment on the
+          company.
         </div>
       </div>
     );
@@ -67,39 +67,39 @@ export default function CalidadContable({ ticker }: Props) {
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-      <div className="section-label">Lo que revela su contabilidad</div>
+      <div className="section-label">What its accounts reveal</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 680 }}>
-        Dos cifras que la empresa no declara y que se pueden deducir de las que sí publica: cuántos
-        años supone que le duran sus activos, y a qué precio compró sus propias acciones.
+        Two figures the company doesn&apos;t state but that can be derived from the ones it does
+        publish: how many years it assumes its assets last, and what price it paid for its own shares.
       </div>
 
       {/* ── La vida útil implícita ─────────────────────────────────────────────────── */}
       {tieneVida && (
         <div style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Vida útil implícita de su inmovilizado</div>
+          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Implied useful life of its fixed assets</div>
           <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
             <div className="sr-tile">
-              <div className="sr-tile-label">Corregida</div>
-              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaCorregida)} años</div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>la que vale</div>
+              <div className="sr-tile-label">Corrected</div>
+              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaCorregida)} years</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>the one that counts</div>
             </div>
             <div className="sr-tile">
-              <div className="sr-tile-label">Sin corregir</div>
-              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-text-3)" }}>{n2(fila.vidaIngenua)} años</div>
+              <div className="sr-tile-label">Uncorrected</div>
+              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-text-3)" }}>{n2(fila.vidaIngenua)} years</div>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
-                {sesgo != null && sesgo > 0.05 ? `exagera ${n2(sesgo)} años` : "sin sesgo apreciable"}
+                {sesgo != null && sesgo > 0.05 ? `overstates by ${n2(sesgo)} years` : "no material bias"}
               </div>
             </div>
             {fila.vidaPrevia != null && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Hace un año</div>
-                <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaPrevia)} años</div>
+                <div className="sr-tile-label">A year ago</div>
+                <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaPrevia)} years</div>
               </div>
             )}
             <div className="sr-tile">
-              <div className="sr-tile-label">Crecimiento del activo</div>
+              <div className="sr-tile-label">Asset growth</div>
               <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{pct(fila.crecimientoPct, 0)}</div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{fila.ruidoso ? "tan alto que la cifra es ruidosa" : "en rango normal"}</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{fila.ruidoso ? "so high the figure is noisy" : "in the normal range"}</div>
             </div>
           </div>
 
@@ -108,11 +108,11 @@ export default function CalidadContable({ ticker }: Props) {
               sobre el índice, la mediana del sesgo son 0,56 años y el máximo 17,2 (UPS). Sin
               corregir, en un auge de inversión la métrica acusaría a todo el mundo. */}
           <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700 }}>
-            La cifra sin corregir se infla sola cuando el activo crece, porque lo comprado este año
-            aún no ha depreciado. La corregida usa la base media del ejercicio.
+            The uncorrected figure inflates on its own when assets grow, because what was bought
+            this year hasn&apos;t depreciated yet. The corrected one uses the fiscal-year average base.
             {fila.viaDep === "total_contaminado" && (
-              <> <strong>Ojo:</strong> esta empresa no separa la depreciación de la amortización de
-              intangibles en sus cuentas, así que la cifra incluye las dos y sale más corta de lo real.</>
+              <> <strong>Note:</strong> this company doesn&apos;t separate depreciation from amortization of
+              intangibles in its accounts, so the figure includes both and comes out shorter than reality.</>
             )}
           </div>
 
@@ -122,7 +122,7 @@ export default function CalidadContable({ ticker }: Props) {
                   criterio contable de un cambio en lo que la empresa compra: un centro de datos son
                   servidores de 5 años y obra civil de 30. Marcarlo como alerta sería acusar con una
                   prueba que no distingue las dos cosas. */}
-              <div style={{ fontWeight: 700, color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", textTransform: "uppercase", letterSpacing: ".04em" }}>Aviso</div>
+              <div style={{ fontWeight: 700, color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", textTransform: "uppercase", letterSpacing: ".04em" }}>Notice</div>
               <div style={{ lineHeight: 1.55, marginTop: 2 }}>{s.texto}</div>
             </div>
           ))}
@@ -133,31 +133,31 @@ export default function CalidadContable({ ticker }: Props) {
       {tieneRec && (
         <div>
           <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>
-            A qué precio recompró la directiva sus propias acciones
+            The price management paid to buy back its own shares
           </div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
             <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800 }}>
               {fila.precioRecompra?.toFixed(2)}
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> por acción</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> per share</span>
             </div>
             {fila.retornoRecompraPct != null && (
               <div style={{ fontWeight: 700, color: fila.retornoRecompraPct >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                la acción está {pct(fila.retornoRecompraPct)} desde entonces
+                the stock is {pct(fila.retornoRecompraPct)} since then
               </div>
             )}
-            {fila.anoRecompra != null && <div className="sr-hint">ejercicio {fila.anoRecompra}</div>}
+            {fila.anoRecompra != null && <div className="sr-hint">fiscal year {fila.anoRecompra}</div>}
           </div>
           <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700 }}>
             {fila.retornoRecompraPct == null
-              ? "No hay precio actual con el que compararlo."
+              ? "No current price to compare it with."
               : fila.retornoRecompraPct >= 0
-                ? "Con su propio dinero, la dirección situó el valor razonable por debajo de donde cotiza hoy, y de momento le ha salido bien. Es lo que creían entonces, no un pronóstico sobre lo que hará la acción."
-                : "Pagó por encima de donde está el mercado hoy: es una decisión de asignación de capital que ha destruido valor. Sobre eso —no sobre el precio futuro— sí se puede juzgar a una dirección."}
+                ? "With its own money, management put fair value below where the stock trades today, and so far it has worked out. That is what they believed then, not a forecast of what the stock will do."
+                : "It paid above where the market is today: a capital-allocation decision that has destroyed value. That —not the future price— is something management can fairly be judged on."}
           </div>
           {fila.recompraCreible !== true && (
             <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>
-              ⚠️ No se ha podido comprobar contra el rango en que la acción cotizó ese ejercicio, así
-              que el precio medio va sin verificar.
+              ⚠️ It couldn&apos;t be checked against the range the stock traded in that fiscal year, so
+              the average price is unverified.
             </div>
           )}
         </div>
@@ -166,10 +166,9 @@ export default function CalidadContable({ ticker }: Props) {
       {/* ⚠️ LA FECHA, SIEMPRE. Es una foto precalculada, no un dato vivo, y esconderlo sería
           presentar como actual algo que puede tener semanas. */}
       <div className="sr-hint" style={{ marginTop: "var(--sr-sp-4)", lineHeight: 1.6 }}>
-        Foto calculada el {asOf} sobre {universo} empresas del índice, a partir de las cuentas
-        presentadas a la SEC. No se actualiza sola: FMP —la fuente en vivo del resto de la página— no
-        publica ni el inmovilizado bruto ni las acciones recompradas, que es lo que estas dos medidas
-        necesitan.
+        Snapshot computed on {asOf} across {universo} index companies, from SEC filings. It doesn&apos;t
+        update on its own: FMP —the live source for the rest of this page— publishes neither gross
+        fixed assets nor shares repurchased, which is what these two measures need.
       </div>
     </div>
   );

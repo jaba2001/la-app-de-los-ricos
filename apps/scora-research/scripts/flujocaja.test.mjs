@@ -129,7 +129,7 @@ const SANA = {
   ok(p.pasos.at(-1).tipo === "fin" && p.pasos.at(-1).importe === 140, "termina en el flujo operativo");
   // 100 + 30 (D&A) + 15 (SBC) − 8 (cobros) − 6 (inventario) = 131; faltan 9 hasta 140.
   cerca(p.sinExplicar, 9, 1e-9, "lo que no explican los conceptos conocidos se calcula");
-  ok(p.pasos.some((x) => /Otros ajustes/.test(x.concepto)), "y se muestra como «otros ajustes», no se reparte");
+  ok(p.pasos.some((x) => /Other adjustments/.test(x.concepto)), "y se muestra como «otros ajustes», no se reparte");
   // ⚠️ 9 sobre un salto de 40 es el 22,5 %, que PASA del umbral del 20 %. Mi primera version de
   // este test decia "menos del 20 %" y fallo: la aritmetica estaba mal en el test, no en el
   // codigo. Se deja fijado en los dos lados del corte, que es lo que habria evitado el error.
@@ -163,7 +163,7 @@ const SANA = {
   // El efecto del tipo de cambio entra en la suma: es lo que reconcilia la caja final.
   const conFx = destino({ ocfTTM: 100, cfiTTM: -20, cffTTM: -10, fxCashTTM: 5, deltaCashConFxTTM: 75 });
   ok(conFx.cuadra, "el efecto divisa forma parte del cuadre");
-  ok(conFx.bloques.some((b) => /cambio/i.test(b.concepto)), "y aparece como bloque propio");
+  ok(conFx.bloques.some((b) => /FX effect/i.test(b.concepto)), "y aparece como bloque propio");
 }
 
 // ── EL SANKEY DE CAJA: lo que hay que fijar es que CIERRE ────────────────────────────────
@@ -186,8 +186,8 @@ const SANA = {
   // 140 = capex 40 + resto inversion 10 + recompras 30 + dividendos 20 + resto financiacion 10 + caja 30
   const v = (c) => s.flujos.find((x) => x.concepto === c)?.valor ?? null;
   cerca(v("Capex"), 40, 1e-9, "el capex sale con su magnitud");
-  cerca(v("Resto de inversion") ?? v("Resto de inversión"), 10, 1e-9, "y el resto de inversion es CFI + capex, no un hueco");
-  cerca(v("Resto de financiacion (deuda)") ?? v("Resto de financiación (deuda)"), 10, 1e-9, "igual con la financiacion");
+  cerca(v("Resto de inversion") ?? v("Other investing"), 10, 1e-9, "y el resto de inversion es CFI + capex, no un hueco");
+  cerca(v("Resto de financiacion (deuda)") ?? v("Other financing (debt)"), 10, 1e-9, "igual con la financiacion");
 
   // ⚠️ TODO valor es positivo: el sentido lo lleva `lado`, no el signo. Mezclarlos es como se
   // dibujan las barras que apuntan al lado equivocado.
@@ -197,24 +197,24 @@ const SANA = {
   const baja = sankeyCaja({ ...SANA, cffTTM: -160, deltaCashConFxTTM: -70 });
   cierra(baja, "con la caja bajando tambien cierra");
   const c = baja.flujos.find((x) => x.clase === "caja");
-  ok(c.lado === "origen" && /Reducci/.test(c.concepto), "y la reduccion de caja aparece como ORIGEN");
+  ok(c.lado === "origen" && /Decrease in cash/.test(c.concepto), "y la reduccion de caja aparece como ORIGEN");
 
   // Deuda EMITIDA: el resto de financiacion pasa a ser un origen.
   const emite = sankeyCaja({ ...SANA, cffTTM: 100, deltaCashConFxTTM: 190 });
   cierra(emite, "emitiendo deuda tambien cierra");
-  const r = emite.flujos.find((x) => /deuda/i.test(x.concepto));
+  const r = emite.flujos.find((x) => /debt/i.test(x.concepto));
   ok(r.lado === "origen", "endeudarse es un ORIGEN de caja, no un destino");
 
   // Un negocio que CONSUME caja: el CFO cambia de lado y la historia es de donde sale.
   const quema = sankeyCaja({ ...SANA, ocfTTM: -40, cfiTTM: -50, cffTTM: 200, deltaCashConFxTTM: 110 });
   cierra(quema, "un negocio que quema caja tambien cierra");
   const op = quema.flujos.find((x) => x.clase === "operacion");
-  ok(op.lado === "destino" && /consume/i.test(op.concepto), "y el CFO negativo se dibuja como consumo, no como origen");
+  ok(op.lado === "destino" && /burns cash/i.test(op.concepto), "y el CFO negativo se dibuja como consumo, no como origen");
 
   // Sin desglose fino se dibuja igual, pero se DECLARA que es minimo.
   const min = sankeyCaja({ ocfTTM: 100, cfiTTM: -30, cffTTM: -20, deltaCashConFxTTM: 50 });
   ok(min.nivel === "minimo", "sin capex ni retribucion el nivel es minimo, no completo");
-  ok(min.flujos.some((x) => /sin desglosar/i.test(x.concepto)), "y los agregados se marcan como no desglosados");
+  ok(min.flujos.some((x) => /not broken down/i.test(x.concepto)), "y los agregados se marcan como no desglosados");
   cierra(min, "y aun asi cierra");
 
   // Sin CFO no se inventa nada.
@@ -235,7 +235,7 @@ const SANA = {
   // tres flujos. El arreglo no es tolerar el hueco, es DIBUJARLO.
   const conResiduo = sankeyCaja({ ...SANA, deltaCashConFxTTM: 32 });   // calculada 30, declarada 32
   cerca(conResiduo.residuo, 2, 1e-9, "el residuo se calcula");
-  const ne = conResiduo.flujos.find((x) => x.concepto === "No explicado");
+  const ne = conResiduo.flujos.find((x) => x.concepto === "Unexplained");
   ok(ne != null, "y aparece como bloque propio «No explicado»");
   cerca(ne.valor, 2, 1e-9, "con su tamano REAL, sin repartirlo entre los demas");
   ok(ne.lado === "origen", "declarar mas caja de la que explican los flujos es un origen no explicado");
@@ -244,7 +244,7 @@ const SANA = {
 
   // Y al reves: menos caja declarada que la que explican los flujos.
   const menos = sankeyCaja({ ...SANA, deltaCashConFxTTM: 28 });
-  ok(menos.flujos.find((x) => x.concepto === "No explicado").lado === "destino", "y al reves es un destino no explicado");
+  ok(menos.flujos.find((x) => x.concepto === "Unexplained").lado === "destino", "y al reves es un destino no explicado");
   cierra(menos, "que tambien cierra");
 }
 

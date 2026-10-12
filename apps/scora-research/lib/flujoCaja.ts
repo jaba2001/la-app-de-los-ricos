@@ -23,6 +23,9 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Lo que hace falta de `fundamentalsAsOf`. Todo opcional: la mitad del trabajo es la ausencia. */
+/** El bloque que la suma de los tres flujos no cubre. El componente lo nombra en su nota. */
+export const CONCEPTO_NO_EXPLICADO = "Unexplained";
+
 export interface EntradaCaja {
   ticker?: string;
   niTTM?: number | null; ocfTTM?: number | null; capexTTM?: number | null;
@@ -136,7 +139,7 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   // equivocada — el mismo error que calcular el FCF de un banco.
   if (!d.financiera && d.cashConversion != null && d.cashConversion < UMBRALES.cashConversionMala) {
     pon("conversion_baja", "alerta",
-      `El beneficio no se está convirtiendo en caja: por cada euro de beneficio entran ${d.cashConversion.toFixed(2)} de caja operativa.`,
+      `Earnings aren't turning into cash: each dollar of net income brings in ${d.cashConversion.toFixed(2)} of operating cash.`,
       { cashConversion: +d.cashConversion.toFixed(3) });
   }
 
@@ -145,7 +148,7 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   const crecCobros = f.receivables != null && f.prev?.receivables ? (f.receivables - f.prev.receivables) / Math.abs(f.prev.receivables) : null;
   if (!d.financiera && crecVentas != null && crecCobros != null && crecCobros - crecVentas > UMBRALES.exceso) {
     pon("cobros_disparados", "alerta",
-      `Las cuentas por cobrar crecen ${(100 * crecCobros).toFixed(0)} % y las ventas ${(100 * crecVentas).toFixed(0)} %: se está vendiendo más rápido de lo que se cobra.`,
+      `Receivables are growing ${(100 * crecCobros).toFixed(0)}% and sales ${(100 * crecVentas).toFixed(0)}%: it is selling faster than it is collecting.`,
       { crecimientoCobros: +crecCobros.toFixed(3), crecimientoVentas: +crecVentas.toFixed(3) });
   }
 
@@ -153,7 +156,7 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   const crecInv = f.inventory != null && f.prev?.inventory ? (f.inventory - f.prev.inventory) / Math.abs(f.prev.inventory) : null;
   if (!d.financiera && crecVentas != null && crecInv != null && crecInv - crecVentas > UMBRALES.exceso) {
     pon("inventario_acumulado", "aviso",
-      `El inventario crece ${(100 * crecInv).toFixed(0)} % frente a unas ventas que crecen ${(100 * crecVentas).toFixed(0)} %: se está acumulando mercancía sin vender.`,
+      `Inventory is growing ${(100 * crecInv).toFixed(0)}% against sales growing ${(100 * crecVentas).toFixed(0)}%: unsold goods are piling up.`,
       { crecimientoInventario: +crecInv.toFixed(3), crecimientoVentas: +crecVentas.toFixed(3) });
   }
 
@@ -166,7 +169,7 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   const regulada = /utilit|servicios p|real estate|inmobiliar/i.test(f.sector ?? "");
   const gravedadRetribucion: Gravedad = regulada ? "aviso" : "alerta";
   const notaRegulada = regulada
-    ? " En un negocio regulado e intensivo en capital esto es habitual: la inversión se financia con deuda y el dividendo sale del retorno regulado."
+    ? " In a regulated, capital-intensive business this is normal: investment is debt-financed and the dividend comes out of the regulated return."
     : "";
 
   // 4 · **La bandera del manual**: se devuelve al accionista más de lo que el negocio genera.
@@ -175,13 +178,13 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   const retribucion = (f.buybacksTTM ?? 0) + (f.dividendsTTM ?? 0);
   if (d.fcf != null && d.fcf > 0 && retribucion > 0 && retribucion / d.fcf > UMBRALES.retribucionSobreFCF) {
     pon("retribucion_no_autofinanciada", gravedadRetribucion,
-      `Recompras y dividendos suman ${(retribucion / 1e9).toFixed(1)} B$ frente a un flujo de caja libre de ${(d.fcf / 1e9).toFixed(1)} B$: se está devolviendo más de lo que el negocio genera.${notaRegulada}`,
+      `Buybacks and dividends add up to $${(retribucion / 1e9).toFixed(1)}B against free cash flow of $${(d.fcf / 1e9).toFixed(1)}B: it is returning more than the business generates.${notaRegulada}`,
       { retribucion, fcf: d.fcf, veces: +(retribucion / d.fcf).toFixed(2) });
   }
   // Y el caso extremo: FCF negativo mientras se sigue retribuyendo.
   if (d.fcf != null && d.fcf <= 0 && retribucion > 0) {
     pon("retribucion_con_fcf_negativo", gravedadRetribucion,
-      `Se reparten ${(retribucion / 1e9).toFixed(1)} B$ entre recompras y dividendos con un flujo de caja libre NEGATIVO (${(d.fcf / 1e9).toFixed(1)} B$).${notaRegulada}`,
+      `$${(retribucion / 1e9).toFixed(1)}B goes to buybacks and dividends with NEGATIVE free cash flow ($${(d.fcf / 1e9).toFixed(1)}B).${notaRegulada}`,
       { retribucion, fcf: d.fcf });
   }
 
@@ -189,7 +192,7 @@ export function banderas(f: EntradaCaja, d = diagnosticar(f)): Bandera[] {
   if (d.capexSobreVentas != null && d.capexSobreVentas > UMBRALES.capexAlto &&
       d.crecimientoCFO != null && d.crecimientoCFO <= 0) {
     pon("capex_sin_retorno", "aviso",
-      `La inversión se lleva el ${(100 * d.capexSobreVentas).toFixed(0)} % de las ventas y la caja operativa no crece (${(100 * d.crecimientoCFO).toFixed(0)} %). Habrá que ver si esa inversión da retorno.`,
+      `Capex takes ${(100 * d.capexSobreVentas).toFixed(0)}% of sales and operating cash isn't growing (${(100 * d.crecimientoCFO).toFixed(0)}%). It remains to be seen whether that investment pays off.`,
       { capexSobreVentas: +d.capexSobreVentas.toFixed(3), crecimientoCFO: +d.crecimientoCFO.toFixed(3) });
   }
 
@@ -215,22 +218,22 @@ export interface Puente {
  */
 export function puente(f: EntradaCaja): Puente | null {
   if (f.niTTM == null || f.ocfTTM == null) return null;
-  const pasos: Puente["pasos"] = [{ concepto: "Beneficio neto", importe: f.niTTM, tipo: "inicio" }];
+  const pasos: Puente["pasos"] = [{ concepto: "Net income", importe: f.niTTM, tipo: "inicio" }];
   let acc = f.niTTM;
-  if (f.daTTM != null) { pasos.push({ concepto: "Depreciación y amortización", importe: f.daTTM, tipo: "suma" }); acc += f.daTTM; }
-  if (f.sbcTTM != null) { pasos.push({ concepto: "Compensación en acciones", importe: f.sbcTTM, tipo: "suma" }); acc += f.sbcTTM; }
+  if (f.daTTM != null) { pasos.push({ concepto: "Depreciation & amortization", importe: f.daTTM, tipo: "suma" }); acc += f.daTTM; }
+  if (f.sbcTTM != null) { pasos.push({ concepto: "Stock-based compensation", importe: f.sbcTTM, tipo: "suma" }); acc += f.sbcTTM; }
 
   // Circulante operativo: lo que el negocio inmoviliza (o libera) en cobros e inventario.
   const dCobros = f.receivables != null && f.prev?.receivables != null ? f.receivables - f.prev.receivables : null;
   const dInv = f.inventory != null && f.prev?.inventory != null ? f.inventory - f.prev.inventory : null;
-  if (dCobros != null && dCobros !== 0) { pasos.push({ concepto: "Variación de cuentas por cobrar", importe: -dCobros, tipo: dCobros > 0 ? "resta" : "suma" }); acc -= dCobros; }
-  if (dInv != null && dInv !== 0) { pasos.push({ concepto: "Variación de inventario", importe: -dInv, tipo: dInv > 0 ? "resta" : "suma" }); acc -= dInv; }
+  if (dCobros != null && dCobros !== 0) { pasos.push({ concepto: "Change in receivables", importe: -dCobros, tipo: dCobros > 0 ? "resta" : "suma" }); acc -= dCobros; }
+  if (dInv != null && dInv !== 0) { pasos.push({ concepto: "Change in inventory", importe: -dInv, tipo: dInv > 0 ? "resta" : "suma" }); acc -= dInv; }
 
   const sinExplicar = f.ocfTTM - acc;
   if (Math.abs(sinExplicar) > 1) {
-    pasos.push({ concepto: "Otros ajustes (no desglosados)", importe: sinExplicar, tipo: sinExplicar >= 0 ? "suma" : "resta" });
+    pasos.push({ concepto: "Other adjustments (not broken down)", importe: sinExplicar, tipo: sinExplicar >= 0 ? "suma" : "resta" });
   }
-  pasos.push({ concepto: "Flujo de caja operativo", importe: f.ocfTTM, tipo: "fin" });
+  pasos.push({ concepto: "Operating cash flow", importe: f.ocfTTM, tipo: "fin" });
 
   const salto = Math.abs(f.ocfTTM - f.niTTM);
   return { pasos, sinExplicar, suficiente: salto === 0 ? true : Math.abs(sinExplicar) / salto <= 0.2 };
@@ -258,9 +261,9 @@ export function destino(f: EntradaCaja, tolerancia = 0.02): DestinoCaja | null {
   const add = (concepto: string, importe: number | null | undefined) => {
     if (importe != null && importe !== 0) bloques.push({ concepto, importe });
   };
-  add("Inversión (CFI)", f.cfiTTM);
-  add("Financiación (CFF)", f.cffTTM);
-  add("Efecto del tipo de cambio", f.fxCashTTM);
+  add("Investing (CFI)", f.cfiTTM);
+  add("Financing (CFF)", f.cffTTM);
+  add("FX effect", f.fxCashTTM);
 
   const variacionCalculada = f.ocfTTM + bloques.reduce((s, b) => s + b.importe, 0);
   const variacionDeclarada = f.deltaCashConFxTTM ?? f.deltaCashTTM ?? null;
@@ -330,8 +333,8 @@ export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
 
   // ── ORIGEN. Un CFO negativo no es un destino con signo: es que el negocio CONSUME caja,
   // y entonces la historia que cuenta el diagrama es de dónde sale ese dinero.
-  if (d.cfo >= 0) push("Flujo de explotación", d.cfo, "origen", "operacion");
-  else push("El negocio consume caja", d.cfo, "destino", "operacion");
+  if (d.cfo >= 0) push("Operating cash flow", d.cfo, "origen", "operacion");
+  else push("The business burns cash", d.cfo, "destino", "operacion");
 
   // ── INVERSIÓN. `capexTTM` viene como magnitud positiva; el resto de la inversión es lo
   // que queda del agregado, y puede ser entrada (vender inversiones) o salida.
@@ -340,7 +343,7 @@ export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
   if (capex != null) push("Capex", capex, "destino", "inversion");
   if (cfi != null) {
     const resto = cfi + (capex ?? 0);   // cfi es negativo cuando sale caja
-    push(capex == null ? "Inversión (sin desglosar)" : "Resto de inversión",
+    push(capex == null ? "Investing (not broken down)" : "Other investing",
          resto, resto < 0 ? "destino" : "origen", capex == null ? "inversion" : "resto");
   }
 
@@ -349,22 +352,22 @@ export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
   // origen de caja, amortizar un destino.
   const buy = f.buybacksTTM ?? null, div = f.dividendsTTM ?? null;
   const cff = f.cffTTM ?? null;
-  push("Recompras", buy, "destino", "financiacion");
-  push("Dividendos", div, "destino", "financiacion");
+  push("Buybacks", buy, "destino", "financiacion");
+  push("Dividends", div, "destino", "financiacion");
   if (cff != null) {
     const retribucion = (buy ?? 0) + (div ?? 0);
     const resto = cff + retribucion;
     const sinDesglose = buy == null && div == null;
-    push(sinDesglose ? "Financiación (sin desglosar)" : "Resto de financiación (deuda)",
+    push(sinDesglose ? "Financing (not broken down)" : "Other financing (debt)",
          resto, resto < 0 ? "destino" : "origen", sinDesglose ? "financiacion" : "resto");
   }
 
-  push("Efecto del tipo de cambio", f.fxCashTTM, (f.fxCashTTM ?? 0) < 0 ? "destino" : "origen", "divisa");
+  push("FX effect", f.fxCashTTM, (f.fxCashTTM ?? 0) < 0 ? "destino" : "origen", "divisa");
 
   // ── EL CIERRE. La variación de caja es lo que queda, y se dibuja con su signo real: si la
   // caja BAJA, es un origen más (se tiró de hucha), no un destino.
   const v = d.variacionDeclarada ?? d.variacionCalculada;
-  push(v >= 0 ? "Aumento de la caja" : "Reducción de la caja", v, v >= 0 ? "destino" : "origen", "caja");
+  push(v >= 0 ? "Increase in cash" : "Decrease in cash", v, v >= 0 ? "destino" : "origen", "caja");
 
   // ⚠️ EL BLOQUE QUE HACE QUE EL DIBUJO NO MIENTA, y que el test sintético no podía pedir
   // porque ahí el residuo siempre era cero. Sobre datos reales SIEMPRE hay residuo: la
@@ -376,7 +379,7 @@ export function sankeyCaja(f: EntradaCaja, tolerancia = 0.02): SankeyCaja {
   // «No desglosado» del Sankey de resultados. Repartirlo entre los demás para que encaje es
   // la forma bonita de mentir; enseñarlo es lo que convierte el hueco en información.
   if (d.residuo != null && d.residuo !== 0)
-    push("No explicado", d.residuo, d.residuo > 0 ? "origen" : "destino", "resto");
+    push(CONCEPTO_NO_EXPLICADO, d.residuo, d.residuo > 0 ? "origen" : "destino", "resto");
 
   const tieneDesglose = capex != null && (buy != null || div != null);
   const nivel: SankeyCaja["nivel"] = tieneDesglose ? "completo" : "minimo";

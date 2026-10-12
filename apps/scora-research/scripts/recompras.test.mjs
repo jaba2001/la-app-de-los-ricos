@@ -29,7 +29,7 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
 
   const l = lecturaRecompra(r, 521);
   ok(l.clave === "recompro_barato", "la lectura es que compraron por debajo del precio actual");
-  ok(/487/.test(l.texto) && /no un pron/i.test(l.texto), "cita el número Y se declara descriptiva, no pronóstico");
+  ok(/487/.test(l.texto) && /not a forecast/i.test(l.texto), "cita el número Y se declara descriptiva, no pronóstico");
   ok(!/comprar|vender|subir[aá]|objetivo/i.test(l.texto), "y no recomienda nada");
 }
 
@@ -40,14 +40,14 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   const r = recompra({ importe: 1e9, acciones: 20e6, precioActual: 100, precioMin: 80, precioMax: 120 });
   cerca(r.precioMedio, 50, 1e-9, "el cálculo da 50 $…");
   ok(r.creible === false, "…que es IMPOSIBLE: la acción nunca bajó de 80 en el periodo");
-  ok(/retenciones por impuestos/.test(r.motivo), "y el motivo nombra la causa habitual");
+  ok(/tax withholding/.test(r.motivo), "y el motivo nombra la causa habitual");
   ok(lecturaRecompra(r, 100).clave === "no_creible", "la lectura lo declara no publicable");
   ok(!/recompr[oó] (barato|caro)/.test(lecturaRecompra(r, 100).texto), "y NO da un veredicto sobre la directiva");
 
   // Por encima del máximo: las dos cifras no son del mismo periodo.
   const alto = recompra({ importe: 1e9, acciones: 5e6, precioActual: 100, precioMin: 80, precioMax: 120 });
   cerca(alto.precioMedio, 200, 1e-9, "200 $ de precio medio");
-  ok(alto.creible === false && /mismo periodo/.test(alto.motivo), "por encima del máximo: tampoco es creíble");
+  ok(alto.creible === false && /same period/.test(alto.motivo), "por encima del máximo: tampoco es creíble");
 
   // Justo dentro de la tolerancia SÍ pasa: las compras son intradía y el rango son cierres.
   const borde = recompra({ importe: 1e9, acciones: 1e9 / (80 * (1 - UMBRALES_RECOMPRA.toleranciaRango + 0.001)),
@@ -72,16 +72,16 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   ok(r.retornoDesdeRecompra < 0, "y la acción está por debajo");
   const l = lecturaRecompra(r, 150);
   ok(l.clave === "recompro_caro", "la lectura es que recompraron caro");
-  ok(/destruido valor/.test(l.texto), "y lo dice sin rodeos");
+  ok(/destroyed value/.test(l.texto), "y lo dice sin rodeos");
   // ⚠️ El juicio es sobre la ASIGNACIÓN DE CAPITAL, que sí es evaluable, no sobre el precio futuro.
-  ok(/asignaci[oó]n de capital/.test(l.texto), "juzga la asignación de capital, que es lo evaluable");
+  ok(/capital-allocation/.test(l.texto), "juzga la asignación de capital, que es lo evaluable");
   ok(!/vender|caer[aá]|va a bajar/i.test(l.texto), "y no predice nada sobre la acción");
 }
 
 // ── Ausente no es cero, ni Infinity ─────────────────────────────────────────────────────
 {
   ok(recompra({}).precioMedio === null, "sin datos, sin precio");
-  ok(/sin importe o sin acciones/.test(recompra({}).motivo), "y se dice qué falta");
+  ok(/no amount or no share count/.test(recompra({}).motivo), "y se dice qué falta");
   ok(recompra({ importe: 1e9 }).precioMedio === null, "sin acciones no hay precio");
   ok(recompra({ acciones: 1e6 }).precioMedio === null, "ni sin importe");
   ok(recompra({ importe: 1e9, acciones: 0 }).precioMedio === null, "cero acciones: null, no Infinity");
@@ -114,7 +114,7 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   ok(viejo.precioMedio === 100, "el precio medio se sigue calculando: el dato existe");
   const l = lecturaRecompra(viejo, 300);
   ok(l.clave === "rancio", "pero la lectura NO es «recompro barato» aunque la accion este 3x");
-  ok(/dato hist[oó]rico/.test(l.texto), "se declara dato historico");
+  ok(/historical fact/.test(l.texto), "se declara dato historico");
   ok(!/valor razonable actual|le ha salido bien/.test(l.texto.replace("no como estimación de valor razonable actual", "")),
      "y no se presenta como lo que la directiva cree hoy");
 

@@ -73,7 +73,7 @@ export function recompra(e: EntradaRecompra, marketCap?: number | null): Recompr
   const imp = num(e.importe), acc = num(e.acciones);
   const vacio: Recompra = { precioMedio: null, retornoDesdeRecompra: null, creible: null, motivo: null, intensidad: null, rancio: false };
   if (imp == null || acc == null || acc <= 0 || imp <= 0) {
-    return { ...vacio, motivo: imp == null || acc == null ? "sin importe o sin acciones" : "importe o acciones no positivos" };
+    return { ...vacio, motivo: imp == null || acc == null ? "no amount or no share count" : "amount or share count not positive" };
   }
 
   const precioMedio = Math.abs(imp) / Math.abs(acc);
@@ -89,10 +89,10 @@ export function recompra(e: EntradaRecompra, marketCap?: number | null): Recompr
     const t = UMBRALES_RECOMPRA.toleranciaRango;
     if (precioMedio < min * (1 - t)) {
       creible = false;
-      motivo = `precio medio ${precioMedio.toFixed(2)} por debajo del mínimo del periodo (${min.toFixed(2)}): el recuento de acciones probablemente incluye retenciones por impuestos de la retribución en acciones, que no se compran en el mercado`;
+      motivo = `average price ${precioMedio.toFixed(2)} below the period low (${min.toFixed(2)}): the share count probably includes tax withholding on stock compensation, which is not bought in the market`;
     } else if (precioMedio > max * (1 + t)) {
       creible = false;
-      motivo = `precio medio ${precioMedio.toFixed(2)} por encima del máximo del periodo (${max.toFixed(2)}): las dos cifras no describen el mismo periodo`;
+      motivo = `average price ${precioMedio.toFixed(2)} above the period high (${max.toFixed(2)}): the two figures do not describe the same period`;
     } else creible = true;
   }
 
@@ -120,13 +120,13 @@ export interface LecturaRecompra {
 export function lecturaRecompra(r: Recompra, precioActual?: number | null): LecturaRecompra | null {
   if (r.precioMedio == null) return null;
   if (r.creible === false) {
-    return { clave: "no_creible", texto: `No se publica el precio de recompra: ${r.motivo}`, evidencia: { motivo: r.motivo ?? "" } };
+    return { clave: "no_creible", texto: `Buyback price not published: ${r.motivo}`, evidencia: { motivo: r.motivo ?? "" } };
   }
   // ⚠️ Un hecho viejo NO se lee como valor razonable revelado. Se dice que existe y se para.
   if (r.rancio) {
     return { clave: "rancio",
-      texto: `La última recompra etiquetada es demasiado antigua para leerla como lo que la directiva cree hoy: ` +
-        `a ${r.precioMedio.toFixed(2)} por acción. Se publica como dato histórico, no como estimación de valor razonable actual.`,
+      texto: `The latest tagged buyback is too old to read as what management believes today: ` +
+        `${r.precioMedio.toFixed(2)} per share. Shown as a historical fact, not as a current fair-value estimate.`,
       evidencia: { precioMedioRecompra: +r.precioMedio.toFixed(2) } };
   }
   const ret = r.retornoDesdeRecompra;
@@ -142,13 +142,13 @@ export function lecturaRecompra(r: Recompra, precioActual?: number | null): Lect
 
   return ret > 0
     ? { clave: "recompro_barato",
-        texto: `La directiva recompró a una media de ${p(r.precioMedio)} y la acción cotiza hoy ${pct(ret)} por encima. ` +
-          `Con su propio dinero situó el valor razonable por debajo del precio actual, y de momento le ha salido bien. ` +
-          `Es lo que creían entonces, no un pronóstico sobre lo que hará la acción.`,
+        texto: `Management bought back at an average of ${p(r.precioMedio)} and the stock trades ${pct(ret)} above that today. ` +
+          `With its own money it put fair value below today's price, and so far it has worked out. ` +
+          `That is what they believed then, not a forecast of what the stock will do.`,
         evidencia: ev }
     : { clave: "recompro_caro",
-        texto: `La directiva recompró a una media de ${p(r.precioMedio)} y la acción cotiza hoy ${pct(ret)}. ` +
-          `Pagó por encima de donde está el mercado: eso es una decisión de asignación de capital que ha destruido valor, ` +
-          `y sobre eso —no sobre el precio futuro— sí se puede juzgar a una directiva.`,
+        texto: `Management bought back at an average of ${p(r.precioMedio)} and the stock is ${pct(ret)} from that today. ` +
+          `It paid above where the market is: a capital-allocation decision that has destroyed value, ` +
+          `and that —not the future price— is something management can fairly be judged on.`,
         evidencia: ev };
 }

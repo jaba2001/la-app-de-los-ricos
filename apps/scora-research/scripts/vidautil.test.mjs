@@ -106,14 +106,14 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
   const s = señalesVida(v);
   ok(s.length > 0 && s.every((x) => x.gravedad === "aviso"),
      "toda señal de vida útil es AVISO, nunca alerta: la métrica no distingue criterio de mezcla");
-  ok(/NO las distingue|no las distingue/.test(s[0].texto),
+  ok(/does NOT tell them apart/i.test(s[0].texto),
      "y el texto lo dice explícitamente, no lo deja al lector");
-  ok(!/fraude|maquilla|manipul|engañ/i.test(s[0].texto), "y no acusa de nada");
+  ok(!/fraud|window-dress|manipulat|deceiv|cook/i.test(s[0].texto), "y no acusa de nada");
 
   // Con el activo disparado el texto lo advierte además.
   const r = vidaUtil({ depreciacion: 100, brutoFin: 2200, brutoIni: 1100,
     prev: { depreciacion: 100, brutoFin: 1100, brutoIni: 900 } });
-  ok(r.ruidoso && /ruidosa/.test(señalesVida(r)[0].texto), "y si el activo crece mucho, el texto lo avisa");
+  ok(r.ruidoso && /noisy/.test(señalesVida(r)[0].texto), "y si el activo crece mucho, el texto lo avisa");
 }
 
 // ── Valores absurdos: se descartan en vez de publicarse ─────────────────────────────────

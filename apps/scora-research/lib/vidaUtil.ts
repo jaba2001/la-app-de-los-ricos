@@ -134,10 +134,10 @@ export function señalesVida(v: VidaUtil): SeñalVida[] {
   if (v.cambioRelativo >= UMBRALES_VIDA.extensionMinima) {
     out.push({
       clave: "vida_util_alargada", gravedad: "aviso",
-      texto: `La vida útil implícita de su inmovilizado pasa de ${pp(v.vidaPrevia)} a ${pp(v.vidaCorregida)} años` +
-        (v.beneficioInflado != null ? `, lo que reduce el gasto por depreciación y sube el beneficio declarado sin que entre caja` : "") +
-        `. Puede ser un cambio de criterio contable o simplemente que ahora compra activos de vida más larga: esta medida NO las distingue.` +
-        (v.ruidoso ? " Y su activo crece tan rápido que la cifra es especialmente ruidosa." : ""),
+      texto: `The implied useful life of its fixed assets goes from ${pp(v.vidaPrevia)} to ${pp(v.vidaCorregida)} years` +
+        (v.beneficioInflado != null ? `, which lowers depreciation expense and lifts reported earnings with no cash coming in` : "") +
+        `. It may be an accounting-policy change or simply that it now buys longer-lived assets: this measure does NOT tell them apart.` +
+        (v.ruidoso ? " And its asset base is growing so fast that the figure is especially noisy." : ""),
       evidencia: {
         vidaAntes: +v.vidaPrevia.toFixed(2), vidaAhora: +v.vidaCorregida.toFixed(2),
         cambioPct: +(v.cambioRelativo * 100).toFixed(1),
@@ -148,8 +148,8 @@ export function señalesVida(v: VidaUtil): SeñalVida[] {
   } else if (v.cambioRelativo <= -UMBRALES_VIDA.extensionMinima) {
     out.push({
       clave: "vida_util_acortada", gravedad: "aviso",
-      texto: `La vida útil implícita baja de ${pp(v.vidaPrevia)} a ${pp(v.vidaCorregida)} años: reconoce MÁS gasto por depreciación ` +
-        `y por tanto menos beneficio. Es lo contrario de un maquillaje, y suele señalar que la empresa espera que sus activos se queden obsoletos antes.`,
+      texto: `The implied useful life drops from ${pp(v.vidaPrevia)} to ${pp(v.vidaCorregida)} years: it books MORE depreciation ` +
+        `and therefore lower earnings. That is the opposite of window-dressing, and it usually signals the company expects its assets to become obsolete sooner.`,
       evidencia: {
         vidaAntes: +v.vidaPrevia.toFixed(2), vidaAhora: +v.vidaCorregida.toFixed(2),
         cambioPct: +(v.cambioRelativo * 100).toFixed(1),
