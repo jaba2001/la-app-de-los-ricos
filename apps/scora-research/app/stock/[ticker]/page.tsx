@@ -12,6 +12,8 @@ import { computeReverseDCF } from "@/lib/reverseDcf";
 import { useMacroContext } from "@/lib/MacroContext";
 import { track } from "@/lib/analytics";
 import { useMode, setMode, tabVisible, BEGINNER_TABS } from "@/lib/mode";
+import { completarConEdgar } from "@/lib/trimestres";
+import { esComparableCubierto } from "@/lib/simbolos";
 import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData } from "@/lib/types";
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
@@ -134,7 +136,7 @@ export default function StockTickerPage() {
   const [failedApis, setFailedApis] = useState(0);
   // 2 siempre frescas (macro + quote) + 31 del lote. La ranura del ETF sectorial cuenta
   // aunque no se adivine, para que este numero no dependa de si es la primera visita.
-  const TOTAL_SOURCES = 33;
+  const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añade una, sube
   // Fallos de lectura o escritura que no impiden el análisis pero no pueden callarse
   // (AUDIT_REPORT M-3): la watchlist, o un análisis que se ve pero no quedó guardado.
   const [avisoDatos, setAvisoDatos] = useState<string | null>(null);
@@ -290,12 +292,12 @@ export default function StockTickerPage() {
       const [
         profileRes, metricsRes, ratiosRes,
         historyRes, incomeRes, balanceRes, cashRes,
-        peersRes, targetsRes, estimatesRes, holdersRes,
+        peersRes, targetsRes, estimatesRes, _sinTenedores,
         earningsRes, insiderRes, dcfRes,
-        spyRes, congressRes, houseRes,
+        spyRes, _sinCongreso, _sinHouse,
         annualIncomeRes, sharesFloatRes, growthRes,
         fhMetricRes, fhTargetRes, fhEarningsRes, fhRecommRes,
-        fhShortRes, fhEarningsCalRes,
+        _sinFhShort, fhEarningsCalRes,
         edgarRes,
         simfinRes,
         finvizRes,
@@ -306,32 +308,44 @@ export default function StockTickerPage() {
         track(authedFetch<unknown>(`/api/fmp/key-metrics-ttm?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/ratios-ttm?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=${ticker}`)),
-        track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&period=quarter&limit=12`)),
-        track(authedFetch<unknown[]>(`/api/fmp/balance-sheet-statement?symbol=${ticker}&period=quarter&limit=12`)),
-        track(authedFetch<unknown[]>(`/api/fmp/cash-flow-statement?symbol=${ticker}&period=quarter&limit=8`)),
-        track(authedFetch<string[]>(`/api/fmp/peers?symbol=${ticker}`)),
-        track(authedFetch<unknown[]>(`/api/fmp/price-target?symbol=${ticker}&limit=10`)),
-        track(authedFetch<unknown[]>(`/api/fmp/analyst-estimates?symbol=${ticker}&limit=2`)),
-        track(authedFetch<unknown[]>(`/api/fmp/institutional-holder?symbol=${ticker}`)),
-        track(authedFetch<unknown[]>(`/api/fmp/earnings-surprises?symbol=${ticker}`)),
+        // Trimestres: el plan de FMP admite `limit` hasta 5 (con 12 u 8 respondía 402 y los tres
+        // estados se iban siempre al respaldo de EDGAR). Cinco bastan para el TTM y su
+        // variación interanual (trimestre 0 contra trimestre 4).
+        track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&period=quarter&limit=5`)),
+        track(authedFetch<unknown[]>(`/api/fmp/balance-sheet-statement?symbol=${ticker}&period=quarter&limit=5`)),
+        track(authedFetch<unknown[]>(`/api/fmp/cash-flow-statement?symbol=${ticker}&period=quarter&limit=5`)),
+        // `peers`, `price-target` y `earnings-surprises` devolvían [] con 404: /stable los
+        // renombró. Estos son sus equivalentes (comprobado contra la API, 12-10-2026).
+        track(authedFetch<{ symbol: string }[]>(`/api/fmp/stock-peers?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/price-target-consensus?symbol=${ticker}`)),
+        track(authedFetch<unknown[]>(`/api/fmp/analyst-estimates?symbol=${ticker}&period=annual&limit=2`)),
+        // Tenedores institucionales: 402 en este plan, sin sustituto gratuito. No se pide.
+        Promise.resolve(null),
+        track(authedFetch<unknown[]>(`/api/fmp/earnings?symbol=${ticker}&limit=5`)), // el plan admite hasta 5
         // Insider: FMP free returns 404 here; Finnhub stock/insider-transactions is free.
         track(authedFetch<{data?: Record<string,unknown>[]}>(`/api/finnhub/stock/insider-transactions?symbol=${ticker}`)),
         track(authedFetch<unknown>(`/api/fmp/discounted-cash-flow?symbol=${ticker}`)),
         track(authedFetch<unknown[]>(`/api/fmp/historical-price-eod/full?symbol=SPY`)),
         // Congress: FMP free returns 404; use the free STOCK-Act S3 route (senate + house merged).
-        track(authedFetch<unknown[]>(`/api/congress/${ticker}`)),
-        track(authedFetch<unknown[]>(`/api/fmp/house-disclosure?symbol=${ticker}`)),
+        // Congreso: los volcados del STOCK Act son privados (403) desde el 04-09-2026 y las rutas
+        // de FMP que los sustituirían no entran en el plan. Sin fuente no se pide: null hace
+        // que StockSmartMoney diga «source unavailable» en vez de afirmar «0 operaciones».
+        Promise.resolve(null),
+        // house-disclosure: 402 en este plan (y su sustituto house-trades también). No se pide.
+        Promise.resolve(null),
         track(authedFetch<unknown[]>(`/api/fmp/income-statement?symbol=${ticker}&limit=5`)),
         track(authedFetch<unknown[]>(`/api/fmp/shares-float?symbol=${ticker}`)),
         // Growth ratios (revenue/EPS YoY) — not present in stable ratios-ttm
         track(authedFetch<unknown[]>(`/api/fmp/financial-growth?symbol=${ticker}&limit=1`)),
         // Phase 1 — Finnhub fundamentals (fills gaps when FMP plan blocks endpoints)
         track(authedFetch<{metric: Record<string, number>}>(`/api/finnhub/stock/metric?symbol=${ticker}&metric=all`)),
-        track(authedFetch<{targetHigh: number; targetLow: number; targetMean: number; lastUpdated: string}>(`/api/finnhub/stock/price-target?symbol=${ticker}`)),
+        // Finnhub stock/price-target y stock/short-interest: 403 en este plan. No se piden; el
+        // objetivo sale de FMP price-target-consensus y el short interest de /api/short-interest.
+        Promise.resolve(null),
         track(authedFetch<Record<string, unknown>[]>(`/api/finnhub/stock/earnings?symbol=${ticker}`)),
         track(authedFetch<{buy: number; hold: number; period: string; sell: number; strongBuy: number; strongSell: number}[]>(`/api/finnhub/stock/recommendation?symbol=${ticker}`)),
         // Phase 2 — short float + next earnings date (already in proxy ALLOWED)
-        track(authedFetch<{data:{shortPercent:number}[]}>(`/api/finnhub/stock/short-interest?symbol=${ticker}&from=${new Date(Date.now()-90*86400000).toISOString().slice(0,10)}&to=${new Date().toISOString().slice(0,10)}`)),
+        Promise.resolve(null),
         track(authedFetch<{earningsCalendar:{date:string;hour:string}[]}>(`/api/finnhub/calendar/earnings?symbol=${ticker}&from=${new Date().toISOString().slice(0,10)}&to=${new Date(Date.now()+30*86400000).toISOString().slice(0,10)}`)),
         // Phase 3 — SEC EDGAR income / balance sheet / cash flow (US stocks only; European returns empty)
         track(authedFetch<{income:Record<string,unknown>[];balanceSheet:Record<string,unknown>[];cashFlow:Record<string,unknown>[];annualIncome:Record<string,unknown>[]}>(`/api/edgar?symbol=${ticker}`)),
@@ -376,8 +390,19 @@ export default function StockTickerPage() {
         profile,
       });
 
-      // Finnhub price targets (fallback if FMP returned empty)
-      const fmpTargets = targetsRes.status === "fulfilled" ? (targetsRes.value as Record<string,unknown>[]) ?? [] : [];
+      // Objetivo de precio: FMP price-target-consensus da UNA fila (alto/bajo/consenso/mediana),
+      // no la lista por analista que daba el endpoint antiguo. Se presenta con la misma forma
+      // que ya usaba el respaldo de Finnhub, que es lo que pintan StockResearch y StockReport.
+      const consenso = targetsRes.status === "fulfilled"
+        ? ((targetsRes.value as Record<string, unknown>[] | null)?.[0] ?? null) : null;
+      const fmpTargets: Record<string, unknown>[] = consenso && Number(consenso.targetConsensus) > 0 ? [{
+        priceTarget:    Number(consenso.targetConsensus),
+        adjPriceTarget: Number(consenso.targetConsensus),
+        publishedDate:  new Date().toISOString().slice(0, 10),
+        analystName:    `High $${Number(consenso.targetHigh).toFixed(0)} · Low $${Number(consenso.targetLow).toFixed(0)} · Median $${Number(consenso.targetMedian).toFixed(0)}`,
+        analystCompany: "FMP consensus",
+        action:         "Consensus",
+      }] : [];
       const fhTarget   = fhTargetRes.status === "fulfilled"
         ? fhTargetRes.value as { targetHigh?: number; targetLow?: number; targetMean?: number; lastUpdated?: string } | null
         : null;
@@ -392,7 +417,10 @@ export default function StockTickerPage() {
           }] : []);
 
       // Finnhub earnings (fallback — component accepts both FMP and Finnhub formats)
-      const fmpEarnings = earningsRes.status === "fulfilled" ? (earningsRes.value as Record<string,unknown>[]) ?? [] : [];
+      // FMP `earnings` mezcla trimestres publicados y próximos (epsActual null): solo los
+      // publicados son una sorpresa medible.
+      const fmpEarnings = earningsRes.status === "fulfilled"
+        ? ((earningsRes.value as Record<string,unknown>[]) ?? []).filter((e) => e.epsActual != null) : [];
       const fhEarnings  = fhEarningsRes.status === "fulfilled" ? (fhEarningsRes.value as Record<string,unknown>[]) ?? [] : [];
       const mergedEarnings = fmpEarnings.length > 0 ? fmpEarnings : fhEarnings;
 
@@ -405,8 +433,16 @@ export default function StockTickerPage() {
 
       // Count truly missing sources (after FMP + Finnhub fallback)
       if (!live()) return;
-      const coreFmpFailed = [quoteRes, profileRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, estimatesRes, holdersRes, insiderRes, dcfRes].filter(r => r.status === "rejected").length;
-      setFailedApis(
+      // Solo cuenta lo que se pidió: las fuentes fuera del plan ya no se piden (ver arriba). Y a
+      // un ETF no se le cuentan como «no disponibles» lo que un ETF no tiene (estados, ratios,
+      // objetivos de analistas, sorpresas de beneficios): SPY salía con «4 data sources
+      // unavailable» sin que faltara nada.
+      const esEtf = profile?.isEtf === true || profile?.isFund === true;
+      const coreFmpFailed = (esEtf
+        ? [quoteRes, profileRes, historyRes]
+        : [quoteRes, profileRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, estimatesRes, insiderRes, dcfRes]
+      ).filter(r => r.status === "rejected").length;
+      setFailedApis(esEtf ? coreFmpFailed :
         coreFmpFailed
         + (mergedMetrics.peRatioTTM != null || mergedMetrics.roeTTM != null ? 0 : 1)
         + (mergedRatios.grossProfitMarginTTM != null || mergedRatios.revenueGrowthTTM != null ? 0 : 1)
@@ -437,9 +473,8 @@ export default function StockTickerPage() {
       })();
       const fhNum = (key: string): number | null => fhM?.[key] ?? null;
 
-      const fhSI = fhShortRes.status === "fulfilled"
-        ? (fhShortRes.value as {data?:{shortPercent?:number}[]})?.data ?? [] : [];
-      const shortPercent = fhSI.length > 0 ? (fhSI[fhSI.length-1]?.shortPercent ?? null) : null;
+      // El % de short float de Finnhub es de pago (403): el short interest sale de /api/short-interest.
+      const shortPercent: number | null = null;
 
       const fhCal = fhEarningsCalRes.status === "fulfilled"
         ? (fhEarningsCalRes.value as {earningsCalendar?:{date?:string;hour?:string}[]})?.earningsCalendar ?? [] : [];
@@ -491,9 +526,13 @@ export default function StockTickerPage() {
       const fmpCashFlow = cashRes.status         === "fulfilled" ? (cashRes.value         as Record<string,unknown>[]) ?? [] : [];
       const fmpAnnual   = annualIncomeRes.status === "fulfilled" ? (annualIncomeRes.value as Record<string,unknown>[]) ?? [] : [];
       // Priority: FMP (if any data) → EDGAR (US stocks) → SimFin (European stocks)
-      const mergedIncome       = fmpIncome.length   > 0 ? fmpIncome   : (edgar?.income        ?? simfin?.income        ?? []);
-      const mergedBalance      = fmpBalance.length  > 0 ? fmpBalance  : (edgar?.balanceSheet  ?? simfin?.balanceSheet  ?? []);
-      const mergedCashFlow     = fmpCashFlow.length > 0 ? fmpCashFlow : (edgar?.cashFlow      ?? simfin?.cashFlow      ?? []);
+      // FMP da los 5 trimestres más recientes (límite del plan); EDGAR/SimFin completan los
+      // anteriores, sin pisar ninguno de FMP. El TTM del año anterior (trimestres 4–7) y la
+      // previsión de ingresos (8+) los necesitan — ver lib/trimestres.ts.
+      const respaldo = edgar?.income?.length ? edgar : simfin;
+      const mergedIncome       = completarConEdgar(fmpIncome,   respaldo?.income);
+      const mergedBalance      = completarConEdgar(fmpBalance,  respaldo?.balanceSheet);
+      const mergedCashFlow     = completarConEdgar(fmpCashFlow, respaldo?.cashFlow);
       const mergedAnnualIncome = fmpAnnual.length   > 0 ? fmpAnnual   : (edgar?.annualIncome  ?? simfin?.annualIncome  ?? []);
       // ─────────────────────────────────────────────────────────────
 
@@ -538,10 +577,17 @@ export default function StockTickerPage() {
         income:               mergedIncome,
         balanceSheet:         mergedBalance,
         cashFlow:             mergedCashFlow,
-        peers:                peersRes.status    === "fulfilled" ? (peersRes.value    as string[]) ?? [] : [],
+        // stock-peers devuelve objetos y mezcla lo que el plan de FMP no cubre (402 al pedir sus
+        // ratios): bolsas extranjeras (a AAPL le daba 002241.SZ — sufijo de 2+ letras; BRK.B
+        // tiene una), extranjeras en OTC (5 letras acabadas en F: PCRFF, SSNLF) y fondos de
+        // inversión (5 letras acabadas en X: VIGAX). Ver lib/simbolos.ts.
+        peers:                peersRes.status    === "fulfilled"
+          ? ((peersRes.value as { symbol?: string }[] | null) ?? []).map((x) => x?.symbol)
+              .filter((x): x is string => !!x && esComparableCubierto(x) && x !== ticker.toUpperCase())
+          : [],
         priceTargets:         mergedTargets,
         analystEstimates:     estimatesRes.status === "fulfilled" ? (estimatesRes.value as Record<string,unknown>[]) ?? [] : [],
-        institutionalHolders: holdersRes.status  === "fulfilled" ? (holdersRes.value  as Record<string,unknown>[]) ?? [] : [],
+        institutionalHolders: [], // 402 en el plan de FMP: StockSmartMoney lo explica en pantalla
         earningsSurprises:    mergedEarnings,
         insiderTrades:        insiderRes.status  === "fulfilled" ? ((insiderRes.value as {data?:Record<string,unknown>[]})?.data ?? []) : [],
         dcf:                  dcfRes.status === "fulfilled" ? (Array.isArray(dcfRes.value) ? dcfRes.value[0] : dcfRes.value) as Record<string,unknown> ?? null : null,
@@ -551,8 +597,8 @@ export default function StockTickerPage() {
         // Un fallo se propaga como `null`, no como lista vacia: los volcados del STOCK Act
         // dejaron de ser publicos (403 desde el 2026-09-04) y aplanarlo a [] hacia que el panel
         // enseñara «0B / 0S congress» —una afirmacion sobre datos que no tenemos—.
-        congressTrades:       congressRes.status === "fulfilled" ? (congressRes.value as Record<string,unknown>[]) ?? [] : null,
-        houseDisclosures:     houseRes.status    === "fulfilled" ? (houseRes.value    as Record<string,unknown>[]) ?? [] : [],
+        congressTrades:       null, // sin fuente (ver la llamada): null = «no disponible», no «0 operaciones»
+        houseDisclosures:     [], // 402 en el plan de FMP
         annualIncome:         mergedAnnualIncome,
         sharesFloat:          sharesFloatRes.status  === "fulfilled" ? (sharesFloatRes.value  as Record<string,unknown>[]) ?? [] : [],
         analystConsensus,

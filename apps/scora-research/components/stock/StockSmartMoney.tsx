@@ -106,8 +106,8 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                     2026-09-04 no puntua, asi que ponerlo al lado de los insiders sugeriria que
                     aporta a la nota. Y si la fuente no contesta se dice, en vez de «0B / 0S». */}
                 {congresoCaido
-                  ? <span style={{ opacity: .7 }}> · congress: fuente no disponible</span>
-                  : <span style={{ opacity: .7 }}> · congress (no puntúa): {signal.congress.buyCount}B / {signal.congress.sellCount}S</span>}
+                  ? <span style={{ opacity: .7 }}> · congress: source unavailable</span>
+                  : <span style={{ opacity: .7 }}> · congress (not scored): {signal.congress.buyCount}B / {signal.congress.sellCount}S</span>}
                 {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? ` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M` : ""}
               </div>
             </div>
@@ -190,7 +190,9 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
         <div className="card">
           <div className="section-label">13-F Institutional Holders</div>
           {loading ? <Sk w="100%" h={200} /> : holders.length === 0 ? (
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>No institutional data</div>
+            // Vacío por la fuente, no por la empresa: los tenedores 13-F de FMP no entran en el
+            // plan (402) y no hay sustituto gratuito. Decirlo evita que parezca «nadie la tiene».
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>13-F holder data isn&apos;t included in the current data plan.</div>
           ) : (
             <table className="sr-table">
               <thead><tr><th>Institution</th><th style={{ textAlign: "right" }}>Shares</th><th style={{ textAlign: "right" }}>% Portfolio</th></tr></thead>
@@ -213,7 +215,10 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
         <div className="section-label">Congressional Trades — STOCK Act Disclosures</div>
         {loading ? <Sk w="100%" h={160} /> : allCongress.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>
-            No recent congressional disclosures for {ticker}
+            {/* Sin fuente no se puede afirmar «no hay operaciones»: se dice que falta la fuente. */}
+            {congresoCaido
+              ? "Congressional trading data is unavailable: the public STOCK Act feeds stopped being public in September 2026."
+              : `No recent congressional disclosures for ${ticker}`}
           </div>
         ) : (
           <table className="sr-table">

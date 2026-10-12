@@ -174,9 +174,12 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
   const [peerData, setPeerData] = useState<Record<string, Record<string, unknown>>>({});
   const [loadingPeers, setLoadingPeers] = useState(false);
   const limited = peers.slice(0, 5);
+  const tieneRatios = ratios != null;
 
   useEffect(() => {
-    if (!limited.length) return;
+    // Sin ratios propios (un ETF, p. ej.) no hay con qué comparar: no se piden los de los
+    // comparables, que además son otros ETFs fuera del plan de FMP (402).
+    if (!limited.length || !tieneRatios) return;
     setLoadingPeers(true);
     Promise.allSettled(
       limited.map(t =>
@@ -189,7 +192,7 @@ function PeerMetricsTable({ ticker, peers, ratios }: {
       setPeerData(map);
       setLoadingPeers(false);
     }).catch(() => setLoadingPeers(false));
-  }, [limited.join(",")]);
+  }, [limited.join(","), tieneRatios]);
 
   const fmtPe = (v: unknown) => {
     const x = Number(v); return isNaN(x) || x <= 0 || x > 999 ? "—" : x.toFixed(1) + "x";
