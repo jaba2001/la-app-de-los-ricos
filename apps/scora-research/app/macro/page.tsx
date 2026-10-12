@@ -12,6 +12,7 @@ import WelcomeBanner from "@/components/WelcomeBanner";
 import RegimeAlert from "@/components/RegimeAlert";
 import PushToggle from "@/components/PushToggle";
 import MacroBrief from "@/components/macro/MacroBrief";
+import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
 
 const TabSk = () => <Sk w="100%" h={400} />;
 
@@ -260,7 +261,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
           onBlur={e => (e.target.style.borderColor = "var(--sr-border)")}
         />
         <span className="sr-hint">
-          {entries.length} populated · {nullEntries.length} null
+          {entries.length} populated · {nullEntries.length} empty
         </span>
         {macro.updated_at && (
           <span className="sr-hint">
@@ -285,7 +286,8 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
                   padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", fontWeight: 600, fontSize: "11px",
                   color: typeof v === "boolean" ? (v ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text)",
                 }} className="num">
-                  {fmtVal(v)}
+                  {/* El régimen y el cuadrante se guardan con su etiqueta en español: se enseña la inglesa. */}
+                  {fmtVal(k === "regime_label" ? etiquetaRegimen(macro) : k === "cartera_quadrant" ? etiquetaCuadrante(v as string | null) : v)}
                 </td>
               </tr>
             ))}
@@ -296,7 +298,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
       {nullEntries.length > 0 && (
         <details style={{ background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg)", overflow: "hidden" }}>
           <summary style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", cursor: "pointer" }}>
-            {nullEntries.length} fields pending (null in macro_state)
+            {nullEntries.length} fields pending (empty in macro_state)
           </summary>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
             <tbody>

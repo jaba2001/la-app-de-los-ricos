@@ -183,7 +183,7 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
           <div className="section-label">Quality &amp; solvency</div>
           <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 620, lineHeight: 1.5 }}>
             Distress, earnings quality, ROE decomposition and credit risk — all from the financial statements.
-            Se muestran como contexto; no mueven el Scora Score hasta validar su poder predictivo.
+            Shown as context; they don&apos;t move the Scora Score until their predictive power is validated.
           </div>
           <div className="sr-grid-3">
             {quality.altman && (
