@@ -9,7 +9,7 @@ import { requireUser } from '../auth.js';
 import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
-import { respaldoYahoo, esSimboloFueraDePlan } from './yahoo.js';
+import { respaldoYahoo, esSimboloFueraDePlan, esLimiteAgotado } from './yahoo.js';
 import { fetchConReintento } from './red.js';
 
 
@@ -115,9 +115,9 @@ export async function serve(request, ctx) {
   const { status, body, fuente } = await dedupe(key, async () => {
     const res = await fetchConReintento(upstream.toString(), { headers: { 'Accept': 'application/json' } });
     let r = { status: res.status, body: await res.text(), fuente: 'fmp' };
-    // ETFs fuera del plan (402 «Special Endpoint»): cotización e histórico salen de Yahoo con
-    // la forma de FMP. Ver lib/server/providers/yahoo.js.
-    if ((path === 'quote' || path === 'historical-price-eod/full') && esSimboloFueraDePlan(r.status, r.body)) {
+    // ETFs fuera del plan (402 «Special Endpoint») o FMP sin cuota del día (429 «Limit
+    // Reach»): cotización e histórico salen de Yahoo con la forma de FMP. Ver yahoo.js.
+    if ((path === 'quote' || path === 'historical-price-eod/full') && (esSimboloFueraDePlan(r.status, r.body) || esLimiteAgotado(r.status, r.body))) {
       const y = await respaldoYahoo(path, url.searchParams);
       if (y) r = { ...y, fuente: 'yahoo' };
     }

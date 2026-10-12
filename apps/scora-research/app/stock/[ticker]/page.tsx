@@ -639,7 +639,11 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
       // ── Write 24h snapshot (exclude quote/rdcf, cap history arrays) ──
       // Skip when core data is missing (e.g. FMP rate-limited): caching an empty
       // payload would poison every re-analyze for the rest of the day.
-      const snapshotWorthSaving = stockData.profile != null || stockData.income.length > 0 || stockData.history.length > 0;
+      // Y tampoco si falló alguna fuente básica: con FMP sin cuota, el precio sale de Yahoo y los
+      // estados de EDGAR, así que «hay historial» ya no significa «está todo». Una foto a medias
+      // se serviría el resto del día aunque FMP volviera.
+      const snapshotWorthSaving = coreFmpFailed === 0
+        && (stockData.profile != null || stockData.income.length > 0 || stockData.history.length > 0);
       const { quote: _snapQ, rdcf: _snapR, history: _sh, spyHistory: _ss, sectorEtfHistory: _se, ...snapRest } = stockData;
       // Es una caché: si no se guarda, la próxima visita pide los datos otra vez. No merece un
       // aviso en pantalla, pero tampoco pasar en silencio.

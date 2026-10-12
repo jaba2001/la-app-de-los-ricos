@@ -70,6 +70,14 @@ export const esSimboloFueraDePlan = (status, cuerpo) =>
   status === 402 && /symbol/i.test(String(cuerpo)) && /not available under your current subscription/i.test(String(cuerpo));
 
 /**
+ * FMP sin cuota: «Limit Reach». La clave es UNA para toda la app (producción y pruebas), y
+ * el 12-10-2026 se agotó a media tarde: todas las fichas se quedaron sin precio ni gráfico.
+ * Cotización e histórico salen entonces de Yahoo, igual que los ETFs fuera del plan; los
+ * estados financieros ya tienen su respaldo en EDGAR.
+ */
+export const esLimiteAgotado = (status, cuerpo) => status === 429 && /limit reach/i.test(String(cuerpo));
+
+/**
  * Pide a Yahoo y devuelve `{ status, body }` con la forma de FMP, o null si Yahoo tampoco
  * lo tiene (y entonces se devuelve el 402 original: el front ya sabe tratarlo).
  */
