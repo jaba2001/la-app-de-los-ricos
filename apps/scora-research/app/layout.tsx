@@ -7,6 +7,7 @@ import Nav from "@/components/Nav";
 import SiteFooter from "@/components/SiteFooter";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import ConsentBanner from "@/components/ConsentBanner";
+import ScreenAssistant from "@/components/ScreenAssistant";
 import { SITIO } from "@/lib/sitio";
 import IdiomaProvider from "@/components/IdiomaProvider";
 import { idiomaPeticion } from "@/lib/i18n/servidor";
@@ -70,6 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <SiteFooter />
             {/* «Ask about this page»: explica lo que hay en pantalla. En el layout para que la
                 conversación sobreviva a la navegación entre páginas. */}
+            <ScreenAssistant />
           </MacroProvider>
         </AuthProvider>
         </IdiomaProvider>

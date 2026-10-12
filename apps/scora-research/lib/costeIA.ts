@@ -16,6 +16,11 @@ export interface AiUsage {
 const PRICE_PER_MTOK: Record<string, { in: number; out: number }> = {
   "claude-haiku-4-5": { in: 1, out: 5 },
   "claude-sonnet-4-6": { in: 3, out: 15 },
+  // El asistente de pantalla (lib/server/asistente.js). Opus 4.8 es el respaldo al que la API
+  // puede pasar una pregunta que Opus 5 rechace, y la fila de auditoría lleva el que respondió.
+  "claude-opus-5": { in: 5, out: 25 },
+  "claude-opus-4-8": { in: 5, out: 25 },
+  "claude-sonnet-5": { in: 2, out: 10 },
 };
 
 /** Rough USD cost of one completion. Null when tokens or price are unknown. */

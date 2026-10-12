@@ -1,0 +1,253 @@
+/* El asistente de pantalla (components/ScreenAssistant.tsx). En hoja aparte y no en estilos
+   en línea porque necesita lo que el atributo style no da: media queries (en el móvil el
+   panel ocupa toda la pantalla), :hover/:focus y una animación. */
+
+.sr-asis-lanzador {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px 0 14px;
+  border: none;
+  border-radius: var(--sr-radius-pill);
+  background: var(--sr-brand);
+  color: var(--sr-text-inv);
+  font: inherit;
+  font-size: var(--sr-t-base);
+  font-weight: 600;
+  box-shadow: var(--sr-shadow-lg);
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.sr-asis-lanzador:hover { background: var(--sr-brand-ink); transform: translateY(-1px); }
+.sr-asis-lanzador:focus-visible { outline: 2px solid var(--sr-brand); outline-offset: 3px; }
+
+/* Por encima del aviso de cookies (z-index 1000): el usuario lo ha abierto a propósito. */
+.sr-asis-panel {
+  position: fixed;
+  top: var(--sr-nav-h);
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  max-width: 100vw;
+  background: var(--sr-surface);
+  border-left: 1px solid var(--sr-border);
+  box-shadow: var(--sr-shadow-lg);
+  animation: sr-asis-entrar 0.18s ease-out;
+}
+@keyframes sr-asis-entrar { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.sr-asis-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sr-sp-3);
+  padding: var(--sr-sp-4);
+  border-bottom: 1px solid var(--sr-border);
+}
+.sr-asis-titulo { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: var(--sr-t-md); color: var(--sr-text); }
+.sr-asis-titulo svg { color: var(--sr-brand); }
+.sr-asis-sub { margin-top: 2px; font-size: var(--sr-t-sm); color: var(--sr-text-3); }
+.sr-asis-acciones { display: flex; gap: 4px; }
+
+.sr-asis-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--sr-radius-sm);
+  background: transparent;
+  color: var(--sr-text-3);
+  cursor: pointer;
+}
+.sr-asis-icono:hover { background: var(--sr-surface-3); color: var(--sr-text); }
+
+.sr-asis-lista {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sr-sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sr-sp-4);
+}
+
+.sr-asis-vacio { padding: var(--sr-sp-4); color: var(--sr-text-2); font-size: var(--sr-t-base); line-height: 1.5; }
+.sr-asis-vacio p { margin: 0 0 var(--sr-sp-4); }
+.sr-asis-sugerencias { display: flex; flex-wrap: wrap; gap: var(--sr-sp-2); }
+.sr-asis-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--sr-border-2);
+  border-radius: var(--sr-radius-pill);
+  background: var(--sr-surface);
+  color: var(--sr-text);
+  font: inherit;
+  font-size: var(--sr-t-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.sr-asis-chip:hover { border-color: var(--sr-brand); background: var(--sr-amber-dim); }
+
+.sr-asis-boton {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--sr-radius);
+  background: var(--sr-brand);
+  color: var(--sr-text-inv);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sr-asis-usuario { align-self: flex-end; max-width: 88%; }
+.sr-asis-usuario-txt {
+  padding: 8px 12px;
+  border-radius: var(--sr-radius-lg) var(--sr-radius-lg) 4px var(--sr-radius-lg);
+  background: var(--sr-surface-3);
+  color: var(--sr-text);
+  font-size: var(--sr-t-base);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.sr-asis-ruta { margin-top: 3px; text-align: right; font-size: var(--sr-t-xs); color: var(--sr-text-3); overflow-wrap: anywhere; }
+
+.sr-asis-respuesta { font-size: var(--sr-t-base); line-height: 1.55; color: var(--sr-text); overflow-wrap: anywhere; }
+.sr-asis-rico p { margin: 0 0 var(--sr-sp-2); }
+.sr-asis-rico ul, .sr-asis-rico ol { margin: 0 0 var(--sr-sp-2); padding-left: 20px; }
+.sr-asis-rico li { margin-bottom: 3px; }
+.sr-asis-rico code { padding: 1px 4px; border-radius: 4px; background: var(--sr-surface-3); font-size: 0.92em; }
+/* Una cita de la página: subrayado de puntos y un fondo dorado suave, el mismo color con el
+   que luego se resalta en la página. En línea (no inline-block) para que corte como el texto. */
+.sr-asis-cita {
+  padding: 0 2px;
+  border-radius: 3px;
+  background: rgba(212, 160, 23, 0.16);
+  text-decoration: underline dotted rgba(138, 90, 0, 0.7);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.sr-asis-cita:hover { background: rgba(212, 160, 23, 0.32); }
+.sr-asis-cita:focus-visible { outline: 2px solid var(--sr-brand); outline-offset: 1px; }
+.sr-asis-cita-nota { margin-left: 4px; font-size: var(--sr-t-xs); color: var(--sr-text-3); }
+
+.sr-asis-error { margin: var(--sr-sp-2) 0; color: var(--sr-warn); font-size: var(--sr-t-sm); }
+.sr-asis-error a { color: var(--sr-brand); font-weight: 600; }
+
+.sr-asis-leyendo { display: flex; align-items: center; gap: 4px; color: var(--sr-text-3); font-size: var(--sr-t-sm); }
+.sr-asis-leyendo span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sr-brand);
+  animation: sr-asis-punto 1s infinite ease-in-out;
+}
+.sr-asis-leyendo span:nth-child(2) { animation-delay: 0.15s; }
+.sr-asis-leyendo span:nth-child(3) { animation-delay: 0.3s; margin-right: 4px; }
+@keyframes sr-asis-punto { 0%, 80%, 100% { opacity: 0.25; } 40% { opacity: 1; } }
+
+.sr-asis-pie { padding: var(--sr-sp-3) var(--sr-sp-4) calc(var(--sr-sp-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--sr-border); }
+.sr-asis-seleccion {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--sr-sp-2);
+  padding: 4px 4px 4px 10px;
+  border-left: 3px solid var(--sr-brand);
+  border-radius: var(--sr-radius-sm);
+  background: var(--sr-amber-dim);
+  font-size: var(--sr-t-sm);
+  color: var(--sr-text-2);
+}
+.sr-asis-seleccion-txt { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sr-asis-form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sr-sp-2);
+  padding: 6px 6px 6px 12px;
+  border: 1px solid var(--sr-border-2);
+  border-radius: var(--sr-radius-lg);
+  background: var(--sr-surface);
+}
+.sr-asis-form:focus-within { border-color: var(--sr-brand); box-shadow: var(--sr-shadow-amber); }
+.sr-asis-form textarea {
+  flex: 1;
+  min-height: 24px;
+  max-height: 160px;
+  padding: 4px 0;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--sr-text);
+  font: inherit;
+  /* 16 px: con menos, Safari en iPhone hace zoom al enfocar el campo. */
+  font-size: 16px;
+  line-height: 1.4;
+  field-sizing: content;
+}
+.sr-asis-enviar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--sr-radius);
+  background: var(--sr-brand);
+  color: var(--sr-text-inv);
+  cursor: pointer;
+}
+.sr-asis-enviar:disabled { background: var(--sr-surface-3); color: var(--sr-text-3); cursor: default; }
+.sr-asis-aviso { margin: 6px 0 0; font-size: var(--sr-t-xs); color: var(--sr-text-3); text-align: center; }
+
+/* ── Lo resaltado en la PÁGINA (lib/resaltar.ts) ── */
+/* El texto citado lo pinta la CSS Custom Highlight API. Su regla, ::highlight(sr-asis), la
+   inyecta lib/resaltar.ts: el parser de CSS de Turbopack no la entiende y tumba la hoja entera. */
+.sr-asis-capa { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 899; pointer-events: none; }
+.sr-asis-marca { position: absolute; border-radius: 4px; pointer-events: none; }
+/* Un destello que se apaga solo, para que el ojo encuentre la marca tras el desplazamiento. */
+.sr-asis-marca-destello { animation: sr-asis-destello 1.8s ease-out forwards; }
+@keyframes sr-asis-destello {
+  0%   { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.9); opacity: 1; }
+  60%  { box-shadow: 0 0 0 12px rgba(212, 160, 23, 0); opacity: 1; }
+  100% { box-shadow: 0 0 0 12px rgba(212, 160, 23, 0); opacity: 0; }
+}
+/* Sin Highlight API: el recuadro es la marca y se queda hasta limpiar. */
+.sr-asis-marca-fija { background: rgba(212, 160, 23, 0.35); }
+.sr-asis-marca-grafico { outline: 3px solid #D4A017; outline-offset: 4px; border-radius: 8px; animation: sr-asis-destello 1.8s ease-out; }
+
+/* Con sitio de sobra, el panel no tapa la página: la estrecha, como un panel lateral del
+   navegador. La barra es fija y no se mueve; el panel empieza debajo de ella. */
+@media (min-width: 1024px) {
+  html.sr-asis-abierto body { margin-right: 400px; }
+}
+
+/* Móvil: el panel ocupa la pantalla entera (encima de la barra) y el botón es solo el icono. */
+@media (max-width: 640px) {
+  .sr-asis-lanzador { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 48px; height: 48px; padding: 0; justify-content: center; }
+  .sr-asis-lanzador-txt { display: none; }
+  .sr-asis-lanzador svg { width: 20px; height: 20px; }
+  .sr-asis-panel { top: 0; width: 100vw; border-left: none; }
+}
+
+@media print {
+  .sr-asis-lanzador, .sr-asis-panel { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sr-asis-panel, .sr-asis-leyendo span, .sr-asis-marca-grafico { animation: none; }
+  .sr-asis-marca-destello { display: none; }
+  .sr-asis-lanzador { transition: none; }
+}

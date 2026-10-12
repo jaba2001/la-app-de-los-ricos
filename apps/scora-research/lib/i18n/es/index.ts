@@ -10,6 +10,7 @@ import { SERVIDOR } from "./servidor.ts";
 import { LIB } from "./lib.ts";
 import { LIB2 } from "./lib2.ts";
 import { CATALOGOS } from "./catalogos.ts";
+import { ASISTENTE } from "./asistente.ts";
 
 export const ES: Record<string, string> = {
   ...COMUN,
@@ -22,4 +23,5 @@ export const ES: Record<string, string> = {
   ...LIB,
   ...LIB2,
   ...CATALOGOS,
+  ...ASISTENTE,
 };

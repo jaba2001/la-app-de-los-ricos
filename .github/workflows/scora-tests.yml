@@ -352,6 +352,10 @@ jobs:
       # (AUDIT_REPORT A-7).
       - name: Cuerpo reenviado a Anthropic
         run: node --experimental-strip-types --no-warnings scripts/anthropicbody.test.mjs
+      # El asistente de pantalla: el cliente no elige modelo ni instrucciones, Haiku no recibe
+      # parametros que le dan un 400, y al recortar una pagina larga no se pierde lo visible.
+      - name: Asistente de pantalla
+        run: node --experimental-strip-types --no-warnings scripts/asistente.test.mjs
       # El registro de auditoria de la IA lo escribe el servidor, y el navegador ya no puede
       # insertar el suyo (AUDIT_REPORT A-4). La parte con Postgres se salta sin base.
       - name: Registro de auditoria de la IA
