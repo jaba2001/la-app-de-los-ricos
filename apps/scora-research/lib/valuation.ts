@@ -15,6 +15,8 @@ const num = (x: number | null | undefined): x is number => x != null && isFinite
 export interface WaccBridge {
   costOfEquity: number;       // % (CAPM)
   costOfDebtAfterTax: number; // %
+  /** true si no había gasto por intereses publicado y el coste de la deuda es rf + 1 punto. */
+  costOfDebtEstimated: boolean;
   weightEquity: number;       // 0-1
   weightDebt: number;         // 0-1
   wacc: number;               // %
@@ -31,13 +33,17 @@ export function waccBridge(inp: WaccInputs): WaccBridge | null {
   const erp = inp.erp ?? ERP_BASE;
   const tax = inp.taxRate ?? 0.21;
   const ke = rf + beta * erp;
-  const kdPre = D > 0 && num(inp.interestExpense) && inp.interestExpense > 0 ? (inp.interestExpense / D) * 100 : 0;
+  // Con deuda y sin gasto por intereses publicado (AAPL desde 2024) el coste NO es 0: eso
+  // abarataba el WACC y mostraba «Coste de deuda 0,00 %». Se estima como rf + 1 punto (un
+  // diferencial de grado de inversión) y se marca como estimado.
+  const conIntereses = D > 0 && num(inp.interestExpense) && inp.interestExpense > 0;
+  const kdPre = D === 0 ? 0 : conIntereses ? (inp.interestExpense! / D) * 100 : rf + 1;
   const kd = kdPre * (1 - tax);
   const V = E + D;
   const we = E / V, wd = D / V;
   const wacc = we * ke + wd * kd;
   const r = (x: number) => Math.round(x * 100) / 100;
-  return { costOfEquity: r(ke), costOfDebtAfterTax: r(kd), weightEquity: r(we), weightDebt: r(wd), wacc: r(wacc) };
+  return { costOfEquity: r(ke), costOfDebtAfterTax: r(kd), costOfDebtEstimated: D > 0 && !conIntereses, weightEquity: r(we), weightDebt: r(wd), wacc: r(wacc) };
 }
 
 // ── Forward DCF sensitivity matrix ───────────────────────────────────────────

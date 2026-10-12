@@ -195,6 +195,12 @@ approx("wacc cost of debt AT", wb.costOfDebtAfterTax, 3.95, 1e-2);
 approx("wacc weight equity", wb.weightEquity, 0.8, 1e-3);
 approx("wacc blended", wb.wacc, 9.27, 2e-2);
 ok("wacc null no mcap", waccBridge({ rf: 4, beta: 1, marketCap: 0, totalDebt: 1, interestExpense: 1 }) === null);
+// Deuda sin gasto por intereses publicado (AAPL desde 2024): antes coste 0 % → WACC abaratado.
+const sinInt = waccBridge({ rf: 4, beta: 1.2, erp: 5.5, taxRate: 0.21, marketCap: 800, totalDebt: 200, interestExpense: null });
+approx("sin intereses: coste de deuda estimado rf+1 tras impuestos", sinInt.costOfDebtAfterTax, 3.95, 1e-2);
+ok("sin intereses: marcado como estimado", sinInt.costOfDebtEstimated === true);
+ok("con intereses: no estimado", wb.costOfDebtEstimated === false);
+ok("sin deuda: coste 0 y no estimado", waccBridge({ rf: 4, beta: 1, marketCap: 800, totalDebt: 0, interestExpense: null }).costOfDebtEstimated === false);
 const dm = dcfMatrix({ revenueTTM: 1000, fcfMarginTTM: 0.15, netDebt: 0, sharesOut: 100 }, [8, 10], [5, 10]);
 ok("dcf matrix dims", dm.grid.length === 2 && dm.grid[0].length === 2);
 ok("dcf matrix cell positive", typeof dm.grid[0][0] === "number" && dm.grid[0][0] > 0);

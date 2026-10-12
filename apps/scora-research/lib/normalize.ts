@@ -56,6 +56,9 @@ function pctToFrac(v: number | null): number | null {
  * preserved by spreading the raw objects first; renamed/moved fields are then
  * overlaid so the legacy keys always resolve when the data exists anywhere.
  */
+/** Un 0 que en realidad es «no publicado» (ver interestCoverageTTM). */
+const noCero = (x: number | null | undefined): number | null => (x == null || x === 0 ? null : x);
+
 export function normalizeFundamentals(s: RawFundamentalSources): { metrics: Dict; ratios: Dict } {
   const km = s.fmpKeyMetrics ?? {};
   const ra = s.fmpRatios ?? {};
@@ -95,7 +98,11 @@ export function normalizeFundamentals(s: RawFundamentalSources): { metrics: Dict
     // leverage / liquidity / coverage
     debtEquityRatioTTM:        firstNum(n(ra, "debtToEquityRatioTTM"), f("totalDebt/totalEquityAnnual"), f("totalDebt/totalEquityQuarterly")),
     currentRatioTTM:           firstNum(n(ra, "currentRatioTTM"), n(km, "currentRatioTTM"), f("currentRatioAnnual"), f("currentRatioQuarterly")),
-    interestCoverageTTM:       firstNum(n(ra, "interestCoverageRatioTTM"), f("netInterestCoverageAnnual")),
+    // FMP pone 0 cuando la empresa no publica el gasto por intereses aparte (AAPL desde 2024):
+    // una cobertura de exactamente 0 significaría beneficio operativo nulo, así que es un dato
+    // ausente. Contado como 0 hundía la «eficiencia de capital» del foso de AAPL (4/25) y la
+    // nota de salud. Se pasa al respaldo de Finnhub (622× para AAPL).
+    interestCoverageTTM:       firstNum(noCero(n(ra, "interestCoverageRatioTTM")), noCero(f("netInterestCoverageTTM")), noCero(f("netInterestCoverageAnnual"))),
     // returns duplicated here because StockFundamentals reads them from `ratios`
     returnOnInvestedCapitalTTM: firstNum(n(km, "returnOnInvestedCapitalTTM"), pctToFrac(f("roiTTM"))),
     returnOnCapitalEmployedTTM: firstNum(n(km, "returnOnCapitalEmployedTTM")),

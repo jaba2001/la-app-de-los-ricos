@@ -361,6 +361,12 @@ function requireArtifact(name, regenCmd) {
   ok(c.metrics.enterpriseValueOverEBITDATTM === 25.9, "norm-merge: FMP evEbitda kept");
   approx(c.metrics.roeTTM, 0.3332, 1e-9, "norm-merge: Finnhub fills missing roe");
 
+  // FMP pone interestCoverageRatioTTM = 0 cuando no se publica el gasto por intereses (AAPL
+  // desde 2024): es un dato ausente, no una cobertura nula. Debe ganar el respaldo de Finnhub.
+  const d = normalizeFundamentals({ fmpRatios: { interestCoverageRatioTTM: 0 }, finnhubMetric: { netInterestCoverageTTM: 622.5 } });
+  ok(d.ratios.interestCoverageTTM === 622.5, `norm: cobertura 0 de FMP → respaldo Finnhub (${d.ratios.interestCoverageTTM})`);
+  ok(normalizeFundamentals({ fmpRatios: { interestCoverageRatioTTM: 0 } }).ratios.interestCoverageTTM === null, "norm: cobertura 0 sin respaldo → null, no 0");
+
   // The payoff: a normalized UBER feeds calcScores to a NON-zero value+growth,
   // exactly what the legacy-name bug was suppressing.
   const m = a.metrics, r = a.ratios;
