@@ -28,6 +28,8 @@ const growthPct = (now: number | null, prev: number | null): number | null =>
 const BAND_COLOR: Record<string, string> = {
   baja: "var(--sr-pos)", moderada: "var(--sr-text-2)", alta: "var(--sr-warn)", severa: "var(--sr-neg)",
 };
+/** Nombre en pantalla de cada banda (la clave interna sigue en español). */
+const BAND_LABEL: Record<string, string> = { baja: "Low", moderada: "Moderate", alta: "High", severa: "Severe" };
 
 export default function Governance({ ticker, data, rf }: Props) {
   const built = useMemo(() => {
@@ -92,32 +94,32 @@ export default function Governance({ ticker, data, rf }: Props) {
   return (
     <div className="animate-fade-in">
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Coste de agencia · Jensen &amp; Meckling (1976) · {ticker}</div>
+        <div className="section-label">Agency cost · Jensen &amp; Meckling (1976) · {ticker}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 640 }}>
-          Cuando quien decide no es quien pone el dinero aparecen costes de agencia: monitorización, fianza y pérdida
-          residual. La pregunta que resume el paper más citado de las finanzas corporativas es simple:
-          <strong> ¿de quién es el dinero que se está gastando, y en beneficio de quién?</strong>
+          When the people deciding aren&apos;t the people putting up the money, agency costs appear: monitoring, bonding
+          and residual loss. The question that sums up the most-cited paper in corporate finance is simple:
+          <strong> whose money is being spent, and for whose benefit?</strong>
         </div>
 
         {!g ? (
-          <div className="sr-hint">Sin estados financieros suficientes para medir el coste de agencia.</div>
+          <div className="sr-hint">Not enough financial statements to measure the agency cost.</div>
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-3)" }}>
               <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: BAND_COLOR[g.band] }}>
                 {g.agencyCost.toFixed(0)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}>/100</span>
               </div>
-              <div style={{ textTransform: "capitalize", fontWeight: 700, color: BAND_COLOR[g.band] }}>fricción {g.band}</div>
-              <div className="sr-hint">mayor = peor para el accionista · {g.covered} de 6 señales</div>
+              <div style={{ fontWeight: 700, color: BAND_COLOR[g.band] }}>{BAND_LABEL[g.band] ?? g.band} friction</div>
+              <div className="sr-hint">higher = worse for shareholders · {g.covered} of 6 signals</div>
             </div>
 
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table">
                 <thead><tr>
-                  <th>Señal</th>
-                  <th style={{ textAlign: "right" }}>Valor</th>
-                  <th style={{ textAlign: "right" }}>Coste</th>
-                  <th>Qué mide</th>
+                  <th>Signal</th>
+                  <th style={{ textAlign: "right" }}>Value</th>
+                  <th style={{ textAlign: "right" }}>Cost</th>
+                  <th>What it measures</th>
                 </tr></thead>
                 <tbody>
                   {g.components.map((c) => (
@@ -142,33 +144,33 @@ export default function Governance({ ticker, data, rf }: Props) {
       </div>
 
       <div className="card">
-        <div className="section-label">Test del flujo de caja libre · Jensen (1986)</div>
+        <div className="section-label">Free cash flow test · Jensen (1986)</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 640 }}>
-          La hipótesis del FCF: el directivo con caja abundante y sin proyectos buenos construye imperio en vez de
-          repartir. De ahí la conclusión contraintuitiva del paper — <strong>la deuda disciplina</strong>, porque
-          compromete la caja futura y le quita discrecionalidad.
+          The FCF hypothesis: a manager with plenty of cash and no good projects builds an empire instead of paying
+          it out. Hence the paper&apos;s counterintuitive conclusion — <strong>debt disciplines</strong>, because it
+          commits future cash and takes away discretion.
         </div>
 
         {!jensen ? (
-          <div className="sr-hint">Faltan margen de FCF, ROIC o WACC para correr el test.</div>
+          <div className="sr-hint">FCF margin, ROIC or WACC is missing, so the test can&apos;t run.</div>
         ) : (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
               <div className="sr-tile">
-                <div className="sr-tile-label">Diferencial ROIC − WACC</div>
+                <div className="sr-tile-label">ROIC − WACC spread</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: (jensen.spread ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
                   {jensen.spread == null ? "—" : `${jensen.spread >= 0 ? "+" : ""}${jensen.spread.toFixed(1)} pp`}
                 </div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">Rentabilidad al accionista</div>
+                <div className="sr-tile-label">Shareholder yield</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{totalYield == null ? "—" : `${totalYield.toFixed(2)}%`}</div>
-                <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>dividendos + recompras − emisión</div>
+                <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>dividends + buybacks − issuance</div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">Construcción de imperio</div>
+                <div className="sr-tile-label">Empire building</div>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: jensen.empireBuilding ? "var(--sr-neg)" : "var(--sr-pos)" }}>
-                  {jensen.empireBuilding ? "SÍ" : "No"}
+                  {jensen.empireBuilding ? "YES" : "No"}
                 </div>
               </div>
             </div>
@@ -179,9 +181,9 @@ export default function Governance({ ticker, data, rf }: Props) {
         )}
 
         <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-          Estas señales <strong>no entran en el Scora Score</strong>. La emisión neta (Pontiff &amp; Woodgate 2008) y el
-          crecimiento de activos (Cooper, Gulen &amp; Schill 2008) tienen IC documentada en la literatura, así que merecen
-          medirse en el harness — pero medirse, no suponerse. Hasta que pasen el gate fuera de muestra son contexto.
+          These signals <strong>do not feed the Scora Score</strong>. Net issuance (Pontiff &amp; Woodgate 2008) and
+          asset growth (Cooper, Gulen &amp; Schill 2008) have documented IC in the literature, so they deserve to be
+          measured in the harness — measured, not assumed. Until they pass the out-of-sample gate they are context.
         </div>
       </div>
       <Articulacion data={data} />

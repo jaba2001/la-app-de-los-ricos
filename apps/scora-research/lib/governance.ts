@@ -93,12 +93,12 @@ const ANCHORS: Record<string, [number, number][]> = {
 };
 
 const LABELS: Record<string, string> = {
-  netIssuance: "Emisión neta de acciones",
-  sbcToRevenue: "SBC / ingresos",
-  sbcToFcf: "SBC / flujo de caja libre",
-  assetGrowth: "Crecimiento del activo",
-  insiderAlignment: "Alineación de insiders",
-  accruals: "Accruals (calidad del beneficio)",
+  netIssuance: "Net share issuance",
+  sbcToRevenue: "SBC / revenue",
+  sbcToFcf: "SBC / free cash flow",
+  assetGrowth: "Asset growth",
+  insiderAlignment: "Insider alignment",
+  accruals: "Accruals (earnings quality)",
 };
 
 /**
@@ -126,12 +126,12 @@ export function computeGovernance(inp: GovernanceInputs): GovernanceResult | nul
 
   add("netIssuance", inp.netIssuancePct,
     num(inp.netIssuancePct) && inp.netIssuancePct < 0
-      ? "Recompra neta: el accionista que se queda posee más empresa."
-      : "Dilución: cada acción existente vale una porción menor de la misma empresa.");
-  add("sbcToRevenue", inp.sbcToRevenuePct, "Parte de los ingresos que se paga al equipo en acciones del accionista.");
-  add("sbcToFcf", inp.sbcToFcfPct, "Cuánto del flujo de caja libre se consume en compensación en acciones.");
-  add("assetGrowth", inp.assetGrowthPct, "Cooper-Gulen-Schill (2008): crecer activos deprisa predice retornos futuros bajos.");
-  add("accruals", inp.accrualsRatio, "Sloan (1996): beneficio muy por encima de la caja es beneficio de menor calidad.");
+      ? "Net buyback: shareholders who stay own more of the company."
+      : "Dilution: each existing share is a smaller slice of the same company.");
+  add("sbcToRevenue", inp.sbcToRevenuePct, "Share of revenue paid to staff in shareholders' stock.");
+  add("sbcToFcf", inp.sbcToFcfPct, "How much of free cash flow is consumed by stock-based compensation.");
+  add("assetGrowth", inp.assetGrowthPct, "Cooper-Gulen-Schill (2008): fast asset growth predicts low future returns.");
+  add("accruals", inp.accrualsRatio, "Sloan (1996): earnings well above cash are lower-quality earnings.");
 
   if (num(inp.insiderOwn) && inp.insiderOwn >= 0 && inp.insiderOwn <= 1) {
     components.push({
@@ -139,7 +139,7 @@ export function computeGovernance(inp: GovernanceInputs): GovernanceResult | nul
       label: LABELS.insiderAlignment,
       raw: inp.insiderOwn,
       score: insiderAlignmentCost(inp.insiderOwn),
-      note: "Punto dulce: poca participación es desalineación; demasiada, atrincheramiento.",
+      note: "Sweet spot: too little ownership is misalignment; too much, entrenchment.",
     });
   }
 
@@ -152,15 +152,15 @@ export function computeGovernance(inp: GovernanceInputs): GovernanceResult | nul
   const top = [...components].sort((a, b) => b.score - a.score)[0];
   readings.push(
     band === "baja"
-      ? "Los incentivos parecen alineados con el accionista: el capital se gestiona como si fuera propio."
+      ? "Incentives look aligned with shareholders: capital is managed as if it were their own."
       : band === "moderada"
-      ? "Fricciones de agencia normales. Nada alarmante, pero conviene saber dónde va el dinero."
+      ? "Normal agency frictions. Nothing alarming, but worth knowing where the money goes."
       : band === "alta"
-      ? "Coste de agencia elevado: una parte apreciable del valor creado no llega al accionista."
-      : "Coste de agencia severo: la gestión está transfiriendo valor desde el accionista de forma sistemática."
+      ? "High agency cost: a meaningful part of the value created doesn't reach shareholders."
+      : "Severe agency cost: management is systematically transferring value away from shareholders."
   );
-  readings.push(`Principal fuente: ${top.label.toLowerCase()} (${top.raw.toFixed(2)}).`);
-  if (components.length < 6) readings.push(`Calculado sobre ${components.length} de 6 señales disponibles.`);
+  readings.push(`Main source: ${top.label.toLowerCase()} (${top.raw.toFixed(2)}).`);
+  if (components.length < 6) readings.push(`Computed on ${components.length} of 6 available signals.`);
   return { agencyCost, band, components, covered: components.length, readings };
 }
 
@@ -211,10 +211,10 @@ export function jensenFcfTest(inp: JensenFcfInputs): JensenFcfResult | null {
   const empireBuilding = cashRich && destroysValue && (investsHeavily || returnsLittle);
 
   const reading = empireBuilding
-    ? `Patrón de construcción de imperio: genera caja (FCF ${inp.fcfMarginPct.toFixed(1)}% de ingresos) pero reinvierte a un retorno POR DEBAJO de su coste de capital (ROIC ${inp.roicPct.toFixed(1)}% vs WACC ${inp.waccPct.toFixed(1)}%). Jensen (1986): ese dinero rendiría más repartido que reinvertido.`
+    ? `Empire-building pattern: it generates cash (FCF ${inp.fcfMarginPct.toFixed(1)}% of revenue) but reinvests at a return BELOW its cost of capital (ROIC ${inp.roicPct.toFixed(1)}% vs WACC ${inp.waccPct.toFixed(1)}%). Jensen (1986): that money would earn more paid out than reinvested.`
     : destroysValue
-    ? `El ROIC (${inp.roicPct.toFixed(1)}%) está por debajo del coste de capital (${inp.waccPct.toFixed(1)}%): crecer destruye valor, aunque no se dan todas las condiciones del patrón de imperio.`
-    : `El capital se reinvierte por encima de su coste (ROIC ${inp.roicPct.toFixed(1)}% vs WACC ${inp.waccPct.toFixed(1)}%, diferencial +${spread.toFixed(1)} pp): crecer aquí CREA valor.`;
+    ? `ROIC (${inp.roicPct.toFixed(1)}%) is below the cost of capital (${inp.waccPct.toFixed(1)}%): growing destroys value, though not every condition of the empire pattern is met.`
+    : `Capital is reinvested above its cost (ROIC ${inp.roicPct.toFixed(1)}% vs WACC ${inp.waccPct.toFixed(1)}%, spread +${spread.toFixed(1)} pp): growth here CREATES value.`;
 
   return { empireBuilding, spread, shareholderYield, reading };
 }

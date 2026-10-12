@@ -348,7 +348,7 @@ function heteroSeries(p, n, seed) {
   ok("Jensen no marca a un buen asignador", sano.empireBuilding === false);
   ok("Jensen calcula rentabilidad al accionista", Math.abs(sano.shareholderYield - 5) < 1e-9);
   ok("Jensen sin entradas -> null", jensenFcfTest({ fcfMarginPct: 10 }) === null);
-  ok("Jensen explica el diferencial positivo", sano.reading.includes("CREA valor"));
+  ok("Jensen explica el diferencial positivo", sano.reading.includes("CREATES value"));
 
   // Rentabilidad total al accionista.
   approx("shareholderYield resta la emisión", shareholderYield(2, 3, 1), 4, 1e-9);
