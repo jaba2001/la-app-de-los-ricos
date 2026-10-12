@@ -41,6 +41,10 @@ export default function Nav() {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
   const [suggIdx, setSuggIdx] = useState(-1);
+  // Menú plegable para pantallas estrechas: las 10 pestañas, el buscador y la cuenta no caben
+  // por debajo de ~1100 px, y la barra empujaba la página entera hacia los lados en el móvil.
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  useEffect(() => { setMenuAbierto(false); }, [pathname]);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -83,7 +87,7 @@ export default function Nav() {
   const activePath = MAIN_TABS.find(t => pathname.startsWith(t.href))?.href ?? "";
 
   return (
-    <header style={{
+    <header className="nav-header" style={{
       position: "fixed",
       top: 0,
       left: 0,
@@ -119,14 +123,14 @@ export default function Nav() {
           <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--sr-text)" }}>
             Scora
           </span>
-          <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 400, color: "var(--sr-text-3)", marginLeft: 4 }}>
+          <span className="nav-logo-sub" style={{ fontSize: "var(--sr-t-base)", fontWeight: 400, color: "var(--sr-text-3)", marginLeft: 4 }}>
             Research
           </span>
         </div>
       </div>
 
       {/* Main tabs */}
-      <nav style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+      <nav className="nav-desktop" style={{ display: "flex", gap: 4, flexShrink: 0 }}>
         {MAIN_TABS.map(tab => (
           <button
             key={tab.href}
@@ -139,7 +143,7 @@ export default function Nav() {
       </nav>
 
       {/* Global ticker search */}
-      <div style={{ position: "relative", flex: 1, maxWidth: 340 }}>
+      <div style={{ position: "relative", flex: 1, minWidth: 0, maxWidth: 340 }}>
         <input
           placeholder="Search ticker or company…"
           value={query}
@@ -207,20 +211,52 @@ export default function Nav() {
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto" }}>
         <QuotaPill />
         <button
-          className="btn-ghost"
+          className="btn-ghost nav-desktop"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
           onClick={() => router.push("/account")}
         >
           Account
         </button>
         <button
-          className="btn-ghost"
+          className="btn-ghost nav-desktop"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
           onClick={signOut}
         >
           Sign out
         </button>
+        <button
+          className="btn-ghost nav-menu-btn"
+          aria-label={menuAbierto ? "Close menu" : "Open menu"}
+          aria-expanded={menuAbierto}
+          style={{ fontSize: "var(--sr-t-base)", padding: "6px 10px", lineHeight: 1 }}
+          onClick={() => setMenuAbierto(v => !v)}
+        >
+          {menuAbierto ? "✕" : "☰"}
+        </button>
       </div>
+
+      {menuAbierto && (
+        <div className="nav-menu-panel" style={{
+          position: "absolute", top: "100%", left: 0, right: 0,
+          background: "var(--sr-bg)", borderBottom: "1px solid var(--sr-border)",
+          boxShadow: "0 12px 28px rgba(0,0,0,0.12)", padding: "var(--sr-sp-2) var(--sr-sp-4) var(--sr-sp-4)",
+          display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 6,
+          maxHeight: "calc(100vh - var(--sr-nav-h))", overflowY: "auto",
+        }}>
+          {MAIN_TABS.map(tab => (
+            <button
+              key={tab.href}
+              className={`tab-pill ${activePath === tab.href ? "active" : ""}`}
+              style={{ justifyContent: "flex-start", textAlign: "left" }}
+              onClick={() => router.push(tab.href)}
+            >
+              {tab.label}
+            </button>
+          ))}
+          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={() => router.push("/account")}>Account</button>
+          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={signOut}>Sign out</button>
+        </div>
+      )}
     </header>
   );
 }

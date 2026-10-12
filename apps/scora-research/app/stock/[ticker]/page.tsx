@@ -955,7 +955,8 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
         backdropFilter: "blur(8px)", borderBottom: "1px solid var(--sr-border)",
       }}>
         {/* Stock info bar */}
-        <div style={{ padding: "var(--sr-sp-3) var(--sr-sp-6)", display: "flex", alignItems: "center", gap: "var(--sr-sp-4)", borderBottom: "1px solid var(--sr-border)" }}>
+        {/* flexWrap: en el móvil el precio, ☆ y CSV bajan a otra línea en vez de desbordar. */}
+        <div className="ficha-cabecera" style={{ padding: "var(--sr-sp-3) var(--sr-sp-6)", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--sr-sp-4)", borderBottom: "1px solid var(--sr-border)" }}>
           <button
             onClick={() => router.push("/stock")}
             style={{ background: "none", border: "none", color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", cursor: "pointer" }}
@@ -963,7 +964,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
             ← Stocks
           </button>
           <div style={{ width: 1, height: 16, background: "var(--sr-border)" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", flex: 1 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--sr-sp-2)", flex: 1, minWidth: 0 }}>
             <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{ticker}</span>
             {isRecentIPO && (
               <span style={{

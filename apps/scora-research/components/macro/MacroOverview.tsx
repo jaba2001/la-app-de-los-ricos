@@ -140,7 +140,7 @@ export default function MacroOverview({ macro, loading }: Props) {
       <DataError mensaje={errorCarga} />
       {/* Top row: IC Score + Regime */}
       <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-6)", alignItems: "stretch" }}>
-        <div className="card" style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-5)", minWidth: 260 }}>
+        <div className="card" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--sr-sp-5)", minWidth: 0 }}>
           <div style={{ position: "relative", width: 130, height: 130, flexShrink: 0 }}>
             {loading ? <Sk w={130} h={130} r={65} /> : (
               <>

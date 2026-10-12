@@ -239,7 +239,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           background: macroTilt ? `color-mix(in srgb, ${macroTilt.color} 6%, var(--sr-surface))` : "var(--sr-surface)",
           border: macroTilt ? `1px solid color-mix(in srgb, ${macroTilt.color} 25%, var(--sr-border))` : "1px solid var(--sr-border)",
         }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--sr-sp-4)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--sr-sp-4)" }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-2)" }}>
                 <div className="section-label" style={{ margin: 0 }}>Macro Context</div>
