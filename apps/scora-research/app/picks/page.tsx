@@ -20,7 +20,10 @@ import {
   ENTRY_PCTL, EXIT_PCTL, PERSISTENCE_DAYS, QUARANTINE_MONTHS,
 } from "@/lib/picks";
 
-export const revalidate = 900;
+// Por petición, no ISR (12-10-2026): el build de Docker no tiene base de datos, así que la
+// versión pre-renderizada salía VACÍA («no hay datos») y era la que veía el primer visitante
+// tras cada despliegue — en producción, durante días. Son dos consultas pequeñas.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Scora Picks",

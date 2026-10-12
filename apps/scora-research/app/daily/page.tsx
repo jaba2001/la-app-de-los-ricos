@@ -9,7 +9,10 @@ import Link from "next/link";
 import DailyReportView from "@/components/daily/DailyReportView";
 import { fetchDailyClose, fetchDailyDates, dailySummaryLine, formatDayLong } from "@/lib/dailyClose";
 
-export const revalidate = 900;
+// Por petición, no ISR (12-10-2026): el build de Docker no tiene base de datos, así que la
+// versión pre-renderizada salía VACÍA («no hay datos») y era la que veía el primer visitante
+// tras cada despliegue — en producción, durante días. Son dos consultas pequeñas.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const rep = await fetchDailyClose();
