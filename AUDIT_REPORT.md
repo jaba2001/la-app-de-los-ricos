@@ -476,7 +476,7 @@ en español (la interfaz va en inglés por decisión de Jorge). Cada arreglo, en
 **⚠️ La clave de FMP es UNA para producción y pruebas, y el plan tiene límite diario.** El
 12-10-2026 se agotó a media tarde con las pruebas («Limit Reach», 429): mientras dura, las fichas
 de producción salen con precio de Yahoo y estados de EDGAR, pero sin perfil, ratios ni
-estimaciones. Cada análisis nuevo gasta ~21 llamadas. Decisión pendiente (D-6): subir de plan o
+estimaciones. Cada análisis nuevo gasta ~21 llamadas. Decisión pendiente (D-10): subir de plan o
 usar una clave aparte para las pruebas.
 
 **Pendiente de repetir con cuota de FMP:** las fichas `/stock/AAPL` y `/stock/SPY` completas y la
@@ -486,22 +486,20 @@ ficha (en modo degradado), watchlist y diario de punta a punta.
 ## Preguntas pendientes (D-n)
 
 **Datos y migración**
-- **D-1 · Cómo terminar la migración de datos (C-5).** ¿Los 9 workflows de GitHub pasan a
-  escribir en Cloud SQL (necesitan acceso: Cloud SQL Auth Proxy con una cuenta de servicio, o
-  IP autorizada) y se copia el histórico de Supabase? ¿O se mueven a Cloud Scheduler? ¿Y el
-  audio del brief (Supabase Storage) pasa a Cloud Storage?
+- ~~**D-1 · Cómo terminar la migración de datos (C-5).**~~ Decidido el 12-10: los workflows
+  escriben en Cloud SQL y se copia el histórico. Código listo; faltan los pasos en producción
+  («C-5», al final). Sigue abierto: el audio del brief (Supabase Storage → Cloud Storage).
 - **D-5 · Rol de base de datos (A-5).** ¿Creo la migración de un rol `scora_app` con permisos
   mínimos para que la app deje de conectar como `postgres`? Es un cambio de roles en la base.
 
 **Producción e infraestructura**
-- **D-6 · Cuota de FMP.** La clave de producción es la misma que usan las pruebas y el plan tiene
+- **D-10 · Cuota de FMP.** La clave de producción es la misma que usan las pruebas y el plan tiene
   límite diario (agotado el 12-10-2026). ¿Subir de plan, o una clave aparte para pruebas?
-- **D-2 · Configuración del servicio (A-1, A-2, A-3).** En Cloud Run faltan `ANTHROPIC_KEY`,
-  Stripe, Upstash, Resend, VAPID y Groq/Gemini. ¿Es a propósito (lanzamiento sin IA ni cobro)
-  o hay que subirlas? ¿Enciendo `RATELIMIT_FAIL_CLOSED=1`? ¿Quito del Terraform los secretos
-  de Supabase (destruye esos recursos al aplicar)?
+- **D-2 · Configuración del servicio (A-1, A-2, A-3).** Al 12-10 Cloud Run ya tiene
+  `ANTHROPIC_KEY`, Upstash y `RATELIMIT_FAIL_CLOSED`. Faltan Stripe (cobro), Resend (correos de
+  alertas), VAPID (push) y Groq/Gemini. ¿A propósito o hay que subirlas? ¿Quito del Terraform
+  los secretos de Supabase (destruye esos recursos al aplicar)?
 - **D-9 · Dominio.** ¿Cuál es el definitivo, para `metadataBase` y el sitemap (B-4)?
-- **Despliegue.** ¿Quieres que despliegue estos arreglos, o lo haces tú?
 
 **Producto y legal**
 - **D-3 · Revocación de sesión.** Hoy una sesión revocada vale hasta 1 h también en IA y
@@ -514,8 +512,7 @@ ficha (en modo degradado), watchlist y diario de punta a punta.
   muestre un error en pantalla? Son 27 cambios de interfaz.
 - **D-8 · Rutas de proveedor sin uso (B-1).** ¿Quito de la lista blanca las 16 que el front no
   pide? Algún script de research podría usarlas.
-- **Cuenta de prueba.** Para cerrar lo NO VERIFICADO de las pantallas con sesión necesito una
-  cuenta de Identity Platform de prueba, o que hagas tú ese recorrido.
+- ~~**Cuenta de prueba.**~~ Hecho el 12-10 con `e2e@scora.test` (recorrido con sesión).
 
 ---
 
