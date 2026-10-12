@@ -14,6 +14,12 @@ interface Props { macro: MacroState | null; loading: boolean; }
 // Opt-in toggle for the daily macro-alert emails sent by el cron alerts-check
 // cron (credit blowout, QT acceleration, credit divergence). Writes the user's email
 // into sl_alert_prefs; the cron reads that table and emails via Resend.
+//
+// Solo se enseña con NEXT_PUBLIC_EMAIL_ALERTS=1 (se fija al construir la imagen). Sin Resend el
+// cron no envía nada, y un interruptor que promete correos que nunca llegan es peor que no
+// tenerlo (MVP del 12-10-2026: todavía sin dominio ni Resend).
+const ALERTAS_POR_CORREO = process.env.NEXT_PUBLIC_EMAIL_ALERTS === "1";
+
 function AlertSubscription() {
   const { session } = useAuth();
   const [enabled, setEnabled] = useState<boolean | null>(null);
@@ -40,7 +46,7 @@ function AlertSubscription() {
     setSaving(false);
   }
 
-  if (!session || enabled == null) return null;
+  if (!ALERTAS_POR_CORREO || !session || enabled == null) return null;
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", marginTop: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
       <div style={{ flex: 1 }}>
