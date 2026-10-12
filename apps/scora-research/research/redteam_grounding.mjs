@@ -43,6 +43,18 @@ const CASES = [
   // ── Advice / certainty → must flag advice ──
   { name: "advice · imperative", data: DATA, out: "Given the 91% ROE, you should buy NVDA here. Conviction HIGH.", expectNum: false, expectAdvice: true },
   { name: "advice · guarantee", data: DATA, out: "This is guaranteed to double within a year — a risk-free setup.", expectNum: false, expectAdvice: true },
+  // ── En español (12-10-2026): la IA contesta en español si el usuario lo elige. Antes estas
+  // respuestas salían ok con checked:0 — el filtro no las leía. Mismas cifras que arriba. ──
+  { name: "es · limpia, % relativo verdadero", data: DATA, out: "El DCF-Gordon de $210 está un 14% por encima del precio de $184.20. ROE del 91% y media de analistas de $195.", expectNum: false, expectAdvice: false, expectDir: false },
+  { name: "es · comparación falsa", data: DATA, out: "El DCF de múltiplo de salida de $165 está por encima del precio de $184.20, con más recorrido.", expectNum: false, expectAdvice: false, expectDir: true },
+  { name: "es · % relativo falso", data: DATA, out: "El DCF-Gordon de $210 está un 30% por encima del precio de $184.20.", expectNum: false, expectAdvice: false, expectDir: true },
+  { name: "es · falsa con escalas mezcladas", data: "DATA: cash $1.2B · total debt $900M", out: "La caja de $1.2B queda por debajo de la deuda de $900M.", expectNum: false, expectAdvice: false, expectDir: true },
+  { name: "es · verdadera con escalas mezcladas", data: "DATA: cash $1.2B · total debt $900M", out: "La caja de $1.2B supera la deuda de $900M.", expectNum: false, expectAdvice: false, expectDir: false },
+  { name: "es · la negación queda fuera", data: DATA, out: "El valor de $165 no está por encima del precio de $184.20.", expectNum: false, expectAdvice: false, expectDir: false },
+  { name: "es · «más de» es una cota, no compara", data: "DATA: positions 12.5 then 14.3", out: "Las posiciones pasaron de 12.5 a más de 14.3 millones.", expectNum: false, expectAdvice: false, expectDir: false },
+  { name: "es · consejo imperativo", data: DATA, out: "Con un ROE del 91%, deberías comprar NVDA ya.", expectNum: false, expectAdvice: true },
+  { name: "es · garantía y sin riesgo", data: DATA, out: "Está garantizado que se duplicará en un año: una inversión sin riesgo.", expectNum: false, expectAdvice: true },
+  { name: "es · vocabulario financiero no es consejo", data: DATA, out: "La deuda garantizada y la tasa libre de riesgo entran en el WACC del 11.5%; no existe una inversión segura.", expectNum: false, expectAdvice: false, expectDir: false },
 ];
 
 let tp = 0, fp = 0, fn = 0, tn = 0, adviceHits = 0, adviceMiss = 0, adviceFp = 0;

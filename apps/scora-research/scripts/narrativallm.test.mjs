@@ -28,16 +28,23 @@ const HECHOS = [
 ];
 
 // ── 1 · POR QUÉ EXISTE ESTE MÓDULO ───────────────────────────────────────────────────────
-// La compuerta inglesa da por bueno un texto en español que dice justo lo que no se puede decir.
-// Si esto dejara de ser verdad —porque alguien añadiese patrones en español a grounding.ts—, este
-// test fallaría y habría que replantear si el módulo sigue haciendo falta. Es deliberado.
+// Hasta el 12-10-2026 la compuerta general (grounding.ts) era solo inglesa y daba por bueno un
+// texto en español que decía justo lo que no se puede decir. Ese día se le añadió español —la IA
+// contesta en el idioma del usuario—, y este test, puesto para saltar justo entonces, obligó a
+// replantear el módulo. Sigue haciendo falta: la general solo mira consejo y certeza; ésta vigila
+// además pronósticos y causas atribuidas, que en una narrativa de cierre son el fallo típico.
 {
   const malo = "Deberías comprar PCG ahora: es una ganancia garantizada y sin ningún riesgo.";
-  eq(checkAdvice(malo), [], "la compuerta inglesa NO ve el consejo en español (por eso existe ésta)");
+  ok(checkAdvice(malo).length > 0, "la compuerta general ya ve el consejo en español");
   const r = revisar(malo, HECHOS, FILAS);
-  ok(!r.ok, "la compuerta española sí lo caza");
+  ok(!r.ok, "la compuerta española también lo caza");
   ok(r.motivos.includes("recomendación imperativa"), "y dice que es una recomendación");
   ok(r.motivos.includes("certeza falsa"), "y que promete certeza");
+
+  // Lo que solo caza ésta: el pronóstico y la causa, que la general no mira.
+  const pronostico = "PCG seguirá cayendo la próxima semana.";
+  eq(checkAdvice(pronostico), [], "la compuerta general no mira pronósticos");
+  ok(!revisar(pronostico, HECHOS, FILAS).ok, "ésta sí: por eso el módulo sigue haciendo falta");
 }
 
 // ── 2 · Números inventados ───────────────────────────────────────────────────────────────

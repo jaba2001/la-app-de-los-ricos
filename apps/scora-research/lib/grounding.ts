@@ -106,8 +106,28 @@ const GT_WORDS = /\b(above|exceed(?:s|ed|ing)?|top(?:s|ped)?|beat(?:s)?|outpac(?
 // comparative — only the finite verb forms "trails"/"trailed" count.
 const LT_WORDS = /\b(below|beneath|trail(?:s|ed)|behind|lower than|less than|fewer than|smaller than|cheaper than|weaker than|slower than|narrower than|(?:a )?discount to|short of)\b/i;
 const NEGATION = /\b(not|no longer|isn'?t|aren'?t|wasn'?t|weren'?t|hardly|barely|never|without)\b/i;
+
+// ── Lo mismo en español (12-10-2026) ──
+// La IA contesta en español cuando el usuario lo elige (conIdioma, lib/proxy.ts) y el asistente
+// de pantalla en el idioma de la pregunta. Con las listas solo en inglés, una respuesta en
+// español no se comprobaba: ok:true con checked:0, y así quedaba en ai_audit_log. Mismo
+// criterio conservador que arriba, y por eso NO están «más de»/«menos de» (son cotas, «pasó de
+// 100 a más de 150», no comparaciones entre las dos cifras). `\b` no sirve con tildes («más»):
+// los límites de palabra van con \p{L} y la bandera u.
+// Probado contra las ~2.400 frases del diccionario (lib/i18n/es): «más que», «bate» y
+// «rentabilidad sin riesgo» daban falsas alarmas («aprieta mucho más que al 3 %», «1/N bate a
+// la optimización», «rentabilidad sin riesgo de impago») y están fuera.
+const palabraEs = (patron: string) => new RegExp(`(?<![\\p{L}\\p{N}])(?:${patron})(?![\\p{L}\\p{N}])`, "iu");
+const GT_ES = palabraEs("por encima de(?:l)?|supera(?:n|ba|ban)?|superó|superaron|superior(?:es)? a(?:l)?|mayor(?:es)? que"
+  + "|más (?:alt[oa]s?|grandes?|car[oa]s?|fuertes?|rápid[oa]s?|ampli[oa]s?) que|por delante de(?:l)?"
+  + "|con (?:una )?prima (?:sobre|respecto a)");
+const LT_ES = palabraEs("por debajo de(?:l)?|inferior(?:es)? a(?:l)?|menor(?:es)? que"
+  + "|más (?:baj[oa]s?|barat[oa]s?|débil(?:es)?|lent[oa]s?|estrech[oa]s?|pequeñ[oa]s?) que|(?:queda(?:n)? )?(?:por )?detrás de(?:l)?"
+  + "|con (?:un )?descuento (?:sobre|respecto a)");
+const NEGATION_ES = palabraEs("no|ni|nunca|jamás|apenas|sin");
+
 // A number glued to a duration/ordinal/filing word is a count, not a comparable quantity.
-const NON_QUANTITY_AFTER = /^\s?-?\s?(years?|yrs?|months?|weeks?|days?|quarters?|K\b|Q\b|x\b|×)/i;
+const NON_QUANTITY_AFTER = /^\s?-?\s?(years?|yrs?|months?|weeks?|days?|quarters?|años?|mes(?:es)?|semanas?|días?|trimestres?|K\b|Q\b|x\b|×)/i;
 
 export interface DirectionResult { ok: boolean; violations: string[]; checked: number; }
 
@@ -131,8 +151,8 @@ export function checkDirection(output: string): DirectionResult {
       const t1 = tokens[i], t2 = tokens[i + 1];
       const between = sentence.slice(t1.end, t2.idx);
       if (between.length > 80) continue;              // too far apart to be one claim
-      if (NEGATION.test(between)) continue;           // "not above" → out of scope
-      const gt = GT_WORDS.test(between), lt = LT_WORDS.test(between);
+      if (NEGATION.test(between) || NEGATION_ES.test(between)) continue; // "not above" → out of scope
+      const gt = GT_WORDS.test(between) || GT_ES.test(between), lt = LT_WORDS.test(between) || LT_ES.test(between);
       if (gt === lt) continue;                        // no comparator, or contradictory
       const dir = gt ? 1 : -1;
 
@@ -174,6 +194,15 @@ const ADVICE_PATTERNS: { re: RegExp; label: string }[] = [
   { re: /\bguaranteed?\b/i, label: "false certainty (guarantee)" },
   { re: /\bwill (definitely|certainly|surely) (rise|fall|double|triple|go)\b/i, label: "false certainty (prediction)" },
   { re: /\bcan'?t lose\b|\brisk-?free\b/i, label: "risk-free claim" },
+  // En español, con las mismas etiquetas. Más estrechas que las inglesas a propósito: «deuda
+  // garantizada», «garantías» (colateral) y «tasa libre de riesgo» son vocabulario normal al
+  // explicar un balance o un DCF, no promesas.
+  { re: palabraEs("(?:deberías|debes|tienes que|te conviene|le conviene|conviene|usted debería)\\s+(?:comprar|vender|invertir|apostar|ponerte en corto|ponerse en corto|deshacerte)"), label: "imperative recommendation" },
+  { re: palabraEs("(?:(?:te|le|les|os)\\s+)?(?:recomiendo|recomendamos|aconsejo|aconsejamos)\\s+(?:comprar|vender|invertir|ponerse en corto|que (?:compres|vendas|inviertas|compre|venda|invierta|compren|vendan))"), label: "explicit recommendation" },
+  { re: palabraEs("(?:está|es|son|están|queda)\\s+garantizad[oa]s?|(?:rentabilidad|beneficio|ganancia|retorno|subida)(?:es)?\\s+garantizad[oa]s?"), label: "false certainty (guarantee)" },
+  { re: palabraEs("(?:seguro que|sin duda|sin ninguna duda|con toda seguridad|definitivamente|con certeza)\\s+(?:subirá|bajará|caerá|se duplicará|se triplicará|irá|rebotará)"
+    + "|(?:subirá|bajará|caerá|se duplicará|se triplicará|rebotará)\\s+(?:seguro|sin duda|con toda seguridad|con certeza)"), label: "false certainty (prediction)" },
+  { re: palabraEs("no (?:puedes|puede|pueden|podéis) perder|imposible perder|sin ningún riesgo|sin riesgo alguno|(?:inversión|apuesta|operación|ganancia|jugada) sin riesgo(?! de)"), label: "risk-free claim" },
 ];
 
 /** Detect advice/certainty phrasing that violates the educational-only stance. */
