@@ -52,6 +52,10 @@ const Governance        = dynamic(() => import("@/components/stock/Governance"),
 const RevenueForecast   = dynamic(() => import("@/components/stock/RevenueForecast"),   { ssr: false });
 const ValuationLab      = dynamic(() => import("@/components/stock/ValuationLab"),      { ssr: false });
 
+/** Lo que no llegó a la ficha, ya aplicados los respaldos, y si es por la cuota diaria de FMP. */
+interface Huecos { que: string[]; cuotaFmp: boolean }
+const SIN_HUECOS: Huecos = { que: [], cuotaFmp: false };
+
 /** Pestañas que solo tienen sentido para la acción de una empresa (estados financieros). */
 const SOLO_ACCIONES = new Set(["governance", "fundamentals", "valuation", "report", "diligence", "research", "smartmoney"]);
 
@@ -147,7 +151,8 @@ export default function StockTickerPage() {
   const [loading, setLoading] = useState(false);
   const [fetchProgress, setFetchProgress] = useState(0);
   const [error, setError] = useState("");
-  const [failedApis, setFailedApis] = useState(0);
+  // Lo que falta en la ficha (en inglés: es la clave de traducción) y si la causa es la cuota de FMP.
+  const [faltan, setFaltan] = useState<Huecos>(SIN_HUECOS);
   // 2 siempre frescas (macro + quote) + 31 del lote. La ranura del ETF sectorial cuenta
   // aunque no se adivine, para que este numero no dependa de si es la primera visita.
   // Versión del formato de la foto diaria (stock_snapshot). La foto guarda los datos YA
@@ -192,7 +197,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
     setError("");
     setLoading(false);
     setFetchProgress(0);
-    setFailedApis(0);
+    setFaltan(SIN_HUECOS);
     datos.from("sl_watchlist").select("id").eq("user_id", session.user.id).eq("ticker", ticker).maybeSingle()
       .then(({ data, error }) => {
         // Sin esto, la estrella salía vacía también cuando la consulta fallaba: parecía que
@@ -309,7 +314,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
       if (snap?.data && (snap.data as { _v?: number })._v === VERSION_FOTO) {
         stockData = { ...(snap.data as StockData), quote: freshQuote, rdcf: null, finviz: (snap.data as StockData).finviz ?? null };
         setFetchProgress(TOTAL_SOURCES);
-        setFailedApis(0);
+        setFaltan(SIN_HUECOS);
       } else {
       // ── CACHE MISS: remaining 27 fetches ─────────────────────────
       const [
@@ -456,24 +461,15 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
       const analystConsensus = fhRecomm.length > 0 ? fhRecomm[0] : null;
       // ─────────────────────────────────────────────────────────────
 
-      // Count truly missing sources (after FMP + Finnhub fallback)
       if (!live()) return;
-      // Solo cuenta lo que se pidió: las fuentes fuera del plan ya no se piden (ver arriba). Y a
-      // un ETF no se le cuentan como «no disponibles» lo que un ETF no tiene (estados, ratios,
-      // objetivos de analistas, sorpresas de beneficios): SPY salía con «4 data sources
-      // unavailable» sin que faltara nada.
+      // Fuentes básicas que fallaron. Decide si la foto del día se guarda (más abajo), no lo que
+      // se enseña: eso sale de `huecos`, ya aplicados los respaldos. A un ETF no se le piden los
+      // datos que un ETF no tiene (estados, ratios, objetivos de analistas).
       const esEtf = profile?.isEtf === true || profile?.isFund === true;
       const coreFmpFailed = (esEtf
         ? [quoteRes, profileRes, historyRes]
         : [quoteRes, profileRes, historyRes, incomeRes, balanceRes, cashRes, peersRes, estimatesRes, insiderRes, dcfRes]
       ).filter(r => r.status === "rejected").length;
-      setFailedApis(esEtf ? coreFmpFailed :
-        coreFmpFailed
-        + (mergedMetrics.peRatioTTM != null || mergedMetrics.roeTTM != null ? 0 : 1)
-        + (mergedRatios.grossProfitMarginTTM != null || mergedRatios.revenueGrowthTTM != null ? 0 : 1)
-        + (mergedTargets.length  === 0 ? 1 : 0)
-        + (mergedEarnings.length === 0 ? 1 : 0)
-      );
 
       // ── Phase 2: Technical indicators from price history + Finnhub ─
       const histData: Record<string,unknown>[] = historyRes.status === "fulfilled"
@@ -560,6 +556,36 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
       const mergedCashFlow     = completarConEdgar(fmpCashFlow, respaldo?.cashFlow);
       const mergedAnnualIncome = fmpAnnual.length   > 0 ? fmpAnnual   : (edgar?.annualIncome  ?? simfin?.annualIncome  ?? []);
       // ─────────────────────────────────────────────────────────────
+
+      // ── Lo que falta DE VERDAD, ya aplicados los respaldos ────────
+      // Antes se sumaban los rechazos de FMP aunque Finnhub, Yahoo o EDGAR hubieran rellenado el
+      // dato: con FMP sin cuota, PEP salía con «8 data sources unavailable» y tres de esos datos
+      // estaban en pantalla (12-10-2026). Y se dice QUÉ falta: un número no le sirve al usuario.
+      // `peers`, estimaciones, insiders y DCF no tienen respaldo: un rechazo es un hueco. Los
+      // objetivos y los resultados vacíos SIN rechazo son un valor sin cobertura, no un fallo.
+      const caido = (r: PromiseSettledResult<unknown>) => r.status === "rejected";
+      const huecos: [boolean, string][] = [
+        [!quote,                "live price"],
+        [!profile,              "company profile"],
+        [histData.length === 0, "price history"],
+      ];
+      if (!esEtf) huecos.push(
+        [mergedIncome.length === 0, "financial statements"],
+        [mergedMetrics.peRatioTTM == null && mergedMetrics.roeTTM == null, "valuation ratios"],
+        [mergedRatios.grossProfitMarginTTM == null && mergedRatios.revenueGrowthTTM == null, "margins and growth"],
+        [caido(peersRes),     "peers"],
+        [caido(estimatesRes), "analyst estimates"],
+        [mergedTargets.length === 0 && caido(targetsRes), "price targets"],
+        [mergedEarnings.length === 0 && (caido(earningsRes) || caido(fhEarningsRes)), "earnings history"],
+        [caido(insiderRes),   "insider trades"],
+        [caido(dcfRes),       "DCF"],
+      );
+      // FMP sin cuota del día responde 429 «Limit Reach» (ver lib/server/providers/yahoo.js). Se
+      // dice en el aviso: es temporal, y sin eso parece que la ficha está rota.
+      const cuotaFmp = [profileRes, metricsRes, ratiosRes, incomeRes, balanceRes, cashRes, peersRes,
+        targetsRes, estimatesRes, earningsRes, dcfRes, annualIncomeRes, sharesFloatRes, growthRes]
+        .some((r) => r.status === "rejected" && /limit reach/i.test(String((r.reason as Error)?.message ?? r.reason)));
+      if (live()) setFaltan({ que: huecos.filter(([f]) => f).map(([, q]) => q), cuotaFmp });
 
       // ── Phase 8: Finviz + Finnhub fallback ───────────────────────
       // Finviz blocks Vercel's IPs, so its scrape usually returns {}. Fill the
@@ -1119,10 +1145,16 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
                 {error}
               </div>
             )}
-            {!error && failedApis > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", marginBottom: "var(--sr-sp-4)", border: "1px solid color-mix(in srgb, var(--sr-warn) 20%, transparent)" }}>
-                {failedApis === 1 ? tr("⚠ 1 data source unavailable — some fields may show “—”") : tr(`⚠ ${failedApis} data sources unavailable — some fields may show “—”`)}</div>
-            )}
+            {!error && faltan.que.length > 0 && (() => {
+              // Cada nombre se traduce suelto y la frase como plantilla: «{x}» pasa ya traducido.
+              const lista = faltan.que.map((q) => tr(q)).join(", ");
+              return (
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", marginBottom: "var(--sr-sp-4)", border: "1px solid color-mix(in srgb, var(--sr-warn) 20%, transparent)" }}>
+                  {faltan.cuotaFmp
+                    ? tr(`⚠ Our fundamentals provider reached its daily limit — not available right now: ${lista}. Those fields show “—” until it resets.`)
+                    : tr(`⚠ Not available right now: ${lista} — those fields show “—”.`)}</div>
+              );
+            })()}
             {/* Answer-first: the call, three reasons and the falsifier — above every tab,
                 so the first five seconds answer the question instead of presenting
                 thirteen tabs of raw material. Depth stays exactly where it was. */}

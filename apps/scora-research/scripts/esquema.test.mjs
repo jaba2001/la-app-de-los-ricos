@@ -47,6 +47,17 @@ check("cuando la base vuelve, se lee (no se queda pegado al fallo)", segundo, "o
 try { await mod.esquema(); } catch { /* sigue sin base: lo que importa es si lo intentó */ }
 check("el mismo módulo vuelve a preguntar a la base (no devuelve la promesa rechazada)", consultas, 2);
 
+// ── 1b. Qué se reintenta al conectar (arranque en frío en Cloud Run, 12-10-2026) ─────
+// Solo lo que falla ANTES de mandar la consulta: repetir algo que ya llegó duplicaría un INSERT.
+const con = (msg, code) => Object.assign(new Error(msg), code ? { code } : {});
+check("reintenta: timeout al abrir la conexión", mod.esFalloAlConectar(con("Connection terminated due to connection timeout")), true);
+check("reintenta: el pool no consigue conexión a tiempo", mod.esFalloAlConectar(con("timeout exceeded when trying to connect")), true);
+check("reintenta: puerto cerrado", mod.esFalloAlConectar(con("connect ECONNREFUSED 127.0.0.1:1", "ECONNREFUSED")), true);
+check("reintenta: el socket de Cloud SQL aún no existe", mod.esFalloAlConectar(con("connect ENOENT /cloudsql/x/.s.PGSQL.5432", "ENOENT")), true);
+check("NO reintenta: conexión cortada a mitad", mod.esFalloAlConectar(con("Connection terminated unexpectedly")), false);
+check("NO reintenta: ECONNRESET", mod.esFalloAlConectar(con("read ECONNRESET", "ECONNRESET")), false);
+check("NO reintenta: un error de SQL", mod.esFalloAlConectar(con("duplicate key value", "23505")), false);
+
 // ── 2. Caducidad: una columna nueva aparece sin reiniciar ────────────────────────────
 mod2._ttlEsquema(50);
 await admin.query("alter table sl_watchlist drop column if exists columna_nueva");

@@ -489,6 +489,38 @@ usar una clave aparte para las pruebas.
 prueba de alertas (`acciones.spec.ts`). El resto pasa: 21 páginas, 12 pestañas de Macro, 24 de la
 ficha (en modo degradado), watchlist y diario de punta a punta.
 
+### Segundo recorrido (12-10-2026, noche): «14 data sources unavailable»
+
+Jorge veía en muchas fichas «⚠ 14 data sources unavailable». 14 es el máximo del contador: TODAS
+las fuentes a la vez, también Finnhub y el respaldo de Yahoo. No era FMP (sin cuota salen 8).
+
+**🔴 Causa: la sesión no se puede renovar (D-11, pendiente de Jorge).** La clave web de Firebase
+`scora-web` (creada a mano el 25-09, fuera de Terraform) solo permite `identitytoolkit`, el login.
+El token de sesión dura una hora y el SDK lo renueva contra `securetoken`, que esa clave bloquea
+(`403 API_KEY_SERVICE_BLOCKED`, comprobado contra la clave que sirve producción). A la hora de
+entrar, `getIdToken()` lanza, cada `authedFetch` revienta ANTES de salir del navegador —por eso no
+hay rastro en los logs de Cloud Run— y la app sigue enseñando al usuario como conectado. En el
+recorrido se ve exacto: sesión creada a las 19:11, 403 en todas las páginas desde las 20:11.
+**Arreglo: añadir `securetoken.googleapis.com` a las APIs permitidas de `scora-web`.** No necesita
+desplegar. Sin él, ninguna prueba con sesión de más de una hora es fiable.
+
+**Arreglado en código:**
+
+| hallazgo | arreglo |
+|---|---|
+| El aviso de la ficha contaba los rechazos de FMP aunque Finnhub, Yahoo o EDGAR hubieran rellenado el dato (PEP: «8», tres de ellos en pantalla). Ahora dice QUÉ falta, ya aplicados los respaldos, y si la causa es la cuota diaria de FMP | `app/stock/[ticker]/page.tsx` |
+| `/daily/<fecha>` daba 500 (y `/daily` los precarga todos): era ISR y desde la traducción el layout lee la cookie de idioma. Ahora por petición, como `/daily` | `app/daily/[date]/page.tsx` |
+| Macro → Markets: 429 de NUESTRO limitador de FRED (10/min; la curva pide 7 series, Risk Model y Factor Exposure 5 cada uno). Sube a 40/min. Y un error de FRED salía con `max-age` de 6 h: el navegador lo guardaba | `app/api/fred/series/route.js` |
+| Producción, arranque en frío: «Connection terminated due to connection timeout» y `/picks` y `/daily` vacíos (12:55 y 13:16 UTC). Un reintento si falla al ABRIR la conexión (la consulta no llegó a mandarse; repetirla es seguro) | `lib/server/data/pool.ts` (+7 casos en `scripts/esquema.test.mjs`) |
+
+**Sin arreglar, y por qué:**
+- **Cuota de FMP (D-10).** Con FMP agotado no hay fuente gratuita para estimaciones de analistas,
+  objetivos de precio, DCF ni float. El perfil y los comparables sí la tendrían (Finnhub
+  `profile2`/`peers`), pero su sector no usa los nombres de FMP y el sector alimenta la
+  puntuación: una equivalencia adivinada daría notas mal sin aviso. No se hizo a ciegas.
+- **La pestaña Research de AAPL se colgó una vez** en el recorrido (la prueba agotó sus 15 min).
+  Aislada carga bien y deja la red en reposo; no se reprodujo.
+
 ## Preguntas pendientes (D-n)
 
 **Datos y migración**
@@ -499,6 +531,9 @@ ficha (en modo degradado), watchlist y diario de punta a punta.
   mínimos para que la app deje de conectar como `postgres`? Es un cambio de roles en la base.
 
 **Producción e infraestructura**
+- **D-11 · 🔴 Renovación de sesión bloqueada.** La clave web `scora-web` no permite
+  `securetoken.googleapis.com`: toda sesión se rompe a la hora («14 data sources unavailable»).
+  Hay que añadir esa API a la clave. Ver «Segundo recorrido».
 - **D-10 · Cuota de FMP.** La clave de producción es la misma que usan las pruebas y el plan tiene
   límite diario (agotado el 12-10-2026). ¿Subir de plan, o una clave aparte para pruebas?
 - **D-2 · Configuración del servicio (A-1, A-2, A-3).** Al 12-10 Cloud Run ya tiene

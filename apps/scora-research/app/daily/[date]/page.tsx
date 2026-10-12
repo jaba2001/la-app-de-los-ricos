@@ -11,15 +11,11 @@ import DailyReportView from "@/components/daily/DailyReportView";
 import { fetchDailyClose, fetchDailyDates, dailySummaryLine, formatDayLong, isIsoDay } from "@/lib/dailyClose";
 import { tServidor } from "@/lib/i18n/servidor";
 
-export const revalidate = 900;
-/** Un día que aún no está pregenerado se renderiza a demanda y se cachea. */
-export const dynamicParams = true;
-
-/** Pregenera los días ya publicados; el resto entra por `dynamicParams`. */
-export async function generateStaticParams(): Promise<{ date: string }[]> {
-  const dates = await fetchDailyDates(60);
-  return dates.map((date) => ({ date }));
-}
+// Por petición, como /daily. Antes era ISR (revalidate + generateStaticParams), pero desde que la
+// página y el layout leen la cookie de idioma (tServidor) Next ya no puede servirla pregenerada:
+// cada día respondía 500, y /daily los precarga todos al enlazarlos (recorrido, 12-10-2026).
+// Es una consulta pequeña por visita.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   { params }: { params: Promise<{ date: string }> }

@@ -14,8 +14,22 @@ export const ACCIONES: Record<string, string> = {
     "Carga fundamentales, valoración, momentum, actividad de directivos, contexto macro y más para este ticker.",
   "Analyzing…": "Analizando…",
   "Fetching {a} / {b} data sources…": "Cargando {a} / {b} fuentes de datos…",
-  "⚠ 1 data source unavailable — some fields may show “—”": "⚠ 1 fuente de datos no disponible: algunos campos pueden salir como «—»",
-  "⚠ {x} data sources unavailable — some fields may show “—”": "⚠ {x} fuentes de datos no disponibles: algunos campos pueden salir como «—»",
+  // El aviso de datos que faltan: la frase es plantilla y cada hueco se traduce suelto.
+  "⚠ Not available right now: {x} — those fields show “—”.": "⚠ Ahora mismo no disponible: {x}. Esos campos salen como «—».",
+  "⚠ Our fundamentals provider reached its daily limit — not available right now: {x}. Those fields show “—” until it resets.":
+    "⚠ Nuestro proveedor de fundamentales ha llegado a su límite diario. Ahora mismo no disponible: {x}. Esos campos salen como «—» hasta que se renueve.",
+  "live price": "precio en directo",
+  "company profile": "perfil de la empresa",
+  "price history": "histórico de precios",
+  "financial statements": "estados financieros",
+  "valuation ratios": "ratios de valoración",
+  "margins and growth": "márgenes y crecimiento",
+  "peers": "comparables",
+  "analyst estimates": "estimaciones de analistas",
+  "price targets": "precios objetivo",
+  "earnings history": "historial de resultados",
+  "insider trades": "operaciones de directivos",
+  "DCF": "DCF",
 
   // ── Buscador de acciones (app/stock) ──
   "Stock Analysis": "Análisis de acciones",

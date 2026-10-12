@@ -52,7 +52,36 @@ export function pool(): Pool {
   // Un error en una conexión ociosa del pool es un evento 'error' sin manejador, y eso en
   // Node tumba el proceso entero. Cloud Run lo reiniciaría, pero con peticiones en vuelo.
   _pool.on("error", (e) => console.error("pool de Postgres:", e.message));
+
+  // UN reintento si falla al ABRIR la conexión. En producción, las primeras consultas de una
+  // instancia recién arrancada en frío superaban a veces los 5 s de conexión («Connection
+  // terminated due to connection timeout», 12-10-2026 a las 12:55 y 13:16 UTC) y /picks y /daily
+  // salían vacíos. La consulta no llegó a mandarse, así que repetirla es seguro, también un
+  // INSERT. Se envuelve aquí y no en cada llamante porque el pool viaja como objeto a /api/data,
+  // /api/publico y los crons: este es el único sitio por el que pasan todos.
+  const consultaOriginal = _pool.query.bind(_pool) as (...a: unknown[]) => Promise<unknown>;
+  _pool.query = (async (...a: unknown[]) => {
+    try { return await consultaOriginal(...a); }
+    catch (e) {
+      if (!esFalloAlConectar(e)) throw e;
+      console.warn("pool de Postgres: reintento tras fallo al conectar:", (e as Error).message);
+      await new Promise((r) => setTimeout(r, 500));
+      return consultaOriginal(...a);
+    }
+  }) as Pool["query"];
   return _pool;
+}
+
+/**
+ * ¿Falló al abrir la conexión, antes de mandar la consulta? Solo entonces es seguro repetirla.
+ * ECONNRESET y "Connection terminated unexpectedly" quedan fuera a propósito: pueden llegar con
+ * la consulta ya enviada, y repetir un INSERT a ciegas lo duplicaría.
+ */
+export function esFalloAlConectar(e: unknown): boolean {
+  const m = String((e as Error)?.message ?? e);
+  const c = (e as { code?: string })?.code;
+  return /connection terminated due to connection timeout|timeout exceeded when trying to connect/i.test(m)
+    || c === "ECONNREFUSED" || c === "ENOENT";
 }
 
 // ── Las columnas reales, cacheadas ───────────────────────────────────────────────────

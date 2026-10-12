@@ -25,9 +25,18 @@ const OPTIONAL = {
 // Las series de FRED se publican como mucho a diario, así que 6 h es holgado y seguro.
 const CACHE_TTL = 21600;
 
+/**
+ * Llamadas a FRED por usuario y minuto. Era 10, y la propia app pide más: la curva de tipos de
+ * Macro → Markets lanza 7 series a la vez, y Risk Model (ficha) y Factor Exposure (Journal) otras
+ * 5 cada uno. Abrir Markets y una ficha en el mismo minuto daba 429 en la curva (recorrido con
+ * sesión, 12-10-2026). 40 cubre ese uso con margen; la caché compartida de 6 h absorbe las
+ * repetidas y deja el total muy por debajo del límite de FRED por clave.
+ */
+const LIMITE_FRED = { max: 40, window: 60 };
+
 export async function GET(request) {
   const { user, error: authErr } = await requireUser(request); if (authErr) return authErr;
-  const rl = await checkRateLimit('fred', user.id, 10, 60, request); if (rl) return rl;
+  const rl = await checkRateLimit('fred', user.id, LIMITE_FRED.max, LIMITE_FRED.window, request); if (rl) return rl;
   const json = (obj, status) => new Response(JSON.stringify(obj), {
     status, headers: corsHeaders(request, { 'Content-Type': 'application/json' }),
   });
@@ -85,7 +94,9 @@ export async function GET(request) {
     status: res.status,
     headers: corsHeaders(request, {
       'Content-Type': 'application/json',
-      'Cache-Control': `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}`,
+      // Lo mismo para el navegador: un error con max-age de 6 h se quedaba en su caché y la
+      // curva seguía rota después de que FRED volviera.
+      'Cache-Control': res.ok ? `public, max-age=${CACHE_TTL}, s-maxage=${CACHE_TTL}` : 'no-store',
       'X-Scora-Cache': res.ok ? 'MISS' : 'BYPASS',
     }),
   });
