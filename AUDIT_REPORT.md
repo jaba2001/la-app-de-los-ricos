@@ -433,20 +433,53 @@ Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (
 
 **NO VERIFICADO, y por qué:**
 
-- **Las pantallas con sesión, cargando datos reales en el navegador.** El servidor solo acepta
-  tokens firmados por Google para el proyecto, y no tengo una cuenta de Identity Platform con
-  la que iniciar sesión. Lo que hay detrás está probado a nivel de función y contra Postgres
-  real: `requireUser` (con y sin `strict`), aislamiento entre usuarios, el contrato cliente ↔
-  `/api/data` y `isPro`. Para cerrarlo hace falta una cuenta de prueba (última pregunta).
+- ~~**Las pantallas con sesión, cargando datos reales en el navegador.**~~ Cerrado el 12-10-2026
+  con el usuario de pruebas `e2e@scora.test`: ver «Recorrido con sesión» más abajo.
 - **Los datos de Cloud SQL en producción** (C-5): sin credenciales de lectura.
 - **`terraform validate`** (A-1): terraform no está instalado.
 - **Que FMP sirva tickers internacionales** con el plan contratado (M-4): sin su clave.
 - **Producción no corre este código.** Va por detrás incluso del `main` anterior
   (`/api/publico` → 404). Nada de lo arreglado está desplegado; no he desplegado nada.
-- **Observación sin causa confirmada:** en Chromium local, `/daily` y `/picks` no llegan a
-  «red en reposo» aunque el documento se cierra en 1 ms por `curl` y la página se pinta
-  completa y sin errores. Sospecha: `upgrade-insecure-requests` en la CSP sobre `http://`
-  local. En producción (https) no debería aplicar; no lo he podido comprobar allí.
+- ~~**Observación sin causa confirmada:** `/daily` y `/picks` no llegaban a «red en reposo».~~
+  Causa encontrada el 12-10-2026: el service worker de next-pwa (`cacheOnFrontEndNav`) volvía a
+  pedir las páginas en segundo plano. Quitado en `0a0cfae`.
+
+## Recorrido con sesión (12-10-2026)
+
+Playwright con el usuario de pruebas, contra el build de producción y una copia local de los
+datos de Supabase: cada página, su botón de carga y **cada pestaña** (`e2e/sesion/`). Mira
+errores de consola, respuestas 4xx/5xx —también dentro de `/api/batch`—, textos rotos y texto
+en español (la interfaz va en inglés por decisión de Jorge). Cada arreglo, en su commit.
+
+**Lo que encontró, además de traducciones:**
+
+| hallazgo | arreglo |
+|---|---|
+| FMP: rutas renombradas en `/stable`, límite de 5 trimestres, ETFs con 402, errores cacheados 24 h | `4c8a37a`, `0335c3b` |
+| EDGAR: ingresos de 2018 (concepto viejo), un trimestre por año, CapEx con el signo al revés | `5cdd4e0` |
+| EDGAR: KO sin estados — la SEC devolvía `"units":{"USD":{}}` y tumbaba la ficha; ahora `companyfacts`, una petición en vez de 18 | `e98d068` |
+| Cobertura de intereses 0 cuando faltaba el dato; coste de deuda inventado | `32703ae` |
+| El «DXY» era el índice amplio de la Fed; `real_yield_10y` no existía | `72f5976` (+ `sql/gcp/007`) |
+| Finviz cambió de URL y de HTML: Sentiment vacía | `a065922` |
+| ETFs puntuados como empresas (también desde el Screener, y en «Top at risk») | `c41410f`, `b4ff9d0` |
+| **Producción no tenía ningún cron programado** | `806cc38` (`infra/scheduler.sh`, aplicado) |
+| `/daily` y `/picks` pre-renderizados sin base de datos; la PWA cacheaba la API | `2dd7bce`, `0a0cfae` |
+| `/discovery`: 235 filas para un ranking de 150 (semanas viejas) y el cross-asset parado desde el 09-07 | `c2b2097` |
+| Smart Money: sector siempre vacío; el cron daba 200 aunque no guardara | `fc1b8ac` |
+| Paper fund: «A» con Sharpe 4,48 sobre dos meses | `4daac05` |
+| La foto diaria de la ficha servía datos procesados con código viejo hasta el día siguiente | `1d501f0` |
+| Un parpadeo de red dejaba huecos (502 «fetch failed») | `2fe7235` |
+| **FMP sin cuota del día**: precio y gráfico desde Yahoo, capitalización de otras fuentes, sin guardar fotos a medias | `eed91e5`, `734199b`, `1da89d7` |
+
+**⚠️ La clave de FMP es UNA para producción y pruebas, y el plan tiene límite diario.** El
+12-10-2026 se agotó a media tarde con las pruebas («Limit Reach», 429): mientras dura, las fichas
+de producción salen con precio de Yahoo y estados de EDGAR, pero sin perfil, ratios ni
+estimaciones. Cada análisis nuevo gasta ~21 llamadas. Decisión pendiente (D-6): subir de plan o
+usar una clave aparte para las pruebas.
+
+**Pendiente de repetir con cuota de FMP:** las fichas `/stock/AAPL` y `/stock/SPY` completas y la
+prueba de alertas (`acciones.spec.ts`). El resto pasa: 21 páginas, 12 pestañas de Macro, 24 de la
+ficha (en modo degradado), watchlist y diario de punta a punta.
 
 ## Preguntas pendientes (D-n)
 
@@ -459,6 +492,8 @@ Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (
   mínimos para que la app deje de conectar como `postgres`? Es un cambio de roles en la base.
 
 **Producción e infraestructura**
+- **D-6 · Cuota de FMP.** La clave de producción es la misma que usan las pruebas y el plan tiene
+  límite diario (agotado el 12-10-2026). ¿Subir de plan, o una clave aparte para pruebas?
 - **D-2 · Configuración del servicio (A-1, A-2, A-3).** En Cloud Run faltan `ANTHROPIC_KEY`,
   Stripe, Upstash, Resend, VAPID y Groq/Gemini. ¿Es a propósito (lanzamiento sin IA ni cobro)
   o hay que subirlas? ¿Enciendo `RATELIMIT_FAIL_CLOSED=1`? ¿Quito del Terraform los secretos
