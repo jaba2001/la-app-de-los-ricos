@@ -438,8 +438,10 @@ Pruebas nuevas: `lecturas_servidor` (18), `datacontrato` (12), `anthropicbody` (
 - **Los datos de Cloud SQL en producción** (C-5): sin credenciales de lectura.
 - **`terraform validate`** (A-1): terraform no está instalado.
 - **Que FMP sirva tickers internacionales** con el plan contratado (M-4): sin su clave.
-- **Producción no corre este código.** Va por detrás incluso del `main` anterior
-  (`/api/publico` → 404). Nada de lo arreglado está desplegado; no he desplegado nada.
+- ~~**Producción no corre este código.**~~ Desplegado el 12-10-2026: revisión `scora-00006-qbq`,
+  imagen `1b60d57` (la anterior, `scora-00005-9hn` / `eb24ccb`, queda para volver atrás). Comprobado
+  después: 15 rutas en 200, `/no-existe` 404, `/api/batch` y los crons 401 sin credenciales, las 6
+  pruebas de visitante en Chromium contra producción, y el log sin errores.
 - ~~**Observación sin causa confirmada:** `/daily` y `/picks` no llegaban a «red en reposo».~~
   Causa encontrada el 12-10-2026: el service worker de next-pwa (`cacheOnFrontEndNav`) volvía a
   pedir las páginas en segundo plano. Quitado en `0a0cfae`.
