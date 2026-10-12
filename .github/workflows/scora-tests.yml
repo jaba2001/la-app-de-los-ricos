@@ -285,13 +285,6 @@ jobs:
 
       - name: La capa de tipos
         run: node --experimental-strip-types --no-warnings scripts/tipos.test.mjs
-      # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
-      # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una
-      # corrida abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números
-      # publicados siguieron siendo los del día anterior sin que nada lo dijera.
-      - name: Frescura de los artefactos publicados
-        run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
-
       # ── INTEGRACION Y CONTRATO ────────────────────────────────────────────────────────
       # Las 51 suites de abajo prueban funciones puras importandolas. Ninguna arranca la
       # app, asi que un fallo de cableado —una ruta mal exportada, un runtime equivocado,
@@ -453,3 +446,26 @@ jobs:
       # A build that needs secrets to compile would be the actual bug.
       - name: Build
         run: npx next build
+
+  # ¿Siguen valiendo los números publicados? Un artefacto de backtest que ya no sale de las
+  # entradas que hay ahora es peor que no tenerlo: se sigue citando. El 2026-08-29 una corrida
+  # abortó por memoria DESPUÉS del trabajo caro, no escribió, y los números publicados siguieron
+  # siendo los del día anterior sin que nada lo dijera.
+  #
+  # JOB APARTE desde el 12-10-2026. Era un paso en medio de `tests`: cuando cambia el índice el
+  # artefacto caduca (es un aviso de DATOS, se arregla rehaciendo un backtest de horas), y ese
+  # paso en rojo cortaba el job — la integración, el contrato y el build llevaban desde el
+  # 27-09 sin ejecutarse en CI. Aparte sigue poniendo el workflow en rojo, pero no esconde nada.
+  frescura:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/scora-research/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Frescura de los artefactos publicados
+        run: node --experimental-strip-types --no-warnings research/frescura_artefactos.mjs
