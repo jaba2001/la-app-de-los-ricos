@@ -272,7 +272,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                 <tr key={row.rank} style={{ background: row.ticker === ticker ? "color-mix(in srgb, var(--sr-amber) 8%, transparent)" : undefined }}>
                   <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{row.rank}</td>
                   <td><span onClick={() => router.push(`/stock/${row.ticker}`)} style={{ fontWeight: 700, color: row.ticker === ticker ? "var(--sr-amber)" : "var(--sr-text)", cursor: "pointer" }}>{row.ticker}</span></td>
-                  <td style={{ color: "var(--sr-text-2)" }}>{row.sector}</td>
+                  <td style={{ color: "var(--sr-text-2)" }}>{row.sector ?? "—"}</td>
                   <td style={{ textAlign: "right", color: "var(--sr-pos)", fontWeight: 600 }} className="num">${(row.net_insider_buying_usd / 1e6).toFixed(1)}M</td>
                   <td style={{ textAlign: "right" }} className="num">{row.num_insiders}</td>
                   <td style={{ color: "var(--sr-text-3)" }}>{row.month?.slice(0, 7)}</td>

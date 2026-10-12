@@ -5,6 +5,7 @@
 // already configured in this project's Vercel env for the /api/fmp proxy.
 import { assertCron } from '../../../../lib/server/cron.js';
 import { sbFetch } from "../../../../lib/server/data/postgrest.js";
+import { sectoresDeFmp } from "../../../../lib/server/sectores.js";
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -65,12 +66,15 @@ export async function GET(request) {
     .sort((a, b) => b.usd - a.usd)
     .slice(0, 50);
 
+  // El sector salía siempre null y la columna de la ficha quedaba vacía (lib/server/sectores.js).
+  const { sectores, fallos: fallosSector } = await sectoresDeFmp(ranked.map((r) => r.ticker), { key: process.env.FMP_KEY });
+
   const month = new Date().toISOString().slice(0, 7) + '-01';
   const rows = ranked.map((r, i) => ({
     month,
     rank: i + 1,
     ticker: r.ticker,
-    sector: null,
+    sector: sectores.get(r.ticker) ?? null,
     net_insider_buying_usd: r.usd,
     num_insiders: r.num_insiders,
     score: Math.min(100, Math.log10(r.usd) * 20),
@@ -88,15 +92,19 @@ export async function GET(request) {
   );
   const sbBody = sbResp.ok ? undefined : await sbResp.text();
 
+  // Si no se pudo guardar, el cron FALLÓ: con 200, Cloud Scheduler lo daba por bueno y no
+  // reintentaba, y el fallo solo quedaba dentro del cuerpo de la respuesta.
   return new Response(
     JSON.stringify({
       source: 'fmp',
       pagesFetched,
       scraped: rows.length,
+      sectors: sectores.size,
+      sector_errors: fallosSector.length ? fallosSector.slice(0, 10) : undefined,
       db_status: sbResp.status,
       db_error: sbBody,
       fmp_error: fmpError,
     }),
-    { headers: { 'Content-Type': 'application/json' } }
+    { status: sbResp.ok ? 200 : 502, headers: { 'Content-Type': 'application/json' } }
   );
 }
