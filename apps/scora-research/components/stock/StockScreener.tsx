@@ -15,6 +15,7 @@ import DataError, { NO_SE_PUDO_CARGAR, NO_SE_PUDO_GUARDAR } from "@/components/u
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { latestAnalyses } from "@/lib/latestAnalyses";
+import { classifyInstrument } from "@/lib/instrument";
 
 // Data Explorer — optional metric columns the user can toggle on/off over the watchlist
 // (TIKR-style). Every metric is already computed & stored in sl_analyses; no new fetch.
@@ -57,6 +58,13 @@ export default function StockScreener() {
   async function quickAnalyze(ticker: string) {
     if (!session) return;
     track("screener_run", { ticker, columns: extraCols.size, watchlist_size: watchlist.length });
+    // El score de acciones no se aplica a un ETF, metal, bono o cripto, y guardarlo lo metía en
+    // sl_analyses como una empresa (SPY salía en «Top at risk» con un AVOID). Los conocidos se
+    // descartan antes de gastar llamadas; los demás, cuando el perfil dice que son un fondo.
+    const noEsAccion = (instr: { isEquity: boolean; label: string }) =>
+      setAviso(`${ticker}: ${instr.label} — the stock score doesn't apply. Open its page for the instrument view.`);
+    const previo = classifyInstrument(ticker, null);
+    if (!previo.isEquity) { noEsAccion(previo); return; }
     setAnalyzingTickers(prev => new Set([...prev, ticker]));
     try {
       const [quoteRes, profileRes, metricsRes, ratiosRes, growthRes, fhMetricRes] = await Promise.allSettled([
@@ -74,6 +82,8 @@ export default function StockScreener() {
       const fmpRatios     = ratiosRes.status  === "fulfilled" ? (ratiosRes.value  as Record<string,unknown>[])?.[0] ?? null : null;
       const fmpGrowth     = growthRes.status  === "fulfilled" ? (growthRes.value  as Record<string,unknown>[])?.[0] ?? null : null;
       const fhM = fhMetricRes.status === "fulfilled" ? (fhMetricRes.value as { metric?: Record<string, number> })?.metric ?? null : null;
+      const instr = classifyInstrument(ticker, profile as { isEtf?: boolean; sector?: string; industry?: string } | null);
+      if (!instr.isEquity) { noEsAccion(instr); return; }
 
       // Canonical field mapping (FMP-stable + Finnhub) — same layer as the full page.
       const { metrics, ratios } = normalizeFundamentals({ fmpKeyMetrics, fmpRatios, fmpGrowth, finnhubMetric: fhM, profile });
@@ -138,8 +148,9 @@ export default function StockScreener() {
     } catch (e) {
       // Antes: `catch {}` con "fail silently". La fila se quedaba sin nota y nadie sabía por qué.
       setAviso(`${ticker}: couldn't be scored (${e instanceof Error ? e.message : "data unavailable"}).`);
+    } finally {
+      setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
     }
-    setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
   }
 
   async function addTicker(e: React.FormEvent) {

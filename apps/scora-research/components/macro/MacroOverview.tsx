@@ -9,6 +9,7 @@ import { getRating, computeICHealthScore } from "@/lib/scoring";
 import { useAuth } from "@/lib/auth";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
+import { classifyInstrument } from "@/lib/instrument";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -121,7 +122,10 @@ export default function MacroOverview({ macro, loading }: Props) {
           if (error) { setErrorCarga(NO_SE_PUDO_CARGAR); return; }
           if (!data) return;
           const seen = new Set<string>();
-          const unique = (data as StockAnalysis[]).filter(r => { if (seen.has(r.ticker)) return false; seen.add(r.ticker); return true; });
+          // Solo acciones: antes de que la ficha dejara de puntuar ETFs como empresas (c41410f)
+          // se guardaron análisis de SPY y compañía, y salían aquí con sector «Financial
+          // Services» y un AVOID que no significa nada para un índice.
+          const unique = (data as StockAnalysis[]).filter(r => { if (seen.has(r.ticker) || !classifyInstrument(r.ticker, null).isEquity) return false; seen.add(r.ticker); return true; });
           unique.sort((a, b) => Number(a.macro_tilt ?? 0) - Number(b.macro_tilt ?? 0));
           setTopAtRisk(unique.slice(0, 8));
         });
