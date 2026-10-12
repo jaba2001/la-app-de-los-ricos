@@ -18,6 +18,7 @@ import StockThesis from "@/components/stock/StockThesis";
 import EarningsTone from "@/components/stock/EarningsTone";
 import InstrumentPanel from "@/components/stock/InstrumentPanel";
 import BondCockpit from "@/components/stock/BondCockpit";
+import { etiquetaRegimen } from "@/lib/regimen";
 
 interface Props {
   data: StockData | null;
@@ -205,9 +206,9 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)",
           flexWrap: "wrap",
         }}>
-          <span>Último análisis guardado:</span>
+          <span>Last saved analysis:</span>
           <span style={{ color: "var(--sr-text-2)", fontWeight: 600 }}>
-            {new Date(savedAnalysis.analysis_date).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric" })}
+            {new Date(savedAnalysis.analysis_date).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}
           </span>
           <span style={{ color: savedAnalysis.rating === "STRONG BUY" ? "var(--sr-pos)" : savedAnalysis.rating?.includes("BUY") ? "#34D399" : savedAnalysis.rating?.includes("SELL") ? "var(--sr-neg)" : "var(--sr-warn)", fontWeight: 700 }}>
             {savedAnalysis.rating ?? "—"}
@@ -243,7 +244,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-2)" }}>
                 <div className="section-label" style={{ margin: 0 }}>Macro Context</div>
                 {loading ? <Sk w={80} h={18} /> : macro?.regime_label && (
-                  <Pill label={macro.regime_label} color={
+                  <Pill label={etiquetaRegimen(macro) ?? macro.regime_label} color={
                     macro.regime_id === "expansion" ? "var(--sr-pos)" :
                     macro.regime_id === "contraction" || macro.regime_id === "stagflation" ? "var(--sr-neg)" : "var(--sr-warn)"
                   } />

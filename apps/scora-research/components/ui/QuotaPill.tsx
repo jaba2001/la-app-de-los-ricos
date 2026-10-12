@@ -31,8 +31,8 @@ export default function QuotaPill() {
       disabled={!puedeSubir}
       title={
         agotado
-          ? `Sin análisis de IA hasta las 00:00 UTC${puedeSubir ? " — Pro amplía el límite" : ""}`
-          : `${remaining} de ${limit} análisis de IA restantes hoy (se reinicia a las 00:00 UTC)`
+          ? `No AI analyses left until 00:00 UTC${puedeSubir ? " — Pro raises the limit" : ""}`
+          : `${remaining} of ${limit} AI analyses left today (resets at 00:00 UTC)`
       }
       style={{
         flexShrink: 0,

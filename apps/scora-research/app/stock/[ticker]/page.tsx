@@ -985,7 +985,7 @@ export default function StockTickerPage() {
           )}
           <button
             onClick={toggleWatchlist}
-            title={watchlisted ? "Quitar de watchlist" : "Agregar a watchlist"}
+            title={watchlisted ? "Remove from watchlist" : "Add to watchlist"}
             style={{
               background: watchlisted ? "color-mix(in srgb, var(--sr-amber) 15%, transparent)" : "var(--sr-surface-2)",
               border: `1px solid ${watchlisted ? "color-mix(in srgb, var(--sr-amber) 40%, transparent)" : "var(--sr-border)"}`,

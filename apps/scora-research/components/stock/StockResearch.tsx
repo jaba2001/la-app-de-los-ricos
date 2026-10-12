@@ -9,6 +9,7 @@ import { Pill } from "@/components/ui/Pill";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { getRating, calcFactorTilts, SECTOR_PE_BM, SECTOR_EV_BM } from "@/lib/scoring";
 import { latestAnalyses } from "@/lib/latestAnalyses";
+import { etiquetaRegimen } from "@/lib/regimen";
 
 interface Props {
   data: StockData | null;
@@ -132,7 +133,7 @@ KEY METRICS:
 - Interest Coverage: ${ratios?.interestCoverageTTM ?? "—"}x
 
 MACRO CONTEXT:
-- Regime: ${macro.regime_label ?? "—"} | IC Score: ${macro.ic_score ?? "—"}
+- Regime: ${etiquetaRegimen(macro) ?? "—"} | IC Score: ${macro.ic_score ?? "—"}
 - Recession Probability: ${macro.recession_prob ?? "—"}% | Credit Stress: ${macro.credit_stress ?? "—"}
 - 10Y Treasury: ${macro.dgs10 ?? "—"}%
 

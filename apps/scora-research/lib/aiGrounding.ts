@@ -11,6 +11,7 @@ import type { MacroState } from "./types";
 import { secularRegime } from "./secular";
 import { stockPickingRegime } from "./microScore";
 import { blendWeights, ASSET_META, ALLOC_ASSETS } from "./allocation";
+import { etiquetaRegimen } from "./regimen";
 
 const n = (v: number | null | undefined, unit = "", d = 1) =>
   v == null || (typeof v === "number" && isNaN(v)) ? "not available" : `${(v as number).toFixed(d)}${unit}`;
@@ -58,7 +59,7 @@ LAYER 2 — TACTICAL RISK-ON (liquidity-led, stationary; validated OOS Sharpe 1.
 
 CROSS-ASSET CONTEXT:
 - HY credit OAS: ${n(macro.hy_oas, " bps", 0)} · 10y-3m curve: ${n(macro.t10y3m, "%", 2)} · VIX: ${n(macro.vix, "", 0)} · Broad USD index (Fed, trade-weighted): ${n(macro.dxy, "", 0)}
-- Production regime label: ${macro.regime_label ?? "not available"}
+- Production regime label: ${etiquetaRegimen(macro) ?? "not available"}
 
 LAYER 4 — STOCK-PICKING REGIME (validated: momentum selection pays when correlation is low):
 - Implied correlation (^COR3M): ${n(macro.implied_corr, "", 1)} → ${pick.label} (${pick.detail})`;

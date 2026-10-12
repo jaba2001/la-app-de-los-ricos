@@ -84,7 +84,7 @@ export const GROWTH_BACKTEST = {
   // qué depende es lo que un evaluador encontraría por su cuenta.
   robustezDrawdown: { ratioRegistroCompleto: 0.32, ratioDesde2009: 0.68,
     allocatorMin: -15.8, allocatorMax: -16.2, ventanasProbadas: 8,
-    nota: "El drawdown del allocator es estable en 8 ventanas; el del indice no. El ratio de un tercio depende de incluir 2008." },
+    nota: "The allocator's drawdown is stable across 8 windows; the index's is not. The one-third ratio depends on including 2008." },
 
   // ⚠️ **Y EL SHARPE NO SOBREVIVE A LA DEFLACION POR ENSAYOS.** Con un solo intento seria
   // significativo (DSR 99,9 %); con los 344 ensayos gastados sobre estos mismos datos el umbral
@@ -94,10 +94,10 @@ export const GROWTH_BACKTEST = {
 
   // Rotacion y capacidad, que un fondo real reporta y aqui no se habian medido nunca.
   operativa: { rotacionAnualPct: 174, mesesQuieto: 150, capacidadMillones: 530,
-    nota: "Capacidad al 10 % del volumen diario, limitada por IEF. BIL se excluye porque a escala se tienen letras y no el ETF. Solo aplica si hay un vehiculo de inversion: Scora es software." },
+    nota: "Capacity at 10% of daily volume, limited by IEF. BIL is excluded because at scale you hold bills, not the ETF. Only applies if there is an investment vehicle: Scora is software." },
 
   significacion: { tVsSpy: 1.47, tVsBench6040: 0.97, significativo: false,
-    nota: "La ventaja de Sharpe no alcanza significación con 236 meses. El drawdown y las capturas son hechos observados, no estimaciones." },
+    nota: "The Sharpe advantage isn't significant over 236 months. Drawdown and capture ratios are observed facts, not estimates." },
 
   subPeriods: [
     { label: "2007–2019", strat: "+204% · Sharpe 0.87 · −16% DD", spy: "+196% · 0.56 · −51%" },

@@ -159,7 +159,7 @@ export default function MacroPage() {
               </div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", maxWidth: 440, lineHeight: 1.7 }}>
                 Composite scores, FRED indicators, market data and AI synthesis.
-                Click below to fetch the latest snapshot from Supabase.
+                Click below to fetch the latest snapshot.
               </div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-1)", alignItems: "center" }}>
@@ -180,7 +180,7 @@ export default function MacroPage() {
             </button>
             {loading && (
               <div className="sr-hint">
-                Fetching macro_state from Supabase…
+                Fetching the latest macro snapshot…
               </div>
             )}
           </div>
@@ -264,7 +264,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
         </span>
         {macro.updated_at && (
           <span className="sr-hint">
-            Cron: {new Date(macro.updated_at as string).toLocaleString("es-MX")}
+            Cron: {new Date(macro.updated_at as string).toLocaleString("en-US")}
           </span>
         )}
       </div>

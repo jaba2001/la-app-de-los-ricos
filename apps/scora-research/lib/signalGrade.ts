@@ -76,39 +76,39 @@ export function gradeSignal(ev: SignalEvidence): GradedSignal {
   // ── 1. IC medida (0-40) ────────────────────────────────────────────────────
   const ic = ev.ic;
   if (ic == null || !isFinite(ic)) {
-    reasons.push("Sin IC medida: no sabemos si predice algo.");
+    reasons.push("No measured IC: we don't know whether it predicts anything.");
   } else {
     const a = Math.abs(ic);
-    if (a >= IC_STRONG) { points += 40; reasons.push(`IC ${ic.toFixed(3)}: más del doble del efecto mínimo detectable (${MDE_IC}).`); }
-    else if (a >= IC_USEFUL) { points += 26; reasons.push(`IC ${ic.toFixed(3)}: por encima del efecto mínimo detectable (${MDE_IC}).`); }
-    else { reasons.push(`IC ${ic.toFixed(3)}: POR DEBAJO del efecto mínimo detectable (${MDE_IC}). No es una señal débil — con esta muestra es indetectable, y un IC así solo se "confirma" por azar.`); }
-    if (ic < 0) reasons.push("Ojo: el signo es NEGATIVO — predice al revés de como se usa.");
+    if (a >= IC_STRONG) { points += 40; reasons.push(`IC ${ic.toFixed(3)}: more than twice the minimum detectable effect (${MDE_IC}).`); }
+    else if (a >= IC_USEFUL) { points += 26; reasons.push(`IC ${ic.toFixed(3)}: above the minimum detectable effect (${MDE_IC}).`); }
+    else { reasons.push(`IC ${ic.toFixed(3)}: BELOW the minimum detectable effect (${MDE_IC}). It is not a weak signal — with this sample it is undetectable, and an IC like this only gets "confirmed" by chance.`); }
+    if (ic < 0) reasons.push("Careful: the sign is NEGATIVE — it predicts the opposite of how it is used.");
   }
 
   // ── 2. Fuera de muestra (0-30) — el eje que más pesa por unidad ────────────
   switch (ev.oos) {
     case "passed":
-      points += 30; reasons.push("Superó un gate fuera de muestra.");
+      points += 30; reasons.push("Passed an out-of-sample gate.");
       break;
     case "failed":
-      reasons.push("Se midió fuera de muestra y NO lo superó: dentro de muestra no cuenta.");
+      reasons.push("Measured out of sample and did NOT pass: in-sample doesn't count.");
       break;
     default:
-      points += 6; reasons.push("Nunca se sometió a un gate fuera de muestra.");
+      points += 6; reasons.push("Never put through an out-of-sample gate.");
   }
 
   // ── 3. Tamaño muestral (0-15) ──────────────────────────────────────────────
   const n = ev.sampleSize;
-  if (n == null) reasons.push("Tamaño muestral desconocido.");
-  else if (n >= 5000) { points += 15; reasons.push(`${n.toLocaleString("es")} observaciones.`); }
-  else if (n >= 1000) { points += 11; reasons.push(`${n.toLocaleString("es")} observaciones.`); }
-  else if (n >= 200) { points += 6; reasons.push(`${n.toLocaleString("es")} observaciones: justo.`); }
-  else { points += 2; reasons.push(`Solo ${n.toLocaleString("es")} observaciones.`); }
+  if (n == null) reasons.push("Unknown sample size.");
+  else if (n >= 5000) { points += 15; reasons.push(`${n.toLocaleString("en-US")} observations.`); }
+  else if (n >= 1000) { points += 11; reasons.push(`${n.toLocaleString("en-US")} observations.`); }
+  else if (n >= 200) { points += 6; reasons.push(`${n.toLocaleString("en-US")} observations: borderline.`); }
+  else { points += 2; reasons.push(`Only ${n.toLocaleString("en-US")} observations.`); }
 
   // ── 4. Integridad point-in-time (0-15) ─────────────────────────────────────
-  if (ev.pointInTime === true) { points += 15; reasons.push("Universo point-in-time: sin sesgo de supervivencia."); }
-  else if (ev.pointInTime === false) { reasons.push("Universo con sesgo de supervivencia: el resultado está inflado por construcción."); }
-  else reasons.push("Integridad del universo sin verificar.");
+  if (ev.pointInTime === true) { points += 15; reasons.push("Point-in-time universe: no survivorship bias."); }
+  else if (ev.pointInTime === false) { reasons.push("Universe with survivorship bias: the result is inflated by construction."); }
+  else reasons.push("Universe integrity not verified.");
 
   // ── Penalización por multiplicidad ─────────────────────────────────────────
   // Cuantas más variantes se probaron sobre los mismos datos, más probable es que la
@@ -118,7 +118,7 @@ export function gradeSignal(ev: SignalEvidence): GradedSignal {
     const penalty = Math.min(15, Math.round(Math.log10(Math.max(1, trials)) * 7));
     if (penalty > 0) {
       points -= penalty;
-      reasons.push(`−${penalty} por multiplicidad: ${trials} ensayos sobre los mismos datos elevan el listón.`);
+      reasons.push(`−${penalty} for multiplicity: ${trials} trials on the same data raise the bar.`);
     }
   }
 
@@ -126,10 +126,10 @@ export function gradeSignal(ev: SignalEvidence): GradedSignal {
   const grade: Grade = points >= 78 ? "A" : points >= 55 ? "B" : points >= 32 ? "C" : "D";
 
   const caveat =
-    grade === "A" ? "Medida, validada fuera de muestra y sobre universo limpio. Aun así: evidencia pasada, no promesa."
-    : grade === "B" ? "Evidencia razonable con alguna pata floja. Úsala como contexto, no como disparador."
-    : grade === "C" ? "Evidencia débil. Informativa a lo sumo; no debería mover una decisión por sí sola."
-    : "Sin evidencia suficiente. Está aquí por transparencia, no porque funcione.";
+    grade === "A" ? "Measured, validated out of sample, on a clean universe. Even so: past evidence, not a promise."
+    : grade === "B" ? "Reasonable evidence with a weak leg. Use it as context, not as a trigger."
+    : grade === "C" ? "Weak evidence. Informative at most; it shouldn't move a decision on its own."
+    : "Not enough evidence. It is here for transparency, not because it works.";
 
   return { grade, points, reasons, caveat };
 }
@@ -142,8 +142,8 @@ export const GRADE_COLOR: Record<Grade, string> = {
 };
 
 export const GRADE_LABEL: Record<Grade, string> = {
-  A: "Evidencia sólida",
-  B: "Evidencia razonable",
-  C: "Evidencia débil",
-  D: "Sin evidencia",
+  A: "Strong evidence",
+  B: "Reasonable evidence",
+  C: "Weak evidence",
+  D: "No evidence",
 };

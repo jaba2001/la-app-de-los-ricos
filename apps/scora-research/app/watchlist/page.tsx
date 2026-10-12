@@ -145,7 +145,7 @@ export default function WatchlistPage() {
               opacity: adding ? 0.7 : 1,
             }}
           >
-            {adding ? "…" : "Agregar"}
+            {adding ? "…" : "Add"}
           </button>
         </div>
       </div>
@@ -171,10 +171,10 @@ export default function WatchlistPage() {
           borderRadius: "var(--sr-radius-lg)",
         }}>
           <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-2)" }}>
-            Tu watchlist está vacía
+            Your watchlist is empty
           </p>
           <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>
-            Agrega tickers arriba o usa el ★ en la página de análisis de cualquier stock.
+            Add tickers above or use the ★ on any stock page.
           </p>
         </div>
       ) : (
@@ -182,7 +182,7 @@ export default function WatchlistPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
             <thead>
               <tr style={{ background: "var(--sr-surface-2)" }}>
-                {["Ticker", "Precio", "Cambio %", "P/E", "Cap. Mercado", "Agregado", ""].map(h => (
+                {["Ticker", "Price", "Change %", "P/E", "Market cap", "Added", ""].map(h => (
                   <th key={h} style={{
                     padding: "var(--sr-sp-2) var(--sr-sp-3)",
                     textAlign: "left",
@@ -235,7 +235,7 @@ export default function WatchlistPage() {
                       )}
                     </td>
                     <td style={{ padding: "var(--sr-sp-3)", color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>
-                      {new Date(item.added_at).toLocaleDateString("es-MX", { day: "2-digit", month: "short" })}
+                      {new Date(item.added_at).toLocaleDateString("en-US", { day: "2-digit", month: "short" })}
                     </td>
                     <td style={{ padding: "var(--sr-sp-3)" }}>
                       <button
@@ -246,7 +246,7 @@ export default function WatchlistPage() {
                           fontSize: "var(--sr-t-base)", padding: "2px 8px",
                           borderRadius: "var(--sr-radius-sm)",
                         }}
-                        title="Eliminar de watchlist"
+                        title="Remove from watchlist"
                       >
                         ×
                       </button>

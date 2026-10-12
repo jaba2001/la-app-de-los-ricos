@@ -32,7 +32,7 @@ export default function FactorExposure({ positions }: Props) {
   const [error, setError] = useState("");
 
   const run = useCallback(async () => {
-    if (positions.length < 2) { setError("Añade al menos 2 posiciones abiertas distintas."); return; }
+    if (positions.length < 2) { setError("Add at least 2 different open positions."); return; }
     setLoading(true); setError(""); setRes(null);
     try {
       const uniq = new Map<string, number>();
@@ -55,7 +55,7 @@ export default function FactorExposure({ positions }: Props) {
       const usable = histories.filter((h) => h.closes.length >= 25);
       const dropped = histories.filter((h) => h.closes.length < 25).map((h) => h.t);
       if (usable.length < 2 || spy.length < 25) {
-        setError("Se necesitan al menos 2 nombres con 24+ meses de historial (y SPY).");
+        setError("At least 2 names with 24+ months of history (and SPY) are needed.");
         setLoading(false); return;
       }
 
@@ -69,10 +69,10 @@ export default function FactorExposure({ positions }: Props) {
       const factors: Record<string, number[]> = { market: pctReturns(spy), ...macro };
 
       const model = fitFactorModel(y, factors);
-      if (!model) { setError("No se pudo ajustar el modelo (factores colineales o muestra corta)."); setLoading(false); return; }
+      if (!model) { setError("The model couldn't be fitted (collinear factors or too short a sample)."); setLoading(false); return; }
       setRes({ model, names: usable.map((u) => u.t), weights, dropped });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Fallo al construir la exposición por factor");
+      setError(e instanceof Error ? e.message : "Couldn't build the factor exposure");
     }
     setLoading(false);
   }, [positions]);
@@ -96,12 +96,12 @@ export default function FactorExposure({ positions }: Props) {
         <div>
           <div className="section-label" style={{ margin: 0 }}>Factor X-ray · APT (Ross 1976)</div>
           <div className="sr-hint" style={{ maxWidth: 520, lineHeight: 1.5 }}>
-            Regresa los retornos de <strong>tu cartera</strong> sobre el mercado y las sorpresas macro. El sector dice
-            de qué va cada empresa; el factor dice qué mueve tu dinero. No suelen coincidir.
+            Regresses <strong>your portfolio&apos;s</strong> returns on the market and on macro surprises. The sector says
+            what each company does; the factor says what moves your money. They rarely match.
           </div>
         </div>
         <button className="btn-primary" onClick={run} disabled={loading} style={{ flexShrink: 0, padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}>
-          {loading ? "Midiendo…" : "✦ Radiografiar"}
+          {loading ? "Measuring…" : "✦ Run X-ray"}
         </button>
       </div>
 
@@ -111,18 +111,18 @@ export default function FactorExposure({ positions }: Props) {
         <div style={{ marginTop: "var(--sr-sp-3)" }}>
           {/* El titular */}
           <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${effectiveBets < 2 ? "var(--sr-warn)" : "var(--sr-pos)"} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${effectiveBets < 2 ? "var(--sr-warn)" : "var(--sr-pos)"} 24%, transparent)`, fontSize: "var(--sr-t-sm)", lineHeight: 1.6, marginBottom: "var(--sr-sp-3)" }}>
-            Tienes <strong>{res.names.length} nombres</strong> y{" "}
-            <strong className="num">{effectiveBets.toFixed(1)}</strong> apuestas efectivas independientes.{" "}
-            {(topShareOfSystematic * 100).toFixed(0)}% de la varianza que los factores explican viene de{" "}
+            You hold <strong>{res.names.length} names</strong> and{" "}
+            <strong className="num">{effectiveBets.toFixed(1)}</strong> effective independent bets.{" "}
+            {(topShareOfSystematic * 100).toFixed(0)}% of the variance the factors explain comes from{" "}
             <strong>{FACTOR_LABELS[topLoading.factor] ?? topLoading.factor}</strong>.
-            {effectiveBets < 2 && <> Contar tickers no es diversificar: en la práctica esto es una sola posición.</>}
+            {effectiveBets < 2 && <> Counting tickers is not diversifying: in practice this is a single position.</>}
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
             <div className="sr-tile"><div className="sr-tile-label">R²</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.rSquared * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Sistemático</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.systematicShare * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Idiosincrático</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: "var(--sr-warn)" }}>{(m.idiosyncraticShare * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Meses</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{m.n}</div><div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{(m.n / m.k).toFixed(1)} por parámetro</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">Systematic</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.systematicShare * 100).toFixed(0)}%</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">Idiosyncratic</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: "var(--sr-warn)" }}>{(m.idiosyncraticShare * 100).toFixed(0)}%</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">Months</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{m.n}</div><div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{(m.n / m.k).toFixed(1)} per parameter</div></div>
           </div>
 
           <div style={{ overflowX: "auto" }}>
@@ -131,7 +131,7 @@ export default function FactorExposure({ positions }: Props) {
                 <th>Factor</th>
                 <th style={{ textAlign: "right" }}>Beta</th>
                 <th style={{ textAlign: "right" }}>t</th>
-                <th style={{ textAlign: "right" }}>% varianza</th>
+                <th style={{ textAlign: "right" }}>% of variance</th>
               </tr></thead>
               <tbody>
                 {[...m.loadings].sort((a, b) => Math.abs(b.varianceShare) - Math.abs(a.varianceShare)).map((l) => (
@@ -148,14 +148,14 @@ export default function FactorExposure({ positions }: Props) {
 
           {explainLoadings(m, FACTOR_LABELS).length > 0 && (
             <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
-              <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 4 }}>Tu cartera, en una frase</div>
+              <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 4 }}>Your portfolio, in one sentence</div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>
-                Una posición {explainLoadings(m, FACTOR_LABELS).join(" · ")}.
+                A position {explainLoadings(m, FACTOR_LABELS).join(" · ")}.
               </div>
             </div>
           )}
 
-          <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>Escenarios sobre la cartera</div>
+          <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>Portfolio scenarios</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--sr-sp-2)" }}>
             {SCENARIOS.map((s) => {
               if (!Object.keys(s.shocks).every((k) => m.loadings.some((l) => l.factor === k))) return null;
@@ -171,10 +171,10 @@ export default function FactorExposure({ positions }: Props) {
           </div>
 
           <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-            Pesos por valor de mercado actual, betas de una regresión de {m.n} meses. Las filas atenuadas tienen
-            |t| &lt; 2 y no son distinguibles de cero. Los escenarios son lineales: no capturan que las betas suben
-            justo en las crisis, que es cuando importan.
-            {res.dropped.length > 0 && <div style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ Sin historial suficiente, excluidos del cálculo: {res.dropped.join(", ")}.</div>}
+            Weights by current market value, betas from a {m.n}-month regression. Dimmed rows have
+            |t| &lt; 2 and are not distinguishable from zero. Scenarios are linear: they don&apos;t capture that betas rise
+            precisely in crises, which is when they matter.
+            {res.dropped.length > 0 && <div style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ Not enough history, excluded from the calculation: {res.dropped.join(", ")}.</div>}
             {m.warnings.map((w, i) => <div key={i} style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ {w}</div>)}
           </div>
         </div>

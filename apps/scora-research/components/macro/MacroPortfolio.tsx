@@ -15,6 +15,7 @@ import SecularClock from "@/components/macro/SecularClock";
 import SectorRotation from "@/components/macro/SectorRotation";
 import ScoraBrief from "@/components/macro/ScoraBrief";
 import { latestAnalyses } from "@/lib/latestAnalyses";
+import { etiquetaRegimen } from "@/lib/regimen";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -184,7 +185,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
 
   if (!session) return (
     <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-      Inicia sesión para ver tu cartera.
+      Sign in to see your portfolio.
     </div>
   );
 
@@ -195,7 +196,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
   };
 
   const avgIc = entries.length ? entries.reduce((s, e) => s + e.icScore, 0) / entries.length : 0;
-  const regimeLabel = macro?.regime_label ?? "—";
+  const regimeLabel = etiquetaRegimen(macro) ?? "—";
   const regimeColor = macro?.regime_id === "expansion" ? "var(--sr-pos)" : macro?.regime_id === "contraction" || macro?.regime_id === "stagflation" ? "var(--sr-neg)" : "var(--sr-warn)";
 
   return (
@@ -213,9 +214,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
         </div>
       ) : entries.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-          <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>Tu watchlist está vacía</p>
+          <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>Your watchlist is empty</p>
           <p style={{ fontSize: "var(--sr-t-sm)" }}>
-            Agrega tickers desde la página de Stock (★) o desde el Screener.
+            Add tickers from a stock page (★) or from the Screener.
           </p>
         </div>
       ) : (
@@ -226,8 +227,8 @@ export default function MacroPortfolio({ macro, loading }: Props) {
           <div>
             <div className="section-label">Portfolio Heat</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 2 }}>
-              Régimen: <strong style={{ color: regimeColor }}>{regimeLabel}</strong>
-              {" · "}{entries.length} posiciones
+              Regime: <strong style={{ color: regimeColor }}>{regimeLabel}</strong>
+              {" · "}{entries.length} {entries.length === 1 ? "position" : "positions"}
             </div>
           </div>
           <div style={{ display: "flex", gap: "var(--sr-sp-5)" }}>

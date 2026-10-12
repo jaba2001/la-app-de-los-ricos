@@ -362,7 +362,7 @@ function heteroSeries(p, n, seed) {
   ok("grado A con evidencia completa", best.grade === "A");
   const worst = gradeSignal({});
   ok("grado D sin evidencia", worst.grade === "D");
-  ok("D avisa de que no hay evidencia", worst.caveat.toLowerCase().includes("sin evidencia"));
+  ok("D avisa de que no hay evidencia", worst.caveat.toLowerCase().includes("not enough evidence"));
 
   const icLow = gradeSignal({ ic: 0.01, oos: "passed", sampleSize: 9000, pointInTime: true }).points;
   const icMid = gradeSignal({ ic: 0.06, oos: "passed", sampleSize: 9000, pointInTime: true }).points;
@@ -382,7 +382,7 @@ function heteroSeries(p, n, seed) {
   const manyTrials = gradeSignal({ ic: 0.08, oos: "passed", sampleSize: 9000, pointInTime: true, trials: 500 }).points;
   ok("mas ensayos penalizan la nota", manyTrials < fewTrials);
 
-  ok("IC negativo se avisa", gradeSignal({ ic: -0.09, oos: "passed", sampleSize: 9000, pointInTime: true }).reasons.some((r) => r.includes("NEGATIVO")));
+  ok("IC negativo se avisa", gradeSignal({ ic: -0.09, oos: "passed", sampleSize: 9000, pointInTime: true }).reasons.some((r) => r.includes("NEGATIVE")));
 
   ok("puntos en [0,100]", [best, worst, gradeSignal({ ic: 0.5, trials: 1e6 })].every((g) => g.points >= 0 && g.points <= 100));
   ok("toda nota tiene color y etiqueta", ["A", "B", "C", "D"].every((g) => GRADE_COLOR[g] && GRADE_LABEL[g]));
@@ -397,7 +397,7 @@ function heteroSeries(p, n, seed) {
   const bajoMde = gradeSignal({ ic: MDE_IC - 0.01, oos: "passed", sampleSize: 9000, pointInTime: true });
   const sobreMde = gradeSignal({ ic: MDE_IC + 0.01, oos: "passed", sampleSize: 9000, pointInTime: true });
   ok("IC bajo el MDE no suma puntos de IC", sobreMde.points - bajoMde.points >= 20);
-  ok("IC bajo el MDE lo dice explicitamente", bajoMde.reasons.some((r) => r.includes("POR DEBAJO")));
+  ok("IC bajo el MDE lo dice explicitamente", bajoMde.reasons.some((r) => r.includes("BELOW")));
   ok("un IC de 0.02 no puntua (exigiria 77 anos de datos)",
     gradeSignal({ ic: 0.02, oos: "passed", sampleSize: 9000, pointInTime: true }).points ===
     gradeSignal({ ic: 0.0, oos: "passed", sampleSize: 9000, pointInTime: true }).points);

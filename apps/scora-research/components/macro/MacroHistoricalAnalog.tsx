@@ -8,6 +8,7 @@ import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import DataError from "@/components/ui/DataError";
+import { etiquetaRegimen } from "@/lib/regimen";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -86,7 +87,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-2)" }}>
           <div>
             <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: regimeColor }}>
-              {macro.regime_label ?? "—"}
+              {etiquetaRegimen(macro) ?? "—"}
             </span>
           </div>
           {icHealth != null && (

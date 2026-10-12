@@ -88,7 +88,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
               muestra mas abajo como contexto pero nunca puntuo —la funcion recibe insiders y
               Congreso, no carteras—, y el Congreso quedo retirado el 2026-09-04. Prometer tres
               fuentes y usar una era una afirmacion sin respaldo. */}
-          <span className="sr-hint">Insider · datos gratuitos · 13-F y Congress, como contexto</span>
+          <span className="sr-hint">Insiders · free data · 13F and Congress, as context</span>
         </div>
         {loading ? <Sk w="100%" h={120} /> : (
           <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 240px) 1fr", gap: "var(--sr-sp-5)", alignItems: "stretch" }}>

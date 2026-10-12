@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 
 const REGIMES = ["low", "mid", "high"] as const;
 const REGIME_LABEL: Record<string, string> = {
-  low: "Correlación baja",
-  mid: "Correlación media",
-  high: "Correlación alta",
+  low: "Low correlation",
+  mid: "Medium correlation",
+  high: "High correlation",
 };
 
 const pct = (v: number) => `${(v * 100).toFixed(1)}%`;

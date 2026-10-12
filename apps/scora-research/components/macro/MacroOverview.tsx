@@ -8,6 +8,7 @@ import { Pill } from "@/components/ui/Pill";
 import { getRating, computeICHealthScore } from "@/lib/scoring";
 import { useAuth } from "@/lib/auth";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
+import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -177,7 +178,7 @@ export default function MacroOverview({ macro, loading }: Props) {
               <div className="section-label">Current Regime</div>
               {loading ? <Sk w={140} h={32} /> : (
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: regimeColor, letterSpacing: "-0.02em" }}>
-                  {macro?.regime_label ?? "Loading…"}
+                  {etiquetaRegimen(macro) ?? "Loading…"}
                 </div>
               )}
             </div>
@@ -185,7 +186,7 @@ export default function MacroOverview({ macro, loading }: Props) {
           </div>
           <div className="sr-grid-3">
             {[
-              { label: "Quadrant",      val: macro?.cartera_quadrant },
+              { label: "Quadrant",      val: etiquetaCuadrante(macro?.cartera_quadrant) },
               { label: "Net Liquidity", val: macro?.net_liquidity_dir },
               { label: "Fed Room",      val: macro?.fed_room },
             ].map(({ label, val }) => (
@@ -351,7 +352,7 @@ export default function MacroOverview({ macro, loading }: Props) {
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
                     <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: quadrantInfo.color }}>{quadrantInfo.label}</div>
-                    <Pill label={quadrant?.toUpperCase() ?? ""} color={quadrantInfo.color} />
+                    <Pill label={quadrantInfo.label.toUpperCase()} color={quadrantInfo.color} />
                   </div>
                   <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)" }}>{quadrantInfo.desc}</div>
                   <div style={{ marginBottom: "var(--sr-sp-2)" }}>

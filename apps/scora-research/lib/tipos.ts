@@ -99,7 +99,7 @@ export function descomponer(a10: number | null, real10: number | null, t5yifr?: 
 export function percentil(valor: number | null, historia: number[]):
   { pct: number; n: number } | { pct: null; motivo: string } {
   const v = num(valor);
-  if (v == null) return { pct: null, motivo: "sin valor" };
+  if (v == null) return { pct: null, motivo: "no value" };
   const h = historia.filter((x) => Number.isFinite(x));
   if (h.length < UMBRALES_TIPOS.minObsPercentil)
     return { pct: null, motivo: `sample too small: ${h.length} obs, ${UMBRALES_TIPOS.minObsPercentil} needed` };

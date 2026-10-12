@@ -52,7 +52,7 @@ export function createBatcher(transport: BatchTransport, opts: BatcherOptions = 
       const byId = new Map((res?.results ?? []).map((r) => [r.id, r]));
       chunk.forEach((p, idx) => {
         const r = byId.get(String(idx));
-        if (!r) { p.reject(new Error(`[batch] sin respuesta para ${p.path}`)); return; }
+        if (!r) { p.reject(new Error(`[batch] no response for ${p.path}`)); return; }
         if (r.status < 200 || r.status >= 300) {
           // Mismo formato de error que la vía individual: las pantallas hacen
           // setError(e.message) y no deben distinguir por dónde vino la petición.

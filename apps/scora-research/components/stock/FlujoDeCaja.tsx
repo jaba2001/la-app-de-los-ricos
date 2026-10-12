@@ -25,7 +25,7 @@ const dinero = (v: number | null | undefined) => {
   const a = Math.abs(v);
   if (a >= 1e9) return `${(v / 1e9).toFixed(2)} B`;
   if (a >= 1e6) return `${(v / 1e6).toFixed(0)} M`;
-  return v.toLocaleString("es");
+  return v.toLocaleString("en-US");
 };
 
 /**
@@ -78,8 +78,8 @@ export default function FlujoDeCaja({ data, loading }: Props) {
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
       <div className="section-label">Cash flow · if it isn&apos;t cash, it doesn&apos;t count</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 660 }}>
-        El beneficio reconoce ingresos que aún no se han cobrado y gastos que se pagaron hace años. Por eso beneficio y
-        caja divergen, y por eso una empresa puede batir estimaciones y caer en bolsa.
+        Earnings recognize revenue that hasn&apos;t been collected yet and expenses that were paid years ago. That is why
+        earnings and cash diverge, and why a company can beat estimates and still fall in the market.
       </div>
 
       {/* ── El diagnóstico ─────────────────────────────────────────────────────────── */}

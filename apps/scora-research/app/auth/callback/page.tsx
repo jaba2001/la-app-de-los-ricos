@@ -13,23 +13,23 @@ export default function AuthCallback() {
     // Platform pide completar la entrada a mano con el email, porque el enlace por si solo
     // no dice a quien pertenece — se puede abrir en otro navegador o reenviar.
     if (!isSignInWithEmailLink(auth(), window.location.href)) {
-      setStatus("Este enlace no es válido o ya se usó.");
+      setStatus("This link is invalid or has already been used.");
       return;
     }
     let email = window.localStorage.getItem("scora:emailLogin");
     if (!email) {
       // Caso real: el enlace se abre en otro dispositivo. Preguntarlo es el camino que
       // recomienda Google; el enlace solo sirve para ESE correo, asi que teclear otro falla.
-      email = window.prompt("Confirma tu correo para completar el acceso") ?? "";
-      if (!email) { setStatus("Hace falta el correo para completar el acceso."); return; }
+      email = window.prompt("Confirm your email to finish signing in") ?? "";
+      if (!email) { setStatus("Your email is needed to finish signing in."); return; }
     }
     signInWithEmailLink(auth(), email, window.location.href)
       .then(() => {
         window.localStorage.removeItem("scora:emailLogin");
-        setStatus("Dentro — redirigiendo…");
+        setStatus("Signed in — redirecting…");
         router.replace("/macro");
       })
-      .catch((e) => setStatus(`No se pudo completar: ${(e as Error).message}`));
+      .catch((e) => setStatus(`Couldn't finish signing in: ${(e as Error).message}`));
   }, [router]);
 
   return (

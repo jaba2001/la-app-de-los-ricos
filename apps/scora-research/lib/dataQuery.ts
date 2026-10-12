@@ -55,7 +55,7 @@ async function enviar(trozo: Pendiente[]) {
     const res = await transporte(trozo.map((p) => p.pet));
     trozo.forEach((p, i) => {
       const r = res.results?.[i];
-      if (!r) { p.reject(new Error("sin respuesta para la consulta")); return; }
+      if (!r) { p.reject(new Error("no response for the query")); return; }
       if ("error" in r) { p.reject(new Error(r.error)); return; }
       p.resolve(r);
     });
@@ -125,7 +125,7 @@ class Consulta<T = unknown> implements PromiseLike<Respuesta<T>> {
         if (rows.length === 0) {
           // `single()` sin filas es un error en Supabase; `maybeSingle()` devuelve null.
           return this.modo === "single"
-            ? { data: null, error: { message: "No se encontró ninguna fila" } }
+            ? { data: null, error: { message: "No row found" } }
             : { data: null, error: null };
         }
         return { data: rows[0] as T, error: null };

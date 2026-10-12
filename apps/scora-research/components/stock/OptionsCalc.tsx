@@ -195,9 +195,9 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
 
       {/* Multi-leg strategies (Fase 4) */}
       <div className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
-        <div className="section-label">Estrategias multi-pata</div>
+        <div className="section-label">Multi-leg strategies</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          Estructuras armadas alrededor del spot (strikes ATM / ±5-10%), valoradas con Black-Scholes y tus inputs. Ideal para proteger un holding (collar) o definir riesgo (spreads).
+          Structures built around spot (ATM / ±5-10% strikes), priced with Black-Scholes and your inputs. Useful to protect a holding (collar) or define risk (spreads).
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-1)", marginBottom: "var(--sr-sp-3)" }}>
           {(Object.keys(STRATEGY_LABELS) as StrategyName[]).map((s) => (
@@ -230,7 +230,7 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
             </table>
           </>
         ) : (
-          <div className="sr-hint">Introduce spot, vol y días válidos para construir la estrategia.</div>
+          <div className="sr-hint">Enter a valid spot, vol and days to build the strategy.</div>
         )}
       </div>
     </div>

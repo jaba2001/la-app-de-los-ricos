@@ -34,18 +34,21 @@ const sumTTM = (arr: Row[], ...keys: string[]): number | null => {
 };
 
 const ETIQUETA: Record<IdComprobacion, string> = {
-  balance: "Activo = Pasivo + Patrimonio",
-  caja: "Variación de caja = suma de los tres flujos",
-  patrimonio: "Patrimonio = anterior + resultado − retribución",
-  margen: "Margen bruto = Ingresos − Coste de ventas",
+  balance: "Assets = Liabilities + Equity",
+  caja: "Change in cash = sum of the three cash flows",
+  patrimonio: "Equity = prior + net income − payouts",
+  margen: "Gross profit = Revenue − Cost of revenue",
 };
 
 const EXPLICA: Record<IdComprobacion, string> = {
-  balance: "La identidad exacta de la partida doble. Incluye minoritarios y patrimonio temporal (mezzanine), que van fuera del patrimonio permanente.",
-  caja: "Explotación + inversión + financiación, más el efecto del tipo de cambio sobre los saldos en divisa. Se mide contra el activo, no contra sí misma: la variación de caja en doce meses ronda cero.",
-  patrimonio: "Comprobación laxa a propósito (25 %): entre dos ejercicios el patrimonio se mueve además por resultado global, pagos en acciones y conversiones, que no están en esta cuenta.",
-  margen: "Aritmética pura cuando están las tres magnitudes.",
+  balance: "The exact double-entry identity. Includes minority interest and temporary (mezzanine) equity, which sit outside permanent equity.",
+  caja: "Operating + investing + financing, plus the FX effect on foreign-currency balances. Measured against total assets, not against itself: the change in cash over twelve months hovers around zero.",
+  patrimonio: "A deliberately loose check (25%): between two fiscal years equity also moves with other comprehensive income, stock-based pay and conversions, which aren't in this sum.",
+  margen: "Pure arithmetic when all three figures are present.",
 };
+
+/** Nombre en pantalla de la confianza (la clave de lib/articulacion.ts sigue en español). */
+const CONFIANZA_LABEL: Record<string, string> = { alta: "High", media: "Medium", baja: "Low" };
 
 export default function Articulacion({ data }: { data: StockData | null }) {
   const r = useMemo(() => {
@@ -83,30 +86,30 @@ export default function Articulacion({ data }: { data: StockData | null }) {
     });
   }, [data]);
 
-  if (!r) return <p className="sr-hint">Sin estados financieros suficientes para comprobar la integridad contable.</p>;
+  if (!r) return <p className="sr-hint">Not enough financial statements to check accounting integrity.</p>;
 
   const color = r.confianza === "alta" ? "var(--sr-pos)" : r.confianza === "media" ? "var(--sr-warn)" : "var(--sr-neg)";
   const resumen = r.comprobables === 0
-    ? "No hay ninguna identidad comprobable con los datos disponibles."
-    : `${r.pasan} de ${r.comprobables} identidades cuadran.`;
+    ? "No identity can be checked with the available data."
+    : `${r.pasan} of ${r.comprobables} identities reconcile.`;
 
   return (
     <section className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-        <h3 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, margin: 0 }}>Integridad contable</h3>
-        <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>confianza {r.confianza}</span>
+        <h3 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, margin: 0 }}>Accounting integrity</h3>
+        <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>{CONFIANZA_LABEL[r.confianza] ?? r.confianza} confidence</span>
         <span className="sr-hint" style={{ fontSize: "var(--sr-t-xs)" }}>{resumen}</span>
       </div>
 
       <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
-        La partida doble obliga a que estas cuentas cuadren. Cuando no cuadran, cualquier ratio construido
-        encima es un número creíble y equivocado. <strong>No dice si la empresa es buena</strong>: dice si sus
-        cifras se sostienen entre sí.
+        Double-entry bookkeeping forces these accounts to reconcile. When they don&apos;t, any ratio built on top
+        is a credible, wrong number. <strong>It doesn&apos;t say whether the company is good</strong>: it says whether
+        its figures hold together.
       </p>
 
       <div style={{ marginTop: "var(--sr-sp-3)", display: "grid", gap: "var(--sr-sp-2)" }}>
         {r.comprobaciones.map((c) => {
-          const estado = c.ok === null ? "no comprobable" : c.ok ? "cuadra" : "no cuadra";
+          const estado = c.ok === null ? "not checkable" : c.ok ? "reconciles" : "doesn't reconcile";
           const col = c.ok === null ? "var(--sr-text-2)" : c.ok ? "var(--sr-pos)" : "var(--sr-neg)";
           return (
             <div key={c.id} style={{ borderLeft: `3px solid ${col}`, paddingLeft: "var(--sr-sp-2)" }}>
@@ -114,13 +117,13 @@ export default function Articulacion({ data }: { data: StockData | null }) {
                 <strong style={{ fontSize: "var(--sr-t-sm)" }}>{ETIQUETA[c.id]}</strong>
                 <span style={{ fontSize: "var(--sr-t-sm)", color: col, fontWeight: 700 }}>
                   {estado}
-                  {c.desvio != null && c.ok === false ? ` · desvía ${(c.desvio * 100).toFixed(1)} %` : ""}
-                  {c.ok === true && c.desvio != null ? ` · ${(c.desvio * 100).toFixed(2)} %` : ""}
+                  {c.desvio != null && c.ok === false ? ` · off by ${(c.desvio * 100).toFixed(1)}%` : ""}
+                  {c.ok === true && c.desvio != null ? ` · ${(c.desvio * 100).toFixed(2)}%` : ""}
                 </span>
               </div>
               <p className="sr-hint" style={{ margin: "2px 0 0", fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
                 {c.ok === null ? c.motivo : EXPLICA[c.id]}
-                {c.ok !== null ? ` Tolerancia ${(TOLERANCIA[c.id] * 100).toFixed(0)} %.` : ""}
+                {c.ok !== null ? ` Tolerance ${(TOLERANCIA[c.id] * 100).toFixed(0)}%.` : ""}
               </p>
             </div>
           );
@@ -128,8 +131,8 @@ export default function Articulacion({ data }: { data: StockData | null }) {
       </div>
 
       <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
-        <strong>«No comprobable» no es «mal».</strong> Significa que faltan magnitudes o que las disponibles son
-        de cierres distintos, y comparar dos fotos diferentes no detecta un descuadre: lo inventa.
+        <strong>&ldquo;Not checkable&rdquo; doesn&apos;t mean &ldquo;wrong&rdquo;.</strong> It means figures are missing or the available ones
+        come from different period ends, and comparing two different snapshots doesn&apos;t detect a mismatch: it invents one.
       </p>
     </section>
   );

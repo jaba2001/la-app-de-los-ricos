@@ -132,12 +132,12 @@ function comparar(
     return { id, ok: null, izq: num(izq) ? izq : null, der: num(der) ? der : null, desvio: null, motivo: faltan };
   }
   const base = num(escala) && Math.abs(escala) > 0 ? Math.abs(escala) : Math.max(Math.abs(izq), Math.abs(der));
-  if (base === 0) return { id, ok: true, izq, der, desvio: 0, motivo: "ambos lados son cero" };
+  if (base === 0) return { id, ok: true, izq, der, desvio: 0, motivo: "both sides are zero" };
   const desvio = Math.abs(izq - der) / base;
   const ok = desvio <= tol;
   return {
     id, izq, der, ok, desvio: Math.round(desvio * 1e6) / 1e6,
-    motivo: ok ? "" : `desvía ${(desvio * 100).toFixed(1)} % (tolerancia ${(tol * 100).toFixed(0)} %)`,
+    motivo: ok ? "" : `off by ${(desvio * 100).toFixed(1)}% (tolerance ${(tol * 100).toFixed(0)}%)`,
   };
 }
 
@@ -191,13 +191,13 @@ export function articular(inp: ArticulacionInputs): ArticulacionResult {
 
   const comprobaciones: Comprobacion[] = [
     comparar("balance", inp.assets, pasivoMasNeto, TOLERANCIA.balance,
-      "falta activo, pasivo o patrimonio al mismo cierre"),
+      "missing assets, liabilities or equity at the same period end"),
     comparar("caja", deltaCajaObs, flujoNeto, TOLERANCIA.caja,
-      "falta la variación de caja o alguno de los tres flujos", inp.assets ?? inp.escalaCaja),
+      "missing the change in cash or one of the three cash flows", inp.assets ?? inp.escalaCaja),
     comparar("patrimonio", inp.equityFin ?? inp.equity, netoEsperado, TOLERANCIA.patrimonio,
-      "falta el patrimonio del ejercicio anterior o el resultado"),
+      "missing prior-year equity or net income"),
     comparar("margen", inp.grossProfit, brutoEsperado, TOLERANCIA.margen,
-      "falta margen bruto, ingresos o coste de ventas"),
+      "missing gross profit, revenue or cost of revenue"),
   ];
 
   const evaluadas = comprobaciones.filter((c) => c.ok !== null);

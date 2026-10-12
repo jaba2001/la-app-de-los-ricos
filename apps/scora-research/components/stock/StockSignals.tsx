@@ -180,9 +180,9 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
       {/* Quality & solvency (Fase 1) */}
       {hasQuality && (
         <div className="card">
-          <div className="section-label">Calidad &amp; solvencia</div>
+          <div className="section-label">Quality &amp; solvency</div>
           <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 620, lineHeight: 1.5 }}>
-            Distress, calidad de beneficio, descomposición del ROE y riesgo de crédito — todo de los estados financieros.
+            Distress, earnings quality, ROE decomposition and credit risk — all from the financial statements.
             Se muestran como contexto; no mueven el Scora Score hasta validar su poder predictivo.
           </div>
           <div className="sr-grid-3">
@@ -190,21 +190,21 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
               <div className="sr-tile">
                 <div className="sr-tile-label">Altman {quality.altman.model} · distress</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: ZBAND_COLOR[quality.altman.band] }} className="num">{quality.altman.z.toFixed(2)}</div>
-                <div className="sr-hint" style={{ color: ZBAND_COLOR[quality.altman.band] }}>{quality.altman.band === "safe" ? "Zona segura" : quality.altman.band === "grey" ? "Zona gris" : "Zona de distress"}</div>
+                <div className="sr-hint" style={{ color: ZBAND_COLOR[quality.altman.band] }}>{quality.altman.band === "safe" ? "Safe zone" : quality.altman.band === "grey" ? "Grey zone" : "Distress zone"}</div>
               </div>
             )}
             {quality.merton && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Prob. de impago (1a)</div>
+                <div className="sr-tile-label">Default prob. (1y)</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.merton.pd < 0.02 ? "var(--sr-pos)" : quality.merton.pd < 0.10 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">{(quality.merton.pd * 100).toFixed(2)}%</div>
                 <div className="sr-hint">DtD {quality.merton.distanceToDefault.toFixed(1)} · Merton/KMV</div>
               </div>
             )}
             {quality.accruals && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Calidad de beneficio</div>
+                <div className="sr-tile-label">Earnings quality</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.accruals.quality === "high" ? "var(--sr-pos)" : quality.accruals.quality === "medium" ? "var(--sr-warn)" : "var(--sr-neg)" }}>
-                  {quality.accruals.quality === "high" ? "Alta" : quality.accruals.quality === "medium" ? "Media" : "Baja"}
+                  {quality.accruals.quality === "high" ? "High" : quality.accruals.quality === "medium" ? "Medium" : "Low"}
                 </div>
                 <div className="sr-hint">Accruals {(quality.accruals.ratio * 100).toFixed(1)}%</div>
               </div>
@@ -215,14 +215,14 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.piotroski.score / quality.piotroski.max >= 0.7 ? "var(--sr-pos)" : quality.piotroski.score / quality.piotroski.max >= 0.45 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">
                   {quality.piotroski.score}<span className="sr-hint">/{quality.piotroski.max}</span>
                 </div>
-                <div className="sr-hint">Fortaleza fundamental</div>
+                <div className="sr-hint">Fundamental strength</div>
               </div>
             )}
             {quality.beneish && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Beneish M · manipulación</div>
+                <div className="sr-tile-label">Beneish M · manipulation</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{quality.beneish.m.toFixed(2)}</div>
-                <div className="sr-hint" style={{ color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }}>{quality.beneish.flag === "unlikely" ? "Sin señal" : "⚠ Posible manipulación"}</div>
+                <div className="sr-hint" style={{ color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }}>{quality.beneish.flag === "unlikely" ? "No signal" : "⚠ Possible manipulation"}</div>
               </div>
             )}
             {quality.dupont && (
@@ -322,11 +322,11 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
       {/* Factor exposure + ESG-lite lenses (Fase 6) */}
       {(factorTilts || esg) && (
         <div className="card">
-          <div className="section-label">Lentes · factor &amp; ESG</div>
+          <div className="section-label">Lenses · factor &amp; ESG</div>
           <div className="sr-grid-2" style={{ gap: "var(--sr-sp-5)" }}>
             {factorTilts && (
               <div>
-                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Exposición a factores</div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Factor exposure</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {FACTOR_LABELS.map(([k, label]) => {
                     const v = factorTilts[k];              // 0-20
@@ -341,12 +341,12 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
                     );
                   })}
                 </div>
-                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>El estilo dominante es el que la rotación por régimen premia o penaliza (medido).</div>
+                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>The dominant style is the one the regime rotation rewards or penalizes (measured).</div>
               </div>
             )}
             {esg && (
               <div>
-                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>ESG-lite (proxy gratis)</div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>ESG-lite (free proxy)</div>
                 <div className="sr-grid-4" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
                   {([["E", esg.e], ["S", esg.s], ["G", esg.g], ["Overall", esg.overall]] as [string, number][]).map(([l, val]) => (
                     <div key={l} className="sr-tile" style={{ textAlign: "center" }}>
