@@ -382,6 +382,22 @@ jobs:
       # La copia de datos, con Supabase simulado y contra Postgres real. Sin Postgres se salta.
       - name: Copia de Supabase a Cloud SQL
         run: node --experimental-strip-types --no-warnings scripts/migrarsupabase.test.mjs
+      # Trimestres de la SEC con la forma de FMP: ingresos de 2018, flujo de caja con un
+      # trimestre por año y CapEx con el signo al revés salieron en la ficha de AAPL.
+      - name: EDGAR → trimestres (y mezcla con FMP)
+        run: node --experimental-strip-types --no-warnings scripts/edgarhechos.test.mjs
+      # Los ETFs que el plan de FMP no cubre salen de Yahoo con la forma exacta de FMP.
+      - name: Respaldo de Yahoo para ETFs
+        run: node --experimental-strip-types --no-warnings scripts/yahoo.test.mjs
+      # Finviz cambio el HTML de su tabla en 2026 y el parser devolvia {} en silencio.
+      - name: Parser de Finviz (formatos 2026 y anterior)
+        run: node --experimental-strip-types --no-warnings scripts/finviz.test.mjs
+      # /discovery enseñaba 235 filas para un ranking de 150: las de semanas anteriores.
+      - name: Discovery, solo la última tanda
+        run: node --experimental-strip-types --no-warnings scripts/discovery.test.mjs
+      # El cron de insiders escribía sector null en todas las filas.
+      - name: Sector de los compradores insider
+        run: node --experimental-strip-types --no-warnings scripts/sectores.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)
