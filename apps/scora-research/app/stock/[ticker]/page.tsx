@@ -148,7 +148,14 @@ export default function StockTickerPage() {
   const [failedApis, setFailedApis] = useState(0);
   // 2 siempre frescas (macro + quote) + 31 del lote. La ranura del ETF sectorial cuenta
   // aunque no se adivine, para que este numero no dependa de si es la primera visita.
-  const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añade una, sube
+  // Versión del formato de la foto diaria (stock_snapshot). La foto guarda los datos YA
+// procesados, así que cualquier cambio en cómo se procesan no llegaba a quien hubiera visto
+// el valor ese día hasta el siguiente: en el recorrido del 12-10-2026 la ficha de AAPL seguía
+// pidiendo ratios de comparables que el filtro nuevo ya descarta (402 de FMP). Súbela cuando
+// cambie la forma o el tratamiento de StockData.
+const VERSION_FOTO = 2;
+
+const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añade una, sube
   // Fallos de lectura o escritura que no impiden el análisis pero no pueden callarse
   // (AUDIT_REPORT M-3): la watchlist, o un análisis que se ve pero no quedó guardado.
   const [avisoDatos, setAvisoDatos] = useState<string | null>(null);
@@ -295,7 +302,9 @@ export default function StockTickerPage() {
       if (!live()) return;
       let stockData: StockData;
 
-      if (snap?.data) {
+      // Una foto de otra versión del formato es una caché que ya no vale: se pide todo otra vez
+      // y se sobrescribe (ver VERSION_FOTO).
+      if (snap?.data && (snap.data as { _v?: number })._v === VERSION_FOTO) {
         stockData = { ...(snap.data as StockData), quote: freshQuote, rdcf: null, finviz: (snap.data as StockData).finviz ?? null };
         setFetchProgress(TOTAL_SOURCES);
         setFailedApis(0);
@@ -639,6 +648,7 @@ export default function StockTickerPage() {
         snapshot_date: today,
         user_id: session.user.id,
         data: {
+          _v: VERSION_FOTO,
           ...snapRest,
           history:          _sh.slice(0, 252),
           spyHistory:       _ss.slice(0, 252),
