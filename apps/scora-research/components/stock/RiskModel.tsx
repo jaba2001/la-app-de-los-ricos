@@ -208,7 +208,7 @@ export default function RiskModel({ ticker, data }: Props) {
               {frictions.components.map((c) => (
                 <div key={c.key} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
                   <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{c.label}</div>
-                  <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800 }}>{c.key === "size" ? `$${(c.raw / 1e9).toFixed(1)}B` : c.raw.toFixed(2)}</div>
+                  <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800 }}>{c.key === "size" ? (c.raw >= 1e12 ? `$${(c.raw / 1e12).toFixed(2)}T` : `$${(c.raw / 1e9).toFixed(1)}B`) : c.raw.toFixed(2)}</div>
                   <div className="num" style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>friction {c.score.toFixed(0)}</div>
                 </div>
               ))}

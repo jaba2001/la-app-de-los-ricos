@@ -308,7 +308,8 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Powered by watermark */}
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", paddingRight: "var(--sr-sp-2)" }}>
-        Fundamentals via Finnhub · short interest via NASDAQ/FINRA · ownership needs a paid feed
+        {/* La propiedad sale de Finviz cuando responde; el respaldo de Finnhub no la trae. */}
+        Fundamentals via Finnhub · short interest via NASDAQ/FINRA · {fv?.instOwn != null ? "ownership via Finviz" : "ownership needs a paid feed"}
       </div>
 
     </div>

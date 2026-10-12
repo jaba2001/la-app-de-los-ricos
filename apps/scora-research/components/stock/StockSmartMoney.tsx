@@ -8,6 +8,12 @@ import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
+/** $8.5M · $412K: con «/1e6 .toFixed(1)», una compra de 30.000 $ salía como «$0.0M». */
+const dolaresCortos = (v: number) => {
+  const a = Math.abs(Number(v) || 0);
+  return a >= 1e9 ? `$${(v / 1e9).toFixed(1)}B` : a >= 1e6 ? `$${(v / 1e6).toFixed(1)}M` : a >= 1e3 ? `$${(v / 1e3).toFixed(0)}K` : `$${Math.round(v)}`;
+};
+
 interface InsiderRow { rank: number; ticker: string; sector: string; net_insider_buying_usd: number; num_insiders: number; month: string; }
 
 function periodRet(arr: number[], days: number): number | null {
@@ -273,7 +279,7 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
                   <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{row.rank}</td>
                   <td><span onClick={() => router.push(`/stock/${row.ticker}`)} style={{ fontWeight: 700, color: row.ticker === ticker ? "var(--sr-amber)" : "var(--sr-text)", cursor: "pointer" }}>{row.ticker}</span></td>
                   <td style={{ color: "var(--sr-text-2)" }}>{row.sector ?? "—"}</td>
-                  <td style={{ textAlign: "right", color: "var(--sr-pos)", fontWeight: 600 }} className="num">${(row.net_insider_buying_usd / 1e6).toFixed(1)}M</td>
+                  <td style={{ textAlign: "right", color: "var(--sr-pos)", fontWeight: 600 }} className="num">{dolaresCortos(row.net_insider_buying_usd)}</td>
                   <td style={{ textAlign: "right" }} className="num">{row.num_insiders}</td>
                   <td style={{ color: "var(--sr-text-3)" }}>{row.month?.slice(0, 7)}</td>
                 </tr>
