@@ -94,7 +94,7 @@ const ventaCon = () => ({ type: "sale", amount: 50000, date: "2026-08-01" });
   comprobar("el rótulo existe", rotulo !== "");
   comprobar("y NO presenta 13-F y Congress como fuentes de la nota",
     !/Insider\s*·\s*13-F\s*·\s*Congress\s*·\s*free data/.test(rotulo), rotulo.trim().slice(0, 80));
-  comprobar("el panel marca que el Congreso no puntúa", /no puntúa|fuente no disponible/.test(UI));
+  comprobar("el panel marca que el Congreso no puntúa", /not scored|source unavailable/.test(UI));
 }
 
 // ── CONTROL POSITIVO ─────────────────────────────────────────────────────────────────────

@@ -76,7 +76,7 @@ const ok = (id, obj) => ({ id, status: 200, body: JSON.stringify(obj) });
   }, { schedule: m.schedule });
   const p = b.enqueue("/api/fmp/quote?symbol=A");
   m.run();
-  check("sin respuesta → rechaza", await p.then(() => "resolvio", (e) => e.message.startsWith("[batch] sin respuesta")), true);
+  check("sin respuesta → rechaza", await p.then(() => "resolvio", (e) => e.message.startsWith("[batch] no response")), true);
 }
 
 // ── Lote caído → cada petición por su cuenta ────────────────────────────────────────

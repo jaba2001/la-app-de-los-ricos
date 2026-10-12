@@ -106,8 +106,9 @@ const pedir = async (ruta, init = {}) => {
     //   · sin Upstash  -> 503, porque su limitador es fail-closed a proposito (sin el
     //     seria un cañon de correos anonimo).
     //   · con Upstash  -> 400, porque el cuerpo vacio no trae correo valido.
-    // Lo que se prueba es lo comun a los dos: un cuerpo vacio NUNCA se acepta.
-    check("waitlist rechaza un cuerpo vacio", [r.status, r.status === 503 || r.status === 400], [r.status, true]);
+    //   · 429 si el limitador ya corto esta IP (pasa al relanzar la suite varias veces seguidas).
+    // Lo que se prueba es lo comun a los tres: un cuerpo vacio NUNCA se acepta.
+    check("waitlist rechaza un cuerpo vacio", [r.status, [400, 429, 503].includes(r.status)], [r.status, true]);
   }
 
   for (const [method, ruta] of protegidas) {

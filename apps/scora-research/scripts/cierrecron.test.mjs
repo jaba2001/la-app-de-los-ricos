@@ -62,7 +62,10 @@ const corre = async () => (await GET(new Request("http://x/api/cron/daily-close"
 await db.query("truncate macro_state_history, sl_daily_close");
 await db.query("delete from macro_state");
 if (macroAntes) {
-  const cols = Object.keys(macroAntes);
+  // Las columnas generadas (real_yield_10y, sql/gcp/007) no admiten valor: las calcula Postgres.
+  const { rows: gen } = await db.query("select column_name from information_schema.columns where table_schema = 'public' and table_name = 'macro_state' and is_generated = 'ALWAYS'");
+  const generadas = new Set(gen.map((g) => g.column_name));
+  const cols = Object.keys(macroAntes).filter((c) => !generadas.has(c));
   await db.query(`insert into macro_state (${cols.map((c) => `"${c}"`).join(",")}) values (${cols.map((_, i) => `$${i + 1}`).join(",")})`, cols.map((c) => macroAntes[c]));
 }
 await db.end();

@@ -218,15 +218,16 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
   ok(!/depreciacion|brutoFin|brutoIni/.test(codigo),
      "ni toca los campos crudos de los que sale la vida util: eso es del modulo");
   // La señal de vida util es SIEMPRE aviso: la metrica no distingue criterio contable de mezcla.
-  ok(/>Aviso</.test(ui), "las señales se pintan como AVISO");
-  ok(!/>Alerta</.test(ui), "y NUNCA como alerta: la metrica no puede acusar");
+  ok(/>Notice</.test(codigo), "las señales se pintan como AVISO (Notice)");
+  ok(!/>(Alerta|Alert)</.test(codigo), "y NUNCA como alerta: la metrica no puede acusar");
   // La fecha de la foto no es opcional.
   ok(/\{asOf\}/.test(ui), "la pantalla publica la fecha de la foto");
-  ok(/No se actualiza sola|precalculada/i.test(ui), "y dice que no es un dato vivo");
+  // Sobre el código sin comentarios: el comentario dice «precalculada» y aprobaba solo.
+  ok(/doesn&apos;t\s+update on its own|doesn't update on its own/i.test(codigo), "y dice que no es un dato vivo");
   // La recompra describe, no pronostica.
-  ok(/no un pron[oó]stico/.test(ui), "el precio de recompra se declara descriptivo");
-  ok(!/comprar ahora|objetivo de precio|va a subir/i.test(ui), "y no recomienda nada");
-  ok(/asignaci[oó]n de capital/.test(ui), "y cuando pagaron caro, juzga la asignacion de capital");
+  ok(/not a forecast/.test(codigo), "el precio de recompra se declara descriptivo");
+  ok(!/comprar ahora|objetivo de precio|va a subir|buy now|price target|will rise|going to rise/i.test(codigo), "y no recomienda nada");
+  ok(/capital-allocation decision/.test(codigo), "y cuando pagaron caro, juzga la asignacion de capital");
 }
 
 console.log(pass && !fail ? `\n✓ vidaUtil: ${pass} passed, 0 failed\n` : `\n✖ vidaUtil: ${pass} passed, ${fail} failed\n`);
