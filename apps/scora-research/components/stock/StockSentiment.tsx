@@ -1,6 +1,7 @@
 "use client";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { Sk } from "@/components/ui/Skeleton";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { data: StockData | null; loading: boolean; }
 
@@ -35,9 +36,9 @@ function Arrow({ v }: { v: number | null | undefined }) {
 function Cell({ label, value, sub }: { label: string; value: React.ReactNode; sub?: React.ReactNode }) {
   return (
     <div className="sr-tile">
-      <div className="sr-tile-label">{label}</div>
+      <div className="sr-tile-label">{tv(label)}</div>
       <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{value}</div>
-      {sub && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{sub}</div>}
+      {sub && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{tv(sub)}</div>}
     </div>
   );
 }
@@ -80,7 +81,7 @@ export default function StockSentiment({ data, loading }: Props) {
     : "var(--sr-text-2)";
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <div className="section-label" style={{ marginBottom: "var(--sr-sp-3)" }}>{title}</div>
+    <div className="section-label" style={{ marginBottom: "var(--sr-sp-3)" }}>{tv(title)}</div>
   );
 
   return (
@@ -88,23 +89,23 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Short Interest */}
       <div className="card">
-        <SectionTitle title="Short Interest" />
+        <SectionTitle title={t("Short Interest")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
           <Cell
-            label="Short Float"
+            label={t("Short Float")}
             value={<span style={{ color: sfColor }}>{sfPct != null ? `${sfPct.toFixed(2)}%` : "—"}</span>}
-            sub="% of float shorted"
+            sub={t("% of float shorted")}
           />
           <Cell
-            label="Short Ratio"
+            label={t("Short Ratio")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fmt(fv?.shortRatio, 1)}</span>}
-            sub="days to cover"
+            sub={t("days to cover")}
           />
           {fv?.shortVolumeRatio != null && (
             <Cell
-              label="Short Volume"
+              label={t("Short Volume")}
               value={<span style={{ color: fv.shortVolumeRatio > 0.55 ? "var(--sr-neg)" : fv.shortVolumeRatio > 0.45 ? "var(--sr-warn)" : "var(--sr-text-2)" }}>{`${(fv.shortVolumeRatio * 100).toFixed(0)}%`}</span>}
-              sub="of daily volume (FINRA)"
+              sub={t("of daily volume (FINRA)")}
             />
           )}
         </div>
@@ -113,7 +114,7 @@ export default function StockSentiment({ data, loading }: Props) {
           <div style={{ marginTop: "var(--sr-sp-2)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4 }}>
               <span>0%</span>
-              <span style={{ color: sfColor, fontWeight: 600 }}>{sfPct.toFixed(2)}% short float</span>
+              <span style={{ color: sfColor, fontWeight: 600 }}>{t(`${sfPct.toFixed(2)}% short float`)}</span>
               <span>50%+</span>
             </div>
             <div style={{ height: 6, background: "var(--sr-surface-3)", borderRadius: 3, overflow: "hidden" }}>
@@ -126,9 +127,9 @@ export default function StockSentiment({ data, loading }: Props) {
               }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
-              <span style={{ color: "var(--sr-pos)" }}>Low (&lt;5%)</span>
-              <span style={{ color: "var(--sr-warn)" }}>Elevated (10-20%)</span>
-              <span style={{ color: "var(--sr-neg)" }}>High (&gt;20%)</span>
+              <span style={{ color: "var(--sr-pos)" }}>{t("Low (<5%)")}</span>
+              <span style={{ color: "var(--sr-warn)" }}>{t("Elevated (10-20%)")}</span>
+              <span style={{ color: "var(--sr-neg)" }}>{t("High (>20%)")}</span>
             </div>
           </div>
         )}
@@ -136,138 +137,138 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Ownership Flows */}
       <div className="card">
-        <SectionTitle title="Ownership Flows" />
+        <SectionTitle title={t("Ownership Flows")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
-            label="Inst Own"
+            label={t("Inst Own")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.instOwn != null ? `${(fv.instOwn * 100).toFixed(1)}%` : "—"}</span>}
-            sub="% institutional ownership"
+            sub={t("% institutional ownership")}
           />
           <Cell
-            label="Inst Trans"
+            label={t("Inst Trans")}
             value={
               <span style={{ color: rc(fv?.instTrans) }}>
                 <Arrow v={fv?.instTrans} /> {fmtPct(fv?.instTrans)}
               </span>
             }
-            sub="quarterly institutional flow"
+            sub={t("quarterly institutional flow")}
           />
           <Cell
-            label="Insider Own"
+            label={t("Insider Own")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.insiderOwn != null ? `${(fv.insiderOwn * 100).toFixed(1)}%` : "—"}</span>}
-            sub="% insider ownership"
+            sub={t("% insider ownership")}
           />
           <Cell
-            label="Insider Trans"
+            label={t("Insider Trans")}
             value={
               <span style={{ color: rc(fv?.insiderTrans) }}>
                 <Arrow v={fv?.insiderTrans} /> {fmtPct(fv?.insiderTrans)}
               </span>
             }
-            sub="quarterly insider flow"
+            sub={t("quarterly insider flow")}
           />
         </div>
       </div>
 
       {/* Activity */}
       <div className="card">
-        <SectionTitle title="Trading Activity" />
+        <SectionTitle title={t("Trading Activity")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
-            label="Rel Volume"
+            label={t("Rel Volume")}
             value={<span style={{ color: relVolColor }}>{fv?.relVolume != null ? `${fv.relVolume.toFixed(2)}x` : "—"}</span>}
-            sub="vs avg volume"
+            sub={t("vs avg volume")}
           />
           <Cell
             label="ATR"
             value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.atr != null ? `$${fmt(fv.atr, 2)}` : "—"}</span>}
-            sub="avg true range"
+            sub={t("avg true range")}
           />
           <Cell
-            label="Volatility 14D"
+            label={t("Volatility 14D")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.volatility14d != null ? `${(fv.volatility14d * 100).toFixed(2)}%` : "—"}</span>}
-            sub="daily avg move"
+            sub={t("daily avg move")}
           />
         </div>
       </div>
 
       {/* Analyst Sentiment */}
       <div className="card">
-        <SectionTitle title="Analyst Sentiment" />
+        <SectionTitle title={t("Analyst Sentiment")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
-            label="Recommendation"
+            label={t("Recommendation")}
             value={<span style={{ color: recommColor }}>{recommLabel}</span>}
-            sub={fv?.recom != null ? `Score: ${fv.recom.toFixed(2)} (1=Buy, 5=Sell)` : undefined}
+            sub={fv?.recom != null ? t(`Score: ${fv.recom.toFixed(2)} (1=Buy, 5=Sell)`) : undefined}
           />
           <Cell
-            label="Target Price"
+            label={t("Target Price")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fv?.targetPrice != null ? `$${fmt(fv.targetPrice, 2)}` : "—"}</span>}
-            sub="analyst consensus target"
+            sub={t("analyst consensus target")}
           />
           <Cell
-            label="Forward P/E"
+            label={t("Forward P/E")}
             value={<span style={{ color: "var(--sr-text-2)" }}>{fmt(fv?.forwardPe, 1)}</span>}
-            sub="next-12M earnings"
+            sub={t("next-12M earnings")}
           />
           <Cell
             label="PEG"
             value={<span style={{ color: fv?.peg != null ? (fv.peg < 1 ? "var(--sr-pos)" : fv.peg < 2 ? "var(--sr-text-2)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{fmt(fv?.peg, 2)}</span>}
-            sub="price/earnings/growth"
+            sub={t("price/earnings/growth")}
           />
         </div>
       </div>
 
       {/* Growth Signals */}
       <div className="card">
-        <SectionTitle title="Growth Signals" />
+        <SectionTitle title={t("Growth Signals")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
             label="EPS Q/Q"
             value={<span style={{ color: rc(fv?.epsQoQ) }}><Arrow v={fv?.epsQoQ} /> {fmtPct(fv?.epsQoQ)}</span>}
-            sub="earnings acceleration"
+            sub={t("earnings acceleration")}
           />
           <Cell
-            label="Sales Q/Q"
+            label={t("Sales Q/Q")}
             value={<span style={{ color: rc(fv?.salesQoQ) }}><Arrow v={fv?.salesQoQ} /> {fmtPct(fv?.salesQoQ)}</span>}
-            sub="revenue acceleration"
+            sub={t("revenue acceleration")}
           />
           <Cell
-            label="EPS Next Y"
+            label={t("EPS Next Y")}
             value={<span style={{ color: rc(fv?.epsNextY) }}><Arrow v={fv?.epsNextY} /> {fmtPct(fv?.epsNextY)}</span>}
-            sub="next-year EPS growth est."
+            sub={t("next-year EPS growth est.")}
           />
           <Cell
-            label="EPS Next 5Y"
+            label={t("EPS Next 5Y")}
             value={<span style={{ color: rc(fv?.epsNext5Y) }}><Arrow v={fv?.epsNext5Y} /> {fmtPct(fv?.epsNext5Y)}</span>}
-            sub="5-year EPS CAGR est."
+            sub={t("5-year EPS CAGR est.")}
           />
           <Cell
-            label="Sales 3Y CAGR"
+            label={t("Sales 3Y CAGR")}
             value={<span style={{ color: rc(fv?.salesGrowth3Y) }}><Arrow v={fv?.salesGrowth3Y} /> {fmtPct(fv?.salesGrowth3Y)}</span>}
-            sub="3-year revenue CAGR"
+            sub={t("3-year revenue CAGR")}
           />
         </div>
       </div>
 
       {/* Margins */}
       <div className="card">
-        <SectionTitle title="Margins" />
+        <SectionTitle title={t("Margins")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
-            label="Operating Margin"
+            label={t("Operating Margin")}
             value={<span style={{ color: fv?.operatingMargin != null ? (fv.operatingMargin > 0.15 ? "var(--sr-pos)" : fv.operatingMargin > 0 ? "var(--sr-text-2)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>
               {fv?.operatingMargin != null ? `${(fv.operatingMargin * 100).toFixed(1)}%` : "—"}
             </span>}
           />
           <Cell
-            label="Profit Margin"
+            label={t("Profit Margin")}
             value={<span style={{ color: rc(fv?.profitMargin) }}>
               {fv?.profitMargin != null ? `${(fv.profitMargin * 100).toFixed(1)}%` : "—"}
             </span>}
           />
           <Cell
-            label="Gross Margin"
+            label={t("Gross Margin")}
             value={<span style={{ color: "var(--sr-text-2)" }}>
               {fv?.grossMarginFv != null ? `${(fv.grossMarginFv * 100).toFixed(1)}%` : "—"}
             </span>}
@@ -289,18 +290,18 @@ export default function StockSentiment({ data, loading }: Props) {
 
       {/* Long-term Performance */}
       <div className="card">
-        <SectionTitle title="Long-term Performance" />
+        <SectionTitle title={t("Long-term Performance")} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: "var(--sr-sp-3)" }}>
           <Cell
-            label="Perf 1Y"
+            label={t("Perf 1Y")}
             value={<span style={{ color: rc(fv?.perfYear) }}>{fmtPct(fv?.perfYear)}</span>}
           />
           <Cell
-            label="Perf 3Y"
+            label={t("Perf 3Y")}
             value={<span style={{ color: rc(fv?.perf3Y) }}>{fmtPct(fv?.perf3Y)}</span>}
           />
           <Cell
-            label="Perf 5Y"
+            label={t("Perf 5Y")}
             value={<span style={{ color: rc(fv?.perf5Y) }}>{fmtPct(fv?.perf5Y)}</span>}
           />
         </div>
@@ -309,7 +310,7 @@ export default function StockSentiment({ data, loading }: Props) {
       {/* Powered by watermark */}
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", paddingRight: "var(--sr-sp-2)" }}>
         {/* La propiedad sale de Finviz cuando responde; el respaldo de Finnhub no la trae. */}
-        Fundamentals via Finnhub · short interest via NASDAQ/FINRA · {fv?.instOwn != null ? "ownership via Finviz" : "ownership needs a paid feed"}
+        {t("Fundamentals via Finnhub · short interest via NASDAQ/FINRA ·")}{" "}{fv?.instOwn != null ? t("ownership via Finviz") : t("ownership needs a paid feed")}
       </div>
 
     </div>

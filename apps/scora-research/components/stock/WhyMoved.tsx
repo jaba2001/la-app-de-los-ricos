@@ -10,6 +10,7 @@ import { useMemo, useState } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { attributeReturn, toDatedCloses, dominantDriver, type AttributionKey } from "@/lib/attribution";
 import { Sk } from "@/components/ui/Skeleton";
+import { t, tv } from "@/lib/i18n/cliente";
 
 const HORIZONS: { days: number; label: string; word: string }[] = [
   { days: 1, label: "1D", word: "today" },
@@ -84,7 +85,7 @@ export default function WhyMoved({ data, loading, ticker }: Props) {
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-3)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-        <div className="section-label" style={{ margin: 0 }}>Why it moved</div>
+        <div className="section-label" style={{ margin: 0 }}>{t("Why it moved")}</div>
         <div style={{ display: "flex", gap: 4 }}>
           {HORIZONS.map((h) => (
             <button
@@ -94,7 +95,7 @@ export default function WhyMoved({ data, loading, ticker }: Props) {
               className={`subtab ${horizon === h.days ? "active" : ""}`}
               aria-pressed={horizon === h.days}
             >
-              {h.label}
+              {tv(h.label)}
             </button>
           ))}
         </div>
@@ -102,8 +103,7 @@ export default function WhyMoved({ data, loading, ticker }: Props) {
 
       {!attr ? (
         <div className="sr-hint">
-          Not enough overlapping price history to attribute this move honestly.
-        </div>
+          {t("Not enough overlapping price history to attribute this move honestly.")}</div>
       ) : (
         <>
           {/* Headline: the realized move, then the one-line decomposition. */}
@@ -119,7 +119,7 @@ export default function WhyMoved({ data, loading, ticker }: Props) {
               {pct(attr.totalReturn)}
             </span>
             <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-              {ticker} {horizonMeta.word}
+              {ticker} {t(horizonMeta.word)}
             </span>
           </div>
 
@@ -151,26 +151,23 @@ export default function WhyMoved({ data, loading, ticker }: Props) {
           >
             {attr.components.map((c) => (
               <div key={c.key} className="sr-tile" title={BUCKET_HINT[c.key]}>
-                <div className="sr-tile-label" style={{ color: BUCKET_COLOR[c.key] }}>{c.label}</div>
+                <div className="sr-tile-label" style={{ color: BUCKET_COLOR[c.key] }}>{tv(c.label)}</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{pp(c.contribution)}</div>
-                <div className="sr-hint">{(c.share * 100).toFixed(0)}% of the move</div>
+                <div className="sr-hint">{t(`${(c.share * 100).toFixed(0)}% of the move`)}</div>
               </div>
             ))}
           </div>
 
           {earningsInWindow && (
             <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", color: "var(--sr-warn)" }}>
-              Earnings landed inside this window — expect the company bucket to carry it.
-            </div>
+              {t("Earnings landed inside this window — expect the company bucket to carry it.")}</div>
           )}
 
           {/* Method, stated plainly. The whole point of this card is that the number can
               be checked, so the inputs that produced it are not hidden in a tooltip. */}
           <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>
-            β {attr.betaMarket.toFixed(2)} vs SPY
-            {attr.betaSector !== null && series?.sectorSym ? ` · β ${attr.betaSector.toFixed(2)} vs ${series.sectorSym} (market-neutralized)` : ""}
-            {" · "}estimated on {attr.sampleDays} trading days · buckets sum to the realized return by construction
-          </div>
+            {t(`β ${attr.betaMarket.toFixed(2)} vs SPY`)}{attr.betaSector !== null && series?.sectorSym ? t(` · β ${attr.betaSector.toFixed(2)} vs ${series.sectorSym} (market-neutralized)`) : ""}
+            {" "}{t(`· estimated on ${attr.sampleDays} trading days · buckets sum to the realized return by construction`)}</div>
         </>
       )}
     </div>

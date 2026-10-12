@@ -4,6 +4,7 @@ import { authedFetch } from "@/lib/proxy";
 import type { MacroState } from "@/lib/types";
 import { METALS, netManagedMoney, wowChange, positioningRead, goldSilverRatio, type CotRow } from "@/lib/metals";
 import { rendimientoReal } from "@/lib/dolar";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading?: boolean; }
 type CotResponse = Record<string, { market: string; name: string; unit: string; rows: CotRow[] }>;
@@ -53,14 +54,12 @@ export default function MetalsCockpit({ macro }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)" }}>
       <div className="card">
-        <div className="section-label">Metals · price &amp; positioning</div>
+        <div className="section-label">{tr("Metals · price & positioning")}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 620, lineHeight: 1.5 }}>
-          Price from the liquid ETF proxy; positioning from the CFTC Commitments of Traders (weekly) — managed-money
-          net long/short is the honest read of institutional flow.
-        </div>
+          {tr("Price from the liquid ETF proxy; positioning from the CFTC Commitments of Traders (weekly) — managed-money net long/short is the honest read of institutional flow.")}</div>
 
         {loading ? (
-          <div className="sr-hint" style={{ padding: "var(--sr-sp-3) 0" }}>Loading metals…</div>
+          <div className="sr-hint" style={{ padding: "var(--sr-sp-3) 0" }}>{tr("Loading metals…")}</div>
         ) : (
           <div className="sr-grid-2">
             {METALS.map(m => {
@@ -82,9 +81,9 @@ export default function MetalsCockpit({ macro }: Props) {
                   <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, margin: "2px 0 6px" }} className="num">
                     {q?.price != null ? `$${q.price.toFixed(2)}` : "—"}
                   </div>
-                  <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(read.tone), marginBottom: 4 }}>{read.label}</div>
+                  <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(read.tone), marginBottom: 4 }}>{tv(read.label)}</div>
                   <div className="sr-hint">
-                    {net != null ? `Managed-money net ${net >= 0 ? "+" : ""}${net.toLocaleString()} contracts` : "No COT data"}
+                    {net != null ? tr(`Managed-money net ${net >= 0 ? "+" : ""}${net.toLocaleString()} contracts`) : tr("No COT data")}
                     {wow != null ? ` · WoW ${wow >= 0 ? "+" : ""}${wow.toLocaleString()}` : ""}
                   </div>
                 </div>
@@ -96,30 +95,29 @@ export default function MetalsCockpit({ macro }: Props) {
         {/* Cross-metal context */}
         <div className="sr-grid-3" style={{ marginTop: "var(--sr-sp-4)" }}>
           <div className="sr-tile">
-            <div className="sr-tile-label">Gold / silver ratio</div>
+            <div className="sr-tile-label">{tr("Gold / silver ratio")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{gsr != null ? gsr.toFixed(1) : "—"}</div>
-            <div className="sr-hint">{gsr != null ? (gsr > 85 ? "Silver cheap vs gold" : gsr < 65 ? "Silver rich vs gold" : "Mid-range") : "Needs GLD + SLV"}</div>
+            <div className="sr-hint">{gsr != null ? (gsr > 85 ? tr("Silver cheap vs gold") : gsr < 65 ? tr("Silver rich vs gold") : tr("Mid-range")) : tr("Needs GLD + SLV")}</div>
           </div>
           <div className="sr-tile">
-            <div className="sr-tile-label">Real 10-yr yield</div>
+            <div className="sr-tile-label">{tr("Real 10-yr yield")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: realYield == null ? "var(--sr-text-3)" : realYield < 1 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {realYield != null ? `${realYield.toFixed(2)}%` : "—"}
             </div>
-            <div className="sr-hint">10y Treasury − core PCE · gold&apos;s biggest macro driver</div>
+            <div className="sr-hint">{tr("10y Treasury − core PCE · gold's biggest macro driver")}</div>
           </div>
           {/* Aquí ponía «Gold spot (FRED) · Daily LBMA fix» con el precio de GLD (gold_price sale de
               una cotización de GLD; la serie LBMA de FRED se dejó de publicar): repetía el
               precio de arriba con una etiqueta falsa. La inflación implícita es el otro motor. */}
           <div className="sr-tile">
-            <div className="sr-tile-label">10y breakeven inflation</div>
+            <div className="sr-tile-label">{tr("10y breakeven inflation")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{breakeven != null ? `${breakeven.toFixed(2)}%` : "—"}</div>
-            <div className="sr-hint">Higher expected inflation supports gold</div>
+            <div className="sr-hint">{tr("Higher expected inflation supports gold")}</div>
           </div>
         </div>
 
         <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          Lower real yields lift gold (no coupon to compete with); a high gold/silver ratio historically favors silver. Warehouse &amp; lease-rate depth is a paid-data upgrade.
-        </div>
+          {tr("Lower real yields lift gold (no coupon to compete with); a high gold/silver ratio historically favors silver. Warehouse & lease-rate depth is a paid-data upgrade.")}</div>
       </div>
     </div>
   );

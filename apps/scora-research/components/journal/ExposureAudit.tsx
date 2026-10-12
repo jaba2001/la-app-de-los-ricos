@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { computeExposure, detectTheme, type Position, type Bucket } from "@/lib/exposure";
+import { t as tr } from "@/lib/i18n/cliente";
 
 interface Trade { ticker: string; shares: number; price: number; thesis: string | null; sector: string | null; }
 interface Props { trades: Trade[]; marks: Record<string, number>; }
@@ -59,24 +60,23 @@ export default function ExposureAudit({ trades, marks }: Props) {
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-      <div className="section-label">Exposure &amp; concentration</div>
+      <div className="section-label">{tr("Exposure & concentration")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 560, lineHeight: 1.5 }}>
-        How your open book is spread across names, sectors and themes — so concentration is seen before it&apos;s felt.
-      </div>
+        {tr("How your open book is spread across names, sectors and themes — so concentration is seen before it's felt.")}</div>
 
       {/* Concentration tiles */}
       <div className="sr-grid-3" style={{ marginBottom: "var(--sr-sp-4)" }}>
         <div className="sr-tile">
-          <div className="sr-tile-label">Positions</div>
+          <div className="sr-tile-label">{tr("Positions")}</div>
           <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{exposure.byPosition.length}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Effective bets (1/HHI)</div>
+          <div className="sr-tile-label">{tr("Effective bets (1/HHI)")}</div>
           <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">{exposure.effectiveNames.toFixed(1)}</div>
-          <div className="sr-hint">Diversification, not raw count</div>
+          <div className="sr-hint">{tr("Diversification, not raw count")}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Largest name</div>
+          <div className="sr-tile-label">{tr("Largest name")}</div>
           <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: exposure.topWeight > 0.25 ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">
             {(exposure.topWeight * 100).toFixed(0)}%
           </div>
@@ -89,7 +89,7 @@ export default function ExposureAudit({ trades, marks }: Props) {
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)" }}>
           {exposure.flags.map((f, i) => (
             <div key={i} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", fontSize: "var(--sr-t-xs)", lineHeight: 1.5, background: "color-mix(in srgb, var(--sr-warn) 9%, transparent)", color: "var(--sr-warn)", border: "1px solid color-mix(in srgb, var(--sr-warn) 22%, transparent)" }}>
-              ⚠ {f}
+              ⚠ {tr(f)}
             </div>
           ))}
         </div>
@@ -97,15 +97,15 @@ export default function ExposureAudit({ trades, marks }: Props) {
 
       <div className="sr-grid-2" style={{ gap: "var(--sr-sp-5)" }}>
         <div>
-          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>By sector</div>
+          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{tr("By sector")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {exposure.bySector.length ? exposure.bySector.map(b => <BarRow key={b.key} b={b} color="var(--sr-amber)" />) : <div className="sr-hint">Loading sectors…</div>}
+            {exposure.bySector.length ? exposure.bySector.map(b => <BarRow key={b.key} b={b} color="var(--sr-amber)" />) : <div className="sr-hint">{tr("Loading sectors…")}</div>}
           </div>
         </div>
         <div>
-          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>By theme</div>
+          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{tr("By theme")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            {exposure.byTheme.length ? exposure.byTheme.map(b => <BarRow key={b.key} b={b} color="#8B5CF6" />) : <div className="sr-hint">Tag trades with a thesis to see themes.</div>}
+            {exposure.byTheme.length ? exposure.byTheme.map(b => <BarRow key={b.key} b={b} color="#8B5CF6" />) : <div className="sr-hint">{tr("Tag trades with a thesis to see themes.")}</div>}
           </div>
         </div>
       </div>

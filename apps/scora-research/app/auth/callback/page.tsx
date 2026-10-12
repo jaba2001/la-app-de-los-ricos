@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isSignInWithEmailLink, signInWithEmailLink } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
+import { t } from "@/lib/i18n/cliente";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function AuthCallback() {
     // Platform pide completar la entrada a mano con el email, porque el enlace por si solo
     // no dice a quien pertenece — se puede abrir en otro navegador o reenviar.
     if (!isSignInWithEmailLink(auth(), window.location.href)) {
-      setStatus("This link is invalid or has already been used.");
+      setStatus(t("This link is invalid or has already been used."));
       return;
     }
     let email = window.localStorage.getItem("scora:emailLogin");
@@ -21,15 +22,15 @@ export default function AuthCallback() {
       // Caso real: el enlace se abre en otro dispositivo. Preguntarlo es el camino que
       // recomienda Google; el enlace solo sirve para ESE correo, asi que teclear otro falla.
       email = window.prompt("Confirm your email to finish signing in") ?? "";
-      if (!email) { setStatus("Your email is needed to finish signing in."); return; }
+      if (!email) { setStatus(t("Your email is needed to finish signing in.")); return; }
     }
     signInWithEmailLink(auth(), email, window.location.href)
       .then(() => {
         window.localStorage.removeItem("scora:emailLogin");
-        setStatus("Signed in — redirecting…");
+        setStatus(t("Signed in — redirecting…"));
         router.replace("/macro");
       })
-      .catch((e) => setStatus(`Couldn't finish signing in: ${(e as Error).message}`));
+      .catch((e) => setStatus(t(`Couldn't finish signing in: ${(e as Error).message}`)));
   }, [router]);
 
   return (
@@ -55,7 +56,7 @@ export default function AuthCallback() {
         </svg>
       </div>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>Scora Research</div>
+        <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{t("Scora Research")}</div>
         <div style={{ fontSize: 13, color: "#94A3B8" }}>{status}</div>
       </div>
       <div style={{

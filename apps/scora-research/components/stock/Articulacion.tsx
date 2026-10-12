@@ -15,6 +15,8 @@
 import { useMemo } from "react";
 import { articular, TOLERANCIA, type IdComprobacion } from "@/lib/articulacion";
 import type { StockData } from "@/app/stock/[ticker]/page";
+import { t as tr } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 type Row = Record<string, unknown>;
 const n = (v: unknown): number | null => { const x = Number(v); return isFinite(x) && v !== null && v !== "" ? x : null; };
@@ -86,7 +88,7 @@ export default function Articulacion({ data }: { data: StockData | null }) {
     });
   }, [data]);
 
-  if (!r) return <p className="sr-hint">Not enough financial statements to check accounting integrity.</p>;
+  if (!r) return <p className="sr-hint">{tr("Not enough financial statements to check accounting integrity.")}</p>;
 
   const color = r.confianza === "alta" ? "var(--sr-pos)" : r.confianza === "media" ? "var(--sr-warn)" : "var(--sr-neg)";
   const resumen = r.comprobables === 0
@@ -96,16 +98,13 @@ export default function Articulacion({ data }: { data: StockData | null }) {
   return (
     <section className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-        <h3 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, margin: 0 }}>Accounting integrity</h3>
-        <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>{CONFIANZA_LABEL[r.confianza] ?? r.confianza} confidence</span>
+        <h3 style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, margin: 0 }}>{tr("Accounting integrity")}</h3>
+        <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>{tr(CONFIANZA_LABEL[r.confianza] ?? r.confianza)} {" "}{tr("confidence")}</span>
         <span className="sr-hint" style={{ fontSize: "var(--sr-t-xs)" }}>{resumen}</span>
       </div>
 
       <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.7 }}>
-        Double-entry bookkeeping forces these accounts to reconcile. When they don&apos;t, any ratio built on top
-        is a credible, wrong number. <strong>It doesn&apos;t say whether the company is good</strong>: it says whether
-        its figures hold together.
-      </p>
+        <Trans text={"Double-entry bookkeeping forces these accounts to reconcile. When they don't, any ratio built on top is a credible, wrong number. <s1>It doesn't say whether the company is good</s1>: it says whether its figures hold together."} s1={(c) => <strong>{c}</strong>} /></p>
 
       <div style={{ marginTop: "var(--sr-sp-3)", display: "grid", gap: "var(--sr-sp-2)" }}>
         {r.comprobaciones.map((c) => {
@@ -114,16 +113,16 @@ export default function Articulacion({ data }: { data: StockData | null }) {
           return (
             <div key={c.id} style={{ borderLeft: `3px solid ${col}`, paddingLeft: "var(--sr-sp-2)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-                <strong style={{ fontSize: "var(--sr-t-sm)" }}>{ETIQUETA[c.id]}</strong>
+                <strong style={{ fontSize: "var(--sr-t-sm)" }}>{tr(ETIQUETA[c.id])}</strong>
                 <span style={{ fontSize: "var(--sr-t-sm)", color: col, fontWeight: 700 }}>
                   {estado}
-                  {c.desvio != null && c.ok === false ? ` · off by ${(c.desvio * 100).toFixed(1)}%` : ""}
+                  {c.desvio != null && c.ok === false ? tr(` · off by ${(c.desvio * 100).toFixed(1)}%`) : ""}
                   {c.ok === true && c.desvio != null ? ` · ${(c.desvio * 100).toFixed(2)}%` : ""}
                 </span>
               </div>
               <p className="sr-hint" style={{ margin: "2px 0 0", fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
-                {c.ok === null ? c.motivo : EXPLICA[c.id]}
-                {c.ok !== null ? ` Tolerance ${(TOLERANCIA[c.id] * 100).toFixed(0)}%.` : ""}
+                {tr(c.ok === null ? c.motivo : EXPLICA[c.id])}
+                {c.ok !== null ? tr(` Tolerance ${(TOLERANCIA[c.id] * 100).toFixed(0)}%.`) : ""}
               </p>
             </div>
           );
@@ -131,9 +130,7 @@ export default function Articulacion({ data }: { data: StockData | null }) {
       </div>
 
       <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
-        <strong>&ldquo;Not checkable&rdquo; doesn&apos;t mean &ldquo;wrong&rdquo;.</strong> It means figures are missing or the available ones
-        come from different period ends, and comparing two different snapshots doesn&apos;t detect a mismatch: it invents one.
-      </p>
+        <Trans text={"<s1>“Not checkable” doesn't mean “wrong”.</s1> It means figures are missing or the available ones come from different period ends, and comparing two different snapshots doesn't detect a mismatch: it invents one."} s1={(c) => <strong>{c}</strong>} /></p>
     </section>
   );
 }

@@ -10,6 +10,7 @@ import PortfolioOptimizer from "@/components/journal/PortfolioOptimizer";
 import ExposureAudit from "@/components/journal/ExposureAudit";
 import FactorExposure from "@/components/journal/FactorExposure";
 import PositionSizer from "@/components/journal/PositionSizer";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface JournalTrade {
   id: number; ticker: string; side: string; shares: number; price: number;
@@ -95,7 +96,7 @@ export default function JournalPage() {
     const ticker = f.ticker.trim().toUpperCase();
     const shares = Number(f.shares);
     const price = Number(f.price);
-    if (!ticker || !(shares > 0) || !(price >= 0)) { setError("Ticker, shares (>0) and price are required."); return; }
+    if (!ticker || !(shares > 0) || !(price >= 0)) { setError(tr("Ticker, shares (>0) and price are required.")); return; }
     setSaving(true); setError("");
     const { error } = await datos.from("sl_journal").insert({
       user_id: session.user.id,
@@ -110,7 +111,7 @@ export default function JournalPage() {
 
   async function closeTrade(t: JournalTrade) {
     const mark = marks[t.ticker];
-    if (mark == null) { setError(`No live price for ${t.ticker} yet — try again in a moment.`); return; }
+    if (mark == null) { setError(tr(`No live price for ${t.ticker} yet — try again in a moment.`)); return; }
     const { error } = await datos.from("sl_journal")
       .update({ status: "closed", exit_price: mark, exit_date: new Date().toISOString().slice(0, 10) })
       .eq("id", t.id);
@@ -160,10 +161,9 @@ export default function JournalPage() {
   return (
     <div style={{ padding: "var(--sr-sp-5)", maxWidth: 1040, margin: "0 auto" }}>
       <div style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <h1 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, letterSpacing: "-0.02em" }}>Trade Journal</h1>
+        <h1 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, letterSpacing: "-0.02em" }}>{tr("Trade Journal")}</h1>
         <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", marginTop: 4 }}>
-          Log your real trades, group them by thesis, and track live P&amp;L. Your own book — separate from the paper fund.
-        </p>
+          {tr("Log your real trades, group them by thesis, and track live P&L. Your own book — separate from the paper fund.")}</p>
       </div>
 
       {/* Summary tiles */}
@@ -175,27 +175,27 @@ export default function JournalPage() {
           { label: "Realized P&L", value: `${realTotal >= 0 ? "+" : ""}${money(realTotal)}`, color: pnlColor(realTotal) },
         ].map(t => (
           <div key={t.label} className="sr-tile">
-            <div className="sr-tile-label">{t.label}</div>
+            <div className="sr-tile-label">{tv(t.label)}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: t.color }} className="num">{t.value}</div>
-            {t.sub && <div className="sr-hint">{t.sub}</div>}
+            {t.sub && <div className="sr-hint">{tv(t.sub)}</div>}
           </div>
         ))}
       </div>
 
       {/* Add trade */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">Log a trade</div>
+        <div className="section-label">{tr("Log a trade")}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)", alignItems: "center" }}>
-          <input style={{ ...inputStyle, width: 90 }} placeholder="Ticker" value={f.ticker} onChange={e => setF({ ...f, ticker: e.target.value.toUpperCase() })} />
+          <input style={{ ...inputStyle, width: 90 }} placeholder={tr("Ticker")} value={f.ticker} onChange={e => setF({ ...f, ticker: e.target.value.toUpperCase() })} />
           <select style={{ ...inputStyle, width: 84 }} value={f.side} onChange={e => setF({ ...f, side: e.target.value })}>
-            <option value="buy">Buy</option>
-            <option value="sell">Sell</option>
+            <option value="buy">{tr("Buy")}</option>
+            <option value="sell">{tr("Sell")}</option>
           </select>
-          <input style={{ ...inputStyle, width: 90 }} type="number" placeholder="Shares" value={f.shares} onChange={e => setF({ ...f, shares: e.target.value })} />
-          <input style={{ ...inputStyle, width: 100 }} type="number" placeholder="Price $" value={f.price} onChange={e => setF({ ...f, price: e.target.value })} />
+          <input style={{ ...inputStyle, width: 90 }} type="number" placeholder={tr("Shares")} value={f.shares} onChange={e => setF({ ...f, shares: e.target.value })} />
+          <input style={{ ...inputStyle, width: 100 }} type="number" placeholder={tr("Price $")} value={f.price} onChange={e => setF({ ...f, price: e.target.value })} />
           <input style={{ ...inputStyle, width: 140 }} type="date" value={f.trade_date} onChange={e => setF({ ...f, trade_date: e.target.value })} />
-          <input style={{ ...inputStyle, flex: 1, minWidth: 160 }} placeholder="Thesis / tag (optional)" value={f.thesis} onChange={e => setF({ ...f, thesis: e.target.value })} onKeyDown={e => e.key === "Enter" && addTrade()} />
-          <button className="btn-primary" onClick={addTrade} disabled={saving} style={{ flexShrink: 0 }}>{saving ? "…" : "Add trade"}</button>
+          <input style={{ ...inputStyle, flex: 1, minWidth: 160 }} placeholder={tr("Thesis / tag (optional)")} value={f.thesis} onChange={e => setF({ ...f, thesis: e.target.value })} onKeyDown={e => e.key === "Enter" && addTrade()} />
+          <button className="btn-primary" onClick={addTrade} disabled={saving} style={{ flexShrink: 0 }}>{saving ? "…" : tr("Add trade")}</button>
         </div>
       </div>
 
@@ -205,15 +205,15 @@ export default function JournalPage() {
 
       {/* Open positions */}
       <div className="card" style={{ padding: 0, marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label" style={{ padding: "var(--sr-sp-4) var(--sr-sp-4) 0" }}>Open positions</div>
+        <div className="section-label" style={{ padding: "var(--sr-sp-4) var(--sr-sp-4) 0" }}>{tr("Open positions")}</div>
         {loadingList ? <div style={{ padding: "var(--sr-sp-4)" }}><Sk h={80} /></div> : openTrades.length === 0 ? (
-          <div style={{ padding: "var(--sr-sp-6)", textAlign: "center", color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No open positions. Log a trade above.</div>
+          <div style={{ padding: "var(--sr-sp-6)", textAlign: "center", color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("No open positions. Log a trade above.")}</div>
         ) : (
           <table className="sr-table">
             <thead><tr>
-              <th>Ticker</th><th>Side</th><th style={{ textAlign: "right" }}>Shares</th>
-              <th style={{ textAlign: "right" }}>Entry</th><th style={{ textAlign: "right" }}>Mark</th>
-              <th style={{ textAlign: "right" }}>Unreal. P&L</th><th>Thesis</th><th>Date</th><th></th>
+              <th>{tr("Ticker")}</th><th>{tr("Side")}</th><th style={{ textAlign: "right" }}>{tr("Shares")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Entry")}</th><th style={{ textAlign: "right" }}>{tr("Mark")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Unreal. P&L")}</th><th>{tr("Thesis")}</th><th>{tr("Date")}</th><th></th>
             </tr></thead>
             <tbody>
               {openTrades.map(t => {
@@ -234,8 +234,8 @@ export default function JournalPage() {
                     <td style={{ color: "var(--sr-text-2)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.thesis ?? "—"}</td>
                     <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>{t.trade_date}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      <button onClick={() => closeTrade(t)} title="Close at market" style={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", cursor: "pointer", padding: "3px 8px", fontSize: "var(--sr-t-xs)", marginRight: 4 }}>Close</button>
-                      <button onClick={() => removeTrade(t.id)} title="Delete" style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 6px", fontSize: "var(--sr-t-base)" }}>×</button>
+                      <button onClick={() => closeTrade(t)} title={tr("Close at market")} style={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", cursor: "pointer", padding: "3px 8px", fontSize: "var(--sr-t-xs)", marginRight: 4 }}>{tr("Close")}</button>
+                      <button onClick={() => removeTrade(t.id)} title={tr("Delete")} style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 6px", fontSize: "var(--sr-t-base)" }}>×</button>
                     </td>
                   </tr>
                 );
@@ -270,9 +270,9 @@ export default function JournalPage() {
       {/* Attribution by thesis */}
       {thesisRows.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-          <div className="section-label">Attribution by thesis</div>
+          <div className="section-label">{tr("Attribution by thesis")}</div>
           <table className="sr-table">
-            <thead><tr><th>Thesis</th><th style={{ textAlign: "right" }}>Cost basis</th><th style={{ textAlign: "right" }}>P&L (unreal.+real.)</th><th style={{ textAlign: "right" }}>Return</th></tr></thead>
+            <thead><tr><th>{tr("Thesis")}</th><th style={{ textAlign: "right" }}>{tr("Cost basis")}</th><th style={{ textAlign: "right" }}>{tr("P&L (unreal.+real.)")}</th><th style={{ textAlign: "right" }}>{tr("Return")}</th></tr></thead>
             <tbody>
               {thesisRows.map(([thesis, v]) => (
                 <tr key={thesis}>
@@ -290,12 +290,12 @@ export default function JournalPage() {
       {/* Closed trades */}
       {closedTrades.length > 0 && (
         <div className="card" style={{ padding: 0 }}>
-          <div className="section-label" style={{ padding: "var(--sr-sp-4) var(--sr-sp-4) 0" }}>Closed trades</div>
+          <div className="section-label" style={{ padding: "var(--sr-sp-4) var(--sr-sp-4) 0" }}>{tr("Closed trades")}</div>
           <table className="sr-table">
             <thead><tr>
-              <th>Ticker</th><th>Side</th><th style={{ textAlign: "right" }}>Shares</th>
-              <th style={{ textAlign: "right" }}>Entry</th><th style={{ textAlign: "right" }}>Exit</th>
-              <th style={{ textAlign: "right" }}>Realized P&L</th><th>Thesis</th><th>Closed</th><th></th>
+              <th>{tr("Ticker")}</th><th>{tr("Side")}</th><th style={{ textAlign: "right" }}>{tr("Shares")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Entry")}</th><th style={{ textAlign: "right" }}>{tr("Exit")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Realized P&L")}</th><th>{tr("Thesis")}</th><th>{tr("Closed")}</th><th></th>
             </tr></thead>
             <tbody>
               {closedTrades.map(t => {
@@ -310,7 +310,7 @@ export default function JournalPage() {
                     <td style={{ textAlign: "right", fontWeight: 600, color: pnlColor(pnl) }} className="num">{pnl >= 0 ? "+" : ""}{money(pnl)}</td>
                     <td style={{ color: "var(--sr-text-2)", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.thesis ?? "—"}</td>
                     <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>{t.exit_date ?? "—"}</td>
-                    <td><button onClick={() => removeTrade(t.id)} title="Delete" style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 6px", fontSize: "var(--sr-t-base)" }}>×</button></td>
+                    <td><button onClick={() => removeTrade(t.id)} title={tr("Delete")} style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 6px", fontSize: "var(--sr-t-base)" }}>×</button></td>
                   </tr>
                 );
               })}

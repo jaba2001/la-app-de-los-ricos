@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import { forecastSeries } from "@/lib/forecast";
 import { forecastARIMA } from "@/lib/arima";
+import { t } from "@/lib/i18n/cliente";
 
 interface Fc { method: string; points: number[]; lower: number[]; upper: number[]; growthRate: number | null; r2: number | null; arima: boolean; }
 
@@ -51,8 +52,8 @@ export default function RevenueForecast({ data }: Props) {
   if (!model) {
     return (
       <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-        <div className="section-label">Revenue trajectory forecast</div>
-        <div className="sr-hint">Not enough quarterly revenue history to project (need ≥ 4 quarters).</div>
+        <div className="section-label">{t("Revenue trajectory forecast")}</div>
+        <div className="sr-hint">{t("Not enough quarterly revenue history to project (need ≥ 4 quarters).")}</div>
       </div>
     );
   }
@@ -63,37 +64,36 @@ export default function RevenueForecast({ data }: Props) {
 
   return (
     <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-      <div className="section-label">Revenue trajectory forecast · {fc.method}</div>
+      <div className="section-label">{t(`Revenue trajectory forecast · ${fc.method}`)}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-        Fits {fc.arima ? "an ARIMA model" : `a ${fc.method === "geometric" ? "compound-growth" : "linear"} trend`} to the last {model.revs.length} quarters and projects the next 4 with an ~80% band. Educational, not guidance.
-      </div>
+        {t("Fits")}{" "}{fc.arima ? t("an ARIMA model") : t(`a ${fc.method === "geometric" ? "compound-growth" : "linear"} trend`)} {" "}{t(`to the last ${model.revs.length} quarters and projects the next 4 with an ~80% band. Educational, not guidance.`)}</div>
 
       <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-3)" }}>
         <div className="sr-tile">
-          <div className="sr-tile-label">Qtr growth (fit)</div>
+          <div className="sr-tile-label">{t("Qtr growth (fit)")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: gColor }}>
             {fc.growthRate != null ? `${fc.growthRate >= 0 ? "+" : ""}${(fc.growthRate * 100).toFixed(1)}%` : "—"}
           </div>
           <div className="sr-hint">{fc.r2 != null ? `R² ${fc.r2.toFixed(2)}` : fc.method}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">TTM revenue</div>
+          <div className="sr-tile-label">{t("TTM revenue")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{money(ttmRev)}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Fwd TTM (proj.)</div>
+          <div className="sr-tile-label">{t("Fwd TTM (proj.)")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{money(projTtmRev)}</div>
           {fwdGrowth != null && <div className="sr-hint" style={{ color: fwdGrowth >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{fwdGrowth >= 0 ? "+" : ""}{fwdGrowth.toFixed(1)}% YoY</div>}
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Fwd FCF (proj.)</div>
+          <div className="sr-tile-label">{t("Fwd FCF (proj.)")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{money(projFcf)}</div>
-          {fcfMargin != null && <div className="sr-hint">@ {(fcfMargin * 100).toFixed(1)}% FCF margin</div>}
+          {fcfMargin != null && <div className="sr-hint">{t(`@ ${(fcfMargin * 100).toFixed(1)}% FCF margin`)}</div>}
         </div>
       </div>
 
       <table className="sr-table">
-        <thead><tr><th>Next quarter</th><th style={{ textAlign: "right" }}>Low (~80%)</th><th style={{ textAlign: "right" }}>Projected</th><th style={{ textAlign: "right" }}>High (~80%)</th></tr></thead>
+        <thead><tr><th>{t("Next quarter")}</th><th style={{ textAlign: "right" }}>{t("Low (~80%)")}</th><th style={{ textAlign: "right" }}>{t("Projected")}</th><th style={{ textAlign: "right" }}>{t("High (~80%)")}</th></tr></thead>
         <tbody>
           {fc.points.map((p, i) => (
             <tr key={i}>

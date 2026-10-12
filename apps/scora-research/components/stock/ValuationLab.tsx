@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import type { StockData } from "@/app/stock/[ticker]/page";
 import type { MacroState } from "@/lib/types";
 import { waccBridge, dcfMatrix, sectorComps } from "@/lib/valuation";
+import { t } from "@/lib/i18n/cliente";
 
 interface Props { data: StockData; macro: MacroState | null; }
 type Row = Record<string, unknown>;
@@ -56,17 +57,17 @@ export default function ValuationLab({ data, macro }: Props) {
 
   return (
     <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-      <div className="section-label">Valuation lab</div>
+      <div className="section-label">{t("Valuation lab")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 620, lineHeight: 1.5 }}>
-        WACC bridge, DCF sensitivity grid and sector-comps range. {price != null ? `Current price $${price.toFixed(2)}.` : ""}
+        {t("WACC bridge, DCF sensitivity grid and sector-comps range.")}{" "}{price != null ? t(`Current price $${price.toFixed(2)}.`) : ""}
       </div>
 
       {/* WACC bridge */}
       {wb && (
         <div className="sr-grid-4" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-tile"><div className="sr-tile-label">Cost of equity (CAPM)</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{wb.costOfEquity.toFixed(2)}%</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Cost of debt (after tax)</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{wb.costOfDebtEstimated ? "≈" : ""}{wb.costOfDebtAfterTax.toFixed(2)}%</div>{wb.costOfDebtEstimated && <div className="sr-hint">Interest expense not reported — estimated as risk-free + 1 pt.</div>}</div>
-          <div className="sr-tile"><div className="sr-tile-label">Capital structure E / D</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{(wb.weightEquity * 100).toFixed(0)}/{(wb.weightDebt * 100).toFixed(0)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Cost of equity (CAPM)")}</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{wb.costOfEquity.toFixed(2)}%</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Cost of debt (after tax)")}</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{wb.costOfDebtEstimated ? "≈" : ""}{wb.costOfDebtAfterTax.toFixed(2)}%</div>{wb.costOfDebtEstimated && <div className="sr-hint">{t("Interest expense not reported — estimated as risk-free + 1 pt.")}</div>}</div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Capital structure E / D")}</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{(wb.weightEquity * 100).toFixed(0)}/{(wb.weightDebt * 100).toFixed(0)}</div></div>
           <div className="sr-tile"><div className="sr-tile-label">WACC</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">{wb.wacc.toFixed(2)}%</div></div>
         </div>
       )}
@@ -74,7 +75,7 @@ export default function ValuationLab({ data, macro }: Props) {
       {/* DCF sensitivity matrix */}
       {dm && (
         <div style={{ marginBottom: "var(--sr-sp-4)", overflowX: "auto" }}>
-          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>DCF fair value per share · WACC (rows) × Y1-5 growth (columns)</div>
+          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{t("DCF fair value per share · WACC (rows) × Y1-5 growth (columns)")}</div>
           <table className="sr-table">
             <thead><tr><th>WACC \ g</th>{dm.growths.map((g) => <th key={g} style={{ textAlign: "right" }}>{g}%</th>)}</tr></thead>
             <tbody>
@@ -86,16 +87,16 @@ export default function ValuationLab({ data, macro }: Props) {
               ))}
             </tbody>
           </table>
-          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>Green = above the current price (undervalued in that scenario) · red = below.</div>
+          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{t("Green = above the current price (undervalued in that scenario) · red = below.")}</div>
         </div>
       )}
 
       {/* Comps */}
       {comps && (comps.peBased != null || comps.evBased != null) && (
         <div className="sr-grid-3">
-          <div className="sr-tile"><div className="sr-tile-label">Comps P/E sector {comps.sectorPe ?? "—"}×</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: cellColor(comps.peBased) }} className="num">{comps.peBased != null ? `$${comps.peBased.toFixed(2)}` : "—"}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Comps EV/EBITDA {comps.sectorEv ?? "—"}×</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: cellColor(comps.evBased) }} className="num">{comps.evBased != null ? `$${comps.evBased.toFixed(2)}` : "—"}</div></div>
-          <div className="sr-tile"><div className="sr-tile-label">Comps range</div><div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">{money(comps.low)}–{money(comps.high)}</div><div className="sr-hint">mid {money(comps.mid)}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Comps P/E sector")}{" "}{comps.sectorPe ?? "—"}×</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: cellColor(comps.peBased) }} className="num">{comps.peBased != null ? `$${comps.peBased.toFixed(2)}` : "—"}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Comps EV/EBITDA")}{" "}{comps.sectorEv ?? "—"}×</div><div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: cellColor(comps.evBased) }} className="num">{comps.evBased != null ? `$${comps.evBased.toFixed(2)}` : "—"}</div></div>
+          <div className="sr-tile"><div className="sr-tile-label">{t("Comps range")}</div><div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">{money(comps.low)}–{money(comps.high)}</div><div className="sr-hint">{t(`mid ${money(comps.mid)}`)}</div></div>
         </div>
       )}
     </div>

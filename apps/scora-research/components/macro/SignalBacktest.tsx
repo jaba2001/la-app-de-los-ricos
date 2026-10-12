@@ -4,6 +4,7 @@ import { authedFetch } from "@/lib/proxy";
 import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import { runBacktest, type BacktestAnalysis, type BacktestResult, type DatedClose } from "@/lib/backtest";
 import DataError from "@/components/ui/DataError";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 const VERDICT_META: Record<BacktestResult["verdict"], { label: string; color: string; note: string }> = {
   supportive:  { label: "Supportive", color: "var(--sr-pos)",  note: "BUY-rated calls beat SPY more often than the rest" },
@@ -58,7 +59,7 @@ export default function SignalBacktest() {
       });
       setResult(runBacktest(points, historyByTicker, toCloses(spyRaw), 60));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Backtest failed");
+      setError(e instanceof Error ? e.message : tr("Backtest failed"));
     }
     setLoading(false);
   }
@@ -67,13 +68,12 @@ export default function SignalBacktest() {
     <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-3)", flexWrap: "wrap", gap: "var(--sr-sp-3)" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Signal Backtest — do high scores beat SPY?</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("Signal Backtest — do high scores beat SPY?")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
-            Forward return of each analyzed ticker since its analysis date vs SPY over the same window. Descriptive of your own history — not a forecast.
-          </div>
+            {tr("Forward return of each analyzed ticker since its analysis date vs SPY over the same window. Descriptive of your own history — not a forecast.")}</div>
         </div>
         <button className="btn-primary" onClick={run} disabled={loading || analyzed.length === 0} style={{ flexShrink: 0 }}>
-          {loading ? "Running…" : result ? "Re-run" : "Run backtest"}
+          {loading ? tr("Running…") : result ? tr("Re-run") : tr("Run backtest")}
         </button>
       </div>
 
@@ -83,10 +83,10 @@ export default function SignalBacktest() {
 
       <DataError mensaje={errorWatchlist} />
       {analyzed.length === 0 && !loading && !errorWatchlist && (
-        <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>Analyze tickers in your watchlist first to build a backtest.</div>
+        <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("Analyze tickers in your watchlist first to build a backtest.")}</div>
       )}
       {result && excluidos.length > 0 && (
-        <DataError mensaje={`${excluidos.length} of ${analyzed.length} tickers left out — no price history came back (${excluidos.join(", ")}). The result below covers only the rest.`} />
+        <DataError mensaje={tr(`${excluidos.length} of ${analyzed.length} tickers left out — no price history came back (${excluidos.join(", ")}). The result below covers only the rest.`)} />
       )}
 
       {result && (() => {
@@ -94,8 +94,8 @@ export default function SignalBacktest() {
         return (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${m.color} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${m.color} 25%, transparent)`, marginBottom: "var(--sr-sp-4)" }}>
-              <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: m.color }}>{m.label}</span>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{m.note}</span>
+              <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: m.color }}>{tv(m.label)}</span>
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{tv(m.note)}</span>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
@@ -104,19 +104,19 @@ export default function SignalBacktest() {
                 { label: `Rest (score < ${result.buyThreshold})`, s: result.rest, hi: false },
               ].map(({ label, s, hi }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   <div style={{ display: "flex", gap: "var(--sr-sp-4)", alignItems: "baseline" }}>
                     <div>
                       <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: hi ? (s.hitRate >= 0.6 ? "var(--sr-pos)" : s.hitRate >= 0.45 ? "var(--sr-warn)" : "var(--sr-neg)") : "var(--sr-text-2)" }} className="num">
                         {s.n > 0 ? `${(s.hitRate * 100).toFixed(0)}%` : "—"}
                       </div>
-                      <div className="sr-hint">beat SPY ({s.n})</div>
+                      <div className="sr-hint">{tr(`beat SPY (${s.n})`)}</div>
                     </div>
                     <div>
                       <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: s.avgAlpha >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
                         {s.avgAlpha >= 0 ? "+" : ""}{s.avgAlpha.toFixed(1)}%
                       </div>
-                      <div className="sr-hint">avg alpha</div>
+                      <div className="sr-hint">{tr("avg alpha")}</div>
                     </div>
                   </div>
                 </div>
@@ -126,11 +126,11 @@ export default function SignalBacktest() {
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
                 <thead><tr>
-                  <th>Ticker</th><th>Analyzed</th>
-                  <th style={{ textAlign: "right" }}>Score</th>
-                  <th style={{ textAlign: "right" }}>Fwd Return</th>
+                  <th>{tr("Ticker")}</th><th>{tr("Analyzed")}</th>
+                  <th style={{ textAlign: "right" }}>{tr("Score")}</th>
+                  <th style={{ textAlign: "right" }}>{tr("Fwd Return")}</th>
                   <th style={{ textAlign: "right" }}>SPY</th>
-                  <th style={{ textAlign: "right" }}>Alpha</th>
+                  <th style={{ textAlign: "right" }}>{tr("Alpha")}</th>
                 </tr></thead>
                 <tbody>
                   {[...result.points].sort((a, b) => b.alpha - a.alpha).map(p => (
@@ -147,8 +147,7 @@ export default function SignalBacktest() {
               </table>
             </div>
             <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-              One point per ticker (its latest analysis). A small sample and survivorship in your own picks make this indicative, not statistically robust. Past performance does not predict future results.
-            </div>
+              {tr("One point per ticker (its latest analysis). A small sample and survivorship in your own picks make this indicative, not statistically robust. Past performance does not predict future results.")}</div>
           </div>
         );
       })()}

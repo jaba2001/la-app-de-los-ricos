@@ -10,6 +10,7 @@ import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { getRating, calcFactorTilts, SECTOR_PE_BM, SECTOR_EV_BM } from "@/lib/scoring";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import { etiquetaRegimen } from "@/lib/regimen";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props {
   data: StockData | null;
@@ -179,8 +180,8 @@ Be specific, analytical, and data-driven. Write in English.`;
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div>
-            <div className="section-label">AI Earnings Analysis</div>
-            <div className="sr-hint">Claude Haiku — last 4 quarters revenue, EPS & beat/miss pattern</div>
+            <div className="section-label">{tr("AI Earnings Analysis")}</div>
+            <div className="sr-hint">{tr("Claude Haiku — last 4 quarters revenue, EPS & beat/miss pattern")}</div>
           </div>
           <button
             className="btn-primary"
@@ -188,7 +189,7 @@ Be specific, analytical, and data-driven. Write in English.`;
             disabled={earningsLoading || loading || !data}
             style={{ flexShrink: 0 }}
           >
-            {earningsLoading ? "Analyzing…" : earningsAI ? "Re-analyze" : "✦ Analyze Earnings"}
+            {earningsLoading ? tr("Analyzing…") : earningsAI ? tr("Re-analyze") : tr("✦ Analyze Earnings")}
           </button>
         </div>
         {earningsLoading ? (
@@ -204,8 +205,7 @@ Be specific, analytical, and data-driven. Write in English.`;
           </div>
         ) : (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", textAlign: "center", padding: "var(--sr-sp-6) 0" }}>
-            Click to generate AI earnings quality analysis based on recent quarterly data.
-          </div>
+            {tr("Click to generate AI earnings quality analysis based on recent quarterly data.")}</div>
         )}
       </div>
 
@@ -214,21 +214,21 @@ Be specific, analytical, and data-driven. Write in English.`;
         <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
           <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
             <div>
-              <div className="section-label">Peer Score Comparison</div>
-              <div className="sr-hint">From sl_analyses — run full analysis on each peer to populate</div>
+              <div className="section-label">{tr("Peer Score Comparison")}</div>
+              <div className="sr-hint">{tr("From sl_analyses — run full analysis on each peer to populate")}</div>
             </div>
           </div>
           {peerLoading ? <Sk w="100%" h={160} /> : (
             <table className="sr-table">
               <thead><tr>
-                <th>Ticker</th>
-                <th style={{ textAlign: "right" }}>Base Score</th>
-                <th style={{ textAlign: "right" }}>Value</th>
-                <th style={{ textAlign: "right" }}>Health</th>
-                <th style={{ textAlign: "right" }}>Momentum</th>
-                <th style={{ textAlign: "right" }}>Growth</th>
-                <th>Rating</th>
-                <th className="sr-hint">Date</th>
+                <th>{tr("Ticker")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Base Score")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Value")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Health")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Momentum")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Growth")}</th>
+                <th>{tr("Rating")}</th>
+                <th className="sr-hint">{tr("Date")}</th>
               </tr></thead>
               <tbody>
                 {peerList.map(p => {
@@ -245,7 +245,7 @@ Be specific, analytical, and data-driven. Write in English.`;
                       onClick={() => !isThis && router.push(`/stock/${p}`)}
                     >
                       <td style={{ fontWeight: 700, color: isThis ? "var(--sr-amber)" : "var(--sr-text)" }}>
-                        {p}{isThis && <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 400, color: "var(--sr-text-3)", marginLeft: 4 }}>(this)</span>}
+                        {p}{isThis && <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 400, color: "var(--sr-text-3)", marginLeft: 4 }}>{tr("(this)")}</span>}
                       </td>
                       <td style={{ textAlign: "right", fontWeight: 700 }} className="num">
                         {a ? Number(a.score_total).toFixed(0) : <span style={{ color: "var(--sr-text-3)" }}>—</span>}
@@ -254,7 +254,7 @@ Be specific, analytical, and data-driven. Write in English.`;
                       <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_hlth).toFixed(0) : "—"}</td>
                       <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_mom).toFixed(0) : "—"}</td>
                       <td style={{ textAlign: "right" }} className="num">{a ? Number(a.score_growth).toFixed(0) : "—"}</td>
-                      <td>{pRating ? <Pill label={pRating.label} color={pRating.color} /> : <span className="sr-hint">not analyzed</span>}</td>
+                      <td>{pRating ? <Pill label={tv(pRating.label)} color={pRating.color} /> : <span className="sr-hint">{tr("not analyzed")}</span>}</td>
                       <td className="sr-hint">
                         {a?.analysis_date ? String(a.analysis_date).slice(0, 10) : "—"}
                       </td>
@@ -275,10 +275,9 @@ Be specific, analytical, and data-driven. Write in English.`;
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
           <div>
-            <div className="section-label">AI Investment Verdict</div>
+            <div className="section-label">{tr("AI Investment Verdict")}</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-              Claude Haiku — full context: fundamentals + macro + scoring
-            </div>
+              {tr("Claude Haiku — full context: fundamentals + macro + scoring")}</div>
           </div>
           <button
             className="btn-primary"
@@ -286,7 +285,7 @@ Be specific, analytical, and data-driven. Write in English.`;
             disabled={aiLoading || loading || !data || !macro}
             style={{ flexShrink: 0 }}
           >
-            {aiLoading ? "Analyzing…" : aiVerdict ? "✦ Regenerate" : "✦ Generate Verdict"}
+            {aiLoading ? tr("Analyzing…") : aiVerdict ? tr("✦ Regenerate") : tr("✦ Generate Verdict")}
           </button>
         </div>
 
@@ -317,8 +316,7 @@ Be specific, analytical, and data-driven. Write in English.`;
           <div style={{ textAlign: "center", padding: "var(--sr-sp-8)", color: "var(--sr-text-3)" }}>
             <div style={{ fontSize: "2rem", marginBottom: "var(--sr-sp-3)" }}>✦</div>
             <div style={{ fontSize: "var(--sr-t-sm)" }}>
-              Click "Generate Verdict" for a comprehensive AI analysis integrating fundamentals, macro context, and scoring
-            </div>
+              {tr("Click \"Generate Verdict\" for a comprehensive AI analysis integrating fundamentals, macro context, and scoring")}</div>
           </div>
         )}
       </div>
@@ -328,11 +326,11 @@ Be specific, analytical, and data-driven. Write in English.`;
         <div className="card" style={{ borderColor: "color-mix(in srgb, var(--sr-pos) 25%, var(--sr-border))", background: "color-mix(in srgb, var(--sr-pos) 4%, var(--sr-surface))" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
             <span style={{ fontSize: "1.2rem" }}>🏰</span>
-            <div className="section-label" style={{ margin: 0, color: "var(--sr-pos)" }}>Bull Case</div>
+            <div className="section-label" style={{ margin: 0, color: "var(--sr-pos)" }}>{tr("Bull Case")}</div>
           </div>
           {loading ? [0,1,2].map(i => <Sk key={i} w="90%" h={14} />) :
             bullSignals.length === 0
-              ? <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>No strong bull signals detected</div>
+              ? <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>{tr("No strong bull signals detected")}</div>
               : bullSignals.map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
                   <span style={{ color: "var(--sr-pos)", flexShrink: 0 }}>✓</span>{s}
@@ -344,11 +342,11 @@ Be specific, analytical, and data-driven. Write in English.`;
         <div className="card" style={{ borderColor: "color-mix(in srgb, var(--sr-neg) 25%, var(--sr-border))", background: "color-mix(in srgb, var(--sr-neg) 4%, var(--sr-surface))" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
             <span style={{ fontSize: "1.2rem" }}>⚠️</span>
-            <div className="section-label" style={{ margin: 0, color: "var(--sr-neg)" }}>Bear Case / Risks</div>
+            <div className="section-label" style={{ margin: 0, color: "var(--sr-neg)" }}>{tr("Bear Case / Risks")}</div>
           </div>
           {loading ? [0,1,2].map(i => <Sk key={i} w="90%" h={14} />) :
             bearSignals.length === 0
-              ? <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>No major risk signals detected</div>
+              ? <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>{tr("No major risk signals detected")}</div>
               : bearSignals.map((s, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
                   <span style={{ color: "var(--sr-neg)", flexShrink: 0 }}>✗</span>{s}
@@ -361,7 +359,7 @@ Be specific, analytical, and data-driven. Write in English.`;
         {/* Moat scorecard */}
         <div className="card">
           <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
-            <div className="section-label">Quality Moat Scorecard</div>
+            <div className="section-label">{tr("Quality Moat Scorecard")}</div>
             {moat && <Pill label={moatLabel} color={moatColor} />}
           </div>
           {loading ? <Sk w="100%" h={160} /> : moat ? (
@@ -375,7 +373,7 @@ Be specific, analytical, and data-driven. Write in English.`;
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
                     <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{p.name}</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span className="sr-hint">{p.detail}</span>
+                      <span className="sr-hint">{tv(p.detail)}</span>
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: moatColor }} className="num">{p.score}/25</span>
                     </div>
                   </div>
@@ -385,17 +383,17 @@ Be specific, analytical, and data-driven. Write in English.`;
                 </div>
               ))}
             </div>
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("No data")}</div>}
         </div>
 
         {/* Earnings surprises */}
         <div className="card">
-          <div className="section-label">Earnings Surprises (last 8)</div>
+          <div className="section-label">{tr("Earnings Surprises (last 8)")}</div>
           {loading ? <Sk w="100%" h={160} /> : earningsSurprises.length === 0 ? (
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No earnings data</div>
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("No earnings data")}</div>
           ) : (
             <table className="sr-table">
-              <thead><tr><th>Period</th><th style={{ textAlign: "right" }}>Actual EPS</th><th style={{ textAlign: "right" }}>Expected</th><th style={{ textAlign: "right" }}>Surprise</th></tr></thead>
+              <thead><tr><th>{tr("Period")}</th><th style={{ textAlign: "right" }}>{tr("Actual EPS")}</th><th style={{ textAlign: "right" }}>{tr("Expected")}</th><th style={{ textAlign: "right" }}>{tr("Surprise")}</th></tr></thead>
               <tbody>
                 {earningsSurprises.slice(0, 8).map((e, i) => {
                   const actRaw = e.actual ?? e.epsActual ?? e.actualEarningResult;
@@ -451,8 +449,8 @@ Be specific, analytical, and data-driven. Write in English.`;
         return (
           <div className="card" style={{ marginTop: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sr-sp-4)" }}>
-              <div className="section-label" style={{ margin: 0 }}>Factor Tilt Engine</div>
-              <span className="sr-hint">5 factors × 20 pts = 100 max</span>
+              <div className="section-label" style={{ margin: 0 }}>{tr("Factor Tilt Engine")}</div>
+              <span className="sr-hint">{tr("5 factors × 20 pts = 100 max")}</span>
             </div>
             <div className="sr-grid-5">
               {factors.map(f => (
@@ -464,7 +462,7 @@ Be specific, analytical, and data-driven. Write in English.`;
                   <div className="score-bar-track">
                     <div className="score-bar-fill" style={{ width: `${(f.score / 20) * 100}%`, background: f.color }} />
                   </div>
-                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.3 }}>{f.note}</span>
+                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.3 }}>{tv(f.note)}</span>
                 </div>
               ))}
             </div>
@@ -486,11 +484,11 @@ Be specific, analytical, and data-driven. Write in English.`;
               return (
                 <div style={{ marginTop: "var(--sr-sp-4)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", display: "flex", gap: "var(--sr-sp-5)", alignItems: "center" }}>
                   <div>
-                    <span className="sr-hint">Valuation vs {sectorName} BM</span>
-                    <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: alert.color, marginLeft: 10 }}>{alert.label}</span>
+                    <span className="sr-hint">{tr(`Valuation vs ${sectorName} BM`)}</span>
+                    <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: alert.color, marginLeft: 10 }}>{tv(alert.label)}</span>
                   </div>
-                  {pePrem != null && <div className="sr-hint">P/E premium: <strong style={{ color: pePrem > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }}>{pePrem > 0 ? "+" : ""}{pePrem.toFixed(0)}%</strong> vs BM {bm_pe}x</div>}
-                  {evPrem != null && <div className="sr-hint">EV/EBITDA premium: <strong style={{ color: evPrem > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }}>{evPrem > 0 ? "+" : ""}{evPrem.toFixed(0)}%</strong> vs BM {bm_ev}x</div>}
+                  {pePrem != null && <div className="sr-hint">{tr("P/E premium:")}{" "}<strong style={{ color: pePrem > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }}>{pePrem > 0 ? "+" : ""}{pePrem.toFixed(0)}%</strong> {" "}{tr(`vs BM ${bm_pe}x`)}</div>}
+                  {evPrem != null && <div className="sr-hint">{tr("EV/EBITDA premium:")}{" "}<strong style={{ color: evPrem > 0 ? "var(--sr-neg)" : "var(--sr-pos)" }}>{evPrem > 0 ? "+" : ""}{evPrem.toFixed(0)}%</strong> {" "}{tr(`vs BM ${bm_ev}x`)}</div>}
                 </div>
               );
             })()}
@@ -501,7 +499,7 @@ Be specific, analytical, and data-driven. Write in English.`;
       {/* Analyst targets & Insider trades */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginTop: "var(--sr-sp-5)" }}>
         <div className="card">
-          <div className="section-label">Analyst Price Targets</div>
+          <div className="section-label">{tr("Analyst Price Targets")}</div>
           {!loading && data?.analystConsensus && (() => {
             const c = data.analystConsensus!;
             const total = c.strongBuy + c.buy + (c.hold ?? 0) + c.sell + c.strongSell;
@@ -510,8 +508,8 @@ Be specific, analytical, and data-driven. Write in English.`;
             return (
               <div style={{ marginBottom: "var(--sr-sp-3)" }}>
                 <div style={{ display: "flex", gap: "var(--sr-sp-3)", marginBottom: 6, alignItems: "center", fontSize: "var(--sr-t-xs)" }}>
-                  {bullPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-pos)" }}>{bullPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>Buy</span></span>}
-                  {bearPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-neg)" }}>{bearPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>Sell</span></span>}
+                  {bullPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-pos)" }}>{bullPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>{tr("Buy")}</span></span>}
+                  {bearPct > 0 && <span><span style={{ fontWeight: 700, color: "var(--sr-neg)" }}>{bearPct}%</span> <span style={{ color: "var(--sr-text-3)" }}>{tr("Sell")}</span></span>}
                 </div>
                 <div style={{ height: 4, borderRadius: 2, overflow: "hidden", background: "var(--sr-surface-3)" }}>
                   <div style={{ height: "100%", display: "flex" }}>
@@ -523,10 +521,10 @@ Be specific, analytical, and data-driven. Write in English.`;
             );
           })()}
           {loading ? <Sk w="100%" h={120} /> : priceTargets.length === 0 ? (
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No analyst targets</div>
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("No analyst targets")}</div>
           ) : (
             <table className="sr-table">
-              <thead><tr><th>Analyst</th><th style={{ textAlign: "right" }}>Target</th><th>Action</th></tr></thead>
+              <thead><tr><th>{tr("Analyst")}</th><th style={{ textAlign: "right" }}>{tr("Target")}</th><th>{tr("Action")}</th></tr></thead>
               <tbody>
                 {priceTargets.slice(0, 8).map((t, i) => (
                   <tr key={i}>
@@ -541,12 +539,12 @@ Be specific, analytical, and data-driven. Write in English.`;
         </div>
 
         <div className="card">
-          <div className="section-label">Insider Transactions</div>
+          <div className="section-label">{tr("Insider Transactions")}</div>
           {loading ? <Sk w="100%" h={120} /> : insiderTrades.length === 0 ? (
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No insider data</div>
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("No insider data")}</div>
           ) : (
             <table className="sr-table">
-              <thead><tr><th>Name</th><th>Type</th><th style={{ textAlign: "right" }}>Value</th></tr></thead>
+              <thead><tr><th>{tr("Name")}</th><th>{tr("Type")}</th><th style={{ textAlign: "right" }}>{tr("Value")}</th></tr></thead>
               <tbody>
                 {insiderTrades.slice(0, 8).map((t, i) => {
                   const isBuy = (t.transactionType as string)?.toLowerCase().includes("buy") || (t.transactionCode as string) === "P";

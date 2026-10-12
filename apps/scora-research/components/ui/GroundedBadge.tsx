@@ -1,4 +1,5 @@
-// Shared governance badge for AI outputs that run through aiAnalyzeAudited. Shows "✓ grounded"
+
+import { t } from "@/lib/i18n/cliente";// Shared governance badge for AI outputs that run through aiAnalyzeAudited. Shows "✓ grounded"
 // when the code-level grounding gate found no unverified figures, or lists the flagged ones
 // (capped) otherwise. The run is always logged to ai_audit_log. Keeps every AI surface honest
 // and consistent — the product's core "AI that can't lie" moat, made visible.
@@ -13,9 +14,9 @@ export function GroundedBadge({ violations }: { violations: (number | string)[] 
         background: `color-mix(in srgb, ${n === 0 ? "var(--sr-pos)" : "var(--sr-warn)"} 14%, transparent)`,
         color: n === 0 ? "var(--sr-pos)" : "var(--sr-warn)",
       }}>
-        {n === 0 ? "✓ grounded" : `⚠ ${n} unverified figure${n > 1 ? "s" : ""}: ${shown}`}
+        {n === 0 ? t("✓ grounded") : t(`⚠ ${n} unverified figure${n > 1 ? "s" : ""}: ${shown}`)}
       </span>
-      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", alignSelf: "center" }}>logged to audit trail</span>
+      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", alignSelf: "center" }}>{t("logged to audit trail")}</span>
     </div>
   );
 }

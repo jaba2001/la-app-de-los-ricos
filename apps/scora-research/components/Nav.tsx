@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
 import QuotaPill from "@/components/ui/QuotaPill";
+import SelectorIdioma from "@/components/SelectorIdioma";
+import { t } from "@/lib/i18n/cliente";
 
 const MAIN_TABS = [
   // Primero: es la pieza diaria, la razón de volver cada día (y es pública).
@@ -137,7 +139,7 @@ export default function Nav() {
             className={`tab-pill ${activePath === tab.href ? "active" : ""}`}
             onClick={() => router.push(tab.href)}
           >
-            {tab.label}
+            {t(tab.label)}
           </button>
         ))}
       </nav>
@@ -145,7 +147,7 @@ export default function Nav() {
       {/* Global ticker search */}
       <div style={{ position: "relative", flex: 1, minWidth: 0, maxWidth: 340 }}>
         <input
-          placeholder="Search ticker or company…"
+          placeholder={t("Search ticker or company…")}
           value={query}
           onChange={e => { setQuery(e.target.value.toUpperCase()); setSuggIdx(-1); }}
           onKeyDown={handleKeyDown}
@@ -210,23 +212,24 @@ export default function Nav() {
       {/* Cuota de IA + sign out */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, marginLeft: "auto" }}>
         <QuotaPill />
+        <span className="nav-desktop"><SelectorIdioma compacto /></span>
         <button
           className="btn-ghost nav-desktop"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
           onClick={() => router.push("/account")}
         >
-          Account
+          {t("Account")}
         </button>
         <button
           className="btn-ghost nav-desktop"
           style={{ fontSize: "var(--sr-t-xs)", padding: "6px 12px" }}
           onClick={signOut}
         >
-          Sign out
+          {t("Sign out")}
         </button>
         <button
           className="btn-ghost nav-menu-btn"
-          aria-label={menuAbierto ? "Close menu" : "Open menu"}
+          aria-label={menuAbierto ? t("Close menu") : t("Open menu")}
           aria-expanded={menuAbierto}
           style={{ fontSize: "var(--sr-t-base)", padding: "6px 10px", lineHeight: 1 }}
           onClick={() => setMenuAbierto(v => !v)}
@@ -250,11 +253,12 @@ export default function Nav() {
               style={{ justifyContent: "flex-start", textAlign: "left" }}
               onClick={() => router.push(tab.href)}
             >
-              {tab.label}
+              {t(tab.label)}
             </button>
           ))}
-          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={() => router.push("/account")}>Account</button>
-          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={signOut}>Sign out</button>
+          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={() => router.push("/account")}>{t("Account")}</button>
+          <button className="btn-ghost" style={{ fontSize: "var(--sr-t-sm)", textAlign: "left" }} onClick={signOut}>{t("Sign out")}</button>
+          <div style={{ gridColumn: "1 / -1", paddingTop: 4 }}><SelectorIdioma /></div>
         </div>
       )}
     </header>

@@ -170,8 +170,9 @@ const cerca = (a, b, tol, m) => ok(a != null && Math.abs(a - b) <= tol, `${m} �
   ok(/frequency=d/.test(ui), "y en frecuencia diaria, por lo mismo");
 
   // El aviso no puede publicarse sin su tasa base tampoco en la web, y no como texto suelto:
-  // llamando a la funcion que la adjunta.
-  ok(/\{\s*avisoConTasaBase\(/.test(ui), "el componente RENDERIZA avisoConTasaBase(), no el booleano solo");
+  // llamando a la funcion que la adjunta. Puede ir dentro de la traducción (tv(…)): sigue siendo
+  // la frase con su tasa base, solo que en el idioma del usuario.
+  ok(/\{\s*(?:tv?\(\s*)?avisoConTasaBase\(/.test(ui), "el componente RENDERIZA avisoConTasaBase(), no el booleano solo");
 }
 
 // ── EL TIPO REAL: EL NUMERO CONTEMPORANEO NUNCA SALE SOLO ────────────────────────────────

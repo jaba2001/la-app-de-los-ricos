@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { useEntitlements } from "@/lib/entitlements";
 import { track } from "@/lib/analytics";
+import { t as tr, fecha } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 // Mismo origen: el backend vive en app/api de esta misma app.
 const PROXY = process.env.NEXT_PUBLIC_PROXY_URL ?? "";
@@ -118,20 +120,19 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
         }),
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) { setState("error"); setError(body?.error || "Something went wrong. Try again."); return; }
+      if (!res.ok) { setState("error"); setError(body?.error || tr("Something went wrong. Try again.")); return; }
       track("waitlist_submitted");
       setState("done");
     } catch {
       setState("error");
-      setError("Network error. Try again in a moment.");
+      setError(tr("Network error. Try again in a moment."));
     }
   }
 
   if (state === "done") {
     return (
       <div style={{ marginTop: "var(--sr-sp-5)", fontSize: "var(--sr-t-sm)", color: "var(--sr-pos)", lineHeight: 1.5 }}>
-        ✓ You&apos;re on the list. We&apos;ll email you once — when there&apos;s something real to try.
-      </div>
+        {tr("✓ You're on the list. We'll email you once — when there's something real to try.")}</div>
     );
   }
 
@@ -139,7 +140,7 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
     <form onSubmit={submit} style={{ marginTop: "var(--sr-sp-5)", display: "flex", flexDirection: "column", gap: 8 }}>
       <input
         type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com" aria-label="Email for the Pro waitlist"
+        placeholder={tr("you@example.com")} aria-label={tr("Email for the Pro waitlist")}
         style={{
           width: "100%", borderRadius: "var(--sr-radius)", padding: "9px 12px",
           fontSize: "var(--sr-t-sm)", background: "var(--sr-surface-2)",
@@ -147,12 +148,11 @@ function WaitlistForm({ defaultEmail, accessToken }: { defaultEmail: string; acc
         }}
       />
       <button type="submit" disabled={state === "sending"} className="sr-btn-amber" style={{ opacity: state === "sending" ? 0.6 : 1 }}>
-        {state === "sending" ? "Adding…" : "Notify me"}
+        {state === "sending" ? tr("Adding…") : tr("Notify me")}
       </button>
       {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4 }}>{error}</div>}
       <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        One email when Pro launches. No newsletter, no sharing.
-      </div>
+        {tr("One email when Pro launches. No newsletter, no sharing.")}</div>
     </form>
   );
 }
@@ -174,7 +174,7 @@ function UpgradeButton({ accessToken, onNeedsLogin }: { accessToken: string | nu
       const body = await res.json().catch(() => ({}));
       if (!res.ok || !body?.url) {
         setBusy(false);
-        setError(body?.error || "Could not start checkout. Try again.");
+        setError(body?.error || tr("Could not start checkout. Try again."));
         return;
       }
       track("checkout_started");
@@ -183,19 +183,18 @@ function UpgradeButton({ accessToken, onNeedsLogin }: { accessToken: string | nu
       window.location.href = body.url;
     } catch {
       setBusy(false);
-      setError("Network error. Try again in a moment.");
+      setError(tr("Network error. Try again in a moment."));
     }
   }
 
   return (
     <div style={{ marginTop: "var(--sr-sp-5)" }}>
       <button onClick={go} disabled={busy} className="sr-btn-amber" style={{ opacity: busy ? 0.6 : 1 }}>
-        {busy ? "Opening checkout…" : "Upgrade to Pro"}
+        {busy ? tr("Opening checkout…") : tr("Upgrade to Pro")}
       </button>
       {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4, marginTop: 8 }}>{error}</div>}
       <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5, marginTop: 8 }}>
-        Cancel anytime from the billing portal. Card details never touch our servers.
-      </div>
+        {tr("Cancel anytime from the billing portal. Card details never touch our servers.")}</div>
     </div>
   );
 }
@@ -217,34 +216,32 @@ function ManageBilling({ accessToken, sub }: {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok || !body?.url) { setBusy(false); setError(body?.error || "Could not open billing."); return; }
+      if (!res.ok || !body?.url) { setBusy(false); setError(body?.error || tr("Could not open billing.")); return; }
       window.location.href = body.url;
     } catch {
       setBusy(false);
-      setError("Network error. Try again in a moment.");
+      setError(tr("Network error. Try again in a moment."));
     }
   }
 
   const until = sub?.current_period_end
-    ? new Date(sub.current_period_end).toLocaleDateString("en-IE", { day: "numeric", month: "short", year: "numeric" })
+    ? fecha(sub.current_period_end, { day: "numeric", month: "short", year: "numeric" })
     : null;
 
   return (
     <div style={{ marginTop: "var(--sr-sp-5)" }}>
       <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-pos)", fontWeight: 700, marginBottom: 8 }}>
-        ✓ You&apos;re on Pro
-      </div>
+        {tr("✓ You're on Pro")}</div>
       {until && (
         <div className="sr-hint" style={{ marginBottom: 10, lineHeight: 1.5 }}>
           {/* Cancelada pero pagada hasta el final del periodo: decirlo evita el susto de
               "he cancelado y sigo teniendo acceso, ¿me van a cobrar otra vez?". */}
-          {sub?.cancel_at_period_end ? `Access until ${until}. Won't renew.` : `Renews ${until}.`}
+          {sub?.cancel_at_period_end ? tr(`Access until ${until}. Won't renew.`) : tr(`Renews ${until}.`)}
         </div>
       )}
       {sub?.status === "past_due" && (
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.5, marginBottom: 10 }}>
-          Last payment failed. Update your card to keep Pro — access continues meanwhile.
-        </div>
+          {tr("Last payment failed. Update your card to keep Pro — access continues meanwhile.")}</div>
       )}
       <button onClick={openPortal} disabled={busy} style={{
         width: "100%", borderRadius: "var(--sr-radius)", padding: "10px 0",
@@ -252,7 +249,7 @@ function ManageBilling({ accessToken, sub }: {
         background: "var(--sr-surface-2)", color: "var(--sr-text)",
         border: "1px solid var(--sr-border)", opacity: busy ? 0.6 : 1,
       }}>
-        {busy ? "Opening…" : "Manage billing"}
+        {busy ? tr("Opening…") : tr("Manage billing")}
       </button>
       {error && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-neg)", lineHeight: 1.4, marginTop: 8 }}>{error}</div>}
     </div>
@@ -320,10 +317,9 @@ export default function Pricing() {
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--sr-sp-6)" }}>
       <div style={{ textAlign: "center", marginBottom: "var(--sr-sp-6)" }}>
-        <h1 style={{ fontSize: "var(--sr-t-3xl, 34px)", fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>Pricing</h1>
+        <h1 style={{ fontSize: "var(--sr-t-3xl, 34px)", fontWeight: 800, letterSpacing: "-0.02em", margin: 0 }}>{tr("Pricing")}</h1>
         <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)", marginTop: "var(--sr-sp-3)", maxWidth: 560, marginInline: "auto", lineHeight: 1.6 }}>
-          The engine runs entirely on free data, so the core is <strong style={{ color: "var(--sr-text)" }}>free forever</strong>. A Pro tier will only add convenience (higher limits, alerts) — never the analysis itself.
-        </p>
+          <Trans text={"The engine runs entirely on free data, so the core is <s1>free forever</s1>. A Pro tier will only add convenience (higher limits, alerts) — never the analysis itself."} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} /></p>
       </div>
 
       {outcome === "success" && (
@@ -334,8 +330,8 @@ export default function Pricing() {
           fontSize: "var(--sr-t-sm)", lineHeight: 1.6,
         }}>
           {isPro
-            ? "✓ Payment received — Pro is active. Thank you."
-            : "✓ Payment received. Activating your account… this usually takes a few seconds."}
+            ? tr("✓ Payment received — Pro is active. Thank you.")
+            : tr("✓ Payment received. Activating your account… this usually takes a few seconds.")}
         </div>
       )}
       {outcome === "cancelled" && (
@@ -344,8 +340,7 @@ export default function Pricing() {
           background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)",
           fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6,
         }}>
-          Checkout cancelled — nothing was charged. The free tier keeps working as before.
-        </div>
+          {tr("Checkout cancelled — nothing was charged. The free tier keeps working as before.")}</div>
       )}
 
       {cfg?.test_mode && (
@@ -357,8 +352,7 @@ export default function Pricing() {
           border: "1px dashed color-mix(in srgb, var(--sr-amber) 55%, transparent)",
           fontSize: "var(--sr-t-xs)", textAlign: "center",
         }}>
-          Stripe is in <strong>test mode</strong> — no real charges. Use card 4242 4242 4242 4242.
-        </div>
+          <Trans text={"Stripe is in <s1>test mode</s1> — no real charges. Use card 4242 4242 4242 4242."} s1={(c) => <strong>{c}</strong>} /></div>
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--sr-sp-4)" }}>
@@ -368,12 +362,11 @@ export default function Pricing() {
           border: "1px solid var(--sr-border)",
         }}>
           <div className="sr-flex-between" style={{ alignItems: "baseline" }}>
-            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>Free</span>
+            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>{tr("Free")}</span>
             <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">€0</span>
           </div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, marginBottom: "var(--sr-sp-4)" }}>
-            The whole engine, forever.
-          </div>
+            {tr("The whole engine, forever.")}</div>
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
             {freeFeatures(limits).map((f) => (
               <li key={f} style={{ display: "flex", gap: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.4 }}>
@@ -385,7 +378,7 @@ export default function Pricing() {
             width: "100%", marginTop: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", padding: "10px 0",
             fontSize: "var(--sr-t-sm)", fontWeight: 700, cursor: "pointer",
             background: "var(--sr-surface-2)", color: "var(--sr-text)", border: "1px solid var(--sr-border)",
-          }}>Start free</button>
+          }}>{tr("Start free")}</button>
         </div>
 
         {/* Pro */}
@@ -395,7 +388,7 @@ export default function Pricing() {
           boxShadow: "0 0 0 4px color-mix(in srgb, var(--sr-amber) 8%, transparent)",
         }}>
           <div className="sr-flex-between" style={{ alignItems: "baseline" }}>
-            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>Pro</span>
+            <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800 }}>{tr("Pro")}</span>
             <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: "var(--sr-amber)" }} className="num">
               {/* El importe viene de Stripe. Mientras no haya pagos sigue el "€0*" honesto de
                   siempre, que la nota al pie explica. */}
@@ -403,7 +396,7 @@ export default function Pricing() {
             </span>
           </div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, marginBottom: "var(--sr-sp-4)" }}>
-            {cfg?.enabled ? "For heavy users." : "For heavy users — when it exists."}
+            {cfg?.enabled ? tr("For heavy users.") : tr("For heavy users — when it exists.")}
           </div>
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: 9 }}>
             {proFeatures(limits).map((f) => (
@@ -418,8 +411,8 @@ export default function Pricing() {
 
       <p style={{ fontSize: "10px", color: "var(--sr-text-3)", textAlign: "center", marginTop: "var(--sr-sp-5)", lineHeight: 1.6, maxWidth: 620, marginInline: "auto" }}>
         {cfg?.enabled
-          ? "Billing is handled by Stripe; card details never reach our servers. Cancel anytime. Educational tool, not investment advice."
-          : "* No monthly cost to you. If a paid tier launches, any processor fee applies only to what you actually earn — never a fixed charge. Educational tool, not investment advice."}
+          ? tr("Billing is handled by Stripe; card details never reach our servers. Cancel anytime. Educational tool, not investment advice.")
+          : tr("* No monthly cost to you. If a paid tier launches, any processor fee applies only to what you actually earn — never a fixed charge. Educational tool, not investment advice.")}
       </p>
     </div>
   );

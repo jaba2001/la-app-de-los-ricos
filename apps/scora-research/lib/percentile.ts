@@ -245,6 +245,6 @@ export function pctlPoints(
  *  crudo y el sector de comparación tienen que ir SIEMPRE al lado. */
 export function explainGrade(g: MetricGrade | PillarGrade | null): string | null {
   if (!g) return null;
-  const dentro = "sector" in g ? ` de ${g.sector === "ALL" ? "todo el universo" : g.sector}` : "";
-  return `Percentil ${Math.round(g.pctl)}${dentro} (${g.grade})`;
+  const dentro = "sector" in g ? ` within ${g.sector === "ALL" ? "the whole universe" : g.sector}` : "";
+  return `Percentile ${Math.round(g.pctl)}${dentro} (${g.grade})`;
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { Sk } from "@/components/ui/Skeleton";
 import { decodificar } from "@/lib/form4";
+import { t as tr, fecha } from "@/lib/i18n/cliente";
 
 interface NewsItem {
   title: string;
@@ -128,7 +129,7 @@ function AlignmentBadge({ a }: { a: Alignment }) {
         padding: "2px 6px", borderRadius: "var(--sr-radius-pill)",
         background: `color-mix(in srgb, ${color} 15%, transparent)`,
         color, border: `1px solid color-mix(in srgb, ${color} 30%, transparent)`,
-      }}>{COMPOSITE_LABELS[a.composite] ?? a.composite}</span>
+      }}>{tr(COMPOSITE_LABELS[a.composite] ?? a.composite)}</span>
       <span style={{
         fontSize: "9px", fontWeight: 700, padding: "2px 6px",
         borderRadius: "var(--sr-radius-pill)", textTransform: "uppercase",
@@ -136,7 +137,7 @@ function AlignmentBadge({ a }: { a: Alignment }) {
         color: a.confidence === "HIGH" ? color : "var(--sr-text-3)",
       }}>{a.confidence}</span>
       <span style={{ fontSize: "9px", color }}>
-        {a.sentiment === "bullish" ? "↑ positive" : a.sentiment === "bearish" ? "↓ negative" : "→ neutral"}
+        {a.sentiment === "bullish" ? tr("↑ positive") : a.sentiment === "bearish" ? tr("↓ negative") : tr("→ neutral")}
       </span>
     </div>
   );
@@ -226,8 +227,7 @@ export default function MacroNews() {
             <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-8)", color: "var(--sr-neg)" }}>{fetchError}</div>
           ) : news.length === 0 ? (
             <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-              No news available for this category.
-            </div>
+              {tr("No news available for this category.")}</div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
               {news.map((item, i) => {
@@ -247,9 +247,9 @@ export default function MacroNews() {
                     onMouseLeave={e => (e.currentTarget.style.borderColor = borderColor)}
                   >
                     <div className="sr-flex-between" style={{ marginBottom: 6 }}>
-                      <span className="sr-hint">{item.site ?? "Source"}</span>
+                      <span className="sr-hint">{item.site ?? tr("Source")}</span>
                       <span className="sr-hint">
-                        {item.publishedDate ? new Date(item.publishedDate).toLocaleDateString("en-US", { month: "short", day: "2-digit" }) : ""}
+                        {item.publishedDate ? fecha(item.publishedDate, { month: "short", day: "2-digit" }) : ""}
                       </span>
                     </div>
                     <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 600, color: "var(--sr-text)", lineHeight: 1.4, marginBottom: 4 }}>
@@ -271,15 +271,15 @@ export default function MacroNews() {
         {/* Sidebar: velocity + alignment summary */}
         <div>
           <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-            <div className="section-label">News Velocity</div>
+            <div className="section-label">{tr("News Velocity")}</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
               <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", textAlign: "center" }}>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{news.length}</div>
-                <div className="sr-hint">Articles</div>
+                <div className="sr-hint">{tr("Articles")}</div>
               </div>
               <div style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", textAlign: "center" }}>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-pos)" }}>LIVE</div>
-                <div className="sr-hint">Status</div>
+                <div className="sr-hint">{tr("Status")}</div>
               </div>
             </div>
 
@@ -287,26 +287,24 @@ export default function MacroNews() {
             {currentSentiment != null && news.length > 0 && (
               <div style={{ marginBottom: "var(--sr-sp-3)" }}>
                 <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: 6 }}>
-                  {COMPOSITE_LABELS[cat.composite]} Signal Alignment
-                </div>
+                  {tr(`${tr(COMPOSITE_LABELS[cat.composite])} Signal Alignment`)}</div>
                 <div style={{ display: "flex", gap: 6, height: 6, borderRadius: 3, overflow: "hidden", marginBottom: 4 }}>
                   <div style={{ flex: currentSentiment.bull, background: "var(--sr-pos)", minWidth: currentSentiment.bull > 0 ? 4 : 0 }} />
                   <div style={{ flex: news.length - currentSentiment.bull - currentSentiment.bear, background: "var(--sr-surface-3)", minWidth: 4 }} />
                   <div style={{ flex: currentSentiment.bear, background: "var(--sr-neg)", minWidth: currentSentiment.bear > 0 ? 4 : 0 }} />
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px" }}>
-                  <span style={{ color: "var(--sr-pos)" }}>↑ {currentSentiment.bull} bullish</span>
-                  <span style={{ color: "var(--sr-neg)" }}>↓ {currentSentiment.bear} bearish</span>
+                  <span style={{ color: "var(--sr-pos)" }}>{tr(`↑ ${currentSentiment.bull} bullish`)}</span>
+                  <span style={{ color: "var(--sr-neg)" }}>{tr(`↓ ${currentSentiment.bear} bearish`)}</span>
                 </div>
               </div>
             )}
           </div>
 
           <div className="card">
-            <div className="section-label">Category Alignment</div>
+            <div className="section-label">{tr("Category Alignment")}</div>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-              Each article is scored by keyword mapping to the macro composite (LCC/CSC/RPC/GRC/HSC). Confidence: HIGH = 3+ keywords, MODERATE = 1-2.
-            </div>
+              {tr("Each article is scored by keyword mapping to the macro composite (LCC/CSC/RPC/GRC/HSC). Confidence: HIGH = 3+ keywords, MODERATE = 1-2.")}</div>
             {CATEGORIES.map(c => {
               const count = categoryCounts[c.id];
               const sm = sentimentMap[c.id];
@@ -314,12 +312,12 @@ export default function MacroNews() {
               return (
                 <div key={c.id} className="stat-row" style={{ cursor: "pointer" }} onClick={() => setActive(c.id)}>
                   <div>
-                    <span style={{ fontSize: "var(--sr-t-sm)", color: isActive ? "var(--sr-amber)" : "var(--sr-text-2)" }}>{c.label}</span>
+                    <span style={{ fontSize: "var(--sr-t-sm)", color: isActive ? "var(--sr-amber)" : "var(--sr-text-2)" }}>{tr(c.label)}</span>
                     {sm && (
                       <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>
                         {sm.bull > 0 && <span style={{ color: "var(--sr-pos)" }}>↑{sm.bull} </span>}
                         {sm.bear > 0 && <span style={{ color: "var(--sr-neg)" }}>↓{sm.bear} </span>}
-                        <span style={{ color: "var(--sr-text-3)" }}>→ {COMPOSITE_LABELS[c.composite]}</span>
+                        <span style={{ color: "var(--sr-text-3)" }}>→ {tr(COMPOSITE_LABELS[c.composite])}</span>
                       </div>
                     )}
                   </div>

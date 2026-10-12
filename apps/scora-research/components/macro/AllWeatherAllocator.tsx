@@ -7,6 +7,7 @@ import {
   type AllocAsset, type RiskProfile,
 } from "@/lib/allocation";
 import { GROWTH_BACKTEST as G, ALLOCATOR_BACKTEST as D } from "@/lib/trackRecord";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; }
 
@@ -95,11 +96,11 @@ export default function AllWeatherAllocator({ macro }: Props) {
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>All-Weather Allocator</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("All-Weather Allocator")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 460, lineHeight: 1.5 }}>
             {profile === "growth"
-              ? "Growth mandate: 100% equities when the liquidity-led gauge is risk-on, the defensive basket when it isn't, with a 12-1m trend gate. The return engine."
-              : "Defensive mandate: continuous risk-on blend across six ETFs, trend gate and inverse-vol (risk-parity) sizing. The lowest-drawdown engine."}
+              ? tr("Growth mandate: 100% equities when the liquidity-led gauge is risk-on, the defensive basket when it isn't, with a 12-1m trend gate. The return engine.")
+              : tr("Defensive mandate: continuous risk-on blend across six ETFs, trend gate and inverse-vol (risk-parity) sizing. The lowest-drawdown engine.")}
           </div>
           <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
             {(["growth", "defensive"] as const).map((p) => (
@@ -114,7 +115,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
           </div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>Risk-on gauge</div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{tr("Risk-on gauge")}</div>
           <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: alloc.tiltColor, lineHeight: 1 }} className="num">{riskOn.toFixed(0)}</div>
           <div style={{ fontSize: "10px", fontWeight: 700, color: alloc.tiltColor, textTransform: "uppercase", letterSpacing: "0.06em" }}>{alloc.tiltLabel}</div>
         </div>
@@ -139,9 +140,9 @@ export default function AllWeatherAllocator({ macro }: Props) {
                 <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: meta.color }}>{a}</span>
               </div>
               <div style={{ minWidth: 118 }}>
-                <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: "var(--sr-text)" }}>{meta.label}</div>
+                <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: "var(--sr-text)" }}>{tv(meta.label)}</div>
                 <div className="sr-hint">
-                  {meta.role}
+                  {tv(meta.role)}
                   {m != null && <span style={{ marginLeft: 6, color: m > 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>· 12-1m {m > 0 ? "+" : ""}{m.toFixed(0)}%</span>}
                 </div>
               </div>
@@ -149,7 +150,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
                 <div style={{ height: "100%", width: `${wpct}%`, background: meta.color, borderRadius: 3, transition: "width 500ms ease" }} />
               </div>
               <div style={{ minWidth: 64, textAlign: "right", display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6 }}>
-                {gated && <span title="Moved to cash by the momentum gate" style={{ fontSize: "9px", fontWeight: 700, color: "var(--sr-neg)", padding: "1px 5px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-neg) 12%, transparent)" }}>→ cash</span>}
+                {gated && <span title={tr("Moved to cash by the momentum gate")} style={{ fontSize: "9px", fontWeight: 700, color: "var(--sr-neg)", padding: "1px 5px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-neg) 12%, transparent)" }}>{tr("→ cash")}</span>}
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-text)" }} className="num">{wpct}%</span>
               </div>
             </div>
@@ -159,7 +160,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
 
       {/* Rationale */}
       <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>
-        {alloc.rationale.map((r, i) => <div key={i}>{momLoading && i === 1 ? "Computing 12-1m momentum trend gate…" : r}</div>)}
+        {alloc.rationale.map((r, i) => <div key={i}>{momLoading && i === 1 ? tr("Computing 12-1m momentum trend gate…") : tr(r)}</div>)}
       </div>
 
       {/* Validated backtest anchor */}
@@ -181,8 +182,7 @@ export default function AllWeatherAllocator({ macro }: Props) {
         ))}
       </div>
       <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        Out-of-sample, net of costs. Growth beats the S&amp;P 500 on every risk-adjusted metric in both sub-periods (never on raw return — no leverage, ever; the index returned more at ~3× the drawdown). Educational — not investment advice; ETF examples, not recommendations.
-      </div>
+        {tr("Out-of-sample, net of costs. Growth beats the S&P 500 on every risk-adjusted metric in both sub-periods (never on raw return — no leverage, ever; the index returned more at ~3× the drawdown). Educational — not investment advice; ETF examples, not recommendations.")}</div>
     </div>
   );
 }

@@ -1,0 +1,82 @@
+// La página del historial (app/track-record): resultados y sus advertencias.
+export const HISTORIAL: Record<string, string> = {
+  "The evidence, measured — not asserted. The honest finding: <s1>picking stocks doesn't beat the market, but regime-driven multi-asset allocation does</s1> — risk-adjusted, with a fifth of the drawdown. Below: the validated allocator backtest (out-of-sample), the honest stock-picking result, and a live forward record. Transparency is the point.":
+    "La evidencia, medida, no afirmada. La conclusión honesta: <s1>elegir acciones no bate al mercado, pero la asignación multiactivo guiada por el régimen sí</s1>, ajustada por riesgo y con una quinta parte de la caída. Abajo: el backtest del asignador validado (fuera de muestra), el resultado honesto de la selección de acciones y un historial en vivo. La transparencia es la clave.",
+  "Growth mandate vs the S&P 500 · risk-adjusted scorecard · {x}": "Mandato Growth frente al S&P 500 · marcador ajustado por riesgo · {x}",
+  "Calmar": "Calmar",
+  "Jensen α / yr": "α de Jensen / año",
+  "CAPM vs S&P": "CAPM frente al S&P",
+  "Monthly VaR 95%": "VaR mensual 95 %",
+  "Monthly CVaR 95%": "CVaR mensual 95 %",
+  "The <s1>{a}</s1>, measured through the exact production path, {b} months net of costs. Over this window it <s2>came out ahead on every risk-adjusted metric</s2> — Sharpe, Sortino, Calmar, Jensen alpha, and half the tail risk (VaR/CVaR) — at <s3>a third of the drawdown</s3>. <s4>Came out ahead</s4> is deliberate: the gap is real in this sample but does not reach statistical significance, and the panel below says by how much. It does <s5>not</s5> beat the index on raw total return (+{c}% vs +{d}%), and we never pretend it does — <s6>no leverage, ever</s6>. Nothing unlevered beat the S&P over this run. For context, beating it on raw return is rare even among professionals: <s7>~90% of active US large-cap funds trail the S&P 500 over 15 years</s7> (SPIVA U.S. Scorecard, S&P Dow Jones Indices) — but that measures total return, not the risk-adjusted edge shown above. A conservative <s8>Defensive</s8> profile (risk-parity, {e} drawdown) is one click away. Includes a small BTC diversifier (CAIA/Grayscale ~5%), carved from equities — never leverage.":
+    "El <s1>{a}</s1>, medido por el mismo camino que usa la app en producción, {b} meses descontando costes. En este periodo <s2>quedó por delante en todas las métricas ajustadas por riesgo</s2> —Sharpe, Sortino, Calmar, alfa de Jensen y la mitad del riesgo de cola (VaR/CVaR)— con <s3>un tercio de la caída</s3>. <s4>Quedó por delante</s4> es a propósito: la diferencia es real en esta muestra pero no llega a ser estadísticamente significativa, y el panel de abajo dice en cuánto. <s5>No</s5> bate al índice en rentabilidad total bruta (+{c}% frente a +{d}%), y nunca fingimos que lo haga: <s6>sin apalancamiento, nunca</s6>. Nada sin apalancar batió al S&P en este periodo. Como contexto, batirlo en rentabilidad bruta es raro incluso entre profesionales: <s7>~90 % de los fondos activos de gran capitalización de EE. UU. quedan por detrás del S&P 500 a 15 años</s7> (SPIVA U.S. Scorecard, S&P Dow Jones Indices); pero eso mide rentabilidad total, no la ventaja ajustada por riesgo de arriba. Un perfil conservador <s8>Defensivo</s8> (paridad de riesgo, caída de {e}) está a un clic. Incluye un pequeño diversificador en BTC (CAIA/Grayscale ~5 %), sacado de la renta variable: nunca apalancamiento.",
+  "<s1>The Sharpe edge is not statistically significant.</s1> Over {a} months the difference against the S&P 500 gives <s2>t = {b}</s2> and against a static 60/40 <s3>t = {c}</s3> (Jobson-Korkie with Memmel’s correction). Two decades of data are not enough to prove a Sharpe gap this size — reaching t = 2 would take roughly <s4>17 more years</s4>. We publish the statistic instead of the adjective.":
+    "<s1>La ventaja en Sharpe no es estadísticamente significativa.</s1> En {a} meses, la diferencia frente al S&P 500 da <s2>t = {b}</s2> y frente a un 60/40 fijo <s3>t = {c}</s3> (Jobson-Korkie con la corrección de Memmel). Dos décadas de datos no bastan para demostrar una diferencia de Sharpe de este tamaño: llegar a t = 2 llevaría unos <s4>17 años más</s4>. Publicamos el estadístico en lugar del adjetivo.",
+  "<s1>The drawdown is a different kind of claim.</s1> {a} against {b} is not an estimate that needs a confidence interval: it is the worst case that actually happened. The same goes for the capture ratios — the strategy took part in about two thirds of the index’s up months and under half of its down months. Those are descriptions, and they are the ones we stand behind.":
+    "<s1>La caída es otro tipo de afirmación.</s1> {a} frente a {b} no es una estimación que necesite un intervalo de confianza: es el peor caso que de verdad ocurrió. Lo mismo vale para los ratios de captura: la estrategia participó en unos dos tercios de los meses alcistas del índice y en menos de la mitad de los bajistas. Son descripciones, y son las que defendemos.",
+  "<s1>But “a third of the drawdown” leans on 2008.</s1> Started from {a} different years, this strategy’s worst loss barely moves — always between {b}% and {c}%, which is what risk control is supposed to look like. The index’s does move: −50.7% with the financial crisis in the window, −23.9% without it. So the ratio is <s2>{d}</s2> over the full record and <s3>{e}</s3> from 2009 onward. Both are true. Anyone who plots the series from 2010 will find the second one, so we put it here first.":
+    "<s1>Pero «un tercio de la caída» se apoya en 2008.</s1> Empezando en {a} años distintos, la peor pérdida de esta estrategia apenas se mueve —siempre entre el {b}% y el {c}%—, que es como debe verse el control del riesgo. La del índice sí se mueve: −50,7 % con la crisis financiera dentro del periodo y −23,9 % sin ella. Así que el ratio es <s2>{d}</s2> en todo el historial y <s3>{e}</s3> desde 2009. Las dos cosas son ciertas. Cualquiera que dibuje la serie desde 2010 encontrará la segunda, así que la ponemos aquí primero.",
+  "<s1>And the Sharpe does not survive deflation for the number of strategies we tried.</s1> Had we tested this once, the observed Sharpe would clear the bar comfortably (deflated probability {a}%). After {b} recorded trials on the same two decades of data, it drops to <s2>{c}%</s2> — under the 95% convention. That is the price of having searched, and it is why every hypothesis from here on is written down before it is run.":
+    "<s1>Y el Sharpe no sobrevive a la corrección por el número de estrategias probadas.</s1> Si lo hubiéramos probado una sola vez, el Sharpe observado superaría el listón con holgura (probabilidad corregida del {a}%). Tras {b} pruebas registradas sobre las mismas dos décadas de datos, baja al <s2>{c}%</s2>, por debajo del 95 % convencional. Es el precio de haber buscado, y por eso cada hipótesis se deja escrita antes de probarla.",
+  "<s1>Returns are not normally distributed, and the Sharpe ratio assumes they are.</s1> Excess kurtosis is <s2>+{a}</s2> — fatter tails, more extreme months, than the ratio’s own maths presumes. Skew is near zero ({b}); the index’s is negative ({c}), which is the worse side to be on.":
+    "<s1>Las rentabilidades no siguen una distribución normal, y el ratio de Sharpe supone que sí.</s1> El exceso de curtosis es <s2>+{a}</s2>: colas más gruesas, más meses extremos de lo que supone el propio cálculo del ratio. La asimetría está cerca de cero ({b}); la del índice es negativa ({c}), que es el lado malo.",
+  "<s1>Cash earns the T-bill rate here, not zero.</s1> Every ratio above uses the real risk-free rate ({a}, {b}% average over the window). With the common shortcut of rf = 0 the headline Sharpe would read <s2>{c}</s2> instead of {d}. The ranking between strategies is identical either way; the level is not, so we use the honest one.":
+    "<s1>Aquí la liquidez rinde lo que las letras del Tesoro, no cero.</s1> Todos los ratios de arriba usan el tipo sin riesgo real ({a}, un {b}% de media en el periodo). Con el atajo habitual de rf = 0, el Sharpe principal saldría <s2>{c}</s2> en lugar de {d}. La clasificación entre estrategias es la misma en los dos casos; el nivel no, así que usamos el honesto.",
+  "Live forward record": "Historial en vivo",
+  "Cohorts sealed": "Cohortes cerradas",
+  "since inception": "desde el inicio",
+  "BUY hit-rate": "Acierto de las COMPRAS",
+  "beating SPY": "batiendo al SPY",
+  "BUY avg return": "Rentabilidad media de las COMPRAS",
+  "Live IC": "IC en vivo",
+  "score ↔ realized": "puntuación ↔ realizado",
+  "Accumulating.": "Acumulando.",
+  "{x} scores sealed so far.": "{x} puntuaciones cerradas hasta ahora.",
+  "The first cohort seals on the next monthly run.": "La primera cohorte se cierra en la próxima ejecución mensual.",
+  "The systematic cron scores the universe on the 2nd of each month and seals an immutable cohort; realized alpha vs SPY is measured weekly. In 3–6 months this becomes a clean forward record no one can accuse of overfitting.":
+    "El proceso automático puntúa el universo el día 2 de cada mes y cierra una cohorte que no se puede modificar; el alfa realizada frente al SPY se mide cada semana. En 3–6 meses será un historial limpio que nadie podrá acusar de estar sobreajustado.",
+  "The validated edge · regime-driven multi-asset allocation · {x}": "La ventaja validada · asignación multiactivo guiada por el régimen · {x}",
+  "A liquidity-led risk-on tilt across six liquid ETFs plus a dual-momentum trend gate — the <s1>{a}</s1>. It matches equity-like results with roughly <s2>a fifth of the drawdown</s2> and a far higher Sharpe (1.01 vs 0.71). Crucially it beats a regime-free dual-momentum control (Sharpe {b}) <s3>out-of-sample</s3>: the walk-forward OOS Sharpe is {c} over {d} months ({e}) with a near-zero overfit gap.":
+    "Una inclinación según el apetito por riesgo guiada por la liquidez entre seis ETFs líquidos, más un filtro de tendencia de momentum dual: el <s1>{a}</s1>. Iguala resultados de renta variable con alrededor de <s2>una quinta parte de la caída</s2> y un Sharpe mucho más alto (1,01 frente a 0,71). Y, lo importante, bate <s3>fuera de muestra</s3> a un control de momentum dual sin régimen (Sharpe {b}): el Sharpe walk-forward fuera de muestra es {c} en {d} meses ({e}), con una diferencia por sobreajuste casi nula.",
+  "Allocator Sharpe": "Sharpe del asignador",
+  "Walk-forward OOS": "Walk-forward fuera de muestra",
+  "Sharpe · gap ~{x}": "Sharpe · diferencia ~{x}",
+  "Window": "Periodo",
+  "incl. the GFC": "con la crisis de 2008",
+  "Sharpe by sub-period": "Sharpe por subperiodo",
+  "Allocator": "Asignador",
+  "Dual-mom only": "Solo momentum dual",
+  "Stock-picking, honestly · {x} names · survivorship-free": "Selección de acciones, con honestidad · {x} valores · sin sesgo de supervivencia",
+  "On the full {a}-name survivorship-free universe, ranking by <s1>value/quality does not beat SPY</s1> ({b} vs {c}, IC {d}). But selection isn't dead — it's <s2>conditional</s2>: a momentum score earns <s3>+{e} IC</s3> (top-minus-bottom decile +{f}% at 3M) when market correlation is <s4>low</s4> — a stock-picker's tape — and <s5>{g}</s5> when correlation is high (momentum crashes). That is the “stock-picking regime” switch surfaced in the app.":
+    "En el universo completo de {a} valores sin sesgo de supervivencia, ordenar por <s1>valor/calidad no bate al SPY</s1> ({b} frente a {c}, IC {d}). Pero la selección no está muerta: es <s2>condicional</s2>. Una puntuación de momentum logra <s3>+{e} de IC</s3> (decil superior menos inferior +{f}% a 3 meses) cuando la correlación del mercado es <s4>baja</s4> —un mercado para elegir acciones— y <s5>{g}</s5> cuando la correlación es alta (el momentum se hunde). Ese es el interruptor de «régimen de selección de acciones» que enseña la app.",
+  "Value/quality return": "Rentabilidad valor/calidad",
+  "Info. Coefficient": "Coef. de información",
+  "{x} name-months": "{x} valores-mes",
+  "Momentum IC · low corr": "IC del momentum · correlación baja",
+  "high corr {x}": "correlación alta {x}",
+  "Caveats — read these": "Advertencias: léelas",
+  "Backtest thresholds and basket weights are literature priors, not return-fit; the live forward record above is the un-backtested proof.":
+    "Los umbrales del backtest y los pesos de las cestas vienen de la literatura, no se ajustaron a la rentabilidad; el historial en vivo de arriba es la prueba sin backtest.",
+  "What these numbers do <s1>not</s1> say": "Lo que estas cifras <s1>no</s1> dicen",
+  "How to read these numbers": "Cómo leer estas cifras",
+  "Hypothetical, not realized": "Hipotéticas, no realizadas",
+  "The allocator and stock-picking results are <s1>hypothetical backtests</s1>: they were computed by applying rules to historical data, not by trading an account. Hypothetical results have inherent limitations — chief among them that they are prepared with the benefit of hindsight and carry no financial risk. No account traded these returns.":
+    "Los resultados del asignador y de la selección de acciones son <s1>backtests hipotéticos</s1>: se calcularon aplicando reglas a datos históricos, no operando una cuenta. Los resultados hipotéticos tienen limitaciones propias, la principal que se preparan sabiendo lo que pasó y sin riesgo financiero. Ninguna cuenta obtuvo estas rentabilidades.",
+  "Net of what, exactly": "Descontando qué, exactamente",
+  "Backtest returns are net of an assumed round-trip transaction cost applied at each rebalance. They are <s1>gross of</s1> taxes, bid-ask spread beyond that assumption, market impact, financing, and any subscription fee for this product. Your realized return would be lower.":
+    "Las rentabilidades del backtest descuentan un coste supuesto de compraventa en cada rebalanceo. <s1>No descuentan</s1> impuestos, el diferencial compra-venta más allá de ese supuesto, el impacto en el mercado, la financiación ni ninguna cuota de suscripción a este producto. Tu rentabilidad real sería menor.",
+  "Survivorship": "Supervivencia",
+  "The stock-picking test runs on a <s1>point-in-time, survivorship-free</s1> universe — it includes names that were later delisted or acquired. The allocator uses index ETFs, which carry the index provider's own reconstitution rules rather than ours.":
+    "La prueba de selección de acciones usa un universo <s1>point-in-time y sin sesgo de supervivencia</s1>: incluye valores que después dejaron de cotizar o fueron comprados. El asignador usa ETFs de índices, que siguen las reglas de recomposición del proveedor del índice, no las nuestras.",
+  "Past performance": "Rentabilidad pasada",
+  "Past performance — hypothetical or realized — <s1>does not predict future results</s1>. A strategy that beat its benchmark over the sample above can underperform for years.":
+    "La rentabilidad pasada —hipotética o real— <s1>no predice resultados futuros</s1>. Una estrategia que batió a su referencia en la muestra de arriba puede quedarse por detrás durante años.",
+  "No testimonials, no selected trades": "Sin testimonios ni operaciones escogidas",
+  "This page publishes the <s1>whole record</s1>, including the stock-picking result that lost to the index. Scora does not publish testimonials, screenshots of winning trades, or cherry-picked calls — a record you can only see the good half of is not a record.":
+    "Esta página publica el <s1>historial completo</s1>, también el resultado de la selección de acciones que perdió frente al índice. Scora no publica testimonios, capturas de operaciones ganadoras ni aciertos escogidos: un historial del que solo ves la mitad buena no es un historial.",
+  "Not investment advice": "No es asesoramiento de inversión",
+  "Scora Research is an educational tool. Nothing here is a recommendation to buy or sell any security, and it is not personalized to your circumstances.":
+    "Scora Research es una herramienta educativa. Nada de lo que hay aquí es una recomendación para comprar o vender ningún valor, ni está adaptado a tus circunstancias.",
+  "Allocator: research/backtest_assets.mjs (stationary regime) + walkforward.mjs · Stock-picking: research/backtest.mjs --full 500 · free data (EDGAR / Yahoo / Tiingo / FRED)":
+    "Asignador: research/backtest_assets.mjs (régimen estacionario) + walkforward.mjs · Selección de acciones: research/backtest.mjs --full 500 · datos gratuitos (EDGAR / Yahoo / Tiingo / FRED)",
+};

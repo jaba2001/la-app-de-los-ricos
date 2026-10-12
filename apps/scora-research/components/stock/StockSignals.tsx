@@ -6,6 +6,7 @@ import { trendStage, detectBaseBreakout, type OHLCV } from "@/lib/technicalIndic
 import { computeQuality, type QualityScores } from "@/lib/quality";
 import { esgLite } from "@/lib/esg";
 import type { FactorTilts } from "@/lib/scoring";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { subScores: SubScores | null; data: StockData | null; rf?: number | null; factorTilts?: FactorTilts | null; }
 
@@ -130,15 +131,15 @@ function scoreColor(s: number): string {
 function Gauge({ title, sub }: { title: string; sub: SubScore | null }) {
   if (!sub) return (
     <div className="sr-tile">
-      <div className="sr-tile-label">{title}</div>
+      <div className="sr-tile-label">{tv(title)}</div>
       <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: "var(--sr-text-3)" }}>—</div>
-      <div className="sr-hint">Not enough data</div>
+      <div className="sr-hint">{t("Not enough data")}</div>
     </div>
   );
   const col = scoreColor(sub.score);
   return (
     <div className="sr-tile">
-      <div className="sr-tile-label">{title}</div>
+      <div className="sr-tile-label">{tv(title)}</div>
       <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
         <span style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: col }} className="num">{sub.score.toFixed(1)}</span>
         <span className="sr-hint">/ 10</span>
@@ -152,7 +153,7 @@ function Gauge({ title, sub }: { title: string; sub: SubScore | null }) {
             <span style={{ width: 34, height: 3, borderRadius: 2, background: "var(--sr-surface-3)", position: "relative", flexShrink: 0 }}>
               <span style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${Math.round(f.strength * 100)}%`, background: scoreColor(f.strength * 10), borderRadius: 2 }} />
             </span>
-            <span className="sr-hint">{f.label}</span>
+            <span className="sr-hint">{tv(f.label)}</span>
           </div>
         ))}
       </div>
@@ -180,57 +181,54 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
       {/* Quality & solvency (Fase 1) */}
       {hasQuality && (
         <div className="card">
-          <div className="section-label">Quality &amp; solvency</div>
+          <div className="section-label">{t("Quality & solvency")}</div>
           <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 620, lineHeight: 1.5 }}>
-            Distress, earnings quality, ROE decomposition and credit risk — all from the financial statements.
-            Shown as context; they don&apos;t move the Scora Score until their predictive power is validated.
-          </div>
+            {t("Distress, earnings quality, ROE decomposition and credit risk — all from the financial statements. Shown as context; they don't move the Scora Score until their predictive power is validated.")}</div>
           <div className="sr-grid-3">
             {quality.altman && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Altman {quality.altman.model} · distress</div>
+                <div className="sr-tile-label">{t(`Altman ${quality.altman.model} · distress`)}</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: ZBAND_COLOR[quality.altman.band] }} className="num">{quality.altman.z.toFixed(2)}</div>
-                <div className="sr-hint" style={{ color: ZBAND_COLOR[quality.altman.band] }}>{quality.altman.band === "safe" ? "Safe zone" : quality.altman.band === "grey" ? "Grey zone" : "Distress zone"}</div>
+                <div className="sr-hint" style={{ color: ZBAND_COLOR[quality.altman.band] }}>{quality.altman.band === "safe" ? t("Safe zone") : quality.altman.band === "grey" ? t("Grey zone") : t("Distress zone")}</div>
               </div>
             )}
             {quality.merton && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Default prob. (1y)</div>
+                <div className="sr-tile-label">{t("Default prob. (1y)")}</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.merton.pd < 0.02 ? "var(--sr-pos)" : quality.merton.pd < 0.10 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">{(quality.merton.pd * 100).toFixed(2)}%</div>
-                <div className="sr-hint">DtD {quality.merton.distanceToDefault.toFixed(1)} · Merton/KMV</div>
+                <div className="sr-hint">{t(`DtD ${quality.merton.distanceToDefault.toFixed(1)} · Merton/KMV`)}</div>
               </div>
             )}
             {quality.accruals && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Earnings quality</div>
+                <div className="sr-tile-label">{t("Earnings quality")}</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.accruals.quality === "high" ? "var(--sr-pos)" : quality.accruals.quality === "medium" ? "var(--sr-warn)" : "var(--sr-neg)" }}>
-                  {quality.accruals.quality === "high" ? "High" : quality.accruals.quality === "medium" ? "Medium" : "Low"}
+                  {quality.accruals.quality === "high" ? t("High") : quality.accruals.quality === "medium" ? t("Medium") : t("Low")}
                 </div>
-                <div className="sr-hint">Accruals {(quality.accruals.ratio * 100).toFixed(1)}%</div>
+                <div className="sr-hint">{t(`Accruals ${(quality.accruals.ratio * 100).toFixed(1)}%`)}</div>
               </div>
             )}
             {quality.piotroski && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Piotroski F</div>
+                <div className="sr-tile-label">{t("Piotroski F")}</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.piotroski.score / quality.piotroski.max >= 0.7 ? "var(--sr-pos)" : quality.piotroski.score / quality.piotroski.max >= 0.45 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">
                   {quality.piotroski.score}<span className="sr-hint">/{quality.piotroski.max}</span>
                 </div>
-                <div className="sr-hint">Fundamental strength</div>
+                <div className="sr-hint">{t("Fundamental strength")}</div>
               </div>
             )}
             {quality.beneish && (
               <div className="sr-tile">
-                <div className="sr-tile-label">Beneish M · manipulation</div>
+                <div className="sr-tile-label">{t("Beneish M · manipulation")}</div>
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{quality.beneish.m.toFixed(2)}</div>
-                <div className="sr-hint" style={{ color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }}>{quality.beneish.flag === "unlikely" ? "No signal" : "⚠ Possible manipulation"}</div>
+                <div className="sr-hint" style={{ color: quality.beneish.flag === "unlikely" ? "var(--sr-pos)" : "var(--sr-neg)" }}>{quality.beneish.flag === "unlikely" ? t("No signal") : t("⚠ Possible manipulation")}</div>
               </div>
             )}
             {quality.dupont && (
               <div className="sr-tile">
-                <div className="sr-tile-label">DuPont · ROE {(quality.dupont.roe3 * 100).toFixed(1)}%</div>
+                <div className="sr-tile-label">{t(`DuPont · ROE ${(quality.dupont.roe3 * 100).toFixed(1)}%`)}</div>
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.6, marginTop: 2 }}>
-                  Margin {(quality.dupont.netMargin * 100).toFixed(1)}% · Turnover {quality.dupont.assetTurnover.toFixed(2)}× · Leverage {quality.dupont.equityMultiplier.toFixed(2)}×
-                </div>
+                  {t(`Margin ${(quality.dupont.netMargin * 100).toFixed(1)}% · Turnover ${quality.dupont.assetTurnover.toFixed(2)}× · Leverage ${quality.dupont.equityMultiplier.toFixed(2)}×`)}</div>
               </div>
             )}
           </div>
@@ -239,29 +237,27 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
 
       {/* Quality sub-scores */}
       <div className="card">
-        <div className="section-label">Quality sub-scores</div>
+        <div className="section-label">{t("Quality sub-scores")}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", maxWidth: 560, lineHeight: 1.5 }}>
-          Two plain 0-10 gauges drawn from the same fundamentals the Scora Score uses — the durability of the
-          business and the quality of its cash generation.
-        </div>
+          {t("Two plain 0-10 gauges drawn from the same fundamentals the Scora Score uses — the durability of the business and the quality of its cash generation.")}</div>
         <div className="sr-grid-2">
-          <Gauge title="Moat" sub={subScores?.moat ?? null} />
-          <Gauge title="Cash-flow quality" sub={subScores?.cashFlow ?? null} />
+          <Gauge title={t("Moat")} sub={subScores?.moat ?? null} />
+          <Gauge title={t("Cash-flow quality")} sub={subScores?.cashFlow ?? null} />
         </div>
       </div>
 
       {/* Trend layer */}
       <div className="card">
-        <div className="section-label">Trend &amp; entry</div>
+        <div className="section-label">{t("Trend & entry")}</div>
         {!stage ? (
-          <div className="sr-hint">Not enough price history for a trend read.</div>
+          <div className="sr-hint">{t("Not enough price history for a trend read.")}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
             {/* Stage */}
             <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-4)", flexWrap: "wrap" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {[1, 2, 3, 4].map(s => (
-                  <span key={s} title={STAGE_META[s].blurb} style={{
+                  <span key={s} title={tv(STAGE_META[s].blurb)} style={{
                     width: 26, height: 26, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: "var(--sr-t-xs)", fontWeight: 800,
                     background: s === stage.stage ? STAGE_META[s].color : "var(--sr-surface-3)",
@@ -272,33 +268,33 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
               </div>
               <div>
                 <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: STAGE_META[stage.stage].color }}>
-                  Stage {stage.stage} · {stage.label}
+                  {t(`Stage ${stage.stage} · ${stage.label}`)}
                 </div>
-                <div className="sr-hint" style={{ maxWidth: 420, lineHeight: 1.4 }}>{STAGE_META[stage.stage].blurb}</div>
+                <div className="sr-hint" style={{ maxWidth: 420, lineHeight: 1.4 }}>{tv(STAGE_META[stage.stage].blurb)}</div>
               </div>
             </div>
 
             {/* 150-day line facts */}
             <div className="sr-grid-3">
               <div className="sr-tile">
-                <div className="sr-tile-label">150-day MA</div>
+                <div className="sr-tile-label">{t("150-day MA")}</div>
                 <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{stage.sma150 != null ? `$${stage.sma150.toFixed(2)}` : "—"}</div>
-                <div className="sr-hint">{price != null && stage.sma150 != null ? (price > stage.sma150 ? "Price above" : "Price below") : ""}</div>
+                <div className="sr-hint">{price != null && stage.sma150 != null ? (price > stage.sma150 ? t("Price above") : t("Price below")) : ""}</div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">150-day slope (20d)</div>
+                <div className="sr-tile-label">{t("150-day slope (20d)")}</div>
                 <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: stage.slopePct == null ? "var(--sr-text-3)" : stage.slopePct > 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
                   {stage.slopePct == null ? "—" : `${stage.slopePct > 0 ? "+" : ""}${stage.slopePct.toFixed(1)}%`}
                 </div>
-                <div className="sr-hint">Trend direction</div>
+                <div className="sr-hint">{t("Trend direction")}</div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">Base breakout</div>
+                <div className="sr-tile-label">{t("Base breakout")}</div>
                 <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: bb?.status === "base-breakout" ? "var(--sr-pos)" : bb?.status === "in-base" ? "var(--sr-amber)" : "var(--sr-text-3)" }}>
-                  {bb?.status === "base-breakout" ? "Breaking out" : bb?.status === "in-base" ? "In base" : "No base"}
+                  {bb?.status === "base-breakout" ? t("Breaking out") : bb?.status === "in-base" ? t("In base") : t("No base")}
                 </div>
                 <div className="sr-hint">
-                  {bb?.volumeRatio != null ? `Vol ${bb.volumeRatio.toFixed(1)}× avg${bb.volumeConfirmed ? " ✓" : ""}` : "—"}
+                  {bb?.volumeRatio != null ? t(`Vol ${bb.volumeRatio.toFixed(1)}× avg${bb.volumeConfirmed ? " ✓" : ""}`) : "—"}
                 </div>
               </div>
             </div>
@@ -308,13 +304,12 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
                 background: bb.volumeConfirmed && bb.aboveTrend ? "color-mix(in srgb, var(--sr-pos) 10%, transparent)" : "color-mix(in srgb, var(--sr-amber) 10%, transparent)",
                 color: bb.volumeConfirmed && bb.aboveTrend ? "var(--sr-pos)" : "var(--sr-amber)" }}>
                 {bb.volumeConfirmed && bb.aboveTrend
-                  ? `Breakout above the base high${bb.baseHigh != null ? ` ($${bb.baseHigh.toFixed(2)})` : ""} on ${bb.volumeRatio?.toFixed(1)}× volume, price above the 150-day line — a confirmed setup.`
-                  : `Price cleared the base high${bb.baseHigh != null ? ` ($${bb.baseHigh.toFixed(2)})` : ""} but ${!bb.volumeConfirmed ? "without a 2× volume expansion" : ""}${!bb.volumeConfirmed && !bb.aboveTrend ? " and " : ""}${!bb.aboveTrend ? "below the 150-day line" : ""} — unconfirmed.`}
+                  ? t(`Breakout above the base high${bb.baseHigh != null ? ` ($${bb.baseHigh.toFixed(2)})` : ""} on ${bb.volumeRatio?.toFixed(1)}× volume, price above the 150-day line — a confirmed setup.`)
+                  : t(`Price cleared the base high${bb.baseHigh != null ? ` ($${bb.baseHigh.toFixed(2)})` : ""} but ${!bb.volumeConfirmed ? "without a 2× volume expansion" : ""}${!bb.volumeConfirmed && !bb.aboveTrend ? " and " : ""}${!bb.aboveTrend ? "below the 150-day line" : ""} — unconfirmed.`)}
               </div>
             )}
             <div className="sr-hint" style={{ lineHeight: 1.5 }}>
-              Trend context, not a recommendation. Scora&apos;s directional call folds price, trend and macro together on the Research tab.
-            </div>
+              {t("Trend context, not a recommendation. Scora's directional call folds price, trend and macro together on the Research tab.")}</div>
           </div>
         )}
       </div>
@@ -322,17 +317,17 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
       {/* Factor exposure + ESG-lite lenses (Fase 6) */}
       {(factorTilts || esg) && (
         <div className="card">
-          <div className="section-label">Lenses · factor &amp; ESG</div>
+          <div className="section-label">{t("Lenses · factor & ESG")}</div>
           <div className="sr-grid-2" style={{ gap: "var(--sr-sp-5)" }}>
             {factorTilts && (
               <div>
-                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Factor exposure</div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{t("Factor exposure")}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {FACTOR_LABELS.map(([k, label]) => {
                     const v = factorTilts[k];              // 0-20
                     return (
                       <div key={k} style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
-                        <div style={{ minWidth: 78, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{label}</div>
+                        <div style={{ minWidth: 78, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{tv(label)}</div>
                         <div style={{ flex: 1, height: 8, background: "var(--sr-surface-3)", borderRadius: 4, overflow: "hidden" }}>
                           <div style={{ height: "100%", width: `${Math.min(100, v * 5)}%`, background: "var(--sr-amber)", borderRadius: 4 }} />
                         </div>
@@ -341,12 +336,12 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
                     );
                   })}
                 </div>
-                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>The dominant style is the one the regime rotation rewards or penalizes (measured).</div>
+                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{t("The dominant style is the one the regime rotation rewards or penalizes (measured).")}</div>
               </div>
             )}
             {esg && (
               <div>
-                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>ESG-lite (free proxy)</div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{t("ESG-lite (free proxy)")}</div>
                 <div className="sr-grid-4" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
                   {([["E", esg.e], ["S", esg.s], ["G", esg.g], ["Overall", esg.overall]] as [string, number][]).map(([l, val]) => (
                     <div key={l} className="sr-tile" style={{ textAlign: "center" }}>
@@ -355,7 +350,7 @@ export default function StockSignals({ subScores, data, rf, factorTilts }: Props
                     </div>
                   ))}
                 </div>
-                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.5 }}>{esg.note}</div>
+                <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.5 }}>{tv(esg.note)}</div>
               </div>
             )}
           </div>

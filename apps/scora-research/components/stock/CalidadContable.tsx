@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { FilaCalidad } from "@/lib/calidadContableDatos";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { ticker: string }
 
@@ -43,7 +45,7 @@ export default function CalidadContable({ ticker }: Props) {
     return () => { vivo = false; };
   }, [ticker]);
 
-  if (fila === undefined) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">Loading…</div></div>;
+  if (fila === undefined) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">{t("Loading…")}</div></div>;
 
   const tieneVida = fila?.vidaCorregida != null;
   const tieneRec = fila?.precioRecompra != null;
@@ -51,14 +53,9 @@ export default function CalidadContable({ ticker }: Props) {
   if (!fila || (!tieneVida && !tieneRec)) {
     return (
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">What its accounts reveal</div>
+        <div className="section-label">{t("What its accounts reveal")}</div>
         <div className="sr-hint" style={{ lineHeight: 1.55 }}>
-          Not enough data for {ticker.toUpperCase()}. The implied useful life needs <strong>gross</strong>{" "}
-          fixed assets for two fiscal years and the buyback price needs the number of
-          <strong> shares</strong> repurchased, and not every company tags those figures in its
-          filings. Index coverage is 63% and 62%; this is a data gap, not a judgment on the
-          company.
-        </div>
+          <Trans text={`Not enough data for ${ticker.toUpperCase()}. The implied useful life needs <s1>gross</s1> fixed assets for two fiscal years and the buyback price needs the number of<s2> shares</s2> repurchased, and not every company tags those figures in its filings. Index coverage is 63% and 62%; this is a data gap, not a judgment on the company.`} s1={(c) => <strong>{c}</strong>} s2={(c) => <strong>{c}</strong>} /></div>
       </div>
     );
   }
@@ -67,39 +64,37 @@ export default function CalidadContable({ ticker }: Props) {
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-      <div className="section-label">What its accounts reveal</div>
+      <div className="section-label">{t("What its accounts reveal")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 680 }}>
-        Two figures the company doesn&apos;t state but that can be derived from the ones it does
-        publish: how many years it assumes its assets last, and what price it paid for its own shares.
-      </div>
+        {t("Two figures the company doesn't state but that can be derived from the ones it does publish: how many years it assumes its assets last, and what price it paid for its own shares.")}</div>
 
       {/* ── La vida útil implícita ─────────────────────────────────────────────────── */}
       {tieneVida && (
         <div style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>Implied useful life of its fixed assets</div>
+          <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{t("Implied useful life of its fixed assets")}</div>
           <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
             <div className="sr-tile">
-              <div className="sr-tile-label">Corrected</div>
-              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaCorregida)} years</div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>the one that counts</div>
+              <div className="sr-tile-label">{t("Corrected")}</div>
+              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{t(`${n2(fila.vidaCorregida)} years`)}</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("the one that counts")}</div>
             </div>
             <div className="sr-tile">
-              <div className="sr-tile-label">Uncorrected</div>
-              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-text-3)" }}>{n2(fila.vidaIngenua)} years</div>
+              <div className="sr-tile-label">{t("Uncorrected")}</div>
+              <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-text-3)" }}>{t(`${n2(fila.vidaIngenua)} years`)}</div>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
-                {sesgo != null && sesgo > 0.05 ? `overstates by ${n2(sesgo)} years` : "no material bias"}
+                {sesgo != null && sesgo > 0.05 ? t(`overstates by ${n2(sesgo)} years`) : t("no material bias")}
               </div>
             </div>
             {fila.vidaPrevia != null && (
               <div className="sr-tile">
-                <div className="sr-tile-label">A year ago</div>
-                <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{n2(fila.vidaPrevia)} years</div>
+                <div className="sr-tile-label">{t("A year ago")}</div>
+                <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{t(`${n2(fila.vidaPrevia)} years`)}</div>
               </div>
             )}
             <div className="sr-tile">
-              <div className="sr-tile-label">Asset growth</div>
+              <div className="sr-tile-label">{t("Asset growth")}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{pct(fila.crecimientoPct, 0)}</div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{fila.ruidoso ? "so high the figure is noisy" : "in the normal range"}</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{fila.ruidoso ? t("so high the figure is noisy") : t("in the normal range")}</div>
             </div>
           </div>
 
@@ -108,11 +103,8 @@ export default function CalidadContable({ ticker }: Props) {
               sobre el índice, la mediana del sesgo son 0,56 años y el máximo 17,2 (UPS). Sin
               corregir, en un auge de inversión la métrica acusaría a todo el mundo. */}
           <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700 }}>
-            The uncorrected figure inflates on its own when assets grow, because what was bought
-            this year hasn&apos;t depreciated yet. The corrected one uses the fiscal-year average base.
-            {fila.viaDep === "total_contaminado" && (
-              <> <strong>Note:</strong> this company doesn&apos;t separate depreciation from amortization of
-              intangibles in its accounts, so the figure includes both and comes out shorter than reality.</>
+            {t("The uncorrected figure inflates on its own when assets grow, because what was bought this year hasn't depreciated yet. The corrected one uses the fiscal-year average base.")}{fila.viaDep === "total_contaminado" && (
+              <> <Trans text={"<s1>Note:</s1> this company doesn't separate depreciation from amortization of intangibles in its accounts, so the figure includes both and comes out shorter than reality."} s1={(c) => <strong>{c}</strong>} /></>
             )}
           </div>
 
@@ -122,8 +114,8 @@ export default function CalidadContable({ ticker }: Props) {
                   criterio contable de un cambio en lo que la empresa compra: un centro de datos son
                   servidores de 5 años y obra civil de 30. Marcarlo como alerta sería acusar con una
                   prueba que no distingue las dos cosas. */}
-              <div style={{ fontWeight: 700, color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", textTransform: "uppercase", letterSpacing: ".04em" }}>Notice</div>
-              <div style={{ lineHeight: 1.55, marginTop: 2 }}>{s.texto}</div>
+              <div style={{ fontWeight: 700, color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", textTransform: "uppercase", letterSpacing: ".04em" }}>{t("Notice")}</div>
+              <div style={{ lineHeight: 1.55, marginTop: 2 }}>{tv(s.texto)}</div>
             </div>
           ))}
         </div>
@@ -133,32 +125,28 @@ export default function CalidadContable({ ticker }: Props) {
       {tieneRec && (
         <div>
           <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>
-            The price management paid to buy back its own shares
-          </div>
+            {t("The price management paid to buy back its own shares")}</div>
           <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
             <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800 }}>
               {fila.precioRecompra?.toFixed(2)}
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> per share</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}> {" "}{t("per share")}</span>
             </div>
             {fila.retornoRecompraPct != null && (
               <div style={{ fontWeight: 700, color: fila.retornoRecompraPct >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                the stock is {pct(fila.retornoRecompraPct)} since then
-              </div>
+                {t(`the stock is ${pct(fila.retornoRecompraPct)} since then`)}</div>
             )}
-            {fila.anoRecompra != null && <div className="sr-hint">fiscal year {fila.anoRecompra}</div>}
+            {fila.anoRecompra != null && <div className="sr-hint">{t(`fiscal year ${fila.anoRecompra}`)}</div>}
           </div>
           <div className="sr-hint" style={{ lineHeight: 1.6, maxWidth: 700 }}>
             {fila.retornoRecompraPct == null
-              ? "No current price to compare it with."
+              ? t("No current price to compare it with.")
               : fila.retornoRecompraPct >= 0
-                ? "With its own money, management put fair value below where the stock trades today, and so far it has worked out. That is what they believed then, not a forecast of what the stock will do."
-                : "It paid above where the market is today: a capital-allocation decision that has destroyed value. That —not the future price— is something management can fairly be judged on."}
+                ? t("With its own money, management put fair value below where the stock trades today, and so far it has worked out. That is what they believed then, not a forecast of what the stock will do.")
+                : t("It paid above where the market is today: a capital-allocation decision that has destroyed value. That —not the future price— is something management can fairly be judged on.")}
           </div>
           {fila.recompraCreible !== true && (
             <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>
-              ⚠️ It couldn&apos;t be checked against the range the stock traded in that fiscal year, so
-              the average price is unverified.
-            </div>
+              {t("⚠️ It couldn't be checked against the range the stock traded in that fiscal year, so the average price is unverified.")}</div>
           )}
         </div>
       )}
@@ -166,10 +154,7 @@ export default function CalidadContable({ ticker }: Props) {
       {/* ⚠️ LA FECHA, SIEMPRE. Es una foto precalculada, no un dato vivo, y esconderlo sería
           presentar como actual algo que puede tener semanas. */}
       <div className="sr-hint" style={{ marginTop: "var(--sr-sp-4)", lineHeight: 1.6 }}>
-        Snapshot computed on {asOf} across {universo} index companies, from SEC filings. It doesn&apos;t
-        update on its own: FMP —the live source for the rest of this page— publishes neither gross
-        fixed assets nor shares repurchased, which is what these two measures need.
-      </div>
+        {t(`Snapshot computed on ${asOf} across ${universo} index companies, from SEC filings. It doesn't update on its own: FMP —the live source for the rest of this page— publishes neither gross fixed assets nor shares repurchased, which is what these two measures need.`)}</div>
     </div>
   );
 }

@@ -12,6 +12,8 @@ import { deleteUser } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 const FRASE = "DELETE";
 
@@ -34,8 +36,8 @@ export default function AccountPage() {
     } catch (e) {
       const m = (e as Error).message;
       setError(/subscription_active|Cancel your subscription/.test(m)
-        ? "You have an active subscription. Cancel it from Billing on the Pricing page first, then delete your account."
-        : "We couldn't delete your data. Nothing was deleted — please try again.");
+        ? t("You have an active subscription. Cancel it from Billing on the Pricing page first, then delete your account.")
+        : t("We couldn't delete your data. Nothing was deleted — please try again."));
       setEstado("idle");
       return;
     }
@@ -45,8 +47,8 @@ export default function AccountPage() {
     } catch (e) {
       const code = (e as { code?: string }).code;
       setError(code === "auth/requires-recent-login"
-        ? "Your data has been deleted. To remove the login itself, sign in again and repeat this step (it's a security check)."
-        : "Your data has been deleted, but the login could not be removed. Sign in again and repeat this step.");
+        ? t("Your data has been deleted. To remove the login itself, sign in again and repeat this step (it's a security check).")
+        : t("Your data has been deleted, but the login could not be removed. Sign in again and repeat this step."));
       await signOut();
       setEstado("idle");
       return;
@@ -57,8 +59,8 @@ export default function AccountPage() {
   if (estado === "hecho") {
     return (
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "var(--sr-sp-6)" }}>
-        <h1 style={{ fontSize: "var(--sr-t-xl)", marginBottom: "var(--sr-sp-3)" }}>Account deleted</h1>
-        <p style={{ color: "var(--sr-text-2)" }}>Your account and all its data have been deleted.</p>
+        <h1 style={{ fontSize: "var(--sr-t-xl)", marginBottom: "var(--sr-sp-3)" }}>{t("Account deleted")}</h1>
+        <p style={{ color: "var(--sr-text-2)" }}>{t("Your account and all its data have been deleted.")}</p>
       </div>
     );
   }
@@ -66,21 +68,17 @@ export default function AccountPage() {
 
   return (
     <div style={{ maxWidth: 560, margin: "0 auto", padding: "var(--sr-sp-6)" }}>
-      <h1 style={{ fontSize: "var(--sr-t-xl)", marginBottom: "var(--sr-sp-4)" }}>Your account</h1>
+      <h1 style={{ fontSize: "var(--sr-t-xl)", marginBottom: "var(--sr-sp-4)" }}>{t("Your account")}</h1>
       <p style={{ color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-5)" }}>
-        Signed in as <strong style={{ color: "var(--sr-text)" }}>{session.user.email ?? "—"}</strong>
+        <Trans text={`Signed in as <s1>${session.user.email ?? "—"}</s1>`} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} />
       </p>
 
       <section style={{ border: "1px solid color-mix(in srgb, var(--sr-neg) 45%, var(--sr-border))", borderRadius: "var(--sr-radius-lg, 14px)", padding: "var(--sr-sp-5)" }}>
-        <h2 style={{ fontSize: "var(--sr-t-base)", marginBottom: "var(--sr-sp-2)" }}>Delete account</h2>
+        <h2 style={{ fontSize: "var(--sr-t-base)", marginBottom: "var(--sr-sp-2)" }}>{t("Delete account")}</h2>
         <p style={{ color: "var(--sr-text-2)", fontSize: "var(--sr-t-sm)", lineHeight: 1.6, marginBottom: "var(--sr-sp-3)" }}>
-          This permanently deletes your login and everything linked to it: watchlist, journal,
-          alerts and their preferences, saved analyses and snapshots, push subscriptions, your
-          AI history and your waitlist sign-up. It can&apos;t be undone.
-        </p>
+          {t("This permanently deletes your login and everything linked to it: watchlist, journal, alerts and their preferences, saved analyses and snapshots, push subscriptions, your AI history and your waitlist sign-up. It can't be undone.")}</p>
         <label style={{ display: "block", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-2)" }}>
-          Type <strong>{FRASE}</strong> to confirm
-        </label>
+          <Trans text={`Type <s1>${FRASE}</s1> to confirm`} s1={(c) => <strong>{c}</strong>} /></label>
         <input
           value={confirmacion}
           onChange={(e) => setConfirmacion(e.target.value)}
@@ -93,7 +91,7 @@ export default function AccountPage() {
           disabled={confirmacion !== FRASE || estado === "borrando"}
           style={{ background: "var(--sr-neg)", color: "#fff", border: "none", borderRadius: "var(--sr-radius)", padding: "10px 18px", fontWeight: 700, cursor: confirmacion === FRASE ? "pointer" : "not-allowed", opacity: confirmacion === FRASE ? 1 : 0.5 }}
         >
-          {estado === "borrando" ? "Deleting…" : "Delete my account"}
+          {estado === "borrando" ? t("Deleting…") : t("Delete my account")}
         </button>
       </section>
     </div>

@@ -6,6 +6,8 @@ import { buildAllocationBrief } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, type KbCard } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { macro: MacroState | null; }
 
@@ -42,7 +44,7 @@ export default function ScoraBrief({ macro }: Props) {
       const res = await aiAnalyzeAudited(prompt, { module: "allocation-brief", dataBlock: prompt, sources: ["macro_state", ...(kb ? ["kb"] : [])], maxTokens: 700 });
       setBrief(res.text); setViolations(res.violations);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to generate brief");
+      setError(e instanceof Error ? e.message : t("Failed to generate brief"));
     }
     setLoading(false);
   }
@@ -53,13 +55,12 @@ export default function ScoraBrief({ macro }: Props) {
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Scora Brief · AI narrator</div>
+          <div className="section-label" style={{ margin: 0 }}>{t("Scora Brief · AI narrator")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 440, lineHeight: 1.5 }}>
-            The validated stack — secular, allocation, correlation — narrated. <strong style={{ color: "var(--sr-text-2)" }}>Grounded</strong>: cites only the real numbers above, never invents.
-          </div>
+            <Trans text={"The validated stack — secular, allocation, correlation — narrated. <s1>Grounded</s1>: cites only the real numbers above, never invents."} s1={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} /></div>
         </div>
         <button className="btn-primary" onClick={generate} disabled={loading} style={{ flexShrink: 0 }}>
-          {loading ? "Writing…" : brief ? "Regenerate" : "✦ Generate brief"}
+          {loading ? t("Writing…") : brief ? t("Regenerate") : t("✦ Generate brief")}
         </button>
       </div>
 
@@ -81,8 +82,7 @@ export default function ScoraBrief({ macro }: Props) {
       )}
       {!brief && !loading && !error && (
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", padding: "var(--sr-sp-3) 0" }}>
-          A ~180-word read on where we are, what the allocation says, and what would change the view — built only from the Secular Clock, risk-on gauge, and stock-picking regime above.
-        </div>
+          {t("A ~180-word read on where we are, what the allocation says, and what would change the view — built only from the Secular Clock, risk-on gauge, and stock-picking regime above.")}</div>
       )}
     </div>
   );

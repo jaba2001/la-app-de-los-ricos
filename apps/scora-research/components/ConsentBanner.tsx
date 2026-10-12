@@ -6,6 +6,7 @@
 import { useSyncExternalStore, type CSSProperties } from "react";
 import { useAuth } from "@/lib/auth";
 import { analyticsConfigured, leerConsentimiento, guardarConsentimiento, olvidarConsentimiento, suscribirConsentimiento, identify } from "@/lib/analytics";
+import { t } from "@/lib/i18n/cliente";
 
 export default function ConsentBanner() {
   const { session } = useAuth();
@@ -27,19 +28,16 @@ export default function ConsentBanner() {
   } as const;
 
   return (
-    <div role="dialog" aria-label="Analytics consent" style={{
+    <div role="dialog" aria-label={t("Analytics consent")} style={{
       position: "fixed", left: 16, right: 16, bottom: 16, zIndex: 1000, maxWidth: 640, margin: "0 auto",
       background: "var(--sr-surface)", border: "1px solid var(--sr-border-2, var(--sr-border))",
       borderRadius: "var(--sr-radius-lg, 14px)", padding: "var(--sr-sp-4)", boxShadow: "0 12px 40px rgba(0,0,0,0.45)",
     }}>
       <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6, margin: "0 0 var(--sr-sp-3)" }}>
-        We&apos;d like to use product analytics (PostHog, EU servers) to see which features get used.
-        It stores a cookie and an ID on your device. Nothing is sent unless you accept, and the
-        app works the same either way.
-      </p>
+        {t("We'd like to use product analytics (PostHog, EU servers) to see which features get used. It stores a cookie and an ID on your device. Nothing is sent unless you accept, and the app works the same either way.")}</p>
       <div style={{ display: "flex", gap: "var(--sr-sp-2)", justifyContent: "flex-end" }}>
-        <button style={boton} onClick={() => elegir("no")}>Decline</button>
-        <button style={boton} onClick={() => elegir("si")}>Accept</button>
+        <button style={boton} onClick={() => elegir("no")}>{t("Decline")}</button>
+        <button style={boton} onClick={() => elegir("si")}>{t("Accept")}</button>
       </div>
     </div>
   );
@@ -51,7 +49,6 @@ export function PreferenciasAnalitica({ className, style }: { className?: string
   return (
     <button type="button" onClick={olvidarConsentimiento} className={className}
       style={{ background: "none", border: "none", padding: 0, font: "inherit", color: "inherit", textDecoration: "underline", cursor: "pointer", ...style }}>
-      Analytics preferences
-    </button>
+      {t("Analytics preferences")}</button>
   );
 }

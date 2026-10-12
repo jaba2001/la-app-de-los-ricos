@@ -9,6 +9,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import DataError from "@/components/ui/DataError";
 import { etiquetaRegimen } from "@/lib/regimen";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -50,8 +51,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
   if (!macro) {
     return (
       <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-        Macro data unavailable.
-      </div>
+        {t("Macro data unavailable.")}</div>
     );
   }
 
@@ -77,13 +77,12 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
           border: "1px solid color-mix(in srgb, var(--sr-warn) 30%, transparent)",
           fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)",
         }}>
-          One or more macro composites are null — matching uses 50 as neutral placeholder. Results are directional only.
-        </div>
+          {t("One or more macro composites are null — matching uses 50 as neutral placeholder. Results are directional only.")}</div>
       )}
 
       {/* Header: today's regime */}
       <div className="card">
-        <div className="section-label">Today's Regime</div>
+        <div className="section-label">{t("Today's Regime")}</div>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-2)" }}>
           <div>
             <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: regimeColor }}>
@@ -92,7 +91,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
           </div>
           {icHealth != null && (
             <div style={{ marginLeft: "auto", textAlign: "center" }}>
-              <div className="sr-hint">IC Health</div>
+              <div className="sr-hint">{t("IC Health")}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: icHealth >= 65 ? "var(--sr-pos)" : icHealth >= 45 ? "var(--sr-warn)" : "var(--sr-neg)" }}>
                 {icHealth.toFixed(0)}
               </div>
@@ -100,8 +99,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
           )}
         </div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)" }}>
-          Closest historical analogs ranked by weighted distance across Liquidity, Credit, Recession, Geopolitical and Housing composites (same weighting as the IC Health Score).
-        </div>
+          {t("Closest historical analogs ranked by weighted distance across Liquidity, Credit, Recession, Geopolitical and Housing composites (same weighting as the IC Health Score).")}</div>
       </div>
 
       {/* Ranked analog matches */}
@@ -110,8 +108,8 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
           <div key={analog.id} className="card">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
               <div>
-                <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: "var(--sr-text)" }}>{analog.label}</div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{analog.dateRange}</div>
+                <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: "var(--sr-text)" }}>{tv(analog.label)}</div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t(analog.dateRange)}</div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
                 <Pill label={analog.regimeId} color={REGIME_COLORS[analog.regimeId] ?? "var(--sr-text-2)"} />
@@ -119,7 +117,7 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
                   <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: similarity >= 70 ? "var(--sr-pos)" : similarity >= 45 ? "var(--sr-warn)" : "var(--sr-text-3)" }}>
                     {similarity}%
                   </div>
-                  <div style={{ fontSize: "9px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>similarity</div>
+                  <div style={{ fontSize: "9px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("similarity")}</div>
                 </div>
               </div>
             </div>
@@ -129,32 +127,32 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.5, marginBottom: "var(--sr-sp-4)" }}>
-              <div><strong style={{ color: "var(--sr-text)" }}>Trigger: </strong>{analog.narrative.trigger}</div>
-              <div><strong style={{ color: "var(--sr-text)" }}>Context: </strong>{analog.narrative.context}</div>
-              <div><strong style={{ color: "var(--sr-text)" }}>What followed: </strong>{analog.narrative.whatHappenedNext}</div>
+              <div><strong style={{ color: "var(--sr-text)" }}>{t("Trigger:")}{" "}</strong>{tv(analog.narrative.trigger)}</div>
+              <div><strong style={{ color: "var(--sr-text)" }}>{t("Context:")}{" "}</strong>{tv(analog.narrative.context)}</div>
+              <div><strong style={{ color: "var(--sr-text)" }}>{t("What followed:")}{" "}</strong>{tv(analog.narrative.whatHappenedNext)}</div>
             </div>
 
             <div className="stat-row">
-              <span style={{ color: "var(--sr-text-3)" }}>SPY drawdown</span>
+              <span style={{ color: "var(--sr-text-3)" }}>{t("SPY drawdown")}</span>
               <span className="num" style={{ color: "var(--sr-neg)" }}>{fmtPct(analog.marketImpact.spyDrawdownPct)}</span>
             </div>
             <div className="stat-row">
-              <span style={{ color: "var(--sr-text-3)" }}>Duration</span>
+              <span style={{ color: "var(--sr-text-3)" }}>{t("Duration")}</span>
               <span className="num" style={{ color: "var(--sr-text-2)" }}>{fmtMonths(analog.marketImpact.durationMonths)}</span>
             </div>
             <div className="stat-row">
-              <span style={{ color: "var(--sr-text-3)" }}>Recovery</span>
+              <span style={{ color: "var(--sr-text-3)" }}>{t("Recovery")}</span>
               <span className="num" style={{ color: "var(--sr-text-2)" }}>{fmtMonths(analog.marketImpact.recoveryMonths)}</span>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)" }}>
               <div>
-                <div style={{ fontSize: "10px", color: "var(--sr-pos)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Outperformed</div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{analog.sectorImpact.outperformers.join(", ") || "—"}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-pos)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{t("Outperformed")}</div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{analog.sectorImpact.outperformers.map((x) => t(x)).join(", ") || "—"}</div>
               </div>
               <div>
-                <div style={{ fontSize: "10px", color: "var(--sr-neg)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>Underperformed</div>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{analog.sectorImpact.underperformers.join(", ") || "—"}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-neg)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>{t("Underperformed")}</div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)" }}>{analog.sectorImpact.underperformers.map((x) => t(x)).join(", ") || "—"}</div>
               </div>
             </div>
           </div>
@@ -164,14 +162,13 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
       {/* Portfolio cross-reference against the top match */}
       {!holdingsLoading && session && sectorExposure.length > 0 && topMatch && (
         <div className="card">
-          <div className="section-label">Your Portfolio in This Regime</div>
+          <div className="section-label">{t("Your Portfolio in This Regime")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-            Sector exposure cross-referenced against the closest match ({topMatch.analog.label}) only — illustrative, not a recommendation.
-          </div>
+            {t(`Sector exposure cross-referenced against the closest match (${topMatch.analog.label}) only — illustrative, not a recommendation.`)}</div>
           {sectorExposure.map(s => (
             <div key={s.sector} className="stat-row">
               <span style={{ color: "var(--sr-text-2)" }}>{s.sector} <span style={{ color: "var(--sr-text-3)" }}>({s.tickerCount})</span></span>
-              <Pill label={ROLE_META[s.historicalRole].label} color={ROLE_META[s.historicalRole].color} />
+              <Pill label={tv(ROLE_META[s.historicalRole].label)} color={ROLE_META[s.historicalRole].color} />
             </div>
           ))}
         </div>
@@ -179,12 +176,10 @@ export default function MacroHistoricalAnalog({ macro, loading }: Props) {
 
       {/* Future enhancement note */}
       <div className="card sr-hint">
-        Today's matches compare against a curated library of well-known historical episodes. Scora now records a daily macro snapshot — once enough history accumulates, this tab can also compare today against Scora's own recorded past instead of curated estimates only.
-      </div>
+        {t("Today's matches compare against a curated library of well-known historical episodes. Scora now records a daily macro snapshot — once enough history accumulates, this tab can also compare today against Scora's own recorded past instead of curated estimates only.")}</div>
 
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)" }}>
-        Historical analogs are illustrative and approximate; past regimes do not predict future returns. Not financial advice.
-      </div>
+        {t("Historical analogs are illustrative and approximate; past regimes do not predict future returns. Not financial advice.")}</div>
     </div>
   );
 }

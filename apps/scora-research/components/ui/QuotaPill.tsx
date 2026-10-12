@@ -10,6 +10,7 @@
 // el servidor, que vuelve a comprobar la cuota en cada petición.
 import { useRouter } from "next/navigation";
 import { useQuota } from "@/lib/quotaState";
+import { t } from "@/lib/i18n/cliente";
 
 export default function QuotaPill() {
   const quota = useQuota();
@@ -31,8 +32,8 @@ export default function QuotaPill() {
       disabled={!puedeSubir}
       title={
         agotado
-          ? `No AI analyses left until 00:00 UTC${puedeSubir ? " — Pro raises the limit" : ""}`
-          : `${remaining} of ${limit} AI analyses left today (resets at 00:00 UTC)`
+          ? t(`No AI analyses left until 00:00 UTC${puedeSubir ? t(" — Pro raises the limit") : ""}`)
+          : t(`${remaining} of ${limit} AI analyses left today (resets at 00:00 UTC)`)
       }
       style={{
         flexShrink: 0,
@@ -51,7 +52,7 @@ export default function QuotaPill() {
       <span className="num" style={{ fontWeight: 700 }}>
         {Math.max(0, remaining)}/{limit}
       </span>
-      {puedeSubir && <span style={{ opacity: 0.9 }}>· Upgrade</span>}
+      {puedeSubir && <span style={{ opacity: 0.9 }}>{t("· Upgrade")}</span>}
     </button>
   );
 }

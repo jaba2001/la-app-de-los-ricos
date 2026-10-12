@@ -6,6 +6,7 @@ import { getRating } from "@/lib/scoring";
 import { useWatchlistAnalyses } from "@/lib/useWatchlistAnalyses";
 import { Pill } from "@/components/ui/Pill";
 import DataError from "@/components/ui/DataError";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props { ticker: string; peers?: string[] }
 
@@ -57,7 +58,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
       <DataError mensaje={errorWatchlist} />
       {/* Ticker selector */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">Select tickers to compare (max 4)</div>
+        <div className="section-label">{tr("Select tickers to compare (max 4)")}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
           {/* Always show current ticker first, even if not in watchlist */}
           {!watchlist.some(w => w.ticker === ticker) && (() => {
@@ -79,7 +80,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
                   border: isSelected ? "1px solid color-mix(in srgb, var(--sr-amber) 40%, transparent)" : "1px solid var(--sr-amber)",
                 }}
               >
-                {ticker} ★{!hasAnalysis && <span style={{ marginLeft: 4, fontSize: "10px", opacity: 0.6 }}>(no analysis)</span>}
+                {ticker} ★{!hasAnalysis && <span style={{ marginLeft: 4, fontSize: "10px", opacity: 0.6 }}>{tr("(no analysis)")}</span>}
               </button>
             );
           })()}
@@ -109,15 +110,14 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
           })}
           {watchlist.length === 0 && !analyses[ticker] && (
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>
-              Analyze this ticker first, then add others in the Screener tab to compare.
-            </div>
+              {tr("Analyze this ticker first, then add others in the Screener tab to compare.")}</div>
           )}
         </div>
       </div>
 
       {suggestedPeers.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-          <div className="section-label">Suggested peers · open to analyze &amp; compare</div>
+          <div className="section-label">{tr("Suggested peers · open to analyze & compare")}</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
             {suggestedPeers.map(p => (
               <button
@@ -129,19 +129,18 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
               </button>
             ))}
           </div>
-          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>Peers from the company&apos;s sector. Analyze one, add it to your watchlist, then it appears above to compare head-to-head.</div>
+          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{tr("Peers from the company's sector. Analyze one, add it to your watchlist, then it appears above to compare head-to-head.")}</div>
         </div>
       )}
 
       {activeTickers.length < 2 ? (
         <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-8)", color: "var(--sr-text-3)" }}>
-          Select at least 2 tickers with saved analyses to compare.
-        </div>
+          {tr("Select at least 2 tickers with saved analyses to compare.")}</div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
           <table className="sr-table">
             <thead><tr>
-              <th>Metric</th>
+              <th>{tr("Metric")}</th>
               {activeTickers.map(t => (
                 <th key={t} style={{ textAlign: "right" }}>
                   <button
@@ -155,14 +154,14 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
             </tr></thead>
             <tbody>
               <tr>
-                <td style={{ fontWeight: 600 }}>Sector</td>
+                <td style={{ fontWeight: 600 }}>{tr("Sector")}</td>
                 {activeTickers.map(t => <td key={t} style={{ textAlign: "right", color: "var(--sr-text-2)" }}>{analyses[t].sector ?? "—"}</td>)}
               </tr>
               <tr>
-                <td style={{ fontWeight: 600 }}>Rating</td>
+                <td style={{ fontWeight: 600 }}>{tr("Rating")}</td>
                 {activeTickers.map(t => {
                   const r = getRating(Number(analyses[t].score_total));
-                  return <td key={t} style={{ textAlign: "right" }}><Pill label={r.label} color={r.color} /></td>;
+                  return <td key={t} style={{ textAlign: "right" }}><Pill label={tv(r.label)} color={r.color} /></td>;
                 })}
               </tr>
               {COMPARE_METRICS.map(m => {
@@ -170,7 +169,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
                 const best = m.best === "max" ? Math.max(...vals) : Math.min(...vals);
                 return (
                   <tr key={m.label}>
-                    <td style={{ fontWeight: 600 }}>{m.label}</td>
+                    <td style={{ fontWeight: 600 }}>{tv(m.label)}</td>
                     {activeTickers.map((t, i) => {
                       const v = vals[i];
                       const isBest = v === best;
@@ -202,7 +201,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
                   const best = eligible.length ? (m.lowerBetter ? Math.min(...eligible) : Math.max(...eligible)) : null;
                   return (
                     <tr key={m.label}>
-                      <td style={{ fontWeight: 600 }}>{m.label}</td>
+                      <td style={{ fontWeight: 600 }}>{tv(m.label)}</td>
                       {activeTickers.map((t, i) => {
                         const v = vals[i];
                         const isBest = v != null && isFinite(v) && best != null && v === best && (!m.lowerBetter || v > 0);
@@ -222,7 +221,7 @@ export default function StockCompare({ ticker, peers = [] }: Props) {
                 if (rows.length === 0) return null;
                 return (
                   <>
-                    <tr><td colSpan={activeTickers.length + 1} className="sr-hint" style={{ paddingTop: "var(--sr-sp-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Valuation multiples · lower P/E·EV/EBITDA·P/FCF and higher ROIC·FCF-yield = cheaper/better</td></tr>
+                    <tr><td colSpan={activeTickers.length + 1} className="sr-hint" style={{ paddingTop: "var(--sr-sp-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{tr("Valuation multiples · lower P/E·EV/EBITDA·P/FCF and higher ROIC·FCF-yield = cheaper/better")}</td></tr>
                     {rows}
                   </>
                 );

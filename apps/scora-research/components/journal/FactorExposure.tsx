@@ -7,6 +7,8 @@ import {
 import {
   FACTOR_LABELS, SCENARIOS, fromHistory, monthlyCloses, pctReturns, fetchMacroInnovations,
 } from "@/lib/factorData";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Position { ticker: string; value: number }
 interface Props { positions: Position[] }
@@ -32,7 +34,7 @@ export default function FactorExposure({ positions }: Props) {
   const [error, setError] = useState("");
 
   const run = useCallback(async () => {
-    if (positions.length < 2) { setError("Add at least 2 different open positions."); return; }
+    if (positions.length < 2) { setError(tr("Add at least 2 different open positions.")); return; }
     setLoading(true); setError(""); setRes(null);
     try {
       const uniq = new Map<string, number>();
@@ -55,7 +57,7 @@ export default function FactorExposure({ positions }: Props) {
       const usable = histories.filter((h) => h.closes.length >= 25);
       const dropped = histories.filter((h) => h.closes.length < 25).map((h) => h.t);
       if (usable.length < 2 || spy.length < 25) {
-        setError("At least 2 names with 24+ months of history (and SPY) are needed.");
+        setError(tr("At least 2 names with 24+ months of history (and SPY) are needed."));
         setLoading(false); return;
       }
 
@@ -69,10 +71,10 @@ export default function FactorExposure({ positions }: Props) {
       const factors: Record<string, number[]> = { market: pctReturns(spy), ...macro };
 
       const model = fitFactorModel(y, factors);
-      if (!model) { setError("The model couldn't be fitted (collinear factors or too short a sample)."); setLoading(false); return; }
+      if (!model) { setError(tr("The model couldn't be fitted (collinear factors or too short a sample).")); setLoading(false); return; }
       setRes({ model, names: usable.map((u) => u.t), weights, dropped });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't build the factor exposure");
+      setError(e instanceof Error ? e.message : tr("Couldn't build the factor exposure"));
     }
     setLoading(false);
   }, [positions]);
@@ -94,14 +96,12 @@ export default function FactorExposure({ positions }: Props) {
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Factor X-ray · APT (Ross 1976)</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("Factor X-ray · APT (Ross 1976)")}</div>
           <div className="sr-hint" style={{ maxWidth: 520, lineHeight: 1.5 }}>
-            Regresses <strong>your portfolio&apos;s</strong> returns on the market and on macro surprises. The sector says
-            what each company does; the factor says what moves your money. They rarely match.
-          </div>
+            <Trans text={"Regresses <s1>your portfolio's</s1> returns on the market and on macro surprises. The sector says what each company does; the factor says what moves your money. They rarely match."} s1={(c) => <strong>{c}</strong>} /></div>
         </div>
         <button className="btn-primary" onClick={run} disabled={loading} style={{ flexShrink: 0, padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}>
-          {loading ? "Measuring…" : "✦ Run X-ray"}
+          {loading ? tr("Measuring…") : tr("✦ Run X-ray")}
         </button>
       </div>
 
@@ -111,32 +111,28 @@ export default function FactorExposure({ positions }: Props) {
         <div style={{ marginTop: "var(--sr-sp-3)" }}>
           {/* El titular */}
           <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${effectiveBets < 2 ? "var(--sr-warn)" : "var(--sr-pos)"} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${effectiveBets < 2 ? "var(--sr-warn)" : "var(--sr-pos)"} 24%, transparent)`, fontSize: "var(--sr-t-sm)", lineHeight: 1.6, marginBottom: "var(--sr-sp-3)" }}>
-            You hold <strong>{res.names.length} names</strong> and{" "}
-            <strong className="num">{effectiveBets.toFixed(1)}</strong> effective independent bets.{" "}
-            {(topShareOfSystematic * 100).toFixed(0)}% of the variance the factors explain comes from{" "}
-            <strong>{FACTOR_LABELS[topLoading.factor] ?? topLoading.factor}</strong>.
-            {effectiveBets < 2 && <> Counting tickers is not diversifying: in practice this is a single position.</>}
+            <Trans text={`You hold <s1>${res.names.length} names</s1> and <s2>${effectiveBets.toFixed(1)}</s2> effective independent bets. ${(topShareOfSystematic * 100).toFixed(0)}% of the variance the factors explain comes from <s3>${tr(FACTOR_LABELS[topLoading.factor] ?? topLoading.factor)}</s3>.`} s1={(c) => <strong>{c}</strong>} s2={(c) => <strong className="num">{c}</strong>} s3={(c) => <strong>{c}</strong>} />{effectiveBets < 2 && <> {" "}{tr("Counting tickers is not diversifying: in practice this is a single position.")}</>}
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
             <div className="sr-tile"><div className="sr-tile-label">R²</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.rSquared * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Systematic</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.systematicShare * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Idiosyncratic</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: "var(--sr-warn)" }}>{(m.idiosyncraticShare * 100).toFixed(0)}%</div></div>
-            <div className="sr-tile"><div className="sr-tile-label">Months</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{m.n}</div><div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{(m.n / m.k).toFixed(1)} per parameter</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">{tr("Systematic")}</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{(m.systematicShare * 100).toFixed(0)}%</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">{tr("Idiosyncratic")}</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: "var(--sr-warn)" }}>{(m.idiosyncraticShare * 100).toFixed(0)}%</div></div>
+            <div className="sr-tile"><div className="sr-tile-label">{tr("Months")}</div><div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{m.n}</div><div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{tr(`${(m.n / m.k).toFixed(1)} per parameter`)}</div></div>
           </div>
 
           <div style={{ overflowX: "auto" }}>
             <table className="sr-table">
               <thead><tr>
-                <th>Factor</th>
-                <th style={{ textAlign: "right" }}>Beta</th>
+                <th>{tr("Factor")}</th>
+                <th style={{ textAlign: "right" }}>{tr("Beta")}</th>
                 <th style={{ textAlign: "right" }}>t</th>
-                <th style={{ textAlign: "right" }}>% of variance</th>
+                <th style={{ textAlign: "right" }}>{tr("% of variance")}</th>
               </tr></thead>
               <tbody>
                 {[...m.loadings].sort((a, b) => Math.abs(b.varianceShare) - Math.abs(a.varianceShare)).map((l) => (
                   <tr key={l.factor} style={{ opacity: l.significant ? 1 : 0.55 }}>
-                    <td style={{ fontWeight: 600 }}>{FACTOR_LABELS[l.factor] ?? l.factor}</td>
+                    <td style={{ fontWeight: 600 }}>{tr(FACTOR_LABELS[l.factor] ?? l.factor)}</td>
                     <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{l.beta >= 0 ? "+" : ""}{l.beta.toFixed(3)}</td>
                     <td style={{ textAlign: "right", color: l.significant ? "var(--sr-text)" : "var(--sr-text-3)" }} className="num">{l.tStat.toFixed(1)}</td>
                     <td style={{ textAlign: "right" }} className="num">{(l.varianceShare * 100).toFixed(1)}%</td>
@@ -148,14 +144,13 @@ export default function FactorExposure({ positions }: Props) {
 
           {explainLoadings(m, FACTOR_LABELS).length > 0 && (
             <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
-              <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 4 }}>Your portfolio, in one sentence</div>
+              <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 4 }}>{tr("Your portfolio, in one sentence")}</div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.6 }}>
-                A position {explainLoadings(m, FACTOR_LABELS).join(" · ")}.
-              </div>
+                {tr(`A position ${explainLoadings(m, FACTOR_LABELS).join(" · ")}.`)}</div>
             </div>
           )}
 
-          <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>Portfolio scenarios</div>
+          <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>{tr("Portfolio scenarios")}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "var(--sr-sp-2)" }}>
             {SCENARIOS.map((s) => {
               if (!Object.keys(s.shocks).every((k) => m.loadings.some((l) => l.factor === k))) return null;
@@ -163,7 +158,7 @@ export default function FactorExposure({ positions }: Props) {
               const tone = r.total >= 0 ? "var(--sr-pos)" : "var(--sr-neg)";
               return (
                 <div key={s.label} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${tone} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${tone} 22%, transparent)` }}>
-                  <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{s.label}</div>
+                  <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{tv(s.label)}</div>
                   <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: tone }}>{r.total >= 0 ? "+" : ""}{r.total.toFixed(2)}%</div>
                 </div>
               );
@@ -171,11 +166,8 @@ export default function FactorExposure({ positions }: Props) {
           </div>
 
           <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-            Weights by current market value, betas from a {m.n}-month regression. Dimmed rows have
-            |t| &lt; 2 and are not distinguishable from zero. Scenarios are linear: they don&apos;t capture that betas rise
-            precisely in crises, which is when they matter.
-            {res.dropped.length > 0 && <div style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ Not enough history, excluded from the calculation: {res.dropped.join(", ")}.</div>}
-            {m.warnings.map((w, i) => <div key={i} style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ {w}</div>)}
+            {tr(`Weights by current market value, betas from a ${m.n}-month regression. Dimmed rows have |t| < 2 and are not distinguishable from zero. Scenarios are linear: they don't capture that betas rise precisely in crises, which is when they matter.`)}{res.dropped.length > 0 && <div style={{ marginTop: 4, color: "var(--sr-warn)" }}>{tr(`⚠ Not enough history, excluded from the calculation: ${res.dropped.join(", ")}.`)}</div>}
+            {m.warnings.map((w, i) => <div key={i} style={{ marginTop: 4, color: "var(--sr-warn)" }}>⚠ {tr(w)}</div>)}
           </div>
         </div>
       )}

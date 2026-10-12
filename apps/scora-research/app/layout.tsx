@@ -8,6 +8,8 @@ import SiteFooter from "@/components/SiteFooter";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
 import ConsentBanner from "@/components/ConsentBanner";
 import { SITIO } from "@/lib/sitio";
+import IdiomaProvider from "@/components/IdiomaProvider";
+import { idiomaPeticion } from "@/lib/i18n/servidor";
 
 const hanken = Hanken_Grotesk({
   subsets: ["latin"],
@@ -43,10 +45,14 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // El idioma sale de la cookie (o, la primera vez, del navegador): así el primer HTML ya va
+  // en el idioma bueno. Leer la cookie hace dinámicas todas las páginas, que es lo que se quiere.
+  const idioma = await idiomaPeticion();
   return (
-    <html lang="en" className={`${hanken.variable} ${newsreader.variable}`}>
+    <html lang={idioma} className={`${hanken.variable} ${newsreader.variable}`}>
       <body>
+        <IdiomaProvider idioma={idioma}>
         <AuthProvider>
           {/* Renders nothing — mounts PostHog and keeps identity in sync. Must be
               inside AuthProvider (reads the session). No-op without a PostHog key. */}
@@ -62,8 +68,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
             <SiteFooter />
+            {/* «Ask about this page»: explica lo que hay en pantalla. En el layout para que la
+                conversación sobreviva a la navegación entre páginas. */}
           </MacroProvider>
         </AuthProvider>
+        </IdiomaProvider>
         {/* Delivery metrics (Core Web Vitals per route). Complements PostHog:
             PostHog measures behaviour, these measure how fast it arrives. */}
       </body>

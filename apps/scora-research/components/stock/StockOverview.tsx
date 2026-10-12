@@ -19,6 +19,8 @@ import EarningsTone from "@/components/stock/EarningsTone";
 import InstrumentPanel from "@/components/stock/InstrumentPanel";
 import BondCockpit from "@/components/stock/BondCockpit";
 import { etiquetaRegimen } from "@/lib/regimen";
+import { t as trad, tv, fecha } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props {
   data: StockData | null;
@@ -67,7 +69,7 @@ function ScoreGauge({ score, max, label, color }: { score: number; max: number; 
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</span>
+        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>{tv(label)}</span>
         <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }} className="num">{score}<span style={{ color: "var(--sr-text-3)", fontWeight: 400 }}>/{max}</span></span>
       </div>
       <div className="score-bar-track">
@@ -206,24 +208,23 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)",
           flexWrap: "wrap",
         }}>
-          <span>Last saved analysis:</span>
+          <span>{trad("Last saved analysis:")}</span>
           <span style={{ color: "var(--sr-text-2)", fontWeight: 600 }}>
-            {new Date(savedAnalysis.analysis_date).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}
+            {fecha(savedAnalysis.analysis_date, { day: "2-digit", month: "short", year: "numeric" })}
           </span>
           <span style={{ color: savedAnalysis.rating === "STRONG BUY" ? "var(--sr-pos)" : savedAnalysis.rating?.includes("BUY") ? "#34D399" : savedAnalysis.rating?.includes("SELL") ? "var(--sr-neg)" : "var(--sr-warn)", fontWeight: 700 }}>
             {savedAnalysis.rating ?? "—"}
           </span>
           <span className="num" style={{ color: "var(--sr-text-2)" }}>
-            Score: <strong>{savedAnalysis.score_total}</strong>
+            <Trans text={`Score: <s1>${savedAnalysis.score_total}</s1>`} s1={(c) => <strong>{c}</strong>} />
             {savedAnalysis.macro_tilt != null && savedAnalysis.macro_tilt !== 0 && (
               <span style={{ color: Number(savedAnalysis.macro_tilt) > 0 ? "var(--sr-pos)" : "var(--sr-neg)", marginLeft: 4 }}>
-                {Number(savedAnalysis.macro_tilt) > 0 ? "+" : ""}{savedAnalysis.macro_tilt} macro
-              </span>
+                {Number(savedAnalysis.macro_tilt) > 0 ? "+" : ""}{trad(`${savedAnalysis.macro_tilt} macro`)}</span>
             )}
           </span>
           {icScore != null && (
             <span className="num" style={{ color: "var(--sr-text-3)", marginLeft: "auto" }}>
-              vs current: <strong style={{ color: icScore >= savedAnalysis.score_total + (savedAnalysis.macro_tilt ?? 0) ? "var(--sr-pos)" : "var(--sr-neg)" }}>
+              {trad("vs current:")}{" "}<strong style={{ color: icScore >= savedAnalysis.score_total + (savedAnalysis.macro_tilt ?? 0) ? "var(--sr-pos)" : "var(--sr-neg)" }}>
                 {icScore.toFixed(0)}
               </strong>
             </span>
@@ -242,7 +243,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: "var(--sr-sp-4)" }}>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-2)" }}>
-                <div className="section-label" style={{ margin: 0 }}>Macro Context</div>
+                <div className="section-label" style={{ margin: 0 }}>{trad("Macro Context")}</div>
                 {loading ? <Sk w={80} h={18} /> : macro?.regime_label && (
                   <Pill label={etiquetaRegimen(macro) ?? macro.regime_label} color={
                     macro.regime_id === "expansion" ? "var(--sr-pos)" :
@@ -255,13 +256,13 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               ) : macroTilt ? (
                 <div>
                   <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-2)" }}>
-                    <strong style={{ color: macroTilt.color }}>{!instr.isEquity ? instr.label : profile?.sector ? `${profile.sector as string} sector` : "This position"}</strong>
-                    {" — macro tilt is "}<strong style={{ color: macroTilt.color }}>{macroTilt.label}</strong>
-                    {macroTilt.tilt !== 0 && <span className="num"> ({macroTilt.tilt > 0 ? "+" : ""}{macroTilt.tilt} pts)</span>}
+                    <strong style={{ color: macroTilt.color }}>{!instr.isEquity ? instr.label : profile?.sector ? trad(`${profile.sector as string} sector`) : trad("This position")}</strong>
+                    {trad(" — macro tilt is ")}<strong style={{ color: macroTilt.color }}>{tv(macroTilt.label)}</strong>
+                    {macroTilt.tilt !== 0 && <span className="num"> ({macroTilt.tilt > 0 ? "+" : ""}{trad(`${macroTilt.tilt} pts)`)}</span>}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
                     {macroTilt.reasons.map((r, i) => (
-                      <span key={i} style={{ fontSize: "var(--sr-t-xs)", padding: "3px 8px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-2)", color: "var(--sr-text-2)" }}>{r}</span>
+                      <span key={i} style={{ fontSize: "var(--sr-t-xs)", padding: "3px 8px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-2)", color: "var(--sr-text-2)" }}>{trad(r)}</span>
                     ))}
                   </div>
                 </div>
@@ -274,7 +275,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 { label: "DGS10",     val: loading ? null : macro?.dgs10 != null ? `${Number(macro.dgs10).toFixed(2)}%` : null },
               ].map(({ label, val }) => (
                 <div key={label} style={{ textAlign: "center", minWidth: 60 }}>
-                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2, whiteSpace: "nowrap" }}>{label}</div>
+                  <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2, whiteSpace: "nowrap" }}>{tv(label)}</div>
                   {loading || val == null ? <Sk w={40} h={20} /> : <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">{val}</div>}
                 </div>
               ))}
@@ -282,14 +283,13 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           </div>
           {!loading && macroTilt && (
             <div style={{ marginTop: "var(--sr-sp-3)", display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", width: 80, flexShrink: 0 }}>Macro Tilt</span>
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", width: 80, flexShrink: 0 }}>{trad("Macro Tilt")}</span>
               <div style={{ flex: 1, height: 6, background: "var(--sr-surface-3)", borderRadius: 3, position: "relative" }}>
                 <div style={{ position: "absolute", left: "50%", top: 0, height: "100%", width: `${Math.abs(macroTilt.tilt) / 20 * 50}%`, transform: macroTilt.tilt >= 0 ? "none" : "translateX(-100%)", background: macroTilt.color, borderRadius: 3, transition: "width 600ms ease" }} />
                 <div style={{ position: "absolute", left: "50%", top: -2, width: 1, height: 10, background: "var(--sr-border-2)" }} />
               </div>
               <span style={{ fontSize: "var(--sr-t-xs)", color: macroTilt.color, fontWeight: 700, width: 80, textAlign: "right" }} className="num">
-                {macroTilt.tilt > 0 ? "+" : ""}{macroTilt.tilt} pts
-              </span>
+                {macroTilt.tilt > 0 ? "+" : ""}{trad(`${macroTilt.tilt} pts`)}</span>
             </div>
           )}
         </div>
@@ -309,22 +309,22 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
           {instr.isEquity && (
           <div className="card" style={{ textAlign: "center" }}>
-            <div className="section-label">Scora Score</div>
+            <div className="section-label">{trad("Scora Score")}</div>
             {loading ? <Sk w="80px" h={64} /> : (
               <div>
                 <div style={{ fontSize: "var(--sr-t-hero)", fontWeight: 700, letterSpacing: "-0.03em", color: icScore != null ? totalColor(icScore) : "var(--sr-text-3)", lineHeight: 1 }} className="num">
                   {icScore?.toFixed(0) ?? "—"}
                 </div>
-                {rating && <div style={{ marginTop: 6 }}><Pill label={rating.label} color={rating.color} /></div>}
+                {rating && <div style={{ marginTop: 6 }}><Pill label={tv(rating.label)} color={rating.color} /></div>}
                 {/* Cuando la nota va topada por un pilar hundido, el motivo se dice. Topar
                     sin explicar es lo que hace Seeking Alpha; el valor está en la frase. */}
                 {rating?.capped && rating.reason && (
-                  <div className="sr-hint" style={{ marginTop: 6, color: "var(--sr-warn)" }}>{rating.reason}</div>
+                  <div className="sr-hint" style={{ marginTop: 6, color: "var(--sr-warn)" }}>{tv(rating.reason)}</div>
                 )}
                 {scores && macroTilt && macroTilt.tilt !== 0 && (
                   <div style={{ marginTop: 8, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-                    Base: <span className="num">{scores.total}</span>
-                    <span style={{ color: macroTilt.color, marginLeft: 4 }}>{macroTilt.tilt > 0 ? "+" : ""}{macroTilt.tilt} macro</span>
+                    <Trans text={`Base: <s1>${scores.total}</s1>`} s1={(c) => <span className="num">{c}</span>} />
+                    <span style={{ color: macroTilt.color, marginLeft: 4 }}>{macroTilt.tilt > 0 ? "+" : ""}{trad(`${macroTilt.tilt} macro`)}</span>
                   </div>
                 )}
                 {/* Divulgación de metodología (F2). No es letra pequeña por gusto: la norma
@@ -337,9 +337,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     comparando en absoluto; los percentiles por sector están en Fundamentals,
                     que es donde sí aportan: explicar, no seleccionar. */}
                 <div className="sr-hint" style={{ marginTop: 8 }}>
-                  Scored on absolute thresholds across the market. Sector-relative percentiles —
-                  how it ranks against its own peers — are in Fundamentals.
-                </div>
+                  {trad("Scored on absolute thresholds across the market. Sector-relative percentiles — how it ranks against its own peers — are in Fundamentals.")}</div>
               </div>
             )}
           </div>
@@ -347,17 +345,17 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
           {instr.isEquity && (
           <div className="card">
-            <div className="section-label">Score Breakdown</div>
+            <div className="section-label">{trad("Score Breakdown")}</div>
             {loading ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>{[0,1,2,3].map(i => <Sk key={i} w="100%" h={28} />)}</div>
             ) : scores ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
-                <ScoreGauge score={scores.value}    max={25} label="Value"    color={SC.value} />
-                <ScoreGauge score={scores.health}   max={30} label="Health"   color={SC.health} />
-                <ScoreGauge score={scores.momentum} max={25} label="Momentum" color={SC.momentum} />
-                <ScoreGauge score={scores.growth}   max={20} label="Growth"   color={SC.growth} />
+                <ScoreGauge score={scores.value}    max={25} label={trad("Value")}    color={SC.value} />
+                <ScoreGauge score={scores.health}   max={30} label={trad("Health")}   color={SC.health} />
+                <ScoreGauge score={scores.momentum} max={25} label={trad("Momentum")} color={SC.momentum} />
+                <ScoreGauge score={scores.growth}   max={20} label={trad("Growth")}   color={SC.growth} />
               </div>
-            ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>No data</div>}
+            ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{trad("No data")}</div>}
           </div>
           )}
 
@@ -370,20 +368,20 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             return (
               <div className="card">
                 <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
-                  <div className="section-label" style={{ margin: 0 }}>Trajectory · momentum</div>
+                  <div className="section-label" style={{ margin: 0 }}>{trad("Trajectory · momentum")}</div>
                   <span style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: tr.color }} className="num">
-                    {tr.score}<span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 400 }}>/100 · {tr.label}</span>
+                    {tr.score}<span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 400 }}>/100 · {tv(tr.label)}</span>
                   </span>
                 </div>
                 <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${tr.score}%`, background: tr.color }} /></div>
                 <div style={{ display: "flex", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flexWrap: "wrap" }}>
-                  <span>12-1m mom: <strong className="num" style={{ color: mom12_1 != null ? (mom12_1 > 0 ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{mom12_1 != null ? (mom12_1 > 0 ? "+" : "") + mom12_1.toFixed(0) + "%" : "—"}</strong></span>
+                  <span>{trad("12-1m mom:")}{" "}<strong className="num" style={{ color: mom12_1 != null ? (mom12_1 > 0 ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text-3)" }}>{mom12_1 != null ? (mom12_1 > 0 ? "+" : "") + mom12_1.toFixed(0) + "%" : "—"}</strong></span>
                   <span>6m: <strong className="num" style={{ color: "var(--sr-text-2)" }}>{pc6 != null ? (pc6 > 0 ? "+" : "") + pc6.toFixed(0) + "%" : "—"}</strong></span>
-                  <span>growth: <strong className="num" style={{ color: "var(--sr-text-2)" }}>{scores.growth}/20</strong></span>
+                  <span><Trans text={`growth: <s1>${scores.growth}/20</s1>`} s1={(c) => <strong className="num" style={{ color: "var(--sr-text-2)" }}>{c}</strong>} /></span>
                 </div>
                 <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${pick.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${pick.color} 28%, transparent)`, fontSize: "var(--sr-t-xs)", lineHeight: 1.5 }}>
-                  <strong style={{ color: pick.color }}>Stock-picking: {pick.label}</strong>
-                  <span style={{ color: "var(--sr-text-3)" }}> — {pick.detail}</span>
+                  <strong style={{ color: pick.color }}>{trad(`Stock-picking: ${pick.label}`)}</strong>
+                  <span style={{ color: "var(--sr-text-3)" }}> — {tv(pick.detail)}</span>
                 </div>
               </div>
             );
@@ -400,26 +398,26 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             const toneColor = (t: string) => t === "pos" ? "var(--sr-pos)" : t === "neg" ? "var(--sr-neg)" : t === "warn" ? "var(--sr-warn)" : "var(--sr-text-2)";
             return (
               <div className="card">
-                <div className="section-label">Top-down context</div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{td.summary}</div>
+                <div className="section-label">{trad("Top-down context")}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tv(td.summary)}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {td.layers.map((L, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-2)" }} title={L.note}>
+                    <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-2)" }} title={tv(L.note)}>
                       <span className="num" style={{ fontSize: "10px", fontWeight: 700, color: toneColor(L.tone), minWidth: 20 }}>{L.code}</span>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", minWidth: 62 }}>{L.label}</span>
-                      <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: toneColor(L.tone) }}>{L.value}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", minWidth: 62 }}>{tv(L.label)}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: toneColor(L.tone) }}>{tv(L.value)}</span>
                     </div>
                   ))}
                 </div>
                 {td.ensemble && td.ensemble.contributions.length > 0 && (
                   <div style={{ marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
                     <div className="sr-flex-between" style={{ marginBottom: 4 }}>
-                      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>IC-weighted composite · {td.ensemble.regime} corr</span>
+                      <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{trad(`IC-weighted composite · ${td.ensemble.regime} corr`)}</span>
                       <span className="num" style={{ fontSize: "var(--sr-t-sm)", fontWeight: 800, color: td.ensemble.color }}>{td.ensemble.composite}/100</span>
                     </div>
                     <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${td.ensemble.composite}%`, background: td.ensemble.color }} /></div>
                     <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 5 }}>
-                      Weighted by measured IC: {td.ensemble.contributions.map((c) => `${c.factor} ${(c.weight * 100).toFixed(0)}%`).join(" · ")}
+                      {trad(`Weighted by measured IC: ${td.ensemble.contributions.map((c) => `${c.factor} ${(c.weight * 100).toFixed(0)}%`).join(" · ")}`)}
                     </div>
                   </div>
                 )}
@@ -463,17 +461,17 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             return (
               <div className="card">
                 <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
-                  <div className="section-label" style={{ margin: 0 }}>Rating · top-down</div>
-                  <span style={{ fontSize: "10px", fontWeight: 700, color: convColor }}>{rt.conviction} conviction · {rt.convictionPct}%</span>
+                  <div className="section-label" style={{ margin: 0 }}>{trad("Rating · top-down")}</div>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: convColor }}>{trad(`${rt.conviction} conviction · ${rt.convictionPct}%`)}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
                   {chip(rt.rating)}
-                  <span className="num sr-hint">{rt.directional}/100 directional</span>
+                  <span className="num sr-hint">{trad(`${rt.directional}/100 directional`)}</span>
                 </div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tf.summary} <span style={{ color: "var(--sr-text-2)" }}>{rt.note}</span></div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>{tv(tf.summary)} <span style={{ color: "var(--sr-text-2)" }}>{tv(rt.note)}</span></div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
                   {rows.map(({ k, q, r, tk }) => (
-                    <div key={k} title={r.reasons.join(" · ")}>
+                    <div key={k} title={r.reasons.map((x) => trad(x)).join(" · ")}>
                       <div className="sr-flex-between" style={{ marginBottom: 3 }}>
                         <span style={{ fontSize: "var(--sr-t-xs)" }}><strong style={{ color: "var(--sr-text)" }}>{k}</strong> <span style={{ color: "var(--sr-text-3)" }}>· {q}</span></span>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -486,8 +484,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                   ))}
                 </div>
                 <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-                  No &quot;Hold&quot; by design — every name gets a directional call; conviction (not a neutral label) carries the honesty. Monthly gates the call; daily is a reversion/entry filter. The full-score cross-sectional IC is ~0, so the direction leans on the trend + regime reads, not the raw score.
-                </div>
+                  {trad("No \"Hold\" by design — every name gets a directional call; conviction (not a neutral label) carries the honesty. Monthly gates the call; daily is a reversion/entry filter. The full-score cross-sectional IC is ~0, so the direction leans on the trend + regime reads, not the raw score.")}</div>
               </div>
             );
           })()}
@@ -522,8 +519,8 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           {scoreHistory.length >= 2 && (
             <div className="card">
               <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-                <div className="section-label" style={{ margin: 0 }}>Score History</div>
-                <span className="sr-hint">{scoreHistory.length} sessions</span>
+                <div className="section-label" style={{ margin: 0 }}>{trad("Score History")}</div>
+                <span className="sr-hint">{trad(`${scoreHistory.length} sessions`)}</span>
               </div>
               <Sparkline points={scoreHistory.map(h => h.score)} color="var(--sr-amber)" />
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
@@ -565,16 +562,14 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             return (
               <div className="card">
                 <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
-                  <div className="section-label" style={{ margin: 0 }}>Score Track Record</div>
+                  <div className="section-label" style={{ margin: 0 }}>{trad("Score Track Record")}</div>
                   {highs.length > 0 && (
                     <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hits >= highs.length / 2 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                      {hits}/{highs.length} BUY→up
-                    </span>
+                      {trad(`${hits}/${highs.length} BUY→up`)}</span>
                   )}
                 </div>
                 <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-                  Forward price return from each analysis to today
-                </div>
+                  {trad("Forward price return from each analysis to today")}</div>
                 {rows.map(r => (
                   <div key={r.date} className="stat-row" style={{ padding: "3px 0" }}>
                     <span className="sr-hint num">{r.date}</span>
@@ -591,7 +586,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
           })()}
 
           <div className="card">
-            <div className="section-label">Quick Info</div>
+            <div className="section-label">{trad("Quick Info")}</div>
             {[
               { label: "Sector",     val: profile?.sector as string },
               { label: "Industry",   val: profile?.industry as string },
@@ -602,7 +597,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               { label: "IPO Date",   val: profile?.ipoDate as string },
             ].map(({ label, val }) => (
               <div key={label} className="stat-row">
-                <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>{label}</span>
+                <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>{tv(label)}</span>
                 {loading ? <Sk w={70} h={14} /> : <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 500 }}>{val ?? "—"}</span>}
               </div>
             ))}
@@ -615,7 +610,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               ROIC ni márgenes). Su lectura es la de InstrumentPanel: momentum y régimen. */}
           {instr.isEquity && (
           <div className="card">
-            <div className="section-label">Key Metrics (TTM)</div>
+            <div className="section-label">{trad("Key Metrics (TTM)")}</div>
             <div className="sr-grid-4">
               {[
                 { label: "P/E",             val: n(metrics?.peRatioTTM, 1) },
@@ -632,7 +627,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 { label: "EV/Revenue",      val: n(metrics?.evToSalesTTM, 1) },
               ].map(({ label, val }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   {loading ? <Sk w={40} h={18} /> : <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>}
                 </div>
               ))}
@@ -645,7 +640,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
             return (
               <div className="card">
                 <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-                  <div className="section-label" style={{ margin: 0 }}>52-Week Range</div>
+                  <div className="section-label" style={{ margin: 0 }}>{trad("52-Week Range")}</div>
                   <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">${p52.toFixed(2)}</span>
                 </div>
                 {low52 != null && high52 != null && (
@@ -668,7 +663,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
           {/* Technical Signals */}
           <div className="card">
-            <div className="section-label">Technical Signals</div>
+            <div className="section-label">{trad("Technical Signals")}</div>
             {loading || !cl.length ? (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-3)" }}>
                 {[0,1,2,3,4,5].map(i => <Sk key={i} w="100%" h={52} />)}
@@ -683,7 +678,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rsi14 > 70 ? "var(--sr-neg)" : rsi14 < 30 ? "var(--sr-pos)" : "var(--sr-warn)" }} className="num">{rsi14.toFixed(1)}</div>
                         <div style={{ fontSize: "var(--sr-t-xs)", color: rsi14 > 70 ? "var(--sr-neg)" : rsi14 < 30 ? "var(--sr-pos)" : "var(--sr-warn)", fontWeight: 600, marginTop: 2 }}>
-                          {rsi14 > 70 ? "Overbought" : rsi14 < 30 ? "Oversold" : "Neutral"}
+                          {rsi14 > 70 ? trad("Overbought") : rsi14 < 30 ? trad("Oversold") : trad("Neutral")}
                         </div>
                       </>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
@@ -691,22 +686,22 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
                   {/* vs SMA50 */}
                   <div className="sr-tile">
-                    <div className="sr-tile-label">vs SMA 50</div>
+                    <div className="sr-tile-label">{trad("vs SMA 50")}</div>
                     {vs50 != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(vs50) }} className="num">{vs50 >= 0 ? "+" : ""}{vs50.toFixed(1)}%</div>
-                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(vs50), fontWeight: 600, marginTop: 2 }}>{vs50 >= 0 ? "Above" : "Below"} SMA50</div>
+                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(vs50), fontWeight: 600, marginTop: 2 }}>{vs50 >= 0 ? trad("Above") : trad("Below")} SMA50</div>
                       </>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
                   </div>
 
                   {/* vs SMA200 */}
                   <div className="sr-tile">
-                    <div className="sr-tile-label">vs SMA 200</div>
+                    <div className="sr-tile-label">{trad("vs SMA 200")}</div>
                     {vs200 != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(vs200) }} className="num">{vs200 >= 0 ? "+" : ""}{vs200.toFixed(1)}%</div>
-                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(vs200), fontWeight: 600, marginTop: 2 }}>{vs200 >= 0 ? "Uptrend" : "Downtrend"}</div>
+                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(vs200), fontWeight: 600, marginTop: 2 }}>{vs200 >= 0 ? trad("Uptrend") : trad("Downtrend")}</div>
                       </>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
                   </div>
@@ -717,14 +712,14 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     {macd != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(macd) }} className="num">{macd >= 0 ? "+" : ""}{macd.toFixed(2)}</div>
-                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(macd), fontWeight: 600, marginTop: 2 }}>{macd >= 0 ? "Bullish" : "Bearish"}</div>
+                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(macd), fontWeight: 600, marginTop: 2 }}>{macd >= 0 ? trad("Bullish") : trad("Bearish")}</div>
                       </>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
                   </div>
 
                   {/* 3M Return */}
                   <div className="sr-tile">
-                    <div className="sr-tile-label">3M Return</div>
+                    <div className="sr-tile-label">{trad("3M Return")}</div>
                     {ret3m != null ? (
                       <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(ret3m) }} className="num">{ret3m >= 0 ? "+" : ""}{ret3m.toFixed(1)}%</div>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
@@ -732,11 +727,11 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
                   {/* 6M Alpha vs SPY */}
                   <div className="sr-tile">
-                    <div className="sr-tile-label">6M Alpha vs SPY</div>
+                    <div className="sr-tile-label">{trad("6M Alpha vs SPY")}</div>
                     {alpha6m != null ? (
                       <>
                         <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(alpha6m) }} className="num">{alpha6m >= 0 ? "+" : ""}{alpha6m.toFixed(1)}%</div>
-                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(alpha6m), fontWeight: 600, marginTop: 2 }}>{alpha6m >= 0 ? "Outperforming" : "Underperforming"}</div>
+                        <div style={{ fontSize: "var(--sr-t-xs)", color: rc(alpha6m), fontWeight: 600, marginTop: 2 }}>{alpha6m >= 0 ? trad("Outperforming") : trad("Underperforming")}</div>
                       </>
                     ) : <div style={{ color: "var(--sr-text-3)" }}>—</div>}
                   </div>
@@ -745,7 +740,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                 {sma50 != null && sma200 != null && (
                   <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", fontSize: "var(--sr-t-xs)", display: "flex", alignItems: "center", gap: 8 }}>
                     <span style={{ fontWeight: 700, color: sma50 > sma200 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                      {sma50 > sma200 ? "Golden Cross" : "Death Cross"}
+                      {sma50 > sma200 ? trad("Golden Cross") : trad("Death Cross")}
                     </span>
                     <span style={{ color: "var(--sr-text-3)" }}>
                       SMA50 ${sma50.toFixed(2)} {sma50 > sma200 ? ">" : "<"} SMA200 ${sma200.toFixed(2)}
@@ -781,16 +776,14 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
               <div className="card">
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
                   <div>
-                    <div className="section-label" style={{ margin: 0 }}>Sector Context</div>
+                    <div className="section-label" style={{ margin: 0 }}>{trad("Sector Context")}</div>
                     <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
-                      {sector} · {n} analyzed in last 30d
-                    </div>
+                      {trad(`${sector} · ${n} analyzed in last 30d`)}</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: pctColor }} className="num">
-                      {pct}th pct.
-                    </div>
-                    <div className="sr-hint">vs sector</div>
+                      {trad(`${pct}th pct.`)}</div>
+                    <div className="sr-hint">{trad("vs sector")}</div>
                   </div>
                 </div>
 
@@ -810,8 +803,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                       }}>
                         {i === currentBucket && (
                           <div style={{ position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)", fontSize: 8, color: pctColor, fontWeight: 700, marginBottom: 2, whiteSpace: "nowrap" }}>
-                            ▼ you
-                          </div>
+                            {trad("▼ you")}</div>
                         )}
                       </div>
                     </div>
@@ -833,7 +825,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
                     { label: "vs Median",     val: `${currentScore - median >= 0 ? "+" : ""}${(currentScore - median).toFixed(0)}`, color: (currentScore - median) > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
                   ].map(({ label, val, color }) => (
                     <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-2) var(--sr-sp-3)" }}>
-                      <div style={{ color: "var(--sr-text-3)", marginBottom: 2 }}>{label}</div>
+                      <div style={{ color: "var(--sr-text-3)", marginBottom: 2 }}>{tv(label)}</div>
                       <div style={{ fontWeight: 700, color, fontSize: "var(--sr-t-sm)" }} className="num">{val}</div>
                     </div>
                   ))}
@@ -844,7 +836,7 @@ export default function StockOverview({ data, macro, scores, icScore, rating, ma
 
           {profile?.description != null && !loading && (
             <div className="card">
-              <div className="section-label">About</div>
+              <div className="section-label">{trad("About")}</div>
               <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", lineHeight: 1.7 }}>
                 {String(profile.description).length > 400 ? String(profile.description).slice(0, 400) + "…" : String(profile.description)}
               </p>

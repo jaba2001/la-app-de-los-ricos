@@ -1,3 +1,5 @@
+import { t } from "@/lib/i18n/cliente";
+
 // Aviso de que un dato NO se pudo leer o guardar (AUDIT_REPORT M-3).
 //
 // Existe porque 27 consultas trataban un error igual que "no hay filas": la watchlist salía
@@ -14,9 +16,9 @@ export default function DataError({ mensaje, onCerrar }: { mensaje: string | nul
       borderRadius: "var(--sr-radius)", padding: "8px 12px", margin: "var(--sr-sp-3) 0",
       fontSize: "var(--sr-t-sm)", color: "var(--sr-text)",
     }}>
-      <span>{mensaje}</span>
+      <span>{t(mensaje)}</span>
       {onCerrar && (
-        <button onClick={onCerrar} aria-label="Dismiss" style={{ background: "none", border: "none", color: "var(--sr-text-2)", cursor: "pointer", fontSize: "var(--sr-t-base)" }}>×</button>
+        <button onClick={onCerrar} aria-label={t("Dismiss")} style={{ background: "none", border: "none", color: "var(--sr-text-2)", cursor: "pointer", fontSize: "var(--sr-t-base)" }}>×</button>
       )}
     </div>
   );

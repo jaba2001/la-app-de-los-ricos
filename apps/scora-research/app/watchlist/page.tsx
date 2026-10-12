@@ -5,6 +5,7 @@ import Link from "next/link";
 import { datos } from "@/lib/dataClient";
 import { useAuth } from "@/lib/auth";
 import { authedFetch } from "@/lib/proxy";
+import { t as tr, fecha } from "@/lib/i18n/cliente";
 
 interface WatchlistItem { id: number; ticker: string; added_at: string; }
 interface Quote { symbol: string; price: number; changesPercentage: number; pe: number | null; marketCap: number | null; }
@@ -109,7 +110,7 @@ export default function WatchlistPage() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         marginBottom: "var(--sr-sp-6)", flexWrap: "wrap", gap: "var(--sr-sp-3)",
       }}>
-        <h1 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, letterSpacing: "-0.02em" }}>Watchlist</h1>
+        <h1 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, letterSpacing: "-0.02em" }}>{tr("Watchlist")}</h1>
         <div style={{ display: "flex", gap: "var(--sr-sp-2)" }}>
           <input
             type="text"
@@ -145,7 +146,7 @@ export default function WatchlistPage() {
               opacity: adding ? 0.7 : 1,
             }}
           >
-            {adding ? "…" : "Add"}
+            {adding ? "…" : tr("Add")}
           </button>
         </div>
       </div>
@@ -171,11 +172,9 @@ export default function WatchlistPage() {
           borderRadius: "var(--sr-radius-lg)",
         }}>
           <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-2)" }}>
-            Your watchlist is empty
-          </p>
+            {tr("Your watchlist is empty")}</p>
           <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>
-            Add tickers above or use the ★ on any stock page.
-          </p>
+            {tr("Add tickers above or use the ★ on any stock page.")}</p>
         </div>
       ) : (
         <div style={{ background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg)", overflow: "hidden" }}>
@@ -235,7 +234,7 @@ export default function WatchlistPage() {
                       )}
                     </td>
                     <td style={{ padding: "var(--sr-sp-3)", color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>
-                      {new Date(item.added_at).toLocaleDateString("en-US", { day: "2-digit", month: "short" })}
+                      {fecha(item.added_at, { day: "2-digit", month: "short" })}
                     </td>
                     <td style={{ padding: "var(--sr-sp-3)" }}>
                       <button
@@ -246,7 +245,7 @@ export default function WatchlistPage() {
                           fontSize: "var(--sr-t-base)", padding: "2px 8px",
                           borderRadius: "var(--sr-radius-sm)",
                         }}
-                        title="Remove from watchlist"
+                        title={tr("Remove from watchlist")}
                       >
                         ×
                       </button>

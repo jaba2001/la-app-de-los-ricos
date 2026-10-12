@@ -16,6 +16,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import { classifyInstrument } from "@/lib/instrument";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 // Data Explorer — optional metric columns the user can toggle on/off over the watchlist
 // (TIKR-style). Every metric is already computed & stored in sl_analyses; no new fetch.
@@ -62,7 +63,7 @@ export default function StockScreener() {
     // sl_analyses como una empresa (SPY salía en «Top at risk» con un AVOID). Los conocidos se
     // descartan antes de gastar llamadas; los demás, cuando el perfil dice que son un fondo.
     const noEsAccion = (instr: { isEquity: boolean; label: string }) =>
-      setAviso(`${ticker}: ${instr.label} — the stock score doesn't apply. Open its page for the instrument view.`);
+      setAviso(tr(`${ticker}: ${instr.label} — the stock score doesn't apply. Open its page for the instrument view.`));
     const previo = classifyInstrument(ticker, null);
     if (!previo.isEquity) { noEsAccion(previo); return; }
     setAnalyzingTickers(prev => new Set([...prev, ticker]));
@@ -143,11 +144,11 @@ export default function StockScreener() {
       const { error } = await datos.from("sl_analyses").upsert(row, { onConflict: "ticker,analysis_date,user_id" });
       // La nota se enseña igual —está calculada—, pero si no se guardó no entra en el
       // historial ni en las alertas, y eso hay que decirlo.
-      if (error) setAviso(`${ticker}: scored but not saved to your history. Try again.`);
+      if (error) setAviso(tr(`${ticker}: scored but not saved to your history. Try again.`));
       setAnalyses(prev => ({ ...prev, [ticker]: row as StockAnalysis }));
     } catch (e) {
       // Antes: `catch {}` con "fail silently". La fila se quedaba sin nota y nadie sabía por qué.
-      setAviso(`${ticker}: couldn't be scored (${e instanceof Error ? e.message : "data unavailable"}).`);
+      setAviso(tr(`${ticker}: couldn't be scored (${e instanceof Error ? e.message : "data unavailable"}).`));
     } finally {
       setAnalyzingTickers(prev => { const s = new Set(prev); s.delete(ticker); return s; });
     }
@@ -228,9 +229,9 @@ export default function StockScreener() {
       <DataError mensaje={aviso} onCerrar={() => setAviso(null)} />
       {/* Stock-picking regime — validated Phase 4 context: does selecting names pay right now? */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${picking.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${picking.color} 28%, transparent)` }}>
-        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: picking.color, whiteSpace: "nowrap" }}>Selection regime: {picking.label}</span>
+        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: picking.color, whiteSpace: "nowrap" }}>{tr(`Selection regime: ${picking.label}`)}</span>
         <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>
-          {macroState?.implied_corr != null ? `Implied correlation ${macroState.implied_corr.toFixed(1)}. ` : ""}{picking.detail}
+          {macroState?.implied_corr != null ? tr(`Implied correlation ${macroState.implied_corr.toFixed(1)}. `) : ""}{tv(picking.detail)}
         </span>
       </div>
 
@@ -238,33 +239,33 @@ export default function StockScreener() {
       <form onSubmit={addTicker} style={{ display: "flex", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-5)", maxWidth: 400 }}>
         <input
           className="sr-input"
-          placeholder="Add ticker to watchlist"
+          placeholder={tr("Add ticker to watchlist")}
           value={newTicker}
           onChange={e => setNewTicker(e.target.value.toUpperCase())}
         />
-        <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>Add</button>
+        <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>{tr("Add")}</button>
       </form>
 
       {/* Sort controls */}
       <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)", flexWrap: "wrap", alignItems: "center" }}>
-        <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>Sort by:</span>
+        <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>{tr("Sort by:")}</span>
         {([["ic_score", "Scora Score"], ["score_total", "Base Score"], ["macro_tilt", "Macro Tilt"]] as const).map(([key, label]) => (
           <button
             key={key}
             className={`subtab ${sortBy === key ? "active" : ""}`}
             onClick={() => setSortBy(key)}
           >
-            {label}
+            {tv(label)}
           </button>
         ))}
       </div>
 
       {/* Data Explorer — toggle metric columns + export */}
       <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap", alignItems: "center" }}>
-        <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>Columns:</span>
+        <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", alignSelf: "center" }}>{tr("Columns:")}</span>
         {EXTRA_COLS.map(c => (
           <button key={c.key} className={`subtab ${extraCols.has(c.key) ? "active" : ""}`} onClick={() => toggleCol(c.key)}>
-            {extraCols.has(c.key) ? "✓ " : "+ "}{c.label}
+            {extraCols.has(c.key) ? "✓ " : "+ "}{tv(c.label)}
           </button>
         ))}
         {watchlist.length > 0 && (
@@ -272,8 +273,7 @@ export default function StockScreener() {
             onClick={exportWatchlistCSV}
             style={{ marginLeft: "auto", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)", padding: "5px 10px", cursor: "pointer" }}
           >
-            ↓ Export CSV
-          </button>
+            {tr("↓ Export CSV")}</button>
         )}
       </div>
 
@@ -282,18 +282,17 @@ export default function StockScreener() {
         <Sk w="100%" h={300} />
       ) : watchlist.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-          Watchlist is empty. Add tickers above.
-        </div>
+          {tr("Watchlist is empty. Add tickers above.")}</div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
           <table className="sr-table">
             <thead><tr>
-              <th>Ticker</th><th>Sector</th><th style={{ textAlign: "right" }}>Base Score</th>
+              <th>{tr("Ticker")}</th><th>{tr("Sector")}</th><th style={{ textAlign: "right" }}>{tr("Base Score")}</th>
               {EXTRA_COLS.filter(c => extraCols.has(c.key)).map(c => (
-                <th key={c.key} style={{ textAlign: "right" }}>{c.label}</th>
+                <th key={c.key} style={{ textAlign: "right" }}>{tv(c.label)}</th>
               ))}
-              <th style={{ textAlign: "right" }}>Macro Tilt</th><th style={{ textAlign: "right" }}>Scora Score</th>
-              <th>Rating</th><th>As of</th><th></th>
+              <th style={{ textAlign: "right" }}>{tr("Macro Tilt")}</th><th style={{ textAlign: "right" }}>{tr("Scora Score")}</th>
+              <th>{tr("Rating")}</th><th>{tr("As of")}</th><th></th>
             </tr></thead>
             <tbody>
               {sorted.map(w => {
@@ -312,7 +311,7 @@ export default function StockScreener() {
                     <td style={{ fontWeight: 700, color: "var(--sr-text)" }}>
                       {w.ticker}
                       {isAnalyzing && (
-                        <span style={{ marginLeft: 6, fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)", fontWeight: 400 }}>analyzing…</span>
+                        <span style={{ marginLeft: 6, fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)", fontWeight: 400 }}>{tr("analyzing…")}</span>
                       )}
                     </td>
                     <td style={{ color: "var(--sr-text-3)" }}>{a?.sector ?? "—"}</td>
@@ -323,20 +322,20 @@ export default function StockScreener() {
                     })}
                     <td style={{ textAlign: "right", color: tilt != null ? (tilt > 0 ? "var(--sr-pos)" : tilt < 0 ? "var(--sr-neg)" : "var(--sr-text-3)") : "var(--sr-text-3)" }} className="num">
                       {tilt != null ? `${tilt > 0 ? "+" : ""}${tilt}` : "—"}
-                      {liveTilt != null && <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginLeft: 3 }} title="Live tilt from current macro">↻</span>}
+                      {liveTilt != null && <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginLeft: 3 }} title={tr("Live tilt from current macro")}>↻</span>}
                     </td>
                     <td style={{ textAlign: "right", fontWeight: 700, color: ic != null ? (ic >= 65 ? "var(--sr-pos)" : ic >= 50 ? "var(--sr-warn)" : "var(--sr-neg)") : "var(--sr-text-3)" }} className="num">
                       {ic != null ? ic.toFixed(0) : isAnalyzing ? "…" : "—"}
                     </td>
-                    <td>{rating ? <Pill label={rating.label} color={rating.color} /> : "—"}</td>
+                    <td>{rating ? <Pill label={tv(rating.label)} color={rating.color} /> : "—"}</td>
                     <td style={{ whiteSpace: "nowrap" }}>
-                      <span className="num" style={{ fontSize: "var(--sr-t-xs)", color: stale ? "var(--sr-warn)" : "var(--sr-text-3)" }} title={a?.analysis_date ? `Scored on ${a.analysis_date}${stale ? " — stale, re-analyze to compare fairly" : ""}` : undefined}>
-                        {a?.analysis_date ? (daysOld === 0 ? "today" : daysOld === 1 ? "1d ago" : `${daysOld}d ago`) : "—"}
+                      <span className="num" style={{ fontSize: "var(--sr-t-xs)", color: stale ? "var(--sr-warn)" : "var(--sr-text-3)" }} title={a?.analysis_date ? tr(`Scored on ${a.analysis_date}${stale ? " — stale, re-analyze to compare fairly" : ""}`) : undefined}>
+                        {a?.analysis_date ? (daysOld === 0 ? tr("today") : daysOld === 1 ? tr("1d ago") : tr(`${daysOld}d ago`)) : "—"}
                         {stale ? " ⚠" : ""}
                       </span>
                       {a && !isAnalyzing && (
                         <button
-                          title="Re-analyze with fresh data"
+                          title={tr("Re-analyze with fresh data")}
                           style={{ background: "none", border: "none", color: "var(--sr-text-3)", cursor: "pointer", padding: "2px 4px", fontSize: "var(--sr-t-xs)" }}
                           onClick={e => { e.stopPropagation(); quickAnalyze(w.ticker); }}
                         >↻</button>

@@ -3,6 +3,7 @@ import type { MacroState } from "@/lib/types";
 import type { Instrument } from "@/lib/instrument";
 import { stockPickingRegime } from "@/lib/microScore";
 import { rendimientoReal } from "@/lib/dolar";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props {
   instrument: Instrument;
@@ -62,19 +63,19 @@ export default function InstrumentPanel({ instrument, closes, spyCloses, macro, 
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>{instrument.label} · {instrument.assetClass}</div>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 320, lineHeight: 1.4 }}>{ticker} — momentum & regime read, not fundamentals.</div>
+          <div className="section-label" style={{ margin: 0 }}>{tv(instrument.label)} · {instrument.assetClass}</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 320, lineHeight: 1.4 }}>{t(`${ticker} — momentum & regime read, not fundamentals.`)}</div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Signal</div>
-          <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: sig.color }}>{sig.label}</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("Signal")}</div>
+          <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: sig.color }}>{tv(sig.label)}</div>
         </div>
       </div>
-      <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${sig.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${sig.color} 26%, transparent)`, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)" }}>{sig.detail}</div>
+      <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${sig.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${sig.color} 26%, transparent)`, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)" }}>{tv(sig.detail)}</div>
 
       {/* Momentum */}
       <div className="sr-flex-between" style={{ marginBottom: 6 }}>
-        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Momentum score</span>
+        <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("Momentum score")}</span>
         <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 800, color: score >= 66 ? "var(--sr-pos)" : score >= 40 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">{score}/100</span>
       </div>
       <div className="score-bar-track"><div className="score-bar-fill" style={{ width: `${score}%`, background: score >= 66 ? "var(--sr-pos)" : score >= 40 ? "var(--sr-warn)" : "var(--sr-neg)" }} /></div>
@@ -86,24 +87,24 @@ export default function InstrumentPanel({ instrument, closes, spyCloses, macro, 
 
       {/* Technicals + relative strength */}
       <div style={{ display: "flex", gap: "var(--sr-sp-4)", flexWrap: "wrap", marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)", fontSize: "var(--sr-t-xs)" }}>
-        <span style={{ color: "var(--sr-text-3)" }}>Trend: <strong style={{ color: uptrend ? "var(--sr-pos)" : "var(--sr-neg)" }}>{uptrend ? "Up" : "Down"}</strong> <span style={{ color: "var(--sr-text-3)" }}>(vs 200-day{above50 != null ? `, ${above50 ? ">" : "<"}50-day` : ""})</span></span>
+        <span style={{ color: "var(--sr-text-3)" }}>{t("Trend:")}{" "}<strong style={{ color: uptrend ? "var(--sr-pos)" : "var(--sr-neg)" }}>{uptrend ? t("Up") : t("Down")}</strong> <span style={{ color: "var(--sr-text-3)" }}>{t("(vs 200-day")}{above50 != null ? t(`, ${above50 ? ">" : "<"}50-day`) : ""})</span></span>
         <span style={{ color: "var(--sr-text-3)" }}>RSI: <strong className="num" style={{ color: rsi == null ? "var(--sr-text-3)" : rsi >= 70 ? "var(--sr-neg)" : rsi <= 30 ? "var(--sr-pos)" : "var(--sr-text-2)" }}>{rsi != null ? rsi.toFixed(0) : "—"}</strong></span>
-        <span style={{ color: "var(--sr-text-3)" }}>RS vs SPY (6m): <strong className="num" style={{ color: rs6 == null ? "var(--sr-text-3)" : rs6 > 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{rs6 != null ? (rs6 > 0 ? "+" : "") + rs6.toFixed(0) + "pp" : "—"}</strong></span>
+        <span style={{ color: "var(--sr-text-3)" }}>{t("RS vs SPY (6m):")}{" "}<strong className="num" style={{ color: rs6 == null ? "var(--sr-text-3)" : rs6 > 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{rs6 != null ? (rs6 > 0 ? "+" : "") + rs6.toFixed(0) + "pp" : "—"}</strong></span>
       </div>
 
       {/* Macro drivers */}
       {instrument.drivers.length > 0 && (
         <div style={{ marginTop: "var(--sr-sp-3)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Macro drivers</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>{t("Macro drivers")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
             {instrument.drivers.map((d) => {
               const v = val(d.field);
               return (
                 <div key={d.field} className="sr-flex-between" style={{ fontSize: "var(--sr-t-xs)" }}>
-                  <span style={{ color: "var(--sr-text-2)" }}>{d.label}</span>
+                  <span style={{ color: "var(--sr-text-2)" }}>{tv(d.label)}</span>
                   <span className="num" style={{ color: "var(--sr-text)", fontWeight: 600 }}>
                     {v != null ? v.toFixed(d.field === "hy_oas" || d.field === "bbb_oas" || d.field === "dxy" ? 0 : 1) + (d.unit ?? "") : "—"}
-                    <span style={{ fontSize: "9px", color: "var(--sr-text-3)", marginLeft: 5 }}>favorable si {d.good === "low" ? "↓" : "↑"}</span>
+                    <span style={{ fontSize: "9px", color: "var(--sr-text-3)", marginLeft: 5 }}>{t("favorable if")}{" "}{d.good === "low" ? "↓" : "↑"}</span>
                   </span>
                 </div>
               );
@@ -113,8 +114,7 @@ export default function InstrumentPanel({ instrument, closes, spyCloses, macro, 
       )}
 
       <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        {instrument.note} Selection regime: <strong style={{ color: picking.color }}>{picking.label.toLowerCase()}</strong> (momentum pays when correlation is low). Educational — not advice.
-      </div>
+        {t(`${instrument.note} Selection regime:`)}{" "}<strong style={{ color: picking.color }}>{t(picking.label.toLowerCase())}</strong> {" "}{t("(momentum pays when correlation is low). Educational — not advice.")}</div>
     </div>
   );
 }

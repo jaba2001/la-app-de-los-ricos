@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { t, tv } from "@/lib/i18n/cliente";
 
 export default function Error({
   error,
@@ -25,10 +26,9 @@ export default function Error({
           borderRadius: 12, padding: 24, marginBottom: 16,
         }}>
           <div style={{ color: "#B42318", fontWeight: 700, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-            Page Error
-          </div>
+            {t("Page Error")}</div>
           <pre style={{ color: "#0E1A2B", fontSize: 13, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-            {error.message || "Unknown error"}
+            {tv(error.message || "Unknown error")}
           </pre>
         </div>
         {error.stack && (
@@ -49,8 +49,7 @@ export default function Error({
             fontSize: 14, cursor: "pointer",
           }}
         >
-          Try again
-        </button>
+          {t("Try again")}</button>
       </div>
     </div>
   );

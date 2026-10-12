@@ -5,6 +5,8 @@ import { accrualsRatio } from "@/lib/quality";
 import Articulacion from "./Articulacion";
 import { waccBridge } from "@/lib/valuation";
 import type { StockData } from "@/app/stock/[ticker]/page";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { ticker: string; data: StockData | null; rf: number | null }
 
@@ -94,42 +96,40 @@ export default function Governance({ ticker, data, rf }: Props) {
   return (
     <div className="animate-fade-in">
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Agency cost · Jensen &amp; Meckling (1976) · {ticker}</div>
+        <div className="section-label">{t(`Agency cost · Jensen & Meckling (1976) · ${ticker}`)}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 640 }}>
-          When the people deciding aren&apos;t the people putting up the money, agency costs appear: monitoring, bonding
-          and residual loss. The question that sums up the most-cited paper in corporate finance is simple:
-          <strong> whose money is being spent, and for whose benefit?</strong>
+          <Trans text={"When the people deciding aren't the people putting up the money, agency costs appear: monitoring, bonding and residual loss. The question that sums up the most-cited paper in corporate finance is simple:<s1> whose money is being spent, and for whose benefit?</s1>"} s1={(c) => <strong>{c}</strong>} />
         </div>
 
         {!g ? (
-          <div className="sr-hint">Not enough financial statements to measure the agency cost.</div>
+          <div className="sr-hint">{t("Not enough financial statements to measure the agency cost.")}</div>
         ) : (
           <>
             <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-3)" }}>
               <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: BAND_COLOR[g.band] }}>
                 {g.agencyCost.toFixed(0)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}>/100</span>
               </div>
-              <div style={{ fontWeight: 700, color: BAND_COLOR[g.band] }}>{BAND_LABEL[g.band] ?? g.band} friction</div>
-              <div className="sr-hint">higher = worse for shareholders · {g.covered} of 6 signals</div>
+              <div style={{ fontWeight: 700, color: BAND_COLOR[g.band] }}>{t(BAND_LABEL[g.band] ?? g.band)} {" "}{t("friction")}</div>
+              <div className="sr-hint">{t(`higher = worse for shareholders · ${g.covered} of 6 signals`)}</div>
             </div>
 
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table">
                 <thead><tr>
-                  <th>Signal</th>
-                  <th style={{ textAlign: "right" }}>Value</th>
-                  <th style={{ textAlign: "right" }}>Cost</th>
-                  <th>What it measures</th>
+                  <th>{t("Signal")}</th>
+                  <th style={{ textAlign: "right" }}>{t("Value")}</th>
+                  <th style={{ textAlign: "right" }}>{t("Cost")}</th>
+                  <th>{t("What it measures")}</th>
                 </tr></thead>
                 <tbody>
                   {g.components.map((c) => (
                     <tr key={c.key}>
-                      <td style={{ fontWeight: 600 }}>{c.label}</td>
+                      <td style={{ fontWeight: 600 }}>{tv(c.label)}</td>
                       <td style={{ textAlign: "right" }} className="num">
                         {c.key === "insiderAlignment" ? `${(c.raw * 100).toFixed(1)}%` : c.key === "accruals" ? c.raw.toFixed(3) : `${c.raw.toFixed(1)}%`}
                       </td>
                       <td style={{ textAlign: "right", fontWeight: 700, color: c.score >= 60 ? "var(--sr-neg)" : c.score >= 35 ? "var(--sr-warn)" : "var(--sr-pos)" }} className="num">{c.score.toFixed(0)}</td>
-                      <td className="sr-hint" style={{ lineHeight: 1.45 }}>{c.note}</td>
+                      <td className="sr-hint" style={{ lineHeight: 1.45 }}>{tv(c.note)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -137,54 +137,48 @@ export default function Governance({ ticker, data, rf }: Props) {
             </div>
 
             <div style={{ marginTop: "var(--sr-sp-3)" }}>
-              {g.readings.map((r, i) => <div key={i} className="sr-hint" style={{ lineHeight: 1.6, marginBottom: 3 }}>{r}</div>)}
+              {g.readings.map((r, i) => <div key={i} className="sr-hint" style={{ lineHeight: 1.6, marginBottom: 3 }}>{t(r)}</div>)}
             </div>
           </>
         )}
       </div>
 
       <div className="card">
-        <div className="section-label">Free cash flow test · Jensen (1986)</div>
+        <div className="section-label">{t("Free cash flow test · Jensen (1986)")}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 640 }}>
-          The FCF hypothesis: a manager with plenty of cash and no good projects builds an empire instead of paying
-          it out. Hence the paper&apos;s counterintuitive conclusion — <strong>debt disciplines</strong>, because it
-          commits future cash and takes away discretion.
-        </div>
+          <Trans text={"The FCF hypothesis: a manager with plenty of cash and no good projects builds an empire instead of paying it out. Hence the paper's counterintuitive conclusion — <s1>debt disciplines</s1>, because it commits future cash and takes away discretion."} s1={(c) => <strong>{c}</strong>} /></div>
 
         {!jensen ? (
-          <div className="sr-hint">FCF margin, ROIC or WACC is missing, so the test can&apos;t run.</div>
+          <div className="sr-hint">{t("FCF margin, ROIC or WACC is missing, so the test can't run.")}</div>
         ) : (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
               <div className="sr-tile">
-                <div className="sr-tile-label">ROIC − WACC spread</div>
+                <div className="sr-tile-label">{t("ROIC − WACC spread")}</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: (jensen.spread ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
-                  {jensen.spread == null ? "—" : `${jensen.spread >= 0 ? "+" : ""}${jensen.spread.toFixed(1)} pp`}
+                  {jensen.spread == null ? "—" : t(`${jensen.spread >= 0 ? "+" : ""}${jensen.spread.toFixed(1)} pp`)}
                 </div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">Shareholder yield</div>
+                <div className="sr-tile-label">{t("Shareholder yield")}</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800 }}>{totalYield == null ? "—" : `${totalYield.toFixed(2)}%`}</div>
-                <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>dividends + buybacks − issuance</div>
+                <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{t("dividends + buybacks − issuance")}</div>
               </div>
               <div className="sr-tile">
-                <div className="sr-tile-label">Empire building</div>
+                <div className="sr-tile-label">{t("Empire building")}</div>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: jensen.empireBuilding ? "var(--sr-neg)" : "var(--sr-pos)" }}>
                   {jensen.empireBuilding ? "YES" : "No"}
                 </div>
               </div>
             </div>
             <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${jensen.empireBuilding ? "var(--sr-neg)" : "var(--sr-pos)"} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${jensen.empireBuilding ? "var(--sr-neg)" : "var(--sr-pos)"} 22%, transparent)`, fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
-              {jensen.reading}
+              {tv(jensen.reading)}
             </div>
           </>
         )}
 
         <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-          These signals <strong>do not feed the Scora Score</strong>. Net issuance (Pontiff &amp; Woodgate 2008) and
-          asset growth (Cooper, Gulen &amp; Schill 2008) have documented IC in the literature, so they deserve to be
-          measured in the harness — measured, not assumed. Until they pass the out-of-sample gate they are context.
-        </div>
+          <Trans text={"These signals <s1>do not feed the Scora Score</s1>. Net issuance (Pontiff & Woodgate 2008) and asset growth (Cooper, Gulen & Schill 2008) have documented IC in the literature, so they deserve to be measured in the harness — measured, not assumed. Until they pass the out-of-sample gate they are context."} s1={(c) => <strong>{c}</strong>} /></div>
       </div>
       <Articulacion data={data} />
     </div>

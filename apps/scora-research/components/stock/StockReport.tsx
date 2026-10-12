@@ -10,6 +10,8 @@ import { buildResearchReport } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { data: StockData | null; macro: MacroState | null; scores: Scores | null; icScore: number | null; loading: boolean; ticker: string; }
 
@@ -145,7 +147,7 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
   }
 
   if (loading) return <Sk w="100%" h={500} />;
-  if (!model) return <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>Not enough financial data to build a research note for {ticker}. (Non-US names, ETFs and metals don&apos;t have a DCF.)</div>;
+  if (!model) return <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>{tr(`Not enough financial data to build a research note for ${ticker}. (Non-US names, ETFs and metals don't have a DCF.)`)}</div>;
 
   const { v, field } = model;
   // Common axis for the football field bars.
@@ -157,18 +159,17 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-5)", animation: "none" }} className="animate-fade-in">
       <div className="sr-flex-between" style={{ flexWrap: "wrap", gap: "var(--sr-sp-3)" }}>
         <div>
-          <h2 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, margin: 0 }}>Research Report</h2>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>Institutional-style initiation note · assembled from data you already fetched. Educational.</div>
+          <h2 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, margin: 0 }}>{tr("Research Report")}</h2>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{tr("Institutional-style initiation note · assembled from data you already fetched. Educational.")}</div>
         </div>
-        <button onClick={exportHTML} style={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)", padding: "6px 12px", cursor: "pointer" }}>↓ Export HTML</button>
+        <button onClick={exportHTML} style={{ background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)", padding: "6px 12px", cursor: "pointer" }}>{tr("↓ Export HTML")}</button>
       </div>
 
       {/* ── Terminal-multiple hinge — the differentiator ── */}
       <div className="card">
-        <div className="section-label">Terminal-multiple hinge</div>
+        <div className="section-label">{tr("Terminal-multiple hinge")}</div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          A 10-year DCF is dominated by its terminal value — and TV rests on one unprovable choice. We show it <strong style={{ color: "var(--sr-text)" }}>both ways</strong> and the gap. Don&apos;t average them; decide which assumption fits this business.
-        </div>
+          <Trans text={"A 10-year DCF is dominated by its terminal value — and TV rests on one unprovable choice. We show it <s1>both ways</s1> and the gap. Don't average them; decide which assumption fits this business."} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-3)" }}>
           {[
             { k: "DCF · Gordon 2.5%", val: v.dcfGordon, up: v.gordonUpside, sub: "perpetuity terminal" },
@@ -182,26 +183,26 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
               ) : (
                 <>
                   <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, marginTop: 4 }} className="num">{fmt(c.val, 0)}</div>
-                  {c.up != null && <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: c.up >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{pct(c.up)} vs price</div>}
+                  {c.up != null && <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: c.up >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">{tr(`${pct(c.up)} vs price`)}</div>}
                 </>
               )}
-              <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{c.sub}</div>
+              <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{tv(c.sub)}</div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-3)" }}>WACC {v.wacc}% (CAPM: rf {num(macro?.dgs10)?.toFixed(1) ?? "—"}% + β×ERP). Near-term growth {model.g1.toFixed(0)}% (analyst estimates).</div>
+        <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-3)" }}>{tr(`WACC ${v.wacc}% (CAPM: rf`)}{" "}{num(macro?.dgs10)?.toFixed(1) ?? "—"}{tr(`% + β×ERP). Near-term growth ${model.g1.toFixed(0)}% (analyst estimates).`)}</div>
       </div>
 
       {/* ── Football field ── */}
       <div className="card">
-        <div className="section-label">Valuation range · football field</div>
+        <div className="section-label">{tr("Valuation range · football field")}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)", marginTop: "var(--sr-sp-2)" }}>
           {field.map((r) => {
             const color = r.kind === "dcf" ? "var(--sr-amber)" : r.kind === "analyst" ? "var(--sr-accent, #6366f1)" : "var(--sr-text-3)";
             return (
               <div key={r.label}>
                 <div className="sr-flex-between" style={{ fontSize: "var(--sr-t-xs)", marginBottom: 3 }}>
-                  <span style={{ color: "var(--sr-text-2)" }}>{r.label}</span>
+                  <span style={{ color: "var(--sr-text-2)" }}>{tv(r.label)}</span>
                   <span className="num" style={{ color: "var(--sr-text-3)" }}>{fmt(r.lo, 0)} – {fmt(r.hi, 0)}</span>
                 </div>
                 <div style={{ position: "relative", height: 10, background: "var(--sr-surface-3)", borderRadius: 5 }}>
@@ -212,7 +213,7 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
           })}
           {/* current-price marker */}
           <div style={{ position: "relative", height: 16 }}>
-            <div style={{ position: "absolute", left: `${xpos(model.price)}%`, top: 0, transform: "translateX(-50%)", fontSize: "10px", color: "var(--sr-text)", fontWeight: 700, whiteSpace: "nowrap" }} className="num">▲ ${model.price.toFixed(0)} now</div>
+            <div style={{ position: "absolute", left: `${xpos(model.price)}%`, top: 0, transform: "translateX(-50%)", fontSize: "10px", color: "var(--sr-text)", fontWeight: 700, whiteSpace: "nowrap" }} className="num">{tr(`▲ $${model.price.toFixed(0)} now`)}</div>
           </div>
         </div>
       </div>
@@ -220,22 +221,22 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
       {/* ── DuPont + bubble ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: "var(--sr-sp-4)" }}>
         <div className="card">
-          <div className="section-label">DuPont ROE</div>
+          <div className="section-label">{tr("DuPont ROE")}</div>
           {model.dp.roe != null ? (
             <>
               <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, marginBottom: "var(--sr-sp-2)" }} className="num">{(model.dp.roe * 100).toFixed(1)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)" }}>% ROE</span></div>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.9 }}>
-                <div className="sr-flex-between"><span>Net margin</span><strong className="num">{(model.dp.netMargin! * 100).toFixed(1)}%</strong></div>
-                <div className="sr-flex-between"><span>× Asset turnover</span><strong className="num">{model.dp.assetTurnover!.toFixed(2)}×</strong></div>
-                <div className="sr-flex-between"><span>× Equity multiplier</span><strong className="num">{model.dp.equityMultiplier!.toFixed(2)}×</strong></div>
+                <div className="sr-flex-between"><span>{tr("Net margin")}</span><strong className="num">{(model.dp.netMargin! * 100).toFixed(1)}%</strong></div>
+                <div className="sr-flex-between"><span>{tr("× Asset turnover")}</span><strong className="num">{model.dp.assetTurnover!.toFixed(2)}×</strong></div>
+                <div className="sr-flex-between"><span>{tr("× Equity multiplier")}</span><strong className="num">{model.dp.equityMultiplier!.toFixed(2)}×</strong></div>
               </div>
             </>
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>Not available</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{tr("Not available")}</div>}
         </div>
         <div className="card">
-          <div className="section-label">Price vs growth</div>
-          <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: model.bubble.color }}>{model.bubble.label}</div>
-          {model.bubble.ratio != null && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }} className="num">1y price move ÷ revenue growth = {model.bubble.ratio.toFixed(1)}×</div>}
+          <div className="section-label">{tr("Price vs growth")}</div>
+          <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: model.bubble.color }}>{tv(model.bubble.label)}</div>
+          {model.bubble.ratio != null && <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }} className="num">{tr(`1y price move ÷ revenue growth = ${model.bubble.ratio.toFixed(1)}×`)}</div>}
         </div>
       </div>
 
@@ -243,10 +244,10 @@ export default function StockReport({ data, macro, scores, icScore, loading, tic
       <div className="card">
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
           <div>
-            <div className="section-label" style={{ margin: 0 }}>Analyst note · AI, grounded</div>
-            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>SWOT + bull/base/bear from the computed valuation{docs.length > 0 ? <span style={{ color: "var(--sr-pos)" }}> · cites 10-K</span> : ""}. No invented numbers.</div>
+            <div className="section-label" style={{ margin: 0 }}>{tr("Analyst note · AI, grounded")}</div>
+            <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>{tr("SWOT + bull/base/bear from the computed valuation")}{docs.length > 0 ? <span style={{ color: "var(--sr-pos)" }}> {" "}{tr("· cites 10-K")}</span> : ""}{tr(". No invented numbers.")}</div>
           </div>
-          <button className="btn-primary" onClick={generate} disabled={gen} style={{ flexShrink: 0 }}>{gen ? "Writing…" : note ? "Regenerate" : "✦ Write note"}</button>
+          <button className="btn-primary" onClick={generate} disabled={gen} style={{ flexShrink: 0 }}>{gen ? tr("Writing…") : note ? tr("Regenerate") : tr("✦ Write note")}</button>
         </div>
         {err && <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{err}</div>}
         {gen && <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>{[90, 70, 85, 60, 75].map((w, i) => <Sk key={i} w={`${w}%`} h={13} />)}</div>}

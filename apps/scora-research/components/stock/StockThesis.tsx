@@ -6,6 +6,7 @@ import { buildStockThesis, type StockThesisInput } from "@/lib/aiGrounding";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
+import { t } from "@/lib/i18n/cliente";
 
 interface Props { input: StockThesisInput; macro: MacroState | null; }
 
@@ -53,7 +54,7 @@ export default function StockThesis({ input, macro }: Props) {
       const res = await aiAnalyzeAudited(prompt, { module: "stock-thesis", ticker: input.ticker, dataBlock: prompt, sources, maxTokens: 700 });
       setThesis(res.text); setViolations(res.violations);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to generate thesis");
+      setError(e instanceof Error ? e.message : t("Failed to generate thesis"));
     }
     setLoading(false);
   }
@@ -62,14 +63,13 @@ export default function StockThesis({ input, macro }: Props) {
     <div className="card">
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>AI thesis · grounded</div>
+          <div className="section-label" style={{ margin: 0 }}>{t("AI thesis · grounded")}</div>
           <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>
-            Cites only {input.ticker}&apos;s computed metrics — no invented numbers.
-            {docs.length > 0 && <span style={{ color: "var(--sr-pos)", marginLeft: 4 }}>· Grounded in 10-K{docs[0].fiscal_year ? ` FY${docs[0].fiscal_year}` : ""} ({[...new Set(docs.map((d) => d.section))].join(", ")})</span>}
+            {t(`Cites only ${input.ticker}'s computed metrics — no invented numbers.`)}{docs.length > 0 && <span style={{ color: "var(--sr-pos)", marginLeft: 4 }}>{t("· Grounded in 10-K")}{docs[0].fiscal_year ? ` FY${docs[0].fiscal_year}` : ""} ({[...new Set(docs.map((d) => d.section))].join(", ")})</span>}
           </div>
         </div>
         <button className="btn-primary" onClick={generate} disabled={loading} style={{ flexShrink: 0 }}>
-          {loading ? "Writing…" : thesis ? "Regenerate" : "✦ Generate"}
+          {loading ? t("Writing…") : thesis ? t("Regenerate") : t("✦ Generate")}
         </button>
       </div>
       {error && <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{error}</div>}

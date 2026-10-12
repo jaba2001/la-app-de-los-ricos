@@ -1,3 +1,6 @@
+
+import { tv } from "@/lib/i18n/cliente";
+
 export function Pill({ label, color }: { label: string; color: string }) {
   return (
     <span className="pill" style={{
@@ -5,7 +8,7 @@ export function Pill({ label, color }: { label: string; color: string }) {
       color,
       border: `1px solid color-mix(in srgb, ${color} 35%, transparent)`,
     }}>
-      {label}
+      {tv(label)}
     </span>
   );
 }

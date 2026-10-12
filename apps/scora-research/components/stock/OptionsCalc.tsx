@@ -5,6 +5,8 @@ import {
   impliedVol, impliedProbability, noArbitrageBounds,
   type OptionType, type StrategyName,
 } from "@/lib/greeks";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { ticker: string; price: number | null; rate: number | null; /** % anual */ divYield?: number | null; }
 
@@ -16,7 +18,7 @@ const numInput: React.CSSProperties = {
 function Field({ label, value, onChange, step = 1, min }: { label: string; value: number; onChange: (n: number) => void; step?: number; min?: number }) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 3, fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-      {label}
+      {tv(label)}
       <input type="number" value={Number.isFinite(value) ? value : ""} step={step} min={min} onChange={(e) => onChange(Number(e.target.value))} style={numInput} className="num" />
     </label>
   );
@@ -85,19 +87,18 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
 
   const stat = (label: string, val: string, sub?: string) => (
     <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
-      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</div>
+      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{tv(label)}</div>
       <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 800 }} className="num">{val}</div>
-      {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{sub}</div>}
+      {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{tv(sub)}</div>}
     </div>
   );
 
   return (
     <div className="animate-fade-in">
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Options calculator · Black-Scholes · {ticker}</div>
+        <div className="section-label">{tr(`Options calculator · Black-Scholes · ${ticker}`)}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          Price a European option and its Greeks from your own inputs. Free &amp; educational — a pricing tool, not a live options-flow feed. Rate prefilled from the Treasury curve.
-        </div>
+          {tr("Price a European option and its Greeks from your own inputs. Free & educational — a pricing tool, not a live options-flow feed. Rate prefilled from the Treasury curve.")}</div>
 
         {/* Type toggle */}
         <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
@@ -108,12 +109,12 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
 
         {/* Inputs */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
-          <Field label="Spot $" value={spot} onChange={mark(setSpot)} step={0.5} min={0} />
-          <Field label="Strike $" value={strike} onChange={mark(setStrike)} step={0.5} min={0} />
-          <Field label="Days to expiry" value={days} onChange={mark(setDays)} step={1} min={0} />
-          <Field label="Implied vol %" value={ivPct} onChange={mark(setIvPct)} step={1} min={0} />
-          <Field label="Risk-free %" value={ratePct} onChange={mark(setRatePct)} step={0.1} />
-          <Field label="Div yield %" value={divPct} onChange={mark(setDivPct)} step={0.1} min={0} />
+          <Field label={tr("Spot $")} value={spot} onChange={mark(setSpot)} step={0.5} min={0} />
+          <Field label={tr("Strike $")} value={strike} onChange={mark(setStrike)} step={0.5} min={0} />
+          <Field label={tr("Days to expiry")} value={days} onChange={mark(setDays)} step={1} min={0} />
+          <Field label={tr("Implied vol %")} value={ivPct} onChange={mark(setIvPct)} step={1} min={0} />
+          <Field label={tr("Risk-free %")} value={ratePct} onChange={mark(setRatePct)} step={0.1} />
+          <Field label={tr("Div yield %")} value={divPct} onChange={mark(setDivPct)} step={0.1} min={0} />
         </div>
 
         {/* Price + Greeks */}
@@ -130,32 +131,27 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
 
       {/* Medición: qué está descontando el mercado */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">What the market is pricing</div>
+        <div className="section-label">{tr("What the market is pricing")}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          Above, you type a volatility and get a price. Here it runs the other way: paste the option&rsquo;s
-          <strong> market price</strong> (your broker shows it free) and Black-Scholes is inverted to recover the
-          volatility that price implies. That number is the market&rsquo;s forecast — not yours.
-        </div>
+          <Trans text={"Above, you type a volatility and get a price. Here it runs the other way: paste the option’s<s1> market price</s1> (your broker shows it free) and Black-Scholes is inverted to recover the volatility that price implies. That number is the market’s forecast — not yours."} s1={(c) => <strong>{c}</strong>} /></div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-3)", alignItems: "flex-end", marginBottom: "var(--sr-sp-3)" }}>
-          <Field label="Market price $" value={marketPx} onChange={setMarketPx} step={0.05} min={0} />
+          <Field label={tr("Market price $")} value={marketPx} onChange={setMarketPx} step={0.05} min={0} />
           {solved && (
             <button
               className="btn-primary"
               onClick={() => { setTouched(true); setIvPct(Number((solved.vol * 100).toFixed(2))); }}
               style={{ padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}
             >
-              Use {(solved.vol * 100).toFixed(1)}% above
-            </button>
+              {tr(`Use ${(solved.vol * 100).toFixed(1)}% above`)}</button>
           )}
         </div>
 
         {marketPx > 0 && !solved && (
           <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 10%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", lineHeight: 1.5 }}>
-            No implied volatility can be recovered from ${marketPx.toFixed(2)}.
-            {marketPx < bounds.lo || marketPx > bounds.hi
-              ? <> That price is outside the no-arbitrage range (${bounds.lo.toFixed(2)} – ${bounds.hi.toFixed(2)}), so no volatility reproduces it — check the inputs.</>
-              : <> This contract is so deep in- or out-of-the-money that its price barely depends on volatility, so the number is not identifiable. Showing one anyway would be false precision.</>}
+            {tr(`No implied volatility can be recovered from $${marketPx.toFixed(2)}.`)}{marketPx < bounds.lo || marketPx > bounds.hi
+              ? <> {" "}{tr(`That price is outside the no-arbitrage range ($${bounds.lo.toFixed(2)} – $${bounds.hi.toFixed(2)}), so no volatility reproduces it — check the inputs.`)}</>
+              : <> {" "}{tr("This contract is so deep in- or out-of-the-money that its price barely depends on volatility, so the number is not identifiable. Showing one anyway would be false precision.")}</>}
           </div>
         )}
 
@@ -169,36 +165,32 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
               {stat("1σ move", `±${prob.expectedMovePct.toFixed(1)}%`, `to expiry (${days}d)`)}
             </div>
             <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
-              N(d2) is a <strong>risk-neutral</strong> probability, not a real-world one: it embeds the risk premium
-              investors charge for bearing the outcome, so it systematically overstates downside. Read it as
-              &ldquo;what the market charges&rdquo;, never as &ldquo;what will happen&rdquo;.
-            </div>
+              <Trans text={"N(d2) is a <s1>risk-neutral</s1> probability, not a real-world one: it embeds the risk premium investors charge for bearing the outcome, so it systematically overstates downside. Read it as “what the market charges”, never as “what will happen”."} s1={(c) => <strong>{c}</strong>} /></div>
           </>
         )}
       </div>
 
       {/* Payoff at expiry */}
       <div className="card">
-        <div className="section-label">Payoff at expiry (long, net of premium)</div>
+        <div className="section-label">{tr("Payoff at expiry (long, net of premium)")}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-2)" }}>
           {payoffPts.map((p) => (
             <div key={p.label} style={{ padding: "var(--sr-sp-2)", borderRadius: "var(--sr-radius)", textAlign: "center", background: `color-mix(in srgb, ${p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)"} 10%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)"} 24%, transparent)` }}>
-              <div className="sr-hint">{p.label} · ${p.spot.toFixed(0)}</div>
+              <div className="sr-hint">{tv(p.label)} · ${p.spot.toFixed(0)}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: p.pnl >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>
                 {p.pnl >= 0 ? "+" : "−"}${Math.abs(p.pnl).toFixed(2)}
               </div>
             </div>
           ))}
         </div>
-        <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>Max loss on a long option = the premium (${g.price.toFixed(2)}). Break-even at ${be.toFixed(2)}.</div>
+        <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{tr(`Max loss on a long option = the premium ($${g.price.toFixed(2)}). Break-even at $${be.toFixed(2)}.`)}</div>
       </div>
 
       {/* Multi-leg strategies (Fase 4) */}
       <div className="card" style={{ marginTop: "var(--sr-sp-4)" }}>
-        <div className="section-label">Multi-leg strategies</div>
+        <div className="section-label">{tr("Multi-leg strategies")}</div>
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-          Structures built around spot (ATM / ±5-10% strikes), priced with Black-Scholes and your inputs. Useful to protect a holding (collar) or define risk (spreads).
-        </div>
+          {tr("Structures built around spot (ATM / ±5-10% strikes), priced with Black-Scholes and your inputs. Useful to protect a holding (collar) or define risk (spreads).")}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-1)", marginBottom: "var(--sr-sp-3)" }}>
           {(Object.keys(STRATEGY_LABELS) as StrategyName[]).map((s) => (
             <button key={s} className={`subtab ${strategy === s ? "active" : ""}`} onClick={() => setStrategy(s)}>{STRATEGY_LABELS[s]}</button>
@@ -216,11 +208,11 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
               {stat("Net theta/day", strat.netTheta.toFixed(3))}
             </div>
             <table className="sr-table">
-              <thead><tr><th>Leg</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Strike</th><th style={{ textAlign: "right" }}>Premium</th></tr></thead>
+              <thead><tr><th>{tr("Leg")}</th><th style={{ textAlign: "right" }}>{tr("Qty")}</th><th style={{ textAlign: "right" }}>{tr("Strike")}</th><th style={{ textAlign: "right" }}>{tr("Premium")}</th></tr></thead>
               <tbody>
                 {strat.legs.map((l, i) => (
                   <tr key={i}>
-                    <td style={{ textTransform: "capitalize", fontWeight: 600, color: l.qty >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{l.qty >= 0 ? "Long" : "Short"} {l.kind}</td>
+                    <td style={{ textTransform: "capitalize", fontWeight: 600, color: l.qty >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }}>{l.qty >= 0 ? tr("Long") : tr("Short")} {l.kind}</td>
                     <td style={{ textAlign: "right" }} className="num">{l.qty}</td>
                     <td style={{ textAlign: "right" }} className="num">{l.strike != null ? `$${l.strike.toFixed(2)}` : "—"}</td>
                     <td style={{ textAlign: "right" }} className="num">${l.premium.toFixed(2)}</td>
@@ -230,7 +222,7 @@ export default function OptionsCalc({ ticker, price, rate, divYield }: Props) {
             </table>
           </>
         ) : (
-          <div className="sr-hint">Enter a valid spot, vol and days to build the strategy.</div>
+          <div className="sr-hint">{tr("Enter a valid spot, vol and days to build the strategy.")}</div>
         )}
       </div>
     </div>

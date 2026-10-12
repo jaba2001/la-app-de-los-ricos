@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
+import { t, tv } from "@/lib/i18n/cliente";
 
 export default function GlobalError({
   error,
@@ -26,28 +27,26 @@ export default function GlobalError({
                 <path d="M2 14L7 8L10 11L15 5" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <span style={{ fontWeight: 700, fontSize: 18 }}>Scora Research</span>
+            <span style={{ fontWeight: 700, fontSize: 18 }}>{t("Scora Research")}</span>
           </div>
           <div style={{ background: "#FFFFFF", border: "1px solid #B42318", borderRadius: 12, padding: 24, marginBottom: 16 }}>
             <div style={{ color: "#B42318", fontWeight: 700, fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-              Error Details
-            </div>
+              {t("Error Details")}</div>
             <pre style={{ color: "#0E1A2B", fontSize: 13, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
-              {error.message || "Unknown error"}
+              {tv(error.message || "Unknown error")}
             </pre>
           </div>
           {error.stack && (
             <div style={{ background: "#FFFFFF", border: "1px solid #1E3A5F", borderRadius: 12, padding: 24, marginBottom: 16 }}>
               <div style={{ color: "#94A3B8", fontWeight: 700, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>
-                Stack Trace
-              </div>
+                {t("Stack Trace")}</div>
               <pre style={{ color: "#4A6080", fontSize: 11, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
                 {error.stack}
               </pre>
             </div>
           )}
           {error.digest && (
-            <div style={{ color: "#4A6080", fontSize: 11, marginBottom: 16 }}>Digest: {error.digest}</div>
+            <div style={{ color: "#4A6080", fontSize: 11, marginBottom: 16 }}>{t(`Digest: ${error.digest}`)}</div>
           )}
           <button
             onClick={reset}
@@ -57,8 +56,7 @@ export default function GlobalError({
               fontSize: 14, cursor: "pointer",
             }}
           >
-            Try again
-          </button>
+            {t("Try again")}</button>
         </div>
       </body>
     </html>

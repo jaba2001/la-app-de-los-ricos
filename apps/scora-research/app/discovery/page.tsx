@@ -8,6 +8,8 @@ import { stockPickingRegime } from "@/lib/microScore";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 import { ultimaTanda } from "@/lib/discovery";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Row {
   ticker: string; sector: string | null; price: number | null;
@@ -61,34 +63,32 @@ export default function DiscoveryPage() {
     <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1080, margin: "0 auto" }} className="animate-fade-in">
       <DataError mensaje={errorCarga} />
       <div style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>Discovery</h1>
+        <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", margin: 0 }}>{t("Discovery")}</h1>
         <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 6, maxWidth: 720, lineHeight: 1.6 }}>
           {isX ? (
-            <>Metals, commodities, bonds, equity indices and sectors ranked by <strong style={{ color: "var(--sr-text)" }}>12-1m momentum</strong> — the
-            same factor that drives the validated dual-momentum allocation. A cross-asset map of <em>what is leading right now</em>.</>
+            <><Trans text={"Metals, commodities, bonds, equity indices and sectors ranked by <s1>12-1m momentum</s1> — the same factor that drives the validated dual-momentum allocation. A cross-asset map of <s2>what is leading right now</s2>."} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} s2={(c) => <em>{c}</em>} /></>
           ) : (
-            <>The S&amp;P 500 ranked by <strong style={{ color: "var(--sr-text)" }}>12-1m momentum</strong>. This is a map of <em>what is leading right
-            now</em> — not a list of recommendations, and not a claim that these names will outperform.</>
+            <><Trans text={"The S&P 500 ranked by <s1>12-1m momentum</s1>. This is a map of <s2>what is leading right now</s2> — not a list of recommendations, and not a claim that these names will outperform."} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} s2={(c) => <em>{c}</em>} /></>
           )}
         </p>
       </div>
 
       {/* Feed toggle */}
       <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)" }}>
-        <button className={`subtab ${!isX ? "active" : ""}`} onClick={() => setFeed("equity")}>Stocks · S&amp;P 500</button>
-        <button className={`subtab ${isX ? "active" : ""}`} onClick={() => setFeed("cross-asset")}>Cross-asset</button>
+        <button className={`subtab ${!isX ? "active" : ""}`} onClick={() => setFeed("equity")}>{t("Stocks · S&P 500")}</button>
+        <button className={`subtab ${isX ? "active" : ""}`} onClick={() => setFeed("cross-asset")}>{t("Cross-asset")}</button>
       </div>
 
       {/* Stock-picking regime gate — validated Phase 4 context */}
       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${picking.color} 9%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${picking.color} 30%, transparent)` }}>
         <div style={{ minWidth: 58, textAlign: "center" }}>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Corr</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("Corr")}</div>
           <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 800, color: picking.color, lineHeight: 1 }} className="num">{macro?.implied_corr != null ? macro.implied_corr.toFixed(0) : "—"}</div>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: picking.color }}>Selection regime: {picking.label}</div>
+          <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: picking.color }}>{t(`Selection regime: ${picking.label}`)}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, lineHeight: 1.45 }}>
-            {isX ? "Momentum leadership is most reliable in low-correlation regimes; when correlation is high, sleeves move together and the ranking carries less edge." : picking.detail}
+            {isX ? t("Momentum leadership is most reliable in low-correlation regimes; when correlation is high, sleeves move together and the ranking carries less edge.") : t(picking.detail)}
           </div>
         </div>
       </div>
@@ -101,16 +101,9 @@ export default function DiscoveryPage() {
       {!isX && (
         <div style={{ padding: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-5)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px dashed var(--sr-border)" }}>
           <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-text-2)", marginBottom: 4 }}>
-            What we measured, before you trust this list
-          </div>
+            {t("What we measured, before you trust this list")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-            Over <strong style={{ color: "var(--sr-text-2)" }}>192 months (2010–2026)</strong> on the point-in-time S&amp;P 500, picking the top momentum
-            decile returned <strong style={{ color: "var(--sr-neg)" }}>+728%</strong> — while holding <em>the same 400 names equally weighted</em>, with no
-            selection at all, returned <strong style={{ color: "var(--sr-text-2)" }}>+908%</strong>. Ranking by momentum
-            <strong style={{ color: "var(--sr-neg)" }}> lagged doing nothing by 180 points</strong>, and its information coefficient is statistically
-            indistinguishable from zero. What the data <em>does</em> show is that the signal is strongly time-varying — its dispersion is 16× what chance
-            would explain — which is why the regime below matters more than the ranking itself. Use this as a leadership map, not as a buy list.
-          </div>
+            <Trans text={"Over <s1>192 months (2010–2026)</s1> on the point-in-time S&P 500, picking the top momentum decile returned <s2>+728%</s2> — while holding <s3>the same 400 names equally weighted</s3>, with no selection at all, returned <s4>+908%</s4>. Ranking by momentum<s5> lagged doing nothing by 180 points</s5>, and its information coefficient is statistically indistinguishable from zero. What the data <s6>does</s6> show is that the signal is strongly time-varying — its dispersion is 16× what chance would explain — which is why the regime below matters more than the ranking itself. Use this as a leadership map, not as a buy list."} s1={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} s2={(c) => <strong style={{ color: "var(--sr-neg)" }}>{c}</strong>} s3={(c) => <em>{c}</em>} s4={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} s5={(c) => <strong style={{ color: "var(--sr-neg)" }}>{c}</strong>} s6={(c) => <em>{c}</em>} /></div>
         </div>
       )}
 
@@ -127,15 +120,14 @@ export default function DiscoveryPage() {
         <Sk w="100%" h={360} />
       ) : rows.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-          The discovery feed is being built. The universe is scored weekly.
-        </div>
+          {t("The discovery feed is being built. The universe is scored weekly.")}</div>
       ) : (
         <div className="card" style={{ padding: 0 }}>
           <table className="sr-table">
             <thead><tr>
-              <th style={{ textAlign: "right" }}>#</th><th>{isX ? "Instrument" : "Ticker"}</th><th>{isX ? "Class" : "Sector"}</th>
-              <th style={{ textAlign: "right" }}>12-1m mom</th><th style={{ textAlign: "right" }}>6m</th>
-              <th style={{ textAlign: "right" }}>Momentum</th><th style={{ textAlign: "right" }}>Price</th>
+              <th style={{ textAlign: "right" }}>#</th><th>{isX ? t("Instrument") : t("Ticker")}</th><th>{isX ? t("Class") : t("Sector")}</th>
+              <th style={{ textAlign: "right" }}>{t("12-1m mom")}</th><th style={{ textAlign: "right" }}>6m</th>
+              <th style={{ textAlign: "right" }}>{t("Momentum")}</th><th style={{ textAlign: "right" }}>{t("Price")}</th>
             </tr></thead>
             <tbody>
               {filtered.map((r) => (
@@ -143,7 +135,7 @@ export default function DiscoveryPage() {
                   <td style={{ textAlign: "right", color: "var(--sr-text-3)" }} className="num">{r.rank}</td>
                   <td style={{ fontWeight: 700, color: "var(--sr-text)" }}>
                     {r.ticker}
-                    {isX && r.label && <span style={{ display: "block", fontSize: "10px", fontWeight: 500, color: "var(--sr-text-3)" }}>{r.label}</span>}
+                    {isX && r.label && <span style={{ display: "block", fontSize: "10px", fontWeight: 500, color: "var(--sr-text-3)" }}>{tv(r.label)}</span>}
                   </td>
                   <td style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-xs)" }}>{r.sector ?? "—"}</td>
                   <td style={{ textAlign: "right", fontWeight: 700, color: (r.mom_12_1 ?? 0) >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
@@ -166,9 +158,8 @@ export default function DiscoveryPage() {
       )}
 
       <div style={{ textAlign: "right", fontSize: "10px", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-4)" }}>
-        {asOf ? `As of ${asOf} · ` : ""}{rows.length} {isX ? "instruments" : "names"} · momentum from free EOD prices · {isX ? "research/discovery_instruments.mjs" : "research/discovery.mjs"}
-        {!isX && <> · audited in <code style={{ fontSize: "inherit" }}>research/momentum_audit.mjs</code> (192 months)</>}. Educational — not investment advice.
-      </div>
+        {asOf ? t(`As of ${asOf} · `) : ""}{rows.length} {isX ? t("instruments") : t("names")} {" "}{t("· momentum from free EOD prices ·")}{" "}{isX ? t("research/discovery_instruments.mjs") : t("research/discovery.mjs")}
+        {!isX && <> {" "}{t("· audited in")}{" "}<code style={{ fontSize: "inherit" }}>research/momentum_audit.mjs</code> {" "}{t("(192 months)")}</>}{t(". Educational — not investment advice.")}</div>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import { toDatedCloses } from "@/lib/attribution";
 import { HORIZON_LABEL, type Horizon } from "@/lib/rating";
 import { useHorizon, setHorizon } from "@/lib/horizon";
 import type { RegimeId } from "@/lib/timeframes";
+import { t, tv } from "@/lib/i18n/cliente";
 
 const HORIZONS: Horizon[] = ["days", "months", "years"];
 
@@ -72,15 +73,14 @@ export default function Verdict({ data, macro, scores, icScore, loading }: Props
           <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 800, color: verdict.color }}>
             {verdict.rating}
           </span>
-          <span className="num sr-hint">{verdict.directional}/100 directional</span>
+          <span className="num sr-hint">{t(`${verdict.directional}/100 directional`)}</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
           <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: convColor }}>
-            {verdict.conviction} conviction · {verdict.convictionPct}%
-          </span>
+            {t(`${verdict.conviction} conviction · ${verdict.convictionPct}%`)}</span>
           {/* Holding period is the first thing that decides whether a name is a good idea,
               and almost nothing asks. Changing it re-weights the call, it does not hide it. */}
-          <div style={{ display: "flex", gap: 4 }} role="group" aria-label="Holding period">
+          <div style={{ display: "flex", gap: 4 }} role="group" aria-label={t("Holding period")}>
             {HORIZONS.map((h) => (
               <button
                 key={h}
@@ -88,7 +88,7 @@ export default function Verdict({ data, macro, scores, icScore, loading }: Props
                 onClick={() => setHorizon(h)}
                 className={`subtab ${horizon === h ? "active" : ""}`}
                 aria-pressed={horizon === h}
-                title={`Rate this name on a ${HORIZON_LABEL[h].toLowerCase()} view`}
+                title={t(`Rate this name on a ${HORIZON_LABEL[h].toLowerCase()} view`)}
               >
                 {HORIZON_LABEL[h]}
               </button>
@@ -98,7 +98,7 @@ export default function Verdict({ data, macro, scores, icScore, loading }: Props
       </div>
 
       <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)", lineHeight: 1.5 }}>
-        {verdict.summary}
+        {tv(verdict.summary)}
       </div>
 
       {verdict.reasons.length > 0 && (
@@ -106,7 +106,7 @@ export default function Verdict({ data, macro, scores, icScore, loading }: Props
           {verdict.reasons.map((r, i) => (
             <li key={i} style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", display: "flex", gap: "var(--sr-sp-2)" }}>
               <span style={{ color: verdict.color, flexShrink: 0 }}>▸</span>
-              <span>{r}</span>
+              <span>{t(r)}</span>
             </li>
           ))}
         </ul>
@@ -114,10 +114,10 @@ export default function Verdict({ data, macro, scores, icScore, loading }: Props
 
       {/* The falsifier. A call you cannot disprove is marketing, not research. */}
       <div className="sr-hint" style={{ borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-2)" }}>
-        <strong style={{ color: "var(--sr-text-2)" }}>What would change this:</strong> {verdict.whatWouldChangeIt}
+        <strong style={{ color: "var(--sr-text-2)" }}>{t("What would change this:")}</strong> {t(verdict.whatWouldChangeIt)}
       </div>
 
-      <div className="sr-hint" style={{ marginTop: 4 }}>{verdict.note}</div>
+      <div className="sr-hint" style={{ marginTop: 4 }}>{tv(verdict.note)}</div>
     </div>
   );
 }

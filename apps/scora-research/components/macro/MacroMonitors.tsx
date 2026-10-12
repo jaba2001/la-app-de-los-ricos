@@ -2,6 +2,7 @@
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -18,7 +19,7 @@ function MonitorCard({ title, score, color, status, signals, children }: {
     <div className="card">
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
         <div>
-          <div className="section-label">{title}</div>
+          <div className="section-label">{tv(title)}</div>
           {score != null && (
             <span style={{ fontSize: "var(--sr-t-hero)", fontWeight: 700, color, lineHeight: 1 }} className="num">
               {score.toFixed(0)}
@@ -97,7 +98,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
         {/* Meltup Monitor */}
         <MonitorCard
-          title="Meltup Monitor"
+          title={t("Meltup Monitor")}
           score={meltup}
           color={meltupColor}
           status={meltupStatus}
@@ -110,7 +111,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
         {/* Bubble Risk Monitor */}
         <MonitorCard
-          title="Bubble Risk Monitor"
+          title={t("Bubble Risk Monitor")}
           score={bubbleAvg}
           color={bubbleColor}
           status={bubbleStatus}
@@ -123,7 +124,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
         {/* Recession Monitor */}
         <MonitorCard
-          title="Recession Monitor"
+          title={t("Recession Monitor")}
           score={rpc}
           color={rpcColor}
           status={rpcStatus}
@@ -137,13 +138,13 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
         {/* Feature 9: Stock/Bond Correlation Badge */}
         <div className="card">
-          <div className="section-label">Stock / Bond Correlation Regime</div>
+          <div className="section-label">{t("Stock / Bond Correlation Regime")}</div>
           {(() => {
             const pce = macro?.core_pce_yoy != null ? Number(macro.core_pce_yoy) : null;
             const cpi = macro?.core_cpi_yoy != null ? Number(macro.core_cpi_yoy) : null;
             const infl = pce ?? cpi;
             const dgs10 = macro?.dgs10 != null ? Number(macro.dgs10) : null;
-            if (infl == null) return <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>Inflation data unavailable</div>;
+            if (infl == null) return <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{t("Inflation data unavailable")}</div>;
 
             const inflColor = infl >= 3.5 ? "var(--sr-neg)" : infl >= 2.5 ? "var(--sr-warn)" : "var(--sr-pos)";
             const corrLabel = infl >= 3.5 ? "Positive (High Inflation)" : infl >= 2.5 ? "Borderline" : "Negative (Low Inflation)";
@@ -168,9 +169,9 @@ export default function MacroMonitors({ macro, loading }: Props) {
                     { label: "10Y Rate", val: dgs10 != null ? `${dgs10.toFixed(2)}%` : "—", color: dgs10 != null && dgs10 > 4.5 ? "var(--sr-warn)" : "var(--sr-text-2)", sub: "Higher = more pressure" },
                   ].map(({ label, val, color, sub }) => (
                     <div key={label} className="sr-tile">
-                      <div className="sr-tile-label">{label}</div>
+                      <div className="sr-tile-label">{tv(label)}</div>
                       <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color }} className="num">{val}</div>
-                      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
+                      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{tv(sub)}</div>
                     </div>
                   ))}
                 </div>
@@ -185,7 +186,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
 
       {/* Commodity Supercycle */}
         <div className="card">
-          <div className="section-label">Commodity Supercycle</div>
+          <div className="section-label">{t("Commodity Supercycle")}</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
             {[
               { label: "WTI Oil",   val: macro?.wti_level != null ? `$${Number(macro.wti_level).toFixed(1)}` : "—" },
@@ -196,7 +197,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
                 ? `${(Number(macro.dgs10) - Number(macro.core_pce_yoy)).toFixed(2)}%` : "—" },
             ].map(({ label, val, color }) => (
               <div key={label} className="sr-tile">
-                <div className="sr-tile-label">{label}</div>
+                <div className="sr-tile-label">{tv(label)}</div>
                 <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: color ?? "var(--sr-text)" }} className="num">{val}</div>
               </div>
             ))}
@@ -207,15 +208,14 @@ export default function MacroMonitors({ macro, loading }: Props) {
       {/* Dalio Debt Cycle */}
       <div className="card">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)", flexWrap: "wrap", gap: 6 }}>
-          <div className="section-label" style={{ marginBottom: 0 }}>Dalio Long-Term Debt Cycle</div>
+          <div className="section-label" style={{ marginBottom: 0 }}>{t("Dalio Long-Term Debt Cycle")}</div>
           <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)" }}>
             {macro?.dalio_stage != null && (
               <span className="sr-hint">
-                Stage {macro.dalio_stage} — from macro_state
-              </span>
+                {t(`Stage ${macro.dalio_stage} — from macro_state`)}</span>
             )}
             <span style={{ fontSize: "10px", color: dalioStale() ? "var(--sr-warn)" : "var(--sr-text-3)", fontWeight: dalioStale() ? 700 : 400 }}>
-              {dalioStale() ? "⚠ KPIs may be stale · " : "KPIs "}reviewed {DALIO_REVIEWED}
+              {dalioStale() ? t("⚠ KPIs may be stale · ") : "KPIs "}{t(`reviewed ${DALIO_REVIEWED}`)}
             </span>
           </div>
         </div>
@@ -233,12 +233,12 @@ export default function MacroMonitors({ macro, loading }: Props) {
                   fontSize: "var(--sr-t-xs)", fontWeight: 700, color: isCurrent ? "var(--sr-warn)" : "var(--sr-text-3)",
                   marginBottom: 4,
                 }}>
-                  Stage {stage.n}{isCurrent ? " ← CURRENT" : ""}
+                  {t(`Stage ${stage.n}`)}{isCurrent ? " ← CURRENT" : ""}
                 </div>
                 <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: isCurrent ? "var(--sr-text)" : "var(--sr-text-2)", marginBottom: 4 }}>
-                  {stage.label}
+                  {tv(stage.label)}
                 </div>
-                <div className="sr-hint">{stage.desc}</div>
+                <div className="sr-hint">{tv(stage.desc)}</div>
               </div>
             );
           })}
@@ -246,7 +246,7 @@ export default function MacroMonitors({ macro, loading }: Props) {
         <div style={{ marginTop: "var(--sr-sp-4)", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)" }}>
           {DALIO_KPIS.map(({ label, val, warn }) => (
             <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-              <div className="sr-tile-label">{label}</div>
+              <div className="sr-tile-label">{tv(label)}</div>
               <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)", marginTop: 2 }}>⚠ {warn}</div>
             </div>

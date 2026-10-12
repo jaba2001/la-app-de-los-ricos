@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { pushConfigured, pushSupported, isSubscribed, enablePush, disablePush } from "@/lib/push";
+import { t } from "@/lib/i18n/cliente";
 
 // Opt-in to browser push alerts for regime changes & breadth divergences (B6 delivery).
 // Renders nothing unless push is both supported and configured (VAPID key present).
@@ -20,7 +21,7 @@ export default function PushToggle() {
   async function toggle() {
     setBusy(true); setMsg("");
     if (on) { await disablePush(); setOn(false); }
-    else { const r = await enablePush(); if (r.ok) setOn(true); else setMsg(r.error || "Failed"); }
+    else { const r = await enablePush(); if (r.ok) setOn(true); else setMsg(r.error || t("Failed")); }
     setBusy(false);
   }
 
@@ -33,10 +34,10 @@ export default function PushToggle() {
         border: `1px solid ${on ? "color-mix(in srgb, var(--sr-pos) 35%, transparent)" : "var(--sr-border)"}`,
         color: on ? "var(--sr-pos)" : "var(--sr-text-2)",
       }}>
-        {on ? "🔔 Regime alerts on" : "🔕 Enable regime alerts"}
+        {on ? t("🔔 Regime alerts on") : t("🔕 Enable regime alerts")}
       </button>
       {msg && <span style={{ fontSize: "10px", color: "var(--sr-neg)" }}>{msg}</span>}
-      {!msg && <span className="sr-hint">Get notified on breadth divergences &amp; risk-off shifts.</span>}
+      {!msg && <span className="sr-hint">{t("Get notified on breadth divergences & risk-off shifts.")}</span>}
     </div>
   );
 }

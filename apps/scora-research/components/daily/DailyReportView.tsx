@@ -10,12 +10,16 @@ import {
   BREADTH_LABEL, BREADTH_NOTE, signedPct, formatDayLong,
   type DailyReport,
 } from "@/lib/dailyClose";
+import { tServidor, idiomaPeticion } from "@/lib/i18n/servidor";
+import { frases, LOCALE } from "@/lib/i18n/traducir";
 
 const tone = (v: number) => (v >= 0 ? "var(--sr-pos)" : "var(--sr-neg)");
 
-export default function DailyReportView({
+export default async function DailyReportView({
   report, dates, activeDate,
 }: { report: DailyReport; dates: string[]; activeDate: string }) {
+  const t = await tServidor();
+  const locale = LOCALE[await idiomaPeticion()];
   const maxAbs = Math.max(...report.sectors.map((s) => Math.abs(s.changePct)), 0.01);
   // `dates` viene ordenado de más reciente a más antiguo.
   const isLatest = dates.length === 0 || dates[0] === activeDate;
@@ -30,11 +34,11 @@ export default function DailyReportView({
       />
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)", flexWrap: "wrap", gap: "var(--sr-sp-3)" }}>
         <div>
-          <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, letterSpacing: "-0.02em" }}>Daily close</h1>
-          <div className="sr-hint">{formatDayLong(report.date)} · measured, not forecast</div>
+          <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, letterSpacing: "-0.02em" }}>{t("Daily close")}</h1>
+          <div className="sr-hint">{t(`${formatDayLong(report.date, locale)} · measured, not forecast`)}</div>
         </div>
         {dates.length > 1 && (
-          <nav style={{ display: "flex", gap: 4, overflowX: "auto" }} aria-label="Previous closes">
+          <nav style={{ display: "flex", gap: 4, overflowX: "auto" }} aria-label={t("Previous closes")}>
             {dates.slice(0, 6).map((d) => (
               <Link
                 key={d}
@@ -59,11 +63,11 @@ export default function DailyReportView({
             <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>S&amp;P 500</span>
           </div>
         )}
-        <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text)", lineHeight: 1.7, margin: 0 }}>{report.headline}</p>
-        {report.context && <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{report.context}</p>}
+        <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text)", lineHeight: 1.7, margin: 0 }}>{frases(report.headline).map((f) => t(f)).join(" ")}</p>
+        {report.context && <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{frases(report.context).map((f) => t(f)).join(" ")}</p>}
         {report.regime.changed && (
           <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-amber) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--sr-amber) 30%, transparent)", color: "var(--sr-amber)", fontSize: "var(--sr-t-xs)", fontWeight: 700 }}>
-            Regime change: {report.regime.previousId} → {report.regime.id}
+            {t(`Regime change: ${report.regime.previousId} → ${report.regime.id}`)}
           </div>
         )}
       </div>
@@ -72,35 +76,35 @@ export default function DailyReportView({
       {report.breadth && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-            <div className="section-label" style={{ margin: 0 }}>What kind of day it was</div>
+            <div className="section-label" style={{ margin: 0 }}>{t("What kind of day it was")}</div>
             <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 800, color: "var(--sr-amber)" }}>
-              {BREADTH_LABEL[report.breadth.kind]}
+              {t(BREADTH_LABEL[report.breadth.kind])}
             </span>
           </div>
           <div className="sr-grid-3">
             <div className="sr-tile">
-              <div className="sr-tile-label">Sectors up / down</div>
+              <div className="sr-tile-label">{t("Sectors up / down")}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{report.breadth.up}–{report.breadth.down}</div>
             </div>
             <div className="sr-tile">
-              <div className="sr-tile-label">Dispersion</div>
-              <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{report.breadth.dispersion.toFixed(2)} pp</div>
-              <div className="sr-hint">spread between sectors</div>
+              <div className="sr-tile-label">{t("Dispersion")}</div>
+              <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{t(`${report.breadth.dispersion.toFixed(2)} pp`)}</div>
+              <div className="sr-hint">{t("spread between sectors")}</div>
             </div>
             <div className="sr-tile">
-              <div className="sr-tile-label">Agreement</div>
+              <div className="sr-tile-label">{t("Agreement")}</div>
               <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{(report.breadth.agreement * 100).toFixed(0)}%</div>
-              <div className="sr-hint">on the same side</div>
+              <div className="sr-hint">{t("on the same side")}</div>
             </div>
           </div>
-          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{BREADTH_NOTE[report.breadth.kind]}</div>
+          <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>{t(BREADTH_NOTE[report.breadth.kind])}</div>
         </div>
       )}
 
       {/* ACTO 2 — el detalle */}
       {report.sectors.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="section-label">Sectors</div>
+          <div className="section-label">{t("Sectors")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {report.sectors.map((s) => (
               <div key={s.etf} style={{ display: "grid", gridTemplateColumns: "150px 1fr 64px", alignItems: "center", gap: "var(--sr-sp-2)" }}>
@@ -126,19 +130,16 @@ export default function DailyReportView({
 
       {report.gaps.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="sr-hint">Not measured today: {report.gaps.join(" · ")}.</div>
+          <div className="sr-hint">{t(`Not measured today: ${report.gaps.join(" · ")}.`)}</div>
         </div>
       )}
 
       {/* Gancho → evidencia → producto */}
       <div className="card">
         <div className="sr-hint" style={{ lineHeight: 1.7 }}>
-          Built from measured values by a deterministic template — no model writes these numbers, so
-          none can be invented. See how the engine has actually done on{" "}
-          <Link href="/track-record" style={{ color: "var(--sr-amber)" }}>the track record</Link>, including
-          the backtest we lost, or try the{" "}
-          <Link href="/demo" style={{ color: "var(--sr-amber)" }}>live demo</Link> — no signup.
-        </div>
+          {t("Built from measured values by a deterministic template — no model writes these numbers, so none can be invented. See how the engine has actually done on")}{" "}
+          <Link href="/track-record" style={{ color: "var(--sr-amber)" }}>{t("the track record")}</Link>{t(", including the backtest we lost, or try the")}{" "}
+          <Link href="/demo" style={{ color: "var(--sr-amber)" }}>{t("live demo")}</Link> {" "}{t("— no signup.")}</div>
       </div>
     </div>
   );

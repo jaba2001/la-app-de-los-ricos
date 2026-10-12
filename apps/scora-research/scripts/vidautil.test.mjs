@@ -218,8 +218,8 @@ const tiene = (ss, k) => ss.some((x) => x.clave === k);
   ok(!/depreciacion|brutoFin|brutoIni/.test(codigo),
      "ni toca los campos crudos de los que sale la vida util: eso es del modulo");
   // La señal de vida util es SIEMPRE aviso: la metrica no distingue criterio contable de mezcla.
-  ok(/>Notice</.test(codigo), "las señales se pintan como AVISO (Notice)");
-  ok(!/>(Alerta|Alert)</.test(codigo), "y NUNCA como alerta: la metrica no puede acusar");
+  ok(/>(?:\{t\(")?Notice(?:"\)\})?</.test(codigo), "las señales se pintan como AVISO (Notice, traducido o no)");
+  ok(!/>(?:\{t\(")?(Alerta|Alert)(?:"\)\})?</.test(codigo), "y NUNCA como alerta: la metrica no puede acusar");
   // La fecha de la foto no es opcional.
   ok(/\{asOf\}/.test(ui), "la pantalla publica la fecha de la foto");
   // Sobre el código sin comentarios: el comentario dice «precalculada» y aprobaba solo.

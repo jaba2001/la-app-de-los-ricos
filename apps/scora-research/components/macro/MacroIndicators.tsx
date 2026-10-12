@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { Sk } from "@/components/ui/Skeleton";
 import { puntuacionDolar, ETIQUETA_DOLAR } from "@/lib/dolar";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -228,7 +229,7 @@ function SeriesRow({ item, macro, loading }: { item: SeriesEntry; macro: MacroSt
 
   return (
     <div className="stat-row" style={{ opacity: missing ? 0.45 : 1 }}>
-      <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{item.label}</span>
+      <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(item.label)}</span>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {loading ? <Sk w={50} h={14} /> : (
           <>
@@ -240,14 +241,13 @@ function SeriesRow({ item, macro, loading }: { item: SeriesEntry; macro: MacroSt
               return b ? (
                 <span style={{ fontSize: "9px", fontWeight: 700, padding: "1px 5px", borderRadius: 3, letterSpacing: "0.02em",
                   background: `color-mix(in srgb, ${b.color} 14%, transparent)`, color: b.color }}>
-                  {b.text}
+                  {tv(b.text)}
                 </span>
               ) : null;
             })()}
             {missing && (
               <span style={{ fontSize: "9px", color: "var(--sr-text-3)", background: "var(--sr-surface-3)", padding: "1px 4px", borderRadius: 3 }}>
-                pending
-              </span>
+                {t("pending")}</span>
             )}
           </>
         )}
@@ -345,7 +345,7 @@ function CompositeBreakdown({ macro, loading }: { macro: MacroState | null; load
   const [expanded, setExpanded] = useState<string | null>(null);
   if (loading || !macro) return (
     <div className="card">
-      <div className="section-label">Composite Score Breakdown</div>
+      <div className="section-label">{t("Composite Score Breakdown")}</div>
       {[1,2,3,4,5].map(i => <div key={i} style={{ marginBottom: 6 }}><Sk w="100%" h={22} /></div>)}
     </div>
   );
@@ -359,8 +359,8 @@ function CompositeBreakdown({ macro, loading }: { macro: MacroState | null; load
   ];
   return (
     <div className="card">
-      <div className="section-label">Composite Score Breakdown</div>
-      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: 10 }}>Click → sub-drivers. Stored = cron · Computed = frontend approx.</div>
+      <div className="section-label">{t("Composite Score Breakdown")}</div>
+      <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: 10 }}>{t("Click → sub-drivers. Stored = cron · Computed = frontend approx.")}</div>
       {composites.map(({ id, label, stored, computed, subs, bad }) => {
         const score = stored ?? Math.round(computed);
         const isExp = expanded === id;
@@ -371,7 +371,7 @@ function CompositeBreakdown({ macro, loading }: { macro: MacroState | null; load
         return (
           <div key={id} style={{ marginBottom: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }} onClick={() => setExpanded(isExp ? null : id)}>
-              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", flex: 1 }}>{label}</span>
+              <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", flex: 1 }}>{tv(label)}</span>
               <div style={{ position: "relative", flex: "0 0 70px", height: 5, background: "var(--sr-surface-3)", borderRadius: 3 }}>
                 <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${pct}%`, borderRadius: 3, background: col, transition: "width 500ms" }} />
               </div>
@@ -387,7 +387,7 @@ function CompositeBreakdown({ macro, loading }: { macro: MacroState | null; load
                     : (sc2 < 35 ? "var(--sr-neg)" : sc2 < 55 ? "var(--sr-warn)" : "var(--sr-pos)");
                   return (
                     <div key={sub.label} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                      <span style={{ fontSize: "9px", color: "var(--sr-text-3)", flex: 1 }}>{sub.label}</span>
+                      <span style={{ fontSize: "9px", color: "var(--sr-text-3)", flex: 1 }}>{tv(sub.label)}</span>
                       <div style={{ position: "relative", flex: "0 0 50px", height: 3, background: "var(--sr-surface-3)", borderRadius: 2 }}>
                         <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${sc2}%`, borderRadius: 2, background: sc2col }} />
                       </div>
@@ -419,7 +419,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
           const total = c.series.length;
           return (
             <button key={c.id} className={`subtab ${active === c.id ? "active" : ""}`} onClick={() => setActive(c.id)}>
-              {c.label}
+              {tv(c.label)}
               <span style={{
                 marginLeft: 6, fontSize: "9px", padding: "1px 5px", borderRadius: "var(--sr-radius-pill)", fontWeight: 700,
                 background: live > 0 ? "color-mix(in srgb, var(--sr-pos) 18%, transparent)" : "var(--sr-surface-3)",
@@ -434,22 +434,21 @@ export default function MacroIndicators({ macro, loading }: Props) {
         {/* Left: series list */}
         <div className="card">
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--sr-sp-3)" }}>
-            <div className="section-label">{cat.label}</div>
-            <span className="sr-hint">{liveCount(cat.series)}/{cat.series.length} live</span>
+            <div className="section-label">{tv(cat.label)}</div>
+            <span className="sr-hint">{t(`${liveCount(cat.series)}/${cat.series.length} live`)}</span>
           </div>
           {cat.series.map(s => (
             <SeriesRow key={s.key} item={s} macro={macro} loading={loading} />
           ))}
           <div style={{ marginTop: "var(--sr-sp-4)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.6, borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
-            "pending" = field not yet written by lib/server/macro.js to macro_state. Add FRED series ID to the macro pipeline to activate.
-          </div>
+            {t("\"pending\" = field not yet written by lib/server/macro.js to macro_state. Add FRED series ID to the macro pipeline to activate.")}</div>
         </div>
 
         {/* Right: Data health + Sahm + Dalio */}
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
           {/* Coverage per category */}
           <div className="card">
-            <div className="section-label">FRED Coverage — All 8 Categories</div>
+            <div className="section-label">{t("FRED Coverage — All 8 Categories")}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               {ALL_CATS.map(c => {
                 const live = liveCount(c.series), total = c.series.length;
@@ -457,7 +456,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
                 return (
                   <div key={c.id} style={{ cursor: "pointer" }} onClick={() => setActive(c.id)}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: active === c.id ? "var(--sr-amber)" : "var(--sr-text-2)" }}>{c.label}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", color: active === c.id ? "var(--sr-amber)" : "var(--sr-text-2)" }}>{tv(c.label)}</span>
                       <span style={{ fontSize: "10px", color: pct === 1 ? "var(--sr-pos)" : pct > 0.5 ? "var(--sr-warn)" : "var(--sr-text-3)" }} className="num">
                         {live}/{total}
                       </span>
@@ -470,7 +469,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
               })}
             </div>
             <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", display: "flex", justifyContent: "space-between" }}>
-              <span className="sr-hint">Total FRED series</span>
+              <span className="sr-hint">{t("Total FRED series")}</span>
               <span style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
                 {ALL_CATS.reduce((s, c) => s + liveCount(c.series), 0)}
                 <span className="sr-hint"> / {ALL_CATS.reduce((s, c) => s + c.series.length, 0)}</span>
@@ -483,7 +482,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
 
           {/* Sahm Rule bands */}
           <div className="card">
-            <div className="section-label">Sahm Rule — Recession Trigger</div>
+            <div className="section-label">{t("Sahm Rule — Recession Trigger")}</div>
             <div style={{ marginBottom: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
               <div className="sr-tile-label">SAHMREALTIME</div>
               {loading ? <Sk w={60} h={20} /> : (() => {
@@ -495,7 +494,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
                       {sv != null ? sv.toFixed(2) : "—"}
                     </div>
                     {band && (
-                      <div style={{ fontSize: "10px", fontWeight: 600, color: band.color, marginTop: 4 }}>{band.label}</div>
+                      <div style={{ fontSize: "10px", fontWeight: 600, color: band.color, marginTop: 4 }}>{tv(band.label)}</div>
                     )}
                   </>
                 );
@@ -512,7 +511,7 @@ export default function MacroIndicators({ macro, loading }: Props) {
                     border: isBandActive ? `1px solid color-mix(in srgb, ${b.color} 30%, transparent)` : "1px solid transparent",
                   }}>
                     <span style={{ fontSize: "10px", fontWeight: 700, color: b.color }} className="num">{b.range}</span>
-                    <span style={{ fontSize: "10px", color: isBandActive ? b.color : "var(--sr-text-3)", fontWeight: isBandActive ? 600 : 400 }}>{b.label}</span>
+                    <span style={{ fontSize: "10px", color: isBandActive ? b.color : "var(--sr-text-3)", fontWeight: isBandActive ? 600 : 400 }}>{tv(b.label)}</span>
                   </div>
                 );
               })}
@@ -521,9 +520,9 @@ export default function MacroIndicators({ macro, loading }: Props) {
 
           {/* Dalio Debt Cycle */}
           <div className="card">
-            <div className="section-label">Dalio Debt Cycle</div>
+            <div className="section-label">{t("Dalio Debt Cycle")}</div>
             <div style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-              <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, marginBottom: 4 }}>Stage 4/5 — Political Fracture</div>
+              <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, marginBottom: 4 }}>{t("Stage 4/5 — Political Fracture")}</div>
               {[
                 ["USD Reserve Share", "58% (↓ from 72%)"],
                 ["Debt / GDP",        "~130%"],
@@ -531,12 +530,11 @@ export default function MacroIndicators({ macro, loading }: Props) {
                 ["Policy Stance",     macro?.fed_room ?? "Pending"],
               ].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
-                  <span>{k}</span><span style={{ fontWeight: 600 }}>{v}</span>
+                  <span>{t(k)}</span><span style={{ fontWeight: 600 }}>{t(v)}</span>
                 </div>
               ))}
               <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 8, opacity: 0.7 }}>
-                USD share &amp; Debt/GDP are manually maintained figures, not live series.
-              </div>
+                {t("USD share & Debt/GDP are manually maintained figures, not live series.")}</div>
             </div>
           </div>
         </div>

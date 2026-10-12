@@ -5,6 +5,8 @@ import {
   covariance, ledoitWolf, minVariance, maxSharpe, longOnly, portfolioStats, equalWeights,
   resampleWeights, type PortfolioStats,
 } from "@/lib/optimize";
+import { t as tr } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { tickers: string[]; }
 
@@ -40,7 +42,7 @@ export default function PortfolioOptimizer({ tickers }: Props) {
   const [error, setError] = useState("");
 
   async function optimize() {
-    if (tickers.length < 2) { setError("Add at least 2 different open tickers to optimize."); return; }
+    if (tickers.length < 2) { setError(tr("Add at least 2 different open tickers to optimize.")); return; }
     setLoading(true); setError(""); setResult(null);
     try {
       const histories = await Promise.all(tickers.map(async (t) => {
@@ -48,7 +50,7 @@ export default function PortfolioOptimizer({ tickers }: Props) {
         return dailyReturns(Array.isArray(res) ? res : []);
       }));
       const usable = histories.map((h, i) => ({ t: tickers[i], r: h })).filter((x) => x.r.length >= 30);
-      if (usable.length < 2) { setError("Not enough price history to optimize these names."); setLoading(false); return; }
+      if (usable.length < 2) { setError(tr("Not enough price history to optimize these names.")); setLoading(false); return; }
 
       const n = Math.min(...usable.map((u) => u.r.length));
       const series = usable.map((u) => u.r.slice(0, n));         // align lengths
@@ -84,7 +86,7 @@ export default function PortfolioOptimizer({ tickers }: Props) {
         months: n,
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Optimization failed");
+      setError(e instanceof Error ? e.message : tr("Optimization failed"));
     }
     setLoading(false);
   }
@@ -102,14 +104,12 @@ export default function PortfolioOptimizer({ tickers }: Props) {
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Portfolio optimizer · Markowitz</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("Portfolio optimizer · Markowitz")}</div>
           <div className="sr-hint" style={{ maxWidth: 520, lineHeight: 1.5 }}>
-            Min-variance &amp; max-Sharpe weights across your open names, with Ledoit-Wolf shrinkage and
-            resampled uncertainty bands. A tool alongside the regime allocator — not a replacement.
-          </div>
+            {tr("Min-variance & max-Sharpe weights across your open names, with Ledoit-Wolf shrinkage and resampled uncertainty bands. A tool alongside the regime allocator — not a replacement.")}</div>
         </div>
         <button className="btn-primary" onClick={optimize} disabled={loading} style={{ flexShrink: 0, padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}>
-          {loading ? "Optimizing…" : "✦ Optimize"}
+          {loading ? tr("Optimizing…") : tr("✦ Optimize")}
         </button>
       </div>
 
@@ -119,10 +119,10 @@ export default function PortfolioOptimizer({ tickers }: Props) {
         <div style={{ marginTop: "var(--sr-sp-3)" }}>
           <table className="sr-table">
             <thead><tr>
-              <th>Ticker</th>
-              <th style={{ textAlign: "right" }}>Equal wt (1/N)</th>
-              <th style={{ textAlign: "right" }}>Min-variance</th>
-              <th style={{ textAlign: "right" }}>Max-Sharpe</th>
+              <th>{tr("Ticker")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Equal wt (1/N)")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Min-variance")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Max-Sharpe")}</th>
             </tr></thead>
             <tbody>
               {result.tickers.map((t, i) => (
@@ -140,19 +140,19 @@ export default function PortfolioOptimizer({ tickers }: Props) {
             </tbody>
             <tfoot>
               <tr style={{ borderTop: "2px solid var(--sr-border)" }}>
-                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>Exp. return</td>
+                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{tr("Exp. return")}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsEqual.ret)}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsMinVar.ret)}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsMaxSharpe.ret)}</td>
               </tr>
               <tr>
-                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>Volatility</td>
+                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{tr("Volatility")}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsEqual.vol)}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsMinVar.vol)}</td>
                 <td style={{ textAlign: "right" }} className="num">{pct(result.statsMaxSharpe.vol)}</td>
               </tr>
               <tr>
-                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>Sharpe (rf {pct(RF)})</td>
+                <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{tr(`Sharpe (rf ${pct(RF)})`)}</td>
                 <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{result.statsEqual.sharpe.toFixed(2)}</td>
                 <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{result.statsMinVar.sharpe.toFixed(2)}</td>
                 <td style={{ textAlign: "right", fontWeight: 700, color: "var(--sr-amber)" }} className="num">{result.statsMaxSharpe.sharpe.toFixed(2)}</td>
@@ -161,24 +161,14 @@ export default function PortfolioOptimizer({ tickers }: Props) {
           </table>
 
           <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
-            Long-only, weights sum to 100%. Built from {result.months} aligned daily returns
-            {result.shrinkDelta > 0 && <> · Ledoit-Wolf shrinkage <strong className="num">{(result.shrinkDelta * 100).toFixed(0)}%</strong> toward a constant-correlation target</>}.
+            {tr(`Long-only, weights sum to 100%. Built from ${result.months} aligned daily returns`)}{result.shrinkDelta > 0 && <> {" "}<Trans text={`· Ledoit-Wolf shrinkage <s1>${(result.shrinkDelta * 100).toFixed(0)}%</s1> toward a constant-correlation target`} s1={(c) => <strong className="num">{c}</strong>} /></>}.
             <br />
-            The <strong>±</strong> figures are the spread of each weight across {DRAWS} bootstrap resamples of the same
-            history — how much the &ldquo;optimal&rdquo; weight moves when the past comes out slightly differently.
-            {spreadMinVar != null && spreadMaxShp != null && spreadMaxShp > spreadMinVar && (
+            <Trans text={`The <s1>±</s1> figures are the spread of each weight across ${DRAWS} bootstrap resamples of the same history — how much the “optimal” weight moves when the past comes out slightly differently.`} s1={(c) => <strong>{c}</strong>} />{spreadMinVar != null && spreadMaxShp != null && spreadMaxShp > spreadMinVar && (
               <>
-                {" "}Note that max-Sharpe&rsquo;s bands are about{" "}
-                <strong className="num">{(spreadMaxShp / Math.max(spreadMinVar, 1e-9)).toFixed(1)}×</strong> wider than
-                min-variance&rsquo;s: it depends on expected returns, which are the worst-estimated input there is
-                (Michaud 1989; Chopra &amp; Ziemba measured errors in means costing ~11× errors in variances).
-              </>
+                {" "}<Trans text={`Note that max-Sharpe’s bands are about <s1>${(spreadMaxShp / Math.max(spreadMinVar, 1e-9)).toFixed(1)}×</s1> wider than min-variance’s: it depends on expected returns, which are the worst-estimated input there is (Michaud 1989; Chopra & Ziemba measured errors in means costing ~11× errors in variances).`} s1={(c) => <strong className="num">{c}</strong>} /></>
             )}
             <br />
-            Equal weight is here as the control, not as filler: DeMiguel, Garlappi &amp; Uppal (2009) found 1/N beats
-            sample-based optimization out of sample across 14 datasets. If the optimized portfolios don&rsquo;t clearly
-            beat it, the honest read is that they don&rsquo;t.
-          </div>
+            {tr("Equal weight is here as the control, not as filler: DeMiguel, Garlappi & Uppal (2009) found 1/N beats sample-based optimization out of sample across 14 datasets. If the optimized portfolios don’t clearly beat it, the honest read is that they don’t.")}</div>
         </div>
       )}
     </div>

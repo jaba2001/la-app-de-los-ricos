@@ -1,6 +1,8 @@
 "use client";
 import type { MacroState } from "@/lib/types";
 import { arbitrageCapitalStress, STRUCTURAL_EDGES } from "@/lib/frictions";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { macro: MacroState | null; }
 
@@ -32,51 +34,46 @@ export default function ArbitrageStress({ macro }: Props) {
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-      <div className="section-label">Arbitrage capital stress · Shleifer &amp; Vishny (1997)</div>
+      <div className="section-label">{t("Arbitrage capital stress · Shleifer & Vishny (1997)")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55 }}>
-        Real arbitrage is done by a few specialists using <em>other people&rsquo;s</em> money. When a trade moves
-        against them, their investors withdraw capital exactly when the opportunity is best — so arbitrage capital
-        is pro-cyclical and scarcest when it is most needed. This gauge tracks that pressure.
-      </div>
+        <Trans text={"Real arbitrage is done by a few specialists using <s1>other people’s</s1> money. When a trade moves against them, their investors withdraw capital exactly when the opportunity is best — so arbitrage capital is pro-cyclical and scarcest when it is most needed. This gauge tracks that pressure."} s1={(c) => <em>{c}</em>} /></div>
 
       {!stress ? (
-        <div className="sr-hint">Macro data not loaded yet.</div>
+        <div className="sr-hint">{t("Macro data not loaded yet.")}</div>
       ) : (
         <>
           <div style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-3)" }}>
             <div className="num" style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: BAND_COLOR[stress.band] }}>
               {stress.score.toFixed(0)}<span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", fontWeight: 600 }}>/100</span>
             </div>
-            <div style={{ fontWeight: 700, color: BAND_COLOR[stress.band] }}>{BAND_LABEL[stress.band] ?? stress.band}</div>
-            <div className="sr-hint">{stress.covered} of 5 inputs available</div>
+            <div style={{ fontWeight: 700, color: BAND_COLOR[stress.band] }}>{t(BAND_LABEL[stress.band] ?? stress.band)}</div>
+            <div className="sr-hint">{t(`${stress.covered} of 5 inputs available`)}</div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(104px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
             {stress.drivers.map((d) => (
               <div key={d.key} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{d.label}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{tv(d.label)}</div>
                 <div className="num" style={{ fontSize: "var(--sr-t-base)", fontWeight: 800 }}>{d.raw.toFixed(d.key === "hyOasBps" || d.key === "moveIndex" ? 0 : 2)}</div>
-                <div className="num" style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>stress {d.score.toFixed(0)}</div>
+                <div className="num" style={{ fontSize: "9px", color: "var(--sr-text-3)" }}>{t(`stress ${d.score.toFixed(0)}`)}</div>
               </div>
             ))}
           </div>
 
           <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${BAND_COLOR[stress.band]} 8%, transparent)`, border: `1px solid color-mix(in srgb, ${BAND_COLOR[stress.band]} 22%, transparent)`, fontSize: "var(--sr-t-xs)", lineHeight: 1.6 }}>
-            {stress.reading}
+            {tv(stress.reading)}
           </div>
         </>
       )}
 
-      <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>Your structural edge</div>
+      <div className="section-label" style={{ marginTop: "var(--sr-sp-4)" }}>{t("Your structural edge")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55 }}>
-        The same paper, read backwards. Every constraint that forces a professional to liquidate early is one a
-        private investor simply does not have. This is a thesis, not a calculation — it doesn&rsquo;t pretend to be a number.
-      </div>
+        {t("The same paper, read backwards. Every constraint that forces a professional to liquidate early is one a private investor simply does not have. This is a thesis, not a calculation — it doesn’t pretend to be a number.")}</div>
       <div style={{ display: "grid", gap: "var(--sr-sp-2)" }}>
         {STRUCTURAL_EDGES.map((e) => (
           <div key={e.title} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)" }}>
-            <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 2 }}>{e.title}</div>
-            <div className="sr-hint" style={{ lineHeight: 1.55 }}>{e.detail}</div>
+            <div style={{ fontWeight: 700, fontSize: "var(--sr-t-sm)", marginBottom: 2 }}>{tv(e.title)}</div>
+            <div className="sr-hint" style={{ lineHeight: 1.55 }}>{tv(e.detail)}</div>
           </div>
         ))}
       </div>

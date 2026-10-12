@@ -5,6 +5,8 @@ import { buildNewsRelevance, type NewsHeadline } from "@/lib/aiGrounding";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { decodificar } from "@/lib/form4";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { ticker: string }
 interface RawNews { datetime?: number; headline?: string; source?: string; summary?: string; url?: string; category?: string }
@@ -78,7 +80,7 @@ export default function StockNews({ ticker }: Props) {
       });
       setAnalysis(res.text); setViolations(res.violations);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to analyze news");
+      setError(e instanceof Error ? e.message : t("Failed to analyze news"));
     }
     setAnalyzing(false);
   }
@@ -88,13 +90,12 @@ export default function StockNews({ ticker }: Props) {
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
           <div>
-            <div className="section-label" style={{ margin: 0 }}>News relevance · grounded</div>
+            <div className="section-label" style={{ margin: 0 }}>{t("News relevance · grounded")}</div>
             <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 460, lineHeight: 1.5 }}>
-              Sorts {ticker}&apos;s last two weeks of headlines into <strong style={{ color: "var(--sr-text-2)" }}>market-moving vs noise</strong> with sentiment — using only the headlines, no invented facts.
-            </div>
+              <Trans text={`Sorts ${ticker}'s last two weeks of headlines into <s1>market-moving vs noise</s1> with sentiment — using only the headlines, no invented facts.`} s1={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} /></div>
           </div>
           <button className="btn-primary" onClick={analyze} disabled={analyzing || loadingNews || news.length === 0} style={{ flexShrink: 0, padding: "8px 14px", fontSize: "var(--sr-t-sm)", fontWeight: 600 }}>
-            {analyzing ? "Analyzing…" : "✦ Filter what matters"}
+            {analyzing ? t("Analyzing…") : t("✦ Filter what matters")}
           </button>
         </div>
         {error && <div style={{ marginTop: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{error}</div>}
@@ -110,9 +111,9 @@ export default function StockNews({ ticker }: Props) {
       </div>
 
       <div className="card">
-        <div className="section-label">Recent headlines — {ticker}</div>
+        <div className="section-label">{t(`Recent headlines — ${ticker}`)}</div>
         {loadingNews ? <Sk w="100%" h={240} /> : news.length === 0 ? (
-          <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>No recent news for {ticker}.</div>
+          <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>{t(`No recent news for ${ticker}.`)}</div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column" }}>
             {news.map((n, i) => (

@@ -9,6 +9,7 @@ import { getRating } from "@/lib/scoring";
 import { Sk } from "@/components/ui/Skeleton";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import DataError, { NO_SE_PUDO_CARGAR, NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface SearchResult { symbol: string; name: string; exchangeShortName: string; }
 
@@ -120,18 +121,16 @@ export default function StockPage() {
       {/* Hero search */}
       <div style={{ textAlign: "center", marginBottom: "var(--sr-sp-8)", padding: "var(--sr-sp-6) 0" }}>
         <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "var(--sr-sp-2)" }}>
-          Stock Analysis
-        </h1>
+          {tr("Stock Analysis")}</h1>
         <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-6)" }}>
-          Micro fundamentals + macro regime · NYSE, NASDAQ, BME/IBEX, LSE, Xetra, Euronext and more
-        </p>
+          {tr("Micro fundamentals + macro regime · NYSE, NASDAQ, BME/IBEX, LSE, Xetra, Euronext and more")}</p>
 
         <form onSubmit={handleSearch} style={{ display: "flex", gap: "var(--sr-sp-3)", maxWidth: 520, margin: "0 auto" }}>
           <div style={{ position: "relative", flex: 1 }}>
             <input
               className="sr-input"
               style={{ width: "100%" }}
-              placeholder="Company name or ticker (e.g. Apple, AAPL, SAN.MC)…"
+              placeholder={tr("Company name or ticker (e.g. Apple, AAPL, SAN.MC)…")}
               value={ticker}
               onChange={e => { setTicker(e.target.value.toUpperCase()); setSuggIdx(-1); }}
               onKeyDown={handleKeyDown}
@@ -183,8 +182,7 @@ export default function StockPage() {
             )}
           </div>
           <button type="submit" className="btn-primary" style={{ flexShrink: 0 }}>
-            Analyze
-          </button>
+            {tr("Analyze")}</button>
         </form>
 
         {/* Quick picks */}
@@ -209,8 +207,8 @@ export default function StockPage() {
       {/* Watchlist */}
       <div>
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
-          <div className="section-label">Watchlist</div>
-          <span className="sr-hint">{watchlist.length} tickers</span>
+          <div className="section-label">{tr("Watchlist")}</div>
+          <span className="sr-hint">{tr(`${watchlist.length} tickers`)}</span>
         </div>
         <DataError mensaje={errorWl} onCerrar={() => setErrorWl(null)} />
 
@@ -220,8 +218,7 @@ export default function StockPage() {
           </div>
         ) : watchlist.length === 0 && !errorWl ? (
           <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-8)", color: "var(--sr-text-3)" }}>
-            Your watchlist is empty. Search any ticker above and analyze it to add it here.
-          </div>
+            {tr("Your watchlist is empty. Search any ticker above and analyze it to add it here.")}</div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "var(--sr-sp-3)" }}>
             {watchlist.map(w => {
@@ -250,11 +247,11 @@ export default function StockPage() {
                         {icScore?.toFixed(0) ?? "—"}
                       </div>
                       <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: rating?.color, marginTop: 2 }}>
-                        {rating?.label}
+                        {tv(rating?.label)}
                       </div>
                     </>
                   ) : (
-                    <div className="sr-hint">Not analyzed yet</div>
+                    <div className="sr-hint">{tr("Not analyzed yet")}</div>
                   )}
                 </div>
               );

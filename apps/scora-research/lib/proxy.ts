@@ -4,6 +4,7 @@ import { estimateCostUsd, usageDeAnthropic, type AiUsage } from "./costeIA";
 import { track } from "./analytics";
 import { setQuota } from "./quotaState";
 import { createBatcher } from "./batchQueue";
+import { idiomaActivo } from "./i18n/cliente";
 
 // Vacío = mismo origen. Desde que el backend vive en esta misma app (app/api/*), las
 // llamadas son relativas y no hay que decirle a nadie dónde está: se acabó el CORS, se acabó
@@ -213,13 +214,22 @@ function parseAnthropic(res: AnthropicResponse): AiCompletion {
   return { text, usage: usageDeAnthropic(res.usage), audit: res.scora_audit ?? null };
 }
 
+// La IA contesta en el idioma del usuario. Se añade al FINAL del mensaje: la auditoría localiza
+// el bloque de datos por su posición en el texto, y lo de delante no se mueve. Y las cifras,
+// con punto decimal y tal cual vienen: el filtro de grounding las compara con los datos, y
+// «3,5 %» no encajaría con «3.5».
+export function conIdioma(prompt: string): string {
+  if (idiomaActivo() !== "es") return prompt;
+  return `${prompt}\n\nIMPORTANT: write your entire answer in Spanish (Spain). Keep tickers, numbers and units exactly as they appear in the data (dot as decimal separator).`;
+}
+
 const anthropicProvider: AiProvider = {
   name: "anthropic",
   async complete(model, maxTokens, prompt, auditoria) {
     const res = await authedFetch<AnthropicResponse>("/api/anthropic/messages", {
       method: "POST",
       body: JSON.stringify({
-        model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }],
+        model, max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: conIdioma(prompt) }],
         ...(auditoria ? { scora_audit: auditoria } : {}),
       }),
     }, 60_000);
@@ -235,7 +245,7 @@ const freeLlmProvider: AiProvider = {
     const res = await authedFetch<AnthropicResponse>("/api/llm", {
       method: "POST",
       body: JSON.stringify({
-        max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: prompt }],
+        max_tokens: Math.min(4096, maxTokens), messages: [{ role: "user", content: conIdioma(prompt) }],
         ...(auditoria ? { scora_audit: auditoria } : {}),
       }),
     }, 60_000);

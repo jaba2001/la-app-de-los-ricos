@@ -18,6 +18,8 @@ import {
   type IncomeKind, type IncomePlan,
 } from "@/lib/greeks";
 import { toDatedCloses } from "@/lib/attribution";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props {
   ticker: string;
@@ -62,8 +64,8 @@ export default function OptionsLab({ ticker, price, rate, history, score }: Prop
   if (!model || !(model.spot > 0)) {
     return (
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Options Lab</div>
-        <div className="sr-hint">Not enough price history to rank volatility for {ticker}.</div>
+        <div className="section-label">{t("Options Lab")}</div>
+        <div className="sr-hint">{t(`Not enough price history to rank volatility for ${ticker}.`)}</div>
       </div>
     );
   }
@@ -80,27 +82,26 @@ export default function OptionsLab({ ticker, price, rate, history, score }: Prop
   const table = (title: string, rows: IncomePlan[], gate: ReturnType<typeof incomeGate>) => (
     <div style={{ marginTop: "var(--sr-sp-4)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
-        <div className="section-label" style={{ margin: 0 }}>{title}</div>
+        <div className="section-label" style={{ margin: 0 }}>{tv(title)}</div>
         <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: gateColor(gate.tone) }}>
-          {gate.allowed ? "" : "Blocked · "}{gate.message}
+          {gate.allowed ? "" : t("Blocked · ")}{tv(gate.message)}
         </span>
       </div>
       {!gate.allowed ? (
         <div className="sr-hint">
-          The engine will not lay out a premium ladder for a commitment to buy this name.
-        </div>
+          {t("The engine will not lay out a premium ladder for a commitment to buy this name.")}</div>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table className="sr-table">
             <thead>
               <tr>
-                <th>Strike</th>
-                <th style={{ textAlign: "right" }}>Days</th>
-                <th style={{ textAlign: "right" }}>Premium</th>
-                <th style={{ textAlign: "right" }}>Ann. yield</th>
-                <th style={{ textAlign: "right" }}>Assigned</th>
+                <th>{t("Strike")}</th>
+                <th style={{ textAlign: "right" }}>{t("Days")}</th>
+                <th style={{ textAlign: "right" }}>{t("Premium")}</th>
+                <th style={{ textAlign: "right" }}>{t("Ann. yield")}</th>
+                <th style={{ textAlign: "right" }}>{t("Assigned")}</th>
                 <th style={{ textAlign: "right" }}>POP</th>
-                <th style={{ textAlign: "right" }}>Break-even</th>
+                <th style={{ textAlign: "right" }}>{t("Break-even")}</th>
               </tr>
             </thead>
             <tbody>
@@ -125,30 +126,30 @@ export default function OptionsLab({ ticker, price, rate, history, score }: Prop
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-        <div className="section-label" style={{ margin: 0 }}>Options Lab · income</div>
-        <span className="sr-hint">spot {model.spot.toFixed(2)}</span>
+        <div className="section-label" style={{ margin: 0 }}>{t("Options Lab · income")}</div>
+        <span className="sr-hint">{t(`spot ${model.spot.toFixed(2)}`)}</span>
       </div>
 
       {/* Is volatility rich right now, measured against its own past? */}
       <div className="sr-grid-4">
         <div className="sr-tile">
-          <div className="sr-tile-label">Realized vol ({VOL_WINDOW}d)</div>
+          <div className="sr-tile-label">{t(`Realized vol (${VOL_WINDOW}d)`)}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{pct(model.current * 100)}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Vol rank</div>
+          <div className="sr-tile-label">{t("Vol rank")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: vr && vr.rank >= 60 ? "var(--sr-pos)" : "var(--sr-text)" }}>
             {vr ? pct(vr.rank, 0) : "—"}
           </div>
-          <div className="sr-hint">{vr ? vr.label : "not enough history"}</div>
+          <div className="sr-hint">{vr ? t(vr.label) : t("not enough history")}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Vol percentile</div>
+          <div className="sr-tile-label">{t("Vol percentile")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }}>{vr ? pct(vr.percentile, 0) : "—"}</div>
-          <div className="sr-hint">{vr ? `${vr.sampleSize} obs` : ""}</div>
+          <div className="sr-hint">{vr ? t(`${vr.sampleSize} obs`) : ""}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">1y range</div>
+          <div className="sr-tile-label">{t("1y range")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }}>
             {vr ? `${pct(vr.low * 100, 0)}–${pct(vr.high * 100, 0)}` : "—"}
           </div>
@@ -158,10 +159,10 @@ export default function OptionsLab({ ticker, price, rate, history, score }: Prop
       {vr && (
         <div className="sr-hint" style={{ marginTop: "var(--sr-sp-2)" }}>
           {vr.rank >= 60
-            ? "Volatility is rich versus its own year — premium selling is being paid comparatively well."
+            ? t("Volatility is rich versus its own year — premium selling is being paid comparatively well.")
             : vr.rank <= 25
-              ? "Volatility is cheap versus its own year — you are being paid little to take this risk."
-              : "Volatility is around its own average — no edge from the vol level itself."}
+              ? t("Volatility is cheap versus its own year — you are being paid little to take this risk.")
+              : t("Volatility is around its own average — no edge from the vol level itself.")}
         </div>
       )}
 
@@ -170,12 +171,7 @@ export default function OptionsLab({ ticker, price, rate, history, score }: Prop
 
       {/* The caveats, on screen rather than buried. */}
       <div className="sr-hint" style={{ marginTop: "var(--sr-sp-4)", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
-        Priced off <strong>realized</strong> volatility, not implied — without a paid options chain there is no
-        live IV surface, so these premiums are a model estimate, not quotes. &quot;Assigned&quot; and &quot;POP&quot; are
-        <strong> risk-neutral</strong> probabilities: what the market charges, not what will happen. Yields
-        annualize a single period at 365/days and assume you can keep re-writing at the same terms — you
-        usually cannot.
-      </div>
+        <Trans text={"Priced off <s1>realized</s1> volatility, not implied — without a paid options chain there is no live IV surface, so these premiums are a model estimate, not quotes. \"Assigned\" and \"POP\" are<s2> risk-neutral</s2> probabilities: what the market charges, not what will happen. Yields annualize a single period at 365/days and assume you can keep re-writing at the same terms — you usually cannot."} s1={(c) => <strong>{c}</strong>} s2={(c) => <strong>{c}</strong>} /></div>
     </div>
   );
 }

@@ -13,6 +13,7 @@ import RegimeAlert from "@/components/RegimeAlert";
 import PushToggle from "@/components/PushToggle";
 import MacroBrief from "@/components/macro/MacroBrief";
 import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
+import { t as tr, tv, fechaHora } from "@/lib/i18n/cliente";
 
 const TabSk = () => <Sk w="100%" h={400} />;
 
@@ -105,20 +106,20 @@ export default function MacroPage() {
             className={`subtab ${activeTab === t.id ? "active" : ""}`}
             onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "macro", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
           >
-            {t.label}
+            {tv(t.label)}
           </button>
         ))}
         {hasLoaded && (
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", flexShrink: 0 }}>
             {macro?.snapshot_date && (
               <span className="sr-hint">
-                Snapshot: {macro.snapshot_date}
+                {tr(`Snapshot: ${macro.snapshot_date}`)}
               </span>
             )}
             <button
               onClick={loadData}
               disabled={loading}
-              title="Refresh macro data"
+              title={tr("Refresh macro data")}
               style={{
                 padding: "4px 10px", fontSize: "var(--sr-t-xs)", fontWeight: 600,
                 borderRadius: "var(--sr-radius-pill)", cursor: loading ? "default" : "pointer",
@@ -126,7 +127,7 @@ export default function MacroPage() {
                 color: loading ? "var(--sr-text-3)" : "var(--sr-text-2)",
               }}
             >
-              {loading ? "…" : "↻ Refresh"}
+              {loading ? "…" : tr("↻ Refresh")}
             </button>
           </div>
         )}
@@ -156,12 +157,9 @@ export default function MacroPage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 480, textAlign: "center", gap: "var(--sr-sp-5)" }}>
             <div>
               <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: "var(--sr-sp-2)" }}>
-                Macro Dashboard
-              </div>
+                {tr("Macro Dashboard")}</div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", maxWidth: 440, lineHeight: 1.7 }}>
-                Composite scores, FRED indicators, market data and AI synthesis.
-                Click below to fetch the latest snapshot.
-              </div>
+                {tr("Composite scores, FRED indicators, market data and AI synthesis. Click below to fetch the latest snapshot.")}</div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-1)", alignItems: "center" }}>
               {["Liquidity · Credit · Recession · Geopolitical · Housing composites", "43+ FRED series across 8 indicator categories", "Live ETF & crypto market quotes", "News sentiment scoring · AI OPLA synthesis"].map(line => (
@@ -177,12 +175,11 @@ export default function MacroPage() {
               disabled={loading}
               style={{ padding: "12px 36px", fontSize: "var(--sr-t-base)", fontWeight: 700, marginTop: "var(--sr-sp-2)" }}
             >
-              {loading ? "Loading…" : "Load Macro Data"}
+              {loading ? tr("Loading…") : tr("Load Macro Data")}
             </button>
             {loading && (
               <div className="sr-hint">
-                Fetching the latest macro snapshot…
-              </div>
+                {tr("Fetching the latest macro snapshot…")}</div>
             )}
           </div>
         ) : (
@@ -220,8 +217,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
 
   if (!macro) return (
     <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-5)" }}>
-      No data — load macro first.
-    </div>
+      {tr("No data — load macro first.")}</div>
   );
 
   const entries = (Object.entries(macro) as [string, unknown][])
@@ -249,7 +245,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
           type="text"
           value={q}
           onChange={e => setQ(e.target.value)}
-          placeholder="Filter field…"
+          placeholder={tr("Filter field…")}
           style={{
             flex: 1, maxWidth: 280,
             padding: "var(--sr-sp-2) var(--sr-sp-3)",
@@ -261,11 +257,10 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
           onBlur={e => (e.target.style.borderColor = "var(--sr-border)")}
         />
         <span className="sr-hint">
-          {entries.length} populated · {nullEntries.length} empty
-        </span>
+          {tr(`${entries.length} populated · ${nullEntries.length} empty`)}</span>
         {macro.updated_at && (
           <span className="sr-hint">
-            Cron: {new Date(macro.updated_at as string).toLocaleString("en-US")}
+            {tr(`Cron: ${fechaHora(macro.updated_at as string)}`)}
           </span>
         )}
       </div>
@@ -274,8 +269,8 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
           <thead>
             <tr style={{ background: "var(--sr-surface-2)" }}>
-              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "left", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase", width: "50%" }}>Field</th>
-              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase" }}>Value</th>
+              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "left", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase", width: "50%" }}>{tr("Field")}</th>
+              <th style={{ padding: "var(--sr-sp-2) var(--sr-sp-4)", textAlign: "right", color: "var(--sr-text-3)", fontWeight: 600, fontSize: "var(--sr-t-xs)", letterSpacing: "0.06em", textTransform: "uppercase" }}>{tr("Value")}</th>
             </tr>
           </thead>
           <tbody>
@@ -298,8 +293,7 @@ function MacroRawData({ macro, loading }: { macro: MacroState | null; loading: b
       {nullEntries.length > 0 && (
         <details style={{ background: "var(--sr-surface)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius-lg)", overflow: "hidden" }}>
           <summary style={{ padding: "var(--sr-sp-3) var(--sr-sp-4)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", cursor: "pointer" }}>
-            {nullEntries.length} fields pending (empty in macro_state)
-          </summary>
+            {tr(`${nullEntries.length} fields pending (empty in macro_state)`)}</summary>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--sr-t-sm)" }}>
             <tbody>
               {nullEntries.map(([k]) => (

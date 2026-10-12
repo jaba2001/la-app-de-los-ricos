@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { computeRiskOn } from "@/lib/allocation";
 import { regimeConfirmation } from "@/lib/regimeLoop";
+import { t, tv } from "@/lib/i18n/cliente";
 
 // Retention / alerts (B6) — a conditional, actionable notice, NOT an always-on panel.
 // It surfaces only when the top-down↔bottom-up loop diverges (the early warning) or when the
@@ -33,12 +34,12 @@ export default function RegimeAlert({ macro }: { macro: MacroState | null }) {
       <span style={{ fontSize: 18, lineHeight: 1.2 }}>⚠</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>{headline}</span>
+          <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }}>{tv(headline)}</span>
           <span style={{ fontSize: "9px", fontWeight: 700, color, padding: "1px 6px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${color} 14%, transparent)` }}>REGIME ALERT</span>
         </div>
-        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginTop: 3, lineHeight: 1.5 }}>{detail}</div>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", marginTop: 3, lineHeight: 1.5 }}>{tv(detail)}</div>
       </div>
-      <button onClick={() => setDismissed(true)} aria-label="Dismiss" style={{ background: "none", border: "none", color: "var(--sr-text-3)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 2 }}>×</button>
+      <button onClick={() => setDismissed(true)} aria-label={t("Dismiss")} style={{ background: "none", border: "none", color: "var(--sr-text-3)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 2 }}>×</button>
     </div>
   );
 }

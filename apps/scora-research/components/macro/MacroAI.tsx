@@ -8,6 +8,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { computeICHealthScore } from "@/lib/scoring";
 import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -50,9 +51,9 @@ function AlertSubscription() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", marginTop: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: "var(--sr-text-2)" }}>Email me macro alerts</div>
+        <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: "var(--sr-text-2)" }}>{tr("Email me macro alerts")}</div>
         <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>
-          Daily check — credit blowout, QT acceleration, credit divergence. To {session.user.email}
+          {tr(`Daily check — credit blowout, QT acceleration, credit divergence. To ${session.user.email}`)}
         </div>
       </div>
       <button
@@ -263,7 +264,7 @@ export default function MacroAI({ macro, loading }: Props) {
       setSynthesis(res.text); setSynthViol(res.violations);
       setSaved(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to generate synthesis");
+      setError(e instanceof Error ? e.message : tr("Failed to generate synthesis"));
     }
     setGenerating(false);
   }
@@ -280,7 +281,7 @@ export default function MacroAI({ macro, loading }: Props) {
       meta: { recession_prob: macro.recession_prob, credit_stress: macro.credit_stress },
     });
     if (!error) setSaved(true);
-    else setError(`Save failed: ${error.message}`);
+    else setError(tr(`Save failed: ${error.message}`));
     setSaving(false);
   }
 
@@ -339,8 +340,8 @@ export default function MacroAI({ macro, loading }: Props) {
           <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
             <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
               <div>
-                <div className="section-label">AI Macro Synthesis — OPLA Framework</div>
-                <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Claude Haiku · Druckenmiller Hierarchy · 8-section structured analysis</div>
+                <div className="section-label">{tr("AI Macro Synthesis — OPLA Framework")}</div>
+                <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tr("Claude Haiku · Druckenmiller Hierarchy · 8-section structured analysis")}</div>
               </div>
               <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap", justifyContent: "flex-end" }}>
                 {synthesis && (
@@ -355,7 +356,7 @@ export default function MacroAI({ macro, loading }: Props) {
                         color: "var(--sr-text-2)",
                       }}
                     >
-                      {exporting ? "Exporting…" : "⬇ Export HTML"}
+                      {exporting ? tr("Exporting…") : tr("⬇ Export HTML")}
                     </button>
                     <button
                       onClick={saveSynthesis}
@@ -368,7 +369,7 @@ export default function MacroAI({ macro, loading }: Props) {
                         color: saved ? "var(--sr-pos)" : "var(--sr-text-2)",
                       }}
                     >
-                      {saving ? "Saving…" : saved ? "✓ Saved" : "↓ Save Brief"}
+                      {saving ? tr("Saving…") : saved ? tr("✓ Saved") : tr("↓ Save Brief")}
                     </button>
                   </>
                 )}
@@ -378,7 +379,7 @@ export default function MacroAI({ macro, loading }: Props) {
                   disabled={generating || loading || !macro}
                   style={{ flexShrink: 0 }}
                 >
-                  {generating ? "Generating…" : synthesis ? "Regenerate" : "✦ Generate Analysis"}
+                  {generating ? tr("Generating…") : synthesis ? tr("Regenerate") : tr("✦ Generate Analysis")}
                 </button>
               </div>
             </div>
@@ -412,22 +413,20 @@ export default function MacroAI({ macro, loading }: Props) {
               <div style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
                 <div style={{ fontSize: "var(--sr-t-xl)", marginBottom: "var(--sr-sp-3)" }}>✦</div>
                 <div style={{ fontSize: "var(--sr-t-sm)", marginBottom: "var(--sr-sp-2)" }}>
-                  8-section OPLA analysis: Regime · Master Signal · Scenarios (Base/Bull/Bear) · Tripwires · Positioning · Dalio Debt Cycle · Historical Analog · 12M Outlook
-                </div>
-                <div className="sr-hint">Powered by Druckenmiller Signal Hierarchy + Howell Liquidity Model</div>
+                  {tr("8-section OPLA analysis: Regime · Master Signal · Scenarios (Base/Bull/Bear) · Tripwires · Positioning · Dalio Debt Cycle · Historical Analog · 12M Outlook")}</div>
+                <div className="sr-hint">{tr("Powered by Druckenmiller Signal Hierarchy + Howell Liquidity Model")}</div>
               </div>
             )}
           </div>
 
           {/* Historical snapshots */}
           <div className="card">
-            <div className="section-label">Historical Macro Snapshot</div>
+            <div className="section-label">{tr("Historical Macro Snapshot")}</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", padding: "var(--sr-sp-4) 0" }}>
-              Historical snapshot data is stored in the macro_state table. IC DataLayer writes snapshots on each refresh cycle.
-            </div>
+              {tr("Historical snapshot data is stored in the macro_state table. IC DataLayer writes snapshots on each refresh cycle.")}</div>
             <table className="sr-table">
               <thead><tr>
-                <th>Date</th><th>IC Score</th><th>LCC</th><th>RPC</th><th>CSC</th><th>Regime</th>
+                <th>{tr("Date")}</th><th>{tr("IC Score")}</th><th>LCC</th><th>RPC</th><th>CSC</th><th>{tr("Regime")}</th>
               </tr></thead>
               <tbody>
                 {loading ? (
@@ -452,7 +451,7 @@ export default function MacroAI({ macro, loading }: Props) {
           <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
             <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
               <div>
-                <div className="section-label">Tripwires</div>
+                <div className="section-label">{tr("Tripwires")}</div>
               </div>
               <div style={{ display: "flex", gap: "var(--sr-sp-2)", alignItems: "center" }}>
                 {activeTripwires.length > 0 && (
@@ -467,7 +466,7 @@ export default function MacroAI({ macro, loading }: Props) {
                       color: alertsSaved ? "var(--sr-pos)" : "var(--sr-text-3)",
                     }}
                   >
-                    {alertsSaved ? "✓ Saved" : "↓ Save to Log"}
+                    {alertsSaved ? tr("✓ Saved") : tr("↓ Save to Log")}
                   </button>
                 )}
               <span style={{
@@ -502,7 +501,7 @@ export default function MacroAI({ macro, loading }: Props) {
                     fontSize: "var(--sr-t-sm)", color: active ? "var(--sr-text)" : "var(--sr-text-3)",
                     fontWeight: active ? 600 : 400, flex: 1,
                   }}>
-                    {t.label}
+                    {tv(t.label)}
                   </span>
                   {val != null && (
                     <span style={{ fontSize: "var(--sr-t-xs)", color: active ? "var(--sr-neg)" : "var(--sr-text-3)" }} className="num">
@@ -517,7 +516,7 @@ export default function MacroAI({ macro, loading }: Props) {
 
           {/* IC Positioning */}
           <div className="card">
-            <div className="section-label">IC Positioning</div>
+            <div className="section-label">{tr("IC Positioning")}</div>
             {loading ? <Sk w="100%" h={80} /> : (
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
                 {[
@@ -527,13 +526,12 @@ export default function MacroAI({ macro, loading }: Props) {
                   { label: "GLOBAL LIQ.",    val: macro?.global_liquidity_dir },
                 ].map(({ label, val }) => (
                   <div key={label} style={{ padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
-                    <div className="sr-tile-label">{label}</div>
+                    <div className="sr-tile-label">{tv(label)}</div>
                     <div style={{ fontWeight: 700, textTransform: "capitalize" }}>{val ?? "—"}</div>
                   </div>
                 ))}
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.6 }}>
-                  Signals computed daily by the IC DataLayer engine and stored in macro_state.
-                </div>
+                  {tr("Signals computed daily by the IC DataLayer engine and stored in macro_state.")}</div>
               </div>
             )}
           </div>

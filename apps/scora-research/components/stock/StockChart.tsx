@@ -11,6 +11,7 @@ import {
   computeSqueeze, computeADX, computeVolumeProfile, computeTLResult, detectDivergences,
   type OHLCV,
 } from "@/lib/technicalIndicators";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props {
   data: StockData | null; loading: boolean; ticker: string;
@@ -43,7 +44,7 @@ function ToggleBtn({ label, active, onClick }: { label: string; active: boolean;
       fontWeight: 600, border: "1px solid var(--sr-border)", cursor: "pointer",
       background: active ? "var(--sr-surface-2)" : "transparent",
       color: active ? "var(--sr-text)" : "var(--sr-text-3)",
-    }}>{label}</button>
+    }}>{tv(label)}</button>
   );
 }
 
@@ -151,7 +152,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
           { label: "52W Low",          val: quote?.yearLow  != null ? `$${Number(quote.yearLow).toFixed(2)}`  : "—", color: "var(--sr-text)" },
         ].map(({ label, val, color }) => (
           <div key={label} className="card-sm">
-            <div className="sr-tile-label">{label}</div>
+            <div className="sr-tile-label">{tv(label)}</div>
             <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
           </div>
         ))}
@@ -174,14 +175,14 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
           </div>
           <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexWrap: "wrap" }}>
             <ToggleBtn label="EMA 10/55"  active={showEMA}        onClick={() => setShowEMA(!showEMA)} />
-            <ToggleBtn label="Volume"      active={showVolume}     onClick={() => setShowVolume(!showVolume)} />
-            <ToggleBtn label="VP Levels"   active={showVP}         onClick={() => setShowVP(!showVP)} />
-            {dgs2 != null && <ToggleBtn label={`Fed ~${dgs2.toFixed(1)}%`} active={false} onClick={() => {}} />}
+            <ToggleBtn label={t("Volume")}      active={showVolume}     onClick={() => setShowVolume(!showVolume)} />
+            <ToggleBtn label={t("VP Levels")}   active={showVP}         onClick={() => setShowVP(!showVP)} />
+            {dgs2 != null && <ToggleBtn label={t(`Fed ~${dgs2.toFixed(1)}%`)} active={false} onClick={() => {}} />}
             <div style={{ width: 1, background: "var(--sr-border)", margin: "0 2px" }} />
-            <ToggleBtn label="Squeeze"     active={showSqueeze}   onClick={() => setShowSqueeze(!showSqueeze)} />
+            <ToggleBtn label={t("Squeeze")}     active={showSqueeze}   onClick={() => setShowSqueeze(!showSqueeze)} />
             <ToggleBtn label="ADX"         active={showADX}       onClick={() => setShowADX(!showADX)} />
-            <ToggleBtn label="Divergence"  active={showDivergence} onClick={() => setShowDivergence(!showDivergence)} />
-            <ToggleBtn label="Zoom Range"  active={showBrush}      onClick={() => setShowBrush(!showBrush)} />
+            <ToggleBtn label={t("Divergence")}  active={showDivergence} onClick={() => setShowDivergence(!showDivergence)} />
+            <ToggleBtn label={t("Zoom Range")}  active={showBrush}      onClick={() => setShowBrush(!showBrush)} />
           </div>
         </div>
 
@@ -257,9 +258,9 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "6px 0 2px", borderTop: "1px solid var(--sr-border)" }}>
                   <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 700, width: 54 }}>SQUEEZE</span>
-                  <span style={{ fontSize: "10px", color: "var(--sr-pos)"  }}>▬ Pos momentum</span>
-                  <span style={{ fontSize: "10px", color: "var(--sr-neg)"  }}>▬ Neg momentum</span>
-                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", opacity: 0.5 }}>dim = squeeze building</span>
+                  <span style={{ fontSize: "10px", color: "var(--sr-pos)"  }}>{t("▬ Pos momentum")}</span>
+                  <span style={{ fontSize: "10px", color: "var(--sr-neg)"  }}>{t("▬ Neg momentum")}</span>
+                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", opacity: 0.5 }}>{t("dim = squeeze building")}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={75}>
                   <BarChart data={chartData} margin={{ top: 2, right: 10, left: 0, bottom: 2 }} syncId="sc">
@@ -300,7 +301,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   <span style={{ fontSize: "10px", color: "#E2E8F0" }}>— ADX</span>
                   <span style={{ fontSize: "10px", color: "var(--sr-pos)" }}>— +DI</span>
                   <span style={{ fontSize: "10px", color: "var(--sr-neg)" }}>— −DI</span>
-                  <span style={{ fontSize: "10px", color: "var(--sr-warn)", opacity: 0.8 }}>--- 23 threshold</span>
+                  <span style={{ fontSize: "10px", color: "var(--sr-warn)", opacity: 0.8 }}>{t("--- 23 threshold")}</span>
                 </div>
                 <ResponsiveContainer width="100%" height={75}>
                   <LineChart data={chartData} margin={{ top: 2, right: 10, left: 0, bottom: 2 }} syncId="sc">
@@ -320,7 +321,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
 
         {/* Legend */}
         <div style={{ display: "flex", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-2)", flexWrap: "wrap" }}>
-          <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)" }}>— Price</span>
+          <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-amber)" }}>{t("— Price")}</span>
           {showEMA && (
             <>
               <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-pos)" }}>— EMA 10</span>
@@ -339,7 +340,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
       {showVP && vp && vpChartData.length > 0 && (
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-            <div className="section-label">Volume Profile — {period}</div>
+            <div className="section-label">{t(`Volume Profile — ${period}`)}</div>
             <div style={{ display: "flex", gap: "var(--sr-sp-4)" }}>
               {[
                 { label: "POC",     val: `$${vp.pocMid.toFixed(2)}`,  color: "var(--sr-amber)" },
@@ -349,7 +350,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   color: lastPrice > vp.pocMid ? "var(--sr-pos)" : "var(--sr-neg)" },
               ].map(({ label, val, color }) => (
                 <div key={label} style={{ textAlign: "center" }}>
-                  <div className="sr-hint">{label}</div>
+                  <div className="sr-hint">{tv(label)}</div>
                   <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
@@ -381,7 +382,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
               ].map(({ color, label }) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <div style={{ width: 10, height: 10, borderRadius: 2, background: color, flexShrink: 0 }} />
-                  <span style={{ color: "var(--sr-text-3)" }}>{label}</span>
+                  <span style={{ color: "var(--sr-text-3)" }}>{tv(label)}</span>
                 </div>
               ))}
             </div>
@@ -394,10 +395,9 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
         <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
             <div>
-              <div className="section-label">TL Confluence™ Strategy</div>
+              <div className="section-label">{t("TL Confluence™ Strategy")}</div>
               <div className="sr-hint">
-                EMA Alignment · ADX Strength · Squeeze Momentum · Volume Profile
-              </div>
+                {t("EMA Alignment · ADX Strength · Squeeze Momentum · Volume Profile")}</div>
             </div>
             {tlResult && (
               <div style={{
@@ -412,8 +412,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
 
           {!tlResult ? (
             <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>
-              Enable Squeeze + ADX + VP for full TL Confluence signal computation.
-            </div>
+              {t("Enable Squeeze + ADX + VP for full TL Confluence signal computation.")}</div>
           ) : (
             <>
               {/* 4 signal lights */}
@@ -460,10 +459,10 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                         boxShadow: active ? "0 0 4px var(--sr-pos)" : "none",
                       }} />
                       <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: active ? "var(--sr-text)" : "var(--sr-text-3)" }}>
-                        {label}
+                        {tv(label)}
                       </span>
                     </div>
-                    <div className="sr-hint">{detail}</div>
+                    <div className="sr-hint">{tv(detail)}</div>
                   </div>
                 ))}
               </div>
@@ -478,7 +477,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   { label: "SHORT", val: `${tlResult.shortSignals}/4`,          color: "var(--sr-neg)" },
                 ].map(({ label, val, color }) => (
                   <div key={label}>
-                    <div className="sr-hint">{label}</div>
+                    <div className="sr-hint">{tv(label)}</div>
                     <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color }} className="num">{val}</div>
                   </div>
                 ))}
@@ -493,10 +492,10 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   { label: "Short TP1",  val: `$${tlResult.tp1Short.toFixed(2)}`,  sub: `−${(tlResult.riskShort*2).toFixed(1)}%`,    c: "var(--sr-pos)" },
                 ].map(({ label, val, sub, c }) => (
                   <div key={label} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius-sm)" }}>
-                    <div className="sr-hint">{label}</div>
+                    <div className="sr-hint">{tv(label)}</div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">{val}</span>
-                      <span style={{ fontSize: "10px", color: c }} className="num">{sub}</span>
+                      <span style={{ fontSize: "10px", color: c }} className="num">{tv(sub)}</span>
                     </div>
                   </div>
                 ))}
@@ -512,8 +511,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                 <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: tlResult.gateColor }}>{tlResult.gate}</div>
                 {icScore == null && (
                   <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
-                    Pass icScore prop to enable full IC gate validation.
-                  </div>
+                    {t("Pass icScore prop to enable full IC gate validation.")}</div>
                 )}
               </div>
             </>
@@ -523,7 +521,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
 
       {/* ── Sector Context ───────────────────────────────────────────────────── */}
       <div className="card">
-        <div className="section-label">Sector Context</div>
+        <div className="section-label">{t("Sector Context")}</div>
         <div className="sr-grid-3">
           {[
             { label: "Sector",   val: profile?.sector   as string ?? "—" },
@@ -531,7 +529,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
             { label: "Beta",     val: (() => { const b = data?.technicals?.beta ?? (data?.metrics?.beta as number ?? null); return b != null ? Number(b).toFixed(2) : "—"; })() },
           ].map(({ label, val }) => (
             <div key={label} className="sr-tile">
-              <div className="sr-tile-label">{label}</div>
+              <div className="sr-tile-label">{tv(label)}</div>
               <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 600 }}>{val}</div>
             </div>
           ))}

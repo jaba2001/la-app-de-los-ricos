@@ -75,6 +75,10 @@ jobs:
         run: node --experimental-strip-types --no-warnings scripts/picks.test.mjs
       - name: Percentiles sector-relativos
         run: node --experimental-strip-types --no-warnings scripts/percentile.test.mjs
+      # Idiomas: el motor de traducción y que cada texto visible tenga su versión en español.
+      # Un texto nuevo sin traducir rompe aquí, en vez de salir en inglés en mitad de la app.
+      - name: Idiomas (inglés / español)
+        run: node --experimental-strip-types --no-warnings scripts/i18n.test.mjs
       - name: Roadmap (F3+F4+F5)
         run: node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs
       # ── LA CAPA DE DATOS ──────────────────────────────────────────────────────────────

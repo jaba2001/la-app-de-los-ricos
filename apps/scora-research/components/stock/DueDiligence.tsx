@@ -8,6 +8,8 @@ import { checkAdvice } from "@/lib/grounding";
 import { kelly, MAX_POSITION } from "@/lib/kelly";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { data: StockData | null; macro: MacroState | null; scores: Scores | null; icScore: number | null; loading: boolean; ticker: string; }
 
@@ -81,18 +83,18 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
   }
 
   if (loading) return <Sk w="100%" h={500} />;
-  if (!dataBlock) return <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>Analyze {ticker} first to run due diligence.</div>;
+  if (!dataBlock) return <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>{t(`Analyze ${ticker} first to run due diligence.`)}</div>;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }} className="animate-fade-in">
       <div>
-        <h2 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, margin: 0 }}>Due Diligence</h2>
-        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>A guided workflow of grounded AI modules. Golden rule: cite, verify, challenge — every figure is checked against the data.</div>
+        <h2 style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, margin: 0 }}>{t("Due Diligence")}</h2>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("A guided workflow of grounded AI modules. Golden rule: cite, verify, challenge — every figure is checked against the data.")}</div>
       </div>
 
       {/* Golden-rule / governance banner */}
       <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-amber) 8%, var(--sr-surface-2))", border: "1px solid color-mix(in srgb, var(--sr-amber) 24%, transparent)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.5 }}>
-        Every module runs under a <strong style={{ color: "var(--sr-text)" }}>code-enforced grounding gate</strong>: the output&apos;s figures are checked against the data block, the run is logged to your audit trail, and any unverified number or advice phrasing is flagged below.{docs.length > 0 && <span style={{ color: "var(--sr-pos)" }}> Filings loaded: {[...new Set(docs.map((d) => d.section))].join(", ")}.</span>}
+        <Trans text={"Every module runs under a <s1>code-enforced grounding gate</s1>: the output's figures are checked against the data block, the run is logged to your audit trail, and any unverified number or advice phrasing is flagged below."} s1={(c) => <strong style={{ color: "var(--sr-text)" }}>{c}</strong>} />{docs.length > 0 && <span style={{ color: "var(--sr-pos)" }}> {" "}{t(`Filings loaded: ${[...new Set(docs.map((d) => d.section))].join(", ")}.`)}</span>}
       </div>
 
       {/* Module cards */}
@@ -103,10 +105,10 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
           <div key={kind} className="card">
             <div className="sr-flex-between" style={{ flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
               <div>
-                <div className="section-label" style={{ margin: 0 }}>{meta.label}</div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>{meta.blurb}</div>
+                <div className="section-label" style={{ margin: 0 }}>{tv(meta.label)}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>{tv(meta.blurb)}</div>
               </div>
-              <button className="btn-primary" onClick={() => run(kind)} disabled={st.loading} style={{ flexShrink: 0 }}>{st.loading ? "Running…" : st.text ? "Re-run" : "Run"}</button>
+              <button className="btn-primary" onClick={() => run(kind)} disabled={st.loading} style={{ flexShrink: 0 }}>{st.loading ? t("Running…") : st.text ? t("Re-run") : t("Run")}</button>
             </div>
             {st.error && <div style={{ marginTop: 8, padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{st.error}</div>}
             {st.loading && <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>{[85, 70, 80].map((w, i) => <Sk key={i} w={`${w}%`} h={12} />)}</div>}
@@ -115,10 +117,10 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
                 {/* governance badge */}
                 <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
                   <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${st.violations.length === 0 ? "var(--sr-pos)" : "var(--sr-warn)"} 14%, transparent)`, color: st.violations.length === 0 ? "var(--sr-pos)" : "var(--sr-warn)" }}>
-                    {st.violations.length === 0 ? "✓ grounded" : `⚠ ${st.violations.length} unverified figure${st.violations.length > 1 ? "s" : ""}: ${st.violations.join(", ")}`}
+                    {st.violations.length === 0 ? t("✓ grounded") : t(`⚠ ${st.violations.length} unverified figure${st.violations.length > 1 ? "s" : ""}: ${st.violations.join(", ")}`)}
                   </span>
-                  {st.advice.length > 0 && <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-neg) 14%, transparent)", color: "var(--sr-neg)" }}>⚠ advice phrasing</span>}
-                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", alignSelf: "center" }}>logged to audit trail</span>
+                  {st.advice.length > 0 && <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-neg) 14%, transparent)", color: "var(--sr-neg)" }}>{t("⚠ advice phrasing")}</span>}
+                  <span style={{ fontSize: "10px", color: "var(--sr-text-3)", alignSelf: "center" }}>{t("logged to audit trail")}</span>
                 </div>
                 <div style={{ fontSize: "var(--sr-t-xs)", lineHeight: 1.65, color: "var(--sr-text-2)" }}>{renderMd(st.text)}</div>
               </div>
@@ -129,13 +131,13 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
 
       {/* Kelly position sizing (deterministic) */}
       <div className="card">
-        <div className="section-label">Position sizing · fractional Kelly</div>
-        <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>Your edge estimate → optimal fraction of capital. Kelly is aggressive; half-Kelly is the practical choice. A calculator, not advice.</div>
+        <div className="section-label">{t("Position sizing · fractional Kelly")}</div>
+        <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>{t("Your edge estimate → optimal fraction of capital. Kelly is aggressive; half-Kelly is the practical choice. A calculator, not advice.")}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
           {([["Win probability", winProb, setWinProb, 10, 90, "%"], ["Upside if right", upside, setUpside, 5, 100, "%"], ["Downside if wrong", downside, setDownside, 5, 80, "%"]] as const).map(([label, val, set, min, max, unit]) => (
             <div key={label}>
               <div className="sr-flex-between" style={{ fontSize: "var(--sr-t-xs)", marginBottom: 3 }}>
-                <span style={{ color: "var(--sr-text-2)" }}>{label}</span><span className="num" style={{ color: "var(--sr-text)" }}>{val}{unit}</span>
+                <span style={{ color: "var(--sr-text-2)" }}>{tv(label)}</span><span className="num" style={{ color: "var(--sr-text)" }}>{val}{unit}</span>
               </div>
               <input type="range" min={min} max={max} step={1} value={val} onChange={(e) => (set as (n: number) => void)(Number(e.target.value))} style={{ width: "100%", accentColor: "var(--sr-amber)" }} />
             </div>
@@ -156,7 +158,7 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
             ))}
           </div>
         )}
-        {k && !k.favorable && <div style={{ fontSize: "10px", color: "var(--sr-neg)", marginTop: 6 }}>Negative edge at these inputs — Kelly says don&apos;t size a position. Max cap is {(MAX_POSITION * 100).toFixed(0)}%.</div>}
+        {k && !k.favorable && <div style={{ fontSize: "10px", color: "var(--sr-neg)", marginTop: 6 }}>{t(`Negative edge at these inputs — Kelly says don't size a position. Max cap is ${(MAX_POSITION * 100).toFixed(0)}%.`)}</div>}
       </div>
     </div>
   );

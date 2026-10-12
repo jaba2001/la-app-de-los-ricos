@@ -107,9 +107,9 @@ export function dailySummaryLine(rep: DailyReport): string {
 }
 
 /** Formato largo y estable de la fecha, sin depender del locale del servidor. */
-export function formatDayLong(iso: string): string {
+export function formatDayLong(iso: string, locale = "en-US"): string {
   if (!isIsoDay(iso)) return iso;
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(locale, {
     weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC",
   });
 }

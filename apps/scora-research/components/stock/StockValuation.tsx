@@ -5,6 +5,7 @@ import type { MacroState, ReverseDCFSnapshot } from "@/lib/types";
 import { computeWACC, ERP_BASE } from "@/lib/reverseDcf";
 import { Sk } from "@/components/ui/Skeleton";
 import { Pill } from "@/components/ui/Pill";
+import { t, tv } from "@/lib/i18n/cliente";
 
 interface Props { data: StockData | null; macro: MacroState | null; loading: boolean; ticker: string; }
 
@@ -208,7 +209,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
     return (
       <div style={{ marginBottom: "var(--sr-sp-3)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-          <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
+          <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(label)}</span>
           <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: "var(--sr-amber)" }} className="num">{value.toFixed(step < 1 ? 1 : 0)}{suffix}</span>
         </div>
         <input
@@ -231,34 +232,31 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
             onClick={() => setActiveScenario(s.key)}
             style={activeScenario === s.key ? { borderColor: s.color, color: s.color } : undefined}
           >
-            {s.label}
+            {tv(s.label)}
           </button>
         ))}
         <button
           onClick={resetActiveToAuto}
           style={{ marginLeft: "auto", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}
         >
-          Reset to auto
-        </button>
+          {t("Reset to auto")}</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
         {/* DCF Model */}
         <div className="card">
           <div className="section-label">
-            Interactive DCF Model — {allScenarios.find(s => s.key === activeScenario)?.label}
+            {t(`Interactive DCF Model — ${allScenarios.find(s => s.key === activeScenario)?.label}`)}
           </div>
           {loading ? <Sk w="100%" h={300} /> : (
             <>
-              <SliderRow label="Year 1-5 Growth" value={active.gr1} min={-10} max={60} onChange={v => updateActive({ gr1: v })} suffix="%" />
-              <SliderRow label="Year 6-10 Growth" value={active.gr2} min={-5} max={30} onChange={v => updateActive({ gr2: v })} suffix="%" />
-              <SliderRow label="FCF Margin" value={active.fcfMargin} min={0} max={50} onChange={v => updateActive({ fcfMargin: v })} suffix="%" />
-              <SliderRow label="WACC / Discount" value={active.wacc} min={4} max={20} step={0.5} onChange={v => updateActive({ wacc: v })} suffix="%" />
-              <SliderRow label="Terminal Growth" value={active.termGr} min={0} max={6} step={0.5} onChange={v => updateActive({ termGr: v })} suffix="%" />
+              <SliderRow label={t("Year 1-5 Growth")} value={active.gr1} min={-10} max={60} onChange={v => updateActive({ gr1: v })} suffix="%" />
+              <SliderRow label={t("Year 6-10 Growth")} value={active.gr2} min={-5} max={30} onChange={v => updateActive({ gr2: v })} suffix="%" />
+              <SliderRow label={t("FCF Margin")} value={active.fcfMargin} min={0} max={50} onChange={v => updateActive({ fcfMargin: v })} suffix="%" />
+              <SliderRow label={t("WACC / Discount")} value={active.wacc} min={4} max={20} step={0.5} onChange={v => updateActive({ wacc: v })} suffix="%" />
+              <SliderRow label={t("Terminal Growth")} value={active.termGr} min={0} max={6} step={0.5} onChange={v => updateActive({ termGr: v })} suffix="%" />
               <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: "var(--sr-sp-2)", lineHeight: 1.5 }}>
-                FCF margin model — same methodology as Reverse DCF. WACC auto-seeded from rf {rfRate.toFixed(2)}% + β {beta.toFixed(2)} × ERP {ERP_BASE.toFixed(1)}%{macro?.credit_stress != null ? ` (+ credit stress)` : ""}.
-                TTM revenue growth {ttmGrowth.toFixed(1)}%, TTM FCF margin {ttmFcfMargin.toFixed(1)}%.
-              </div>
+                {t(`FCF margin model — same methodology as Reverse DCF. WACC auto-seeded from rf ${rfRate.toFixed(2)}% + β ${beta.toFixed(2)} × ERP ${ERP_BASE.toFixed(1)}%`)}{macro?.credit_stress != null ? t(" (+ credit stress)") : ""}{t(`. TTM revenue growth ${ttmGrowth.toFixed(1)}%, TTM FCF margin ${ttmFcfMargin.toFixed(1)}%.`)}</div>
             </>
           )}
         </div>
@@ -266,7 +264,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
         {/* Valuation Result */}
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-4)" }}>
           <div className="card" style={{ flex: 1 }}>
-            <div className="section-label">Intrinsic Value</div>
+            <div className="section-label">{t("Intrinsic Value")}</div>
             {loading ? <Sk w={120} h={64} /> : (
               <div>
                 <div style={{ fontSize: "var(--sr-t-hero)", fontWeight: 700, color: intrinsicColor, letterSpacing: "-0.03em" }} className="num">
@@ -274,7 +272,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginTop: 8 }}>
                   <span style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-2)" }} className="num">
-                    Current: ${currentPrice.toFixed(2)}
+                    {t(`Current: $${currentPrice.toFixed(2)}`)}
                   </span>
                   {upside != null && (
                     <Pill
@@ -283,22 +281,22 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                     />
                   )}
                   {mos != null && (
-                    <Pill label={mos.label} color={mos.color} />
+                    <Pill label={tv(mos.label)} color={mos.color} />
                   )}
                 </div>
                 {mos != null && (
                   <div style={{ marginTop: "var(--sr-sp-2)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-                    Graham Margin of Safety: <span style={{ color: mos.color, fontWeight: 700 }} className="num">{mos.pct.toFixed(1)}%</span>
-                    {mos.pct >= 30 ? " — meets Graham's 30% threshold" : mos.pct >= 0 ? " — below Graham's 30% threshold" : " — price exceeds intrinsic estimate"}
+                    {t("Graham Margin of Safety:")}{" "}<span style={{ color: mos.color, fontWeight: 700 }} className="num">{mos.pct.toFixed(1)}%</span>
+                    {mos.pct >= 30 ? t(" — meets Graham's 30% threshold") : mos.pct >= 0 ? t(" — below Graham's 30% threshold") : t(" — price exceeds intrinsic estimate")}
                   </div>
                 )}
                 <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-                  {upside == null ? "Insufficient data for DCF" :
-                   upside > 30 ? "Deep Value — significant margin of safety" :
-                   upside > 10 ? "Value Zone — modest upside" :
-                   upside > -10 ? "Fair Value — limited upside/downside" :
-                   upside > -30 ? "Premium — limited margin of safety" :
-                   "Overvalued — significant downside risk"}
+                  {upside == null ? t("Insufficient data for DCF") :
+                   upside > 30 ? t("Deep Value — significant margin of safety") :
+                   upside > 10 ? t("Value Zone — modest upside") :
+                   upside > -10 ? t("Fair Value — limited upside/downside") :
+                   upside > -30 ? t("Premium — limited margin of safety") :
+                   t("Overvalued — significant downside risk")}
                 </div>
               </div>
             )}
@@ -307,7 +305,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
           {/* Scenario synthesis */}
           {scenarioValues.length > 0 && (
             <div className="card">
-              <div className="section-label">Scenario Synthesis</div>
+              <div className="section-label">{t("Scenario Synthesis")}</div>
               <div style={{ display: "grid", gridTemplateColumns: dcf ? "repeat(4, 1fr)" : "repeat(3, 1fr)", gap: "var(--sr-sp-3)" }}>
                 {scenarioValues.map(s => (
                   <div key={s.key} style={{
@@ -315,7 +313,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                     borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)",
                     border: s.key === activeScenario ? `1px solid color-mix(in srgb, ${s.color} 40%, transparent)` : "1px solid transparent",
                   }}>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: s.color, marginBottom: 4, fontWeight: 600 }}>{s.label}</div>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: s.color, marginBottom: 4, fontWeight: 600 }}>{tv(s.label)}</div>
                     <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700 }} className="num">
                       {s.value != null ? `$${s.value.toFixed(2)}` : "—"}
                     </div>
@@ -336,7 +334,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
           {/* EV Bridge */}
           {result && (
             <div className="card">
-              <div className="section-label">EV Bridge</div>
+              <div className="section-label">{t("EV Bridge")}</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[
                   { label: "PV Operating FCF (Y1-10)", val: result.pvOperating },
@@ -346,7 +344,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   { label: "= Equity Value", val: result.equity, bold: true },
                 ].map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-sm)", fontWeight: row.bold ? 700 : 400, color: row.bold ? "var(--sr-text)" : "var(--sr-text-2)" }}>
-                    <span>{row.label}</span>
+                    <span>{tv(row.label)}</span>
                     <span className="num">${(row.val / 1e6).toLocaleString("en-US", { maximumFractionDigits: 0 })}M</span>
                   </div>
                 ))}
@@ -355,10 +353,10 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                   return (
                     <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 8%, var(--sr-surface-2))` : "var(--sr-surface-2)", border: `1px solid ${result.tvShare >= 0.70 ? `color-mix(in srgb, ${tvr.color} 30%, transparent)` : "transparent"}` }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", marginBottom: 4 }}>
-                        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: tvr.color }}>TV Risk: {tvr.label}</span>
-                        <span className="sr-hint">({(result.tvShare * 100).toFixed(0)}% of EV)</span>
+                        <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: tvr.color }}>{t(`TV Risk: ${tvr.label}`)}</span>
+                        <span className="sr-hint">{t(`(${(result.tvShare * 100).toFixed(0)}% of EV)`)}</span>
                       </div>
-                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{tvr.warning}</div>
+                      <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{tv(tvr.warning)}</div>
                     </div>
                   );
                 })()}
@@ -369,19 +367,19 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
           {/* FMP DCF */}
           {dcf && (
             <div className="card">
-              <div className="section-label">FMP Consensus DCF</div>
+              <div className="section-label">{t("FMP Consensus DCF")}</div>
               <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }} className="num">
                 ${Number(dcf.dcf ?? 0).toFixed(2)}
               </div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 4 }}>
-                Upside to fair value: {dcf.dcf != null ? `${Number(dcf.dcf) >= currentPrice ? "+" : ""}${(((Number(dcf.dcf) - currentPrice) / currentPrice) * 100).toFixed(1)}%` : "—"}
+                {t("Upside to fair value:")}{" "}{dcf.dcf != null ? `${Number(dcf.dcf) >= currentPrice ? "+" : ""}${(((Number(dcf.dcf) - currentPrice) / currentPrice) * 100).toFixed(1)}%` : "—"}
               </div>
             </div>
           )}
 
           {/* Sensitivity table */}
           <div className="card">
-            <div className="section-label">Sensitivity — WACC × Terminal Growth</div>
+            <div className="section-label">{t("Sensitivity — WACC × Terminal Growth")}</div>
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
                 <thead><tr>
@@ -430,17 +428,17 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
             style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
             onClick={() => setShowYearly(v => !v)}
           >
-            <span>10-Year Projection</span>
-            <span className="sr-hint">{showYearly ? "Hide ▲" : "Show ▼"}</span>
+            <span>{t("10-Year Projection")}</span>
+            <span className="sr-hint">{showYearly ? t("Hide ▲") : t("Show ▼")}</span>
           </div>
           {showYearly && (
             <div style={{ overflowX: "auto", marginTop: "var(--sr-sp-3)" }}>
               <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
                 <thead><tr>
-                  <th>Year</th>
-                  <th style={{ textAlign: "right" }}>Revenue</th>
+                  <th>{t("Year")}</th>
+                  <th style={{ textAlign: "right" }}>{t("Revenue")}</th>
                   <th style={{ textAlign: "right" }}>FCF</th>
-                  <th style={{ textAlign: "right" }}>PV of FCF</th>
+                  <th style={{ textAlign: "right" }}>{t("PV of FCF")}</th>
                 </tr></thead>
                 <tbody>
                   {result.years.map(y => (
@@ -460,7 +458,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
 
       {/* Feature 1+2: FCF Quality Panel */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">FCF Quality</div>
+        <div className="section-label">{t("FCF Quality")}</div>
         {loading ? <Sk w="100%" h={80} /> : (
           <div className="sr-grid-4">
             {[
@@ -508,10 +506,10 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 hint: "FCF growth minus EPS growth — positive = cash generation outpaces accounting earnings",
               },
             ].map(({ label, val, color, sub, hint }) => (
-              <div key={label} className="sr-tile" title={hint}>
-                <div className="sr-tile-label">{label}</div>
+              <div key={label} className="sr-tile" title={tv(hint)}>
+                <div className="sr-tile-label">{tv(label)}</div>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color }} className="num">{val}</div>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 3 }}>{tv(sub)}</div>
               </div>
             ))}
           </div>
@@ -520,14 +518,13 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
 
       {/* Feature 5: Growth × Exit Multiple sensitivity */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">Sensitivity — Revenue Growth × Exit P/FCF Multiple</div>
+        <div className="section-label">{t("Sensitivity — Revenue Growth × Exit P/FCF Multiple")}</div>
         <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-          Implied price using bear/base/bull growth paths × 4 P/FCF exit multiples at year 10. Uses active FCF margin ({active.fcfMargin.toFixed(0)}%) and WACC ({active.wacc.toFixed(1)}%).
-        </div>
+          {t(`Implied price using bear/base/bull growth paths × 4 P/FCF exit multiples at year 10. Uses active FCF margin (${active.fcfMargin.toFixed(0)}%) and WACC (${active.wacc.toFixed(1)}%).`)}</div>
         <div style={{ overflowX: "auto" }}>
           <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)" }}>
             <thead><tr>
-              <th>Growth→</th>
+              <th>{t("Growth→")}</th>
               {growthRows.map((g, i) => <th key={i} style={{ textAlign: "right" }}>{["Bear", "Base", "Bull"][i]} ({g.toFixed(0)}%)</th>)}
             </tr></thead>
             <tbody>
@@ -564,14 +561,13 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
       <div className="card">
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
           <div>
-            <div className="section-label">Reverse DCF — Market Expectations</div>
+            <div className="section-label">{t("Reverse DCF — Market Expectations")}</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-              What revenue CAGR does the current price imply? Auto-computed from FCF margin + WACC.
-            </div>
+              {t("What revenue CAGR does the current price imply? Auto-computed from FCF margin + WACC.")}</div>
           </div>
           {rdcf && (
             <Pill
-              label={rdcf.realityBand === "achievable" ? "Achievable" : rdcf.realityBand === "ambitious" ? "Ambitious" : "Very Aggressive"}
+              label={rdcf.realityBand === "achievable" ? t("Achievable") : rdcf.realityBand === "ambitious" ? t("Ambitious") : t("Very Aggressive")}
               color={rdcf.realityBand === "achievable" ? "var(--sr-pos)" : rdcf.realityBand === "ambitious" ? "var(--sr-warn)" : "var(--sr-neg)"}
             />
           )}
@@ -602,19 +598,18 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 },
               ].map(({ label, val, color }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
               <div style={{ gridColumn: "1 / -1", marginTop: "var(--sr-sp-2)" }}>
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>
-                  WACC {rdcf.wacc.toFixed(1)}% · rf {rdcf.rfRate.toFixed(2)}% · Conservative model: 8% Y1-5, 4% Y6-10
-                </div>
+                  {t(`WACC ${rdcf.wacc.toFixed(1)}% · rf ${rdcf.rfRate.toFixed(2)}% · Conservative model: 8% Y1-5, 4% Y6-10`)}</div>
                 {(() => {
                   const tvr = tvRiskLabel(rdcf.tvShare);
                   return rdcf.tvShare >= 0.50 ? (
                     <div style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: `color-mix(in srgb, ${tvr.color} 8%, var(--sr-surface-2))`, border: `1px solid color-mix(in srgb, ${tvr.color} 25%, transparent)`, fontSize: "var(--sr-t-xs)", color: tvr.color }}>
-                      ▸ Terminal Value Risk ({tvr.label}): {tvr.warning}
+                      {t(`▸ Terminal Value Risk (${tvr.label}): ${tvr.warning}`)}
                     </div>
                   ) : null;
                 })()}
@@ -628,7 +623,7 @@ export default function StockValuation({ data, macro, loading, ticker }: Props) 
                 { label: "Status", val: "Insufficient data" },
               ].map(({ label, val }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700 }} className="num">{val}</div>
                 </div>
               ))}
@@ -665,10 +660,10 @@ function TaxAwarePnL({ price }: { price: number }) {
 
   return (
     <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-      <div className="section-label">Tax-Aware P&amp;L</div>
+      <div className="section-label">{t("Tax-Aware P&L")}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-4)", marginBottom: "var(--sr-sp-4)" }}>
         <div>
-          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>Cost Basis (per share)</label>
+          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>{t("Cost Basis (per share)")}</label>
           <input
             type="number" min={0} step={0.01} value={costBasis || ""}
             onChange={e => setCostBasis(Number(e.target.value))}
@@ -677,7 +672,7 @@ function TaxAwarePnL({ price }: { price: number }) {
           />
         </div>
         <div>
-          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>Shares</label>
+          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>{t("Shares")}</label>
           <input
             type="number" min={1} step={1} value={shares}
             onChange={e => setShares(Number(e.target.value))}
@@ -685,7 +680,7 @@ function TaxAwarePnL({ price }: { price: number }) {
           />
         </div>
         <div>
-          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>Buy Date</label>
+          <label style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", display: "block", marginBottom: 6 }}>{t("Buy Date")}</label>
           <input
             type="date" value={buyDate}
             onChange={e => setBuyDate(e.target.value)}
@@ -697,7 +692,7 @@ function TaxAwarePnL({ price }: { price: number }) {
       {costBasis > 0 && (
         <div className="sr-grid-4">
           <div className="sr-tile">
-            <div className="sr-tile-label">Unrealized P&amp;L</div>
+            <div className="sr-tile-label">{t("Unrealized P&L")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: gain != null && gain >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {gain != null ? `${gain >= 0 ? "+" : ""}$${Math.abs(gain).toLocaleString("en-US", { maximumFractionDigits: 0 })}` : "—"}
             </div>
@@ -707,31 +702,31 @@ function TaxAwarePnL({ price }: { price: number }) {
           </div>
 
           <div className="sr-tile">
-            <div className="sr-tile-label">Tax Treatment</div>
+            <div className="sr-tile-label">{t("Tax Treatment")}</div>
             <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 700, color: isLTCG ? "var(--sr-pos)" : "var(--sr-warn)" }}>
-              {holdingDays == null ? "Enter date" : isLTCG ? "LTCG" : "Short-Term"}
+              {holdingDays == null ? t("Enter date") : isLTCG ? "LTCG" : t("Short-Term")}
             </div>
             <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>
-              {holdingDays != null ? `${holdingDays}d held · ${isLTCG ? `${(ltRate * 100).toFixed(1)}%` : `${(stRate * 100).toFixed(0)}%`} rate` : ""}
+              {holdingDays != null ? t(`${holdingDays}d held · ${isLTCG ? `${(ltRate * 100).toFixed(1)}%` : `${(stRate * 100).toFixed(0)}%`} rate`) : ""}
             </div>
           </div>
 
           <div className="sr-tile">
-            <div className="sr-tile-label">Est. Tax Owed</div>
+            <div className="sr-tile-label">{t("Est. Tax Owed")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: "var(--sr-neg)" }} className="num">
               {taxEstimate != null ? `$${taxEstimate.toLocaleString("en-US", { maximumFractionDigits: 0 })}` : gain != null && gain <= 0 ? "$0" : "—"}
             </div>
-            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>US top marginal rate</div>
+            <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("US top marginal rate")}</div>
           </div>
 
           <div className="sr-tile">
-            <div className="sr-tile-label">Net After Tax</div>
+            <div className="sr-tile-label">{t("Net After Tax")}</div>
             <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: netGain != null && netGain >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" }} className="num">
               {netGain != null ? `${netGain >= 0 ? "+" : ""}$${Math.abs(netGain).toLocaleString("en-US", { maximumFractionDigits: 0 })}` : "—"}
             </div>
             {!isLTCG && holdingDays != null && gain != null && gain > 0 && (
               <div style={{ fontSize: "10px", color: "var(--sr-warn)", marginTop: 2 }}>
-                Wait {366 - holdingDays}d → save ${((gain * (stRate - ltRate)).toLocaleString("en-US", { maximumFractionDigits: 0 }))}
+                {t(`Wait ${366 - holdingDays}d → save $`)}{((gain * (stRate - ltRate)).toLocaleString("en-US", { maximumFractionDigits: 0 }))}
               </div>
             )}
           </div>

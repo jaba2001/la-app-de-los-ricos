@@ -16,6 +16,8 @@ import SectorRotation from "@/components/macro/SectorRotation";
 import ScoraBrief from "@/components/macro/ScoraBrief";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import { etiquetaRegimen } from "@/lib/regimen";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -185,8 +187,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
 
   if (!session) return (
     <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-      Sign in to see your portfolio.
-    </div>
+      {tr("Sign in to see your portfolio.")}</div>
   );
 
   const buckets = {
@@ -214,10 +215,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
         </div>
       ) : entries.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-10)", color: "var(--sr-text-3)" }}>
-          <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>Your watchlist is empty</p>
+          <p style={{ marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-base)" }}>{tr("Your watchlist is empty")}</p>
           <p style={{ fontSize: "var(--sr-t-sm)" }}>
-            Add tickers from a stock page (★) or from the Screener.
-          </p>
+            {tr("Add tickers from a stock page (★) or from the Screener.")}</p>
         </div>
       ) : (
         <>
@@ -225,22 +225,22 @@ export default function MacroPortfolio({ macro, loading }: Props) {
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "var(--sr-sp-4)" }}>
           <div>
-            <div className="section-label">Portfolio Heat</div>
+            <div className="section-label">{tr("Portfolio Heat")}</div>
             <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginTop: 2 }}>
-              Regime: <strong style={{ color: regimeColor }}>{regimeLabel}</strong>
-              {" · "}{entries.length} {entries.length === 1 ? "position" : "positions"}
+              {tr("Regime:")}{" "}<strong style={{ color: regimeColor }}>{regimeLabel}</strong>
+              {" · "}{entries.length} {entries.length === 1 ? tr("position") : tr("positions")}
             </div>
           </div>
           <div style={{ display: "flex", gap: "var(--sr-sp-5)" }}>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>Scora Avg</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{tr("Scora Avg")}</div>
               <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: avgIc >= 65 ? "var(--sr-pos)" : avgIc >= 50 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">
                 {avgIc.toFixed(0)}
               </div>
             </div>
             {(["favorable", "neutral", "headwind"] as const).map(b => (
               <div key={b} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{BUCKET_META[b].label}</div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{tv(BUCKET_META[b].label)}</div>
                 <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: BUCKET_META[b].color }} className="num">
                   {buckets[b].length}
                 </div>
@@ -262,10 +262,9 @@ export default function MacroPortfolio({ macro, loading }: Props) {
         const total = entries.length || 1;
         return (
           <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-            <div className="section-label">Regime Coverage Map</div>
+            <div className="section-label">{tr("Regime Coverage Map")}</div>
             <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-              How many of your {entries.length} positions provide exposure to each economic regime (sectors may cover multiple)
-            </div>
+              {tr(`How many of your ${entries.length} positions provide exposure to each economic regime (sectors may cover multiple)`)}</div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-3)" }}>
               {regimes.map(r => {
                 const count = coverageCounts[r];
@@ -279,7 +278,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                     border: isCurrentRegime ? `1px solid color-mix(in srgb, ${col} 35%, transparent)` : "1px solid transparent",
                   }}>
                     <div className="sr-flex-between" style={{ marginBottom: 6 }}>
-                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: col }}>{REGIME_LABELS[r]}</span>
+                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: col }}>{tr(REGIME_LABELS[r])}</span>
                       {isCurrentRegime && <span style={{ fontSize: "9px", color: col, fontWeight: 700 }}>← CURRENT</span>}
                     </div>
                     <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 6 }}>{REGIME_DESC[r]}</div>
@@ -287,7 +286,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                       <div style={{ height: "100%", width: `${Math.min(100, pct)}%`, background: col, borderRadius: 2, transition: "width 500ms ease" }} />
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: "10px", color: "var(--sr-text-3)" }}>
-                      <span>{count} position{count !== 1 ? "s" : ""}</span>
+                      <span>{tr(`${count} position`)}{count !== 1 ? "s" : ""}</span>
                       <span style={{ color: col, fontWeight: 600 }} className="num">{pct}%</span>
                     </div>
                   </div>
@@ -299,8 +298,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
               const currentPct = Math.round((currentRegimeCount / total) * 100);
               return currentPct < 25 ? (
                 <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, var(--sr-surface-2))", border: "1px solid color-mix(in srgb, var(--sr-warn) 25%, transparent)", fontSize: "var(--sr-t-xs)", color: "var(--sr-warn)" }}>
-                  ⚠ Only {currentPct}% of your portfolio aligns with the current {REGIME_LABELS[macro?.regime_id ?? ""]} regime — consider rotating toward aligned sectors
-                </div>
+                  {tr(`⚠ Only ${currentPct}% of your portfolio aligns with the current ${tr(REGIME_LABELS[macro?.regime_id ?? ""])} regime — consider rotating toward aligned sectors`)}</div>
               ) : null;
             })()}
           </div>
@@ -316,14 +314,13 @@ export default function MacroPortfolio({ macro, loading }: Props) {
         return (
           <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-2)" }}>
-              <div className="section-label" style={{ marginBottom: 0 }}>Satellite Asset Suggestions</div>
+              <div className="section-label" style={{ marginBottom: 0 }}>{tr("Satellite Asset Suggestions")}</div>
               <span style={{ fontSize: "var(--sr-t-xs)", color: regimeColor, fontWeight: 600, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${regimeColor} 12%, transparent)` }}>
-                {REGIME_LABELS[regime] ?? regime}
+                {tr(REGIME_LABELS[regime] ?? regime)}
               </span>
             </div>
             <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-              Based on Trainor-Black satellite portfolio theory — complement your core equity holdings with regime-specific hedges
-            </div>
+              {tr("Based on Trainor-Black satellite portfolio theory — complement your core equity holdings with regime-specific hedges")}</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
               {satellites.map(s => (
                 <div key={s.ticker} style={{ display: "flex", alignItems: "flex-start", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)" }}>
@@ -331,8 +328,8 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                     <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-amber)" }}>{s.ticker}</span>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, marginBottom: 2 }}>{s.label}</div>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{s.reason}</div>
+                    <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, marginBottom: 2 }}>{tv(s.label)}</div>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", lineHeight: 1.4 }}>{tv(s.reason)}</div>
                     <div style={{ display: "flex", gap: "var(--sr-sp-2)", marginTop: 4 }}>
                       {s.regimes.map(r => (
                         <span key={r} style={{ fontSize: "9px", fontWeight: 600, padding: "1px 6px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, var(--sr-text-3) 15%, transparent)`, color: "var(--sr-text-3)" }}>
@@ -345,8 +342,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
               ))}
             </div>
             <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)" }}>
-              Not investment advice — these are ETF examples for educational purposes only. Research before trading.
-            </div>
+              {tr("Not investment advice — these are ETF examples for educational purposes only. Research before trading.")}</div>
           </div>
         );
       })()}
@@ -366,7 +362,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
               }}>
                 <span style={{ color: meta.color, fontSize: "var(--sr-t-xs)" }}>{meta.icon}</span>
                 <span style={{ color: meta.color, fontWeight: 700, fontSize: "var(--sr-t-sm)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                  {meta.label}
+                  {tv(meta.label)}
                 </span>
                 <span style={{ color: meta.color, fontSize: "var(--sr-t-sm)", fontWeight: 700, marginLeft: "auto" }} className="num">
                   {group.length}
@@ -394,14 +390,13 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                             <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: e.icScore >= 65 ? "var(--sr-pos)" : e.icScore >= 50 ? "var(--sr-warn)" : "var(--sr-neg)" }} className="num">
                               {e.icScore.toFixed(0)}
                             </div>
-                            {r && <Pill label={r.label} color={r.color} />}
+                            {r && <Pill label={tv(r.label)} color={r.color} />}
                           </div>
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-                          <span>Base: <span className="num" style={{ color: "var(--sr-text-2)" }}>{e.analysis.score_total}</span></span>
+                          <span><Trans text={`Base: <s1>${e.analysis.score_total}</s1>`} s1={(c) => <span className="num" style={{ color: "var(--sr-text-2)" }}>{c}</span>} /></span>
                           <span style={{ color: e.tiltColor, fontWeight: 600 }}>
-                            {e.liveTilt > 0 ? "+" : ""}{e.liveTilt} pts
-                          </span>
+                            {e.liveTilt > 0 ? "+" : ""}{tr(`${e.liveTilt} pts`)}</span>
                         </div>
                         <div style={{ marginTop: "var(--sr-sp-2)", height: 3, borderRadius: 2, background: "var(--sr-surface-3)" }}>
                           <div style={{ height: "100%", borderRadius: 2, background: e.icScore >= 65 ? "var(--sr-pos)" : e.icScore >= 50 ? "var(--sr-warn)" : "var(--sr-neg)", width: `${Math.min(100, e.icScore)}%`, transition: "width 400ms ease" }} />
@@ -426,20 +421,19 @@ export default function MacroPortfolio({ macro, loading }: Props) {
 
         return (
           <div className="card" style={{ marginTop: "var(--sr-sp-5)" }}>
-            <div className="section-label">Portfolio Regime Stress Test</div>
+            <div className="section-label">{tr("Portfolio Regime Stress Test")}</div>
             <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-3)" }}>
-              Estimated portfolio drawdown vs SPY in historical macro episodes — based on your portfolio's sector composition
-            </div>
+              {tr("Estimated portfolio drawdown vs SPY in historical macro episodes — based on your portfolio's sector composition")}</div>
             <div style={{ overflowX: "auto" }}>
               <table className="sr-table" style={{ fontSize: "var(--sr-t-xs)", minWidth: 520 }}>
                 <thead>
                   <tr>
-                    <th>Episode</th>
-                    <th style={{ textAlign: "center" }}>Regime</th>
-                    <th style={{ textAlign: "right" }}>SPY Peak-Trough</th>
-                    <th style={{ textAlign: "right" }}>Est. Portfolio</th>
-                    <th style={{ textAlign: "right" }}>vs SPY</th>
-                    <th>Sector Read</th>
+                    <th>{tr("Episode")}</th>
+                    <th style={{ textAlign: "center" }}>{tr("Regime")}</th>
+                    <th style={{ textAlign: "right" }}>{tr("SPY Peak-Trough")}</th>
+                    <th style={{ textAlign: "right" }}>{tr("Est. Portfolio")}</th>
+                    <th style={{ textAlign: "right" }}>{tr("vs SPY")}</th>
+                    <th>{tr("Sector Read")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -452,12 +446,12 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                     return (
                       <tr key={analog.id}>
                         <td>
-                          <div style={{ fontWeight: 600 }}>{analog.label}</div>
+                          <div style={{ fontWeight: 600 }}>{tv(analog.label)}</div>
                           <div style={{ color: "var(--sr-text-3)", fontSize: "10px" }}>{analog.dateRange}</div>
                         </td>
                         <td style={{ textAlign: "center" }}>
                           <span style={{ fontSize: "10px", fontWeight: 700, color: rCol, padding: "1px 6px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${rCol} 12%, transparent)` }}>
-                            {REGIME_LABELS[analog.regimeId] ?? analog.regimeId}
+                            {tr(REGIME_LABELS[analog.regimeId] ?? analog.regimeId)}
                           </span>
                         </td>
                         <td style={{ textAlign: "right", color: "var(--sr-neg)", fontWeight: 600 }} className="num">
@@ -468,7 +462,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
                           {estimated != null ? `${estimated.toFixed(1)}%` : "—"}
                         </td>
                         <td style={{ textAlign: "right", color: diff == null ? "var(--sr-text-3)" : diff < 0 ? "var(--sr-neg)" : "var(--sr-pos)" }} className="num">
-                          {diff != null ? `${diff > 0 ? "+" : ""}${diff.toFixed(1)}pp` : "—"}
+                          {diff != null ? tr(`${diff > 0 ? "+" : ""}${diff.toFixed(1)}pp`) : "—"}
                         </td>
                         <td style={{ color: "var(--sr-text-3)", fontSize: "10px", maxWidth: 180 }}>{explanation}</td>
                       </tr>
@@ -478,9 +472,7 @@ export default function MacroPortfolio({ macro, loading }: Props) {
               </table>
             </div>
             <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-              Estimates based on sector classification: outperformers in each episode → ~0.5× SPY drawdown; underperformers → ~1.5× SPY drawdown.
-              Historical analogies are educational — actual outcomes depend on position sizing, correlations, and timing.
-            </div>
+              {tr("Estimates based on sector classification: outperformers in each episode → ~0.5× SPY drawdown; underperformers → ~1.5× SPY drawdown. Historical analogies are educational — actual outcomes depend on position sizing, correlations, and timing.")}</div>
           </div>
         );
       })()}

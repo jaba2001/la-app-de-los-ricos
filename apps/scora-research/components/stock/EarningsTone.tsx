@@ -4,6 +4,8 @@ import { aiAnalyzeAudited } from "@/lib/proxy";
 import { buildEarningsToneAnalysis } from "@/lib/aiGrounding";
 import { Sk } from "@/components/ui/Skeleton";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 // La transcripción se PEGA. Hubo un «Auto-fetch» contra Finnhub stock/transcripts, pero con el
 // plan de este proyecto ese endpoint responde 403 siempre: era un botón que no funcionaba nunca
@@ -42,13 +44,13 @@ export default function EarningsTone({ ticker }: Props) {
       });
       setAnalysis(res.text); setViolations(res.violations);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to analyze");
+      setError(e instanceof Error ? e.message : t("Failed to analyze"));
     }
     setLoading(false);
   }
 
   async function analyze() {
-    if (transcript.trim().length < 200) { setError("Paste the earnings-call transcript (prepared remarks + Q&A) — at least a few paragraphs."); return; }
+    if (transcript.trim().length < 200) { setError(t("Paste the earnings-call transcript (prepared remarks + Q&A) — at least a few paragraphs.")); return; }
     await analyzeText(transcript);
   }
 
@@ -56,10 +58,9 @@ export default function EarningsTone({ ticker }: Props) {
     <div className="card">
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Earnings-call tone · grounded</div>
+          <div className="section-label" style={{ margin: 0 }}>{t("Earnings-call tone · grounded")}</div>
           <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 440, lineHeight: 1.5 }}>
-            Scores confidence, Q&amp;A evasiveness and guidance tone, backing every read with a <strong style={{ color: "var(--sr-text-2)" }}>direct quote</strong>. No outside knowledge. Paste the call text (prepared remarks + Q&amp;A).
-          </div>
+            <Trans text={"Scores confidence, Q&A evasiveness and guidance tone, backing every read with a <s1>direct quote</s1>. No outside knowledge. Paste the call text (prepared remarks + Q&A)."} s1={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} /></div>
         </div>
         <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexShrink: 0 }}>
           <button
@@ -67,7 +68,7 @@ export default function EarningsTone({ ticker }: Props) {
             className="btn-primary"
             style={{ padding: "8px 14px", fontSize: "var(--sr-t-sm)", fontWeight: 600 }}
           >
-            {open ? "Hide" : "Paste transcript"}
+            {open ? t("Hide") : t("Paste transcript")}
           </button>
         </div>
       </div>
@@ -77,13 +78,13 @@ export default function EarningsTone({ ticker }: Props) {
           <textarea
             value={transcript}
             onChange={(e) => setTranscript(e.target.value)}
-            placeholder={`Paste the ${ticker} earnings-call transcript here (prepared remarks + Q&A)…`}
+            placeholder={t(`Paste the ${ticker} earnings-call transcript here (prepared remarks + Q&A)…`)}
             rows={6}
             style={{ width: "100%", resize: "vertical", padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface)", border: "1px solid var(--sr-border)", color: "var(--sr-text)", fontSize: "var(--sr-t-xs)", lineHeight: 1.5, fontFamily: "inherit", outline: "none" }}
           />
           <div className="sr-flex-between" style={{ marginTop: "var(--sr-sp-2)" }}>
-            <span className="sr-hint">{transcript.length.toLocaleString()} chars {transcript.length > 16000 ? "(first 16k analyzed)" : ""}</span>
-            <button className="btn-primary" onClick={analyze} disabled={loading}>{loading ? "Analyzing…" : "✦ Analyze tone"}</button>
+            <span className="sr-hint">{t(`${transcript.length.toLocaleString()} chars`)}{" "}{transcript.length > 16000 ? t("(first 16k analyzed)") : ""}</span>
+            <button className="btn-primary" onClick={analyze} disabled={loading}>{loading ? t("Analyzing…") : t("✦ Analyze tone")}</button>
           </div>
         </div>
       )}

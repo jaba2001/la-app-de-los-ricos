@@ -11,6 +11,8 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
   ResponsiveContainer, LineChart, Line, ComposedChart, Area,
 } from "recharts";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
 
@@ -23,7 +25,7 @@ function GradeChip({ g }: { g: MetricGrade | null }) {
   if (!g) return null;
   return (
     <div
-      title={explainGrade(g) ?? undefined}
+      title={tv(explainGrade(g)) ?? undefined}
       style={{
         display: "inline-flex", alignItems: "center", gap: 4, marginTop: 3,
         padding: "1px 6px", borderRadius: "var(--sr-radius-pill)",
@@ -74,7 +76,7 @@ function HistoricalFinancials({ annual, loading }: { annual: Record<string, unkn
   return (
     <div className="card">
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Historical Financials — Annual</div>
+        <div className="section-label">{tr("Historical Financials — Annual")}</div>
         <div style={{ display: "flex", gap: 4 }}>
           {(["revenue", "income", "fcf"] as const).map(m => (
             <button key={m} onClick={() => setMetric(m)} style={{
@@ -83,7 +85,7 @@ function HistoricalFinancials({ annual, loading }: { annual: Record<string, unkn
               background: metric === m ? "var(--sr-surface-3)" : "transparent",
               border: "1px solid var(--sr-border)",
               color: metric === m ? "var(--sr-text)" : "var(--sr-text-3)",
-            }}>{cfg[m].label}</button>
+            }}>{tv(cfg[m].label)}</button>
           ))}
         </div>
       </div>
@@ -131,7 +133,7 @@ function SharesDilutionChart({ sharesFloat, income, loading }: { sharesFloat: Re
   return (
     <div className="card">
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Shares Outstanding — Dilution Trend</div>
+        <div className="section-label">{tr("Shares Outstanding — Dilution Trend")}</div>
         {dilution != null && (
           <span style={{
             fontSize: "var(--sr-t-xs)", fontWeight: 700, padding: "3px 8px",
@@ -139,14 +141,12 @@ function SharesDilutionChart({ sharesFloat, income, loading }: { sharesFloat: Re
             background: dilution > 5 ? "color-mix(in srgb, var(--sr-neg) 12%, transparent)" : "color-mix(in srgb, var(--sr-pos) 12%, transparent)",
             color: dilution > 5 ? "var(--sr-neg)" : "var(--sr-pos)",
           }}>
-            {dilution > 0 ? "+" : ""}{dilution.toFixed(1)}% dilution
-          </span>
+            {dilution > 0 ? "+" : ""}{tr(`${dilution.toFixed(1)}% dilution`)}</span>
         )}
       </div>
       {loading ? <Sk w="100%" h={160} /> : chartData.length < 2 ? (
         <div className="sr-hint" style={{ padding: "var(--sr-sp-4) 0" }}>
-          Not enough share-count history to show a trend.
-        </div>
+          {tr("Not enough share-count history to show a trend.")}</div>
       ) : (
         <ResponsiveContainer width="100%" height={160}>
           <ComposedChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
@@ -164,11 +164,10 @@ function SharesDilutionChart({ sharesFloat, income, loading }: { sharesFloat: Re
       {chartData.length > 0 && (
         <div style={{ display: "flex", gap: "var(--sr-sp-4)", marginTop: "var(--sr-sp-3)" }}>
           <div className="sr-hint">
-            Current: <strong>{last.toFixed(0)}M</strong> shares
-          </div>
+            <Trans text={`Current: <s1>${last.toFixed(0)}M</s1> shares`} s1={(c) => <strong>{c}</strong>} /></div>
           {dilution != null && (
             <div style={{ fontSize: "var(--sr-t-xs)", color: dilution > 5 ? "var(--sr-neg)" : "var(--sr-pos)" }}>
-              {dilution > 5 ? "Significant dilution" : dilution > 0 ? "Mild dilution" : "Share buybacks"}
+              {dilution > 5 ? tr("Significant dilution") : dilution > 0 ? tr("Mild dilution") : tr("Share buybacks")}
             </div>
           )}
         </div>
@@ -233,15 +232,15 @@ function PeerMetricsTable({ ticker, peers, ratios, metrics }: {
 
   return (
     <div className="card">
-      <div className="section-label">Peer Comparison</div>
+      <div className="section-label">{tr("Peer Comparison")}</div>
       <div style={{ overflowX: "auto" }}>
         <table className="sr-table" style={{ minWidth: 520 }}>
           <thead>
             <tr>
-              <th>Ticker</th>
+              <th>{tr("Ticker")}</th>
               <th style={{ textAlign: "right" }}>P/E (TTM)</th>
-              <th style={{ textAlign: "right" }}>Gross Margin</th>
-              <th style={{ textAlign: "right" }}>Rev Growth</th>
+              <th style={{ textAlign: "right" }}>{tr("Gross Margin")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Rev Growth")}</th>
               <th style={{ textAlign: "right" }}>ROE</th>
             </tr>
           </thead>
@@ -270,8 +269,7 @@ function PeerMetricsTable({ ticker, peers, ratios, metrics }: {
         </table>
       </div>
       <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)" }}>
-        TTM = trailing twelve months · Max 5 peers shown
-      </div>
+        {tr("TTM = trailing twelve months · Max 5 peers shown")}</div>
     </div>
   );
 }
@@ -308,10 +306,10 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
       {/* Margins & Profitability */}
       <div className="card">
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-2)" }}>
-          <div className="section-label" style={{ margin: 0 }}>Profitability (TTM)</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("Profitability (TTM)")}</div>
           {sector && Object.values(graded).some(Boolean) && (
             <div className="sr-hint">
-              Grades are percentiles within <strong style={{ color: "var(--sr-text-2)" }}>{sector}</strong>
+              <Trans text={`Grades are percentiles within <s1>${sector}</s1>`} s1={(c) => <strong style={{ color: "var(--sr-text-2)" }}>{c}</strong>} />
             </div>
           )}
         </div>
@@ -327,7 +325,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
             { label: "EBITDA/Share",    val: n(ratios?.ebitdaPerShareTTM, 2, "", "$"), g: null },
           ].map(({ label, val, g }) => (
             <div key={label} className="sr-tile">
-              <div className="sr-tile-label">{label}</div>
+              <div className="sr-tile-label">{tv(label)}</div>
               {loading ? <Sk w={50} h={20} /> : (
                 <>
                   <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700 }} className="num">{val}</div>
@@ -355,20 +353,20 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         if (!dg.paysDividend) return null;
         return (
           <div className="card">
-            <div className="section-label">Dividend</div>
+            <div className="section-label">{tr("Dividend")}</div>
             <div className="sr-grid-4">
               {dg.grades.map((g) => (
                 <div key={g.key} className="sr-tile">
-                  <div className="sr-tile-label">{g.label}</div>
+                  <div className="sr-tile-label">{tv(g.label)}</div>
                   <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: gradeColor(g.grade) }}>{g.grade}</div>
-                  <div className="sr-hint" style={{ marginTop: 2 }}>{g.reasons[0]}</div>
+                  <div className="sr-hint" style={{ marginTop: 2 }}>{g.reasons[0] && tr(g.reasons[0])}</div>
                 </div>
               ))}
             </div>
             {dg.warnings.length > 0 && (
               <div style={{ marginTop: "var(--sr-sp-3)", padding: "var(--sr-sp-2)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 8%, transparent)" }}>
                 {dg.warnings.map((w) => (
-                  <div key={w} className="sr-hint" style={{ color: "var(--sr-neg)" }}>⚠ {w}</div>
+                  <div key={w} className="sr-hint" style={{ color: "var(--sr-neg)" }}>⚠ {tr(w)}</div>
                 ))}
               </div>
             )}
@@ -392,7 +390,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
         if (dso == null && capexRev == null && opLev == null) return null;
         return (
           <div className="card">
-            <div className="section-label">Operating Efficiency (TTM YoY)</div>
+            <div className="section-label">{tr("Operating Efficiency (TTM YoY)")}</div>
             <div className="sr-grid-3">
               {[
                 { label: "DSO", val: dso != null ? `${dso.toFixed(0)} days` : "—", note: "Accounts Receivable / Revenue × 365", good: dso != null && dso < 45, warn: dso != null && dso > 90 },
@@ -400,11 +398,11 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 { label: "Operating Leverage", val: opLev != null ? `${opLev.toFixed(2)}x` : "—", note: "% EBIT Δ ÷ % Revenue Δ (YoY)", good: opLev != null && opLev > 1 && opLev < 5, warn: opLev != null && (opLev > 10 || opLev < 0) },
               ].map(({ label, val, note, good, warn: w }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   {loading ? <Sk w={50} h={20} /> : (
                     <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color: good ? "var(--sr-pos)" : w ? "var(--sr-warn)" : "var(--sr-text)" }} className="num">{val}</div>
                   )}
-                  <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 4, lineHeight: 1.4 }}>{note}</div>
+                  <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 4, lineHeight: 1.4 }}>{tv(note)}</div>
                 </div>
               ))}
             </div>
@@ -442,7 +440,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
         return (
           <div className="card">
-            <div className="section-label">FCF vs Earnings Divergence</div>
+            <div className="section-label">{tr("FCF vs Earnings Divergence")}</div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
               {[
                 { label: "FCF Growth (YoY)", val: fcfGr != null ? `${fcfGr >= 0 ? "+" : ""}${fcfGr.toFixed(0)}%` : "—", color: fcfGr == null ? "var(--sr-text-3)" : fcfGr > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
@@ -451,7 +449,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 { label: "FCF TTM", val: fmtB(fcfTTM), color: fcfTTM > 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
               ].map(({ label, val, color }) => (
                 <div key={label} className="sr-tile">
-                  <div className="sr-tile-label">{label}</div>
+                  <div className="sr-tile-label">{tv(label)}</div>
                   <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
                 </div>
               ))}
@@ -460,13 +458,11 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
               <span style={{ color: divColor, fontWeight: 700, fontSize: "var(--sr-t-sm)" }}>{divIcon} {divLabel}</span>
               {divergence != null && divergence < -15 && (
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
-                  High accruals often indicate aggressive revenue recognition, large D&A add-backs, or working capital consumption. Cross-check accounts receivable trend.
-                </div>
+                  {tr("High accruals often indicate aggressive revenue recognition, large D&A add-backs, or working capital consumption. Cross-check accounts receivable trend.")}</div>
               )}
               {divergence != null && divergence > 10 && (
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 4 }}>
-                  FCF growing faster than net income suggests high earnings quality — real cash is being generated, not just accounting profits.
-                </div>
+                  {tr("FCF growing faster than net income suggests high earnings quality — real cash is being generated, not just accounting profits.")}</div>
               )}
             </div>
             {qData.length > 1 && (
@@ -495,26 +491,26 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
       {/* Quarterly Income Statement */}
       <div className="card">
         <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-          <div className="section-label" style={{ margin: 0 }}>Income Statement — Quarterly</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr("Income Statement — Quarterly")}</div>
           {!loading && income.length > 4 && (
             <button
               className="btn-ghost"
               style={{ fontSize: "var(--sr-t-xs)", padding: "3px 10px" }}
               onClick={() => setQuarterLimit(prev => prev === 4 ? income.length : 4)}
             >
-              {quarterLimit === 4 ? `Show all ${income.length}Q` : "Show less"}
+              {quarterLimit === 4 ? tr(`Show all ${income.length}Q`) : tr("Show less")}
             </button>
           )}
         </div>
         {loading ? <Sk w="100%" h={200} /> : income.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>
-            {isEuropean ? "Financial statements for European stocks via SimFin (requires SIMFIN_KEY). Ratios above come from Finnhub." : "No data"}
+            {isEuropean ? tr("Financial statements for European stocks via SimFin (requires SIMFIN_KEY). Ratios above come from Finnhub.") : tr("No data")}
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table className="sr-table" style={{ minWidth: 600 }}>
               <thead><tr>
-                <th>Period</th>
+                <th>{tr("Period")}</th>
                 {income.slice(0, quarterLimit).map(q => (
                   <th key={q.date as string} style={{ textAlign: "right" }}>
                     {(q.date as string)?.slice(0, 7)}
@@ -529,7 +525,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                   { label: "EPS",         key: "eps",         fmt: (v: number) => `$${v.toFixed(2)}` },
                 ].map(row => (
                   <tr key={row.label}>
-                    <td style={{ fontWeight: 600, color: "var(--sr-text)" }}>{row.label}</td>
+                    <td style={{ fontWeight: 600, color: "var(--sr-text)" }}>{tv(row.label)}</td>
                     {income.slice(0, quarterLimit).map(q => {
                       const raw = q[row.key];
                       const val = raw != null ? Number(raw) : null;
@@ -551,7 +547,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)" }}>
         <div className="card">
-          <div className="section-label">Balance Sheet (Latest Quarter)</div>
+          <div className="section-label">{tr("Balance Sheet (Latest Quarter)")}</div>
           {loading ? <Sk w="100%" h={160} /> : balance.length > 0 ? (
             [
               { label: "Total Assets",      key: "totalAssets" },
@@ -561,17 +557,17 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
               { label: "Total Debt",        key: "totalDebt" },
             ].map(({ label, key }) => (
               <div key={label} className="stat-row">
-                <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
+                <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(label)}</span>
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }} className="num">
                   {balance[0][key] != null ? `$${(Number(balance[0][key])/1e9).toFixed(1)}B` : "—"}
                 </span>
               </div>
             ))
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Balance sheet via SimFin (requires SIMFIN_KEY)" : "No data"}</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? tr("Balance sheet via SimFin (requires SIMFIN_KEY)") : tr("No data")}</div>}
         </div>
 
         <div className="card">
-          <div className="section-label">Free Cash Flow (Latest Quarters)</div>
+          <div className="section-label">{tr("Free Cash Flow (Latest Quarters)")}</div>
           {loading ? <Sk w="100%" h={160} /> : cashFlow.length > 0 ? (
             cashFlow.slice(0, 5).map(q => {
               const fcf = q.freeCashFlow != null
@@ -586,13 +582,13 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 </div>
               );
             })
-          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? "Cash flow via SimFin (requires SIMFIN_KEY)" : "No data"}</div>}
+          ) : <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>{isEuropean ? tr("Cash flow via SimFin (requires SIMFIN_KEY)") : tr("No data")}</div>}
         </div>
       </div>
 
       {/* Technical Signals — Phase 2 */}
       <div className="card">
-        <div className="section-label">Technical Signals</div>
+        <div className="section-label">{tr("Technical Signals")}</div>
         {loading ? <Sk w="100%" h={300} /> : !data?.technicals ? null : (() => {
           const t = data.technicals!;
           const price = Number(data.quote?.price ?? 0);
@@ -638,9 +634,9 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                   },
                 ] as {label:string;val:string;color:string;sub:string}[]).map(({ label, val, color, sub }) => (
                   <div key={label} className="sr-tile">
-                    <div className="sr-tile-label">{label}</div>
+                    <div className="sr-tile-label">{tv(label)}</div>
                     <div style={{ fontSize: "var(--sr-t-md)", fontWeight: 700, color }} className="num">{val}</div>
-                    {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{sub}</div>}
+                    {sub && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 3 }}>{tv(sub)}</div>}
                   </div>
                 ))}
               </div>
@@ -654,10 +650,10 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                 ] as {label:string;sig:{color:string;label:string};sma:number|null}[]).map(({ label, sig, sma }) => (
                   <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius)", padding: "var(--sr-sp-3)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div className="sr-hint">{label}</div>
+                      <div className="sr-hint">{tv(label)}</div>
                       {sma != null && <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 2 }} className="num">${sma.toFixed(2)}</div>}
                     </div>
-                    <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sig.color }} className="num">{sig.label}</div>
+                    <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sig.color }} className="num">{tv(sig.label)}</div>
                   </div>
                 ))}
               </div>
@@ -666,9 +662,9 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
               {rangeW != null && (
                 <div style={{ marginBottom: "var(--sr-sp-4)" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 6 }}>
-                    <span>52W Low <strong className="num">${t.week52Low?.toFixed(2)}</strong></span>
-                    <span style={{ color: "var(--sr-amber)" }}>{rangeW.toFixed(0)}% of 52W range</span>
-                    <span>52W High <strong className="num">${t.week52High?.toFixed(2)}</strong></span>
+                    <span><Trans text={`52W Low <s1>$${t.week52Low?.toFixed(2)}</s1>`} s1={(c) => <strong className="num">{c}</strong>} /></span>
+                    <span style={{ color: "var(--sr-amber)" }}>{tr(`${rangeW.toFixed(0)}% of 52W range`)}</span>
+                    <span><Trans text={`52W High <s1>$${t.week52High?.toFixed(2)}</s1>`} s1={(c) => <strong className="num">{c}</strong>} /></span>
                   </div>
                   <div style={{ height: 6, background: "var(--sr-surface-3)", borderRadius: 3, position: "relative" }}>
                     <div style={{ height: "100%", width: `${rangeW}%`, background: "linear-gradient(to right, var(--sr-pos), var(--sr-warn))", borderRadius: "3px 0 0 3px" }} />
@@ -690,7 +686,7 @@ export default function StockFundamentals({ data, loading, ticker }: Props) {
                     { label: "YTD", val: t.perfYTD      },
                   ] as {label:string;val:number|null}[]).map(({ label, val }) => (
                     <div key={label} style={{ background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius-sm)", padding: "var(--sr-sp-2) var(--sr-sp-2)", textAlign: "center" }}>
-                      <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginBottom: 3 }}>{label}</div>
+                      <div style={{ fontSize: "9px", color: "var(--sr-text-3)", marginBottom: 3 }}>{tv(label)}</div>
                       <div style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: val != null ? (val >= 0 ? "var(--sr-pos)" : "var(--sr-neg)") : "var(--sr-text-3)" }} className="num">
                         {val != null ? `${val >= 0 ? "+" : ""}${val.toFixed(1)}%` : "—"}
                       </div>

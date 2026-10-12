@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { sendSignInLinkToEmail } from "firebase/auth";
 import { auth } from "@/lib/firebaseClient";
 import { useAuth } from "@/lib/auth";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 export default function LoginPage() {
   const { session, loading } = useAuth();
@@ -87,11 +89,9 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, letterSpacing: "-0.03em" }}>
-              Scora Research
-            </h1>
+              {t("Scora Research")}</h1>
             <p style={{ fontSize: "var(--sr-t-base)", color: "var(--sr-text-3)", marginTop: 6 }}>
-              Macro + Stock intelligence platform
-            </p>
+              {t("Macro + Stock intelligence platform")}</p>
           </div>
         </div>
 
@@ -100,12 +100,11 @@ export default function LoginPage() {
           {!sent ? (
             <form onSubmit={handleSubmit}>
               <label style={{ display: "block", marginBottom: "var(--sr-sp-2)", fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", fontWeight: 500 }}>
-                Email
-              </label>
+                {t("Email")}</label>
               <input
                 className="sr-input"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("your@email.com")}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -130,30 +129,28 @@ export default function LoginPage() {
                 style={{ width: "100%" }}
                 disabled={submitting || !email}
               >
-                {submitting ? "Sending…" : "Send magic link"}
+                {submitting ? t("Sending…") : t("Send magic link")}
               </button>
             </form>
           ) : (
             <div style={{ textAlign: "center", padding: "var(--sr-sp-4) 0" }}>
               <div style={{ fontSize: "2rem", marginBottom: "var(--sr-sp-3)" }}>✉️</div>
-              <p style={{ fontWeight: 600, marginBottom: 8 }}>Check your email</p>
+              <p style={{ fontWeight: 600, marginBottom: 8 }}>{t("Check your email")}</p>
               <p style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-                We sent a magic link to <strong style={{ color: "var(--sr-amber)" }}>{email}</strong>
+                <Trans text={`We sent a magic link to <s1>${email}</s1>`} s1={(c) => <strong style={{ color: "var(--sr-amber)" }}>{c}</strong>} />
               </p>
               <button
                 className="btn-ghost"
                 style={{ marginTop: "var(--sr-sp-5)", width: "100%" }}
                 onClick={() => setSent(false)}
               >
-                Use a different email
-              </button>
+                {t("Use a different email")}</button>
             </div>
           )}
         </div>
 
         <p style={{ textAlign: "center", marginTop: "var(--sr-sp-5)", fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)" }}>
-          No password needed — secure magic link authentication
-        </p>
+          {t("No password needed — secure magic link authentication")}</p>
       </div>
     </div>
   );

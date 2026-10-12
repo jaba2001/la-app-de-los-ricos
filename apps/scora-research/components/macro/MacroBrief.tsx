@@ -12,6 +12,7 @@
 import { useEffect, useRef, useState } from "react";
 import { datos } from "@/lib/dataClient";
 import { track } from "@/lib/analytics";
+import { t } from "@/lib/i18n/cliente";
 
 interface Briefing {
   brief_date: string;
@@ -64,7 +65,7 @@ export default function MacroBrief() {
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", minWidth: 0 }}>
           {brief.audio_url && (
             <button
-              onClick={toggle} aria-label={playing ? "Pause the brief" : "Play the brief"}
+              onClick={toggle} aria-label={playing ? t("Pause the brief") : t("Play the brief")}
               style={{
                 flexShrink: 0, width: 38, height: 38, borderRadius: "50%", border: "none",
                 background: "var(--sr-amber)", color: "var(--sr-text-inv)", cursor: "pointer",
@@ -76,8 +77,7 @@ export default function MacroBrief() {
           )}
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }}>
-              {brief.cadence === "daily" ? "Daily" : "Weekly"} macro brief
-            </div>
+              {brief.cadence === "daily" ? t("Daily") : t("Weekly")} {" "}{t("macro brief")}</div>
             {/* No "text only" caption when there's no audio: text IS the intended state,
                 and labelling it reads as an apology for a missing feature. The play button
                 simply isn't there, which says everything it needs to. */}
@@ -95,7 +95,7 @@ export default function MacroBrief() {
             fontSize: "var(--sr-t-xs)", padding: "5px 10px", cursor: "pointer",
           }}
         >
-          {open ? "Hide transcript" : "Read it"}
+          {open ? t("Hide transcript") : t("Read it")}
         </button>
       </div>
 

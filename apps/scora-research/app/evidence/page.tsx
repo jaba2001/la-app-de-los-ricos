@@ -15,6 +15,8 @@ import portfolioBacktest from "@/research/out/portfolio_backtest.json";
 import trialsLedger from "@/research/out/trials_ledger.json";
 import { gradeSignal, GRADE_COLOR, GRADE_LABEL, MDE_IC, type OosStatus } from "@/lib/signalGrade";
 import { FACTOR_LABEL } from "@/lib/ensemble";
+import { tServidor } from "@/lib/i18n/servidor";
+import TransServidor from "@/components/TransServidor";
 
 export const metadata: Metadata = {
   title: "Evidence ledger · Scora",
@@ -43,7 +45,8 @@ function Tile({ label, value, sub, color }: { label: string; value: string; sub?
   );
 }
 
-export default function EvidencePage() {
+export default async function EvidencePage() {
+  const t = await tServidor();
   const sig = portfolioBacktest.significance;
   const nameMonths = backtestSummary.nameMonths as number;
   const universe = backtestSummary.universe as number;
@@ -68,84 +71,62 @@ export default function EvidencePage() {
 
   return (
     <main className="container" style={{ paddingTop: "var(--sr-sp-6)", paddingBottom: "var(--sr-sp-7)" }}>
-      <h1 style={{ fontSize: "var(--sr-t-3xl)", fontWeight: 800, marginBottom: "var(--sr-sp-2)" }}>Evidence ledger</h1>
+      <h1 style={{ fontSize: "var(--sr-t-3xl)", fontWeight: 800, marginBottom: "var(--sr-sp-2)" }}>{t("Evidence ledger")}</h1>
       <p style={{ color: "var(--sr-text-2)", maxWidth: 720, lineHeight: 1.65, marginBottom: "var(--sr-sp-5)" }}>
-        Every signal in this product, with what it actually measured — <strong>including the ones that failed</strong>.
-        Fama&rsquo;s joint-hypothesis problem says market efficiency can never be tested on its own: you always test
-        efficiency <em>and</em> a model of expected returns together, so any &ldquo;edge&rdquo; may just be a bad model.
-        There is no clean test. The honest response isn&rsquo;t silence — it&rsquo;s showing the working.
-      </p>
+        <TransServidor text={"Every signal in this product, with what it actually measured — <s1>including the ones that failed</s1>. Fama’s joint-hypothesis problem says market efficiency can never be tested on its own: you always test efficiency <s2>and</s2> a model of expected returns together, so any “edge” may just be a bad model. There is no clean test. The honest response isn’t silence — it’s showing the working."} s1={(c) => <strong>{c}</strong>} s2={(c) => <em>{c}</em>} /></p>
 
       {/* ── El titular ── */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">The headline: stock selection does not beat the index</div>
+        <div className="section-label">{t("The headline: stock selection does not beat the index")}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
-          <Tile label="Information coefficient" value={ic3(backtestSummary.informationCoefficient as number)} sub="score vs forward return · ~0 is no predictive power" />
-          <Tile label="PSR vs SPY" value={pct(sig.PSR_vs_SPY)} sub="want >95% · probability the true Sharpe beats SPY" color="var(--sr-neg)" />
-          <Tile label="Top-minus-bottom decile" value={`${(backtestSummary.topMinusBottom as number).toFixed(2)}%`} sub="best decile minus worst — negative is backwards" color="var(--sr-neg)" />
-          <Tile label="Universe" value={`${universe} names`} sub={`${rebalances} monthly rebalances · point-in-time membership`} />
+          <Tile label={t("Information coefficient")} value={ic3(backtestSummary.informationCoefficient as number)} sub={t("score vs forward return · ~0 is no predictive power")} />
+          <Tile label={t("PSR vs SPY")} value={pct(sig.PSR_vs_SPY)} sub={t("want >95% · probability the true Sharpe beats SPY")} color="var(--sr-neg)" />
+          <Tile label={t("Top-minus-bottom decile")} value={`${(backtestSummary.topMinusBottom as number).toFixed(2)}%`} sub={t("best decile minus worst — negative is backwards")} color="var(--sr-neg)" />
+          <Tile label={t("Universe")} value={t(`${universe} names`)} sub={t(`${rebalances} monthly rebalances · point-in-time membership`)} />
         </div>
         <div style={{ padding: "var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--sr-neg) 22%, transparent)", fontSize: "var(--sr-t-sm)", lineHeight: 1.6 }}>
-          <strong>Verdict:</strong> {portfolioBacktest.verdict}
+          <strong>{t("Verdict:")}</strong> {t(portfolioBacktest.verdict)}
         </div>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
-          This is the finding the rest of the product is built around. Proving honestly that you <em>cannot</em> beat
-          the index by picking stocks on free data is the moat, not the failure — Grossman &amp; Stiglitz (1980) showed
-          markets can&rsquo;t be perfectly efficient either, because then nobody would pay to gather information. The
-          return to research exists; it just isn&rsquo;t where retail products claim it is.
-        </p>
+          <TransServidor text={"This is the finding the rest of the product is built around. Proving honestly that you <s1>cannot</s1> beat the index by picking stocks on free data is the moat, not the failure — Grossman & Stiglitz (1980) showed markets can’t be perfectly efficient either, because then nobody would pay to gather information. The return to research exists; it just isn’t where retail products claim it is."} s1={(c) => <em>{c}</em>} /></p>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-2)", lineHeight: 1.6 }}>
-          Scope matters: this is measured on <strong>US large caps with free data</strong>. It is not a claim that no
-          one can ever beat an index. Where margin plausibly remains — less efficient universes, factor combinations
-          gated by regime, risk and drawdown control rather than selection — is a different question, and one that has
-          to be answered with the same measurement discipline rather than asserted.
-        </p>
+          <TransServidor text={"Scope matters: this is measured on <s1>US large caps with free data</s1>. It is not a claim that no one can ever beat an index. Where margin plausibly remains — less efficient universes, factor combinations gated by regime, risk and drawdown control rather than selection — is a different question, and one that has to be answered with the same measurement discipline rather than asserted."} s1={(c) => <strong>{c}</strong>} /></p>
       </div>
 
       {/* ── Deflación ── */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">How hard we deflate for having searched</div>
+        <div className="section-label">{t("How hard we deflate for having searched")}</div>
         <p className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.6, maxWidth: 720 }}>
-          Test 200 worthless strategies, keep the best, and it will show a healthy Sharpe by luck alone. The deflated
-          Sharpe (Bailey &amp; López de Prado) asks the only question that matters: <em>is this better than the best you&rsquo;d
-          expect from M attempts at nothing?</em> The threshold rises with M — so we publish M.
-        </p>
+          <TransServidor text={"Test 200 worthless strategies, keep the best, and it will show a healthy Sharpe by luck alone. The deflated Sharpe (Bailey & López de Prado) asks the only question that matters: <s1>is this better than the best you’d expect from M attempts at nothing?</s1> The threshold rises with M — so we publish M."} s1={(c) => <em>{c}</em>} /></p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-2)" }}>
-          <Tile label="Trials in this script" value={String(sig.trials)} sub="what the backtest itself swept" />
-          <Tile label="Trials on the same data" value={String(totalTrials)} sub={`across ${trialsLedger.artifacts} saved artifacts — a lower bound`} />
-          <Tile label="Deflated Sharpe · optimistic" value={pct(sig.DSR)} sub="using this script's M and variance" />
-          <Tile label="Deflated Sharpe · conservative" value={pct(sig.DSR_cumulative as number)} sub="using the full trial count and pooled dispersion" color="var(--sr-neg)" />
+          <Tile label={t("Trials in this script")} value={String(sig.trials)} sub={t("what the backtest itself swept")} />
+          <Tile label={t("Trials on the same data")} value={String(totalTrials)} sub={t(`across ${trialsLedger.artifacts} saved artifacts — a lower bound`)} />
+          <Tile label={t("Deflated Sharpe · optimistic")} value={pct(sig.DSR)} sub={t("using this script's M and variance")} />
+          <Tile label={t("Deflated Sharpe · conservative")} value={pct(sig.DSR_cumulative as number)} sub={t("using the full trial count and pooled dispersion")} color="var(--sr-neg)" />
         </div>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-          The truth sits between those two bounds: pooling different strategy families inflates the variance beyond
-          what the framework assumes, while counting only this script&rsquo;s three configurations plainly understates the
-          search. Neither bound rescues the verdict — it already fails on PSR. And the trial count is a <strong>lower
-          bound</strong>: it only counts variants that left a file behind.
-        </p>
+          <TransServidor text={"The truth sits between those two bounds: pooling different strategy families inflates the variance beyond what the framework assumes, while counting only this script’s three configurations plainly understates the search. Neither bound rescues the verdict — it already fails on PSR. And the trial count is a <s1>lower bound</s1>: it only counts variants that left a file behind."} s1={(c) => <strong>{c}</strong>} /></p>
       </div>
 
       {/* ── IC por factor ── */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">Every factor, graded</div>
+        <div className="section-label">{t("Every factor, graded")}</div>
         <p className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.6, maxWidth: 720 }}>
-          Measured information coefficient per correlation regime, from a survivorship-free run
-          ({nameMonths.toLocaleString("en")} name-months). Each factor is graded on its <em>best</em> regime — the most
-          generous reading available — and the grade is still mostly C and D. That is the point.
-        </p>
+          <TransServidor text={`Measured information coefficient per correlation regime, from a survivorship-free run (${nameMonths.toLocaleString("en")} name-months). Each factor is graded on its <s1>best</s1> regime — the most generous reading available — and the grade is still mostly C and D. That is the point.`} s1={(c) => <em>{c}</em>} /></p>
         <div style={{ overflowX: "auto" }}>
           <table className="sr-table">
             <thead>
               <tr>
-                <th>Factor</th>
+                <th>{t("Factor")}</th>
                 {REGIMES.map((r) => <th key={r} style={{ textAlign: "right" }}>{REGIME_LABEL[r]}</th>)}
-                <th style={{ textAlign: "right" }}>Best</th>
-                <th style={{ textAlign: "center" }}>Grade</th>
+                <th style={{ textAlign: "right" }}>{t("Best")}</th>
+                <th style={{ textAlign: "center" }}>{t("Grade")}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map(({ factor, ics, best, graded }) => (
                 <tr key={factor}>
-                  <td style={{ fontWeight: 600 }}>{FACTOR_LABEL[factor] ?? factor}</td>
+                  <td style={{ fontWeight: 600 }}>{t(FACTOR_LABEL[factor] ?? factor)}</td>
                   {ics.map((v, i) => (
                     <td key={i} style={{ textAlign: "right", color: v > 0 ? "var(--sr-text-2)" : "var(--sr-text-3)" }} className="num">{ic3(v)}</td>
                   ))}
@@ -171,49 +152,38 @@ export default function EvidencePage() {
 
       {/* ── Lo que falló ── */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">What failed, and stayed failed</div>
+        <div className="section-label">{t("What failed, and stayed failed")}</div>
         {ensembleOOS ? (
           <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-3)" }}>
-              <Tile label="Ensemble OOS IC" value={ic3(ensembleOOS.ensembleIC)} sub="frozen train-window weights, tested out of sample" color="var(--sr-neg)" />
-              <Tile label="Monolithic score OOS IC" value={ic3(ensembleOOS.scoreIC)} sub="the incumbent it had to beat" />
-              <Tile label="Test months" value={String(ensembleOOS.testMonths ?? "—")} sub={`split at ${ensembleOOS.split ?? "—"}`} />
-              <Tile label="Gate" value={ensembleOOS.pass ? "PASSED" : "FAILED"} sub="must be >0 AND beat the score" color={ensembleOOS.pass ? "var(--sr-pos)" : "var(--sr-neg)"} />
+              <Tile label={t("Ensemble OOS IC")} value={ic3(ensembleOOS.ensembleIC)} sub={t("frozen train-window weights, tested out of sample")} color="var(--sr-neg)" />
+              <Tile label={t("Monolithic score OOS IC")} value={ic3(ensembleOOS.scoreIC)} sub={t("the incumbent it had to beat")} />
+              <Tile label={t("Test months")} value={String(ensembleOOS.testMonths ?? "—")} sub={t(`split at ${ensembleOOS.split ?? "—"}`)} />
+              <Tile label={t("Gate")} value={ensembleOOS.pass ? "PASSED" : "FAILED"} sub={t("must be >0 AND beat the score")} color={ensembleOOS.pass ? "var(--sr-pos)" : "var(--sr-neg)"} />
             </div>
             <p className="sr-hint" style={{ lineHeight: 1.6 }}>
-              The IC-weighted ensemble — the most sophisticated thing in the codebase — was tested out of sample against
-              the plain score and <strong>lost</strong>. So it stays informational: visible in the UI as context, never
-              feeding the score. Signals do not get promoted because they are clever; they get promoted by clearing a gate.
-            </p>
+              <TransServidor text={"The IC-weighted ensemble — the most sophisticated thing in the codebase — was tested out of sample against the plain score and <s1>lost</s1>. So it stays informational: visible in the UI as context, never feeding the score. Signals do not get promoted because they are clever; they get promoted by clearing a gate."} s1={(c) => <strong>{c}</strong>} /></p>
           </>
         ) : (
-          <p className="sr-hint">Out-of-sample gate artifact not present in this build.</p>
+          <p className="sr-hint">{t("Out-of-sample gate artifact not present in this build.")}</p>
         )}
       </div>
 
       {/* ── Metodología ── */}
       <div className="card">
-        <div className="section-label">How to read this page</div>
+        <div className="section-label">{t("How to read this page")}</div>
         <ul style={{ margin: 0, paddingLeft: "1.1rem", color: "var(--sr-text-2)", fontSize: "var(--sr-t-sm)", lineHeight: 1.75 }}>
-          <li>Every number comes from a committed artifact in <code>research/out/</code>. The test suite fails if a file is missing or if the constants shipped in the code drift from it.</li>
+          <li>{t("Every number comes from a committed artifact in")}{" "}<code>research/out/</code>{t(". The test suite fails if a file is missing or if the constants shipped in the code drift from it.")}</li>
           <li>
-            An information coefficient near zero means <em>no predictive power</em>. More precisely: this universe&rsquo;s
-            <strong>minimum detectable effect is IC {MDE_IC}</strong> at 80% power (measured — the cross-sectional IC has
-            a standard deviation of ~0.22, so 192 months buys you that much resolution and no more). Below it a
-            coefficient is not &ldquo;weak&rdquo;, it is <em>undetectable</em>: confirming an IC of 0.02 would take
-            seventy-seven years of data. Grades score it as zero, not as partial credit.
-          </li>
+            <TransServidor text={`An information coefficient near zero means <s1>no predictive power</s1>. More precisely: this universe’s<s2>minimum detectable effect is IC ${MDE_IC}</s2> at 80% power (measured — the cross-sectional IC has a standard deviation of ~0.22, so 192 months buys you that much resolution and no more). Below it a coefficient is not “weak”, it is <s3>undetectable</s3>: confirming an IC of 0.02 would take seventy-seven years of data. Grades score it as zero, not as partial credit.`} s1={(c) => <em>{c}</em>} s2={(c) => <strong>{c}</strong>} s3={(c) => <em>{c}</em>} /></li>
           <li>
-            Benchmark caveat: the headline compares against SPY. A cap-weighted index is not the only fair yardstick —
-            the same signal can beat SPY and lose badly against its own equal-weighted universe, which is the benchmark
-            that shares the universe&rsquo;s selection bias. Read single-benchmark claims here, including ours, with that in mind.
-          </li>
-          <li>Grades penalise multiplicity: {totalTrials} trials on the same history raise the bar for all of them. Only one market history exists, and every pass spends it.</li>
-          <li>Point-in-time universe means delisted and removed names are included as of each date — no survivorship bias inflating the result.</li>
-          <li>Past measurement is not a forecast. Nothing here is investment advice.</li>
+            {t("Benchmark caveat: the headline compares against SPY. A cap-weighted index is not the only fair yardstick — the same signal can beat SPY and lose badly against its own equal-weighted universe, which is the benchmark that shares the universe’s selection bias. Read single-benchmark claims here, including ours, with that in mind.")}</li>
+          <li>{t(`Grades penalise multiplicity: ${totalTrials} trials on the same history raise the bar for all of them. Only one market history exists, and every pass spends it.`)}</li>
+          <li>{t("Point-in-time universe means delisted and removed names are included as of each date — no survivorship bias inflating the result.")}</li>
+          <li>{t("Past measurement is not a forecast. Nothing here is investment advice.")}</li>
         </ul>
         <p className="sr-hint" style={{ marginTop: "var(--sr-sp-3)" }}>
-          Artifacts generated {new Date(signalsIc.generatedAt as string).toISOString().slice(0, 10)} · trial ledger {new Date(trialsLedger.generatedAt as string).toISOString().slice(0, 10)}
+          {t(`Artifacts generated ${new Date(signalsIc.generatedAt as string).toISOString().slice(0, 10)} · trial ledger ${new Date(trialsLedger.generatedAt as string).toISOString().slice(0, 10)}`)}
         </p>
       </div>
     </main>

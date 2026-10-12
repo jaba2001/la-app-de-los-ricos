@@ -6,6 +6,7 @@ import { datos } from "@/lib/dataClient";
 import { computeSmartMoneySignal } from "@/lib/smartMoney";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 interface Props { data: StockData | null; loading: boolean; ticker: string; }
 /** $8.5M · $412K: con «/1e6 .toFixed(1)», una compra de 30.000 $ salía como «$0.0M». */
@@ -89,45 +90,44 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       {/* Smart Money Signal — net read + buckets over insider/13-F/Congress (free-data, TradeVision-style) */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)", flexWrap: "wrap" }}>
-          <div className="section-label" style={{ margin: 0 }}>Smart Money Signal — {ticker}</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr(`Smart Money Signal — ${ticker}`)}</div>
           {/* El rotulo nombra lo que ENTRA EN LA NOTA, no lo que se ve en el panel. El 13-F se
               muestra mas abajo como contexto pero nunca puntuo —la funcion recibe insiders y
               Congreso, no carteras—, y el Congreso quedo retirado el 2026-09-04. Prometer tres
               fuentes y usar una era una afirmacion sin respaldo. */}
-          <span className="sr-hint">Insiders · free data · 13F and Congress, as context</span>
+          <span className="sr-hint">{tr("Insiders · free data · 13F and Congress, as context")}</span>
         </div>
         {loading ? <Sk w="100%" h={120} /> : (
           <div style={{ display: "grid", gridTemplateColumns: "minmax(180px, 240px) 1fr", gap: "var(--sr-sp-5)", alignItems: "stretch" }}>
             {/* Net read */}
             <div className="sr-tile" style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, borderColor: `color-mix(in srgb, ${signal.color} 35%, transparent)`, background: `color-mix(in srgb, ${signal.color} 7%, var(--sr-surface-2))` }}>
-              <div className="sr-tile-label">Net read</div>
-              <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: signal.color, lineHeight: 1.1 }}>{signal.label}</div>
+              <div className="sr-tile-label">{tr("Net read")}</div>
+              <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, color: signal.color, lineHeight: 1.1 }}>{tv(signal.label)}</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 2 }}>
                 <span className="num" style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: signal.color }}>{signal.netScore > 0 ? "+" : ""}{signal.netScore}</span>
-                <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-3)", color: "var(--sr-text-2)", fontWeight: 600 }}>{signal.conviction} conviction</span>
+                <span style={{ fontSize: "10px", padding: "1px 7px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-3)", color: "var(--sr-text-2)", fontWeight: 600 }}>{tr(`${signal.conviction} conviction`)}</span>
               </div>
               <div className="sr-hint" style={{ marginTop: 4 }}>
-                {signal.insider.buyCount}B / {signal.insider.sellCount}S insider{signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? "" : ""}
+                {tr(`${signal.insider.buyCount}B / ${signal.insider.sellCount}S insider`)}{signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? "" : ""}
                 {/* El Congreso va DETRAS del separador y con su propia etiqueta: desde el
                     2026-09-04 no puntua, asi que ponerlo al lado de los insiders sugeriria que
                     aporta a la nota. Y si la fuente no contesta se dice, en vez de «0B / 0S». */}
                 {congresoCaido
-                  ? <span style={{ opacity: .7 }}> · congress: source unavailable</span>
-                  : <span style={{ opacity: .7 }}> · congress (not scored): {signal.congress.buyCount}B / {signal.congress.sellCount}S</span>}
-                {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? ` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M` : ""}
+                  ? <span style={{ opacity: .7 }}> {" "}{tr("· congress: source unavailable")}</span>
+                  : <span style={{ opacity: .7 }}> {" "}{tr(`· congress (not scored): ${signal.congress.buyCount}B / ${signal.congress.sellCount}S`)}</span>}
+                {signal.insider.netUsd != null && Math.abs(signal.insider.netUsd) > 0 ? tr(` · net ${signal.insider.netUsd >= 0 ? "+" : "−"}$${(Math.abs(signal.insider.netUsd) / 1e6).toFixed(1)}M`) : ""}
               </div>
             </div>
             {/* Buckets */}
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
               {signal.highlights.map((h, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "baseline", gap: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "var(--sr-surface-2)", border: `1px solid color-mix(in srgb, ${toneColor(h.tone)} 22%, transparent)` }}>
-                  <span style={{ flexShrink: 0, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(h.tone), minWidth: 108 }}>{h.label}</span>
-                  <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.5 }}>{h.detail}</span>
+                  <span style={{ flexShrink: 0, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: toneColor(h.tone), minWidth: 108 }}>{tv(h.label)}</span>
+                  <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-2)", lineHeight: 1.5 }}>{tv(h.detail)}</span>
                 </div>
               ))}
               <div className="sr-hint" style={{ marginTop: 2 }}>
-                Net read weights open-market insider buys/sells (cluster buys strongest) + STOCK-Act disclosures. Not a recommendation.
-              </div>
+                {tr("Net read weights open-market insider buys/sells (cluster buys strongest) + STOCK-Act disclosures. Not a recommendation.")}</div>
             </div>
           </div>
         )}
@@ -136,13 +136,13 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       {/* Sector Relative Strength */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
-          <div className="section-label" style={{ margin: 0 }}>Sector Relative Strength vs {etfSym}</div>
+          <div className="section-label" style={{ margin: 0 }}>{tr(`Sector Relative Strength vs ${etfSym}`)}</div>
         </div>
         {loading ? <Sk w="100%" h={80} /> : (
           <div className="sr-grid-4">
             {rs.map(({ label, tickRet, sectorRet, alpha }) => (
               <div key={label} className="sr-tile">
-                <div className="sr-tile-label">{label} Alpha</div>
+                <div className="sr-tile-label">{tr(`${label} Alpha`)}</div>
                 {alpha != null ? (
                   <>
                     <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: rc(alpha) }} className="num">
@@ -165,12 +165,12 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
         {/* Insider transactions */}
         <div className="card">
-          <div className="section-label">Insider Transactions — {ticker}</div>
+          <div className="section-label">{tr(`Insider Transactions — ${ticker}`)}</div>
           {loading ? <Sk w="100%" h={200} /> : insiders.length === 0 ? (
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>No recent insider activity</div>
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>{tr("No recent insider activity")}</div>
           ) : (
             <table className="sr-table">
-              <thead><tr><th>Date</th><th>Name</th><th>Type</th><th style={{ textAlign: "right" }}>Shares</th></tr></thead>
+              <thead><tr><th>{tr("Date")}</th><th>{tr("Name")}</th><th>{tr("Type")}</th><th style={{ textAlign: "right" }}>{tr("Shares")}</th></tr></thead>
               <tbody>
                 {insiders.slice(0, 10).map((t, i) => {
                   // Finnhub gives a signed `change` (shares acquired vs disposed) — the
@@ -194,14 +194,14 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
 
         {/* 13-F Institutional Holders */}
         <div className="card">
-          <div className="section-label">13-F Institutional Holders</div>
+          <div className="section-label">{tr("13-F Institutional Holders")}</div>
           {loading ? <Sk w="100%" h={200} /> : holders.length === 0 ? (
             // Vacío por la fuente, no por la empresa: los tenedores 13-F de FMP no entran en el
             // plan (402) y no hay sustituto gratuito. Decirlo evita que parezca «nadie la tiene».
-            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>13-F holder data isn&apos;t included in the current data plan.</div>
+            <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>{tr("13-F holder data isn't included in the current data plan.")}</div>
           ) : (
             <table className="sr-table">
-              <thead><tr><th>Institution</th><th style={{ textAlign: "right" }}>Shares</th><th style={{ textAlign: "right" }}>% Portfolio</th></tr></thead>
+              <thead><tr><th>{tr("Institution")}</th><th style={{ textAlign: "right" }}>{tr("Shares")}</th><th style={{ textAlign: "right" }}>{tr("% Portfolio")}</th></tr></thead>
               <tbody>
                 {holders.slice(0, 10).map((h, i) => (
                   <tr key={i}>
@@ -218,19 +218,19 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
 
       {/* Congressional Trades */}
       <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
-        <div className="section-label">Congressional Trades — STOCK Act Disclosures</div>
+        <div className="section-label">{tr("Congressional Trades — STOCK Act Disclosures")}</div>
         {loading ? <Sk w="100%" h={160} /> : allCongress.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>
             {/* Sin fuente no se puede afirmar «no hay operaciones»: se dice que falta la fuente. */}
             {congresoCaido
-              ? "Congressional trading data is unavailable: the public STOCK Act feeds stopped being public in September 2026."
-              : `No recent congressional disclosures for ${ticker}`}
+              ? tr("Congressional trading data is unavailable: the public STOCK Act feeds stopped being public in September 2026.")
+              : tr(`No recent congressional disclosures for ${ticker}`)}
           </div>
         ) : (
           <table className="sr-table">
             <thead><tr>
-              <th>Date</th><th>Member</th><th>Chamber</th>
-              <th>Type</th><th style={{ textAlign: "right" }}>Amount</th>
+              <th>{tr("Date")}</th><th>{tr("Member")}</th><th>{tr("Chamber")}</th>
+              <th>{tr("Type")}</th><th style={{ textAlign: "right" }}>{tr("Amount")}</th>
             </tr></thead>
             <tbody>
               {allCongress.slice(0, 15).map((t, i) => {
@@ -259,19 +259,18 @@ export default function StockSmartMoney({ data, loading, ticker }: Props) {
 
       {/* Market-wide top insider buyers */}
       <div className="card">
-        <div className="section-label">Market Top Insider Buyers — Open Market (Updated Weekly)</div>
+        <div className="section-label">{tr("Market Top Insider Buyers — Open Market (Updated Weekly)")}</div>
         <DataError mensaje={errorTop} />
         {loadingTop ? <Sk w="100%" h={200} /> : errorTop ? null : topBuyers.length === 0 ? (
           <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", padding: "var(--sr-sp-4) 0" }}>
-            No data yet — cron runs every Monday (FMP Form 4s)
-          </div>
+            {tr("No data yet — cron runs every Monday (FMP Form 4s)")}</div>
         ) : (
           <table className="sr-table">
             <thead><tr>
-              <th>#</th><th>Ticker</th><th>Sector</th>
-              <th style={{ textAlign: "right" }}>Net Buying</th>
-              <th style={{ textAlign: "right" }}># Insiders</th>
-              <th>Month</th>
+              <th>#</th><th>{tr("Ticker")}</th><th>{tr("Sector")}</th>
+              <th style={{ textAlign: "right" }}>{tr("Net Buying")}</th>
+              <th style={{ textAlign: "right" }}>{tr("# Insiders")}</th>
+              <th>{tr("Month")}</th>
             </tr></thead>
             <tbody>
               {topBuyers.slice(0, 15).map((row) => (

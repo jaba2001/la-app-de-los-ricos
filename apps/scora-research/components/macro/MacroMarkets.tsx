@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import type { MacroState } from "@/lib/types";
 import { authedFetch } from "@/lib/proxy";
 import { Sk } from "@/components/ui/Skeleton";
+import { t as tr, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -114,10 +116,10 @@ export default function MacroMarkets({ macro, loading }: Props) {
       {/* Market Breadth from macro_state */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-6)" }}>
         <div className="card">
-          <div className="section-label">Sentiment</div>
+          <div className="section-label">{tr("Sentiment")}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-3)" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Fear & Greed</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tr("Fear & Greed")}</span>
               {loading ? <Sk w={40} h={16} /> : (
                 <div style={{ textAlign: "right" }}>
                   <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">{macro?.fear_greed != null ? Number(macro.fear_greed).toFixed(0) : "—"}</span>
@@ -126,13 +128,13 @@ export default function MacroMarkets({ macro, loading }: Props) {
               )}
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Put/Call Ratio</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tr("Put/Call Ratio")}</span>
               {loading ? <Sk w={40} h={16} /> : (
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">{macro?.put_call_ratio != null ? Number(macro.put_call_ratio).toFixed(2) : "—"}</span>
               )}
             </div>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Sentiment Signal</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tr("Sentiment Signal")}</span>
               {loading ? <Sk w={60} h={16} /> : (
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }}>{macro?.sentiment_signal ?? "—"}</span>
               )}
@@ -141,7 +143,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
         </div>
 
         <div className="card">
-          <div className="section-label">WTI Oil</div>
+          <div className="section-label">{tr("WTI Oil")}</div>
           {loading ? <Sk w="100%" h={48} /> : (
             <div>
               <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700 }} className="num">
@@ -163,7 +165,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
         </div>
 
         <div className="card">
-          <div className="section-label">Global Liquidity</div>
+          <div className="section-label">{tr("Global Liquidity")}</div>
           {loading ? <Sk w="100%" h={48} /> : (
             <div>
               <div style={{
@@ -175,7 +177,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
                 {macro?.global_liquidity_dir ?? "—"}
               </div>
               <div style={{ marginTop: 8, fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>
-                Net Liquidity: <strong>{macro?.net_liquidity_dir ?? "—"}</strong>
+                <Trans text={`Net Liquidity: <s1>${macro?.net_liquidity_dir ?? "—"}</s1>`} s1={(c) => <strong>{c}</strong>} />
               </div>
             </div>
           )}
@@ -184,7 +186,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
 
       {/* Crypto */}
       <div style={{ marginBottom: "var(--sr-sp-6)" }}>
-        <div className="section-label">Crypto</div>
+        <div className="section-label">{tr("Crypto")}</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "var(--sr-sp-4)", maxWidth: 480 }}>
           {CRYPTO_TICKERS.map(t => {
             const q = cryptoQuotes[t];
@@ -204,7 +206,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                   <div>
-                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{label}</div>
+                    <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 2 }}>{tv(label)}</div>
                     <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 800, letterSpacing: "0.04em" }}>{sym}</div>
                   </div>
                   {loadingC ? <Sk w={60} h={20} /> : (
@@ -225,7 +227,7 @@ export default function MacroMarkets({ macro, loading }: Props) {
       {/* ETF grids */}
       {ETF_GROUPS.map(group => (
         <div key={group.label} style={{ marginBottom: "var(--sr-sp-5)" }}>
-          <div className="section-label">{group.label}</div>
+          <div className="section-label">{tv(group.label)}</div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: "var(--sr-sp-3)" }}>
             {group.tickers.map(t => (
               <QuoteCard key={t} ticker={t} quote={quotes[t] ?? null} loadingQ={loadingQ} />

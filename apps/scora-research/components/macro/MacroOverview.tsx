@@ -10,6 +10,7 @@ import { useAuth } from "@/lib/auth";
 import DataError, { NO_SE_PUDO_CARGAR } from "@/components/ui/DataError";
 import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
 import { classifyInstrument } from "@/lib/instrument";
+import { t, tv, fechaHora } from "@/lib/i18n/cliente";
 
 interface Props { macro: MacroState | null; loading: boolean; }
 
@@ -88,7 +89,7 @@ export default function MacroOverview({ macro, loading }: Props) {
   const { session } = useAuth();
   const regimeColor = macro?.regime_id ? (REGIME_COLORS[macro.regime_id] ?? "var(--sr-text-2)") : "var(--sr-text-2)";
   const updatedAt   = macro?.updated_at
-    ? new Date(macro.updated_at).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    ? fechaHora(macro.updated_at, { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })
     : null;
   const isStale = macro?.updated_at
     ? (Date.now() - new Date(macro.updated_at).getTime()) > 24 * 60 * 60 * 1000
@@ -150,27 +151,27 @@ export default function MacroOverview({ macro, loading }: Props) {
                     {macro?.ic_score != null ? Number(macro.ic_score).toFixed(1) : "—"}
                   </span>
                   <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", fontWeight: 600, letterSpacing: "0.08em", marginTop: 2 }}>STRESS INDEX</span>
-                  <span style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 1, opacity: 0.7 }}>↑ = more risk</span>
+                  <span style={{ fontSize: "9px", color: "var(--sr-text-3)", marginTop: 1, opacity: 0.7 }}>{t("↑ = more risk")}</span>
                 </div>
               </>
             )}
           </div>
           <div>
-            <div className="section-label">Market Stress Score</div>
+            <div className="section-label">{t("Market Stress Score")}</div>
             {loading ? <Sk w={120} h={20} /> : (
               <div style={{ fontSize: "var(--sr-t-lg)", fontWeight: 700, color: icScoreColor(macro?.ic_score), marginBottom: 4 }}>
-                {Number(macro?.ic_score ?? 0) >= 70 ? "High Stress" : Number(macro?.ic_score ?? 0) >= 45 ? "Elevated" : "Low Stress"}
+                {Number(macro?.ic_score ?? 0) >= 70 ? t("High Stress") : Number(macro?.ic_score ?? 0) >= 45 ? t("Elevated") : t("Low Stress")}
               </div>
             )}
             {updatedAt && (
               <div style={{ fontSize: "var(--sr-t-xs)", color: isStale ? "var(--sr-warn)" : "var(--sr-text-3)", display: "flex", alignItems: "center", gap: 4 }}>
-                {isStale && <span title="Data older than 24h">⚠</span>} Updated {updatedAt}
+                {isStale && <span title={t("Data older than 24h")}>⚠</span>} {" "}{t(`Updated ${updatedAt}`)}
               </div>
             )}
             {icHistory.length >= 2 && (
               <div style={{ marginTop: 12 }}>
                 <Sparkline points={icHistory.map(h => h.score)} color={icScoreColor(macro?.ic_score)} />
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>IC Score — {icHistory.length} snapshots</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 2 }}>{t(`IC Score — ${icHistory.length} snapshots`)}</div>
               </div>
             )}
           </div>
@@ -179,10 +180,10 @@ export default function MacroOverview({ macro, loading }: Props) {
         <div className="card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--sr-sp-4)" }}>
             <div>
-              <div className="section-label">Current Regime</div>
+              <div className="section-label">{t("Current Regime")}</div>
               {loading ? <Sk w={140} h={32} /> : (
                 <div style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 700, color: regimeColor, letterSpacing: "-0.02em" }}>
-                  {etiquetaRegimen(macro) ?? "Loading…"}
+                  {etiquetaRegimen(macro) ?? t("Loading…")}
                 </div>
               )}
             </div>
@@ -195,7 +196,7 @@ export default function MacroOverview({ macro, loading }: Props) {
               { label: "Fed Room",      val: macro?.fed_room },
             ].map(({ label, val }) => (
               <div key={label} className="sr-tile">
-                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
+                <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.06em" }}>{tv(label)}</div>
                 {loading ? <Sk w="80%" h={14} /> : <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }}>{val ?? "—"}</div>}
               </div>
             ))}
@@ -211,11 +212,11 @@ export default function MacroOverview({ macro, loading }: Props) {
           <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-5)" }}>
             {/* IC Health Score */}
             <div className="card" style={{ textAlign: "center", padding: "var(--sr-sp-4)" }}>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "var(--sr-sp-2)" }}>IC Health Score</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "var(--sr-sp-2)" }}>{t("IC Health Score")}</div>
               {icHealth != null && hl ? (
                 <>
                   <div style={{ fontSize: "var(--sr-t-3xl)", fontWeight: 700, color: hl.color, lineHeight: 1 }} className="num">{icHealth.toFixed(0)}</div>
-                  <div style={{ marginTop: 6, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hl.color, letterSpacing: "0.08em" }}>{hl.label}</div>
+                  <div style={{ marginTop: 6, fontSize: "var(--sr-t-xs)", fontWeight: 700, color: hl.color, letterSpacing: "0.08em" }}>{tv(hl.label)}</div>
                   <div style={{ marginTop: 8, height: 4, borderRadius: 2, background: "var(--sr-surface-3)" }}>
                     <div style={{ height: "100%", width: `${icHealth}%`, background: hl.color, borderRadius: 2, transition: "width 800ms ease" }} />
                   </div>
@@ -229,8 +230,8 @@ export default function MacroOverview({ macro, loading }: Props) {
             {/* Druckenmiller Signal Hierarchy */}
             <div className="card" style={{ padding: "var(--sr-sp-4)" }}>
               <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)" }}>
-                <div className="section-label" style={{ margin: 0 }}>Signal Hierarchy — Druckenmiller Framework</div>
-                <span className="sr-hint">Priority 1→5</span>
+                <div className="section-label" style={{ margin: 0 }}>{t("Signal Hierarchy — Druckenmiller Framework")}</div>
+                <span className="sr-hint">{t("Priority 1→5")}</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)" }}>
                 {SIGNAL_HIERARCHY.map(s => {
@@ -245,7 +246,7 @@ export default function MacroOverview({ macro, loading }: Props) {
                       <span style={{ fontSize: "10px", color: "var(--sr-text-3)", width: 16, textAlign: "center", fontWeight: 700 }}>{s.tier}</span>
                       <div style={{ width: 8, height: 8, borderRadius: "50%", background: dot, boxShadow: isBad ? `0 0 5px ${dot}` : "none", flexShrink: 0 }} />
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: sigColor, width: 90, flexShrink: 0 }}>{s.name}</span>
-                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flex: 1 }}>{s.desc}</span>
+                      <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", flex: 1 }}>{tv(s.desc)}</span>
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700, color: sigColor, width: 36, textAlign: "right" }} className="num">{val != null ? val.toFixed(0) : "—"}</span>
                     </div>
                   );
@@ -257,7 +258,7 @@ export default function MacroOverview({ macro, loading }: Props) {
       })()}
 
       {/* Composite scores */}
-      <div className="section-label">Composite Scores</div>
+      <div className="section-label">{t("Composite Scores")}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-6)" }}>
         {COMPOSITES.map(({ key, label, abbr, color }) => {
           const val = macro?.[key] as number | null | undefined;
@@ -271,7 +272,7 @@ export default function MacroOverview({ macro, loading }: Props) {
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>{label}</div>
+              <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>{tv(label)}</div>
               <div className="score-bar-track">
                 <div className="score-bar-fill" style={{ width: `${Number(val ?? 0)}%`, background: color }} />
               </div>
@@ -283,7 +284,7 @@ export default function MacroOverview({ macro, loading }: Props) {
       {/* Key signals grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--sr-sp-5)", marginBottom: "var(--sr-sp-6)" }}>
         <div className="card">
-          <div className="section-label">Rates & Curve</div>
+          <div className="section-label">{t("Rates & Curve")}</div>
           {[
             { label: "2Y Treasury",      val: macro?.dgs2,            fmt: (v: number) => `${v.toFixed(2)}%` },
             { label: "10Y Treasury",     val: macro?.dgs10,           fmt: (v: number) => `${v.toFixed(2)}%` },
@@ -292,14 +293,14 @@ export default function MacroOverview({ macro, loading }: Props) {
             { label: "Curve Steepener",  val: macro?.curve_steepener, fmt: (v: number) => isNaN(v) ? String(macro?.curve_steepener ?? "—") : `${v.toFixed(0)}bp` },
           ].map(({ label, val, fmt }) => (
             <div key={label} className="stat-row">
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(label)}</span>
               {loading ? <Sk w={50} h={14} /> : <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }} className="num">{val != null ? fmt(Number(val)) : "—"}</span>}
             </div>
           ))}
         </div>
 
         <div className="card">
-          <div className="section-label">Fed & Macro</div>
+          <div className="section-label">{t("Fed & Macro")}</div>
           {[
             { label: "Core PCE YoY",       val: macro?.core_pce_yoy,       fmt: (v: number) => `${v.toFixed(1)}%` },
             { label: "Unemployment",        val: macro?.unrate,             fmt: (v: number) => `${v.toFixed(1)}%` },
@@ -307,18 +308,18 @@ export default function MacroOverview({ macro, loading }: Props) {
             { label: "Expected Return 10Y", val: macro?.expected_return_10y,fmt: (v: number) => `${v.toFixed(1)}%` },
           ].map(({ label, val, fmt }) => (
             <div key={label} className="stat-row">
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(label)}</span>
               {loading ? <Sk w={50} h={14} /> : <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }} className="num">{val != null ? fmt(Number(val)) : "—"}</span>}
             </div>
           ))}
           <div className="stat-row">
-            <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Fed Room</span>
+            <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{t("Fed Room")}</span>
             {loading ? <Sk w={60} h={14} /> : <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600 }}>{macro?.fed_room ?? "—"}</span>}
           </div>
         </div>
 
         <div className="card">
-          <div className="section-label">Oil & Sentiment</div>
+          <div className="section-label">{t("Oil & Sentiment")}</div>
           {[
             { label: "WTI Oil",       val: macro?.wti_level,    fmt: (v: number) => `$${v.toFixed(1)}`,  color: undefined },
             { label: "WTI Change 1M", val: macro?.wti_chg_1m,   fmt: (v: number) => `${v.toFixed(1)}%`,  color: (v: number) => v >= 0 ? "var(--sr-pos)" : "var(--sr-neg)" },
@@ -326,7 +327,7 @@ export default function MacroOverview({ macro, loading }: Props) {
             { label: "Put/Call",      val: macro?.put_call_ratio,fmt: (v: number) => v.toFixed(2),         color: undefined },
           ].map(({ label, val, fmt, color }) => (
             <div key={label} className="stat-row">
-              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{label}</span>
+              <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{tv(label)}</span>
               {loading ? <Sk w={50} h={14} /> : (
                 <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: color && val != null ? color(Number(val)) : "var(--sr-text)" }} className="num">
                   {val != null ? fmt(Number(val)) : "—"}
@@ -335,7 +336,7 @@ export default function MacroOverview({ macro, loading }: Props) {
             </div>
           ))}
           <div className="stat-row">
-            <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>Global Liquidity</span>
+            <span style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)" }}>{t("Global Liquidity")}</span>
             {loading ? <Sk w={60} h={14} /> : (
               <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: macro?.global_liquidity_dir === "expansion" ? "var(--sr-pos)" : macro?.global_liquidity_dir === "contraction" ? "var(--sr-neg)" : "var(--sr-warn)" }}>
                 {macro?.global_liquidity_dir ?? "—"}
@@ -349,18 +350,18 @@ export default function MacroOverview({ macro, loading }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-5)" }}>
         {/* Portfolio Positioning */}
         <div className="card">
-          <div className="section-label">Portfolio Positioning</div>
+          <div className="section-label">{t("Portfolio Positioning")}</div>
           {loading ? <Sk w="100%" h={160} /> : (
             <div>
               {quadrantInfo ? (
                 <>
                   <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-3)" }}>
-                    <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: quadrantInfo.color }}>{quadrantInfo.label}</div>
+                    <div style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: quadrantInfo.color }}>{tv(quadrantInfo.label)}</div>
                     <Pill label={quadrantInfo.label.toUpperCase()} color={quadrantInfo.color} />
                   </div>
-                  <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)" }}>{quadrantInfo.desc}</div>
+                  <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", marginBottom: "var(--sr-sp-3)" }}>{tv(quadrantInfo.desc)}</div>
                   <div style={{ marginBottom: "var(--sr-sp-2)" }}>
-                    <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>Suggested ETFs</span>
+                    <span style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.06em" }}>{t("Suggested ETFs")}</span>
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)" }}>
                     {quadrantInfo.etfs.map(etf => (
@@ -379,10 +380,10 @@ export default function MacroOverview({ macro, loading }: Props) {
                 </>
               ) : (
                 <>
-                  <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-4)" }}>All quadrant allocations:</div>
+                  <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-4)" }}>{t("All quadrant allocations:")}</div>
                   {Object.entries(PORTFOLIO_QUADRANTS).map(([key, q]) => (
                     <div key={key} style={{ marginBottom: "var(--sr-sp-3)" }}>
-                      <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: q.color, marginBottom: 4 }}>{q.label}</div>
+                      <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: q.color, marginBottom: 4 }}>{tv(q.label)}</div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {q.etfs.map(etf => (
                           <span key={etf} style={{ fontSize: "10px", padding: "2px 6px", borderRadius: "var(--sr-radius-pill)", background: "var(--sr-surface-2)", color: "var(--sr-text-3)", fontFamily: "var(--font-mono, ui-monospace, monospace)" }}>{etf}</span>
@@ -398,17 +399,16 @@ export default function MacroOverview({ macro, loading }: Props) {
 
         {/* Top At Risk */}
         <div className="card">
-          <div className="section-label">Top At Risk — Worst Macro Tilt</div>
+          <div className="section-label">{t("Top At Risk — Worst Macro Tilt")}</div>
           {topAtRisk.length === 0 ? (
             <div style={{ color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)" }}>
-              Analyze stocks in the Stocks tab to populate this list.
-            </div>
+              {t("Analyze stocks in the Stocks tab to populate this list.")}</div>
           ) : (
             <table className="sr-table">
               <thead><tr>
-                <th>Ticker</th><th>Sector</th>
-                <th style={{ textAlign: "right" }}>Score</th>
-                <th style={{ textAlign: "right" }}>Macro Tilt</th>
+                <th>{t("Ticker")}</th><th>{t("Sector")}</th>
+                <th style={{ textAlign: "right" }}>{t("Score")}</th>
+                <th style={{ textAlign: "right" }}>{t("Macro Tilt")}</th>
               </tr></thead>
               <tbody>
                 {topAtRisk.map(r => {
@@ -418,7 +418,7 @@ export default function MacroOverview({ macro, loading }: Props) {
                     <tr key={r.ticker} style={{ cursor: "pointer" }} onClick={() => router.push(`/stock/${r.ticker}`)}>
                       <td style={{ fontWeight: 700, color: "var(--sr-amber)" }}>{r.ticker}</td>
                       <td style={{ color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)" }}>{r.sector ?? "—"}</td>
-                      <td style={{ textAlign: "right" }}><span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: rating.color }}>{rating.label}</span></td>
+                      <td style={{ textAlign: "right" }}><span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 600, color: rating.color }}>{tv(rating.label)}</span></td>
                       <td style={{ textAlign: "right", color: tilt < -5 ? "var(--sr-neg)" : tilt < 0 ? "var(--sr-warn)" : "var(--sr-pos)", fontWeight: 700 }} className="num">
                         {tilt > 0 ? "+" : ""}{tilt}
                       </td>

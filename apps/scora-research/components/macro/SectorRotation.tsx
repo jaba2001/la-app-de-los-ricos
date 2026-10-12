@@ -3,6 +3,8 @@ import { useEffect, useMemo, useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import { SECTORS, rankSectors, SECTOR_ROTATION_STATS as S } from "@/lib/sectors";
 import { favoredSectors, favoredStyle, REGIME_FACTOR_STATS as RF } from "@/lib/regimeSectors";
+import { t } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Close { date: string; close: number; }
 function toCloses(raw: unknown): Close[] {
@@ -50,19 +52,18 @@ export default function SectorRotation({ regime = null }: { regime?: string | nu
     <div className="card" style={{ marginBottom: "var(--sr-sp-5)" }}>
       <div className="sr-flex-between" style={{ marginBottom: "var(--sr-sp-3)", gap: "var(--sr-sp-3)", flexWrap: "wrap" }}>
         <div>
-          <div className="section-label" style={{ margin: 0 }}>Sector rotation · Layer 3</div>
+          <div className="section-label" style={{ margin: 0 }}>{t("Sector rotation · Layer 3")}</div>
           <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2, maxWidth: 440, lineHeight: 1.5 }}>
-            Within equities, 12-1m momentum favors some sectors. The top {S.topK} (▲) are what a dual-momentum rotation holds.
-          </div>
+            {t(`Within equities, 12-1m momentum favors some sectors. The top ${S.topK} (▲) are what a dual-momentum rotation holds.`)}</div>
         </div>
         <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Favored now</div>
+          <div style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t("Favored now")}</div>
           <div style={{ fontSize: "var(--sr-t-base)", fontWeight: 800, color: "var(--sr-pos)" }}>{ranked.filter((r) => r.favored).map((r) => r.etf).join(" · ") || "—"}</div>
         </div>
       </div>
 
       {!mom ? (
-        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", padding: "var(--sr-sp-3) 0" }}>Computing sector momentum…</div>
+        <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", padding: "var(--sr-sp-3) 0" }}>{t("Computing sector momentum…")}</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
           {ranked.map((r) => {
@@ -93,25 +94,23 @@ export default function SectorRotation({ regime = null }: { regime?: string | nu
       {favStyle && (
         <div style={{ marginTop: "var(--sr-sp-4)", paddingTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)" }}>
           <div className="sr-flex-between" style={{ marginBottom: 8, flexWrap: "wrap", gap: 8 }}>
-            <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Macro-favored · {regime} regime</span>
-            <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-amber)" }}>Style: {favStyle.label} leads</span>
+            <span style={{ fontSize: "10px", color: "var(--sr-text-3)", textTransform: "uppercase", letterSpacing: "0.05em" }}>{t(`Macro-favored · ${regime} regime`)}</span>
+            <span style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-amber)" }}>{t(`Style: ${favStyle.label} leads`)}</span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sr-sp-2)", marginBottom: 8 }}>
             {favSectors.map((s) => (
-              <span key={s.etf} title={`Avg fwd-1m excess vs SPY +${s.excess.toFixed(2)}%`} style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-pos)", padding: "3px 10px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-pos) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--sr-pos) 28%, transparent)" }}>
+              <span key={s.etf} title={t(`Avg fwd-1m excess vs SPY +${s.excess.toFixed(2)}%`)} style={{ fontSize: "var(--sr-t-xs)", fontWeight: 700, color: "var(--sr-pos)", padding: "3px 10px", borderRadius: "var(--sr-radius-pill)", background: "color-mix(in srgb, var(--sr-pos) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--sr-pos) 28%, transparent)" }}>
                 {s.etf} · {s.name} <span className="num" style={{ color: "var(--sr-text-3)" }}>+{s.excess.toFixed(1)}%</span>
               </span>
             ))}
           </div>
           <div style={{ fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-            The regime picks the tailwind, not the name. The <strong>style</strong> rotation is what Scora folds into the score: a regime {favStyle.label.toLowerCase()}/{favStyle.favored === "growth" ? "value" : "growth"} tilt earned Sharpe {RF.rotationSharpe} vs the S&P&apos;s {RF.spySharpe} over {RF.period}. The sectors above are the <strong>historical tendency</strong> for this regime — context, not a live basket (out-of-sample, concentrating into them doesn&apos;t beat the index).
-          </div>
+            <Trans text={`The regime picks the tailwind, not the name. The <s1>style</s1> rotation is what Scora folds into the score: a regime ${favStyle.label.toLowerCase()}/`} s1={(c) => <strong>{c}</strong>} />{favStyle.favored === "growth" ? t("value") : t("growth")} {" "}<Trans text={`tilt earned Sharpe ${RF.rotationSharpe} vs the S&P's ${RF.spySharpe} over ${RF.period}. The sectors above are the <s1>historical tendency</s1> for this regime — context, not a live basket (out-of-sample, concentrating into them doesn't beat the index).`} s1={(c) => <strong>{c}</strong>} /></div>
         </div>
       )}
 
       <div style={{ marginTop: "var(--sr-sp-3)", fontSize: "10px", color: "var(--sr-text-3)", lineHeight: 1.5 }}>
-        Momentum rotation backtest {S.period}: top-{S.topK} Sharpe {S.strategy.sharpe} · drawdown {S.strategy.maxDrawdown}% — half of SPY&apos;s ({S.spy.maxDrawdown}%) and above equal-weight sectors ({S.equalWeight.sharpe} / {S.equalWeight.maxDrawdown}%). A risk refinement within the equity sleeve.
-      </div>
+        {t(`Momentum rotation backtest ${S.period}: top-${S.topK} Sharpe ${S.strategy.sharpe} · drawdown ${S.strategy.maxDrawdown}% — half of SPY's (${S.spy.maxDrawdown}%) and above equal-weight sectors (${S.equalWeight.sharpe} / ${S.equalWeight.maxDrawdown}%). A risk refinement within the equity sleeve.`)}</div>
     </div>
   );
 }

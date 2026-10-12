@@ -9,6 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DailyReportView from "@/components/daily/DailyReportView";
 import { fetchDailyClose, fetchDailyDates, dailySummaryLine, formatDayLong, isIsoDay } from "@/lib/dailyClose";
+import { tServidor } from "@/lib/i18n/servidor";
 
 export const revalidate = 900;
 /** Un día que aún no está pregenerado se renderiza a demanda y se cachea. */
@@ -49,6 +50,7 @@ export async function generateMetadata(
 export default async function DailyByDatePage(
   { params }: { params: Promise<{ date: string }> }
 ) {
+  const t = await tServidor();
   const { date } = await params;
   // Una fecha con formato inválido es un 404, no una query contra la base.
   if (!isIsoDay(date)) notFound();
@@ -58,11 +60,11 @@ export default async function DailyByDatePage(
   if (!report) {
     return (
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 900, margin: "0 auto" }}>
-        <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, marginBottom: "var(--sr-sp-3)" }}>Daily close</h1>
+        <h1 style={{ fontSize: "var(--sr-t-2xl)", fontWeight: 800, marginBottom: "var(--sr-sp-3)" }}>{t("Daily close")}</h1>
         <div className="card">
           <div className="sr-hint" style={{ lineHeight: 1.7 }}>
-            No close published for {date} — markets may have been shut that day. See the{" "}
-            <Link href="/daily" style={{ color: "var(--sr-amber)" }}>latest close</Link>.
+            {t(`No close published for ${date} — markets may have been shut that day. See the`)}{" "}
+            <Link href="/daily" style={{ color: "var(--sr-amber)" }}>{t("latest close")}</Link>.
           </div>
         </div>
       </div>

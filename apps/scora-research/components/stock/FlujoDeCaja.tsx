@@ -4,6 +4,8 @@ import {
   desdeFMP, diagnosticar, banderas, sankeyCaja, UMBRALES,
   type FilaFMP, type FilaBalance, type FilaResultados, type Gravedad, CONCEPTO_NO_EXPLICADO } from "@/lib/flujoCaja";
 import type { StockData } from "@/app/stock/[ticker]/page";
+import { t, tv } from "@/lib/i18n/cliente";
+import Trans from "@/components/Trans";
 
 interface Props { data: StockData | null; loading?: boolean }
 
@@ -57,15 +59,15 @@ export default function FlujoDeCaja({ data, loading }: Props) {
   const bs = useMemo(() => (modelo && d ? banderas(modelo, d) : []), [modelo, d]);
   const sk = useMemo(() => (modelo ? sankeyCaja(modelo) : null), [modelo]);
 
-  if (loading && !modelo) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">Loading the cash-flow statement…</div></div>;
+  if (loading && !modelo) return <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}><div className="sr-hint">{t("Loading the cash-flow statement…")}</div></div>;
 
   // ⚠️ Sin cuatro trimestres NO se dibuja nada. Un TTM incompleto presentado como anual es una
   // cifra falsa, no una aproximación: el CFO saldría un 25 % corto y todos los ratios con él.
   if (!modelo || !d || !sk) {
     return (
       <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-        <div className="section-label">Cash flow</div>
-        <div className="sr-hint">There aren&apos;t four complete quarters of cash-flow statements, so the trailing year isn&apos;t computed. A partial sum looks like data and isn&apos;t.</div>
+        <div className="section-label">{t("Cash flow")}</div>
+        <div className="sr-hint">{t("There aren't four complete quarters of cash-flow statements, so the trailing year isn't computed. A partial sum looks like data and isn't.")}</div>
       </div>
     );
   }
@@ -76,37 +78,35 @@ export default function FlujoDeCaja({ data, loading }: Props) {
 
   return (
     <div className="card" style={{ marginBottom: "var(--sr-sp-4)" }}>
-      <div className="section-label">Cash flow · if it isn&apos;t cash, it doesn&apos;t count</div>
+      <div className="section-label">{t("Cash flow · if it isn't cash, it doesn't count")}</div>
       <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", lineHeight: 1.55, maxWidth: 660 }}>
-        Earnings recognize revenue that hasn&apos;t been collected yet and expenses that were paid years ago. That is why
-        earnings and cash diverge, and why a company can beat estimates and still fall in the market.
-      </div>
+        {t("Earnings recognize revenue that hasn't been collected yet and expenses that were paid years ago. That is why earnings and cash diverge, and why a company can beat estimates and still fall in the market.")}</div>
 
       {/* ── El diagnóstico ─────────────────────────────────────────────────────────── */}
       <div style={{ display: "flex", gap: "var(--sr-sp-3)", flexWrap: "wrap", marginBottom: "var(--sr-sp-4)" }}>
         <div className="sr-tile">
-          <div className="sr-tile-label">Cash conversion</div>
+          <div className="sr-tile-label">{t("Cash conversion")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: d.cashConversion == null ? "var(--sr-text-3)" : d.cashConversion < UMBRALES.cashConversionMala ? "var(--sr-neg)" : "var(--sr-pos)" }}>
             {d.cashConversion == null ? "—" : `${fmt(d.cashConversion)}×`}
           </div>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>operating cash flow ÷ net income</div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("operating cash flow ÷ net income")}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Margin on sales</div>
+          <div className="sr-tile-label">{t("Margin on sales")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{d.margenCFO == null ? "—" : `${(d.margenCFO * 100).toFixed(1)} %`}</div>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>operating cash</div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("operating cash")}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">Free cash flow</div>
+          <div className="sr-tile-label">{t("Free cash flow")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{d.financiera ? "n/a" : dinero(d.fcf)}</div>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{d.financiera ? "not applicable to a financial" : "operating − capex"}</div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{d.financiera ? t("not applicable to a financial") : t("operating − capex")}</div>
         </div>
         <div className="sr-tile">
-          <div className="sr-tile-label">FCF yield</div>
+          <div className="sr-tile-label">{t("FCF yield")}</div>
           <div className="num" style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700, color: d.fcfYield != null && d.fcfYield >= 0.04 ? "var(--sr-pos)" : undefined }}>
             {d.fcfYield == null ? "—" : `${(d.fcfYield * 100).toFixed(1)} %`}
           </div>
-          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>gets interesting from 4-5%</div>
+          <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginTop: 2 }}>{t("gets interesting from 4-5%")}</div>
         </div>
       </div>
 
@@ -115,22 +115,19 @@ export default function FlujoDeCaja({ data, loading }: Props) {
           bandera roja hasta que se suprimieron esas lecturas para financieras. */}
       {d.financiera && (
         <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-3)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-text-3) 8%, transparent)", lineHeight: 1.55 }}>
-          This is a financial institution. Its operating cash flow can be negative without meaning anything bad — making
-          loans <em>is</em> its operation. That&apos;s why free cash flow isn&apos;t computed here and working-capital flags
-          aren&apos;t raised: reading it with an industrial company&apos;s template would give a false diagnosis.
-        </div>
+          <Trans text={"This is a financial institution. Its operating cash flow can be negative without meaning anything bad — making loans <s1>is</s1> its operation. That's why free cash flow isn't computed here and working-capital flags aren't raised: reading it with an industrial company's template would give a false diagnosis."} s1={(c) => <em>{c}</em>} /></div>
       )}
 
       {/* ── Las banderas ───────────────────────────────────────────────────────────── */}
-      <div className="section-label">Flags</div>
+      <div className="section-label">{t("Flags")}</div>
       {bs.length === 0 ? (
-        <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-4)" }}>None of the six signals trips at the published thresholds.</div>
+        <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-4)" }}>{t("None of the six signals trips at the published thresholds.")}</div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-2)", marginBottom: "var(--sr-sp-4)" }}>
           {bs.map((b) => (
             <div key={b.clave} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", borderLeft: `3px solid ${COLOR[b.gravedad]}`, background: `color-mix(in srgb, ${COLOR[b.gravedad]} 8%, transparent)` }}>
               <div style={{ fontWeight: 700, color: COLOR[b.gravedad], fontSize: "var(--sr-t-xs)", textTransform: "uppercase", letterSpacing: ".04em" }}>{ETIQUETA[b.gravedad]}</div>
-              <div style={{ lineHeight: 1.55, marginTop: 2 }}>{b.texto}</div>
+              <div style={{ lineHeight: 1.55, marginTop: 2 }}>{tv(b.texto)}</div>
               <div className="sr-hint num" style={{ marginTop: 4 }}>
                 {Object.entries(b.evidencia).map(([k, v]) => `${k}: ${typeof v === "number" ? v.toFixed(2) : String(v)}`).join(" · ")}
               </div>
@@ -140,21 +137,18 @@ export default function FlujoDeCaja({ data, loading }: Props) {
       )}
 
       {/* ── El destino de la caja ──────────────────────────────────────────────────── */}
-      <div className="section-label">Where the cash goes</div>
+      <div className="section-label">{t("Where the cash goes")}</div>
       {!sk.cuadra ? (
         // ⚠️ MISMO LISTÓN QUE EL SANKEY DE RESULTADOS: si no cuadra con la variación declarada,
         // NO se publica. Escalar las barras para que encajen es la forma bonita de mentir.
         <div className="sr-hint" style={{ lineHeight: 1.55 }}>
-          The breakdown doesn&apos;t reconcile with the change in cash the company reports
-          {sk.residuo != null && <> (difference of {dinero(sk.residuo)})</>}, so it isn&apos;t drawn. A chart that doesn&apos;t
-          reconcile gets fixed by scaling the bars — it looks nice and it lies.
-        </div>
+          {t("The breakdown doesn't reconcile with the change in cash the company reports")}{sk.residuo != null && <> {" "}{t(`(difference of ${dinero(sk.residuo)})`)}</>}{t(", so it isn't drawn. A chart that doesn't reconcile gets fixed by scaling the bars — it looks nice and it lies.")}</div>
       ) : (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sr-sp-4)" }}>
             {([["Where it comes from", origenes], ["Where it goes", destinos]] as const).map(([titulo, lista]) => (
               <div key={titulo}>
-                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{titulo}</div>
+                <div className="sr-tile-label" style={{ marginBottom: "var(--sr-sp-2)" }}>{t(titulo)}</div>
                 {lista.map((x) => (
                   <div key={x.concepto} style={{ marginBottom: "var(--sr-sp-2)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sr-sp-2)", fontSize: "var(--sr-t-xs)" }}>
@@ -170,9 +164,8 @@ export default function FlujoDeCaja({ data, loading }: Props) {
             ))}
           </div>
           <div className="sr-hint" style={{ marginTop: "var(--sr-sp-3)", lineHeight: 1.6 }}>
-            Reconciles: operating + investing + financing + FX effect = reported change in cash.
-            {sk.nivel === "minimo" && " No fine breakdown of capex or shareholder returns, so the aggregates are shown whole."}
-            {sk.flujos.some((x) => x.concepto === CONCEPTO_NO_EXPLICADO) && " The “Unexplained” block is the part the three flows don’t cover: it’s drawn at its real size instead of being spread across the others to make it fit."}
+            {t("Reconciles: operating + investing + financing + FX effect = reported change in cash.")}{sk.nivel === "minimo" && t(" No fine breakdown of capex or shareholder returns, so the aggregates are shown whole.")}
+            {sk.flujos.some((x) => x.concepto === CONCEPTO_NO_EXPLICADO) && t(" The “Unexplained” block is the part the three flows don’t cover: it’s drawn at its real size instead of being spread across the others to make it fit.")}
           </div>
         </>
       )}

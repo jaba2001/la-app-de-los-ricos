@@ -20,6 +20,7 @@ import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 import { classifyInstrument } from "@/lib/instrument";
+import { t as tr, tv } from "@/lib/i18n/cliente";
 
 const TabSk = () => <Sk w="100%" h={500} />;
 
@@ -862,7 +863,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
       if (errorRegistro) console.warn("[stock] no se selló la nota del día en sl_score_log:", errorRegistro.message);
 
     } catch (e) {
-      if (live()) setError(e instanceof Error ? e.message : "Analysis failed");
+      if (live()) setError(e instanceof Error ? e.message : tr("Analysis failed"));
     }
     if (live()) setLoading(false);
   }, [session, ticker]);
@@ -961,8 +962,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
             onClick={() => router.push("/stock")}
             style={{ background: "none", border: "none", color: "var(--sr-text-3)", fontSize: "var(--sr-t-sm)", cursor: "pointer" }}
           >
-            ← Stocks
-          </button>
+            {tr("← Stocks")}</button>
           <div style={{ width: 1, height: 16, background: "var(--sr-border)" }} />
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "var(--sr-sp-2)", flex: 1, minWidth: 0 }}>
             <span style={{ fontSize: "var(--sr-t-xl)", fontWeight: 700 }}>{ticker}</span>
@@ -1007,7 +1007,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
           )}
           <button
             onClick={toggleWatchlist}
-            title={watchlisted ? "Remove from watchlist" : "Add to watchlist"}
+            title={watchlisted ? tr("Remove from watchlist") : tr("Add to watchlist")}
             style={{
               background: watchlisted ? "color-mix(in srgb, var(--sr-amber) 15%, transparent)" : "var(--sr-surface-2)",
               border: `1px solid ${watchlisted ? "color-mix(in srgb, var(--sr-amber) 40%, transparent)" : "var(--sr-border)"}`,
@@ -1045,7 +1045,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
               className={`subtab ${activeTab === t.id ? "active" : ""}`}
               onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "stock", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
             >
-              {t.label}
+              {tv(t.label)}
             </button>
           ))}
           {/* Beginner recorta la superficie, no cambia un solo número: el motor es el
@@ -1054,10 +1054,10 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
             type="button"
             className="subtab"
             onClick={() => { const next = mode === "pro" ? "beginner" : "pro"; setMode(next); track("tab_opened", { page: "stock", tab: `mode:${next}` }); }}
-            title={mode === "pro" ? `Show only the ${BEGINNER_TABS.length} essential tabs` : "Show all tabs"}
+            title={mode === "pro" ? tr(`Show only the ${BEGINNER_TABS.length} essential tabs`) : tr("Show all tabs")}
             style={{ marginLeft: "auto", flexShrink: 0, color: "var(--sr-text-3)" }}
           >
-            {mode === "pro" ? "Beginner view" : `Pro view (${TABS.length} tabs)`}
+            {mode === "pro" ? tr("Beginner view") : tr(`Pro view (${TABS.length} tabs)`)}
           </button>
         </div>
       </div>
@@ -1072,8 +1072,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
                 {ticker}
               </div>
               <div style={{ fontSize: "var(--sr-t-sm)", color: "var(--sr-text-2)", maxWidth: 440, lineHeight: 1.7 }}>
-                Fetch fundamentals, valuation, momentum, insider activity, macro overlay and more for this ticker.
-              </div>
+                {tr("Fetch fundamentals, valuation, momentum, insider activity, macro overlay and more for this ticker.")}</div>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--sr-sp-1)", alignItems: "center" }}>
               {[
@@ -1094,13 +1093,12 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
               disabled={loading}
               style={{ padding: "12px 36px", fontSize: "var(--sr-t-base)", fontWeight: 700, marginTop: "var(--sr-sp-2)" }}
             >
-              {loading ? "Analyzing…" : `Analyze ${ticker}`}
+              {loading ? tr("Analyzing…") : tr(`Analyze ${ticker}`)}
             </button>
             {loading && (
               <div style={{ width: 320, textAlign: "center" }}>
                 <div style={{ fontSize: "var(--sr-t-xs)", color: "var(--sr-text-3)", marginBottom: "var(--sr-sp-2)" }}>
-                  Fetching {fetchProgress} / {TOTAL_SOURCES} data sources…
-                </div>
+                  {tr(`Fetching ${fetchProgress} / ${TOTAL_SOURCES} data sources…`)}</div>
                 <div style={{ height: 4, background: "var(--sr-surface-3)", borderRadius: 2, overflow: "hidden" }}>
                   <div style={{
                     height: "100%",
@@ -1123,8 +1121,7 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
             )}
             {!error && failedApis > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-4)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-warn) 8%, transparent)", color: "var(--sr-warn)", fontSize: "var(--sr-t-xs)", marginBottom: "var(--sr-sp-4)", border: "1px solid color-mix(in srgb, var(--sr-warn) 20%, transparent)" }}>
-                ⚠ {failedApis} data source{failedApis > 1 ? "s" : ""} unavailable — some fields may show "—"
-              </div>
+                {failedApis === 1 ? tr("⚠ 1 data source unavailable — some fields may show “—”") : tr(`⚠ ${failedApis} data sources unavailable — some fields may show “—”`)}</div>
             )}
             {/* Answer-first: the call, three reasons and the falsifier — above every tab,
                 so the first five seconds answer the question instead of presenting
