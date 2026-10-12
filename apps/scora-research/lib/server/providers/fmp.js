@@ -10,6 +10,7 @@ import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
 import { respaldoYahoo, esSimboloFueraDePlan } from './yahoo.js';
+import { fetchConReintento } from './red.js';
 
 
 // Solo lo que el front pide de verdad. Cada ruta de aquí es una puerta a FMP firmada con
@@ -112,7 +113,7 @@ export async function serve(request, ctx) {
   // Single-flight: si otra petición ya está pidiendo esta misma clave, se espera a la suya
   // en vez de salir otra vez al proveedor (ver `dedupe` en lib/cache.js).
   const { status, body, fuente } = await dedupe(key, async () => {
-    const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
+    const res = await fetchConReintento(upstream.toString(), { headers: { 'Accept': 'application/json' } });
     let r = { status: res.status, body: await res.text(), fuente: 'fmp' };
     // ETFs fuera del plan (402 «Special Endpoint»): cotización e histórico salen de Yahoo con
     // la forma de FMP. Ver lib/server/providers/yahoo.js.

@@ -398,6 +398,9 @@ jobs:
       # El cron de insiders escribía sector null en todas las filas.
       - name: Sector de los compradores insider
         run: node --experimental-strip-types --no-warnings scripts/sectores.test.mjs
+      # Un parpadeo de red dejaba un hueco en pantalla (502 «fetch failed» en la cotizacion de IWM).
+      - name: Reintento ante fallos de red de los proveedores
+        run: node --experimental-strip-types --no-warnings scripts/red.test.mjs
       - name: El lote de peticiones (enrutado y cuotas)
         run: node --experimental-strip-types --no-warnings scripts/batch.test.mjs
       - name: La cola de agrupacion (cliente)

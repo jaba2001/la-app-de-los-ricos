@@ -9,6 +9,7 @@ import { requireUser } from '../auth.js';
 import { checkRateLimit } from '../ratelimit.js';
 import { corsHeaders, preflight } from '../cors.js';
 import { cacheKey, cacheGet, cacheSet, dedupe } from '../cache.js';
+import { fetchConReintento } from './red.js';
 
 
 // Solo lo que el front pide de verdad, como en fmp.js. Cerradas el 27-09 por no tener ningún
@@ -101,7 +102,7 @@ export async function serve(request, ctx) {
   // Single-flight: si otra petición ya está pidiendo esta misma clave, se espera a la suya
   // en vez de salir otra vez al proveedor (ver `dedupe` en lib/cache.js).
   const { status, body } = await dedupe(key, async () => {
-    const res = await fetch(upstream.toString(), { headers: { 'Accept': 'application/json' } });
+    const res = await fetchConReintento(upstream.toString(), { headers: { 'Accept': 'application/json' } });
     const text = await res.text();
     // Solo lo que salió bien: un 403 o un 429 cacheado se servía a todos durante el TTL.
     if (res.ok) await cacheSet(key, { status: res.status, body: text }, CACHE_TTL);
