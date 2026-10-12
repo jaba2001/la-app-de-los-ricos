@@ -39,6 +39,13 @@ export function normalizar(s) {
 /** El ticker sin separadores: «BRK.B», «brk-b» y «BRKB» son la misma clave. */
 export const claveTicker = (s) => String(s ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 
+/**
+ * El ticker con los separadores unificados: «brk-b» y «BRK.B» siguen siendo el mismo, pero
+ * «NGL» (NGL Energy Partners) y «NG.L» (National Grid en Londres) ya no. Con claveTicker los
+ * dos daban «NGL» y empataban como ticker exacto.
+ */
+export const tickerExacto = (s) => String(s ?? '').toUpperCase().replace(/[-/]/g, '.');
+
 // Palabras que no distinguen a una empresa de otra. Se quitan para comparar el nombre
 // «significativo»: «Apple Inc.» y «apple» son el mismo nombre.
 const RELLENO = new Set([
@@ -112,7 +119,7 @@ export function prepararEntrada({ symbol, name, exchange = null, type = 'stock',
   const clave = claveTicker(symbol);
   const punto = symbol.indexOf('.');
   return {
-    symbol, name, exchange, type, rank, fuente, clave,
+    symbol, name, exchange, type, rank, fuente, clave, exacto: tickerExacto(symbol),
     base: punto > 0 ? claveTicker(symbol.slice(0, punto)) : clave,
     nombres: [name, ...alias].map(formaNombre),
   };
@@ -121,10 +128,12 @@ export function prepararEntrada({ symbol, name, exchange = null, type = 'stock',
 export function prepararConsulta(q) {
   const raw = String(q ?? '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 50);
   const nn = normalizar(raw);
+  // Solo cuenta como ticker si podría serlo: sin espacios y corto.
+  const pareceTicker = /^[A-Za-z0-9.\-]{1,12}$/.test(raw);
   return {
     raw, nn,
-    // Solo cuenta como ticker si podría serlo: sin espacios y corto.
-    ticker: /^[A-Za-z0-9.\-]{1,12}$/.test(raw) ? claveTicker(raw) : '',
+    ticker: pareceTicker ? claveTicker(raw) : '',
+    exacto: pareceTicker ? tickerExacto(raw) : '',
     compacto: nn.replace(/ /g, ''),
     tokens: nn ? nn.split(' ') : [],
   };
@@ -135,14 +144,18 @@ export function prepararConsulta(q) {
 function puntuarNombre(n, c) {
   // Con una sola letra, «empieza por» casa con miles de nombres: ahí solo cuenta el ticker.
   if (c.nn.length < 2 || !n.nn) return 0;
-  if (n.sig === c.nn || n.nn === c.nn) return 960;                       // «apple» = «Apple Inc.»
+  // El nombre entero, o su primera palabra entera: «apple» = «Apple Inc.», «ford» → «Ford
+  // Motor». Vale casi como un ticker exacto (1000), así que entre los dos decide la popularidad:
+  // con 880 (un «empieza por» cualquiera), el ticker FORD de una empresa diminuta ganaba a Ford
+  // Motor por mucho que la capitalización dijera lo contrario (revisión del 12-10).
+  if (n.sig === c.nn || n.nn === c.nn || n.primera === c.nn) return 960;
   if (n.nn.startsWith(c.nn) || n.sig.startsWith(c.nn)) return 880;        // «appl»
   if (c.compacto.length >= 3 && n.compacto.startsWith(c.compacto)) return 840; // «cocacola»
   // Cada palabra escrita tiene que encajar con alguna del nombre, por prefijo o con pocas
   // erratas: «santander» → «Banco Santander», «nvidea» → «NVIDIA», «bank america». Cada
   // errata cuesta 70: «aple» queda por debajo de lo que empieza por «aple», pero el bono de
   // popularidad aún deja a Apple por encima de un valor desconocido que se llame así.
-  let coste = 0, empiezaIgual = false;
+  let coste = 0, empiezaIgual = false, enteras = true;
   for (let i = 0; i < c.tokens.length; i++) {
     const tok = c.tokens[i];
     const tope = erratasAdmitidas(tok.length);
@@ -154,9 +167,12 @@ function puntuarNombre(n, c) {
     }
     if (mejor > tope) { coste = -1; break; }
     coste += mejor;
+    if (n.palabras[cual] !== tok) enteras = false;
     if (i === 0 && n.palabras[cual] === n.primera) empiezaIgual = true;
   }
-  if (coste >= 0) return (empiezaIgual ? 880 : 800) - 70 * coste;
+  // Palabras enteras aunque no sean la primera («santander» en «Banco Santander») valen más que
+  // un trozo: si no, «Santander Bank Polska» (OTC) pasaba por delante del ADR del Santander.
+  if (coste >= 0) return (empiezaIgual ? 880 : enteras ? 860 : 800) - 70 * coste;
   if (c.nn.length >= 3 && n.nn.includes(c.nn)) return 600;                 // «soft» en «microsoft»
   return 0;
 }
@@ -165,8 +181,9 @@ function puntuarNombre(n, c) {
 export function puntuar(e, c) {
   let s = 0;
   if (c.ticker) {
-    if (e.clave === c.ticker) s = 1000;                                     // AAPL, brk.b → BRK-B
+    if (e.exacto === c.exacto) s = 1000;                                    // AAPL, brk.b → BRK-B
     else if (e.base === c.ticker) s = 940;                                  // MC → MC.PA
+    else if (e.clave === c.ticker) s = 880;                                 // brkb → BRK-B (NGL ≠ NG.L)
     else if (e.clave.startsWith(c.ticker)) s = 860 - Math.min(80, (e.clave.length - c.ticker.length) * 20);
   }
   for (const n of e.nombres) s = Math.max(s, puntuarNombre(n, c));
@@ -416,22 +433,35 @@ const _yahoo = new Map(); // consulta → { hasta, quotes }
 const YAHOO_TTL = 6 * 3600_000;
 const YAHOO_MAX = 500;
 
-/** quotes de Yahoo para la consulta, o [] si falla o tarda más de 2,5 s. */
-export async function buscarEnYahoo(q) {
+// Cortacircuitos: si Yahoo falla o tarda, se deja de preguntarle un minuto. Sin esto, con Yahoo
+// colgado CADA pulsación esperaba los 2,5 s del plazo antes de responder con lo local.
+const YAHOO_PAUSA = 60_000;
+let _yahooParadoHasta = 0;
+const pararYahoo = (motivo) => {
+  if (Date.now() >= _yahooParadoHasta) console.warn(`busqueda: Yahoo no responde (${motivo}) — se busca sin él durante 1 min`);
+  _yahooParadoHasta = Date.now() + YAHOO_PAUSA;
+};
+/** Solo para los tests. */
+export function _reiniciarYahoo() { _yahoo.clear(); _yahooParadoHasta = 0; }
+
+/** quotes de Yahoo para la consulta, o [] si falla, tarda más de 2,5 s o está en pausa. */
+export async function buscarEnYahoo(q, { fetchImpl = fetch } = {}) {
   const clave = q.toLowerCase();
   const hit = _yahoo.get(clave);
   if (hit && hit.hasta > Date.now()) return hit.quotes;
+  if (Date.now() < _yahooParadoHasta) return [];
   try {
     const u = `https://query1.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(q)}&quotesCount=10&newsCount=0&listsCount=0`;
-    const r = await fetch(u, { headers: { 'User-Agent': UA_YAHOO, Accept: 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(2500) });
-    if (!r.ok) return [];
+    const r = await fetchImpl(u, { headers: { 'User-Agent': UA_YAHOO, Accept: 'application/json' }, cache: 'no-store', signal: AbortSignal.timeout(2500) });
+    if (!r.ok) { pararYahoo(`HTTP ${r.status}`); return []; }
     const j = await r.json();
     const quotes = Array.isArray(j?.quotes) ? j.quotes : [];
     // Caché acotada: al llenarse sale la entrada más antigua (un Map recorre en orden de inserción).
     if (_yahoo.size >= YAHOO_MAX) _yahoo.delete(_yahoo.keys().next().value);
     _yahoo.set(clave, { hasta: Date.now() + YAHOO_TTL, quotes });
     return quotes;
-  } catch {
+  } catch (e) {
+    pararYahoo(e?.name === 'TimeoutError' ? 'más de 2,5 s' : e?.message || String(e));
     return [];
   }
 }
