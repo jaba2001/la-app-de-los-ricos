@@ -196,12 +196,11 @@ ok(V && CC && TR && PA && PC && AC, "los artefactos que sostienen las cifras exi
 {
   const M = art("picks_rules_backtest"), A = art("picks_rules_backtest_oos");
   const d = doc("../SCORA_PICKS_REGLAS.md");
-  // ⚠️ `SCORA_PICKS_REGLAS.md` VIVE EN EL REPO PADRE. En CI solo se hace checkout de
-  // `scora-research`, asi que ahi no existe. Escribi esta comprobacion cruzando la prosa con
-  // el artefacto sin caer en eso, y CI la puso roja — con razon. Misma familia que el guardian
-  // de frescura mirando fechas de fichero: una comprobacion que NUNCA puede pasar en CI.
-  // Separado: lo verificable con solo este repo corre SIEMPRE; lo que depende del padre se
-  // declara en voz alta. Un salto silencioso seria peor que no tenerlo.
+  // ⚠️ `SCORA_PICKS_REGLAS.md` vivio en el repo padre hasta la fusion, y en CI no existia: estas
+  // 4 comprobaciones se declaraban «NO EJECUTADAS» y la suite salia en verde igual. Desde el
+  // 13-10-2026 el documento esta versionado aqui, en `apps/` (de ahi el `../`). Si vuelve a
+  // faltar, eso es un FALLO y no un aviso: un salto en verde es justo lo que dejo estas cuatro
+  // sin correr desde la fusion sin que nada lo dijera.
   if (M && A) {
     const ventaja = (j) => +(j.carteras.soloPicks.total - j.benchmarks.universoEW.total).toFixed(1);
     const vM = ventaja(M), vA = ventaja(A);
@@ -215,8 +214,8 @@ ok(V && CC && TR && PA && PC && AC, "los artefactos que sostienen las cifras exi
       ok(citado(fA, vA), `la FILA de 2011-2018 cita la ventaja del artefacto (${vA} pp)`);
       ok(citado(fM, M.benchmarks.universoEW.total), `y su universo equiponderado (${M.benchmarks.universoEW.total} %)`);
     } else {
-      console.log(`  ℹ 4 comprobaciones NO EJECUTADAS: SCORA_PICKS_REGLAS.md esta en el repo padre y aqui no hay checkout de el.`);
-      console.log(`    La ventaja que el documento deberia citar es ${vM} pp (2019-2026) y ${vA} pp (2011-2018).`);
+      ok(false, `SCORA_PICKS_REGLAS.md no esta en apps/: sus 4 comprobaciones no pueden correr ` +
+                `(deberia citar ${vM} pp en 2019-2026 y ${vA} pp en 2011-2018)`);
     }
     // Las dos ventanas TIENEN que compartir huella de datos: si no, compararlas no significa nada.
     ok(M.huella?.sha === A.huella?.sha,
