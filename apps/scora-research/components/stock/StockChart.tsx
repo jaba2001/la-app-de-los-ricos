@@ -501,7 +501,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                       <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">
                         {nivel != null && isFinite(nivel) ? `$${nivel.toFixed(2)}` : "—"}</span>
                       {nivel != null && isFinite(nivel) && lastPrice > 0 && (
-                        <span style={{ fontSize: "10px", color: "var(--sr-text-3)" }} className="num">
+                        <span className="sr-hint num">
                           {`${((lastPrice / nivel - 1) * 100) >= 0 ? "+" : ""}${((lastPrice / nivel - 1) * 100).toFixed(1)}%`}</span>
                       )}
                     </div>
