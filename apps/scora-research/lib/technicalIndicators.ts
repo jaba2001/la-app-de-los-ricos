@@ -272,18 +272,24 @@ export interface TLSignals {
   sqzLong:   boolean; sqzShort:  boolean; sqzLoaded: boolean;
   vpAbove:   boolean; vpBelow:   boolean;
 }
+/**
+ * Niveles de referencia del gráfico: describen dónde está el precio, NO son órdenes. Sustituyen
+ * a los stops y objetivos que se pintaban como consejo (plan único, pieza 1.2 e).
+ */
+export interface TLLevels {
+  ema55:  number | null;  // la media lenta del método
+  low20:  number;         // mínimo de las últimas 20 sesiones
+  high20: number;         // máximo de las últimas 20 sesiones
+}
 export interface TLResult {
   signals:      TLSignals;
   longSignals:  number;
   shortSignals: number;
+  /** Descriptivo: «3/4 up», «2/4 down» o «Mixed». Nunca una posición («LONG», «SHORT»). */
   bias:         string;
   biasColor:    string;
-  stopLong:     number;
-  stopShort:    number;
-  riskLong:     number;
-  riskShort:    number;
-  tp1Long:      number;
-  tp1Short:     number;
+  levels:       TLLevels;
+  /** La lectura técnica frente a la fundamental, descrita: coinciden, no coinciden o no hay confluencia. */
   gate:         string;
   gateColor:    string;
   adxVal:       number | null;
@@ -327,34 +333,39 @@ export function computeTLResult(
   const longSignals  = [emaLong,  adxActive, sqzLong,  vpAbove].filter(Boolean).length;
   const shortSignals = [emaShort, adxActive, sqzShort, vpBelow].filter(Boolean).length;
 
-  let bias = "NEUTRAL", biasColor = "var(--sr-text-3)";
-  if      (longSignals  >= 3) { bias = "LONG";       biasColor = "var(--sr-pos)"; }
-  else if (shortSignals >= 3) { bias = "SHORT";      biasColor = "var(--sr-neg)"; }
-  else if (longSignals === 2 && longSignals > shortSignals)  { bias = "LEAN LONG";  biasColor = "#34D399"; }
-  else if (shortSignals === 2 && shortSignals > longSignals) { bias = "LEAN SHORT"; biasColor = "#FB923C"; }
+  // Las mismas condiciones y los mismos umbrales que antes; cambia cómo se dicen. Scora solo va
+  // largo y no recomienda: el resultado DESCRIBE cuántas de las 4 condiciones del método apuntan
+  // en cada sentido, sin «LONG», «SHORT», «entrada» ni «espera» (plan único, pieza 1.2 e).
+  let bias = "Mixed", biasColor = "var(--sr-text-3)";
+  if      (longSignals  >= 3) { bias = `${longSignals}/4 up`;    biasColor = "var(--sr-pos)"; }
+  else if (shortSignals >= 3) { bias = `${shortSignals}/4 down`; biasColor = "var(--sr-neg)"; }
+  else if (longSignals === 2 && longSignals > shortSignals)  { bias = `${longSignals}/4 up`;    biasColor = "#34D399"; }
+  else if (shortSignals === 2 && shortSignals > longSignals) { bias = `${shortSignals}/4 down`; biasColor = "#FB923C"; }
 
-  const recent20  = rawHist.slice(-20);
-  const swingLow  = Math.min(...recent20.map(d => d.low));
-  const swingHigh = Math.max(...recent20.map(d => d.high));
-  const stopLong  = Math.min(!isNaN(lastESlow) ? lastESlow * 0.993 : Infinity, swingLow * 0.995);
-  const stopShort = Math.max(!isNaN(lastESlow) ? lastESlow * 1.007 : -Infinity, swingHigh * 1.005);
-  const riskLong  = price > 0 && stopLong < price  ? ((price - stopLong)  / price) * 100 : 0;
-  const riskShort = price > 0 && stopShort > price ? ((stopShort - price) / price) * 100 : 0;
-  const tp1Long   = price + 2 * (price - stopLong);
-  const tp1Short  = price - 2 * (stopShort - price);
+  // Niveles de referencia en vez de stops y objetivos: dónde está la media lenta y el rango de las
+  // últimas 20 sesiones. Qué hacer con ellos es cosa de cada uno.
+  const recent20 = rawHist.slice(-20);
+  const levels: TLLevels = {
+    ema55:  !isNaN(lastESlow) ? lastESlow : null,
+    low20:  Math.min(...recent20.map(d => d.low)),
+    high20: Math.max(...recent20.map(d => d.high)),
+  };
 
-  let gate = "No confluence yet — wait for a defined setup", gateColor = "var(--sr-text-3)";
-  if      (longSignals  >= 3 && icScore != null && icScore >= 65) { gate = "✓ Entry confirmed — IC positive + 3/4 TL LONG";            gateColor = "var(--sr-pos)"; }
-  else if (shortSignals >= 3 && icScore != null && icScore <= 35) { gate = "✓ SHORT entry — IC AVOID + 3/4 TL SHORT";                 gateColor = "var(--sr-neg)"; }
-  else if (longSignals  >= 3 && icScore != null && icScore <= 35) { gate = "⚡ CONFLICT — TL LONG but fundamentals AVOID";            gateColor = "var(--sr-warn)"; }
-  else if (shortSignals >= 3 && icScore != null && icScore >= 65) { gate = "⚡ CONFLICT — TL SHORT but fundamentals BUY";             gateColor = "var(--sr-warn)"; }
-  else if (longSignals  >= 2 && icScore != null && icScore >= 65) { gate = "⏳ Waiting — strong fundamentals, awaiting TL LONG";       gateColor = "#34D399"; }
-  else if (shortSignals >= 2 && icScore != null && icScore <= 35) { gate = "⏳ Waiting — weak fundamentals, TL SHORT building";        gateColor = "#FB923C"; }
+  // La lectura técnica frente a la fundamental (el Scora score): coinciden, no coinciden o no hay
+  // confluencia. El score se enseña redondeado; los umbrales se comparan sin redondear.
+  const s = icScore != null ? Math.round(icScore) : null;
+  let gate = "Fewer than 3 of the 4 conditions agree", gateColor = "var(--sr-text-3)";
+  if      (longSignals  >= 3 && icScore != null && icScore >= 65) { gate = `Technical and fundamental readings agree: ${longSignals}/4 conditions up, Scora score ${s}`;    gateColor = "var(--sr-pos)"; }
+  else if (shortSignals >= 3 && icScore != null && icScore <= 35) { gate = `Technical and fundamental readings agree: ${shortSignals}/4 conditions down, Scora score ${s}`; gateColor = "var(--sr-neg)"; }
+  else if (longSignals  >= 3 && icScore != null && icScore <= 35) { gate = `Readings disagree: ${longSignals}/4 conditions up, Scora score ${s}`;                            gateColor = "var(--sr-warn)"; }
+  else if (shortSignals >= 3 && icScore != null && icScore >= 65) { gate = `Readings disagree: ${shortSignals}/4 conditions down, Scora score ${s}`;                         gateColor = "var(--sr-warn)"; }
+  else if (longSignals  >= 2 && icScore != null && icScore >= 65) { gate = `High Scora score (${s}); ${longSignals}/4 conditions up`;                                        gateColor = "#34D399"; }
+  else if (shortSignals >= 2 && icScore != null && icScore <= 35) { gate = `Low Scora score (${s}); ${shortSignals}/4 conditions down`;                                      gateColor = "#FB923C"; }
 
   return {
     signals: { emaLong, emaShort, adxActive, adxRising, sqzLong, sqzShort, sqzLoaded, vpAbove, vpBelow },
     longSignals, shortSignals, bias, biasColor,
-    stopLong, stopShort, riskLong, riskShort, tp1Long, tp1Short,
+    levels,
     gate, gateColor,
     adxVal: lastADX.adx, plusDI: lastADX.plusDI, minusDI: lastADX.minusDI,
     sqzVal: lastSqz.val,

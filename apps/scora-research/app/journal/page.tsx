@@ -262,10 +262,9 @@ export default function JournalPage() {
       {/* Position sizing calculator */}
       <PositionSizer />
 
-      {/* Portfolio optimizer (P2-13) */}
-      {openTrades.length > 0 && (
-        <PortfolioOptimizer tickers={Array.from(new Set(openTrades.map(t => t.ticker.toUpperCase())))} />
-      )}
+      {/* Portfolio optimizer (P2-13): una calculadora como el PositionSizer de arriba. Los tickers
+          los escribe el usuario; nunca se rellenan con sus posiciones (plan único, pieza 1.2 b). */}
+      <PortfolioOptimizer />
 
       {/* Attribution by thesis */}
       {thesisRows.length > 0 && (

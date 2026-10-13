@@ -159,6 +159,7 @@ export const PUBLICO: Record<string, string> = {
   "Grounding": "Verificación",
   "Sources": "Fuentes",
   "✓ grounded": "✓ verificada",
+  "AI-generated": "Generado con IA",
   "{a}/{b} clean": "{a}/{b} limpias",
   "⚠ {x} flagged": "⚠ {x} marcadas",
   "Model: <s1>{x}</s1>": "Modelo: <s1>{x}</s1>",

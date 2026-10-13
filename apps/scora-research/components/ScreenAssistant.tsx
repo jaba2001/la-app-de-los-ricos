@@ -23,6 +23,7 @@ import { preguntarAsistente, RechazoError, type Cierre, type Turno } from "@/lib
 import { QuotaError } from "@/lib/proxy";
 import { GroundedBadge } from "@/components/ui/GroundedBadge";
 import { resaltarEnPagina, limpiarResaltado } from "@/lib/resaltar";
+import { asistenteVisibleEn } from "@/lib/rutasSinAsistente";
 
 /** Lo que hace el panel cuando el usuario pulsa una cita (en el móvil, apartarse). */
 const AlCitar = createContext<() => void>(() => {});
@@ -42,8 +43,8 @@ interface Mensaje {
 
 // Debe coincidir con MAX_MENSAJES de lib/server/asistente.js.
 const MAX_HISTORIAL = 12;
-// Rutas donde el botón estorba: el login y la vuelta del proveedor de identidad.
-const SIN_ASISTENTE = /^\/(login|auth)(\/|$)/;
+// Las rutas sin asistente (el login y las páginas con datos personales) están en
+// lib/rutasSinAsistente.ts, con el porqué.
 
 const SUGERENCIAS = [
   "Explain this page",
@@ -82,10 +83,14 @@ export default function ScreenAssistant() {
   const lista = useRef<HTMLDivElement>(null);
   const entrada = useRef<HTMLTextAreaElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+  // En las páginas personales (lib/rutasSinAsistente.ts) el panel desaparece aunque estuviera
+  // abierto, y con él todo lo que lee la página: la selección y el estrechamiento de abajo.
+  const visible = asistenteVisibleEn(pathname);
 
-  // La selección de la página, guardada mientras el panel está abierto (ver cabecera).
+  // La selección de la página, guardada mientras el panel está abierto (ver cabecera). En una
+  // página personal no se escucha: lo que el usuario seleccione en su diario nunca se guarda.
   useEffect(() => {
-    if (!abierto) return;
+    if (!abierto || !visible) return;
     const alCambiar = () => {
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !sel.rangeCount) return;
@@ -98,15 +103,15 @@ export default function ScreenAssistant() {
     alCambiar();
     document.addEventListener("selectionchange", alCambiar);
     return () => document.removeEventListener("selectionchange", alCambiar);
-  }, [abierto]);
+  }, [abierto, visible]);
 
   // En escritorio la página se estrecha para dejar sitio al panel (ver ScreenAssistant.css) en
   // vez de quedar tapada: lo que el usuario pregunta tiene que seguir a la vista.
   useEffect(() => {
-    if (!abierto) return;
+    if (!abierto || !visible) return;
     document.documentElement.classList.add("sr-asis-abierto");
     return () => document.documentElement.classList.remove("sr-asis-abierto");
-  }, [abierto]);
+  }, [abierto, visible]);
 
   // Esc cierra; al abrir, el foco va al cuadro de texto.
   useEffect(() => {
@@ -174,7 +179,10 @@ export default function ScreenAssistant() {
     if (window.matchMedia("(max-width: 640px)").matches) setAbierto(false);
   }, []);
 
-  if (SIN_ASISTENTE.test(pathname ?? "")) return null;
+  // En el diario y en las demás páginas personales no hay botón ni panel: sin ellos no se puede
+  // capturar la pantalla. El componente sigue montado en el layout, así que la conversación
+  // vuelve intacta al salir de esas páginas.
+  if (!visible) return null;
 
   const nueva = () => { abortar.current?.abort(); setMensajes([]); setSeleccion(""); entrada.current?.focus(); };
 

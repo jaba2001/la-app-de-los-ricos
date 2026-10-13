@@ -21,6 +21,7 @@ import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
 import { classifyInstrument } from "@/lib/instrument";
 import { t as tr, tv } from "@/lib/i18n/cliente";
+import { EXPORTAR_METRICAS } from "@/lib/licencia";
 
 const TabSk = () => <Sk w="100%" h={500} />;
 
@@ -1044,7 +1045,8 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
           >
             {watchlisted ? "★" : "☆"}
           </button>
-          {!loading && data && (
+          {/* Exportar las métricas de la ficha espera a la licencia de datos (lib/licencia.ts). */}
+          {EXPORTAR_METRICAS && !loading && data && (
             <button
               onClick={exportCSV}
               style={{

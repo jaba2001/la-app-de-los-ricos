@@ -406,7 +406,7 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                 color: tlResult.biasColor,
                 background: `color-mix(in srgb, ${tlResult.biasColor} 12%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${tlResult.biasColor} 35%, transparent)`,
-              }}>{tlResult.bias}</div>
+              }}>{tv(tlResult.bias)}</div>
             )}
           </div>
 
@@ -473,8 +473,8 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                   { label: "ADX",   val: tlResult.adxVal?.toFixed(1) ?? "—",   color: (tlResult.adxVal ?? 0) > 40 ? "var(--sr-pos)" : (tlResult.adxVal ?? 0) > 23 ? "var(--sr-warn)" : "var(--sr-text-3)" },
                   { label: "+DI",   val: tlResult.plusDI?.toFixed(1) ?? "—",    color: "var(--sr-pos)" },
                   { label: "−DI",   val: tlResult.minusDI?.toFixed(1) ?? "—",   color: "var(--sr-neg)" },
-                  { label: "LONG",  val: `${tlResult.longSignals}/4`,           color: "var(--sr-pos)" },
-                  { label: "SHORT", val: `${tlResult.shortSignals}/4`,          color: "var(--sr-neg)" },
+                  { label: "Up",    val: `${tlResult.longSignals}/4`,           color: "var(--sr-pos)" },
+                  { label: "Down",  val: `${tlResult.shortSignals}/4`,          color: "var(--sr-neg)" },
                 ].map(({ label, val, color }) => (
                   <div key={label}>
                     <div className="sr-hint">{tv(label)}</div>
@@ -483,35 +483,43 @@ export default function StockChart({ data, loading, ticker, icScore = null, dgs2
                 ))}
               </div>
 
-              {/* Risk management */}
+              {/* Niveles de referencia: dónde está el precio frente a la media lenta, al rango de 20
+                  sesiones y al POC. Describen el gráfico; no son stops ni objetivos (plan único,
+                  pieza 1.2 e). */}
+              <div className="sr-hint" style={{ marginBottom: "var(--sr-sp-2)" }}>
+                {t("Reference levels on the chart: a description, not a recommendation.")}</div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--sr-sp-3)", marginBottom: "var(--sr-sp-4)" }}>
                 {[
-                  { label: "Long Stop",  val: `$${tlResult.stopLong.toFixed(2)}`,  sub: `−${tlResult.riskLong.toFixed(1)}%`,        c: "var(--sr-neg)" },
-                  { label: "Long TP1",   val: `$${tlResult.tp1Long.toFixed(2)}`,   sub: `+${(tlResult.riskLong*2).toFixed(1)}%`,     c: "var(--sr-pos)" },
-                  { label: "Short Stop", val: `$${tlResult.stopShort.toFixed(2)}`, sub: `+${tlResult.riskShort.toFixed(1)}%`,        c: "var(--sr-neg)" },
-                  { label: "Short TP1",  val: `$${tlResult.tp1Short.toFixed(2)}`,  sub: `−${(tlResult.riskShort*2).toFixed(1)}%`,    c: "var(--sr-pos)" },
-                ].map(({ label, val, sub, c }) => (
+                  { label: "EMA 55",          nivel: tlResult.levels.ema55 },
+                  { label: "20-session low",  nivel: tlResult.levels.low20 },
+                  { label: "20-session high", nivel: tlResult.levels.high20 },
+                  { label: "POC (volume)",    nivel: tlResult.pocMid > 0 ? tlResult.pocMid : null },
+                ].map(({ label, nivel }) => (
                   <div key={label} style={{ padding: "var(--sr-sp-2) var(--sr-sp-3)", background: "var(--sr-surface-2)", borderRadius: "var(--sr-radius-sm)" }}>
                     <div className="sr-hint">{tv(label)}</div>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">{val}</span>
-                      <span style={{ fontSize: "10px", color: c }} className="num">{tv(sub)}</span>
+                      <span style={{ fontSize: "var(--sr-t-sm)", fontWeight: 700 }} className="num">
+                        {nivel != null && isFinite(nivel) ? `$${nivel.toFixed(2)}` : "—"}</span>
+                      {nivel != null && isFinite(nivel) && lastPrice > 0 && (
+                        <span className="sr-hint num">
+                          {`${((lastPrice / nivel - 1) * 100) >= 0 ? "+" : ""}${((lastPrice / nivel - 1) * 100).toFixed(1)}%`}</span>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* IC Dual Gate */}
+              {/* La lectura técnica frente a la fundamental */}
               <div style={{
                 padding: "var(--sr-sp-3) var(--sr-sp-4)", borderRadius: "var(--sr-radius)",
                 background: `color-mix(in srgb, ${tlResult.gateColor} 8%, transparent)`,
                 border: `1px solid color-mix(in srgb, ${tlResult.gateColor} 30%, transparent)`,
               }}>
-                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: 2, letterSpacing: "0.06em" }}>IC DUAL GATE</div>
-                <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: tlResult.gateColor }}>{tlResult.gate}</div>
+                <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginBottom: 2, letterSpacing: "0.06em" }}>{t("Technical vs fundamental reading")}</div>
+                <div style={{ fontSize: "var(--sr-t-sm)", fontWeight: 600, color: tlResult.gateColor }}>{tv(tlResult.gate)}</div>
                 {icScore == null && (
                   <div style={{ fontSize: "10px", color: "var(--sr-text-3)", marginTop: 4 }}>
-                    {t("Pass icScore prop to enable full IC gate validation.")}</div>
+                    {t("Without the Scora score, only the technical reading is shown.")}</div>
                 )}
               </div>
             </>

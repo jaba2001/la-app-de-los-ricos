@@ -123,11 +123,14 @@ export const CARTERA: Record<string, string> = {
 
   // ── Optimizador de cartera ──
   "Portfolio optimizer · Markowitz": "Optimizador de cartera · Markowitz",
-  "Min-variance & max-Sharpe weights across your open names, with Ledoit-Wolf shrinkage and resampled uncertainty bands. A tool alongside the regime allocator — not a replacement.":
-    "Pesos de mínima varianza y de máximo Sharpe entre tus valores abiertos, con contracción de Ledoit-Wolf y bandas de incertidumbre remuestreadas. Una herramienta junto al asignador de régimen, no en su lugar.",
+  "Min-variance & max-Sharpe weights for the tickers you enter, with Ledoit-Wolf shrinkage and resampled uncertainty bands. A calculation, not a recommendation: it does not read your journal.":
+    "Pesos de mínima varianza y de máximo Sharpe para los tickers que escribas, con contracción de Ledoit-Wolf y bandas de incertidumbre remuestreadas. Es un cálculo, no una recomendación: no lee tu diario.",
   "Optimizing…": "Optimizando…",
   "✦ Optimize": "✦ Optimizar",
-  "Add at least 2 different open tickers to optimize.": "Añade al menos 2 tickers abiertos distintos para optimizar.",
+  "Enter at least 2 different tickers to optimize.": "Escribe al menos 2 tickers distintos para optimizar.",
+  "Tickers, e.g. AAPL, MSFT, NVDA": "Tickers, p. ej. AAPL, MSFT, NVDA",
+  "Tickers to optimize": "Tickers que optimizar",
+  "Up to {n} tickers.": "Hasta {n} tickers.",
   "Not enough price history to optimize these names.": "No hay historial de precios suficiente para optimizar estos valores.",
   "Optimization failed": "La optimización falló",
   "Equal wt (1/N)": "Igual peso (1/N)",

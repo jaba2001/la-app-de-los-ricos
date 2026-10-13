@@ -433,13 +433,21 @@ export const LIB2: Record<string, string> = {
   // ── lib/technicalIndicators.ts — confluencia técnica + fundamental ──
   "Bullish Div": "Div. alcista",
   "Bearish Div": "Div. bajista",
-  "No confluence yet — wait for a defined setup": "Aún no hay confluencia: espera a una configuración clara",
-  "✓ Entry confirmed — IC positive + 3/4 TL LONG": "✓ Entrada confirmada — IC positivo + 3/4 TL LARGO",
-  "✓ SHORT entry — IC AVOID + 3/4 TL SHORT": "✓ Entrada CORTA — IC EVITAR + 3/4 TL CORTO",
-  "⚡ CONFLICT — TL LONG but fundamentals AVOID": "⚡ CONFLICTO — TL LARGO pero fundamentales EVITAR",
-  "⚡ CONFLICT — TL SHORT but fundamentals BUY": "⚡ CONFLICTO — TL CORTO pero fundamentales COMPRAR",
-  "⏳ Waiting — strong fundamentals, awaiting TL LONG": "⏳ En espera — fundamentales fuertes, a la espera de TL LARGO",
-  "⏳ Waiting — weak fundamentals, TL SHORT building": "⏳ En espera — fundamentales débiles, TL CORTO formándose",
+  // Descriptivo, nunca una orden (plan único, pieza 1.2 e): cuántas de las 4 condiciones apuntan
+  // en cada sentido y si la lectura técnica coincide con el Scora score.
+  "{n}/4 up": "{n}/4 al alza",
+  "{n}/4 down": "{n}/4 a la baja",
+  "Fewer than 3 of the 4 conditions agree": "Menos de 3 de las 4 condiciones coinciden",
+  "Technical and fundamental readings agree: {n}/4 conditions up, Scora score {s}":
+    "La lectura técnica y la fundamental coinciden: {n}/4 condiciones al alza, Scora score {s}",
+  "Technical and fundamental readings agree: {n}/4 conditions down, Scora score {s}":
+    "La lectura técnica y la fundamental coinciden: {n}/4 condiciones a la baja, Scora score {s}",
+  "Readings disagree: {n}/4 conditions up, Scora score {s}":
+    "Las dos lecturas no coinciden: {n}/4 condiciones al alza, Scora score {s}",
+  "Readings disagree: {n}/4 conditions down, Scora score {s}":
+    "Las dos lecturas no coinciden: {n}/4 condiciones a la baja, Scora score {s}",
+  "High Scora score ({s}); {n}/4 conditions up": "Scora score alto ({s}); {n}/4 condiciones al alza",
+  "Low Scora score ({s}); {n}/4 conditions down": "Scora score bajo ({s}); {n}/4 condiciones a la baja",
 
   // ── lib/etf.ts — categorías (los nombres de los fondos son marcas y no se traducen) ──
   "US Large Blend": "EE. UU. gran capitalización mixta",
