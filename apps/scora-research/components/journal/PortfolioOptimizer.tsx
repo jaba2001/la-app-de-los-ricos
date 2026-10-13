@@ -3,12 +3,14 @@ import { useState } from "react";
 import { authedFetch } from "@/lib/proxy";
 import {
   covariance, ledoitWolf, minVariance, maxSharpe, longOnly, portfolioStats, equalWeights,
-  resampleWeights, type PortfolioStats,
+  resampleWeights, tickersDeTexto, MAX_TICKERS_OPTIMIZADOR, type PortfolioStats,
 } from "@/lib/optimize";
 import { t as tr } from "@/lib/i18n/cliente";
 import Trans from "@/components/Trans";
 
-interface Props { tickers: string[]; }
+// Sin props a propósito: los tickers los escribe el usuario y NUNCA salen de su diario. Unos pesos
+// «óptimos» sobre lo que uno tiene equivalen a «mantén esta, reduce aquella» (ESMA, §41 y §46),
+// así que ninguna columna se destaca como la buena. Plan único, pieza 1.2 (b).
 
 interface Band { mean: number[]; stdDev: number[] }
 
@@ -36,13 +38,15 @@ function dailyReturns(history: Record<string, unknown>[]): number[] {
 }
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-export default function PortfolioOptimizer({ tickers }: Props) {
+export default function PortfolioOptimizer() {
+  const [texto, setTexto] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const tickers = tickersDeTexto(texto);
 
   async function optimize() {
-    if (tickers.length < 2) { setError(tr("Add at least 2 different open tickers to optimize.")); return; }
+    if (tickers.length < 2) { setError(tr("Enter at least 2 different tickers to optimize.")); return; }
     setLoading(true); setError(""); setResult(null);
     try {
       const histories = await Promise.all(tickers.map(async (t) => {
@@ -106,12 +110,23 @@ export default function PortfolioOptimizer({ tickers }: Props) {
         <div>
           <div className="section-label" style={{ margin: 0 }}>{tr("Portfolio optimizer · Markowitz")}</div>
           <div className="sr-hint" style={{ maxWidth: 520, lineHeight: 1.5 }}>
-            {tr("Min-variance & max-Sharpe weights across your open names, with Ledoit-Wolf shrinkage and resampled uncertainty bands. A tool alongside the regime allocator — not a replacement.")}</div>
+            {tr("Min-variance & max-Sharpe weights for the tickers you enter, with Ledoit-Wolf shrinkage and resampled uncertainty bands. A calculation, not a recommendation: it does not read your journal.")}</div>
         </div>
         <button className="btn-primary" onClick={optimize} disabled={loading} style={{ flexShrink: 0, padding: "8px 14px", fontSize: "var(--sr-t-sm)" }}>
           {loading ? tr("Optimizing…") : tr("✦ Optimize")}
         </button>
       </div>
+
+      <input
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") optimize(); }}
+        placeholder={tr("Tickers, e.g. AAPL, MSFT, NVDA")}
+        aria-label={tr("Tickers to optimize")}
+        style={{ width: "100%", marginTop: "var(--sr-sp-2)", padding: "8px 10px", borderRadius: "var(--sr-radius)", border: "1px solid var(--sr-border)", background: "var(--sr-surface-2)", color: "var(--sr-text)", fontSize: "var(--sr-t-sm)" }}
+      />
+      <div className="sr-hint" style={{ marginTop: 4 }}>
+        {tr(`Up to ${MAX_TICKERS_OPTIMIZADOR} tickers.`)}{tickers.length > 0 && <> · <span className="num">{tickers.join(", ")}</span></>}</div>
 
       {error && <div style={{ marginTop: "var(--sr-sp-2)", padding: "var(--sr-sp-2) var(--sr-sp-3)", borderRadius: "var(--sr-radius)", background: "color-mix(in srgb, var(--sr-neg) 10%, transparent)", color: "var(--sr-neg)", fontSize: "var(--sr-t-xs)" }}>{error}</div>}
 
@@ -132,7 +147,7 @@ export default function PortfolioOptimizer({ tickers }: Props) {
                   <td style={{ textAlign: "right", color: "var(--sr-text-2)" }} className="num">
                     {pct(result.minVar[i])}{band(result.bandMinVar, i)}
                   </td>
-                  <td style={{ textAlign: "right", fontWeight: 700, color: "var(--sr-amber)" }} className="num">
+                  <td style={{ textAlign: "right", color: "var(--sr-text-2)" }} className="num">
                     {pct(result.maxSharpe[i])}{band(result.bandMaxSharpe, i)}
                   </td>
                 </tr>
@@ -155,7 +170,7 @@ export default function PortfolioOptimizer({ tickers }: Props) {
                 <td style={{ fontWeight: 600, color: "var(--sr-text-3)" }}>{tr(`Sharpe (rf ${pct(RF)})`)}</td>
                 <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{result.statsEqual.sharpe.toFixed(2)}</td>
                 <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{result.statsMinVar.sharpe.toFixed(2)}</td>
-                <td style={{ textAlign: "right", fontWeight: 700, color: "var(--sr-amber)" }} className="num">{result.statsMaxSharpe.sharpe.toFixed(2)}</td>
+                <td style={{ textAlign: "right", fontWeight: 700 }} className="num">{result.statsMaxSharpe.sharpe.toFixed(2)}</td>
               </tr>
             </tfoot>
           </table>

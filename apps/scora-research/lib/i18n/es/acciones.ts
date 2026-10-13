@@ -395,7 +395,14 @@ export const ACCIONES: Record<string, string> = {
   "TL Confluence™ Strategy": "Estrategia TL Confluence™",
   "EMA Alignment · ADX Strength · Squeeze Momentum · Volume Profile": "Alineación de EMAs · Fuerza ADX · Momentum de compresión · Perfil de volumen",
   "Enable Squeeze + ADX + VP for full TL Confluence signal computation.": "Activa Compresión + ADX + VP para calcular la señal TL Confluence completa.",
-  "Pass icScore prop to enable full IC gate validation.": "Pasa la propiedad icScore para activar la validación completa del filtro IC.",
+  "Without the Scora score, only the technical reading is shown.": "Sin el Scora score solo se muestra la lectura técnica.",
+  "Technical vs fundamental reading": "Lectura técnica frente a fundamental",
+  "Reference levels on the chart: a description, not a recommendation.":
+    "Niveles de referencia del gráfico: describen, no recomiendan.",
+  "EMA 55": "EMA 55",
+  "20-session low": "Mínimo de 20 sesiones",
+  "20-session high": "Máximo de 20 sesiones",
+  "POC (volume)": "POC (volumen)",
   "Sector Context": "Contexto sectorial",
   "Fed ~{x}%": "Fed ~{x}%",
 
@@ -590,6 +597,7 @@ export const ACCIONES: Record<string, string> = {
   "Sort by:": "Ordenar por:",
   "Columns:": "Columnas:",
   "↓ Export CSV": "↓ Exportar CSV",
+  "↓ Export tickers (CSV)": "↓ Exportar tickers (CSV)",
   "Watchlist is empty. Add tickers above.": "La lista de seguimiento está vacía. Añade tickers arriba.",
   "As of": "A fecha de",
   "analyzing…": "analizando…",

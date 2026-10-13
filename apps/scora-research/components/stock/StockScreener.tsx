@@ -17,6 +17,7 @@ import { Pill } from "@/components/ui/Pill";
 import { latestAnalyses } from "@/lib/latestAnalyses";
 import { classifyInstrument } from "@/lib/instrument";
 import { t as tr, tv } from "@/lib/i18n/cliente";
+import { EXPORTAR_METRICAS, csvDeTickers } from "@/lib/licencia";
 
 // Data Explorer — optional metric columns the user can toggle on/off over the watchlist
 // (TIKR-style). Every metric is already computed & stored in sl_analyses; no new fetch.
@@ -194,11 +195,16 @@ export default function StockScreener() {
     });
   }
 
-  // Export the full watchlist (all base + toggled metric columns) — the "Data Explorer" export.
+  // Export the watchlist. Sin licencia que cubra el canal CSV (lib/licencia.ts) sale SOLO la
+  // lista de tickers: los scores y las métricas son datos de FMP o derivados de ellos.
   function exportWatchlistCSV() {
     const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`; // RFC-4180 quote-escaping
     const cols = EXTRA_COLS.filter(c => extraCols.has(c.key));
-    track("export_csv", { scope: "watchlist", rows: sorted.length, columns: cols.length });
+    track("export_csv", { scope: "watchlist", rows: sorted.length, columns: EXPORTAR_METRICAS ? cols.length : 0 });
+    if (!EXPORTAR_METRICAS) {
+      descargarCSV(csvDeTickers(sorted.map(w => w.ticker)));
+      return;
+    }
     const header = ["Ticker", "Sector", "Base Score", ...cols.map(c => c.label), "Macro Tilt", "Scora Score", "Rating", "As Of"];
     const lines = [header.map(esc).join(",")];
     for (const w of sorted) {
@@ -217,7 +223,11 @@ export default function StockScreener() {
       ];
       lines.push(cells.map(esc).join(","));
     }
-    const blob = new Blob([lines.join("\n")], { type: "text/csv" });
+    descargarCSV(lines.join("\n"));
+  }
+
+  function descargarCSV(csv: string) {
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url; link.download = `scora_watchlist_${new Date().toISOString().slice(0, 10)}.csv`; link.click();
@@ -273,7 +283,7 @@ export default function StockScreener() {
             onClick={exportWatchlistCSV}
             style={{ marginLeft: "auto", background: "var(--sr-surface-2)", border: "1px solid var(--sr-border)", borderRadius: "var(--sr-radius)", color: "var(--sr-text-2)", fontSize: "var(--sr-t-xs)", padding: "5px 10px", cursor: "pointer" }}
           >
-            {tr("↓ Export CSV")}</button>
+            {EXPORTAR_METRICAS ? tr("↓ Export CSV") : tr("↓ Export tickers (CSV)")}</button>
         )}
       </div>
 

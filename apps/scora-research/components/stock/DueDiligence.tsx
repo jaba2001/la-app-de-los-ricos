@@ -8,6 +8,7 @@ import { checkAdvice } from "@/lib/grounding";
 import { kelly, MAX_POSITION } from "@/lib/kelly";
 import { fetchKbCards, selectCards, renderKb, fetchDocChunks, renderDocChunks, type KbCard, type KbDoc } from "@/lib/knowledge";
 import { Sk } from "@/components/ui/Skeleton";
+import { EtiquetaIA } from "@/components/ui/GroundedBadge";
 import { t, tv } from "@/lib/i18n/cliente";
 import Trans from "@/components/Trans";
 
@@ -114,8 +115,9 @@ export default function DueDiligence({ data, macro, scores, icScore, loading, ti
             {st.loading && <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>{[85, 70, 80].map((w, i) => <Sk key={i} w={`${w}%`} h={12} />)}</div>}
             {st.text && !st.loading && (
               <div style={{ marginTop: "var(--sr-sp-3)", borderTop: "1px solid var(--sr-border)", paddingTop: "var(--sr-sp-3)" }}>
-                {/* governance badge */}
+                {/* governance badge (con el aviso de IA del art. 50.1, pieza 1.2 d) */}
                 <div style={{ display: "flex", gap: "var(--sr-sp-2)", flexWrap: "wrap", marginBottom: "var(--sr-sp-2)" }}>
+                  <EtiquetaIA />
                   <span style={{ fontSize: "10px", fontWeight: 700, padding: "2px 8px", borderRadius: "var(--sr-radius-pill)", background: `color-mix(in srgb, ${st.violations.length === 0 ? "var(--sr-pos)" : "var(--sr-warn)"} 14%, transparent)`, color: st.violations.length === 0 ? "var(--sr-pos)" : "var(--sr-warn)" }}>
                     {st.violations.length === 0 ? t("✓ grounded") : t(`⚠ ${st.violations.length} unverified figure${st.violations.length > 1 ? "s" : ""}: ${st.violations.join(", ")}`)}
                   </span>

@@ -274,7 +274,11 @@ function requireArtifact(name, regenCmd) {
     ok(tl.longSignals >= 0 && tl.longSignals <= 4, `TL long signals 0-4 (${tl.longSignals})`);
     ok(tl.shortSignals >= 0 && tl.shortSignals <= 4, `TL short signals 0-4 (${tl.shortSignals})`);
     ok(typeof tl.bias === "string" && tl.bias.length > 0, "TL bias is a label");
-    ok(tl.stopLong < tl.tp1Long || tl.riskLong === 0, "TL: long stop below TP1");
+    // Pieza 1.2 del plan único: la etiqueta describe (cuántas de las 4 condiciones apuntan en
+    // cada sentido) y en vez de stops y objetivos hay niveles de referencia.
+    ok(/^[0-4]\/4 (up|down)$|^Mixed$/.test(tl.bias), `TL: etiqueta descriptiva, sin LONG/SHORT (${tl.bias})`);
+    ok(!("stopLong" in tl) && !("tp1Long" in tl) && !("stopShort" in tl) && !("tp1Short" in tl), "TL: sin stops ni objetivos");
+    ok(tl.levels && tl.levels.low20 <= tl.levels.high20, "TL: niveles — el mínimo de 20 sesiones no supera al máximo");
   }
 }
 

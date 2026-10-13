@@ -394,3 +394,22 @@ export function covariance(series: number[][]): Matrix {
   }
   return cov;
 }
+
+/**
+ * Los tickers que el usuario escribe para el optimizador («aapl, msft  NVDA»): separados por
+ * comas, puntos y coma o espacios, en mayúsculas, sin repetir y con la misma regla de símbolo
+ * que el servidor (`lib/server/providers/fmp.js`). Lo inválido se descarta.
+ *
+ * El optimizador ya no se rellena con las posiciones del diario: unos pesos «óptimos» sobre lo
+ * que uno tiene equivalen a «mantén esta, reduce aquella» (guía de ESMA de 2023, §41 y §46).
+ * Plan único, pieza 1.2 (b). El tope existe porque cada ticker es una llamada a FMP.
+ */
+export const MAX_TICKERS_OPTIMIZADOR = 12;
+export function tickersDeTexto(texto: string, max = MAX_TICKERS_OPTIMIZADOR): string[] {
+  const vistos = new Set<string>();
+  for (const parte of texto.toUpperCase().split(/[\s,;]+/)) {
+    if (/^[A-Z0-9.\-]{1,15}$/.test(parte)) vistos.add(parte);
+    if (vistos.size >= max) break;
+  }
+  return [...vistos];
+}

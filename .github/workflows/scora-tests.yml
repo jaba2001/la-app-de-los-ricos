@@ -79,6 +79,10 @@ jobs:
       # Un texto nuevo sin traducir rompe aquí, en vez de salir en inglés en mitad de la app.
       - name: Idiomas (inglés / español)
         run: node --experimental-strip-types --no-warnings scripts/i18n.test.mjs
+      # Higiene legal antes de la beta: el asistente fuera del diario, el optimizador sin las
+      # posiciones, el CSV sin datos de terceros, el aviso de IA y ningún texto de recomendación.
+      - name: Higiene legal (asesoramiento, licencia de datos y aviso de IA)
+        run: node --experimental-strip-types --no-warnings scripts/higiene_legal.test.mjs
       - name: Roadmap (F3+F4+F5)
         run: node --experimental-strip-types --no-warnings scripts/roadmap.test.mjs
       # ── LA CAPA DE DATOS ──────────────────────────────────────────────────────────────
