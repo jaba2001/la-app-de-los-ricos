@@ -69,7 +69,15 @@ export const COMUN: Record<string, string> = {
   "Check your email": "Revisa tu correo",
   "We sent a magic link to <s1>{x}</s1>": "Hemos enviado un enlace de acceso a <s1>{x}</s1>",
   "Use a different email": "Usar otro correo",
-  "No password needed — secure magic link authentication": "Sin contraseña: acceso seguro con enlace mágico",
+  "No password needed — sign in with Google or with a link sent to your email": "Sin contraseña: entra con Google o con un enlace que te llega al correo",
+  "Continue with Google": "Continuar con Google",
+  "Opening Google…": "Abriendo Google…",
+  "or with your email": "o con tu correo",
+  "Your browser blocked the Google window. Allow pop-ups for this site and try again.": "El navegador ha bloqueado la ventana de Google. Permite las ventanas emergentes en esta web y vuelve a intentarlo.",
+  "Google sign-in isn't enabled yet. Use the email link below for now.": "El acceso con Google aún no está activado. De momento, usa el enlace por correo de abajo.",
+  "This site isn't authorized for Google sign-in yet. Use the email link below for now.": "Esta web aún no está autorizada para entrar con Google. De momento, usa el enlace por correo de abajo.",
+  "This email already has an account. Sign in once with the email link below.": "Este correo ya tiene una cuenta. Entra una vez con el enlace por correo de abajo.",
+  "Couldn't reach Google. Check your connection and try again.": "No se pudo conectar con Google. Revisa la conexión y vuelve a intentarlo.",
 
   // Vuelta del enlace de acceso
   "This link is invalid or has already been used.": "Este enlace no es válido o ya se ha usado.",

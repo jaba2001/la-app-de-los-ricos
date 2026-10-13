@@ -17,6 +17,12 @@ const SENTRY_INGEST = "https://*.ingest.sentry.io https://*.ingest.de.sentry.io"
 // el navegador corta la peticion y Firebase lo reporta como "network-request-failed",
 // que no dice nada de CSP — nadie podia entrar en ningun entorno.
 const IDENTITY = "https://identitytoolkit.googleapis.com https://securetoken.googleapis.com";
+// «Continuar con Google» (signInWithPopup) carga el cargador de Google (apis.google.com) y un
+// iframe del dominio de autenticación de Firebase, que hace de puente con la ventana emergente.
+// Sin ellos la CSP los corta y el SDK solo dice "auth/internal-error". El dominio llega en el
+// build (NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN, ver Dockerfile).
+const GOOGLE_SCRIPTS = "https://apis.google.com";
+const AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? `https://${process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}` : "";
 
 // La sesion vive en el navegador, asi que cualquier XSS es un secuestro de cuenta
 // completo — la CSP es la mitigacion que faltaba entera (solo se servia HSTS).
@@ -27,13 +33,14 @@ const IDENTITY = "https://identitytoolkit.googleapis.com https://securetoken.goo
 // static optimisation — worth doing if the app ever renders third-party content.
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline'",
+  `script-src 'self' 'unsafe-inline' ${GOOGLE_SCRIPTS}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   // Supabase salio del proyecto en la migracion a Google Cloud; sus origenes estaban
   // aqui de resto y se quitan.
   `connect-src 'self' ${IDENTITY} ${PROXY} ${POSTHOG} ${SENTRY_INGEST}`,
+  `frame-src 'self' ${AUTH_DOMAIN}`,  // el puente de la ventana de Google
   "worker-src 'self'",       // PWA service worker
   "manifest-src 'self'",
   "frame-ancestors 'none'",  // clickjacking — the app was embeddable
