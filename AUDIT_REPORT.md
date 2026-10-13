@@ -494,7 +494,7 @@ ficha (en modo degradado), watchlist y diario de punta a punta.
 Jorge veía en muchas fichas «⚠ 14 data sources unavailable». 14 es el máximo del contador: TODAS
 las fuentes a la vez, también Finnhub y el respaldo de Yahoo. No era FMP (sin cuota salen 8).
 
-**🔴 Causa: la sesión no se puede renovar (D-11, pendiente de Jorge).** La clave web de Firebase
+**✅ (resuelto el 13-10, ver D-11) Causa: la sesión no se puede renovar.** La clave web de Firebase
 `scora-web` (creada a mano el 25-09, fuera de Terraform) solo permite `identitytoolkit`, el login.
 El token de sesión dura una hora y el SDK lo renueva contra `securetoken`, que esa clave bloquea
 (`403 API_KEY_SERVICE_BLOCKED`, comprobado contra la clave que sirve producción). A la hora de
@@ -531,9 +531,12 @@ desplegar. Sin él, ninguna prueba con sesión de más de una hora es fiable.
   mínimos para que la app deje de conectar como `postgres`? Es un cambio de roles en la base.
 
 **Producción e infraestructura**
-- **D-11 · 🔴 Renovación de sesión bloqueada.** La clave web `scora-web` no permite
-  `securetoken.googleapis.com`: toda sesión se rompe a la hora («14 data sources unavailable»).
-  Hay que añadir esa API a la clave. Ver «Segundo recorrido».
+- **D-11 · ✅ Renovación de sesión bloqueada — RESUELTO el 13-10-2026.** La clave web `Scora web`
+  no permitía `securetoken.googleapis.com` y toda sesión se rompía a la hora («14 data sources
+  unavailable»). Con el OK de Jorge se añadió esa API a la clave (ahora: identitytoolkit +
+  securetoken, nada más). Comprobado antes y después contra la clave que sirve producción: antes
+  403 `API_KEY_SERVICE_BLOCKED`; después, la sesión real de pruebas se renueva (token nuevo, 3600 s).
+  No necesitó despliegue. Sigue fuera de Terraform (creada a mano el 25-09).
 - **D-10 · Cuota de FMP.** La clave de producción es la misma que usan las pruebas y el plan tiene
   límite diario (agotado el 12-10-2026). ¿Subir de plan, o una clave aparte para pruebas?
 - **D-2 · Configuración del servicio (A-1, A-2, A-3).** Al 12-10 Cloud Run ya tiene
