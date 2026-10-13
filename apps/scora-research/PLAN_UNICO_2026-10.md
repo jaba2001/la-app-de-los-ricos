@@ -265,7 +265,7 @@ Sin código. Ninguna PR de la fase 1 espera a estas tareas, pero varias funcione
 
 | # | Qué | Quién | Por qué ahora |
 |---|---|---|---|
-| **0.1** | **Parar los crons de los repos viejos:** desactivar los 12 workflows de `alealvarado804-cmyk/scora-research` (`gh workflow disable`, reversible), quitar los 8 crons del Vercel `ic-proxy` y pausar el Vercel `scora-research` | Alejandro (Claude lo hace con su visto bueno) | Escriben en Supabase cada día laborable y gastan cuota de FMP si comparten clave. El de Picks decide en paralelo |
+| **0.1** | **Parar los crons de los repos viejos.** ✅ **Hecho:** los 12 workflows de `alealvarado804-cmyk/scora-research`, desactivados el 13-10 a las 19:37 UTC (`gh workflow disable`, reversible). **Falta:** desactivar los 8 crons del Vercel `ic-proxy` desde su panel (*Settings → Cron Jobs*). No se pausa el proyecto entero: su URL de producción es pública y la usa la web vieja. El Vercel `scora-research` ya no se redespliega, porque ningún bot hace commits; pausarlo es una decisión aparte | Alejandro (los workflows los desactivó Claude con su visto bueno) | Escribían en Supabase cada día laborable y gastan cuota de FMP si comparten clave. El de Picks decidía en paralelo |
 | **0.2** | **La recopia, sin lanzarla a ciegas** (detalle debajo) | Jorge | Integridad del registro vivo de Picks |
 | **0.3** | **D-11:** permitir `securetoken.googleapis.com` en la clave web `scora-web` | Jorge | Sin esto ninguna prueba con sesión es fiable |
 | **0.4** | **D-10:** una clave de FMP aparte para las pruebas, o subir de plan | Jorge + Alejandro | La cuota se agotó el 12-10 con las pruebas |
@@ -295,7 +295,8 @@ Supabase recibió después del 12-10. No conviene lanzarla sin más, por tres he
      abierta del mismo ticker), la copia entera falla.
 
 **Lo que se propone:**
-- parar primero los crons viejos (0.1);
+- parar primero los crons viejos (0.1). Los workflows de GitHub ya no escriben en Supabase desde las
+  19:37 UTC del 13-10; los crons de Vercel siguen haciéndolo hasta que se desactiven;
 - comparar por **clave natural** (las fechas) qué falta de verdad en Cloud SQL, y copiar solo eso;
 - **no tocar las tablas de Picks** sin una decisión expresa de Alejandro y Jorge;
 - verificar que existe la fila de cada fecha de decisión desde C-5. **Las fechas que falten no se
