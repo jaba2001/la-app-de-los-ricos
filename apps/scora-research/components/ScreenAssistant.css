@@ -1,6 +1,6 @@
-/* El asistente de pantalla (components/ScreenAssistant.tsx). En hoja aparte y no en estilos
-   en línea porque necesita lo que el atributo style no da: media queries (en el móvil el
-   panel ocupa toda la pantalla), :hover/:focus y una animación. */
+/* El guía de Scora (components/ScreenAssistant.tsx). En hoja aparte y no en estilos en línea
+   porque necesita lo que el atributo style no da: reglas sobre <html>/<body> para que la página
+   deje sitio al panel, :hover/:focus y animaciones. */
 
 .sr-asis-lanzador {
   position: fixed;
@@ -27,21 +27,83 @@
 .sr-asis-lanzador:focus-visible { outline: 2px solid var(--sr-brand); outline-offset: 3px; }
 
 /* Por encima del aviso de cookies (z-index 1000): el usuario lo ha abierto a propósito. */
+/* Una superficie propia, gris, con la conversación en una tarjeta blanca: se lee como algo
+   aparte de la página, igual que el panel de Claude en el navegador. */
 .sr-asis-panel {
   position: fixed;
-  top: var(--sr-nav-h);
-  right: 0;
-  bottom: 0;
   z-index: 1001;
   display: flex;
   flex-direction: column;
-  width: 400px;
-  max-width: 100vw;
-  background: var(--sr-surface);
+  background: var(--sr-surface-2);
+}
+/* Una columna a la derecha, de arriba abajo, junto a la página (no encima ni debajo de ella). */
+.sr-asis-panel.sr-asis-lateral {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--sr-asis-ancho, 420px);
   border-left: 1px solid var(--sr-border);
-  box-shadow: var(--sr-shadow-lg);
   animation: sr-asis-entrar 0.18s ease-out;
 }
+.sr-asis-cuerpo {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px 10px;
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius-lg);
+  overflow: hidden;
+}
+.sr-asis-inferior .sr-asis-cuerpo { margin: 0 8px 8px; }
+/* Abajo, con la página encima: tabletas y móviles. */
+.sr-asis-panel.sr-asis-inferior {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--sr-asis-alto, 50dvh);
+  border-top: 1px solid var(--sr-border);
+  border-radius: var(--sr-radius-xl) var(--sr-radius-xl) 0 0;
+  box-shadow: 0 -8px 28px rgba(14, 26, 43, 0.12);
+  animation: sr-asis-subir 0.2s ease-out;
+}
+@keyframes sr-asis-subir { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ── La página deja sitio al panel: nunca queda nada tapado ── */
+html.sr-asis-lateral body { margin-right: var(--sr-asis-ancho); }
+/* La barra es fija y de lado a lado (estilo en línea en Nav.tsx): acaba donde empieza el panel. */
+html.sr-asis-lateral .nav-header { right: var(--sr-asis-ancho) !important; }
+/* Y enseña lo que le cabe al lado del panel: el resto pasa a su menú ☰ (lo mide y lo marca
+   ajustarBarra en ScreenAssistant.tsx, en vivo mientras se cambia el ancho del panel). */
+html.sr-asis-lateral .nav-header [data-sr-oculto] { display: none !important; }
+html.sr-asis-nav-menu .nav-menu-btn { display: inline-flex; }
+/* Abajo: margen al final para poder desplazar la página entera por encima de la hoja. */
+html.sr-asis-inferior body { padding-bottom: var(--sr-asis-alto); }
+
+/* ── Tirador para cambiar el tamaño ── */
+.sr-asis-tirador { position: absolute; z-index: 2; touch-action: none; }
+/* 14 px de zona para agarrar (la línea visible es de 2): con menos, se fallaba y se seleccionaba texto. */
+.sr-asis-lateral .sr-asis-tirador { top: 0; bottom: 0; left: -7px; width: 14px; cursor: ew-resize; }
+.sr-asis-lateral .sr-asis-tirador::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 6px; width: 2px;
+  background: transparent; transition: background 0.15s;
+}
+.sr-asis-lateral .sr-asis-tirador:hover::after,
+.sr-asis-lateral .sr-asis-tirador:focus-visible::after,
+html.sr-asis-arrastrando .sr-asis-lateral .sr-asis-tirador::after { background: var(--sr-brand); }
+.sr-asis-inferior .sr-asis-tirador { top: 0; left: 0; right: 0; height: 22px; cursor: ns-resize; }
+.sr-asis-inferior .sr-asis-tirador::after {
+  content: ""; position: absolute; top: 8px; left: 50%; width: 40px; height: 4px; margin-left: -20px;
+  border-radius: 2px; background: var(--sr-border-2);
+}
+.sr-asis-tirador:focus-visible { outline: none; }
+.sr-asis-inferior .sr-asis-tirador:focus-visible::after { background: var(--sr-brand); }
+/* Mientras se arrastra: sin seleccionar texto por el camino y con el cursor del tirador. */
+html.sr-asis-arrastrando, html.sr-asis-arrastrando * { user-select: none !important; }
+html.sr-asis-arrastrando.sr-asis-lateral * { cursor: ew-resize !important; }
+html.sr-asis-arrastrando.sr-asis-inferior * { cursor: ns-resize !important; }
+
 @keyframes sr-asis-entrar { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 
 .sr-asis-cabecera {
@@ -49,9 +111,11 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--sr-sp-3);
-  padding: var(--sr-sp-4);
-  border-bottom: 1px solid var(--sr-border);
+  padding: 14px var(--sr-sp-4) 10px;
 }
+.sr-asis-inferior .sr-asis-cabecera { padding-top: 22px; padding-bottom: 8px; }
+/* En la hoja de abajo cada línea cuenta: el subtítulo sobra. */
+.sr-asis-inferior .sr-asis-sub { display: none; }
 .sr-asis-titulo { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: var(--sr-t-md); color: var(--sr-text); }
 .sr-asis-titulo svg { color: var(--sr-brand); }
 .sr-asis-sub { margin-top: 2px; font-size: var(--sr-t-sm); color: var(--sr-text-3); }
@@ -121,25 +185,12 @@
 }
 .sr-asis-ruta { margin-top: 3px; text-align: right; font-size: var(--sr-t-xs); color: var(--sr-text-3); overflow-wrap: anywhere; }
 
-.sr-asis-respuesta { font-size: var(--sr-t-base); line-height: 1.55; color: var(--sr-text); overflow-wrap: anywhere; }
+/* Algo más grande que el resto de la interfaz: es texto para leer de corrido. */
+.sr-asis-respuesta { font-size: 15px; line-height: 1.6; color: var(--sr-text); overflow-wrap: anywhere; }
 .sr-asis-rico p { margin: 0 0 var(--sr-sp-2); }
 .sr-asis-rico ul, .sr-asis-rico ol { margin: 0 0 var(--sr-sp-2); padding-left: 20px; }
 .sr-asis-rico li { margin-bottom: 3px; }
 .sr-asis-rico code { padding: 1px 4px; border-radius: 4px; background: var(--sr-surface-3); font-size: 0.92em; }
-/* Una cita de la página: subrayado de puntos y un fondo dorado suave, el mismo color con el
-   que luego se resalta en la página. En línea (no inline-block) para que corte como el texto. */
-.sr-asis-cita {
-  padding: 0 2px;
-  border-radius: 3px;
-  background: rgba(212, 160, 23, 0.16);
-  text-decoration: underline dotted rgba(138, 90, 0, 0.7);
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-.sr-asis-cita:hover { background: rgba(212, 160, 23, 0.32); }
-.sr-asis-cita:focus-visible { outline: 2px solid var(--sr-brand); outline-offset: 1px; }
-.sr-asis-cita-nota { margin-left: 4px; font-size: var(--sr-t-xs); color: var(--sr-text-3); }
-
 .sr-asis-error { margin: var(--sr-sp-2) 0; color: var(--sr-warn); font-size: var(--sr-t-sm); }
 .sr-asis-error a { color: var(--sr-brand); font-weight: 600; }
 
@@ -212,34 +263,11 @@
 .sr-asis-enviar:disabled { background: var(--sr-surface-3); color: var(--sr-text-3); cursor: default; }
 .sr-asis-aviso { margin: 6px 0 0; font-size: var(--sr-t-xs); color: var(--sr-text-3); text-align: center; }
 
-/* ── Lo resaltado en la PÁGINA (lib/resaltar.ts) ── */
-/* El texto citado lo pinta la CSS Custom Highlight API. Su regla, ::highlight(sr-asis), la
-   inyecta lib/resaltar.ts: el parser de CSS de Turbopack no la entiende y tumba la hoja entera. */
-.sr-asis-capa { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 899; pointer-events: none; }
-.sr-asis-marca { position: absolute; border-radius: 4px; pointer-events: none; }
-/* Un destello que se apaga solo, para que el ojo encuentre la marca tras el desplazamiento. */
-.sr-asis-marca-destello { animation: sr-asis-destello 1.8s ease-out forwards; }
-@keyframes sr-asis-destello {
-  0%   { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.9); opacity: 1; }
-  60%  { box-shadow: 0 0 0 12px rgba(212, 160, 23, 0); opacity: 1; }
-  100% { box-shadow: 0 0 0 12px rgba(212, 160, 23, 0); opacity: 0; }
-}
-/* Sin Highlight API: el recuadro es la marca y se queda hasta limpiar. */
-.sr-asis-marca-fija { background: rgba(212, 160, 23, 0.35); }
-.sr-asis-marca-grafico { outline: 3px solid #D4A017; outline-offset: 4px; border-radius: 8px; animation: sr-asis-destello 1.8s ease-out; }
-
-/* Con sitio de sobra, el panel no tapa la página: la estrecha, como un panel lateral del
-   navegador. La barra es fija y no se mueve; el panel empieza debajo de ella. */
-@media (min-width: 1024px) {
-  html.sr-asis-abierto body { margin-right: 400px; }
-}
-
-/* Móvil: el panel ocupa la pantalla entera (encima de la barra) y el botón es solo el icono. */
+/* Móvil: el botón es solo el icono. */
 @media (max-width: 640px) {
   .sr-asis-lanzador { right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 48px; height: 48px; padding: 0; justify-content: center; }
   .sr-asis-lanzador-txt { display: none; }
   .sr-asis-lanzador svg { width: 20px; height: 20px; }
-  .sr-asis-panel { top: 0; width: 100vw; border-left: none; }
 }
 
 @media print {
@@ -247,7 +275,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sr-asis-panel, .sr-asis-leyendo span, .sr-asis-marca-grafico { animation: none; }
-  .sr-asis-marca-destello { display: none; }
+  .sr-asis-panel.sr-asis-lateral, .sr-asis-panel.sr-asis-inferior, .sr-asis-leyendo span { animation: none; }
   .sr-asis-lanzador { transition: none; }
 }

@@ -19,6 +19,7 @@ import type { MacroState, Scores, StockAnalysis, ReverseDCFSnapshot, FinvizData 
 import dynamic from "next/dynamic";
 import { Sk } from "@/components/ui/Skeleton";
 import DataError, { NO_SE_PUDO_GUARDAR } from "@/components/ui/DataError";
+import OverflowTabs from "@/components/OverflowTabs";
 import { classifyInstrument } from "@/lib/instrument";
 import { t as tr, tv } from "@/lib/i18n/cliente";
 
@@ -1063,29 +1064,26 @@ const TOTAL_SOURCES = 28; // las llamadas con track() del análisis; si se añad
           </div>
         )}
 
-        {/* Sub-tabs */}
-        <div style={{ padding: "0 var(--sr-sp-6)", display: "flex", gap: "var(--sr-sp-1)", height: "var(--sr-subnav-h)", alignItems: "center", overflowX: "auto" }}>
-          {visibleTabs.map(t => (
+        {/* Sub-tabs: las que no caben van a «More ▾» (components/OverflowTabs). */}
+        <OverflowTabs
+          style={{ padding: "0 var(--sr-sp-6)", gap: "var(--sr-sp-1)", height: "var(--sr-subnav-h)" }}
+          tabs={visibleTabs.map((t) => ({ id: t.id, label: tv(t.label) }))}
+          active={activeTab}
+          onSelect={(id) => { setActiveTab(id); track("tab_opened", { page: "stock", tab: id }); }}
+          trailing={
+            /* Beginner recorta la superficie, no cambia un solo número: el motor es el
+               mismo y las mismas entradas dan la misma llamada en los dos modos. */
             <button
-              key={t.id}
-              className={`subtab ${activeTab === t.id ? "active" : ""}`}
-              onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "stock", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
+              type="button"
+              className="subtab"
+              onClick={() => { const next = mode === "pro" ? "beginner" : "pro"; setMode(next); track("tab_opened", { page: "stock", tab: `mode:${next}` }); }}
+              title={mode === "pro" ? tr(`Show only the ${BEGINNER_TABS.length} essential tabs`) : tr("Show all tabs")}
+              style={{ flexShrink: 0, color: "var(--sr-text-3)" }}
             >
-              {tv(t.label)}
+              {mode === "pro" ? tr("Beginner view") : tr(`Pro view (${TABS.length} tabs)`)}
             </button>
-          ))}
-          {/* Beginner recorta la superficie, no cambia un solo número: el motor es el
-              mismo y las mismas entradas dan la misma llamada en los dos modos. */}
-          <button
-            type="button"
-            className="subtab"
-            onClick={() => { const next = mode === "pro" ? "beginner" : "pro"; setMode(next); track("tab_opened", { page: "stock", tab: `mode:${next}` }); }}
-            title={mode === "pro" ? tr(`Show only the ${BEGINNER_TABS.length} essential tabs`) : tr("Show all tabs")}
-            style={{ marginLeft: "auto", flexShrink: 0, color: "var(--sr-text-3)" }}
-          >
-            {mode === "pro" ? tr("Beginner view") : tr(`Pro view (${TABS.length} tabs)`)}
-          </button>
-        </div>
+          }
+        />
       </div>
 
       {/* Content */}

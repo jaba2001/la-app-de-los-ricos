@@ -377,17 +377,11 @@ async function aPng(el: Element): Promise<string | null> {
   }
 }
 
-// Los gráficos de la última foto, en el orden en que se numeraron («Chart 1», «Chart 2»…). Para
-// que lib/resaltar.ts encuentre el gráfico que cita el modelo: es el mismo que él vio.
-let ultimosGraficos: Element[] = [];
-export const graficosCapturados = () => ultimosGraficos;
-
 /** La foto completa de la página. `seleccion` la guarda el panel (al hacer clic en él se pierde). */
 export async function capturarPantalla(seleccion = ""): Promise<Captura> {
   const lector = new Lector();
   lector.leer(document.body);
   lector.cortar();
-  ultimosGraficos = lector.graficos.map((g) => g.el);
 
   // Imagen para los gráficos que más se ven, hasta MAX_GRAFICOS.
   const elegidos = lector.graficos.filter((g) => g.zona === "visible" && g.area > 0)

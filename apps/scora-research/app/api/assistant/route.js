@@ -5,7 +5,8 @@ import { corsHeaders, preflight } from '../../../lib/server/cors.js';
 import { checkDailyQuota } from '../../../lib/server/quota.js';
 import { isPro } from '../../../lib/server/entitlements.js';
 import { registrarAuditoria } from '../../../lib/server/auditoriaIA.js';
-import { leerPeticion, modeloAsistente, parametrosClaude, tickerDeRuta } from '../../../lib/server/asistente.js';
+import { sbFetch } from '../../../lib/server/data/postgrest.js';
+import { leerPeticion, modeloAsistente, parametrosClaude, tickerDeRuta, tarjetasParaRuta } from '../../../lib/server/asistente.js';
 
 // El asistente de pantalla (components/ScreenAssistant.tsx). Lo que se valida y lo que se
 // manda a Claude está en lib/server/asistente.js; aquí solo el orden de las comprobaciones,
@@ -28,6 +29,24 @@ export const dynamic = 'force-dynamic';
 const MAX_BODY_BYTES = 3 * 1024 * 1024;
 
 const MENSAJE_FALLO = 'The assistant could not answer. Please try again.';
+
+// Las tarjetas de conocimiento de Scora (kb_cards): una docena de filas que cambian a mano, así
+// que se leen como mucho cada 10 minutos por instancia. Si la base falla, el guía responde sin
+// ellas —con su conocimiento general y la página— en vez de no responder.
+const TARJETAS_TTL = 10 * 60_000;
+let _tarjetas = { hasta: 0, filas: [] };
+async function tarjetasDeScora() {
+  if (Date.now() < _tarjetas.hasta) return _tarjetas.filas;
+  try {
+    const r = await sbFetch('kb_cards?select=topic,claim,source,tags,weight');
+    const filas = r.ok ? await r.json() : null;
+    if (Array.isArray(filas)) _tarjetas = { hasta: Date.now() + TARJETAS_TTL, filas };
+    else console.error('assistant: kb_cards no disponible', r.status);
+  } catch (e) {
+    console.error('assistant: kb_cards', e?.message || e);
+  }
+  return _tarjetas.filas;
+}
 
 /** Un mensaje para el usuario sin detalles internos; el detalle va al log. */
 function mensajeDeError(e) {
@@ -66,8 +85,9 @@ export async function POST(request) {
   const q = await checkDailyQuota(user.id, pro, request);
   if (q.limited) return q.limited;
 
+  const tarjetas = tarjetasParaRuta(await tarjetasDeScora(), peticion.pagina.path);
   const cliente = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
-  const params = parametrosClaude(modelo, peticion);
+  const params = parametrosClaude(modelo, peticion, tarjetas);
   // Si el usuario cierra el panel o la pestaña, se corta también la llamada a Anthropic: lo que
   // ya no va a leer nadie no hay por qué seguir pagándolo.
   const stream = cliente.beta.messages.stream(params, { signal: request.signal });
@@ -91,8 +111,8 @@ export async function POST(request) {
           const { pagina, mensajes } = peticion;
           const pregunta = mensajes[mensajes.length - 1].content;
           // El grounding se comprueba contra lo que el modelo tenía delante: la página, la
-          // selección y la propia pregunta (si el usuario escribe «¿y si fuera un 5 %?», ese 5
-          // no es inventado). Mismo registro de auditoría que el resto de la IA de la app.
+          // selección, las tarjetas de Scora y la propia pregunta (si el usuario escribe «¿y si
+          // fuera un 5 %?», ese 5 no es inventado). Mismo registro que el resto de la IA.
           const auditoria = await registrarAuditoria({
             userId: user.id,
             model: final.model,
@@ -103,7 +123,7 @@ export async function POST(request) {
               module: 'screen-assistant',
               ticker: tickerDeRuta(pagina.path),
               sources: [pagina.path],
-              dataBlock: [pagina.texto, pagina.seleccion, pregunta].filter(Boolean).join('\n'),
+              dataBlock: [pagina.texto, pagina.seleccion, ...tarjetas.map((c) => c.claim), pregunta].filter(Boolean).join('\n'),
             },
           });
           enviar({

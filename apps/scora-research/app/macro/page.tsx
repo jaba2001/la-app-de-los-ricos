@@ -12,6 +12,7 @@ import WelcomeBanner from "@/components/WelcomeBanner";
 import RegimeAlert from "@/components/RegimeAlert";
 import PushToggle from "@/components/PushToggle";
 import MacroBrief from "@/components/macro/MacroBrief";
+import OverflowTabs from "@/components/OverflowTabs";
 import { etiquetaRegimen, etiquetaCuadrante } from "@/lib/regimen";
 import { t as tr, tv, fechaHora } from "@/lib/i18n/cliente";
 
@@ -85,32 +86,24 @@ export default function MacroPage() {
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      {/* Sub-nav */}
-      <div style={{
-        position: "sticky",
-        top: "var(--sr-nav-h)",
-        zIndex: 50,
-        background: "color-mix(in srgb, var(--sr-bg) 95%, transparent)",
-        backdropFilter: "blur(8px)",
-        borderBottom: "1px solid var(--sr-border)",
-        padding: "0 var(--sr-sp-6)",
-        display: "flex",
-        alignItems: "center",
-        gap: "var(--sr-sp-1)",
-        height: "var(--sr-subnav-h)",
-        overflowX: "auto",
-      }}>
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            className={`subtab ${activeTab === t.id ? "active" : ""}`}
-            onClick={(e) => { setActiveTab(t.id); track("tab_opened", { page: "macro", tab: t.id }); e.currentTarget.scrollIntoView({ inline: "nearest", block: "nearest" }); }}
-          >
-            {tv(t.label)}
-          </button>
-        ))}
-        {hasLoaded && (
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "var(--sr-sp-3)", flexShrink: 0 }}>
+      {/* Sub-nav: las pestañas que no caben van a «More ▾» (components/OverflowTabs). */}
+      <OverflowTabs
+        style={{
+          position: "sticky",
+          top: "var(--sr-nav-h)",
+          zIndex: 50,
+          background: "color-mix(in srgb, var(--sr-bg) 95%, transparent)",
+          backdropFilter: "blur(8px)",
+          borderBottom: "1px solid var(--sr-border)",
+          padding: "0 var(--sr-sp-6)",
+          gap: "var(--sr-sp-1)",
+          height: "var(--sr-subnav-h)",
+        }}
+        tabs={TABS.map((t) => ({ id: t.id, label: tv(t.label) }))}
+        active={activeTab}
+        onSelect={(id) => { setActiveTab(id); track("tab_opened", { page: "macro", tab: id }); }}
+        trailing={hasLoaded ? (
+          <>
             {macro?.snapshot_date && (
               <span className="sr-hint">
                 {tr(`Snapshot: ${macro.snapshot_date}`)}
@@ -129,9 +122,9 @@ export default function MacroPage() {
             >
               {loading ? "…" : tr("↻ Refresh")}
             </button>
-          </div>
-        )}
-      </div>
+          </>
+        ) : null}
+      />
 
       {/* Content */}
       <div style={{ padding: "var(--sr-sp-6)", maxWidth: 1200, margin: "0 auto" }}>

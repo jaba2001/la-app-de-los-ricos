@@ -13,6 +13,8 @@ export const COMUN: Record<string, string> = {
   "Audit": "Auditoría",
   "Account": "Cuenta",
   "Sign out": "Cerrar sesión",
+  // Pestañas que no caben (components/OverflowTabs)
+  "More": "Más",
   "Open menu": "Abrir menú",
   "Close menu": "Cerrar menú",
   "Search ticker or company…": "Buscar ticker o empresa…",
